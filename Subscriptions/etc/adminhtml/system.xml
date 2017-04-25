@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="tnw_subscriptions" translate="label" sortOrder="360">
+            <label>TNW Subscriptions</label>
+        </tab>
+
+        <section id="tnw_subscriptions_general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <class>separator-top</class>
+            <label>General</label>
+            <tab>tnw_subscriptions</tab>
+
+            <resource>TNW_Subscriptions::config_general</resource>
+
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>General</label>
+                <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Extension Version</label>
+                    <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Version</frontend_model>
+                </field>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1">
+                    <label>Enable Subscriptions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="debug" translate="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Debug and Logging</label>
+                <field id="log_status" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1">
+                    <label>Enable Log</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Location is {{base_dir}}/var/log/tnw_subscriptions.log</comment>
+                </field>
+            </group>
+        </section>
+
+        <section id="tnw_subscriptions_product" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Product</label>
+            <tab>tnw_subscriptions</tab>
+
+            <resource>TNW_Subscriptions::config_product</resource>
+
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>General</label>
+                <field id="purchase_type" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Purchase Type</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\PurchaseType</source_model>
+                </field>
+                <field id="start_date_type" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Start Date</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
+                </field>
+                <field id="lock_product_price_status" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Lock Product Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+
+            <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Discount</label>
+                <field id="offer_flat_discount_status" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1">
+                    <label>Offer Flat Discount</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="discount_amount" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Discount Amount</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <depends>
+                        <field id="offer_flat_discount_status">1</field>
+                    </depends>
+                </field>
+                <field id="discount_type" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Discount Type</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\DiscountType</source_model>
+                    <depends>
+                        <field id="offer_flat_discount_status">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="trial" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Trial</label>
+                <field id="trial_status" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1">
+                    <label>Is Trial Offered </label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="trial_length" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Trial Length</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <depends>
+                        <field id="trial_status">1</field>
+                    </depends>
+                </field>
+                <field id="trial_length_unit" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Trial Length Unit</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType</source_model>
+                    <depends>
+                        <field id="trial_status">1</field>
+                    </depends>
+                </field>
+                <field id="trial_price" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1">
+                    <label>Trial Price</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <depends>
+                        <field id="trial_status">1</field>
+                    </depends>
+                </field>
+                <field id="trial_start_date_type" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1">
+                    <label>Trial Start Date</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
+                    <depends>
+                        <field id="trial_status">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

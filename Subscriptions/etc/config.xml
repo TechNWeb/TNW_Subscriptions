@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <tnw_subscriptions_general>
+            <general>
+                <active>0</active>
+            </general>
+        </tnw_subscriptions_general>
+        <tnw_subscriptions_product>
+            <general>
+                <purchase_type>1</purchase_type>
+                <start_date_type>1</start_date_type>
+                <lock_product_price_status>0</lock_product_price_status>
+            </general>
+            <trial>
+                <trial_status>0</trial_status>
+                <trial_length>15</trial_length>
+                <trial_length_unit>3</trial_length_unit>
+                <trial_start_date_type>1</trial_start_date_type>
+            </trial>
+            <discount>
+                <offer_flat_discount_status>0</offer_flat_discount_status>
+                <discount_amount>10</discount_amount>
+                <discount_type>2</discount_type>
+            </discount>
+        </tnw_subscriptions_product>
+    </default>
+</config>
