@@ -4,8 +4,55 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="TNW_Subscriptions::config_general" title="TNW Subscriptions Config General" sortOrder="100"/>
-                <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product" sortOrder="200"/>
+                <resource id="TNW_Subscriptions::config_general" title="TNW Subscriptions Config General"
+                          sortOrder="100"/>
+                <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product"
+                          sortOrder="200"/>
+                <resource id="TNW_Subscriptions::BillingFrequency" sortOrder="10" title="BillingFrequency">
+                    <resource id="TNW_Subscriptions::BillingFrequency_save" sortOrder="10"
+                              title="Save BillingFrequency"/>
+                    <resource id="TNW_Subscriptions::BillingFrequency_delete" sortOrder="20"
+                              title="Delete BillingFrequency"/>
+                    <resource id="TNW_Subscriptions::BillingFrequency_update" sortOrder="30"
+                              title="Update BillingFrequency"/>
+                    <resource id="TNW_Subscriptions::BillingFrequency_view" sortOrder="40"
+                              title="View BillingFrequency"/>
+                </resource>
+                <resource id="TNW_Subscriptions::ProductBillingFrequency" sortOrder="10"
+                          title="ProductBillingFrequency">
+                    <resource id="TNW_Subscriptions::ProductBillingFrequency_save" sortOrder="10"
+                              title="Save ProductBillingFrequency"/>
+                    <resource id="TNW_Subscriptions::ProductBillingFrequency_update" sortOrder="30"
+                              title="Update ProductBillingFrequency"/>
+                    <resource id="TNW_Subscriptions::ProductBillingFrequency_view" sortOrder="40"
+                              title="View ProductBillingFrequency"/>
+                </resource>
+                <resource id="TNW_Subscriptions::SubscriptionProfile" sortOrder="10" title="SubscriptionProfile">
+                    <resource id="TNW_Subscriptions::SubscriptionProfile_save" sortOrder="10"
+                              title="Save SubscriptionProfile"/>
+                    <resource id="TNW_Subscriptions::SubscriptionProfile_update" sortOrder="30"
+                              title="Update SubscriptionProfile"/>
+                    <resource id="TNW_Subscriptions::SubscriptionProfile_view" sortOrder="40"
+                              title="View SubscriptionProfile"/>
+                </resource>
+                <resource id="TNW_Subscriptions::SubscriptionProfileOrder" sortOrder="10"
+                          title="SubscriptionProfileOrder">
+                    <resource id="TNW_Subscriptions::SubscriptionProfileOrder_save" sortOrder="10"
+                              title="Save SubscriptionProfileOrder"/>
+                    <resource id="TNW_Subscriptions::SubscriptionProfileOrder_update" sortOrder="30"
+                              title="Update SubscriptionProfileOrder"/>
+                    <resource id="TNW_Subscriptions::SubscriptionProfileOrder_view" sortOrder="40"
+                              title="View SubscriptionProfileOrder"/>
+                </resource>
+                <resource id="TNW_Subscriptions::ProductSubscriptionProfile" sortOrder="10"
+                          title="ProductSubscriptionProfile">
+                    <resource id="TNW_Subscriptions::ProductSubscriptionProfile_save" sortOrder="10"
+                              title="Save ProductSubscriptionProfile"/>
+                    <resource id="TNW_Subscriptions::ProductSubscriptionProfile_update" sortOrder="30"
+                              title="Update ProductSubscriptionProfile"/>
+                    <resource id="TNW_Subscriptions::ProductSubscriptionProfile_view" sortOrder="40"
+                              title="View ProductSubscriptionProfile"/>
+                </resource>
             </resource>
         </resources>
     </acl>

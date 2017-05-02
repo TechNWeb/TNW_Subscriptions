@@ -19,8 +19,8 @@ class Version extends Field
     public function __construct(
         Context $context,
         ModuleList $moduleList,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         $this->moduleList = $moduleList;
         parent::__construct($context, $data);
     }
@@ -29,7 +29,7 @@ class Version extends Field
      * @param AbstractElement $element
      * @return string
      */
-    protected function _getElementHtml(AbstractElement  $element)
+    protected function _getElementHtml(AbstractElement $element)
     {
         $element->setReadonly(1);
         $module = $this->moduleList->getOne('TNW_Subscriptions');

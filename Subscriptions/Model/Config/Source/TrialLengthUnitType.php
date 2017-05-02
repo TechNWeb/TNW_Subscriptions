@@ -7,7 +7,7 @@
 
 namespace TNW\Subscriptions\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 
 
 /**
@@ -15,7 +15,7 @@ use Magento\Framework\Option\ArrayInterface;
  *
  * @package TNW\Subscriptions\Model\Config\Source
  */
-class TrialLengthUnitType implements ArrayInterface
+class TrialLengthUnitType extends AbstractSource
 {
 
     const MINUTES = 1;
@@ -29,7 +29,7 @@ class TrialLengthUnitType implements ArrayInterface
      * get options for TrialLengthUnit Type
      * @return array
      */
-    public function toOptionArray()
+    public function getAllOptions()
     {
         /** @var array $optionList */
         $optionList = [
