@@ -119,14 +119,14 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'price',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false,],
                 'price'
             )->addColumn(
                 'initial_fee',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false,],
                 'initial_fee'
             )->addIndex(
                 $installer->getIdxName($tableName,
@@ -234,7 +234,18 @@ class InstallSchema implements InstallSchemaInterface
                 'billing_frequency_id',
                 'tnw_subscriptions_billing_frequency',
                 'id'
-            );
+            )
+                ->addForeignKey(
+                    $setup->getConnection()->getForeignKeyName(
+                        $tableName,
+                        'website_id',
+                        'store_website',
+                        'website_id'
+                    ),
+                    'website_id',
+                    'store_website',
+                    'website_id'
+                );
 
             $tablesToCreate[] = $tableTnwSubscriptionProfile;
         }
@@ -319,20 +330,20 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'price',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false],
                 'price'
             )->addColumn(
                 'initial_fee',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false],
                 'initial_fee'
             )->addColumn(
                 'qty',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 4],
+                '12,4',
+                ['nullable' => false],
                 'qty'
             )->addColumn(
                 'purchase_type',
@@ -361,8 +372,8 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'trial_price',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false],
                 'trial_length_unit'
             )->addColumn(
                 'trial_start_date',
@@ -391,8 +402,8 @@ class InstallSchema implements InstallSchemaInterface
             )->addColumn(
                 'discount_amount',
                 Table::TYPE_DECIMAL,
-                12,
-                ['nullable' => false, 'precision' => 2],
+                '12,2',
+                ['nullable' => false],
                 'discount_amount'
             )->addColumn(
                 'discount_type',
