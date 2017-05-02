@@ -7,7 +7,7 @@
 
 namespace TNW\Subscriptions\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 
 
 /**
@@ -15,18 +15,19 @@ use Magento\Framework\Option\ArrayInterface;
  *
  * @package TNW\Subscriptions\Model\Config\Source
  */
-class PurchaseType implements ArrayInterface
+class PurchaseType extends AbstractSource
 {
 
     const ONE_TIME_PURCHASE_TYPE = 1;
     const RECURRING_PURCHASE_TYPE = 2;
     const ONE_TIME_AND_RECURRING_PURCHASE_TYPE = 3;
 
+
     /**
      * get options for Purchase Type
      * @return array
      */
-    public function toOptionArray()
+    public function getAllOptions()
     {
         /** @var array $optionList */
         $optionList = [

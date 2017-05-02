@@ -7,7 +7,7 @@
 
 namespace TNW\Subscriptions\Model\Config\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 
 
 /**
@@ -15,17 +15,18 @@ use Magento\Framework\Option\ArrayInterface;
  *
  * @package TNW\Subscriptions\Model\Config\Source
  */
-class DiscountType implements ArrayInterface
+class DiscountType extends AbstractSource
 {
 
     const FLAT_FEE_DISCOUNT_TYPE = 1;
     const PERCENT_DISCOUNT_TYPE = 2;
 
+
     /**
      * get options for Discount Type
      * @return array
      */
-    public function toOptionArray()
+    public function getAllOptions()
     {
         /** @var array $optionList */
         $optionList = [

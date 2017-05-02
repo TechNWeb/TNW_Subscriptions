@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="TNW_Subscriptions::top_level" module="TNW_Subscriptions" resource="Magento_Backend::content"
+             sortOrder="9999" title="TNW Subscriptions"/>
+        <add action="tnw_subscriptions/billingfrequency/index"
+             id="TNW_Subscriptions::tnw_subscriptions_billing_frequency" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
+             title="Billing Frequency"/>
+        <add action="tnw_subscriptions/productbillingfrequency/index"
+             id="TNW_Subscriptions::tnw_subscriptions_product_billing_frequency" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
+             title="Product Billing Frequency"/>
+        <add action="tnw_subscriptions/subscriptionprofile/index"
+             id="TNW_Subscriptions::tnw_subscriptions_subscription_profile" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
+             title="Subscription Profile"/>
+        <add action="tnw_subscriptions/subscriptionprofileorder/index"
+             id="TNW_Subscriptions::tnw_subscriptions_subscription_profile_order" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
+             title="Subscription Profile Order"/>
+        <add action="tnw_subscriptions/productsubscriptionprofile/index"
+             id="TNW_Subscriptions::tnw_subscriptions_product_subscription_profile" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
+             title="Product Subscription Profile"/>
+    </menu>
+</config>
