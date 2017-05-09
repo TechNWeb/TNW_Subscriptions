@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterfaceFactory;
 use Magento\Framework\Reflection\DataObjectProcessor;
@@ -22,21 +24,25 @@ use Magento\Store\Model\StoreManagerInterface;
 class ProductBillingFrequencyRepository implements ProductBillingFrequencyRepositoryInterface
 {
 
-    protected $dataObjectHelper;
+    private $dataObjectHelper;
 
-    protected $searchResultsFactory;
+    private $searchResultsFactory;
 
-    protected $dataProductBillingFrequencyFactory;
+    private $dataProductBillingFrequencyFactory;
 
-    protected $ProductBillingFrequencyFactory;
+    private $productBillingFrequencyFactory;
 
-    protected $ProductBillingFrequencyCollectionFactory;
+    private $productBillingFrequencyCollectionFactory;
 
     private $storeManager;
 
-    protected $resource;
+    private $resource;
 
-    protected $dataObjectProcessor;
+    private $dataObjectProcessor;
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
 
 
     /**
@@ -48,6 +54,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         ResourceProductBillingFrequency $resource,
@@ -57,7 +64,8 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         ProductBillingFrequencySearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->resource = $resource;
         $this->productBillingFrequencyFactory = $productBillingFrequencyFactory;
@@ -67,13 +75,14 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $this->dataProductBillingFrequencyFactory = $dataProductBillingFrequencyFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
      * {@inheritdoc}
      */
     public function save(
-        \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $productBillingFrequency
+        ProductBillingFrequencyInterface $productBillingFrequency
     ) {
         /* if (empty($productBillingFrequency->getStoreId())) {
             $storeId = $this->storeManager->getStore()->getId();
@@ -146,10 +155,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
                 $productBillingFrequencyModel->getData(),
                 'TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface'
             );
-            $items[] = $this->dataObjectProcessor->buildOutputDataArray(
-                $productBillingFrequencyData,
-                'TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface'
-            );
+            $items[] = $productBillingFrequencyData;
         }
         $searchResults->setItems($items);
         return $searchResults;
@@ -159,7 +165,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
      * {@inheritdoc}
      */
     public function delete(
-        \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $productBillingFrequency
+        ProductBillingFrequencyInterface $productBillingFrequency
     ) {
         try {
             $this->resource->delete($productBillingFrequency);
@@ -178,5 +184,26 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
     public function deleteById($productBillingFrequencyId)
     {
         return $this->delete($this->getById($productBillingFrequencyId));
+    }
+
+    /**
+     * Retrieve ProductBillingFrequency by product id
+     * @param string
+     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getListByProductId(
+        $productId
+    ) {
+        $this->searchCriteriaBuilder->addFilter(
+            ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+            $productId,
+            'eq'
+        );
+
+        /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->searchCriteriaBuilder->create();
+
+        return $this->getList($searchCriteria);
     }
 }

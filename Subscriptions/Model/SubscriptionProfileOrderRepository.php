@@ -22,21 +22,21 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepositoryInterface
 {
 
-    protected $dataObjectHelper;
+    private $dataObjectHelper;
 
-    protected $searchResultsFactory;
+    private $searchResultsFactory;
 
-    protected $SubscriptionProfileOrderFactory;
+    private $subscriptionProfileOrderFactory;
 
-    protected $dataSubscriptionProfileOrderFactory;
+    private $dataSubscriptionProfileOrderFactory;
 
     private $storeManager;
 
-    protected $resource;
+    private $resource;
 
-    protected $dataObjectProcessor;
+    private $dataObjectProcessor;
 
-    protected $SubscriptionProfileOrderCollectionFactory;
+    private $subscriptionProfileOrderCollectionFactory;
 
 
     /**

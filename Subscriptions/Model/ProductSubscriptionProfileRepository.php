@@ -22,19 +22,19 @@ use Magento\Store\Model\StoreManagerInterface;
 class ProductSubscriptionProfileRepository implements ProductSubscriptionProfileRepositoryInterface
 {
 
-    protected $resource;
+    private $resource;
 
-    protected $ProductSubscriptionProfileFactory;
+    private $productSubscriptionProfileFactory;
 
-    protected $ProductSubscriptionProfileCollectionFactory;
+    private $productSubscriptionProfileCollectionFactory;
 
-    protected $searchResultsFactory;
+    private $searchResultsFactory;
 
-    protected $dataObjectHelper;
+    private $dataObjectHelper;
 
-    protected $dataObjectProcessor;
+    private $dataObjectProcessor;
 
-    protected $dataProductSubscriptionProfileFactory;
+    private $dataProductSubscriptionProfileFactory;
 
     private $storeManager;
 

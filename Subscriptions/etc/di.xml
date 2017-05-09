@@ -75,4 +75,35 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection</argument>
         </arguments>
     </virtualType>
+
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="subscriptions_product"
+                type="TNW\Subscriptions\Plugin\Product\Product"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper">
+        <plugin name="subscriptions_product_initialization"
+                type="TNW\Subscriptions\Plugin\Product\Initialization"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="Magento\Catalog\Api\Data\ProductInterface" xsi:type="array">
+                    <item name="read" xsi:type="array">
+                        <item name="recurring_options_reader" xsi:type="string">TNW\Subscriptions\Model\ProductBillingFrequency\ReadHandler</item>
+                    </item>
+                    <item name="create" xsi:type="array">
+                        <item name="recurring_options_creator" xsi:type="string">TNW\Subscriptions\Model\ProductBillingFrequency\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="recurring_options_updater" xsi:type="string">TNW\Subscriptions\Model\ProductBillingFrequency\SaveHandler</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>

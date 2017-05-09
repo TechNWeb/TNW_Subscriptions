@@ -22,21 +22,21 @@ use Magento\Store\Model\StoreManagerInterface;
 class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
 {
 
-    protected $BillingFrequencyCollectionFactory;
+    private $billingFrequencyCollectionFactory;
 
-    protected $dataObjectHelper;
+    private $dataObjectHelper;
 
-    protected $searchResultsFactory;
+    private $searchResultsFactory;
 
     private $storeManager;
 
-    protected $resource;
+    private $resource;
 
-    protected $dataObjectProcessor;
+    private $dataObjectProcessor;
 
-    protected $BillingFrequencyFactory;
+    private $billingFrequencyFactory;
 
-    protected $dataBillingFrequencyFactory;
+    private $dataBillingFrequencyFactory;
 
 
     /**
@@ -145,10 +145,7 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
                 $billingFrequencyModel->getData(),
                 'TNW\Subscriptions\Api\Data\BillingFrequencyInterface'
             );
-            $items[] = $this->dataObjectProcessor->buildOutputDataArray(
-                $billingFrequencyData,
-                'TNW\Subscriptions\Api\Data\BillingFrequencyInterface'
-            );
+            $items[] = $billingFrequencyData;
         }
         $searchResults->setItems($items);
         return $searchResults;

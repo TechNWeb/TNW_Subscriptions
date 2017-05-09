@@ -41,6 +41,16 @@ interface ProductBillingFrequencyRepositoryInterface
     );
 
     /**
+     * Retrieve ProductBillingFrequency by product id
+     * @param string
+     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getListByProductId(
+        $productId
+    );
+
+    /**
      * Delete ProductBillingFrequency
      * @param \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $productBillingFrequency
      * @return bool true on success
