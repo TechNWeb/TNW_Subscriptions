@@ -22,21 +22,21 @@ use Magento\Store\Model\StoreManagerInterface;
 class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInterface
 {
 
-    protected $dataObjectHelper;
+    private $dataObjectHelper;
 
-    protected $searchResultsFactory;
+    private $searchResultsFactory;
 
-    protected $SubscriptionProfileCollectionFactory;
+    private $subscriptionProfileCollectionFactory;
 
-    protected $dataSubscriptionProfileFactory;
+    private $dataSubscriptionProfileFactory;
 
     private $storeManager;
 
-    protected $SubscriptionProfileFactory;
+    private $subscriptionProfileFactory;
 
-    protected $resource;
+    private $resource;
 
-    protected $dataObjectProcessor;
+    private $dataObjectProcessor;
 
 
     /**
