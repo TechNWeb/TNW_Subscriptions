@@ -5,22 +5,21 @@
 
 define([
     'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
-    'underscore',
-    'mageUtils'
-], function (DynamicRows, _, utils) {
+    'underscore'
+], function (DynamicRows, _) {
     'use strict';
 
     var maxId = 0,
 
     /**
-     * Stores max option_id value of the options from recordData once on initialization
+     * Stores max id value of the options from recordData once on initialization
      * @param {Array} data - array with records data
      */
     initMaxId = function (data) {
         if (data && data.length) {
             maxId = _.max(data, function (record) {
-                return parseInt(record['option_id'], 10) || 0;
-            })['option_id'];
+                return parseInt(record['id'], 10) || 0;
+            })['id'];
             maxId = parseInt(maxId, 10) || 0;
         }
     };
@@ -33,10 +32,10 @@ define([
             },
             update: true,
             map: {
-                'option_id': 'option_id'
+                'id': 'id'
             },
-            identificationProperty: 'option_id',
-            identificationDRProperty: 'option_id'
+            identificationProperty: 'id',
+            identificationDRProperty: 'id'
         },
 
         /** @inheritdoc */
@@ -45,40 +44,6 @@ define([
             initMaxId(this.recordData());
 
             return this;
-        },
-
-        /** @inheritdoc */
-        processingInsertData: function (data) {
-            var options = [],
-                currentOption;
-
-            if (!data) {
-                return;
-            }
-            data.each(function (item) {
-                if (!item.options) {
-                    return;
-                }
-                item.options.each(function (option) {
-                    currentOption = utils.copy(option);
-
-                    if (currentOption.hasOwnProperty('sort_order')) {
-                        delete currentOption['sort_order'];
-                    }
-                    currentOption['option_id'] = ++maxId;
-                    options.push(currentOption);
-                });
-            });
-
-            if (!options.length) {
-                return;
-            }
-            this.cacheGridData = options;
-            options.each(function (opt) {
-                this.mappingValue(opt);
-            }, this);
-
-            this.insertData([]);
         },
 
         /**
@@ -90,8 +55,8 @@ define([
 
         /** @inheritdoc */
         processingAddChild: function (ctx, index, prop) {
-            if (ctx && !_.isNumber(ctx['option_id'])) {
-                ctx['option_id'] = ++maxId;
+            if (ctx && !_.isNumber(ctx['id'])) {
+                ctx['id'] = ++maxId;
             } else if (!ctx) {
                 this.showSpinner(true);
                 this.addChild(ctx, index, prop);

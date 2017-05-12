@@ -43,6 +43,7 @@ class ReadHandler implements ExtensionInterface
 
         /** @var ProductBillingFrequencyInterface $option */
         foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option) {
+            $option->setTitle('Billed & Shipped every ' . $option->getBillingFrequencyId() . ' //TODO');
             $option->setProduct($entity);
             $options[] = $option;
         }

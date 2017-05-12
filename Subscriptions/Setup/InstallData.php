@@ -63,62 +63,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
-            ]
-        );
-
-        $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
-            'tnw_subscr_lock_product_price',
-            [
-                'type' => 'int',
-                'backend' => '',
-                'frontend' => '',
-                'label' => 'Lock product price',
-                'input' => 'boolean',
-                'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-                'global' => 2,
-                'visible' => true,
-                'required' => true,
-                'user_defined' => true,
-                'default' => null,
-                'searchable' => false,
-                'filterable' => false,
-                'comparable' => false,
-                'visible_on_front' => false,
-                'used_in_product_listing' => false,
-                'unique' => false,
-                'apply_to' => '',
-                'system' => 1,
-                'group' => 'Subscription options',
-            ]
-        );
-
-        $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
-            'tnw_subscr_offer_flat_discount',
-            [
-                'type' => 'int',
-                'backend' => '',
-                'frontend' => '',
-                'label' => 'Offer flat discount',
-                'input' => 'boolean',
-                'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-                'global' => 2,
-                'visible' => true,
-                'required' => true,
-                'user_defined' => true,
-                'default' => null,
-                'searchable' => false,
-                'filterable' => false,
-                'comparable' => false,
-                'visible_on_front' => false,
-                'used_in_product_listing' => false,
-                'unique' => false,
-                'apply_to' => '',
-                'system' => 1,
-                'group' => 'Subscription options',
+                'sort_order' => 10,
             ]
         );
 
@@ -147,6 +92,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 20,
             ]
         );
 
@@ -175,6 +121,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 30,
             ]
         );
 
@@ -203,6 +150,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 40,
             ]
         );
 
@@ -231,6 +179,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 50,
             ]
         );
 
@@ -259,6 +208,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 60,
             ]
         );
 
@@ -287,6 +237,65 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 70,
+            ]
+        );
+
+        $eavSetup->addAttribute(
+            \Magento\Catalog\Model\Product::ENTITY,
+            'tnw_subscr_lock_product_price',
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Lock product price',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'global' => 2,
+                'visible' => true,
+                'required' => true,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => false,
+                'unique' => false,
+                'apply_to' => '',
+                'system' => 1,
+                'group' => 'Subscription options',
+                'sort_order' => 80,
+            ]
+        );
+
+        $eavSetup->addAttribute(
+            \Magento\Catalog\Model\Product::ENTITY,
+            'tnw_subscr_offer_flat_discount',
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Offer flat discount',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'global' => 2,
+                'visible' => true,
+                'required' => true,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => false,
+                'unique' => false,
+                'apply_to' => '',
+                'system' => 1,
+                'group' => 'Subscription options',
+                'sort_order' => 90,
             ]
         );
 
@@ -315,6 +324,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 100,
             ]
         );
 
@@ -326,7 +336,7 @@ class InstallData implements InstallDataInterface
                 'backend' => '',
                 'frontend' => '',
                 'label' => 'Discount type',
-                'input' => 'text',
+                'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\DiscountType',
                 'global' => 2,
@@ -343,6 +353,7 @@ class InstallData implements InstallDataInterface
                 'apply_to' => '',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'sort_order' => 110,
             ]
         );
 

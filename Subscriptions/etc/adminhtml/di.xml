@@ -5,9 +5,13 @@
                  type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
-                <item name="subscriptions" xsi:type="array">
+                <item name="recurring_options" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\RecurringOptions</item>
                     <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+                <item name="product_subscriptions_options" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Composite</item>
+                    <item name="sortOrder" xsi:type="number">201</item>
                 </item>
             </argument>
         </arguments>
@@ -15,6 +19,15 @@
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\RecurringOptions">
         <arguments>
             <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Composite">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="subscriptionLockPrice" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice</item>
+                <item name="subscriptionDiscount" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount</item>
+                <item name="subscriptionTrial" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial</item>
+            </argument>
         </arguments>
     </type>
 </config>
