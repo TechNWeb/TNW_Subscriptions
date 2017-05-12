@@ -12,6 +12,8 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Ui\Component\Form\Element\Radio;
+use Magento\Ui\Component\Form\Element\RadioSet;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
@@ -77,6 +79,7 @@ class RecurringOptions extends AbstractModifier
     const FIELD_PRICE_NAME = 'price';
     const FIELD_INITIAL_FEE_NAME = 'initial_fee';
     const FIELD_IS_DELETE = 'is_delete';
+    const FIELD_TITLE_NAME = 'title';
     /**#@-*/
 
     /**#@+
@@ -393,20 +396,10 @@ class RecurringOptions extends AbstractModifier
                 static::FIELD_BILLING_FREQUENCY_NAME => $this->getBillingFrequencyFieldConfig(20),
                 static::FIELD_PRICE_NAME => $this->getPriceFieldConfig(30),
                 static::FIELD_INITIAL_FEE_NAME => $this->getInitialFeeFieldConfig(40),
-                static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(50)
+                static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(50),
+                static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(60),
             ]
         ];
-
-//        if ($this->locator->getProduct()->getStoreId()) {
-//            $useDefaultConfig = [
-//                'service' => [
-//                    'template' => 'Magento_Catalog/form/element/helper/recurring-option-service',
-//                ]
-//            ];
-//            $titlePath = $this->arrayManager->findPath(static::FIELD_BILLING_FREQUENCY, $commonContainer, null)
-//                . static::META_CONFIG_PATH;
-//            $commonContainer = $this->arrayManager->merge($titlePath, $commonContainer, $useDefaultConfig);
-//        }
 
         return $commonContainer;
     }
@@ -435,6 +428,30 @@ class RecurringOptions extends AbstractModifier
         ];
     }
 
+    /**
+     * Get config for title
+     *
+     * @param int $sortOrder
+     * @return array
+     */
+    protected function getTitleFieldConfig($sortOrder)
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'formElement' => Input::NAME,
+                        'componentType' => Field::NAME,
+                        'component'  => 'Magento_Catalog/component/static-type-input',
+                        'dataScope' => static::FIELD_TITLE_NAME,
+                        'sortOrder' => $sortOrder,
+                        'visible' => false,
+                    ],
+                ],
+            ],
+        ];
+    }
+
 
     /**
      * Get config for "Billing Frequencies" field
@@ -448,12 +465,11 @@ class RecurringOptions extends AbstractModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Billing Frequencies'),
+                        'label' => __('Billing Frequency'),
                         'componentType' => Field::NAME,
                         'formElement' => Select::NAME,
                         'component' => 'TNW_Subscriptions/js/recurring-options-type',
                         'elementTmpl' => 'ui/grid/filters/elements/ui-select',
-                        //'selectType' => 'optgroup',
                         'dataScope' => static::FIELD_BILLING_FREQUENCY_NAME,
                         'dataType' => Text::NAME,
                         'sortOrder' => $sortOrder,
