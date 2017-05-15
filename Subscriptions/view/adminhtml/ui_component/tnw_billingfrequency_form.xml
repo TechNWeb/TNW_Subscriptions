@@ -38,10 +38,12 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="General">
+    <fieldset name="general">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" xsi:type="string"/>
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">General Information</item>
+                <item name="sortOrder" xsi:type="number">10</item>
             </item>
         </argument>
         <field name="status">
