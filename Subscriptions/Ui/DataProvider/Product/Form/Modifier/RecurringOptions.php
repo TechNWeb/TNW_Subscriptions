@@ -10,21 +10,18 @@ use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\UrlInterface;
 use Magento\Framework\Stdlib\ArrayManager;
-use Magento\Ui\Component\Form\Element\Radio;
-use Magento\Ui\Component\Form\Element\RadioSet;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Field;
+use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
-use Magento\Ui\Component\Form\Element\Checkbox;
-use Magento\Ui\Component\Form\Element\ActionDelete;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\DataType\Number;
+use Magento\Ui\Component\Form\Element\DataType\Boolean;
 use Magento\Framework\Locale\CurrencyInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -500,17 +497,21 @@ class RecurringOptions extends AbstractModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Default'),
-                        'componentType' => Field::NAME,
                         'formElement' => Checkbox::NAME,
+                        'componentType' => Field::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/recurring-checkbox',
+                        'parentContainer' => static::CONTAINER_OPTION,
+                        'parentSelections' => static::GRID_OPTIONS_NAME,
+                        'dataType' => Boolean::NAME,
+                        'label' => __('Default'),
                         'dataScope' => static::FIELD_IS_DEFAULT_NAME,
-                        'dataType' => Text::NAME,
+                        'prefer' => 'radio',
+                        'value' => '0',
                         'sortOrder' => $sortOrder,
-                        'value' => '1',
                         'valueMap' => [
-                            'true' => '1',
-                            'false' => '0'
-                        ],
+                            'false' => '0',
+                            'true' => '1'
+                        ]
                     ],
                 ],
             ],

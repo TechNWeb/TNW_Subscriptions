@@ -35,7 +35,8 @@ define([
                 'id': 'id'
             },
             identificationProperty: 'id',
-            identificationDRProperty: 'id'
+            identificationDRProperty: 'id',
+            pageSize: 9999 //todo don't know how to clear values for "Default" field on other pages. They are not present in registry.
         },
 
         /** @inheritdoc */
