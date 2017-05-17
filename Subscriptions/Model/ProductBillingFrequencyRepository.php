@@ -206,4 +206,25 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
 
         return $this->getList($searchCriteria);
     }
+
+    /**
+     * Retrieve ProductBillingFrequency by frequency id
+     * @param string $frequencyId
+     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getListByFrequencyId(
+        $frequencyId
+    ) {
+        $this->searchCriteriaBuilder->addFilter(
+            ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
+            $frequencyId,
+            'eq'
+        );
+
+        /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->searchCriteriaBuilder->create();
+
+        return $this->getList($searchCriteria);
+    }
 }

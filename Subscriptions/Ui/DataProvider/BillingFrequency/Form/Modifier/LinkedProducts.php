@@ -9,13 +9,21 @@ namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use Magento\Framework\Phrase;
+use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Element\DataType\Number;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use Magento\Eav\Api\AttributeSetRepositoryInterface;
+use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 
 
 /**
@@ -25,43 +33,85 @@ class LinkedProducts extends AbstractModifier
 {
     const DATA_SCOPE_LINKED_PRODUCTS = 'linked';
     const GROUP_LINKED_PRODUCTS = 'linked';
+    const DEFAULT_SCOPE_NAME = 'tnw_billingfrequency_form.tnw_billingfrequency_form';
 
-    /**
-     * @var UrlInterface
-     */
+    /** @var UrlInterface */
     protected $urlBuilder;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scopeName;
+
+    /** @var Registry */
+    protected $registry;
+
+    /** @var ProductBillingFrequencyRepositoryInterface */
+    protected $productBillingFrequencyRepository;
+
+    /** @var ProductRepositoryInterface */
+    protected $productRepository;
+
+    /** @var ImageHelper */
+    protected $imageHelper;
+
+    /** @var Status */
+    protected $status;
+
+    /** @var AttributeSetRepositoryInterface */
+    protected $attributeSetRepository;
 
     /**
      * LinkedProducts constructor.
      * @param UrlInterface $urlBuilder
+     * @param Registry $coreRegistry
+     * @param ProductRepositoryInterface $productRepository
+     * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
+     * @param string $scopeName
      */
     public function __construct(
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        Registry $coreRegistry,
+        ProductRepositoryInterface $productRepository,
+        ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
+        ImageHelper $imageHelper,
+        Status $status,
+        AttributeSetRepositoryInterface $attributeSetRepository,
+        $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
-        $this->scopeName = 'tnw_billingfrequency_form.tnw_billingfrequency_form';
-    }
+        $this->registry = $coreRegistry;
+        $this->productRepository = $productRepository;
+        $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
+        $this->imageHelper = $imageHelper;
+        $this->status = $status;
+        $this->attributeSetRepository = $attributeSetRepository;
+        $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME;
 
+    }
 
     /**
      * {@inheritdoc}
      */
     public function modifyData(array $data)
     {
+        $frequency = $this->registry->registry('tnw_subscriptions_billingfrequency');
 
-        $productId = 1;
+        if ($frequency && $frequency->getId()){
 
-        if (!$productId) {
-            return $data;
+            $productFrequencies = $this->productBillingFrequencyRepository->getListByFrequencyId(
+                $frequency->getId()
+            );
+
+            $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS] = [];
+
+            /** @var  ProductBillingFrequencyInterface $productFrequency */
+            foreach ($productFrequencies->getItems() as $productFrequency){
+                $product = $this->productRepository->getById($productFrequency->getMagentoProductId());
+
+                if ($product && $product->getId()){
+                    $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS][] = $this->fillData($product, $productFrequency);
+                }
+            }
         }
-
-        $data[$productId][self::DATA_SOURCE_DEFAULT]['current_product_id'] = 0;
-        $data[$productId][self::DATA_SOURCE_DEFAULT]['current_store_id'] = 0;
 
         return $data;
     }
@@ -225,12 +275,6 @@ class LinkedProducts extends AbstractModifier
                                 ],
                                 'behaviourType' => 'simple',
                                 'externalFilterMode' => true,
-                                'imports' => [
-                                    'productId' => '${ $.provider }:data.data.current_product_id',
-                                ],
-                                'exports' => [
-                                    'productId' => '${ $.externalProvider }:params.current_product_id',
-                                ]
                             ],
                         ],
                     ],
@@ -266,7 +310,7 @@ class LinkedProducts extends AbstractModifier
                         'component' => 'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
                         'addButton' => false,
                         'recordTemplate' => 'record',
-                        'dataScope' => 'data.links',
+                        'dataScope' => 'links',
                         'deleteButtonLabel' => __('Remove'),
                         'dataProvider' => 'data.' . $dataProvider,
                         'map' => [
@@ -400,5 +444,30 @@ class LinkedProducts extends AbstractModifier
         ];
 
         return $column;
+    }
+
+    /**
+     * Prepare data column
+     *
+     * @param ProductInterface $linkedProduct
+     * @param ProductBillingFrequencyInterface $linkItem
+     * @return array
+     */
+    protected function fillData(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
+    {
+        return [
+            'id' => $linkedProduct->getId(),
+            'thumbnail' => $this->imageHelper->init($linkedProduct, 'product_listing_thumbnail')->getUrl(),
+            'name' => $linkedProduct->getName(),
+            'status' => $this->status->getOptionText($linkedProduct->getStatus()),
+            'attribute_set' => $this->attributeSetRepository
+                ->get($linkedProduct->getAttributeSetId())
+                ->getAttributeSetName(),
+            'sku' => $linkedProduct->getSku(),
+            'price' => $linkedProduct->getPrice(), //TODO add logic with frequency price
+            'position' => 0, //TODO remove it if you don't need it
+            ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $linkItem->getDefaultBillingFrequency(),
+            ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee()
+        ];
     }
 }
