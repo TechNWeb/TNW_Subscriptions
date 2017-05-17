@@ -89,6 +89,13 @@
                 disabled="false"/>
     </type>
 
+    <type name="TNW\Subscriptions\Model\BillingFrequency">
+        <plugin name="subscriptions_frequency_save_linked_products"
+                type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+
     <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
         <arguments>
             <argument name="extensionActions" xsi:type="array">

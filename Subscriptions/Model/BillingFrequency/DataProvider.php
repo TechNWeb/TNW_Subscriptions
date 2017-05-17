@@ -8,24 +8,29 @@ namespace TNW\Subscriptions\Model\BillingFrequency;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory;
+use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
-
+    /** @var \TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection */
     protected $collection;
 
+    /** @var DataPersistorInterface */
     protected $dataPersistor;
 
     protected $loadedData;
 
+    /** @var LinkedProducts */
+    protected $linkedProductsModifier;
+
     /**
-     * Constructor
-     *
+     * DataProvider constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param DataPersistorInterface $dataPersistor
+     * @param LinkedProducts $linkedProductsModifier
      * @param array $meta
      * @param array $data
      * @internal param CollectionFactory $blockCollectionFactory
@@ -36,11 +41,13 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $requestFieldName,
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
+        LinkedProducts $linkedProductsModifier,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
+        $this->linkedProductsModifier = $linkedProductsModifier;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -67,6 +74,20 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
             $this->dataPersistor->clear('tnw_subscriptions_billingfrequency');
         }
 
+        $this->loadedData = $this->linkedProductsModifier->modifyData($this->loadedData);
+
         return $this->loadedData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
+
+        $meta = $this->linkedProductsModifier->modifyMeta($meta);
+
+        return $meta;
     }
 }

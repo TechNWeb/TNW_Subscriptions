@@ -2,6 +2,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
+    <head>
+        <link src="TNW_Subscriptions::js/subscriptions.js"/>
+    </head>
     <body>
         <referenceContainer name="content">
             <uiComponent name="tnw_billingfrequency_form"/>
