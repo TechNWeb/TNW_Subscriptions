@@ -62,7 +62,7 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                ]
+                ],
             ]
         );
 
@@ -78,7 +78,10 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                ]
+                    'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH . ':value',
+                ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length-unit',
+                'componentType' => 'field',
             ]
         );
 
@@ -94,7 +97,10 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                ]
+                ],
+                'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
+                'componentType' => 'field',
             ]
         );
 
@@ -110,7 +116,9 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                ]
+                ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
+                'componentType' => 'field',
             ]
         );
 
@@ -126,7 +134,9 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                ]
+                ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
+                'componentType' => 'field',
             ]
         );
 
