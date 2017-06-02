@@ -97,6 +97,7 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
+                    'changeComment' => 'index = price:value',
                 ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
