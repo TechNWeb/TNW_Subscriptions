@@ -45,6 +45,18 @@ class LockPrice extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $meta = $this->arrayManager->merge(
+            $this->arrayManager->findPath(
+                self::CODE_LOCK_PRICE,
+                $meta,
+                null,
+                'children'
+            ) . static::META_CONFIG_PATH,
+            $meta,
+            [
+                'notice' =>  __('Recurring option price will always match the product price.'),
+            ]
+        );
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
@@ -58,7 +70,8 @@ class LockPrice extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
-                ]
+                ],
+                'notice' =>  __('Recurring option price will always match the product price.'),
             ]
         );
 

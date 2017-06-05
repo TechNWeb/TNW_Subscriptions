@@ -42,4 +42,16 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         // go to grid
         return $resultRedirect->setPath('*/*/');
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::BillingFrequency_delete'
+        );
+    }
 }

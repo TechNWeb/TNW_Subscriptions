@@ -59,4 +59,16 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
         $resultPage->getConfig()->getTitle()->prepend($model->getId() ? $model->getTitle() : __('New Subscription Profile'));
         return $resultPage;
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }
