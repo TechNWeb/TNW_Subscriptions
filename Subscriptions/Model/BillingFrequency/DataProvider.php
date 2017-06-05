@@ -74,6 +74,10 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
             $this->dataPersistor->clear('tnw_subscriptions_billingfrequency');
         }
 
+        if (!is_array($this->loadedData)) {
+            $this->loadedData = [];
+        }
+        
         $this->loadedData = $this->linkedProductsModifier->modifyData($this->loadedData);
 
         return $this->loadedData;
