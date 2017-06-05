@@ -67,10 +67,6 @@ class LockPrice extends AbstractModifier
             ) . static::META_CONFIG_PATH,
             $meta,
             [
-                'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
-                ],
                 'notice' =>  __('Recurring option price will always match the product price.'),
             ]
         );

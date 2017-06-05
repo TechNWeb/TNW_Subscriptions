@@ -19,7 +19,7 @@ define([
          */
         setInitialValue: function () {
             this._super();
-            this.changeComment();
+            this.changeCommentAndValue();
 
             return this;
         },
@@ -29,13 +29,13 @@ define([
          */
         onUpdate: function () {
             this._super();
-            this.changeComment();
+            this.changeCommentAndValue();
         },
 
         /**
          * Fires to change comment.
          */
-        changeComment: function() {
+        changeCommentAndValue: function() {
             var notice = '';
             var discountAmount = 0;
             var discountType = '';
@@ -46,52 +46,33 @@ define([
             var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount');
             var discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
 
-            if (lockPriceComponent.checked()) {         // Product price is locked
-                if (offerDiscountComponent.checked()) { // Offer flat discount is enabled
-                    discountAmount = discountAmountComponent.value();
+            if (offerDiscountComponent.checked()) { // Offer flat discount is enabled
+                discountAmount = discountAmountComponent.value();
 
-                    if (typeof discountAmount == 'undefined' || discountAmount == '') {
-                        discountAmount = 0;
+                if (typeof discountAmount == 'undefined' || discountAmount == '') {
+                    discountAmount = 0;
+                }
+
+                if (discountAmount != 0) {
+                    discountTypeValue = discountTypeComponent.value();
+
+                    if (typeof discountTypeValue == 'undefined') {
+                        discountTypeValue = 1;
                     }
 
-                    if (discountAmount != 0) {
-                        discountTypeValue = discountTypeComponent.value();
+                    discountType = discountTypeComponent.getOption(discountTypeValue);
 
-                        if (typeof discountTypeValue == 'undefined') {
-                            discountTypeValue = 1;
-                        }
-
-                        discountType = discountTypeComponent.getOption(discountTypeValue);
-
-                        notice += $.mage.__('Estimated') + ' ';
-                        if (discountTypeValue == 1) {        //discount type = Flat Fee
-                            discountAmount = formatPrice.formatPrice(discountAmount);
-                            notice += discountAmountComponent.currencySymbol + discountAmount;
-                        } else if (discountTypeValue == 2) { //discount type = percent
-                            notice += '~' + discountAmount + discountAmountComponent.percentSymbol;
-                        }
+                    notice += $.mage.__('Estimated') + ' ';
+                    if (discountTypeValue == 1) {        //discount type = Flat Fee
+                        discountAmount = formatPrice.formatPrice(discountAmount);
+                        notice += discountAmountComponent.currencySymbol + discountAmount;
+                    } else if (discountTypeValue == 2) { //discount type = percent
+                        notice += '~' + discountAmount + discountAmountComponent.percentSymbol;
                     }
-                } else {  // Offer flat discount is disabled
-                  // no notice
-                }
-            } else {  //Product price is unlocked
-                var productPrice = 0;
-                var productPriceComponent = registry.get('index=price');
-
-                if ((typeof productPriceComponent != 'undefined')
-                    && (typeof productPriceComponent.value() != 'undefined')) {
-                    productPrice = productPriceComponent.value() * 1;
                 }
 
-                var recurringPrice = this.value();
-                recurringPrice = recurringPrice * 1;
-
-                if ((recurringPrice != 0) && (productPrice != 0)) {
-                    discountAmount = productPrice - recurringPrice;
-                    discountAmount = formatPrice.formatPrice(discountAmount);
-                    notice += $.mage.__('Estimated');
-                    notice += ' ' + productPriceComponent.addbefore + discountAmount;
-                }
+            } else {   // Offer flat discount is disabled
+                // no notice
             }
 
             if (notice != '') {     //if calculated notice isn't empty we form whole necessary message to show
@@ -110,28 +91,28 @@ define([
          * Fires to change comment after 'Lock product price' is checked.
          */
         changeCommentLockPrice: function () {
-            this.changeComment();
+            this.changeCommentAndValue();
         },
 
         /**
          * Fires to change comment after 'Offer flat discount' is checked.
          */
         changeCommentOfferDiscount: function () {
-            this.changeComment();
+            this.changeCommentAndValue();
         },
 
         /**
          * Fires to change comment after 'Discount amount' is changed.
          */
         changeCommentDiscountAmount: function () {
-            this.changeComment();
+            this.changeCommentAndValue();
         },
 
         /**
          * Fires to change comment after 'Discount type' is changed.
          */
         changeCommentDiscountType: function () {
-            this.changeComment();
+            this.changeCommentAndValue();
         }
     });
 });
