@@ -36,4 +36,16 @@ class NewAction extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         $resultForward = $this->resultForwardFactory->create();
         return $resultForward->forward('edit');
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::BillingFrequency_edit'
+        );
+    }
 }
