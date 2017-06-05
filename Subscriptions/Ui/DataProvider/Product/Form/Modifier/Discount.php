@@ -46,7 +46,6 @@ class Discount extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 self::CODE_DISCOUNT_AMOUNT,
@@ -59,7 +58,9 @@ class Discount extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                ]
+                ],
+                'currencySymbol' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
+                'percentSymbol' => '%',
             ]
         );
 
@@ -75,7 +76,10 @@ class Discount extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                ]
+                    'changeComment' => 'index = ' . static::CODE_DISCOUNT_AMOUNT . ':value',
+                ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-discount-type',
+                'componentType' => 'field',
             ]
         );
 

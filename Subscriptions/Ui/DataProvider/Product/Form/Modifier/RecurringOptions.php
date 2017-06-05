@@ -479,6 +479,7 @@ class RecurringOptions extends AbstractModifier
                         'validation' => [
                             'required-entry' => true
                         ],
+                        'notice' => __('Recurring schedule to be picked by the end consumer'),
                     ],
                 ],
             ],
@@ -556,6 +557,7 @@ class RecurringOptions extends AbstractModifier
                     'config' => [
                         'label' => __('Price'),
                         'componentType' => Field::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/recurring-price',
                         'formElement' => Input::NAME,
                         'dataScope' => static::FIELD_PRICE_NAME,
                         'dataType' => Number::NAME,
@@ -564,6 +566,13 @@ class RecurringOptions extends AbstractModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
+                        'imports' => [
+                            'changeComment' => 'index = price:value',
+                            'changeCommentLockPrice' => 'index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
+                            'changeCommentOfferDiscount' => 'index = ' . Discount::CODE_FLAT_DISCOUNT . ':checked',
+                            'changeCommentDiscountAmount' => 'index = ' . Discount::CODE_DISCOUNT_AMOUNT . ':value',
+                            'changeCommentDiscountType' => 'index = ' . Discount::CODE_DISCOUNT_TYPE . ':value',
+                        ]
                     ],
                 ],
             ],
@@ -592,6 +601,7 @@ class RecurringOptions extends AbstractModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
+                        'notice' => __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.')
                     ],
                 ],
             ],
