@@ -43,7 +43,7 @@ class BillingFrequencyUnitType implements ArrayInterface
 //            ],
             [
                 'value' => self::DAYS,
-                'label' => 'Day(s)',
+                'label' => __('Day(s)'),
             ],
 //            [
 //                'value' => self::WEEKS,
@@ -51,7 +51,7 @@ class BillingFrequencyUnitType implements ArrayInterface
 //            ],
             [
                 'value' => self::MONTHS,
-                'label' => 'Month(s)',
+                'label' => __('Month(s)'),
             ],
 //            [
 //                'value' => self::YEARS,
