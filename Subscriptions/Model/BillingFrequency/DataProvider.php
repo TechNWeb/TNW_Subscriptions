@@ -61,6 +61,9 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         if (isset($this->loadedData)) {
             return $this->loadedData;
         }
+
+        $this->loadedData = [];
+
         $items = $this->collection->getItems();
         foreach ($items as $model) {
             $this->loadedData[$model->getId()] = $model->getData();
@@ -74,6 +77,10 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
             $this->dataPersistor->clear('tnw_subscriptions_billingfrequency');
         }
 
+        if (!is_array($this->loadedData)) {
+            $this->loadedData = [];
+        }
+        
         $this->loadedData = $this->linkedProductsModifier->modifyData($this->loadedData);
 
         return $this->loadedData;

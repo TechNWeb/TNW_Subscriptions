@@ -7,28 +7,36 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\DataProvider\AbstractDataProvider;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 
-class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
+class DataProvider extends AbstractDataProvider
 {
-
+    /** @var Collection */
     protected $collection;
-
+    /** @var DataPersistorInterface */
     protected $dataPersistor;
-
+    /** @var [] */
     protected $loadedData;
+    /** @var UrlInterface */
+    protected $urlBuilder;
+    /** @var StepPool */
+    protected $stepPool;
 
     /**
-     * Constructor
-     *
+     * DataProvider constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param DataPersistorInterface $dataPersistor
+     * @param UrlInterface $urlBuilder
+     * @param StepPool $stepPool
      * @param array $meta
      * @param array $data
-     * @internal param CollectionFactory $blockCollectionFactory
      */
     public function __construct(
         $name,
@@ -36,12 +44,17 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $requestFieldName,
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
+        UrlInterface $urlBuilder,
+        StepPool $stepPool,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+        $this->urlBuilder = $urlBuilder;
+        $this->stepPool = $stepPool;
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
+            $data);
     }
 
     /**
@@ -51,22 +64,23 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
      */
     public function getData()
     {
-        if (isset($this->loadedData)) {
-            return $this->loadedData;
-        }
-        $items = $this->collection->getItems();
-        foreach ($items as $model) {
-            $this->loadedData[$model->getId()] = $model->getData();
-        }
-        $data = $this->dataPersistor->get('tnw_subscriptions_subscriptionprofile');
+        return [];
+    }
 
-        if (!empty($data)) {
-            $model = $this->collection->getNewEmptyItem();
-            $model->setData($data);
-            $this->loadedData[$model->getId()] = $model->getData();
-            $this->dataPersistor->clear('tnw_subscriptions_subscriptionprofile');
-        }
+    /**
+     * @return array|mixed
+     */
+    public function getConfigData()
+    {
+        $configData = parent::getConfigData();
 
-        return $this->loadedData;
+        $configData['submit_url'] = $this->urlBuilder->getUrl(
+            '*/subscriptionprofile_create/process',
+            [
+                StepPool::STEP_PARAM_NAME => $this->stepPool->getNextStep()
+            ]
+        );
+
+        return $configData;
     }
 }

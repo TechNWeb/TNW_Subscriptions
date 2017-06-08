@@ -60,4 +60,15 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         return $resultPage;
     }
 
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::BillingFrequency_edit'
+        );
+    }
 }
