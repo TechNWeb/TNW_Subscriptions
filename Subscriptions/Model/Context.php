@@ -5,7 +5,7 @@
  *
  */
 
-namespace TNW\Subscriptions;
+namespace TNW\Subscriptions\Model;
 
 
 use Magento\Framework\Message\ManagerInterface;

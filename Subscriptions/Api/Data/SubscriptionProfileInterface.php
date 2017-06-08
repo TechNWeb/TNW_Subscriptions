@@ -17,6 +17,9 @@ interface SubscriptionProfileInterface
     const ID = 'id';
     const LABEL = 'label';
     const BILLING_FREQUENCY_ID = 'billing_frequency_id';
+    const ENGINE_CODE = 'engine_code';
+    const BILLING_ADDRESS_ID = 'billing_address_id';
+    const SHIPPING_ADDRESS_ID = 'billing_shipping_id';
 
 
     /**
@@ -123,4 +126,43 @@ interface SubscriptionProfileInterface
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
      */
     public function setFrequency($frequency);
+
+    /**
+     * Get engine
+     * @return string|null
+     */
+    public function getEngineCode();
+
+    /**
+     * Set engine code
+     * @param string $engineCode
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setEngineCode($engineCode);
+
+    /**
+     * Get billing address id
+     * @return string|null
+     */
+    public function getBillingAddressId();
+
+    /**
+     * Set billing address id
+     * @param string $addressId
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setBillingAddressId($addressId);
+
+    /**
+     * Get shipping address id
+     * @return string|null
+     */
+    public function getShippingAddressId();
+
+    /**
+     * Set shipping address id
+     * @param string $addressId
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setShippingAddressId($addressId);
 }

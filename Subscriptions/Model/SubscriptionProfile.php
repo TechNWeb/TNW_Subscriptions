@@ -7,10 +7,11 @@
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use Magento\Framework\Model\AbstractModel;
 
-class SubscriptionProfile extends \Magento\Framework\Model\AbstractModel implements SubscriptionProfileInterface
+class SubscriptionProfile extends AbstractModel implements SubscriptionProfileInterface
 {
-
+    const TNW_SUBSCRIPTION_CREATE_ORDER_ACTION_NAME = 'tnw_subscriptions_subscriptionprofile_edit';
     /**
      * @return void
      */
@@ -73,7 +74,8 @@ class SubscriptionProfile extends \Magento\Framework\Model\AbstractModel impleme
      */
     public function setBillingFrequencyId($billing_frequency_id)
     {
-        return $this->setData(self::BILLING_FREQUENCY_ID, $billing_frequency_id);
+        return $this->setData(self::BILLING_FREQUENCY_ID,
+            $billing_frequency_id);
     }
 
     /**
@@ -169,5 +171,57 @@ class SubscriptionProfile extends \Magento\Framework\Model\AbstractModel impleme
     public function setFrequency($frequency)
     {
         return $this->setData(self::FREQUENCY, $frequency);
+    }
+
+    /**
+     * Get engine code
+     * @return string
+     */
+    public function getEngineCode()
+    {
+        return $this->getData(self::ENGINE_CODE);
+    }
+
+    /**
+     * @param string $engine
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setEngineCode($engine)
+    {
+        return $this->setData(self::ENGINE_CODE, $engine);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBillingAddressId()
+    {
+        return $this->getData(self::BILLING_ADDRESS_ID);
+    }
+
+    /**
+     * @param string $addressId
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setBillingAddressId($addressId)
+    {
+        return $this->setData(self::BILLING_ADDRESS_ID, $addressId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getShippingAddressId()
+    {
+        return $this->getData(self::SHIPPING_ADDRESS_ID);
+    }
+
+    /**
+     * @param string $addressId
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     */
+    public function setShippingAddressId($addressId)
+    {
+        return $this->setData(self::SHIPPING_ADDRESS_ID, $addressId);
     }
 }
