@@ -13,7 +13,7 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 
-class DataProvider extends AbstractDataProvider
+class ListingDataProvider extends AbstractDataProvider
 {
     /** @var Collection */
     protected $collection;
@@ -65,22 +65,5 @@ class DataProvider extends AbstractDataProvider
     public function getData()
     {
         return [];
-    }
-
-    /**
-     * @return array|mixed
-     */
-    public function getConfigData()
-    {
-        $configData = parent::getConfigData();
-
-        $configData['submit_url'] = $this->urlBuilder->getUrl(
-            '*/subscriptionprofile_create/process',
-            [
-                StepPool::STEP_PARAM_NAME => $this->stepPool->getNextStep()
-            ]
-        );
-
-        return $configData;
     }
 }

@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="context" xsi:type="configurableObject">
+        <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\Context</argument>
+        <argument name="namespace" xsi:type="string">tnw_subscriptionprofile_create_product_listing</argument>
+    </argument>
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_create_product_listing.tnw_subscriptionprofile_create_product_listing_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_create_product_listing.tnw_subscriptionprofile_create_product_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">tnw_subscriptionprofile_product_columns</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_create_product_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class"
+                      xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_product_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" path="mui/index/render" xsi:type="url"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <columns name="tnw_subscriptionprofile_product_columns">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="childDefaults" xsi:type="array">
+                    <item name="fieldAction" xsi:type="array">
+                        <item name="provider" xsi:type="string">ProfileProductsListing</item>
+                        <item name="target" xsi:type="string">selectProduct</item>
+                        <item name="params" xsi:type="array">
+                            <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        </item>
+                    </item>
+                </item>
+            </item>
+        </argument>
+    </columns>
+</listing>
