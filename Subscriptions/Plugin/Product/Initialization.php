@@ -18,7 +18,6 @@ class Initialization
     private $productBillingFrequencyInterfaceFactory;
 
     /**
-     * Initialize constructor.
      * @param ProductBillingFrequencyInterfaceFactory $productBillingFrequencyInterfaceFactory
      */
     public function __construct(
