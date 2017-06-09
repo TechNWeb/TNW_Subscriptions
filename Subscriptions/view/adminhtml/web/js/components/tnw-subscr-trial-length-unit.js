@@ -42,10 +42,14 @@ define([
                 value = 1;
             }
             //Calculate message to show.
-            var optionLabel = this.getOption(value).label;
-            this.notice = $.mage.__('Trial will end after');
-            this.notice += ' ' + this.trialLength + ' ' + optionLabel + '. ';
-            this.notice += $.mage.__('Leave blank if product trial is not offered.');
+            if (this.trialLength != 0) {
+                var optionLabel = this.getOption(value).label;
+                this.notice = $.mage.__('Trial will end after');
+                this.notice += ' ' + this.trialLength + ' ' + optionLabel + '. ';
+                this.notice += $.mage.__('Leave blank if product trial is not offered.');
+            } else {
+                this.notice = $.mage.__('Product trial is not offered.');
+            }
             $('#'+this.noticeId).html(this.notice);
         }
     });
