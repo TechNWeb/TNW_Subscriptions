@@ -2,31 +2,31 @@
 /**
  *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
- *
  */
 
 namespace TNW\Subscriptions\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 
-
 /**
- * Class BillingFrequencyUnitType
- *
- * @package TNW\Subscriptions\Model\Config\Source
+ * Billing Frequency Unit Type configuration data source.
  */
 class BillingFrequencyUnitType implements ArrayInterface
 {
-
+    /**#@+
+     * Constants for Billing Frequency Unit Type.
+     */
     const MINUTES = 1;
     const HOURS = 2;
     const DAYS = 3;
     const WEEKS = 4;
     const MONTHS = 5;
     const YEARS = 6;
+    /**#@-*/
 
     /**
-     * get options for BillingFrequencyUnit Type
+     * Get options for Billing Frequency Unit Type Type.
+     *
      * @return array
      */
     public function toOptionArray()
@@ -35,11 +35,11 @@ class BillingFrequencyUnitType implements ArrayInterface
         $optionList = [
 //            [
 //                'value' => self::MINUTES,
-//                'label' => 'Minute(s)',
+//                'label' => __('Minute(s)'),
 //            ],
 //            [
 //                'value' => self::HOURS,
-//                'label' => 'Hour(s)',
+//                'label' => __('Hour(s)'),
 //            ],
             [
                 'value' => self::DAYS,
@@ -47,7 +47,7 @@ class BillingFrequencyUnitType implements ArrayInterface
             ],
 //            [
 //                'value' => self::WEEKS,
-//                'label' => 'Week(s)',
+//                'label' => __('Week(s)'),
 //            ],
             [
                 'value' => self::MONTHS,
@@ -55,7 +55,7 @@ class BillingFrequencyUnitType implements ArrayInterface
             ],
 //            [
 //                'value' => self::YEARS,
-//                'label' => 'Year(s)',
+//                'label' => __('Year(s)'),
 //            ],
         ];
 
