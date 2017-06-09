@@ -567,6 +567,7 @@ class RecurringOptions extends AbstractModifier
                             'validate-zero-or-greater' => true
                         ],
                         'imports' => [
+                            'disabled' => 'ns = ${ $.ns }, index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
                             'changeCommentAndValue' => 'index = price:value',
                             'changeCommentLockPrice' => 'index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
                             'changeCommentOfferDiscount' => 'index = ' . Discount::CODE_FLAT_DISCOUNT . ':checked',
