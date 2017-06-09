@@ -1,10 +1,15 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create as ProfileCreate;;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-class Start extends ProfileCreate
+class Start extends SubscriptionProfile
 {
     /**
      * Start order create action
@@ -13,9 +18,11 @@ class Start extends ProfileCreate
      */
     public function execute()
     {
-        $this->_getSession()->clearStorage();
+        $this->clearSessionData();
+
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
+
         return $resultRedirect->setPath('tnw_subscriptions/subscriptionprofile/create');
     }
 }

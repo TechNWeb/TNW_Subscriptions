@@ -6,13 +6,15 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-class Create extends Action
+class Create extends SubscriptionProfile
 {
     /** @var PageFactory */
     protected $resultPageFactory;
@@ -22,17 +24,21 @@ class Create extends Action
     /**
      * Create constructor.
      * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param Registry $coreRegistry
+     * @param DataPersistorInterface $dataPersistor
      * @param StepPool $stepPool
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory,
-        StepPool $stepPool
+        Registry $coreRegistry,
+        DataPersistorInterface $dataPersistor,
+        StepPool $stepPool,
+        PageFactory $resultPageFactory
     ) {
-        $this->resultPageFactory = $resultPageFactory;
         $this->stepPool = $stepPool;
-        parent::__construct($context);
+        $this->resultPageFactory = $resultPageFactory;
+        parent::__construct($context, $coreRegistry, $dataPersistor);
     }
 
     /**
@@ -40,6 +46,8 @@ class Create extends Action
      */
     public function execute()
     {
+        $this->dataPersistor->clear(StepPool::PERSISTOR_STEP_PARAM_NAME);
+
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
             StepPool::STEP_PARAM_TYPE_CUSTOMER
@@ -68,13 +76,5 @@ class Create extends Action
         return $this->_authorization->isAllowed(
             'TNW_Subscriptions::SubscriptionProfile_create'
         );
-    }
-
-    /**
-     * @return \TNW\Subscriptions\Model\Backend\Session\Quote
-     */
-    protected function _getSession()
-    {
-        return $this->_objectManager->get('TNW\Subscriptions\Model\Backend\Session\Quote');
     }
 }

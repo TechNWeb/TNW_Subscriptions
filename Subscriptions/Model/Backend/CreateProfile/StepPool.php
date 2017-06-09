@@ -3,10 +3,12 @@
 namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 class StepPool
 {
     const STEP_PARAM_NAME = 'step';
+    const PERSISTOR_STEP_PARAM_NAME = 'tnw_subscription_profile_step';
 
     const STEP_PARAM_TYPE_CUSTOMER = 'customer';
     const STEP_PARAM_TYPE_STORE = 'store';
@@ -23,15 +25,22 @@ class StepPool
     ];
 
     protected $currentStep;
+        /** @var DataPersistorInterface */
+    protected $dataPersistor;
+    /** @var StoreManagerInterface */
+    protected $storeManager;
 
     /**
      * StepPool constructor.
      * @param StoreManagerInterface $storeManager
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->storeManager = $storeManager;
+        $this->dataPersistor = $dataPersistor;
     }
 
 
@@ -48,7 +57,10 @@ class StepPool
      */
     public function getCurrentStep()
     {
-        return $this->currentStep;
+        //if we have no step param in request, try to get it from session
+        return $this->currentStep
+            ? $this->currentStep
+            : $this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME);
     }
 
     /**
@@ -60,6 +72,9 @@ class StepPool
         in_array($currentStep, $this->getStepArray())
             ? $this->currentStep = $currentStep
             : $this->currentStep = self::STEP_PARAM_TYPE_CUSTOMER;
+
+        //set step param in session
+        $this->dataPersistor->set(self::PERSISTOR_STEP_PARAM_NAME, $this->currentStep);
 
         return $this;
     }
