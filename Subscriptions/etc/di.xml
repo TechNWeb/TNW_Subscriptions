@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+* Copyright © 2017 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection"
@@ -112,5 +118,21 @@
                 </item>
             </argument>
         </arguments>
+    </type>
+
+    <!-- Product builder plugin to setup default attributes values on create new product request -->
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Builder">
+        <plugin name="subscriptions_product_builder"
+                type="TNW\Subscriptions\Plugin\Product\Builder"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+
+    <!-- Eav attribute plugin to setup default value from config -->
+    <type name="Magento\Catalog\Model\ResourceModel\Eav\Attribute">
+        <plugin name="subscriptions_eav_attribute"
+                type="TNW\Subscriptions\Plugin\Product\Attribute"
+                sortOrder="60"
+                disabled="false"/>
     </type>
 </config>

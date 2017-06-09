@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
+<!--
+/**
+* Copyright © 2017 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool"
@@ -24,6 +30,8 @@
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Composite">
         <arguments>
             <argument name="modifiers" xsi:type="array">
+                <!--Add modifier to set default values for subscription product attributes-->
+                <item name="subscriptionDefaultValues" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\DefaultValues</item>
                 <item name="subscriptionLockPrice" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice</item>
                 <item name="subscriptionDiscount" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount</item>
                 <item name="subscriptionTrial" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial</item>

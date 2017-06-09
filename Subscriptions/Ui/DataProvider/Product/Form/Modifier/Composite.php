@@ -65,6 +65,17 @@ class Composite extends AbstractModifier
      */
     public function modifyData(array $data)
     {
+        foreach ($this->modifiers as $bundleClass) {
+            /** @var ModifierInterface $bundleModifier */
+            $bundleModifier = $this->objectManager->get($bundleClass);
+            if (!$bundleModifier instanceof ModifierInterface) {
+                throw new \InvalidArgumentException(
+                    'Type "' . $bundleClass . '" is not an instance of ' . ModifierInterface::class
+                );
+            }
+            $data = $bundleModifier->modifyData($data);
+        }
+
         return $data;
     }
 }
