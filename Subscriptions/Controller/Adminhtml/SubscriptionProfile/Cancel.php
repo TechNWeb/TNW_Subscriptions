@@ -1,8 +1,14 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-class Cancel extends \Magento\Sales\Controller\Adminhtml\Order\Create
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+
+class Cancel extends SubscriptionProfile
 {
     /**
      * Cancel order create
@@ -14,7 +20,7 @@ class Cancel extends \Magento\Sales\Controller\Adminhtml\Order\Create
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
-        $this->_getSession()->clearStorage();
+        $this->clearSessionData();
         $resultRedirect->setPath('tnw_subscriptions/subscriptionprofile/index');
 
         return $resultRedirect;

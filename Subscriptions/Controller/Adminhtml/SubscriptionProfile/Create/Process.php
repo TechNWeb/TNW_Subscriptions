@@ -1,11 +1,15 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create as ProfileCreate;;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-class Process extends ProfileCreate
+class Process extends SubscriptionProfile
 {
     /**
      * Start order create action
