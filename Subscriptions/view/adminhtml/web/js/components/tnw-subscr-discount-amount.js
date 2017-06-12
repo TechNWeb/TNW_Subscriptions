@@ -3,7 +3,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'Magento_Ui/js/form/element/select',
+    'Magento_Ui/js/form/element/abstract',
     'uiRegistry',
     'jquery',
     'TNW_Subscriptions/js/formatPrice',
@@ -13,10 +13,6 @@ define([
     'use strict';
 
     return Abstract.extend({
-        defaults: {
-            discountAmount: 0
-        },
-
         /**
          * Callback that fires when 'value' property is updated.
          */
@@ -31,29 +27,31 @@ define([
         changeComment: function() {
             var notice = '';
 
-            //calculate discount amount from the field tnw_subscr_discount_amount
-            var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount');
-            this.discountAmount = discountAmountComponent.value();
+            //calculate discount amount
+            var discountAmount = this.value();
 
             //if discountAmount field is empty we consider it as 0
-            if (this.discountAmount == '') {
-                this.discountAmount = 0;
+            if (discountAmount == '') {
+                discountAmount = 0;
             }
-            //Find out current value. If it isn't calculated we consider it as 1 (default value)
-            var value = this.value();
+
+            //Calculate discount type from the field tnw_subscr_discount_type
+            //If it isn't calculated we consider it as 1 (default value)
+            var discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
+            var value = discountTypeComponent.value();
             if (typeof value == 'undefined') {
                 value = 1;
             }
 
             //Calculate message to show.
             if (value == 1) {
-                var amount = formatPrice.formatPrice(this.discountAmount);
-                notice = discountAmountComponent.currencySymbol + amount;
+                var amount = formatPrice.formatPrice(discountAmount);
+                notice = this.currencySymbol + amount;
             } else if (value == 2) {
-                notice = this.discountAmount + discountAmountComponent.percentSymbol;
+                notice = discountAmount + this.percentSymbol;
             }
 
-            var optionLabel = this.getOption(value).label;
+            var optionLabel = discountTypeComponent.getOption(value).label;
 
             if (notice != '') {
                 this.notice = notice + ' ' + optionLabel + ' ';

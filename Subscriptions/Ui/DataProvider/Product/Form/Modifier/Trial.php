@@ -49,41 +49,49 @@ class Trial extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $trialLengthPath = $this->arrayManager->findPath(
+            self::CODE_TRIAL_LENGTH,
+            $meta,
+            null,
+            'children'
+        );
+        $trialLengthUnitPath = $this->arrayManager->findPath(
+            self::CODE_TRIAL_LENGTH_UNIT,
+            $meta,
+            null,
+            'children'
+        );
+        $trialLengthContainerPath = $this->arrayManager->slicePath($trialLengthPath, 0, -2);
+        $trialLengthUnitContainerPath = $this->arrayManager->slicePath($trialLengthUnitPath, 0, -2);
 
         $meta = $this->arrayManager->merge(
-            $this->arrayManager->findPath(
-                self::CODE_TRIAL_LENGTH,
-                $meta,
-                null,
-                'children'
-            ) . static::META_CONFIG_PATH,
+            $trialLengthPath . static::META_CONFIG_PATH,
             $meta,
             [
+                'imports' => [
+                    'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH_UNIT . ':value',
+                ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
+            ]
+        );
+        $meta = $this->arrayManager->merge(
+            $trialLengthContainerPath . self::META_CONFIG_PATH,
+            $meta,
+            [
+                'breakLine' => false,
+                'component' => 'Magento_Ui/js/form/components/group',
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
                 ],
             ]
         );
-
-        $meta = $this->arrayManager->merge(
-            $this->arrayManager->findPath(
-                self::CODE_TRIAL_LENGTH_UNIT,
-                $meta,
-                null,
-                'children'
-            ) . static::META_CONFIG_PATH,
+        $meta = $this->arrayManager->set(
+            $trialLengthContainerPath . '/children/' . self::CODE_TRIAL_LENGTH_UNIT,
             $meta,
-            [
-                'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH . ':value',
-                ],
-                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length-unit',
-                'componentType' => 'field',
-            ]
+            $this->arrayManager->get($trialLengthUnitPath, $meta)
         );
+        $meta = $this->arrayManager->remove($trialLengthUnitContainerPath, $meta);
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(

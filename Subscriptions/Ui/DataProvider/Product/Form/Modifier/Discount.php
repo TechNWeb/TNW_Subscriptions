@@ -46,42 +46,54 @@ class Discount extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $discountAmountPath = $this->arrayManager->findPath(
+            self::CODE_DISCOUNT_AMOUNT,
+            $meta,
+            null,
+            'children'
+        );
+        $discountTypePath = $this->arrayManager->findPath(
+            self::CODE_DISCOUNT_TYPE,
+            $meta,
+            null,
+            'children'
+        );
+
+        $discountAmountContainerPath = $this->arrayManager->slicePath($discountAmountPath, 0, -2);
+        $discountTypeContainerPath = $this->arrayManager->slicePath($discountTypePath, 0, -2);
+
         $meta = $this->arrayManager->merge(
-            $this->arrayManager->findPath(
-                self::CODE_DISCOUNT_AMOUNT,
-                $meta,
-                null,
-                'children'
-            ) . static::META_CONFIG_PATH,
+            $discountAmountPath . static::META_CONFIG_PATH,
             $meta,
             [
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
+                    'changeComment' => 'index = ' . static::CODE_DISCOUNT_TYPE . ':value',
                 ],
+                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-discount-amount',
+                'componentType' => 'field',
                 'currencySymbol' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'percentSymbol' => '%',
             ]
         );
 
         $meta = $this->arrayManager->merge(
-            $this->arrayManager->findPath(
-                self::CODE_DISCOUNT_TYPE,
-                $meta,
-                null,
-                'children'
-            ) . static::META_CONFIG_PATH,
+            $discountAmountContainerPath . self::META_CONFIG_PATH,
             $meta,
             [
+                'breakLine' => false,
+                'component' => 'Magento_Ui/js/form/components/group',
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                    'changeComment' => 'index = ' . static::CODE_DISCOUNT_AMOUNT . ':value',
                 ],
-                'component' => 'TNW_Subscriptions/js/components/tnw-subscr-discount-type',
-                'componentType' => 'field',
             ]
         );
+        $meta = $this->arrayManager->set(
+            $discountAmountContainerPath . '/children/' . self::CODE_DISCOUNT_TYPE,
+            $meta,
+            $this->arrayManager->get($discountTypePath, $meta)
+        );
+        $meta = $this->arrayManager->remove($discountTypeContainerPath, $meta);
 
         return $meta;
     }
