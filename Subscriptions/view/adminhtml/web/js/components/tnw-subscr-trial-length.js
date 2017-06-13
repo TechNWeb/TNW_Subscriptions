@@ -3,18 +3,15 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'Magento_Ui/js/form/element/select',
+    'Magento_Ui/js/form/element/abstract',
+    'uiRegistry',
     'jquery',
     'mage/translate',
     'jquery/ui'
-], function (Abstract, $) {
+], function (Abstract, registry, $) {
     'use strict';
 
     return Abstract.extend({
-        defaults: {
-            trialLength: 0
-        },
-
         /**
          * Callback that fires when 'value' property is updated.
          */
@@ -25,31 +22,32 @@ define([
 
         /**
          * Fires to change comment.
-         *
-         * @param importedValue
          */
-        changeComment: function(importedValue) {
-            //Find out the length of trial period.
-            if (typeof(importedValue)!= 'undefined') {
-                this.trialLength = importedValue;
-            }
-            if (this.trialLength == '') {
-                this.trialLength = 0;
+        changeComment: function() {
+            //Find out the type of trial period.
+            var unitComponent = registry.get('index=tnw_subscr_trial_length_unit');
+            var unitValue = unitComponent.value();
+            if (typeof unitValue == 'undefined') {
+                unitValue = 1;
             }
 
-            var value = this.value();
-            if (typeof value == 'undefined') {
-                value = 1;
+            //Find out the length of trial period.
+            var trialLength = this.value();
+            if (trialLength == '') {
+                trialLength = 0;
             }
+
             //Calculate message to show.
-            if (this.trialLength != 0) {
-                var optionLabel = this.getOption(value).label;
+            var option = unitComponent.getOption(unitValue);
+            if (trialLength != 0 && (typeof option != 'undefined')) {
+                var optionLabel = unitComponent.getOption(unitValue).label;
                 this.notice = $.mage.__('Trial will end after');
-                this.notice += ' ' + this.trialLength + ' ' + optionLabel + '. ';
+                this.notice += ' ' + trialLength + ' ' + optionLabel + '. ';
                 this.notice += $.mage.__('Leave blank if product trial is not offered.');
             } else {
                 this.notice = $.mage.__('Product trial is not offered.');
             }
+
             $('#'+this.noticeId).html(this.notice);
         }
     });
