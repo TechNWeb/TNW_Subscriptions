@@ -56,6 +56,31 @@ define([
 
         retrieveSearchCriteria: function (parentSelection, index) {
             return 'parentSelections = ' + parentSelection + ' , index = ' + index;
-        }
+        },
+
+        /**
+         * @inheritdoc
+         */
+        setInitialValue: function () {
+            var existIsDefault = false;
+            var records = registry.filter(this.retrieveSearchCriteria(this.parentSelections , this.index)),
+                uid = this.uid;
+
+            records.filter(function (comp) {
+                return comp.uid !== uid;
+            }).each(function (comp) {
+                if (comp.value() == 1) {
+                    return existIsDefault = true;
+                }
+            });
+
+            if (existIsDefault) {
+                this.value(0);
+            }
+
+            this._super();
+
+            return this;
+        },
     });
 });

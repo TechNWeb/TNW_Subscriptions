@@ -507,12 +507,12 @@ class RecurringOptions extends AbstractModifier
                         'label' => __('Default'),
                         'dataScope' => static::FIELD_IS_DEFAULT_NAME,
                         'prefer' => 'radio',
-                        'value' => '0',
                         'sortOrder' => $sortOrder,
                         'valueMap' => [
                             'false' => '0',
                             'true' => '1'
-                        ]
+                        ],
+                        'default' => '1',
                     ],
                 ],
             ],
