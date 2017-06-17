@@ -45,9 +45,11 @@ define([
 
             //Calculate message to show.
             if (value == 1) {
+                // currency
                 var amount = formatPrice.formatPrice(discountAmount);
                 notice = this.currencySymbol + amount;
             } else if (value == 2) {
+                // percent
                 notice = discountAmount + this.percentSymbol;
             }
 
@@ -59,6 +61,16 @@ define([
             }
 
             $('#'+this.noticeId).html(this.notice);
+
+            // Update discount amount sign ($ or %) depends on discount_type
+            if (value == 1) {
+                // currency
+                this.addbefore = this.currencySymbol;
+            } else if (value == 2) {
+                // percent
+                this.addbefore = this.percentSymbol;
+            }
+            $('div.admin__control-addon label[for="' + this.uid + '"] span').html(this.addbefore);
         }
     });
 });
