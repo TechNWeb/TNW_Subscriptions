@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterfaceFactory;
@@ -23,7 +24,6 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class ProductBillingFrequencyRepository implements ProductBillingFrequencyRepositoryInterface
 {
-
     private $dataObjectHelper;
 
     private $searchResultsFactory;
@@ -39,10 +39,16 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
     private $resource;
 
     private $dataObjectProcessor;
+
     /**
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
+    /**
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
 
 
     /**
@@ -55,6 +61,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         ResourceProductBillingFrequency $resource,
@@ -65,7 +72,8 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->resource = $resource;
         $this->productBillingFrequencyFactory = $productBillingFrequencyFactory;
@@ -76,6 +84,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -84,11 +93,14 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
     public function save(
         ProductBillingFrequencyInterface $productBillingFrequency
     ) {
-        /* if (empty($productBillingFrequency->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $productBillingFrequency->setStoreId($storeId);
-        } */
         try {
+            $productSku = $productBillingFrequency->getProductSku();
+
+            if (!$productSku) {
+                throw new CouldNotSaveException(__('ProductSku should be specified'));
+            }
+            $product = $this->productRepository->get($productSku);
+            $productBillingFrequency->setData('magento_product_id', $product->getId());
             $this->resource->save($productBillingFrequency);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
