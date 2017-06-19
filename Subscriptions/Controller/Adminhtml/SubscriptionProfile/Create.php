@@ -55,14 +55,18 @@ class Create extends SubscriptionProfile
 
         $resultPage = $this->resultPageFactory->create();
 
+        $pageTitle = __("Creating Subscription(s)");
+
         if ($currentStep && $this->stepPool->checkStep($currentStep)) {
             $this->stepPool->setCurrentStep($currentStep);
             $resultPage->addHandle(
                 'tnw_subscriptions_subscriptionprofile_create_' . $currentStep
             );
+
+            $pageTitle .= $this->stepPool->getCurrentStepTitle();
         }
 
-        $resultPage->getConfig()->getTitle()->prepend(__("Creating Subscription(s)"));
+        $resultPage->getConfig()->getTitle()->prepend($pageTitle);
         return $resultPage;
     }
 

@@ -1,3 +1,7 @@
 .subscription-prodile-products-container .admin__field-complex-elements{
   max-width: 100%;
 }
+.admin__data-grid-header-row .header-grid-dext{
+  font-size: 2.1rem;
+  float: left;
+}

@@ -2,8 +2,11 @@
 
 namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Store\Model\Website;
+use TNW\Subscriptions\Model\Backend\Session\Quote;
 
 class StepPool
 {
@@ -29,6 +32,10 @@ class StepPool
     protected $dataPersistor;
     /** @var StoreManagerInterface */
     protected $storeManager;
+    /** @var  ObjectManagerInterface */
+    private $_objectManager;
+    /** @var \Magento\Customer\Api\CustomerRepositoryInterface */
+    private $_customerRepository;
 
     /**
      * StepPool constructor.
@@ -37,10 +44,12 @@ class StepPool
      */
     public function __construct(
         StoreManagerInterface $storeManager,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        ObjectManagerInterface $objectManager
     ) {
         $this->storeManager = $storeManager;
         $this->dataPersistor = $dataPersistor;
+        $this->_objectManager = $objectManager;
     }
 
 
@@ -75,6 +84,7 @@ class StepPool
 
         //set step param in session
         $this->dataPersistor->set(self::PERSISTOR_STEP_PARAM_NAME, $this->currentStep);
+        $this->clearCustomer($currentStep);
 
         return $this;
     }
@@ -132,5 +142,92 @@ class StepPool
     public function checkStep($step)
     {
         return in_array($step, $this->getStepArray()) ? true : false;
+    }
+
+    /**
+     * Returns current step's title.
+     *
+     * @return string
+     */
+    public function getCurrentStepTitle()
+    {
+        $title = '';
+        /** @var \TNW\Subscriptions\Model\Backend\Session\Quote $session */
+        $session = $this->_getSession();
+
+        if ($session->getCustomerId()) {
+            $customerName = $this->_getCustomerName($session->getCustomerId());
+            $title .= ' ' . sprintf(__('for %s'), $customerName);
+        } elseif ($this->getCurrentStep() != self::STEP_PARAM_TYPE_CUSTOMER && $session->getCreateNewCustomer()) {
+            $title .= ' ' . __('for a New Customer');
+        }
+
+        /** @var \Magento\Store\Api\Data\StoreInterface|Store $store */
+        $store = $session->getStore();
+        if ($store && $store->getId()) {
+            /** @var Website $website */
+            $website = $store->getWebsite();
+            $websiteName = $website->getName();
+            $title .= ' ' . sprintf(__('in %s'), $websiteName);
+        }
+
+        return $title;
+    }
+
+    /**
+     * Returns current session.
+     *
+     * @return \TNW\Subscriptions\Model\Backend\Session\Quote
+     */
+    private function _getSession()
+    {
+        return $this->_objectManager->get(Quote::class);
+    }
+
+    /**
+     * Returns customer first name and last name from customer model.
+     *
+     * @param $customerId
+     * @return string
+     */
+    private function _getCustomerName($customerId)
+    {
+        $customerName = '';
+        if ($customerId) {
+            $customer = $this->_getCustomerRepository()->getById($customerId);
+            if ($customer->getId()) {
+                $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
+            }
+        }
+
+        return $customerName;
+    }
+
+    /**
+     * Returns customer repository object.
+     *
+     * @return \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    private function _getCustomerRepository()
+    {
+        if (!$this->_customerRepository) {
+            $this->_customerRepository= $this->_objectManager->create(
+                \Magento\Customer\Api\CustomerRepositoryInterface::class
+            );
+        }
+
+        return $this->_customerRepository;
+    }
+
+    /**
+     * Cleares customer data from session.
+     *
+     * @param $currentStep
+     */
+    private function clearCustomer($currentStep)
+    {
+        if ($currentStep == self::STEP_PARAM_TYPE_CUSTOMER) {
+            $this->_getSession()->setCustomerId(null);
+        }
     }
 }

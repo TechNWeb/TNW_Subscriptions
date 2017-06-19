@@ -29,6 +29,12 @@
         </argument>
     </dataSource>
     <listingToolbar name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/toolbar</item>
+                <item name="header_text" translate="true" xsi:type="string">Choose a Customer</item>
+            </item>
+        </argument>
         <filters name="listing_filters">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

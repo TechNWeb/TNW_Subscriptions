@@ -73,6 +73,7 @@ class Discount extends AbstractModifier
                 'componentType' => 'field',
                 'currencySymbol' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'percentSymbol' => '%',
+                'additionalClasses' => 'admin__field-small long_note',
             ]
         );
 
