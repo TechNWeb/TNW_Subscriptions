@@ -94,13 +94,16 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         ProductBillingFrequencyInterface $productBillingFrequency
     ) {
         try {
-            $productSku = $productBillingFrequency->getProductSku();
+            if (!$productBillingFrequency->getData(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID)) {
+                $productSku = $productBillingFrequency->getProductSku();
 
-            if (!$productSku) {
-                throw new CouldNotSaveException(__('ProductSku should be specified'));
+                if (!$productSku) {
+                    throw new CouldNotSaveException(__('ProductSku should be specified'));
+                }
+                $product = $this->productRepository->get($productSku);
+                $productBillingFrequency->setData(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                    $product->getId());
             }
-            $product = $this->productRepository->get($productSku);
-            $productBillingFrequency->setData('magento_product_id', $product->getId());
             $this->resource->save($productBillingFrequency);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
