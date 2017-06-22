@@ -26,9 +26,17 @@ define([
          */
         changeComment: function() {
             var notice = '';
-
+            //Get current price format
+            var priceFormat = null;
+            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
+                priceFormat = $.parseJSON(this.priceFormat);
+            }
             //calculate discount amount
             var discountAmount = this.value();
+            if (typeof discountAmount == 'string') {
+                discountAmount = formatPrice.formatToNumber(discountAmount, priceFormat);
+            }
+
 
             //if discountAmount field is empty we consider it as 0
             if (discountAmount == '') {
@@ -45,7 +53,7 @@ define([
 
             //Calculate message to show.
             if (value == 1) {
-                var amount = formatPrice.formatPrice(discountAmount);
+                var amount = formatPrice.formatPrice(discountAmount, priceFormat);
                 notice = this.currencySymbol + amount;
             } else if (value == 2) {
                 notice = discountAmount + this.percentSymbol;
