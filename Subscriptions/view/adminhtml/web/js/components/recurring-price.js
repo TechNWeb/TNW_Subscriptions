@@ -37,10 +37,7 @@ define([
          */
         changeCommentAndValue: function() {
             //Get current price format
-            var priceFormat = null;
-            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
-                priceFormat = $.parseJSON(this.priceFormat);
-            }
+            var priceFormat = this.getPriceFormat();
 
             var notice = '';
             var discountAmount = 0;
@@ -55,14 +52,8 @@ define([
 
             var recurringPrice = currentValue;
 
-            var productPrice = 0;
+            var productPrice = this.getProductPriceComponentValue();
             var productPriceComponent = registry.get('index=price');
-
-            //Get product price ineger value
-            if ((typeof productPriceComponent != 'undefined')
-                && (typeof productPriceComponent.value() != 'undefined')) {
-                productPrice = formatPrice.formatToNumber(productPriceComponent.value(), priceFormat);
-            }
 
             var lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price');
             var offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount');
@@ -77,6 +68,8 @@ define([
 
                     if (typeof discountAmount == 'undefined' || discountAmount == '') {
                         discountAmount = 0;
+                    } else if (typeof discountAmount == 'string') {
+                        discountAmount = formatPrice.formatToNumber(discountAmount, priceFormat);
                     }
 
                     if (discountAmount != 0) {
@@ -110,7 +103,7 @@ define([
                 }
             }
 
-            this.value(recurringPrice);
+            this.value(formatPrice.formatPrice(recurringPrice, priceFormat));
 
             if (notice != '') {     //if calculated notice isn't empty we form whole necessary message to show
                 notice += ' ' + $.mage.__('savings to the end consumer');
@@ -125,19 +118,46 @@ define([
         },
 
         /**
+         * Return current price format.
+         *
+         * @returns {*}
+         */
+        getPriceFormat: function() {
+            var priceFormat = null;
+            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
+                priceFormat = $.parseJSON(this.priceFormat);
+            }
+
+            return priceFormat;
+        },
+
+        /**
+         * Return product price ineger value
+         *
+         * @returns {number}
+         */
+        getProductPriceComponentValue: function() {
+            var priceFormat = this.getPriceFormat();
+            var productPrice = 0;
+            var productPriceComponent = registry.get('index=price');
+
+
+            if ((typeof productPriceComponent != 'undefined')
+                && (typeof productPriceComponent.value() != 'undefined')) {
+                productPrice = formatPrice.formatToNumber(productPriceComponent.value(), priceFormat);
+            }
+
+            return productPrice;
+        },
+
+        /**
          * Fires to change comment after 'Lock product price' is checked.
          */
         changeCommentLockPrice: function (checked) {
             if (!checked) {
-                var productPrice = 0;
-                var productPriceComponent = registry.get('index=price');
-
-                if ((typeof productPriceComponent != 'undefined')
-                    && (typeof productPriceComponent.value() != 'undefined')) {
-                    productPrice = productPriceComponent.value() * 1;
-                }
-
-                this.value(productPrice);
+                var priceFormat = this.getPriceFormat();
+                var productPrice = this.getProductPriceComponentValue();
+                this.value(formatPrice.formatPrice(productPrice, priceFormat));
             }
             this.changeCommentAndValue();
         },
