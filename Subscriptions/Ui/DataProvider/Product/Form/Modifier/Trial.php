@@ -74,6 +74,7 @@ class Trial extends BaseModifier
                 'imports' => [
                     'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH_UNIT . ':value',
                 ],
+                'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
             ]
         );

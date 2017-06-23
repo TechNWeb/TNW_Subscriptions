@@ -112,7 +112,7 @@ class Quote extends SessionManager
      */
     public function getStore()
     {
-        if ($this->store === null) {
+        if ($this->store === null && !empty($this->getStoreId())) {
             $this->store = $this->storeManager->getStore($this->getStoreId());
             $currencyId = $this->getCurrencyId();
             if ($currencyId) {

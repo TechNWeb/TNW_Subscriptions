@@ -1,0 +1,6 @@
+.long_note .admin__field-note{
+    margin-bottom: 30px;
+}
+.long_note .admin__field-note span{
+    position: absolute;
+}

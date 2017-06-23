@@ -76,6 +76,7 @@ class Discount extends BaseModifier
                 'componentType' => 'field',
                 'currencySymbol' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'percentSymbol' => '%',
+                'additionalClasses' => 'admin__field-small long_note',
                 'priceFormat' => $this->getPriceFormatData(),
             ]
         );
