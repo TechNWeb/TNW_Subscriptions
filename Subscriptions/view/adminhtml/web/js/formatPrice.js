@@ -51,9 +51,11 @@ define([
         var fraction = '00';
         precision = precision * (-1);
         var returnNumber = value;
+        var indexOfDecimalSymbol = value.indexOf(decimalSymbol);
 
-        if (value.indexOf(decimalSymbol) >= 0) {
-            fraction = value.slice(precision);
+        if (indexOfDecimalSymbol >= 0) {
+            var indexToSlice = (value.length - indexOfDecimalSymbol - 1) * (-1);
+            fraction = value.slice(indexToSlice);
             var wholeNumber = value.split(decimalSymbol + fraction);
             returnNumber = wholeNumber[0];
         }
