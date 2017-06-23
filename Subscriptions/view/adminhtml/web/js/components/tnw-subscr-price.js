@@ -71,7 +71,7 @@ define([
                 this.notice = ' ';
             }
 
-            $('#'+this.noticeId).html(this.notice);
+            $('#'+this.noticeId).children().html(this.notice);
         }
     });
 });

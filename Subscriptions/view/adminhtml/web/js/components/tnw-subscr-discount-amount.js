@@ -33,6 +33,10 @@ define([
             }
             //calculate discount amount
             var discountAmount = this.value();
+            if (typeof discountAmount == 'undefined') {
+                discountAmount = this.default;
+            }
+
             if (typeof discountAmount == 'string') {
                 discountAmount = formatPrice.formatToNumber(discountAmount, priceFormat);
             }
@@ -66,7 +70,7 @@ define([
                 this.notice += $.mage.__('discount will be offered for all recurring options below.');
             }
 
-            $('#'+this.noticeId).html(this.notice);
+            $('#'+this.noticeId).children().html(this.notice);
         }
     });
 });
