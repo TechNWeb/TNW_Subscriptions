@@ -17,10 +17,54 @@ define([
     };
 
     return {
-        formatPrice: formatPrice
+        formatPrice: formatPrice,
+        formatToNumber: formatToNumber
     };
 
-    function formatPrice(amount) {
-        return priceUtils.formatPrice(amount, priceFormat);
+    /**
+     * Return locale formatted price amount.
+     *
+     * @param amount
+     * @param format
+     * @returns {*}
+     */
+    function formatPrice(amount, format) {
+        if (typeof format == 'undefined') {
+            format = priceFormat;
+        }
+
+        return priceUtils.formatPrice(amount, format);
+    };
+
+    /**
+     * Return Price formatted to number.
+     *
+     * @param value
+     * @param format
+     * @returns {*}
+     */
+    function formatToNumber(value, format) {
+        var precision = isNaN(format.requiredPrecision = Math.abs(format.requiredPrecision)) ? 2 : format.requiredPrecision;
+        var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol;
+        var groupLength = format.groupLength === undefined ? 3 : format.groupLength;
+        var groupSymbol = format.groupSymbol === undefined ? '.' : format.groupSymbol;
+        var fraction = '00';
+        precision = precision * (-1);
+        var returnNumber = value;
+
+        if (value.indexOf(decimalSymbol) >= 0) {
+            fraction = value.slice(precision);
+            var wholeNumber = value.split(decimalSymbol + fraction);
+            returnNumber = wholeNumber[0];
+        }
+
+        if (returnNumber.length > groupLength) {
+            returnNumber = returnNumber.replace(groupSymbol, '');
+        }
+
+        returnNumber = returnNumber + decimalSymbol + fraction;
+        returnNumber = returnNumber * 1;
+
+        return returnNumber;
     }
 });

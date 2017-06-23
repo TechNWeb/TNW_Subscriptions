@@ -7,13 +7,13 @@
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
-use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
 * Customize Discount field
 */
-class Discount extends AbstractModifier
+class Discount extends BaseModifier
 {
     const CODE_DISCOUNT_TYPE = 'tnw_subscr_discount_type';
     const CODE_DISCOUNT_AMOUNT = 'tnw_subscr_discount_amount';
@@ -32,13 +32,16 @@ class Discount extends AbstractModifier
     /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         LocatorInterface $locator,
-        ArrayManager $arrayManager
+        ArrayManager $arrayManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
+        parent::__construct($storeManager);
     }
 
     /**
@@ -73,6 +76,7 @@ class Discount extends AbstractModifier
                 'componentType' => 'field',
                 'currencySymbol' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'percentSymbol' => '%',
+                'priceFormat' => $this->getPriceFormatData(),
             ]
         );
 
