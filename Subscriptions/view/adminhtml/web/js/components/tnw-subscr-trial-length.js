@@ -33,6 +33,10 @@ define([
 
             //Find out the length of trial period.
             var trialLength = this.value();
+            if (typeof trialLength == 'undefined') {
+                trialLength = this.default;
+            }
+
             if (trialLength == '') {
                 trialLength = 0;
             }
@@ -48,7 +52,7 @@ define([
                 this.notice = $.mage.__('Product trial is not offered.');
             }
 
-            $('#'+this.noticeId).html(this.notice);
+            $('#'+this.noticeId).children().html(this.notice);
         }
     });
 });
