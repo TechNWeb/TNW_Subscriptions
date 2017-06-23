@@ -36,18 +36,32 @@ define([
          * Fires to change comment.
          */
         changeCommentAndValue: function() {
+            //Get current price format
+            var priceFormat = null;
+            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
+                priceFormat = $.parseJSON(this.priceFormat);
+            }
+
             var notice = '';
             var discountAmount = 0;
             var discountType = '';
             var discountTypeValue = '';
-            var recurringPrice = this.value() * 1;
+
+            //Get current component integer value
+            var currentValue = this.value();
+            if (typeof currentValue == 'string') {
+                currentValue = formatPrice.formatToNumber(currentValue, priceFormat);
+            }
+
+            var recurringPrice = currentValue;
 
             var productPrice = 0;
             var productPriceComponent = registry.get('index=price');
 
+            //Get product price ineger value
             if ((typeof productPriceComponent != 'undefined')
                 && (typeof productPriceComponent.value() != 'undefined')) {
-                productPrice = productPriceComponent.value() * 1;
+                productPrice = formatPrice.formatToNumber(productPriceComponent.value(), priceFormat);
             }
 
             var lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price');
@@ -75,7 +89,7 @@ define([
                         notice += $.mage.__('Estimated') + ' ';
                         if (discountTypeValue == 1) {        //discount type = Flat Fee
                             recurringPrice = recurringPrice - discountAmount;
-                            discountAmount = formatPrice.formatPrice(discountAmount);
+                            discountAmount = formatPrice.formatPrice(discountAmount, priceFormat);
                             notice += discountAmountComponent.currencySymbol + discountAmount;
                         } else if (discountTypeValue == 2) { //discount type = percent
                             recurringPrice = recurringPrice * (100 - discountAmount)/100;
@@ -89,7 +103,7 @@ define([
                 if ((recurringPrice != 0) && (productPrice != 0)) {
                     discountAmount = productPrice - recurringPrice;
                     if (discountAmount > 0) {
-                        discountAmount = formatPrice.formatPrice(discountAmount);
+                        discountAmount = formatPrice.formatPrice(discountAmount, priceFormat);
                         notice += $.mage.__('Estimated');
                         notice += ' ' + productPriceComponent.addbefore + discountAmount;
                     }

@@ -11,7 +11,6 @@ use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Stdlib\ArrayManager;
-use Magento\Ui\Component\Modal;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Fieldset;
@@ -22,8 +21,6 @@ use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\DataType\Number;
 use Magento\Ui\Component\Form\Element\DataType\Boolean;
-use Magento\Framework\Locale\CurrencyInterface;
-use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -32,7 +29,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
  * Data provider for "Recurring Options" panel
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class RecurringOptions extends AbstractModifier
+class RecurringOptions extends BaseModifier
 {
     /**#@+
      * Group values
@@ -91,11 +88,6 @@ class RecurringOptions extends AbstractModifier
     protected $locator;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * @var ArrayManager
      */
     protected $arrayManager;
@@ -104,11 +96,6 @@ class RecurringOptions extends AbstractModifier
      * @var array
      */
     protected $meta = [];
-
-    /**
-     * @var CurrencyInterface
-     */
-    private $localeCurrency;
 
     /**
      * @var BillingFrequencyRepository
@@ -135,10 +122,10 @@ class RecurringOptions extends AbstractModifier
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->locator = $locator;
-        $this->storeManager = $storeManager;
         $this->arrayManager = $arrayManager;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        parent::__construct($storeManager);
     }
 
     /**
@@ -573,7 +560,8 @@ class RecurringOptions extends AbstractModifier
                             'changeCommentOfferDiscount' => 'index = ' . Discount::CODE_FLAT_DISCOUNT . ':checked',
                             'changeCommentDiscountAmount' => 'index = ' . Discount::CODE_DISCOUNT_AMOUNT . ':value',
                             'changeCommentDiscountType' => 'index = ' . Discount::CODE_DISCOUNT_TYPE . ':value',
-                        ]
+                        ],
+                        'priceFormat' => $this->getPriceFormatData(),
                     ],
                 ],
             ],
@@ -644,21 +632,6 @@ class RecurringOptions extends AbstractModifier
     }
 
     /**
-     * The getter function to get the locale currency for real application code
-     *
-     * @return \Magento\Framework\Locale\CurrencyInterface
-     *
-     * @deprecated
-     */
-    private function getLocaleCurrency()
-    {
-        if ($this->localeCurrency === null) {
-            $this->localeCurrency = \Magento\Framework\App\ObjectManager::getInstance()->get(CurrencyInterface::class);
-        }
-        return $this->localeCurrency;
-    }
-
-    /**
      * Format price according to the locale of the currency
      *
      * @param mixed $value
@@ -670,11 +643,10 @@ class RecurringOptions extends AbstractModifier
             return null;
         }
 
-        $store = $this->storeManager->getStore();
-        $currency = $this->getLocaleCurrency()->getCurrency($store->getBaseCurrencyCode());
+        /** @var \Magento\Framework\Currency $currency */
+        $currency = $this->getCurrency();
         $value = $currency->toCurrency($value, ['display' => \Magento\Framework\Currency::NO_SYMBOL]);
 
         return $value;
     }
-
 }

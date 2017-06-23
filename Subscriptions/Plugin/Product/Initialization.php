@@ -32,19 +32,17 @@ class Initialization
      *
      * @param \Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper $subject
      * @param \Magento\Catalog\Model\Product $product
-     * @param array $productData
      *
-     * @return array
+     * @return \Magento\Catalog\Model\Product $product
      */
-    public function beforeInitializeFromData(
+    public function afterInitializeFromData(
         \Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper $subject,
-        \Magento\Catalog\Model\Product $product,
-        array $productData
+        \Magento\Catalog\Model\Product $product
     ) {
 
-        if (isset($productData['recurring_options'])) {
-            $options = $productData['recurring_options'];
-            unset($productData['recurring_options']);
+        if ($product->getData('recurring_options')) {
+            $options = $product->getData('recurring_options');
+            $product->unsetData('recurring_options');
         } else {
             $options = [];
         }
@@ -58,6 +56,7 @@ class Initialization
                 if (empty($recurringOptionData['is_delete'])) {
                     /** @var ProductBillingFrequencyInterface $recurringOption */
                     $recurringOption = $this->productBillingFrequencyInterfaceFactory->create(['data' => $recurringOptionData]);
+                    $recurringOption->setProductSku($product->getSku());
                     $recurringOption->setMagentoProductId($product->getId());
                     $recurringOption->setId(null);
                     $recurringOptions[] = $recurringOption;
@@ -67,10 +66,10 @@ class Initialization
         }
 
         $product->setCanSaveRecurringOptions(
-            !empty($productData['affect_product_recurring_options'])
+            !empty($product->getData('affect_product_recurring_options'))
         );
 
 
-        return [$product, $productData];
+        return $product;
     }
 }
