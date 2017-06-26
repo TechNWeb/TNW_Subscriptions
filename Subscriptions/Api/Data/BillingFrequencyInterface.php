@@ -8,6 +8,8 @@ namespace TNW\Subscriptions\Api\Data;
 
 interface BillingFrequencyInterface
 {
+    const SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE = 'tnw_subscriptions_billing_frequency';
+
 
     const WEBSITE_ID = 'website_id';
     const UNIT = 'unit';

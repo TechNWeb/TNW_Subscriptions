@@ -6,7 +6,10 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel;
 
-class ProductBillingFrequency extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+
+class ProductBillingFrequency extends AbstractDb
 {
 
     /**
@@ -16,6 +19,9 @@ class ProductBillingFrequency extends \Magento\Framework\Model\ResourceModel\Db\
      */
     protected function _construct()
     {
-        $this->_init('tnw_subscriptions_product_billing_frequency', 'id');
+        $this->_init(
+            ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE,
+            'id'
+        );
     }
 }
