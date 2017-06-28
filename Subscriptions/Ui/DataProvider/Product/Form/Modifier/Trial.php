@@ -7,13 +7,13 @@
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
-use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
 * Customize Trial field
 */
-class Trial extends AbstractModifier
+class Trial extends BaseModifier
 {
     const CODE_TRIAL = 'tnw_subscr_trial_status';
     const CODE_TRIAL_LENGTH = 'tnw_subscr_trial_length';
@@ -35,13 +35,16 @@ class Trial extends AbstractModifier
     /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         LocatorInterface $locator,
-        ArrayManager $arrayManager
+        ArrayManager $arrayManager,
+        StoreManagerInterface $storeManager
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
+        parent::__construct($storeManager);
     }
 
     /**
@@ -71,6 +74,7 @@ class Trial extends AbstractModifier
                 'imports' => [
                     'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH_UNIT . ':value',
                 ],
+                'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
             ]
         );
@@ -110,6 +114,7 @@ class Trial extends AbstractModifier
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
                 'componentType' => 'field',
+                'priceFormat' => $this->getPriceFormatData(),
             ]
         );
 

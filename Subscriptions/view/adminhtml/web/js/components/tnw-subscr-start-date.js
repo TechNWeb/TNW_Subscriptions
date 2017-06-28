@@ -41,7 +41,7 @@ define([
                 this.notice = $.mage.__('Subscription will automatically start on the last day of the current month.');
             }
 
-            $('#'+this.noticeId).html(this.notice);
+            $('#'+this.noticeId).children().html(this.notice);
         }
     });
 });

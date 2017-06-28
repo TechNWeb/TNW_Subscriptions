@@ -26,9 +26,21 @@ define([
          */
         changeComment: function() {
             var notice = '';
-
+            //Get current price format
+            var priceFormat = null;
+            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
+                priceFormat = $.parseJSON(this.priceFormat);
+            }
             //calculate discount amount
             var discountAmount = this.value();
+            if (typeof discountAmount == 'undefined') {
+                discountAmount = this.default;
+            }
+
+            if (typeof discountAmount == 'string') {
+                discountAmount = formatPrice.formatToNumber(discountAmount, priceFormat);
+            }
+
 
             //if discountAmount field is empty we consider it as 0
             if (discountAmount == '') {
@@ -46,7 +58,7 @@ define([
             //Calculate message to show.
             if (value == 1) {
                 // currency
-                var amount = formatPrice.formatPrice(discountAmount);
+                var amount = formatPrice.formatPrice(discountAmount, priceFormat);
                 notice = this.currencySymbol + amount;
             } else if (value == 2) {
                 // percent
@@ -60,7 +72,7 @@ define([
                 this.notice += $.mage.__('discount will be offered for all recurring options below.');
             }
 
-            $('#'+this.noticeId).html(this.notice);
+            $('#'+this.noticeId).children().html(this.notice);
 
             // Update discount amount sign ($ or %) depends on discount_type
             if (value == 1) {

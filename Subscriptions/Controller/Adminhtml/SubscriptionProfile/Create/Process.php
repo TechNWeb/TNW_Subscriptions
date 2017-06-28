@@ -62,10 +62,12 @@ class Process extends SubscriptionProfile
     {
         if (isset($data['customer_id'])){
             $this->_getSession()->setCustomerId($data['customer_id']);
+            $this->_getSession()->setCreateNewCustomer(null);
         }
 
         if (isset($data['create_new_customer'])){
-            $this->_getSession()->setCustomerId($data['create_new_customer']);
+            $this->_getSession()->setCreateNewCustomer($data['create_new_customer']);
+            $this->_getSession()->setCustomerId(null);
         }
     }
 

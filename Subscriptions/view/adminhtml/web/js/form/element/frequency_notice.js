@@ -71,7 +71,7 @@ define([
                 var unit = unitField.getOption(unitOption);
 
                 notice = $j.mage.__(this.noticeTemplate)
-                    .replace('%1', (this.value() == 1 ? '' : this.value()))
+                    .replace('%1', this.value())
                     .replace('%2', unit.label.toLowerCase());
             } else {
                 notice = $j.mage.__(this.defaultNotice);

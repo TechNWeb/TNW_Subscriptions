@@ -1,3 +1,58 @@
 .subscription-prodile-products-container .admin__field-complex-elements{
   max-width: 100%;
 }
+.admin__data-grid-header-row .header-grid-dext{
+  font-size: 2.1rem;
+  float: left;
+}
+
+
+
+.subscriptions-add-product-modal-form-container{
+  float: left;
+  width: 17%;
+  margin-left: 2rem;
+  padding-top: 0;
+}
+
+.subscriptions-add-product-modal-form-container .action-secondary{
+  background-color: #eb5202;
+  border-color: #eb5202;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+  width: 100%;
+}
+
+
+.subscriptions-add-product-modal-form-container .admin__fieldset{
+  padding-top: 1.4rem;
+}
+
+.subscriptions-add-product-modal-form-container .form-inline .fieldset-wrapper{
+  padding:0 3rem;
+}
+
+/*Bug Magento, legend is nor displayed */
+.subscriptions-add-product-modal-form-container .sub-legend legend{
+  opacity: 1;
+}
+
+.subscriptions-add-product-modal-form-container .sub-period-input input{
+  width: 4rem;
+  margin: 0 0.5rem;
+}
+
+.subscriptions-add-product-modal-grid-container{
+  float: left;
+  width: 80%;
+}
+
+.subscriptions-add-product-modal .modal-title{
+  font-size: 2.8rem;
+}
+.subscriptions-add-product-modal .modal-header{
+  border-bottom: 1px solid #ccc;
+  margin-left: 2.6rem;
+  margin-right: 2.6rem;
+  padding-left: 0;
+}
