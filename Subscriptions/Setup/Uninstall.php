@@ -64,6 +64,12 @@ class Uninstall implements UninstallInterface
             'tnw_subscriptions_product_subscription_profile',
             'tnw_subscriptions_billing_frequency',
             'tnw_subscriptions_subscription_profile',
+            'tnw_subscriptions_subscription_profile_entity_varchar',
+            'tnw_subscriptions_subscription_profile_entity_text',
+            'tnw_subscriptions_subscription_profile_entity_int',
+            'tnw_subscriptions_subscription_profile_entity_decimal',
+            'tnw_subscriptions_subscription_profile_entity_datetime',
+            'tnw_subscriptions_subscription_profile_entity',
         ];
 
         foreach ($tnwTables as $tnwTable) {

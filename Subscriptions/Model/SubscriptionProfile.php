@@ -9,9 +9,23 @@ namespace TNW\Subscriptions\Model;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\Framework\Model\AbstractModel;
 
+/**
+ * Subscription Profile model.
+ */
 class SubscriptionProfile extends AbstractModel implements SubscriptionProfileInterface
 {
     const TNW_SUBSCRIPTION_CREATE_ORDER_ACTION_NAME = 'tnw_subscriptions_subscriptionprofile_edit';
+
+    /**
+     * Entity for subscription profile.
+     */
+    const SUBSCRIPTION_PROFILE_ENTITY = 'tnw_subscriptions_subscription_profile_entity';
+
+    /**
+     * Entity code.
+     */
+    const ENTITY = 'subscription_profile';
+
     /**
      * @return void
      */
