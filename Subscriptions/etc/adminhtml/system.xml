@@ -72,10 +72,11 @@
                     <label>Offer Flat Discount</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="discount_amount" translate="label" type="text" sortOrder="20" showInDefault="1"
+                <field id="discount_amount" translate="label" type="addon_text" sortOrder="20" showInDefault="1"
                        showInWebsite="1">
                     <label>Discount Amount</label>
                     <frontend_class>validate-number</frontend_class>
+                    <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Percent</frontend_model>
                     <depends>
                         <field id="offer_flat_discount_status">1</field>
                     </depends>
@@ -113,10 +114,11 @@
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
-                <field id="trial_price" translate="label" type="text" sortOrder="40" showInDefault="1"
+                <field id="trial_price" translate="label" type="addon_text" sortOrder="40" showInDefault="1"
                        showInWebsite="1">
                     <label>Trial Price</label>
                     <frontend_class>validate-number</frontend_class>
+                    <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
                     <depends>
                         <field id="trial_status">1</field>
                     </depends>
