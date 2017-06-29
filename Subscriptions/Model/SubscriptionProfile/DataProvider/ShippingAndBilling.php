@@ -9,13 +9,10 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
+use \Magento\Framework\Api\Filter;
 
 class ShippingAndBilling extends AbstractDataProvider
 {
-    /** @var Collection */
-    protected $collection;
     /** @var [] */
     protected $loadedData;
     /** @var UrlInterface */
@@ -28,7 +25,6 @@ class ShippingAndBilling extends AbstractDataProvider
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param CollectionFactory $collectionFactory
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
      * @param array $meta
@@ -38,13 +34,11 @@ class ShippingAndBilling extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        CollectionFactory $collectionFactory,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
         array $meta = [],
         array $data = []
     ) {
-        $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
@@ -76,5 +70,13 @@ class ShippingAndBilling extends AbstractDataProvider
         );
 
         return $configData;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFilter(Filter $filter)
+    {
+
     }
 }
