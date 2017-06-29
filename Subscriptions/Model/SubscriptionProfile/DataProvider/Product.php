@@ -12,10 +12,9 @@ use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Container;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
+use \Magento\Framework\Api\Filter;
 
 
 class Product extends AbstractDataProvider
@@ -29,8 +28,6 @@ class Product extends AbstractDataProvider
     const DEFAULT_SCOPE_NAME = 'tnw_subscriptionprofile_create_product_listing';
 
     protected $scopeName = '';
-    /** @var Collection */
-    protected $collection;
     /** @var [] */
     protected $loadedData;
     /** @var UrlInterface */
@@ -43,7 +40,6 @@ class Product extends AbstractDataProvider
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param CollectionFactory $collectionFactory
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
      * @param array $meta
@@ -54,14 +50,12 @@ class Product extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        CollectionFactory $collectionFactory,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
         array $meta = [],
         array $data = [],
         $scopeName = ''
     ) {
-        $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME . '.' . self::DEFAULT_SCOPE_NAME;
@@ -94,6 +88,13 @@ class Product extends AbstractDataProvider
         return $meta;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function addFilter(Filter $filter)
+    {
+
+    }
 
     /**
      * @return array

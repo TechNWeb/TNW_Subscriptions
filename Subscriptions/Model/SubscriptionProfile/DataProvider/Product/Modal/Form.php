@@ -17,10 +17,9 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
+use \Magento\Framework\Api\Filter;
 
 
 class Form extends AbstractDataProvider
@@ -34,8 +33,6 @@ class Form extends AbstractDataProvider
 
     protected $scopeName;
 
-    /** @var Collection */
-    protected $collection;
     /** @var [] */
     protected $loadedData;
     /** @var UrlInterface */
@@ -60,7 +57,6 @@ class Form extends AbstractDataProvider
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param CollectionFactory $collectionFactory
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
      * @param Registry $registry
@@ -76,7 +72,6 @@ class Form extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        CollectionFactory $collectionFactory,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
         Registry $registry,
@@ -88,7 +83,6 @@ class Form extends AbstractDataProvider
         array $meta = [],
         array $data = []
     ) {
-        $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->registry = $registry;
@@ -149,6 +143,14 @@ class Form extends AbstractDataProvider
         );
 
         return $meta;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFilter(Filter $filter)
+    {
+
     }
 
     /**

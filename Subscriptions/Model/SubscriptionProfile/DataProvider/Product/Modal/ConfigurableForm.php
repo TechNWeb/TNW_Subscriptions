@@ -10,8 +10,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
+use \Magento\Framework\Api\Filter;
 
 
 class ConfigurableForm extends AbstractDataProvider
@@ -23,9 +22,6 @@ class ConfigurableForm extends AbstractDataProvider
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'tnw_subscriptionprofile_create_add_product_modal_configurable_form.tnw_subscriptionprofile_create_add_product_modal_configurable_form';
 
     protected $scopeName;
-
-    /** @var Collection */
-    protected $collection;
     /** @var [] */
     protected $loadedData;
     /** @var UrlInterface */
@@ -40,7 +36,6 @@ class ConfigurableForm extends AbstractDataProvider
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param CollectionFactory $collectionFactory
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
      * @param Registry $registry
@@ -52,7 +47,6 @@ class ConfigurableForm extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        CollectionFactory $collectionFactory,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
         Registry $registry,
@@ -60,7 +54,6 @@ class ConfigurableForm extends AbstractDataProvider
         array $meta = [],
         array $data = []
     ) {
-        $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->registry = $registry;
@@ -89,5 +82,13 @@ class ConfigurableForm extends AbstractDataProvider
         $meta = parent::getMeta();
 
         return $meta;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFilter(Filter $filter)
+    {
+
     }
 }
