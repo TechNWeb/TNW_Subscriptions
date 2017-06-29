@@ -44,7 +44,10 @@ class Config
             $groups = $subject->getGroups();
             foreach($groups as $groupName => $group) {
                 foreach($group['fields'] as $fieldName => $field) {
-                    if (in_array($fieldName, $this->fields)) {
+                    if (in_array($fieldName, $this->fields)
+                        && isset($field['value'])
+                    ) {
+                        // If field value is inherited there is no 'value' key but 'inherit' key
                         $value = $field['value'];
                         $price = sprintf("%F", $value);
                         $price = round($price, 2);
