@@ -8,21 +8,23 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
 {
-
     protected $resultPageFactory;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
+        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context, $coreRegistry);
+
+        parent::__construct($context, $coreRegistry, $dataPersistor);
     }
 
     /**
@@ -34,7 +36,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('id');
-        $model = $this->_objectManager->create('TNW\Subscriptions\Model\SubscriptionProfile');
+        $model = $this->_objectManager->create(\TNW\Subscriptions\Model\SubscriptionProfile::class);
 
         // 2. Initial checking
         if ($id) {

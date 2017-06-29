@@ -40,13 +40,13 @@ class SubscriptionProfileActions extends \Magento\Ui\Component\Listing\Columns\C
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (isset($item['id'])) {
+                if (isset($item['entity_id'])) {
                     $item[$this->getData('name')] = [
                         'edit' => [
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_EDIT,
                                 [
-                                    'id' => $item['id']
+                                    'id' => $item['entity_id']
                                 ]
                             ),
                             'label' => __('Edit')
