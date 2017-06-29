@@ -13,6 +13,7 @@ use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UninstallInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 class Uninstall implements UninstallInterface
 {
@@ -49,6 +50,8 @@ class Uninstall implements UninstallInterface
 
         $this->removeConfig($setup);
 
+        $this->removeSubscriptionProfileAttributesAndEntityType($setup);
+
         $setup->endSetup();
     }
 
@@ -63,7 +66,6 @@ class Uninstall implements UninstallInterface
             'tnw_subscriptions_subscription_profile_order',
             'tnw_subscriptions_product_subscription_profile',
             'tnw_subscriptions_billing_frequency',
-            'tnw_subscriptions_subscription_profile',
             'tnw_subscriptions_subscription_profile_entity_varchar',
             'tnw_subscriptions_subscription_profile_entity_text',
             'tnw_subscriptions_subscription_profile_entity_int',
@@ -97,7 +99,7 @@ class Uninstall implements UninstallInterface
             'tnw_subscr_trial_start_date',
             'tnw_subscr_start_date',
             'tnw_subscr_discount_amount',
-            'tnw_subscr_discount_type'
+            'tnw_subscr_discount_type',
         ];
 
         /** @var EavSetup $eavSetup */
@@ -119,6 +121,41 @@ class Uninstall implements UninstallInterface
         $where = $setup->getConnection()->quoteInto('value like ?', 'tnw_subscriptions%');
 
         $setup->getConnection()->delete($setup->getTable('core_config_data'), $where);
+
+        return $this;
+    }
+
+    /**
+     * Remove Subscription Profile Attributes.
+     *
+     * @param $setup
+     * @return $this
+     */
+    private function removeSubscriptionProfileAttributesAndEntityType($setup)
+    {
+        $tnwSubscriptionProfileAttributes = [
+            'customer_id',
+            'billing_frequency_id',
+            'label',
+            'unit',
+            'website_id',
+            'status',
+            'frequency',
+            'engine_code',
+            'shipping_address_id',
+            'billing_address_id',
+            'created_at',
+            'updated_at',
+        ];
+
+        /** @var EavSetup $eavSetup */
+        $eavSetup = $this->eavSetupFactory->create();
+
+        foreach ($tnwSubscriptionProfileAttributes as $tnwSubscriptionProfileAttribute) {
+            $eavSetup->removeAttribute(SubscriptionProfile::ENTITY, $tnwSubscriptionProfileAttribute);
+        }
+
+        $eavSetup->removeEntityType(SubscriptionProfile::ENTITY);
 
         return $this;
     }

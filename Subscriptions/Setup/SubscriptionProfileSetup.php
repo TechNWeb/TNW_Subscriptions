@@ -21,46 +21,6 @@ use \TNW\Subscriptions\Model\SubscriptionProfileFactory;
 class SubscriptionProfileSetup extends EavSetup
 {
     /**
-     * SubscriptionProfile model factory.
-     *
-     * @var SubscriptionProfileFactory
-     */
-    private $subscriptionProfileFactory;
-
-    /**
-     * @param ModuleDataSetupInterface $setup
-     * @param Context $context
-     * @param CacheInterface $cache
-     * @param CollectionFactory $attrGroupCollectionFactory
-     * @param SubscriptionProfileFactory $subscriptionProfileFactory
-     */
-    public function __construct(
-        ModuleDataSetupInterface $setup,
-        Context $context,
-        CacheInterface $cache,
-        CollectionFactory $attrGroupCollectionFactory,
-        SubscriptionProfileFactory $subscriptionProfileFactory
-    ) {
-        $this->subscriptionProfileFactory = $subscriptionProfileFactory;
-
-        parent::__construct($setup, $context, $cache, $attrGroupCollectionFactory);
-    }
-
-    /**
-     * Creates SubscriptionProfile model.
-     *
-     * @param array $data
-     *
-     * @return \TNW\Subscriptions\Model\SubscriptionProfile
-     *
-     * @codeCoverageIgnore
-     */
-    public function createCategory($data = [])
-    {
-        return $this->subscriptionProfileFactory->create($data);
-    }
-
-    /**
      * Default entity and attributes.
      *
      * @return array
@@ -78,7 +38,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 10,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'billing_frequency_id' => [
                         'type' => 'static',
@@ -86,7 +45,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 20,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'label' => [
                         'type' => 'static',
@@ -94,7 +52,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'unit' => [
                         'type' => 'static',
@@ -102,7 +59,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'website_id' => [
                         'type' => 'static',
@@ -110,7 +66,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'status' => [
                         'type' => 'static',
@@ -118,7 +73,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'frequency' => [
                         'type' => 'static',
@@ -126,7 +80,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'engine_code' => [
                         'type' => 'static',
@@ -134,7 +87,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'shipping_address_id' => [
                         'type' => 'static',
@@ -142,7 +94,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'billing_address_id' => [
                         'type' => 'static',
@@ -150,7 +101,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'created_at' => [
                         'type' => 'static',
@@ -158,7 +108,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                     'updated_at' => [
                         'type' => 'static',
@@ -166,7 +115,6 @@ class SubscriptionProfileSetup extends EavSetup
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
-                        'group' => 'Additional information',
                     ],
                 ],
             ],
