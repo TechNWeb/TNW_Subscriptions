@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Api\Data;
 interface ProductSubscriptionProfileInterface
 {
 
-    const ID = 'id';
+    const ID = 'entity_id';
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const PRICE = 'price';

@@ -67,14 +67,6 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection</argument>
         </arguments>
     </virtualType>
-    <virtualType name="TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Grid\Collection"
-                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
-        <arguments>
-            <argument name="mainTable" xsi:type="string">tnw_subscriptions_product_subscription_profile</argument>
-            <argument name="resourceModel"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection</argument>
-        </arguments>
-    </virtualType>
 
     <type name="Magento\Catalog\Model\Product">
         <plugin name="subscriptions_product"
