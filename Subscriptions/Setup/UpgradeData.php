@@ -36,7 +36,7 @@ class UpgradeData implements UpgradeDataInterface
         /** @var EavSetup $eavSetup */
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
 
-        if (version_compare($context->getVersion(), "2.0.3", "<")) {
+        if (version_compare($context->getVersion(), "2.0.4", "<")) {
             $eavSetup->updateAttribute(
                 Product::ENTITY,
                 'tnw_subscr_trial_price',
