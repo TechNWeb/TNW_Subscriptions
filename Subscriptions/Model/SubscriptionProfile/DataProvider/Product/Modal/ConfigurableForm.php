@@ -10,7 +10,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use \Magento\Framework\Api\Filter;
+use Magento\Framework\Api\Filter;
 
 
 class ConfigurableForm extends AbstractDataProvider

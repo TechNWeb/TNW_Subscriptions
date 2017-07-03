@@ -2,8 +2,6 @@
 
 namespace TNW\Subscriptions\Model\Backend\Session;
 
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
 use Magento\Framework\Session\Config\ConfigInterface;
@@ -15,10 +13,10 @@ use Magento\Framework\Session\ValidatorInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Model\QuoteFactory;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Class Quote
@@ -38,20 +36,14 @@ class Quote extends SessionManager
     /** @var Store */
     protected $store;
 
-    /** @var CustomerRepositoryInterface */
-    protected $customerRepository;
-
     /** @var CartRepositoryInterface */
     protected $quoteRepository;
 
     /** @var StoreManagerInterface */
     protected $storeManager;
 
-    /** @var GroupManagementInterface */
-    protected $groupManagement;
-
-    /** @var QuoteFactory */
-    protected $quoteFactory;
+    /** @var SearchCriteriaBuilder */
+    protected $searchCriteriaBuilder;
 
     /**
      * Quote constructor.
@@ -64,11 +56,8 @@ class Quote extends SessionManager
      * @param CookieManagerInterface $cookieManager
      * @param CookieMetadataFactory $cookieMetadataFactory
      * @param State $appState
-     * @param CustomerRepositoryInterface $customerRepository
      * @param CartRepositoryInterface $quoteRepository
      * @param StoreManagerInterface $storeManager
-     * @param GroupManagementInterface $groupManagement
-     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         Http $request,
@@ -80,17 +69,13 @@ class Quote extends SessionManager
         CookieManagerInterface $cookieManager,
         CookieMetadataFactory $cookieMetadataFactory,
         State $appState,
-        CustomerRepositoryInterface $customerRepository,
         CartRepositoryInterface $quoteRepository,
         StoreManagerInterface $storeManager,
-        GroupManagementInterface $groupManagement,
-        QuoteFactory $quoteFactory
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->customerRepository = $customerRepository;
         $this->quoteRepository = $quoteRepository;
         $this->storeManager = $storeManager;
-        $this->groupManagement = $groupManagement;
-        $this->quoteFactory = $quoteFactory;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         parent::__construct(
             $request,
             $sidResolver,
@@ -157,14 +142,26 @@ class Quote extends SessionManager
     }
 
     /**
-     * @return \Magento\Quote\Api\Data\CartInterface[]|ModelQuote[]
+     * @return ModelQuote[]
      */
     public function getSubQuotes()
     {
         if ($this->quotes === null){
-            //TODO
+
             $quoteIds = $this->getSubQuoteIds();
-            $this->quotes = $this->quoteRepository->getList()->getItems();
+            $this->quotes = [];
+
+            if ($quoteIds){
+                $searchCriteria = $this->searchCriteriaBuilder
+                    ->addFilter(
+                        ModelQuote::KEY_ENTITY_ID,
+                        $quoteIds,
+                        'in'
+                    )
+                    ->create();
+
+                $this->quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+            }
         }
 
         return $this->quotes;
@@ -205,6 +202,9 @@ class Quote extends SessionManager
         return $this;
     }
 
+    /**
+     * @return []|null
+     */
     public function getShippingAddressData()
     {
         return $this->storage->getSubShippingAddressData();
@@ -219,6 +219,25 @@ class Quote extends SessionManager
         $this->storage->setSubShippingAddressData($data);
 
         return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setCreateNewCustomer($value)
+    {
+        $this->storage->setCreateNewCustomer($value);
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCreateNewCustomer()
+    {
+        return $this->storage->getCreateNewCustomer();
     }
 
 

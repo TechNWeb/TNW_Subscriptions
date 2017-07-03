@@ -61,4 +61,21 @@ class BillingFrequencyUnitType implements ArrayInterface
 
         return $optionList;
     }
+
+    /**
+     * @param $value
+     * @return null
+     */
+    public function getLabelByValue($value)
+    {
+        $result = null;
+
+        foreach ($this->toOptionArray() as $option){
+            if ($option['value'] == $value){
+                $result = $option['label'];
+            }
+        }
+
+        return $result;
+    }
 }

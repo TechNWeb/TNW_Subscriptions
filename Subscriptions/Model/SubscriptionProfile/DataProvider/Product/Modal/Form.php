@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
@@ -19,7 +20,6 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
-use \Magento\Framework\Api\Filter;
 
 
 class Form extends AbstractDataProvider
@@ -28,6 +28,8 @@ class Form extends AbstractDataProvider
 
     const FORM_DATA_KEY = 'add_product_modal_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
+
+    const DEFAULT_PERIOD_VALUE = 1;
 
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'tnw_subscriptionprofile_create_add_product_modal_form.tnw_subscriptionprofile_create_add_product_modal_form';
 
@@ -114,6 +116,8 @@ class Form extends AbstractDataProvider
             $data[self::FORM_DATA_VALUE]['product_frequencies'][$frequency->getBillingFrequencyId()] = $frequency->getPrice();
         }
 
+        $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
+
         return $data;
     }
 
@@ -184,11 +188,8 @@ class Form extends AbstractDataProvider
                     'start_on' => [
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'visible' => $this->getStartOnFieldVisibility()
-                                ]
+                                'config' => $this->getStartOnFieldConfig()
                             ]
-
                         ]
                     ],
                     'price' => [
@@ -256,25 +257,37 @@ class Form extends AbstractDataProvider
         ];
     }
 
-    protected function getStartOnFieldVisibility()
+    protected function getStartOnFieldConfig()
     {
-        $result = false;
+        $visible = false;
+        $value = null;
+
         $productId = $this->request->getParam('product_id', null);
 
         if ($productId) {
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productId);
 
-            if ($product->getData(Trial::CODE_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER
-                || $product->getData(Trial::CODE_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER
-            ) {
-                $result = true;
+            if ($product->getData(Trial::CODE_TRIAL)) {
+                if ($product->getData(Trial::CODE_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+                    $visible = true;
+                } else {
+                    $value = $product->getData(Trial::CODE_TRIAL_START_DATE);
+                }
+            } else {
+                if ($product->getData(Trial::CODE_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+                    $visible = true;
+                } else {
+                    $value = $product->getData(Trial::CODE_START_DATE);
+                }
             }
         }
 
-        return $result;
+        return [
+            'visible' => $visible,
+            'value' => $value
+        ];
     }
-
 
     /**
      * @return array
