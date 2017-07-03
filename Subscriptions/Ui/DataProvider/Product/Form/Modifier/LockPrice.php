@@ -55,6 +55,7 @@ class LockPrice extends AbstractModifier
             $meta,
             [
                 'notice' =>  __('Recurring option price will always match the product price.'),
+                'elementTmpl' => 'TNW_Subscriptions/form/element/switcher',
             ]
         );
 
@@ -70,7 +71,6 @@ class LockPrice extends AbstractModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
                     'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
-                    'checked' =>  'ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
                 ],
                 'notice' =>  __('Recurring option price will always match the product price.'),
             ]
