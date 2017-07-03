@@ -19,6 +19,7 @@ class Grid extends ProductDataProvider
      */
     const DATA_SCOPE_ADD_PRODUCT_GRID = 'tnw_subscriptionprofile_create_add_product_modal_listing';
     /**#@-*/
+
     /**
      * Grid constructor.
      * @param string $name
