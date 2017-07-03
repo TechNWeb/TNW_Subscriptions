@@ -40,7 +40,7 @@
                 <item name="label" xsi:type="string"/>
             </item>
         </argument>
-        <field name="store">
+        <field name="store_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
@@ -48,7 +48,7 @@
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="source" xsi:type="string">Store</item>
                     <item name="sortOrder" xsi:type="number">110</item>
-                    <item name="dataScope" xsi:type="string">store</item>
+                    <item name="dataScope" xsi:type="string">store_id</item>
                     <item name="disabled" xsi:type="boolean">false</item>
                 </item>
             </argument>

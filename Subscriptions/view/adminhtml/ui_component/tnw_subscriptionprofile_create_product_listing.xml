@@ -33,6 +33,7 @@
     <columns name="tnw_subscriptionprofile_product_columns">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/subscription-listing</item>
                 <item name="childDefaults" xsi:type="array">
                     <item name="fieldAction" xsi:type="array">
                         <item name="provider" xsi:type="string">ProfileProductsListing</item>
@@ -44,5 +45,40 @@
                 </item>
             </item>
         </argument>
+        <column name="title">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldClass" xsi:type="string">sub-product-title</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </column>
+        <column name="products">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldClass" xsi:type="string">sub-products</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/sub-products</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                </item>
+            </argument>
+        </column>
+        <column name="frequency_description">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldClass" xsi:type="string">sub-product-frequency-description</item>
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="sortOrder" xsi:type="number">80</item>
+                </item>
+            </argument>
+        </column>
+        <column name="shipping_method">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldClass" xsi:type="string">sub-product-shipping-method</item>
+                    <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/cells/shipping-method</item>
+                    <item name="sortOrder" xsi:type="number">90</item>
+                </item>
+            </argument>
+        </column>
     </columns>
 </listing>

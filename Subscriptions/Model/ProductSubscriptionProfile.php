@@ -8,15 +8,28 @@ namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 
-class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel implements ProductSubscriptionProfileInterface
+/**
+ * Product subscription profile model.
+ */
+class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
+    implements ProductSubscriptionProfileInterface
 {
+    /**
+     * Entity code.
+     */
+    const ENTITY = 'tnw_product_subscription_profile';
+
+    /**
+     * Entity table.
+     */
+    const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
 
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile');
+        $this->_init(\TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class);
     }
 
     /**

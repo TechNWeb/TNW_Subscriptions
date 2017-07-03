@@ -60,6 +60,14 @@ abstract class SubscriptionProfile extends Action
         return $this->_objectManager->get('TNW\Subscriptions\Model\Backend\Session\Quote');
     }
 
+    /**
+     * @return \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create
+     */
+    protected function getSubCreateModel()
+    {
+        return $this->_objectManager->get('TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create');
+    }
+
 
     protected function clearSessionData()
     {

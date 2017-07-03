@@ -6,9 +6,11 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+/**
+ * Product subscription profile collection.
+ */
+class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection
 {
-
     /**
      * Define resource model
      *
@@ -17,8 +19,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            'TNW\Subscriptions\Model\ProductSubscriptionProfile',
-            'TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile'
+            \TNW\Subscriptions\Model\ProductSubscriptionProfile::class,
+            \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class
         );
     }
 }
