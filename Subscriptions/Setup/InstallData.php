@@ -2,7 +2,6 @@
 /**
  *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
- *
  */
 
 namespace TNW\Subscriptions\Setup;
@@ -12,10 +11,14 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\InstallDataInterface;
+use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
+use Magento\Catalog\Model\Product;
 
 class InstallData implements InstallDataInterface
 {
-
+    /**
+     * @var EavSetupFactory
+     */
     private $eavSetupFactory;
 
     /**
@@ -39,7 +42,7 @@ class InstallData implements InstallDataInterface
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_purchase_type',
             [
                 'type' => 'int',
@@ -49,7 +52,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\PurchaseType',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -68,7 +71,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_trial_status',
             [
                 'type' => 'int',
@@ -78,7 +81,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'boolean',
                 'class' => '',
                 'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -97,7 +100,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_trial_length',
             [
                 'type' => 'varchar',
@@ -107,7 +110,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'text',
                 'class' => '',
                 'source' => '',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -126,7 +129,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_trial_length_unit',
             [
                 'type' => 'int',
@@ -136,7 +139,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -155,7 +158,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_trial_price',
             [
                 'type' => 'varchar',
@@ -165,7 +168,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'text',
                 'class' => '',
                 'source' => '',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -184,7 +187,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_trial_start_date',
             [
                 'type' => 'int',
@@ -194,7 +197,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -213,7 +216,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_start_date',
             [
                 'type' => 'int',
@@ -223,7 +226,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -242,7 +245,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_lock_product_price',
             [
                 'type' => 'int',
@@ -252,7 +255,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'boolean',
                 'class' => '',
                 'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -271,7 +274,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_offer_flat_discount',
             [
                 'type' => 'int',
@@ -281,7 +284,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'boolean',
                 'class' => '',
                 'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -300,7 +303,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_discount_amount',
             [
                 'type' => 'varchar',
@@ -310,7 +313,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'text',
                 'class' => '',
                 'source' => '',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
@@ -329,7 +332,7 @@ class InstallData implements InstallDataInterface
         );
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'tnw_subscr_discount_type',
             [
                 'type' => 'varchar',
@@ -339,7 +342,7 @@ class InstallData implements InstallDataInterface
                 'input' => 'select',
                 'class' => '',
                 'source' => 'TNW\Subscriptions\Model\Config\Source\DiscountType',
-                'global' => 2,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
