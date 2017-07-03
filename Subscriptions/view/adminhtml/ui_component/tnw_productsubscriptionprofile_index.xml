@@ -66,7 +66,7 @@
                 </item>
             </argument>
         </selectionsColumn>
-        <column name="id">
+        <column name="entity_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>

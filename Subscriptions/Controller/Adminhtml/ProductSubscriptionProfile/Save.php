@@ -38,7 +38,7 @@ class Save extends \Magento\Backend\App\Action
         if ($data) {
             $id = $this->getRequest()->getParam('id');
 
-            $model = $this->_objectManager->create('TNW\Subscriptions\Model\ProductSubscriptionProfile')->load($id);
+            $model = $this->_objectManager->create(\TNW\Subscriptions\Model\ProductSubscriptionProfile::class)->load($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Product Subscription Profile no longer exists.'));
                 return $resultRedirect->setPath('*/*/');

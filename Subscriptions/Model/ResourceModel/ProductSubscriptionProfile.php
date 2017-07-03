@@ -6,16 +6,20 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel;
 
-class ProductSubscriptionProfile extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+/**
+ * Product subscription profile resource model.
+ */
+class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntity
 {
-
     /**
-     * Define resource model
-     *
-     * @return void
+     * @inheritdoc
      */
-    protected function _construct()
+    public function getEntityType()
     {
-        $this->_init('tnw_subscriptions_product_subscription_profile', 'id');
+        if (empty($this->_type)) {
+            $this->setType(\TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY);
+        }
+
+        return parent::getEntityType();
     }
 }

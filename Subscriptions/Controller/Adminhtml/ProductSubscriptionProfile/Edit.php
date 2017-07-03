@@ -34,7 +34,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\ProductSubscriptionPr
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('id');
-        $model = $this->_objectManager->create('TNW\Subscriptions\Model\ProductSubscriptionProfile');
+        $model = $this->_objectManager->create(\TNW\Subscriptions\Model\ProductSubscriptionProfile::class);
 
         // 2. Initial checking
         if ($id) {

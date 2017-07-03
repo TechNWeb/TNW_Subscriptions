@@ -10,41 +10,85 @@ namespace TNW\Subscriptions\Setup;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
+/**
+ * Upgrade data for TNW Subscriptions.
+ */
 class UpgradeData implements UpgradeDataInterface
 {
     /**
-     * @var SubscriptionProfileSetupFactory
+     * @var SubscriptionSetupFactory
      */
-    private $subscriptionProfileSetupFactory;
+    private $subscriptionSetupFactory;
 
     /**
-     * @param SubscriptionProfileSetupFactory $subscriptionProfileSetupFactory
+     * @param SubscriptionSetupFactory $subscriptionSetupFactory
      */
-    public function __construct(SubscriptionProfileSetupFactory $subscriptionProfileSetupFactory)
+    public function __construct(SubscriptionSetupFactory $subscriptionSetupFactory)
     {
-        $this->subscriptionProfileSetupFactory = $subscriptionProfileSetupFactory;
+        $this->subscriptionSetupFactory = $subscriptionSetupFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function upgrade(
-        ModuleDataSetupInterface $setup,
-        ModuleContextInterface $context
-    ) {
+    public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
+    {
         $setup->startSetup();
 
         if (version_compare($context->getVersion(), "2.0.3", "<")) {
-            /** @var SubscriptionProfileSetup $subscriptionProfileSetup */
-            $subscriptionProfileSetup = $this->subscriptionProfileSetupFactory->create(['setup' => $setup]);
-            $subscriptionProfileSetup->installEntities();
-
-            $subscriptionProfileSetup->addAttributeGroup(
-                'subscription_profile',
+            /** @var SubscriptionSetup $subscriptionSetup */
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $subscriptionSetup->installEntities();
+            $subscriptionSetup->addAttributeGroup(
+                SubscriptionProfile::ENTITY,
                 'Default',
                 'Additional information'
             );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.5", "<")) {
+
+            /** @var SubscriptionSetup $subscriptionSetup */
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $subscriptionSetup->installEntities();
+            $subscriptionSetup->addAttributeGroup(
+                ProductSubscriptionProfile::ENTITY,
+                'Default',
+                'Additional information'
+            );
+
+            if ($setup->tableExists('tnw_subscriptions_product_subscription_profile')) {
+                $select = $setup->getConnection()->select()
+                    ->from($setup->getTable('tnw_subscriptions_product_subscription_profile'));
+                $select = $setup->getConnection()->insertFromSelect(
+                    $select,
+                    $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                    [
+                        'entity_id',
+                        'subscription_profile_id',
+                        'magento_product_id',
+                        'price',
+                        'initial_fee',
+                        'qty',
+                        'purchase_type',
+                        'trial_status',
+                        'trial_length',
+                        'trial_length_unit',
+                        'trial_price',
+                        'trial_start_date',
+                        'start_date',
+                        'lock_product_price_status',
+                        'offer_flat_discount_status',
+                        'discount_amount',
+                        'discount_type',
+                    ]
+                );
+                $setup->getConnection()->query($select);
+                $setup->getConnection()->dropTable('tnw_subscriptions_product_subscription_profile');
+            }
         }
 
         $setup->endSetup();
