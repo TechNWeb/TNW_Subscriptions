@@ -132,7 +132,7 @@ define([
         },
 
         /**
-         * Return product price ineger value
+         * Return product price integer value
          *
          * @returns {number}
          */
@@ -154,7 +154,8 @@ define([
          * Fires to change comment after 'Lock product price' is checked.
          */
         changeCommentLockPrice: function (checked) {
-            if (!checked) {
+            var lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price');
+            if (lockPriceComponent.valueChangedByUser && !checked) {
                 var priceFormat = this.getPriceFormat();
                 var productPrice = this.getProductPriceComponentValue();
                 this.value(formatPrice.formatPrice(productPrice, priceFormat));
