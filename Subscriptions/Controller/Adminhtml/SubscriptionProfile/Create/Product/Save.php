@@ -6,25 +6,11 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Product;
 
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use Magento\Framework\Controller\ResultFactory;
 
-class Save extends \Magento\Backend\App\Action
+class Save extends SubscriptionProfile
 {
-
-    protected $dataPersistor;
-
-    /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
-     */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
-    ) {
-        $this->dataPersistor = $dataPersistor;
-        parent::__construct($context);
-    }
-
     /**
      * Save action
      *
@@ -32,7 +18,9 @@ class Save extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $response = [];
+        $data = $this->getRequest()->getParams();
+
+        $response = $this->getSubCreateModel()->addToSubscription($data);
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
     }
 

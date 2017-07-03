@@ -1,6 +1,27 @@
-.subscription-prodile-products-container .admin__field-complex-elements{
+.subscription-profile-products-container .admin__field-complex-elements{
   max-width: 100%;
 }
+
+.subscription-profile-products-container .sub-button-left{
+  display: block;
+  padding-top: .6875em;
+  padding-bottom: .6875em;
+  float: left;
+  font-size: 16px;
+}
+
+.subscription-profile-products-container .sub-button-right{
+  display: block;
+  padding-top: .6875em;
+  padding-bottom: .6875em;
+  float: right;
+  font-size: 16px;
+}
+
+.subscription-profile-products-container .admin__fieldset{
+  padding-top: 0;
+}
+
 .admin__data-grid-header-row .header-grid-dext{
   font-size: 2.1rem;
   float: left;
@@ -22,7 +43,6 @@
   text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
   width: 100%;
 }
-
 
 .subscriptions-add-product-modal-form-container .admin__fieldset{
   padding-top: 1.4rem;
@@ -55,4 +75,104 @@
   margin-left: 2.6rem;
   margin-right: 2.6rem;
   padding-left: 0;
+}
+
+.sub-data-grid {
+  color: #666;
+  padding: 0 2rem;
+  background: #f8f8f8;
+  border: 1px solid #e3e3e3;
+}
+
+.sub-data-grid .sub-data-product-container{
+  padding-top: 1.5rem;
+}
+
+.sub-data-grid .sub-product-title{
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sub-data-grid .sub-data-thumbnail{
+  display: inline-block;
+  width: 20%;
+}
+
+.sub-data-grid .sub-data-thumbnail img{
+  display: block;
+  width: 5rem;
+}
+
+.sub-data-grid .dotted-border:after {
+  content: '.................';
+  font-size: 3rem;
+  width: 85%;
+  line-height: 1rem;
+  letter-spacing: 1rem;
+  display: block;
+  margin: 0 auto;
+  padding-bottom: 15px;
+  color: #ccc;
+}
+
+
+.sub-data-grid .border {
+  border-bottom: 2px solid #e3e3e3;
+}
+
+.sub-data-grid .sub-data-row {
+  padding: 1rem 0 0 0;
+}
+
+.sub-data-grid .sub-data-product{
+  display: inline-block;
+  width: 75%;
+  vertical-align: top;
+}
+
+.sub-data-grid .sub-data-product-name{
+  font-size: 16px;
+}
+
+.sub-data-grid .sub-data-product-qty{
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.sub-data-grid .sub-product-shipping-method{
+  padding: 0 0 2rem 0;
+}
+
+.sub-data-grid .subscription-shipping-title{
+  font-weight: bold;
+  padding: 0.5rem 0;
+}
+
+.sub-data-grid .subscription-shipping-method{
+  font-style: italic;
+}
+
+.sub-data-grid .sub-product-frequency-description{
+  padding-top: 1rem;
+}
+
+.sub-data-grid .sub-product-frequency-description .data-grid-cell-content span{
+  font-weight: bold;
+}
+
+.data-total-container .total-title{
+  padding: 1.5rem 0 1.5rem 2rem;
+  font-size: 2.25rem;
+  display: inline-block;
+}
+
+.data-total-container .total-value{
+  padding: 1.5rem 2rem 1.5rem 0;
+  font-size: 2.25rem;
+  display: inline-block;
+  float: right;
+}
+
+.data-total-container{
+  background: #e4e4e4;
 }
