@@ -17,9 +17,9 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
      */
     public function getButtonData()
     {
-        $configurableModal = Product::DEFAULT_SCOPE_NAME . '.'
-            . Product::DEFAULT_SCOPE_NAME
-            . '.'.Product::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS
+        $configurableModal = Product::DATA_SCOPE_SUBSCRIPTION_LISTING . '.'
+            . Product::DATA_SCOPE_SUBSCRIPTION_LISTING
+            . '.' . Product::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS
             . '.configurableModal';
 
         return [
@@ -34,7 +34,7 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
                                 'actionName' => 'toggleModal',
                             ],
                             [
-                                'targetName' => Form::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
+                                'targetName' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM,
                                 'actionName' => 'setConfigurableData',
                             ]
                         ]
