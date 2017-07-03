@@ -14,8 +14,11 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class Grid extends ProductDataProvider
 {
+    /**#@+
+     * Modal products grid data scope
+     */
     const DATA_SCOPE_ADD_PRODUCT_GRID = 'tnw_subscriptionprofile_create_add_product_modal_listing';
-
+    /**#@-*/
     /**
      * Grid constructor.
      * @param string $name

@@ -12,26 +12,50 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
 
 class Product extends AbstractDataProvider
 {
+    /**#@+
+     * Form scope and group values
+     */
     const GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
     const DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
+    /**#@-*/
+
+    /**#@+
+     * Data scopes for child elements
+     */
     const DATA_SCOPE_ADD_PRODUCT_MODAL_GRID = 'add_product_modal_grid';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'add_product_modal_form';
-    const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM_BUTTON = 'add_to_subscription_button';
-    const DEFAULT_SCOPE_NAME = 'tnw_subscriptionprofile_create_product_listing';
+    const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
+    /**#@-*/
+
+    /**#@+
+     * Layout handles for forms
+     */
+    const FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product';
+    const CONFIGURABLE_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product_configurable';
+    /**#@-*/
+
+    /**#@+
+     * Subscription listing data scope
+     */
+    const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_create_product_listing';
+    /**#@-*/
 
     protected $scopeName = '';
     /** @var UrlInterface */
@@ -87,7 +111,7 @@ class Product extends AbstractDataProvider
         $this->context = $context;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->frequencyRepository = $frequencyRepository;
-        $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME . '.' . self::DEFAULT_SCOPE_NAME;
+        $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
@@ -179,15 +203,15 @@ class Product extends AbstractDataProvider
 
 
     /**
-     * @param $subscriptionData
-     * @return string
+     * @param $startDate
+     * @return \Magento\Framework\Phrase|string
      */
     protected function getFormattedStartDate($startDate)
     {
         $nowDate = new \DateTime();
         $nowDate = $nowDate->format('Y-m-d');
 
-        if ($startDate == $nowDate){
+        if ($startDate == $nowDate) {
             $startDate = __('today');
         } else {
             $startDate = $this->context->getLocaleDate()->formatDate(
@@ -285,8 +309,8 @@ class Product extends AbstractDataProvider
                             'arguments' => [
                                 'data' => [
                                     'config' => [
-                                        'formElement' => 'container',
-                                        'componentType' => 'container',
+                                        'formElement' => Container::NAME,
+                                        'componentType' => Container::NAME,
                                         'component' => 'TNW_Subscriptions/js/components/primary-button',
                                         'template' => 'TNW_Subscriptions/form/element/primary-button',
                                         'displayPrimary' => empty($this->session->getSubQuoteIds()),
@@ -311,8 +335,8 @@ class Product extends AbstractDataProvider
                             'arguments' => [
                                 'data' => [
                                     'config' => [
-                                        'formElement' => 'container',
-                                        'componentType' => 'container',
+                                        'formElement' => Container::NAME,
+                                        'componentType' => Container::NAME,
                                         'component' => 'TNW_Subscriptions/js/components/primary-button',
                                         'template' => 'TNW_Subscriptions/form/element/primary-button',
                                         'displayPrimary' => false,
@@ -357,10 +381,7 @@ class Product extends AbstractDataProvider
                 'data' => [
                     'config' => [
                         'isTemplate' => false,
-                        'componentType' => 'modal',
-                        'imports' => [
-                            'state' => '!index=tnw_subscriptionprofile_create_add_product_modal_form:responseStatus'
-                        ],
+                        'componentType' => Modal::NAME,
                         'options' => [
                             'title' => __('Select a product'),
                             'modalClass' => 'subscriptions-add-product-modal',
@@ -422,12 +443,12 @@ class Product extends AbstractDataProvider
                         'realTimeLink' => true,
                         'behaviourType' => 'simple',
                         'externalFilterMode' => true,
-                        'componentType' => 'container',
+                        'componentType' => Container::NAME,
                         'autoRender' => false,
-                        'dataScope' => 'tnw_subscriptionprofile_create_add_product_modal_listing',
-                        'externalProvider' => 'tnw_subscriptionprofile_create_add_product_modal_listing.tnw_subscriptionprofile_create_add_product_modal_listing_data_source',
+                        'dataScope' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID,
+                        'externalProvider' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID . '.' . Grid::DATA_SCOPE_ADD_PRODUCT_GRID . '_data_source',
                         'selectionsProvider' => '${ $.ns }.${ $.ns }.tnw_subscriptionprofile_product_columns.ids',
-                        'ns' => 'tnw_subscriptionprofile_create_add_product_modal_listing',
+                        'ns' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID,
                         'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
                         'immediateUpdateBySelection' => true,
                         'dataLinks' => ['imports' => false, 'exports' => true],
@@ -453,21 +474,21 @@ class Product extends AbstractDataProvider
                     'config' => [
                         'visible' => false,
                         'label' => '',
-                        'componentType' => 'container',
+                        'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
                         'dataScope' => '',
                         'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
                         'render_url' => $this->urlBuilder->getUrl(
                             'mui/index/render_handle',
                             [
-                                'handle' => 'tnw_subscriptions_subscriptionprofile_create_add_product',
+                                'handle' => self::FORM_HANDLE,
                                 'buttons' => 1,
                                 Form::FORM_DATA_KEY => Form::FORM_DATA_VALUE
                             ]
                         ),
                         'autoRender' => true,
-                        'ns' => 'tnw_subscriptionprofile_create_add_product_modal_form',
-                        'externalProvider' => Form::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM . '_data_source',
+                        'ns' => Form::DATA_SCOPE_MODAL_FORM,
+                        'externalProvider' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         'formSubmitType' => 'ajax'
                     ],
@@ -484,10 +505,7 @@ class Product extends AbstractDataProvider
                 'data' => [
                     'config' => [
                         'isTemplate' => false,
-                        'componentType' => 'modal',
-                        'imports' => [
-                            'state' => '!index=add_product_modal_configurable_form:responseStatus'
-                        ],
+                        'componentType' => Modal::NAME,
                         'options' => [
                             'title' => 'Configure product',
                             'modalClass' => 'subscriptions-add-product-configurable-modal',
@@ -512,20 +530,21 @@ class Product extends AbstractDataProvider
                     'config' => [
                         'visible' => true,
                         'label' => '',
-                        'componentType' => 'container',
+                        'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
                         'dataScope' => '',
                         'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
                         'render_url' => $this->urlBuilder->getUrl(
                             'mui/index/render_handle',
                             [
-                                'handle' => 'tnw_subscriptions_subscriptionprofile_create_add_product_configurable',
-                                'buttons' => 1
+                                'handle' => self::CONFIGURABLE_FORM_HANDLE,
+                                'buttons' => 1,
+                                ConfigurableForm::FORM_DATA_KEY => ConfigurableForm::FORM_DATA_VALUE
                             ]
                         ),
                         'autoRender' => false,
-                        'ns' => 'tnw_subscriptionprofile_create_add_product_modal_configurable_form',
-                        'externalProvider' => ConfigurableForm::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM . '_data_source',
+                        'ns' => '' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
+                        'externalProvider' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '.' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }'
                     ],
                 ],
