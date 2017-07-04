@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use \Magento\Framework\Api\Filter;
+use Magento\Framework\Api\Filter;
 
 class ShippingAndBilling extends AbstractDataProvider
 {

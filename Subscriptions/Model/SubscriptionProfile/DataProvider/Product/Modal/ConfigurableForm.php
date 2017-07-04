@@ -10,16 +10,29 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use \Magento\Framework\Api\Filter;
+use Magento\Framework\Api\Filter;
 
 
 class ConfigurableForm extends AbstractDataProvider
 {
-    const GROUP_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'tnw_subscriptionprofile_create_add_product_modal_configurable_form';
-
+    /**#@+
+     * Form request values
+     */
     const FORM_DATA_KEY = 'add_product_modal_configurable_form_data';
+    const FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
 
-    const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'tnw_subscriptionprofile_create_add_product_modal_configurable_form.tnw_subscriptionprofile_create_add_product_modal_configurable_form';
+    /**#@+
+     * Form data scope
+     */
+    const DATA_SCOPE_CONFIGURABLE_MODAL_FORM = 'tnw_subscriptionprofile_create_add_product_modal_configurable_form';
+    /**#@-*/
+
+    /**#@+
+     * Qty field default value
+     */
+    const DEFAULT_QTY_VALUE = 1;
+    /**#@-*/
 
     protected $scopeName;
     /** @var [] */
@@ -57,7 +70,7 @@ class ConfigurableForm extends AbstractDataProvider
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->registry = $registry;
-        $this->scopeName = $scope ? $scope : self::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM;
+        $this->scopeName = $scope ? $scope : self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM .'.'.  self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
@@ -70,6 +83,8 @@ class ConfigurableForm extends AbstractDataProvider
     public function getData()
     {
         $data = [];
+
+        $data[self::FORM_DATA_VALUE]['qty'] = self::DEFAULT_QTY_VALUE;
 
         return $data;
     }

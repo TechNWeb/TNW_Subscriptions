@@ -23,7 +23,7 @@
                 <item name="tnw_productbillingfrequency_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_grid_data_source"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\Collection</item>
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Grid\Collection</item>
                 <item name="tnw_subscriptionprofileorder_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection</item>
                 <item name="tnw_productsubscriptionprofile_grid_data_source"
@@ -53,14 +53,6 @@
                 type="TNW\Subscriptions\Model\ProductBillingFrequency"/>
     <preference for="TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
-    <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\Collection"
-                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
-        <arguments>
-            <argument name="mainTable" xsi:type="string">tnw_subscriptions_subscription_profile</argument>
-            <argument name="resourceModel"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection</argument>
-        </arguments>
-    </virtualType>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfileRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface"
@@ -73,14 +65,6 @@
             <argument name="mainTable" xsi:type="string">tnw_subscriptions_subscription_profile_order</argument>
             <argument name="resourceModel"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Grid\Collection"
-                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
-        <arguments>
-            <argument name="mainTable" xsi:type="string">tnw_subscriptions_product_subscription_profile</argument>
-            <argument name="resourceModel"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection</argument>
         </arguments>
     </virtualType>
 
@@ -135,6 +119,14 @@
         <plugin name="subscriptions_eav_attribute"
                 type="TNW\Subscriptions\Plugin\Product\Attribute"
                 sortOrder="60"
+                disabled="false"/>
+    </type>
+
+    <!-- Addon text form element plugin -->
+    <type name="Magento\Framework\Data\Form\AbstractForm">
+        <plugin name="subscriptions_add_currency_form_element_type"
+                type="TNW\Subscriptions\Plugin\Data\Form\AbstractForm"
+                sortOrder="10"
                 disabled="false"/>
     </type>
 </config>

@@ -14,7 +14,7 @@ interface SubscriptionProfileInterface
     const CUSTOMER_ID = 'customer_id';
     const STATUS = 'status';
     const FREQUENCY = 'frequency';
-    const ID = 'id';
+    const ID = 'entity_id';
     const LABEL = 'label';
     const BILLING_FREQUENCY_ID = 'billing_frequency_id';
     const ENGINE_CODE = 'engine_code';

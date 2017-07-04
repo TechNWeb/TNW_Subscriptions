@@ -33,7 +33,6 @@ define(
                     grid.destroyInserted();
                     //reset form
                     this.getModalForm().set('visible', false);
-                    this.getModalForm().set('isRendered', false);
                     //close modal
                     mainModal.closeModal();
                     //reload sub listing
@@ -64,7 +63,8 @@ define(
             setConfigurableData: function () {
                 var data;
 
-                data = registry.get(this.source.configurableForm).source.data;
+                data = registry.get('index=' + this.source.configurableForm).source.data;
+
                 this.getModalForm().configurableData = $.extend(this.getModalForm().configurableData, data);
 
                 this.updateModalGrid();
@@ -139,9 +139,8 @@ define(
              * Render form data.
              */
             renderForm: function (form, params) {
-                form.destroyInserted();
                 form.set('visible', true);
-                form.set('isRendered', false);
+                form.destroyInserted();
                 form.render(params);
             },
 
@@ -157,8 +156,7 @@ define(
                 if (!this.additionalInvalid && !this.source.get('params.invalid')) {
                     this.setAdditionalData(this.getModalForm().configurableData);
 
-                    this.setAdditionalData(data)
-                        .submit(redirect);
+                    this.setAdditionalData(data).submit(redirect);
                 }
             }
         });

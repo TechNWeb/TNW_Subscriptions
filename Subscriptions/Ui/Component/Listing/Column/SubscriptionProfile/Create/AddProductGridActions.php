@@ -48,7 +48,7 @@ class AddProductGridActions extends Column
                         'view' => [
                             'label' => __('[Add]'),
                             'callback' => [
-                                'provider' => Form::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
+                                'provider' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM,
                                 'target' => 'setProductId'
                             ]
                         ]
