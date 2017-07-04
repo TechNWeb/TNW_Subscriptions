@@ -11,6 +11,7 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -446,6 +447,24 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             //drop old table if exist.
             $setup->getConnection()->dropTable($setup->getTable('tnw_subscriptions_subscription_profile'));
+        }
+
+        if (version_compare($context->getVersion(), "2.0.4", "<")) {
+            $table = $setup->getTable(
+                ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+            );
+
+            $setup->getConnection()->addColumn(
+                $table,
+                \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::PRESET_QTY,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'nullable' => true,
+                    'comment' => 'Preset Qty',
+                    'unsigned' => true,
+                    'default' => null
+                ]
+            );
         }
 
         $setup->endSetup();

@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Api\SearchCriteria;
@@ -74,6 +74,7 @@ class RecurringOptions extends BaseModifier
     const FIELD_INITIAL_FEE_NAME = 'initial_fee';
     const FIELD_IS_DELETE = 'is_delete';
     const FIELD_TITLE_NAME = 'title';
+    const FIELD_PRESET_QTY = 'preset_qty';
     /**#@-*/
 
     /**#@+
@@ -380,8 +381,9 @@ class RecurringOptions extends BaseModifier
                 static::FIELD_BILLING_FREQUENCY_NAME => $this->getBillingFrequencyFieldConfig(20),
                 static::FIELD_PRICE_NAME => $this->getPriceFieldConfig(30),
                 static::FIELD_INITIAL_FEE_NAME => $this->getInitialFeeFieldConfig(40),
-                static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(50),
+                static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(60),
                 static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(60),
+                static::FIELD_PRESET_QTY => $this->getPresetQtyFieldConfig(50),
             ]
         ];
 
@@ -648,5 +650,37 @@ class RecurringOptions extends BaseModifier
         $value = $currency->toCurrency($value, ['display' => \Magento\Framework\Currency::NO_SYMBOL]);
 
         return $value;
+    }
+
+    /**
+     * Get config for "Preset Qty" field.
+     *
+     * @param int $sortOrder
+     * @return array
+     */
+    private function getPresetQtyFieldConfig($sortOrder)
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Preset Qty'),
+                        'componentType' => Field::NAME,
+                        'formElement' => Input::NAME,
+                        'dataScope' => static::FIELD_PRESET_QTY,
+                        'dataType' => Number::NAME,
+                        'sortOrder' => $sortOrder,
+                        'disable' => true,
+                        'validation' => [
+                            'validate-zero-or-greater' => true
+                        ],
+                        'service' => [
+                            'template' => 'TNW_Subscriptions/form/element/helper/set-by-merchant',
+                        ],
+                        'component' => 'TNW_Subscriptions/js/form/product/set-by-merchant',
+                    ],
+                ],
+            ],
+        ];
     }
 }

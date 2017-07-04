@@ -17,7 +17,8 @@ interface ProductBillingFrequencyInterface
     const INITIAL_FEE = 'initial_fee';
     const BILLING_FREQUENCY_ID = 'billing_frequency_id';
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
-
+    const PRESET_QTY = 'preset_qty';
+    const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
 
     /**
      * Get id
@@ -97,4 +98,19 @@ interface ProductBillingFrequencyInterface
      * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface
      */
     public function setInitialFee($initial_fee);
+
+    /**
+     * Get Preset Qty.
+     *
+     * @return mixed
+     */
+    public function getPresetQty();
+
+    /**
+     * Set Preset Qty.
+     *
+     * @param $presetQty
+     * @return $this
+     */
+    public function setPresetQty($presetQty);
 }
