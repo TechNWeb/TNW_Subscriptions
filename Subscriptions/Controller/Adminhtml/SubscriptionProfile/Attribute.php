@@ -29,7 +29,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
     /**
      * @var string
      */
-    protected $_entityTypeId;
+    protected $entityTypeId;
 
     /**
      * Core registry
@@ -47,13 +47,11 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        //\Magento\Framework\Cache\FrontendInterface $attributeLabelCache,
         \Magento\Framework\Registry $coreRegistry,
         PageFactory $resultPageFactory
     ) {
@@ -71,7 +69,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
      */
     public function dispatch(\Magento\Framework\App\RequestInterface $request)
     {
-        $this->_entityTypeId = $this->_objectManager->create(
+        $this->entityTypeId = $this->_objectManager->create(
             \Magento\Eav\Model\Entity::class
         )->setType(
             \TNW\Subscriptions\Model\SubscriptionProfile::ENTITY
@@ -98,6 +96,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
         }
 
         $resultPage->getConfig()->getTitle()->prepend(__('Subscription Profile Attributes'));
+
         return $resultPage;
     }
 
