@@ -38,4 +38,12 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Validate and convert currency fields in configuration -->
+    <type name="Magento\Config\Model\Config">
+        <plugin name="subscriptions_config_validate_currency_fields"
+                type="TNW\Subscriptions\Plugin\Config"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
 </config>

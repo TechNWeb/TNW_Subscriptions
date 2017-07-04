@@ -3,6 +3,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -16,6 +17,7 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Quote\Model\Quote\AddressFactory;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
 class Create
 {
@@ -103,7 +105,7 @@ class Create
 
         $result = [];
         try {
-            $product = $this->getSubProduct($productData);
+            $product = $this->prepareProduct($productData);
 
             $this->prepareBuyRequest($productData);
 
@@ -192,12 +194,18 @@ class Create
      */
     protected function prepareBuyRequest($productData)
     {
+        /** @var Product $product */
+        $product = $this->getProduct($productData['product_id']);
+
+        //Note: If product "is trial" then "start on" is start date of trial period,
+        // otherwise "start on" is start date of subscription
         $data = [
             'qty' => $productData['qty'],
             self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                 'billing_frequency' => $productData['product_billing_frequency'],
                 'term' => $productData['term'],
                 'period' => $productData['period'],
+                'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
                 'start_on' => $this->getStartOnDate($productData['start_on']),
             ],
         ];
@@ -209,7 +217,7 @@ class Create
      * @param $productData
      * @return ProductInterface
      */
-    protected function getSubProduct($productData)
+    protected function prepareProduct($productData)
     {
         $product = $this->getProduct($productData['product_id']);
 
@@ -261,8 +269,6 @@ class Create
      */
     protected function getStartOnDate($startOn)
     {
-        $localeDate = $this->context->getLocaleDate();
-
         switch ($startOn){
             case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
                 $result = new \DateTime();

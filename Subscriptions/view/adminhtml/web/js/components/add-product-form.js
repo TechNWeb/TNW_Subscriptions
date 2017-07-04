@@ -63,7 +63,8 @@ define(
             setConfigurableData: function () {
                 var data;
 
-                data = registry.get(this.source.configurableForm).source.data;
+                data = registry.get('index=' + this.source.configurableForm).source.data;
+
                 this.getModalForm().configurableData = $.extend(this.getModalForm().configurableData, data);
 
                 this.updateModalGrid();

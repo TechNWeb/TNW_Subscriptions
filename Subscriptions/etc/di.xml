@@ -122,6 +122,14 @@
                 disabled="false"/>
     </type>
 
+    <!-- Addon text form element plugin -->
+    <type name="Magento\Framework\Data\Form\AbstractForm">
+        <plugin name="subscriptions_add_currency_form_element_type"
+                type="TNW\Subscriptions\Plugin\Data\Form\AbstractForm"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+
     <!-- Eav attribute plugin to setup default attribute set and attribute group -->
     <type name="Magento\Eav\Model\Attribute">
         <plugin name="subscriptions_subscription_profile_attribute"
