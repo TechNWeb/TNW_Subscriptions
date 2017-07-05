@@ -87,7 +87,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->migrateProductSubscriptionProfileToEav($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.4", "<")) {
+        if (version_compare($context->getVersion(), "2.0.6", "<")) {
             $table = $setup->getTable(
                 ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
             );
