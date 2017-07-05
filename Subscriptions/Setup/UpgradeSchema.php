@@ -13,6 +13,7 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -86,12 +87,30 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->migrateProductSubscriptionProfileToEav($setup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.6", "<")) {
+            $table = $setup->getTable(
+                ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+            );
+
+            $setup->getConnection()->addColumn(
+                $table,
+                \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::PRESET_QTY,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'nullable' => true,
+                    'comment' => 'Preset Qty',
+                    'unsigned' => true,
+                    'default' => null
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 
     /**
      * Migrate Product Subscription Profile to Eav structure.
-     * 
+     *
      * @param SchemaSetupInterface $setup
      * @return void
      * @throws \Zend_Db_Exception
