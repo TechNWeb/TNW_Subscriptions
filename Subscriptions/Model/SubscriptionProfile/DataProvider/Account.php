@@ -77,7 +77,7 @@ class Account extends AbstractDataProvider
         if ($customerId) {
             $dataModel = $this->customerRepository->getById($customerId);
             $data[static::FORM_DATA_VALUE] = [
-                'container_account_data' => [
+                'account' => [
                     'group' => $dataModel->getGroupId(),
                     'email' => $dataModel->getEmail(),
                 ],
