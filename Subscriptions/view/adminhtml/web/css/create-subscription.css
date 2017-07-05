@@ -176,3 +176,14 @@
 .data-total-container{
   background: #e4e4e4;
 }
+
+#anchor-content .admin__control-elem-upper label{
+  width: auto;
+  position: relative;
+  margin-left: 0;
+  float: none;
+
+}
+#anchor-content .admin__control-elem-upper/*, .label-upper .admin__field-control*/{
+  position: relative;
+}
