@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <add id="TNW_Subscriptions::top_level" module="TNW_Subscriptions" resource="Magento_Backend::content"
-             sortOrder="9999" title="Subscriptions"/>
+             sortOrder="9999" title="Subscription"/>
         <add action="tnw_subscriptions/billingfrequency/index"
              id="TNW_Subscriptions::tnw_subscriptions_billing_frequency" module="TNW_Subscriptions"
              parent="TNW_Subscriptions::top_level" resource="TNW_Subscriptions::BillingFrequency" sortOrder="9999"
