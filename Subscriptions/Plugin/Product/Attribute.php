@@ -6,7 +6,10 @@
 
 namespace TNW\Subscriptions\Plugin\Product;
 
+use Magento\Eav\Model\Entity\Type;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory;
 use TNW\Subscriptions\Model\ProductDefaultAttributes;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Eav attribute interceptor
@@ -28,12 +31,32 @@ class Attribute
     private $defaultValues;
 
     /**
+     * Magento\Eav\Model\Entity\Type instance holder.
+     *
+     * @var Type
+     */
+    private $eavEntityType;
+
+    /**
+     * Factory for creating group collection holder.
+     *
+     * @var CollectionFactory
+     */
+    private $groupCollectionFactory;
+
+    /**
      * @param ProductDefaultAttributes $productDefaultAttributes
+     * @param Type $eavEntityType
+     * @param CollectionFactory $groupCollectionFactory
      */
     public function __construct(
-        ProductDefaultAttributes $productDefaultAttributes
+        ProductDefaultAttributes $productDefaultAttributes,
+        Type $eavEntityType,
+        CollectionFactory $groupCollectionFactory
     ) {
         $this->productDefaultAttributes = $productDefaultAttributes;
+        $this->eavEntityType = $eavEntityType;
+        $this->groupCollectionFactory = $groupCollectionFactory;
     }
 
     /**
@@ -55,6 +78,27 @@ class Attribute
         }
 
         return $result;
+    }
+
+    /**
+     * Set default group and attribute set for ProductSubscriptionProfile attributes on save.
+     *
+     * @param \Magento\Catalog\Model\ResourceModel\Eav\Attribute $subject
+     * @return void
+     */
+    public function beforeSave(\Magento\Catalog\Model\ResourceModel\Eav\Attribute $subject)
+    {
+        if ($subject->getEntityType()->getEntityTypeCode() === ProductSubscriptionProfile::ENTITY) {
+            $this->eavEntityType->loadByCode(ProductSubscriptionProfile::ENTITY);
+            $groupCollection = $this->groupCollectionFactory->create()
+                ->setAttributeSetFilter($this->eavEntityType->getDefaultAttributeSetId())
+                ->addFieldToFilter('attribute_group_code', ProductSubscriptionProfile::DEFAUL_GROUP_CODE)
+                ->setPageSize(1)
+                ->load();
+            $group = $groupCollection->getFirstItem();
+            $subject->setAttributeSetId($this->eavEntityType->getDefaultAttributeSetId());
+            $subject->setAttributeGroupId($group->getId());
+        }
     }
 
     /**
