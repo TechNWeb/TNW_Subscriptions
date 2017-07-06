@@ -20,12 +20,8 @@
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_account_form_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">id</argument>
-            <argument name="requestFieldName" xsi:type="string">id</argument>
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                </item>
-            </argument>
+            <argument name="primaryFieldName" xsi:type="string">account_form_data</argument>
+            <argument name="requestFieldName" xsi:type="string">account_form_data</argument>
         </argument>
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
@@ -125,14 +121,15 @@
                 <item name="sortOrder" xsi:type="number">30</item>
             </item>
         </argument>
-        <field name="address">
+        <field name="customer_address_id">
             <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\CustomerAddress</item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Address</item>
-                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="label" translate="true" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">select</item>
                     <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.address</item>
+                    <item name="dataScope" xsi:type="string">account.customer_address_id</item>
                 </item>
             </argument>
         </field>
