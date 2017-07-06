@@ -20,7 +20,7 @@ class Config
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
-    private $xmlSetByMerchant = 'tnw_subscriptions_product/general/set_by_merchant_status';
+    private $xmlUnlockPresetQty = 'tnw_subscriptions_product/general/unlock_preset_qty_status';
     /**#@-*/
 
     /**#@+
@@ -113,14 +113,14 @@ class Config
     }
 
     /**
-     * Get "Set By Merchant" config value.
+     * Get "Unlock Preset Qty" config value.
      *
      * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
      * @return bool
      */
-    public function setByMerchantStatus($websiteId = null)
+    public function unlockPresetQtyStatus($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlSetByMerchant, $websiteId);
+        $value = $this->getStoreConfig($this->xmlUnlockPresetQty, $websiteId);
 
         return $value ? true : false;
     }

@@ -11,11 +11,11 @@ use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Config;
 
 /**
- * Data provider for "Set by Merchant" switcher.
+ * Data provider for "Unlock preset qty" switcher.
  */
-class SetByMerchant extends AbstractModifier
+class UnlockPresetQty extends AbstractModifier
 {
-    const CODE_SET_BY_MERCHANT = 'tnw_subscr_set_by_merchant';
+    const CODE_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
 
     /**
      * Subscriptions config.
@@ -43,17 +43,17 @@ class SetByMerchant extends AbstractModifier
     }
 
     /**
-     * Set config value as default value for "Set By Merchant" on product page.
+     * Set config value as default value for "Unlock preset qty" on product page.
      *
      * @param array $meta
      * @return array
      */
     public function modifyMeta(array $meta)
     {
-        $value = $this->config->setByMerchantStatus();
+        $value = $this->config->unlockPresetQtyStatus();
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_SET_BY_MERCHANT,
+                self::CODE_UNLOCK_PRESET_QTY,
                 $meta,
                 null,
                 'children'
@@ -61,6 +61,7 @@ class SetByMerchant extends AbstractModifier
             $meta,
             [
                 'default' => $value ? '1' : '0',
+                'notice' =>  __('Product quantity is preset for the customer and cannot be changed.'),
             ]
         );
 

@@ -63,10 +63,11 @@
                     <label>Lock Product Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="set_by_merchant_status" translate="label" type="select" sortOrder="30" showInDefault="1"
+                <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
-                    <label>Set By Merchant</label>
+                    <label>Unlock preset qantity</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Product quantity is preset for the customer and cannot be changed.</comment>
                 </field>
             </group>
 

@@ -15,7 +15,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\SetByMerchant;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
 
 /**
  * Upgrade data for TNW Subscriptions.
@@ -151,12 +151,12 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), "2.0.7", "<")) {
             $eavSetup->addAttribute(
                 Product::ENTITY,
-                SetByMerchant::CODE_SET_BY_MERCHANT,
+                UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
                 [
                     'type' => 'int',
                     'backend' => '',
                     'frontend' => '',
-                    'label' => 'Set by Merchant',
+                    'label' => 'Unlock preset qty',
                     'input' => 'boolean',
                     'class' => '',
                     'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',

@@ -674,7 +674,7 @@ class RecurringOptions extends BaseModifier
                             'validate-zero-or-greater' => true
                         ],
                         'imports' => [
-                            'disabled' => '!ns = ${ $.ns }, index = ' . SetByMerchant::CODE_SET_BY_MERCHANT. ':checked',
+                            'disabled' => '!ns = ${ $.ns }, index = ' . UnlockPresetQty::CODE_UNLOCK_PRESET_QTY. ':checked',
                         ],
                     ],
                 ],

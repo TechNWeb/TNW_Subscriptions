@@ -35,7 +35,7 @@
                 <item name="subscriptionLockPrice" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice</item>
                 <item name="subscriptionDiscount" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount</item>
                 <item name="subscriptionTrial" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial</item>
-                <item name="setByMerchant" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\SetByMerchant</item>
+                <item name="unlockPresetQty" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty</item>
             </argument>
         </arguments>
     </type>
