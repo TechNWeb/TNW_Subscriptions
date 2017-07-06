@@ -21,14 +21,12 @@ class Account extends AbstractDataProvider
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
     
-    /** @var [] */
-    protected $loadedData;
     /** @var UrlInterface */
     protected $urlBuilder;
     /** @var StepPool */
     protected $stepPool;
-    /** @var \Magento\Framework\ObjectManagerInterface */
-    private $objectManager;
+    /** @var \TNW\Subscriptions\Model\Backend\Session\Quote */
+    private $session;
     /** @var CustomerRepository */
     private $customerRepository;
 
@@ -39,6 +37,8 @@ class Account extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
+     * @param \TNW\Subscriptions\Model\Backend\Session\Quote $session
+     * @param CustomerRepository $customerRepository
      * @param array $meta
      * @param array $data
      */
@@ -48,12 +48,12 @@ class Account extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
+        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
         CustomerRepository $customerRepository,
         array $meta = [],
         array $data = []
     ) {
-        $this->objectManager = $objectManager;
+        $this->session = $session;
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->customerRepository = $customerRepository;
@@ -70,8 +70,8 @@ class Account extends AbstractDataProvider
     {
         $data = [];
         $customerId = null;
-        if ($this->_getSession()->getCustomerId()) {
-            $customerId = $this->_getSession()->getCustomerId();
+        if ($this->session->getCustomerId()) {
+            $customerId = $this->session->getCustomerId();
         }
 
         if ($customerId) {
@@ -110,13 +110,5 @@ class Account extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
 
-    }
-
-    /**
-     * @return \TNW\Subscriptions\Model\Backend\Session\Quote
-     */
-    private function _getSession()
-    {
-        return $this->objectManager->get(\TNW\Subscriptions\Model\Backend\Session\Quote::class);
     }
 }
