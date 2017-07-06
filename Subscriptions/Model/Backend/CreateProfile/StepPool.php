@@ -16,7 +16,7 @@ class StepPool
     const STEP_PARAM_TYPE_CUSTOMER = 'customer';
     const STEP_PARAM_TYPE_STORE = 'store';
     const STEP_PARAM_TYPE_ACCOUNT_INFORMATION = 'account';
-    const STEP_PARAM_TYPE_SHIPPING_BILLING = 'shipping_and_billing';
+    const STEP_PARAM_TYPE_SHIPPING_BILLING = 'payment_and_billing';
     const STEP_PARAM_TYPE_REVIEW = 'review';
 
     protected $stepArray = [

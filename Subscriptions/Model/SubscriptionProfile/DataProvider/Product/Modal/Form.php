@@ -239,7 +239,7 @@ class Form extends AbstractDataProvider
                             'actions' => [
                                 [
                                     'targetName' => $this->scopeName,
-                                    'actionName' => 'save'
+                                    'actionName' => 'ajaxSubmit'
                                 ]
                             ],
                             'provider' => null
