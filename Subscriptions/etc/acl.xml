@@ -28,6 +28,13 @@
                               title="Attributes"
                               translate="title"/>
                 </resource>
+                <resource id="TNW_Subscriptions::ProductSubscriptionProfile" sortOrder="10"
+                          title="Product Subscription Profile"
+                          translate="title">
+                    <resource id="TNW_Subscriptions::ProductSubscriptionProfile_attributes" sortOrder="10"
+                              title="Attributes"
+                              translate="title" />
+                </resource>
             </resource>
         </resources>
     </acl>

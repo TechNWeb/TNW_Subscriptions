@@ -29,5 +29,11 @@
              id="TNW_Subscriptions::tnw_subscriptions_product_subscription_profile" module="TNW_Subscriptions"
              parent="TNW_Subscriptions::top_level" resource="Magento_Backend::content" sortOrder="9999"
              title="Product Subscription Profile" translate="title"/>
+        <!--Subscription profile product attributes editor-->
+        <add action="tnw_subscriptions/subscriptionprofileproduct_attribute/index"
+             id="TNW_Subscriptions::tnw_subsriptions_product_subscription_profile_attributes" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="TNW_Subscriptions::ProductSubscriptionProfile_attributes"
+             sortOrder="9999"
+             title="Product Subscription Profile Attributes" translate="title"/>
     </menu>
 </config>
