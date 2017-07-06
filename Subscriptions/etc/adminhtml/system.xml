@@ -63,6 +63,11 @@
                     <label>Lock Product Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="set_by_merchant_status" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Set By Merchant</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
 
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">

@@ -20,6 +20,7 @@ class Config
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
+    private $xmlSetByMerchant = 'tnw_subscriptions_product/general/set_by_merchant_status';
     /**#@-*/
 
     /**#@+
@@ -61,7 +62,7 @@ class Config
      * @param StoreManagerInterface $storeManager
      * @param Http $request
      */
-    function __construct(
+    public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         Http $request
@@ -107,6 +108,19 @@ class Config
     public function lockProductPriceStatus($websiteId = null)
     {
         $value = $this->getStoreConfig($this->xmlLockProductPriceStatus, $websiteId);
+
+        return $value ? true : false;
+    }
+
+    /**
+     * Get "Set By Merchant" config value.
+     *
+     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @return bool
+     */
+    public function setByMerchantStatus($websiteId = null)
+    {
+        $value = $this->getStoreConfig($this->xmlSetByMerchant, $websiteId);
 
         return $value ? true : false;
     }

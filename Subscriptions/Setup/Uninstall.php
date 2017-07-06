@@ -106,6 +106,7 @@ class Uninstall implements UninstallInterface
             'tnw_subscr_start_date',
             'tnw_subscr_discount_amount',
             'tnw_subscr_discount_type',
+            'tnw_subscr_set_by_merchant',
         ];
 
         /** @var EavSetup $eavSetup */
