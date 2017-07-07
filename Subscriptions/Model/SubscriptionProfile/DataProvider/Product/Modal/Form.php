@@ -239,7 +239,7 @@ class Form extends AbstractDataProvider
                             'actions' => [
                                 [
                                     'targetName' => $this->scopeName,
-                                    'actionName' => 'save'
+                                    'actionName' => 'ajaxSubmit'
                                 ]
                             ],
                             'provider' => null
@@ -277,6 +277,8 @@ class Form extends AbstractDataProvider
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productId);
 
+            //Note: If product "is trial" then "start on" is start date of trial period,
+            // otherwise "start on" is start date of subscription
             if ($product->getData(Trial::CODE_TRIAL)) {
                 if ($product->getData(Trial::CODE_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
                     $visible = true;

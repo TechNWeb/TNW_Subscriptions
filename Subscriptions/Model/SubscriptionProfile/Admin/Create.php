@@ -4,18 +4,26 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
-use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
+use Magento\Quote\Model\Quote\Address;
+use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
-use TNW\Subscriptions\Model\Context;
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\GroupManagementInterface;
-use Magento\Quote\Model\Quote\AddressFactory;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
+use Magento\Customer\Model\Metadata\Form;
 
 class Create
 {
@@ -51,6 +59,9 @@ class Create
     /** @var AddressFactory */
     protected $addressFactory;
 
+    /** @var FormFactory */
+    protected $formFactory;
+
     /**
      * Create constructor.
      * @param Context $context
@@ -62,6 +73,8 @@ class Create
      * @param GroupManagementInterface $groupManagement
      * @param ProductRepositoryInterface $productRepository
      * @param CustomerRepositoryInterface $customerRepository
+     * @param FormFactory $formFactory
+     * @param AddressRepositoryInterface $addressRepository
      */
     public function __construct(
         Context $context,
@@ -72,7 +85,9 @@ class Create
         AddressFactory $addressFactory,
         GroupManagementInterface $groupManagement,
         ProductRepositoryInterface $productRepository,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        FormFactory $formFactory,
+        AddressRepositoryInterface $addressRepository
     ) {
         $this->context = $context;
         $this->session = $session;
@@ -83,6 +98,8 @@ class Create
         $this->groupManagement = $groupManagement;
         $this->productRepository = $productRepository;
         $this->customerRepository = $customerRepository;
+        $this->formFactory = $formFactory;
+        $this->addressRepository = $addressRepository;
     }
 
     /**
@@ -103,7 +120,7 @@ class Create
 
         $result = [];
         try {
-            $product = $this->getSubProduct($productData);
+            $product = $this->prepareProduct($productData);
 
             $this->prepareBuyRequest($productData);
 
@@ -192,12 +209,18 @@ class Create
      */
     protected function prepareBuyRequest($productData)
     {
+        /** @var Product $product */
+        $product = $this->getProduct($productData['product_id']);
+
+        //Note: If product "is trial" then "start on" is start date of trial period,
+        // otherwise "start on" is start date of subscription
         $data = [
             'qty' => $productData['qty'],
             self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                 'billing_frequency' => $productData['product_billing_frequency'],
                 'term' => $productData['term'],
                 'period' => $productData['period'],
+                'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
                 'start_on' => $this->getStartOnDate($productData['start_on']),
             ],
         ];
@@ -209,7 +232,7 @@ class Create
      * @param $productData
      * @return ProductInterface
      */
-    protected function getSubProduct($productData)
+    protected function prepareProduct($productData)
     {
         $product = $this->getProduct($productData['product_id']);
 
@@ -231,7 +254,7 @@ class Create
             $quote->setIsActive(false);
             $quote->setStoreId($this->session->getStoreId());
 
-            if (!$this->session->getCustomerId()){
+            if (!$this->session->getCustomerId()) {
                 $quote->setBillingAddress($this->addressFactory->create());
                 $quote->setShippingAddress($this->addressFactory->create());
             }
@@ -261,9 +284,7 @@ class Create
      */
     protected function getStartOnDate($startOn)
     {
-        $localeDate = $this->context->getLocaleDate();
-
-        switch ($startOn){
+        switch ($startOn) {
             case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
                 $result = new \DateTime();
                 $result = $result->format('Y-m-t');
@@ -276,6 +297,212 @@ class Create
                 $result = new \DateTime($startOn);
                 $result = $result->format('Y-m-d');
                 break;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $address
+     * @param null $customerAddressId
+     * @return array
+     */
+    public function setShippingAddress($address, $customerAddressId = null)
+    {
+        $result = [];
+
+        /** @var Address $shippingAddress */
+        $shippingAddress = $this->getShippingAddress();
+
+        $shippingAddress->setAddressType(Address::TYPE_SHIPPING);
+
+        if ($customerAddressId) {
+            $addressData = null;
+            try {
+                $addressData = $this->addressRepository->getById($customerAddressId);
+            } catch (NoSuchEntityException $e) {
+                // do nothing if customer is not found by id
+            }
+
+            if ($addressData->getCustomerId() != $this->session->getCustomerId()) {
+                return [__('The customer address is not valid.')];
+            }
+
+            $result = $this->checkCustomerAddress($shippingAddress, $addressData);
+
+        } elseif (is_array($address)) {
+            $shippingAddress->setData($address);
+
+            $result = $this->checkQuoteAddress($shippingAddress, $address);
+        }
+
+        //check if we have errors on address validation
+        //may be make sense don't do this and always save address to quotes
+        if ($result === true) {
+            $saveInAddressBook = (int)(!empty($address['save_in_address_book']));
+
+            $shippingAddress->setSaveInAddressBook($saveInAddressBook);
+            $shippingAddress->setSameAsBilling(0);
+
+            foreach ($this->session->getSubQuotes() as $subQuote) {
+                $subQuote->setShippingAddress($shippingAddress);
+                $this->cartRepository->save($subQuote);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $address
+     * @param null $customerAddressId
+     * @return array
+     */
+    public function setBillingAddress($address, $customerAddressId = null)
+    {
+        $result = [];
+        /** @var Address $shippingAddress */
+        $billingAddress = $this->getBillingAddress();
+        $billingAddress->setAddressType(Address::TYPE_BILLING);
+
+        if ($customerAddressId) {
+            $addressData = null;
+            try {
+                $addressData = $this->addressRepository->getById($customerAddressId);
+            } catch (NoSuchEntityException $e) {
+                // do nothing if customer is not found by id
+            }
+
+            if ($addressData->getCustomerId() != $this->session->getCustomerId()) {
+                return [__('The customer address is not valid.')];
+            }
+
+            $result = $this->checkCustomerAddress($billingAddress, $addressData);
+
+        } elseif (is_array($address)) {
+            if ($address['same_as_shipping']) {
+                $billingAddress = clone $this->getShippingAddress();
+                $billingAddress->unsAddressId();
+                $billingAddress->setAddressType(Address::TYPE_BILLING);
+                $billingAddress->setSaveInAddressBook(0);
+                $result = true;
+            }else{
+                $billingAddress->setData($address);
+                $result = $this->checkQuoteAddress($billingAddress, $address);
+            }
+        }
+
+        //check if we have errors on address validation
+        //may be make sense don't do this and always save address to quotes
+        if ($result === true) {
+            $saveInAddressBook = (int)(!empty($address['save_in_address_book']));
+            $billingAddress->setData('save_in_address_book', $saveInAddressBook);
+
+            foreach ($this->session->getSubQuotes() as $subQuote) {
+                $subQuote->setBillingAddress($billingAddress);
+                $this->cartRepository->save($subQuote);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Address
+     */
+    public function getShippingAddress()
+    {
+        $quotes = $this->session->getSubQuotes();
+
+        if (!empty($quotes)) {
+            $quote = reset($quotes);
+
+            $result = $quote->getShippingAddress();
+        } else {
+            $result = $this->addressFactory->create();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Address $address
+     * @param AddressInterface $customerAddressData
+     * @return array|bool
+     */
+    protected function checkCustomerAddress($address, $customerAddressData)
+    {
+        $address->importCustomerAddressData($customerAddressData)->setSaveInAddressBook(0);
+
+        $addressErrors = $this->getCustomerForm()->validateData($address->getData());
+
+        return $addressErrors;
+    }
+
+    /**
+     * @param Address $address
+     * @param [] $data
+     * @return array
+     */
+    protected function checkQuoteAddress(Address $address, array $data)
+    {
+        $result = [];
+
+        $addressForm = $this->getCustomerForm();
+
+        $request = $addressForm->prepareRequest($data);
+        $addressData = $addressForm->extractData($request);
+
+        $errors = $addressForm->validateData($addressData);
+
+        if ($errors !== true) {
+
+            if ($address->getAddressType() == Address::TYPE_SHIPPING) {
+                $typeName = __('Shipping Address: ');
+            } else {
+                $typeName = __('Billing Address: ');
+            }
+
+            foreach ($errors as $error) {
+                $result[] = $typeName . $error;
+            }
+
+        } else {
+            $address->setData($addressForm->compactData($addressData));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Form
+     */
+    protected function getCustomerForm()
+    {
+        $addressForm = $this->formFactory->create(
+            'customer_address',
+            'adminhtml_customer_address',
+            [],
+            false,
+            false,
+            []
+        );
+        return $addressForm;
+    }
+
+    /**
+     * @return Address
+     */
+    public function getBillingAddress()
+    {
+        $quotes = $this->session->getSubQuotes();
+
+        if (!empty($quotes)) {
+            $quote = reset($quotes);
+
+            $result = $quote->getBillingAddress();
+        } else {
+            $result = $this->addressFactory->create();
         }
 
         return $result;

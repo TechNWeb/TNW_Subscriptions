@@ -86,10 +86,10 @@ class Discount extends BaseModifier
             $meta,
             [
                 'breakLine' => false,
-                'component' => 'Magento_Ui/js/form/components/group',
+                'component' => 'TNW_Subscriptions/js/components/discount-group',
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
+                    'changedOfferDiscount' => 'index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
+                    'changedLockPrice' => 'index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
                 ],
             ]
         );

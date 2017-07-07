@@ -129,4 +129,12 @@
                 sortOrder="10"
                 disabled="false"/>
     </type>
+
+    <!-- Eav attribute plugin to setup default attribute set and attribute group -->
+    <type name="Magento\Eav\Model\Attribute">
+        <plugin name="subscriptions_subscription_profile_attribute"
+                type="TNW\Subscriptions\Plugin\Eav\Attribute"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
 </config>
