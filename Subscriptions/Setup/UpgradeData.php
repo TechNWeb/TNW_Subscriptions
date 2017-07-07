@@ -7,13 +7,15 @@
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Setup\UpgradeDataInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Framework\Setup\ModuleDataSetupInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile;
+use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\UpgradeDataInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
 
 /**
  * Upgrade data for TNW Subscriptions.
@@ -144,6 +146,37 @@ class UpgradeData implements UpgradeDataInterface
                 $setup->getConnection()->query($select);
                 $setup->getConnection()->dropTable('tnw_subscriptions_product_subscription_profile');
             }
+        }
+
+        if (version_compare($context->getVersion(), "2.0.7", "<")) {
+            $eavSetup->addAttribute(
+                Product::ENTITY,
+                UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
+                [
+                    'type' => 'int',
+                    'backend' => '',
+                    'frontend' => '',
+                    'label' => 'Unlock preset qty',
+                    'input' => 'boolean',
+                    'class' => '',
+                    'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                    'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                    'visible' => true,
+                    'required' => true,
+                    'user_defined' => true,
+                    'default' => null,
+                    'searchable' => false,
+                    'filterable' => false,
+                    'comparable' => false,
+                    'visible_on_front' => false,
+                    'used_in_product_listing' => false,
+                    'unique' => false,
+                    'apply_to' => '',
+                    'system' => 1,
+                    'group' => 'Subscription options',
+                    'sort_order' => 120,
+                ]
+            );
         }
 
         $setup->endSetup();

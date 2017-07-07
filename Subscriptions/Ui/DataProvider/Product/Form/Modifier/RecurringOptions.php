@@ -670,14 +670,12 @@ class RecurringOptions extends BaseModifier
                         'dataScope' => static::FIELD_PRESET_QTY,
                         'dataType' => Number::NAME,
                         'sortOrder' => $sortOrder,
-                        'disable' => true,
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
-                        'service' => [
-                            'template' => 'TNW_Subscriptions/form/element/helper/set-by-merchant',
+                        'imports' => [
+                            'disabled' => '!ns = ${ $.ns }, index = ' . UnlockPresetQty::CODE_UNLOCK_PRESET_QTY. ':checked',
                         ],
-                        'component' => 'TNW_Subscriptions/js/form/product/set-by-merchant',
                     ],
                 ],
             ],
