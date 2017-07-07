@@ -12,10 +12,6 @@ use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\DynamicRows;
-use Magento\Ui\Component\Form\Element\DataType\Number;
-use Magento\Ui\Component\Form\Element\DataType\Text;
-use Magento\Ui\Component\Form\Element\Input;
-use Magento\Ui\Component\Form\Field;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
@@ -24,7 +20,11 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use Magento\Eav\Api\AttributeSetRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
-
+use \TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class LinkedProducts
@@ -36,35 +36,53 @@ class LinkedProducts extends AbstractModifier
     const DEFAULT_SCOPE_NAME = 'tnw_billingfrequency_form.tnw_billingfrequency_form';
 
     /** @var UrlInterface */
-    protected $urlBuilder;
+    private $urlBuilder;
 
     /** @var string */
-    protected $scopeName;
+    private $scopeName;
 
     /** @var Registry */
-    protected $registry;
+    private $registry;
 
     /** @var ProductBillingFrequencyRepositoryInterface */
-    protected $productBillingFrequencyRepository;
+    private $productBillingFrequencyRepository;
 
     /** @var ProductRepositoryInterface */
-    protected $productRepository;
+    private $productRepository;
 
     /** @var ImageHelper */
-    protected $imageHelper;
+    private $imageHelper;
 
     /** @var Status */
-    protected $status;
+    private $status;
 
     /** @var AttributeSetRepositoryInterface */
-    protected $attributeSetRepository;
+    private $attributeSetRepository;
 
     /**
-     * LinkedProducts constructor.
+     * Grid Metadata for Linked Products.
+     *
+     * @var GridMetadata
+     */
+    private $gridMetadata;
+
+    /**
+     * Subscriptions config.
+     *
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Registry $coreRegistry
      * @param ProductRepositoryInterface $productRepository
      * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
+     * @param ImageHelper $imageHelper
+     * @param Status $status
+     * @param AttributeSetRepositoryInterface $attributeSetRepository
+     * @param GridMetadata $gridMetadata
+     * @param Config $config
      * @param string $scopeName
      */
     public function __construct(
@@ -75,6 +93,8 @@ class LinkedProducts extends AbstractModifier
         ImageHelper $imageHelper,
         Status $status,
         AttributeSetRepositoryInterface $attributeSetRepository,
+        GridMetadata $gridMetadata,
+        Config $config,
         $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -85,7 +105,8 @@ class LinkedProducts extends AbstractModifier
         $this->status = $status;
         $this->attributeSetRepository = $attributeSetRepository;
         $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME;
-
+        $this->gridMetadata = $gridMetadata;
+        $this->config = $config;
     }
 
     /**
@@ -95,8 +116,7 @@ class LinkedProducts extends AbstractModifier
     {
         $frequency = $this->registry->registry('tnw_subscriptions_billingfrequency');
 
-        if ($frequency && $frequency->getId()){
-
+        if ($frequency && $frequency->getId()) {
             $productFrequencies = $this->productBillingFrequencyRepository->getListByFrequencyId(
                 $frequency->getId()
             );
@@ -104,11 +124,12 @@ class LinkedProducts extends AbstractModifier
             $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS] = [];
 
             /** @var  ProductBillingFrequencyInterface $productFrequency */
-            foreach ($productFrequencies->getItems() as $productFrequency){
+            foreach ($productFrequencies->getItems() as $productFrequency) {
                 $product = $this->productRepository->getById($productFrequency->getMagentoProductId());
 
-                if ($product && $product->getId()){
-                    $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS][] = $this->fillData($product, $productFrequency);
+                if ($product && $product->getId()) {
+                    $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS][]
+                        = $this->fillData($product, $productFrequency);
                 }
             }
         }
@@ -208,7 +229,6 @@ class LinkedProducts extends AbstractModifier
                             ],
                         ],
                     ],
-
                 ],
             ],
         ];
@@ -317,10 +337,16 @@ class LinkedProducts extends AbstractModifier
                             'id' => 'entity_id',
                             'name' => 'name',
                             'status' => 'status_text',
-                            'attribute_set' => 'attribute_set_text',
                             'sku' => 'sku',
-                            'price' => 'price',
+                            'price' => 'tnw_price',
                             'thumbnail' => 'thumbnail_src',
+                            'initial_fee' => 'initial_fee',
+                            'preset_qty' => 'preset_qty',
+                            UnlockPresetQty::CODE_UNLOCK_PRESET_QTY => UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
+                            LockPrice::CODE_LOCK_PRICE => LockPrice::CODE_LOCK_PRICE,
+                            Discount::CODE_DISCOUNT_TYPE => Discount::CODE_DISCOUNT_TYPE,
+                            Discount::CODE_DISCOUNT_AMOUNT => Discount::CODE_DISCOUNT_AMOUNT,
+                            LockPrice::CODE_FLAT_DISCOUNT => LockPrice::CODE_FLAT_DISCOUNT,
                         ],
                         'links' => [
                             'insertData' => '${ $.provider }:${ $.dataProvider }'
@@ -342,108 +368,10 @@ class LinkedProducts extends AbstractModifier
                             ],
                         ],
                     ],
-                    'children' => $this->fillMeta(),
+                    'children' => $this->gridMetadata->fillMeta(),
                 ],
             ],
         ];
-    }
-
-    /**
-     * Retrieve meta column
-     *
-     * @return array
-     */
-    protected function fillMeta()
-    {
-        return [
-            'id' => $this->getTextColumn('id', false, __('ID'), 0),
-            'thumbnail' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'componentType' => Field::NAME,
-                            'formElement' => Input::NAME,
-                            'elementTmpl' => 'ui/dynamic-rows/cells/thumbnail',
-                            'dataType' => Text::NAME,
-                            'dataScope' => 'thumbnail',
-                            'fit' => true,
-                            'label' => __('Thumbnail'),
-                            'sortOrder' => 10,
-                        ],
-                    ],
-                ],
-            ],
-            'name' => $this->getTextColumn('name', false, __('Name'), 20),
-            'status' => $this->getTextColumn('status', true, __('Status'), 30),
-            'attribute_set' => $this->getTextColumn('attribute_set', false,
-                __('Attribute Set'), 40),
-            'sku' => $this->getTextColumn('sku', true, __('SKU'), 50),
-            'price' => $this->getTextColumn('price', true, __('Price'), 60),
-            'actionDelete' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'additionalClasses' => 'data-grid-actions-cell',
-                            'componentType' => 'actionDelete',
-                            'dataType' => Text::NAME,
-                            'label' => __('Actions'),
-                            'sortOrder' => 70,
-                            'fit' => true,
-                        ],
-                    ],
-                ],
-            ],
-            'position' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'dataType' => Number::NAME,
-                            'formElement' => Input::NAME,
-                            'componentType' => Field::NAME,
-                            'dataScope' => 'position',
-                            'sortOrder' => 80,
-                            'visible' => false,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Retrieve text column structure
-     *
-     * @param string $dataScope
-     * @param bool $fit
-     * @param Phrase $label
-     * @param int $sortOrder
-     * @return array
-     */
-    protected function getTextColumn(
-        $dataScope,
-        $fit,
-        Phrase $label,
-        $sortOrder
-    ) {
-        $column = [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'componentType' => Field::NAME,
-                        'formElement' => Input::NAME,
-                        'elementTmpl' => 'ui/dynamic-rows/cells/text',
-                        'component' => 'Magento_Ui/js/form/element/text',
-                        'dataType' => Text::NAME,
-                        'dataScope' => $dataScope,
-                        'fit' => $fit,
-                        'label' => $label,
-                        'sortOrder' => $sortOrder,
-                    ],
-                ],
-            ],
-        ];
-
-        return $column;
     }
 
     /**
@@ -460,14 +388,35 @@ class LinkedProducts extends AbstractModifier
             'thumbnail' => $this->imageHelper->init($linkedProduct, 'product_listing_thumbnail')->getUrl(),
             'name' => $linkedProduct->getName(),
             'status' => $this->status->getOptionText($linkedProduct->getStatus()),
-            'attribute_set' => $this->attributeSetRepository
-                ->get($linkedProduct->getAttributeSetId())
-                ->getAttributeSetName(),
             'sku' => $linkedProduct->getSku(),
-            'price' => $linkedProduct->getPrice(), //TODO add logic with frequency price
-            'position' => 0, //TODO remove it if you don't need it
-            ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $linkItem->getDefaultBillingFrequency(),
-            ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee()
+            'price' => $this->getPrice($linkedProduct, $linkItem),
+            ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee(),
+            ProductBillingFrequencyInterface::PRESET_QTY => $linkItem->getPresetQty(),
+            UnlockPresetQty::CODE_UNLOCK_PRESET_QTY => $linkedProduct->getData(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY),
+            LockPrice::CODE_LOCK_PRICE => $linkedProduct->getData(LockPrice::CODE_LOCK_PRICE),
+            LockPrice::CODE_FLAT_DISCOUNT => $linkedProduct->getData(LockPrice::CODE_FLAT_DISCOUNT),
+            Discount::CODE_DISCOUNT_TYPE => $linkedProduct->getData(Discount::CODE_DISCOUNT_TYPE),
+            Discount::CODE_DISCOUNT_AMOUNT => $linkedProduct->getData(Discount::CODE_DISCOUNT_AMOUNT),
         ];
+    }
+
+    /**
+     * Get price.
+     *
+     * @param ProductInterface $linkedProduct
+     * @param ProductBillingFrequencyInterface $linkItem
+     * @return float|null|string
+     */
+    public function getPrice(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
+    {
+        $lockProductPriceStatus = $this->config->lockProductPriceStatus();
+
+        if ($lockProductPriceStatus) {
+            $price = $linkedProduct->getPrice();
+        } else {
+            $price = $linkItem->getPrice();
+        }
+
+        return $price;
     }
 }
