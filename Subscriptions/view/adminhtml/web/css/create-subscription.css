@@ -204,3 +204,9 @@
 .admin__control-label-up.input {
   width: 74%;
 }
+
+
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control {
+  float: none;
+  margin: 0 auto;
+}

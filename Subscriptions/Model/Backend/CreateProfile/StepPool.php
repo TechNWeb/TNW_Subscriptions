@@ -104,7 +104,7 @@ class StepPool
                 $result = $this->getStepArray()[$stepKey + 1];
             }
 
-            if ($this->storeManager->isSingleStoreMode() && $result == self::STEP_PARAM_TYPE_STORE){
+            if ($this->storeManager->hasSingleStore() && $result == self::STEP_PARAM_TYPE_STORE){
                 $result = self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION;
             }
         }
