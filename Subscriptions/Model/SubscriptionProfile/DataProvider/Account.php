@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
+use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -13,12 +14,21 @@ use Magento\Framework\Api\Filter;
 
 class Account extends AbstractDataProvider
 {
-    /** @var [] */
-    protected $loadedData;
+    /**#@+
+     * Form request values
+     */
+    const FORM_DATA_KEY = 'account_form_data';
+    const FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
+    
     /** @var UrlInterface */
     protected $urlBuilder;
     /** @var StepPool */
     protected $stepPool;
+    /** @var \TNW\Subscriptions\Model\Backend\Session\Quote */
+    private $session;
+    /** @var CustomerRepository */
+    private $customerRepository;
 
     /**
      * DataProvider constructor.
@@ -27,6 +37,8 @@ class Account extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
+     * @param \TNW\Subscriptions\Model\Backend\Session\Quote $session
+     * @param CustomerRepository $customerRepository
      * @param array $meta
      * @param array $data
      */
@@ -36,11 +48,15 @@ class Account extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
+        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
+        CustomerRepository $customerRepository,
         array $meta = [],
         array $data = []
     ) {
+        $this->session = $session;
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
+        $this->customerRepository = $customerRepository;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
@@ -52,7 +68,23 @@ class Account extends AbstractDataProvider
      */
     public function getData()
     {
-        return [];
+        $data = [];
+        $customerId = null;
+        if ($this->session->getCustomerId()) {
+            $customerId = $this->session->getCustomerId();
+        }
+
+        if ($customerId) {
+            $dataModel = $this->customerRepository->getById($customerId);
+            $data[static::FORM_DATA_VALUE] = [
+                'account' => [
+                    'group' => $dataModel->getGroupId(),
+                    'email' => $dataModel->getEmail(),
+                ],
+            ];
+        }
+        
+        return $data;
     }
 
     /**

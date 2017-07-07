@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
 class Process extends Create
 {
@@ -40,10 +41,15 @@ class Process extends Create
             $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
         }
 
-        return $resultRedirect->setPath('tnw_subscriptions/subscriptionprofile/create',
-            [
-                StepPool::STEP_PARAM_NAME => $currentStep
-            ]
+        $redirectParams = [
+            StepPool::STEP_PARAM_NAME => $currentStep,
+        ];
+
+        $redirectParams = array_merge($redirectParams, $this->getAdditionalParams($currentStep));
+
+        return $resultRedirect->setPath(
+            'tnw_subscriptions/subscriptionprofile/create',
+            $redirectParams
         );
     }
 
@@ -129,5 +135,23 @@ class Process extends Create
     protected function resetErrors()
     {
         $this->errors = [];
+    }
+
+    /**
+     * Returns additional request params.
+     *
+     * @param string $currentStep
+     * @return array
+     */
+    private function getAdditionalParams($currentStep)
+    {
+        $additionalParams = [];
+        if ($currentStep == StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+            $additionalParams = [
+                Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
+            ];
+        }
+
+        return $additionalParams;
     }
 }

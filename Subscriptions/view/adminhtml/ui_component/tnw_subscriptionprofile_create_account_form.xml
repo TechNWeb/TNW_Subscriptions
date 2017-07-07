@@ -29,7 +29,7 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="account">
+    <fieldset name="account_info">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
@@ -37,28 +37,42 @@
                 <item name="sortOrder" xsi:type="number">10</item>
             </item>
         </argument>
-        <field name="group">
+        <container name="account">
             <argument name="data" xsi:type="array">
+                <item name="type" xsi:type="string">group</item>
                 <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Group</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.group</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/group</item>
+                    <item name="dataScope" xsi:type="string">account</item>
+                    <item name="breakLine" xsi:type="boolean">false</item>
+                    <item name="additionalClasses" xsi:type="string">admin_field_without_legend</item>
                 </item>
             </argument>
-        </field>
-        <field name="email">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Email</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.email</item>
-                </item>
-            </argument>
-        </field>
+            <field name="group">
+                <argument name="data" xsi:type="array">
+                    <item name="options" xsi:type="object">Magento\Customer\Model\Customer\Attribute\Source\Group</item>
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">number</item>
+                        <item name="label" translate="true" xsi:type="string">Group</item>
+                        <item name="formElement" xsi:type="string">select</item>
+                        <item name="source" xsi:type="string">SubscriptionProfile</item>
+                        <item name="dataScope" xsi:type="string">group</item>
+                        <item name="additionalClasses" xsi:type="string">admin__control-label-up select</item>
+                     </item>
+                </argument>
+            </field>
+            <field name="email">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Email</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="source" xsi:type="string">SubscriptionProfile</item>
+                        <item name="dataScope" xsi:type="string">email</item>
+                        <item name="additionalClasses" xsi:type="string">admin__control-label-up input</item>
+                    </item>
+                </argument>
+            </field>
+        </container>
     </fieldset>
     <fieldset name="shipping">
         <argument name="data" xsi:type="array">
