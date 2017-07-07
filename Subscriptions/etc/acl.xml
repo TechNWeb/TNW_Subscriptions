@@ -16,11 +16,24 @@
                     <resource id="TNW_Subscriptions::BillingFrequency_delete" sortOrder="40"
                               title="Delete BillingFrequency"/>
                 </resource>
-                <resource id="TNW_Subscriptions::SubscriptionProfile" sortOrder="10" title="SubscriptionProfile">
+                <resource id="TNW_Subscriptions::SubscriptionProfile" sortOrder="10" title="Subscription Profile"
+                          translate="title">
                     <resource id="TNW_Subscriptions::SubscriptionProfile_edit" sortOrder="10"
-                              title="Edit SubscriptionProfile"/>
+                              title="Edit SubscriptionProfile"
+                              translate="title"/>
                     <resource id="TNW_Subscriptions::SubscriptionProfile_save" sortOrder="20"
-                              title="Save SubscriptionProfile"/>
+                              title="Save SubscriptionProfile"
+                              translate="title"/>
+                    <resource id="TNW_Subscriptions::SubscriptionProfile_attributes" sortOrder="30"
+                              title="Attributes"
+                              translate="title"/>
+                </resource>
+                <resource id="TNW_Subscriptions::ProductSubscriptionProfile" sortOrder="10"
+                          title="Product Subscription Profile"
+                          translate="title">
+                    <resource id="TNW_Subscriptions::ProductSubscriptionProfile_attributes" sortOrder="10"
+                              title="Attributes"
+                              translate="title" />
                 </resource>
             </resource>
         </resources>

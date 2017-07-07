@@ -145,18 +145,21 @@ define(
             },
 
             /**
-             * Validate and save form.
-             *
-             * @param {String} redirect
-             * @param {Object} data
+             * Disable default save
              */
             save: function (redirect, data) {
+            },
+
+            /**
+             * Validate and save form.
+             */
+            ajaxSubmit: function () {
                 this.validate();
 
                 if (!this.additionalInvalid && !this.source.get('params.invalid')) {
                     this.setAdditionalData(this.getModalForm().configurableData);
 
-                    this.setAdditionalData(data).submit(redirect);
+                    this.submit();
                 }
             }
         });

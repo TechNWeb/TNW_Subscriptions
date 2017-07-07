@@ -16,7 +16,7 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
      */
     protected function _construct()
     {
-        $this->_init('TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency');
+        $this->_init(\TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency::class);
     }
 
     /**
@@ -131,5 +131,21 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     public function setInitialFee($initial_fee)
     {
         return $this->setData(self::INITIAL_FEE, $initial_fee);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPresetQty()
+    {
+        return $this->getData(self::PRESET_QTY);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPresetQty($presetQty)
+    {
+        return $this->setData(self::PRESET_QTY, $presetQty);
     }
 }

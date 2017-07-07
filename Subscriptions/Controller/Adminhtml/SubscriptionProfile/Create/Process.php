@@ -6,12 +6,14 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
-class Process extends SubscriptionProfile
+class Process extends Create
 {
+    protected $errors = [];
+
     /**
      * Start order create action
      *
@@ -19,6 +21,8 @@ class Process extends SubscriptionProfile
      */
     public function execute()
     {
+        $this->resetErrors();
+
         $this->processRequestData();
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
 
@@ -28,6 +32,14 @@ class Process extends SubscriptionProfile
         );
 
         $resultRedirect = $this->resultRedirectFactory->create();
+        if (!empty($this->errors)){
+
+            foreach ($this->errors as $error){
+                $this->messageManager->addErrorMessage($error);
+            }
+
+            $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
+        }
 
         $redirectParams = [
             StepPool::STEP_PARAM_NAME => $currentStep,
@@ -53,7 +65,7 @@ class Process extends SubscriptionProfile
 
         $this->processAccountData($requestData);
 
-        $this->processShippingAndPaymentData($requestData);
+        $this->processPaymentAndBillingData($requestData);
     }
 
     protected function processStoreData($data)
@@ -87,13 +99,42 @@ class Process extends SubscriptionProfile
     protected function processAccountData($data)
     {
         if (isset($data['account'])){
-            $this->_getSession()->setShippingAddressData($data['account']);
+            $customerAddressId = isset($data['account']['customer_address_id'])
+                ? $data['account']['customer_address_id']
+                : null;
+
+            $result = $this->getSubCreateModel()->setShippingAddress($data['account'], $customerAddressId);
+
+            $this->checkProcessResult($result);
         }
     }
 
-    protected function processShippingAndPaymentData($data)
+    protected function processPaymentAndBillingData($data)
     {
-        //TODO add logic to process post data
+        if (isset($data['billing'])){
+            $customerAddressId = isset($data['billing']['customer_address_id'])
+                ? $data['billing']['customer_address_id']
+                : null;
+
+            $result = $this->getSubCreateModel()->setBillingAddress($data['billing'], $customerAddressId);
+
+            $this->checkProcessResult($result);
+        }
+    }
+
+    /**
+     * @param [] $result
+     */
+    protected function checkProcessResult($result)
+    {
+        if (is_array($result)){
+            $this->errors = array_merge($this->errors, $result);
+        }
+    }
+
+    protected function resetErrors()
+    {
+        $this->errors = [];
     }
 
     /**

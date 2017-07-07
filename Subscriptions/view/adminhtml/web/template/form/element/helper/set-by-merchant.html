@@ -1,0 +1,17 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+<div class="admin__field-service">
+    <input type="checkbox"
+           class="admin__control-checkbox"
+           attr="
+                id: $data.uid + '_preset_qty',
+                name: 'product[recurring_options][' + $data.setByMerchantIndex() + '][preset_qty_set_by_merchant]',
+                'data-form-part': $data.ns"
+           ko-checked="setByMerchant">
+    <label translate="'Set by Merchant'" attr="for: $data.uid + '_preset_qty'" class="admin__field-label"></label>
+</div>

@@ -24,6 +24,11 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
      */
     const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
 
+    /*
+     * Default group code for custom attributes.
+     */
+    const DEFAUL_GROUP_CODE = 'additional-information';
+
     /**
      * @return void
      */
