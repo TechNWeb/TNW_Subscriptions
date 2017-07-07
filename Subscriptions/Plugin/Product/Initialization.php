@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Plugin\Product;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterfaceFactory;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
 
 class Initialization
 {
@@ -53,6 +54,7 @@ class Initialization
         if ($options) {
             $recurringOptions = [];
             foreach ($options as $recurringOptionData) {
+                $recurringOptionData = $this->processPresetQty($product, $recurringOptionData);
                 if (empty($recurringOptionData['is_delete'])) {
                     /** @var ProductBillingFrequencyInterface $recurringOption */
                     $recurringOption = $this->productBillingFrequencyInterfaceFactory->create(['data' => $recurringOptionData]);
@@ -71,5 +73,21 @@ class Initialization
 
 
         return $product;
+    }
+
+    /**
+     * Unset preset qty if disabled.
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @param array $recurringOptionData
+     * @return array
+     */
+    private function processPresetQty($product, $recurringOptionData)
+    {
+        if ((int)$product->getData(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY) === 0) {
+            unset($recurringOptionData['preset_qty']);
+        }
+
+        return $recurringOptionData;
     }
 }
