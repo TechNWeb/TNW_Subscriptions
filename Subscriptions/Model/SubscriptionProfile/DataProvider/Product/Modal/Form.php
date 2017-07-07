@@ -10,18 +10,18 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Registry;
-use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
-
+/**
+ * Modal form for adding single product to subscription.
+ */
 class Form extends AbstractDataProvider
 {
     /**#@+
@@ -43,38 +43,66 @@ class Form extends AbstractDataProvider
     const DEFAULT_PERIOD_VALUE = 1;
     /**#@-*/
 
-    protected $scopeName;
-    /** @var [] */
-    protected $loadedData;
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
-    /** @var Registry */
-    protected $registry;
-    /** @var ProductRepositoryInterface */
-    protected $productRepository;
-    /** @var RecurringOptionRepository */
-    protected $recurringOptionRepository;
-    /** @var RequestInterface */
-    protected $request;
-    /** @var BillingFrequencyRepository */
-    protected $frequencyRepository;
-    /** @var [] */
-    protected $productBillingFrequencies;
+    /**
+     * Data scope component name.
+     *
+     * @var string
+     */
+    private $scopeName;
+
+    /**
+     * Repository for retrieving products.
+     *
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
+
+    /**
+     * Repository for retrieving product billing frequencies.
+     *
+     * @var RecurringOptionRepository
+     */
+    private $recurringOptionRepository;
+
+    /**
+     * Help to retrieve data from request(GET, POST).
+     *
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * Repository for retrieving billing frequencies.
+     *
+     * @var BillingFrequencyRepository
+     */
+    private $frequencyRepository;
+
+    /**
+     * Product billing frequencies cache.
+     *
+     * @var ProductBillingFrequencyInterface[]
+     */
+    private $productBillingFrequencies;
+
+    /**
+     * Help convert trial unit value into label.
+     *
+     * @var TrialLengthUnitType
+     */
+    private $unitType;
 
     /**
      * Form constructor.
+     *
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param UrlInterface $urlBuilder
-     * @param StepPool $stepPool
-     * @param Registry $registry
      * @param ProductRepositoryInterface $productRepository
      * @param RecurringOptionRepository $repository
      * @param BillingFrequencyRepository $frequencyRepository
      * @param RequestInterface $request
+     * @param TrialLengthUnitType $unitType
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -83,27 +111,22 @@ class Form extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        UrlInterface $urlBuilder,
-        StepPool $stepPool,
-        Registry $registry,
         ProductRepositoryInterface $productRepository,
         RecurringOptionRepository $repository,
         BillingFrequencyRepository $frequencyRepository,
         RequestInterface $request,
+        TrialLengthUnitType $unitType,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
-        $this->urlBuilder = $urlBuilder;
-        $this->stepPool = $stepPool;
-        $this->registry = $registry;
         $this->productRepository = $productRepository;
         $this->recurringOptionRepository = $repository;
         $this->frequencyRepository = $frequencyRepository;
         $this->request = $request;
+        $this->unitType = $unitType;
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
     /**
@@ -122,6 +145,7 @@ class Form extends AbstractDataProvider
                 $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
             }
             $data[self::FORM_DATA_VALUE]['price'] = $frequency->getPrice();
+            $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
             $data[self::FORM_DATA_VALUE]['product_frequencies'][$frequency->getBillingFrequencyId()] = $frequency->getPrice();
         }
 
@@ -177,10 +201,10 @@ class Form extends AbstractDataProvider
                     'product_billing_frequency' => [
                         'arguments' => [
                             'data' => [
-                                'options' => $this->getProductBillingFrequenciesAsOptionArray()
-                            ]
+                                'options' => $this->getProductBillingFrequenciesAsOptionArray(),
+                            ],
 
-                        ]
+                        ],
                     ],
                     'period' => [
                         'arguments' => [
@@ -188,18 +212,18 @@ class Form extends AbstractDataProvider
                                 'config' => [
                                     'imports' => [
                                         'visible' => '!ns = ${ $.ns }, index = term:checked',
-                                    ]
-                                ]
-                            ]
+                                    ],
+                                ],
+                            ],
 
-                        ]
+                        ],
                     ],
                     'start_on' => [
                         'arguments' => [
                             'data' => [
-                                'config' => $this->getStartOnFieldConfig()
-                            ]
-                        ]
+                                'config' => $this->getStartOnFieldConfig(),
+                            ],
+                        ],
                     ],
                     'price' => [
                         'arguments' => [
@@ -207,17 +231,17 @@ class Form extends AbstractDataProvider
                                 'config' => [
                                     'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                                     'validation' => [
-                                        'validate-zero-or-greater' => true
+                                        'validate-zero-or-greater' => true,
                                     ],
                                     'imports' => [
                                         'changeValue' => 'index = product_billing_frequency:value',
-                                    ]
+                                    ],
                                 ],
                             ],
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -239,14 +263,14 @@ class Form extends AbstractDataProvider
                             'actions' => [
                                 [
                                     'targetName' => $this->scopeName,
-                                    'actionName' => 'ajaxSubmit'
-                                ]
+                                    'actionName' => 'ajaxSubmit',
+                                ],
                             ],
-                            'provider' => null
+                            'provider' => null,
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -262,7 +286,7 @@ class Form extends AbstractDataProvider
             'mainModal' => 'modal',
             'insertConfigurableForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM,
             'configurableForm' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
-            'modalGrid' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID
+            'modalGrid' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
         ];
     }
 
@@ -296,7 +320,7 @@ class Form extends AbstractDataProvider
 
         return [
             'visible' => $visible,
-            'value' => $value
+            'value' => $value,
         ];
     }
 
@@ -334,10 +358,30 @@ class Form extends AbstractDataProvider
 
             $result[] = [
                 'label' => $frequency->getLabel(),
-                'value' => $productFrequency->getBillingFrequencyId()
+                'value' => $productFrequency->getBillingFrequencyId(),
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * Get trial period as string for product.
+     *
+     * @return \Magento\Framework\Phrase|string
+     */
+    private function getTrialPeriod()
+    {
+        $productId = (int)$this->request->getParam('product_id', 0);
+        $product = $this->productRepository->getById($productId);
+        $trialLength = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)
+            ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)->getValue()
+            : 0;
+        $trialUnit = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)
+            ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)->getValue()
+            : 0;
+        $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+
+        return $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : __('not available');
     }
 }

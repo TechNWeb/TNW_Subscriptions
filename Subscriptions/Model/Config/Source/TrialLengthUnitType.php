@@ -61,4 +61,23 @@ class TrialLengthUnitType extends AbstractSource
 
         return $optionList;
     }
+
+    /**
+     * Get trial length unit label by value.
+     *
+     * @param int $value
+     * @return string
+     */
+    public function getLabelByValue($value)
+    {
+        $label = '';
+        foreach ($this->getAllOptions() as $option) {
+            if ($value === $option['value']) {
+                $label = $option['label'];
+                break;
+            }
+        }
+
+        return $label;
+    }
 }
