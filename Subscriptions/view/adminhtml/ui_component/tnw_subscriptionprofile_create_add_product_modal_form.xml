@@ -109,7 +109,7 @@
         <field name="trial_period">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Trial Period:</item>
+                    <item name="label" xsi:type="string" translate="true">Trial Period</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/trial-period</item>
