@@ -176,3 +176,8 @@
 .data-total-container{
   background: #e4e4e4;
 }
+
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control {
+  float: none;
+  margin: 0 auto;
+}
