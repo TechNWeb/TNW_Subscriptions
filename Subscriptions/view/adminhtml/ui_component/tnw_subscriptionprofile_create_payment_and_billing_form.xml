@@ -74,7 +74,7 @@
                 <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\CustomerAddress</item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="boolean">false</item>
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="source" xsi:type="string">SubscriptionProfile</item>
                     <item name="dataScope" xsi:type="string">billing.customer_address_id</item>

@@ -105,8 +105,6 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
                     $product->getId());
             }
 
-            $this->correctPresetQtyValue($productBillingFrequency);
-
             $this->resource->save($productBillingFrequency);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
@@ -244,17 +242,5 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $searchCriteria = $this->searchCriteriaBuilder->create();
 
         return $this->getList($searchCriteria);
-    }
-
-    /**
-     * Check checkbox. If it is false so we set Preset Qty null.
-     *
-     * @param ProductBillingFrequencyInterface $productBillingFrequency
-     */
-    private function correctPresetQtyValue(ProductBillingFrequencyInterface $productBillingFrequency)
-    {
-        if (!$productBillingFrequency->getData(ProductBillingFrequencyInterface::PRESET_QTY_SET_BY_MERCHANT)) {
-            $productBillingFrequency->setPresetQty(null);
-        }
     }
 }
