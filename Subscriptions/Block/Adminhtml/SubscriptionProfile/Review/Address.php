@@ -73,13 +73,9 @@ class Address extends Template
      */
     public function getAddress()
     {
-        if ($this->addressType === self::SHIPPING) {
-            $address = $this->create->getShippingAddress();
-        } else {
-            $address = $this->create->getBillingAddress();
-        }
-
-        return $this->format($address);
+        return $this->addressType === self::SHIPPING
+            ? $this->format($this->create->getShippingAddress())
+            : $this->format($this->create->getBillingAddress());
     }
 
     /**
