@@ -22,21 +22,44 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
 {
-
+    /**
+     * @var BillingFrequencyCollectionFactory
+     */
     private $billingFrequencyCollectionFactory;
 
+    /**
+     * @var DataObjectHelper
+     */
     private $dataObjectHelper;
 
+    /**
+     * @var BillingFrequencySearchResultsInterfaceFactory
+     */
     private $searchResultsFactory;
 
+    /**
+     * @var StoreManagerInterface
+     */
     private $storeManager;
 
+    /**
+     * @var ResourceBillingFrequency
+     */
     private $resource;
 
+    /**
+     * @var DataObjectProcessor
+     */
     private $dataObjectProcessor;
 
+    /**
+     * @var BillingFrequencyFactory
+     */
     private $billingFrequencyFactory;
 
+    /**
+     * @var BillingFrequencyInterfaceFactory
+     */
     private $dataBillingFrequencyFactory;
 
     /**

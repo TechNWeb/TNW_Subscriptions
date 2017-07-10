@@ -21,12 +21,12 @@ class LockPrice extends AbstractModifier
     /**
      * @var ArrayManager
      */
-    protected $arrayManager;
+    private $arrayManager;
 
     /**
      * @var LocatorInterface
      */
-    protected $locator;
+    private $locator;
 
     /**
      * @param LocatorInterface $locator
