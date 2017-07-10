@@ -232,7 +232,7 @@ class GridMetadata
         $priceColumn = $this->setColumnSpecialData(
             $priceColumn,
             'TNW_Subscriptions/js/grid/billing_frequency/price',
-            'TNW_Subscriptions/billing_frequency/input',
+            '',
             [],
             $this->getCurrencySymbol(),
             'ea.',
