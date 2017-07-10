@@ -93,6 +93,13 @@ class Form extends AbstractDataProvider
     private $unitType;
 
     /**
+     * Trial period holder.
+     *
+     * @var string
+     */
+    private $trialPeriod;
+
+    /**
      * Form constructor.
      *
      * @param string $name
@@ -224,6 +231,15 @@ class Form extends AbstractDataProvider
                                 'config' => $this->getStartOnFieldConfig(),
                             ],
                         ],
+                    ],
+                    'trial_period' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'visible' => $this->showTrialPeriod(),
+                                ]
+                            ]
+                        ]
                     ],
                     'price' => [
                         'arguments' => [
@@ -372,16 +388,33 @@ class Form extends AbstractDataProvider
      */
     private function getTrialPeriod()
     {
-        $productId = (int)$this->request->getParam('product_id', 0);
-        $product = $this->productRepository->getById($productId);
-        $trialLength = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)
-            ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)->getValue()
-            : 0;
-        $trialUnit = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)
-            ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)->getValue()
-            : 0;
-        $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+        if ($this->trialPeriod === null) {
+            $productId = (int)$this->request->getParam('product_id', 0);
+            $trialLength = 0;
+            $trialUnit = 0;
+            if ($productId) {
+                $product = $this->productRepository->getById($productId);
+                $trialLength = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)
+                    ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)->getValue()
+                    : 0;
+                $trialUnit = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)
+                    ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)->getValue()
+                    : 0;
+                $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+            }
+            $this->trialPeriod = $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : '';
+        }
 
-        return $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : __('not available');
+        return $this->trialPeriod;
+    }
+
+    /**
+     * Provide visibility status for "Trial Period" field.
+     *
+     * @return bool
+     */
+    private function showTrialPeriod()
+    {
+        return $this->getTrialPeriod() ? true : false;
     }
 }
