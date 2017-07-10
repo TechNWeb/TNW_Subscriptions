@@ -78,6 +78,9 @@ class Discount extends BaseModifier
                 'percentSymbol' => '%',
                 'additionalClasses' => 'admin__field-small long_note',
                 'priceFormat' => $this->getPriceFormatData(),
+                'validation' => [
+                    'discount-less-then-price' => true
+                ],
             ]
         );
 

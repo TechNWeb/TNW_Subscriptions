@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency as ResourceBillingFrequency;
 use TNW\Subscriptions\Api\Data\BillingFrequencySearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterfaceFactory;
@@ -38,6 +39,10 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
 
     private $dataBillingFrequencyFactory;
 
+    /**
+     * @var BillingFrequencyUnitType
+     */
+    private $billingFrequencyUnitType;
 
     /**
      * @param ResourceBillingFrequency $resource
@@ -48,6 +53,7 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
+     * @param BillingFrequencyUnitType $billingFrequencyUnitType
      */
     public function __construct(
         ResourceBillingFrequency $resource,
@@ -57,7 +63,8 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
         BillingFrequencySearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        BillingFrequencyUnitType $billingFrequencyUnitType
     ) {
         $this->resource = $resource;
         $this->billingFrequencyFactory = $billingFrequencyFactory;
@@ -67,6 +74,7 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
         $this->dataBillingFrequencyFactory = $dataBillingFrequencyFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
+        $this->billingFrequencyUnitType = $billingFrequencyUnitType;
     }
 
     /**
@@ -174,5 +182,23 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
     public function deleteById($billingFrequencyId)
     {
         return $this->delete($this->getById($billingFrequencyId));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBillingFrequencyPeriodLabel($billingFrequency)
+    {
+        $billingFrequencyData = '';
+        if ($billingFrequency->getFrequency()) {
+            $unit = $billingFrequency->getUnit();
+            if (!$unit) {
+                $unit = BillingFrequencyUnitType::DAYS;
+            }
+            $unitLabel = $this->billingFrequencyUnitType->getLabelByValue($unit);
+            $billingFrequencyData = $billingFrequency->getFrequency() . ' ' . __($unitLabel);
+        }
+
+        return $billingFrequencyData;
     }
 }
