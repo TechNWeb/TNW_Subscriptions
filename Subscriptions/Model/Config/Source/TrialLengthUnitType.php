@@ -33,30 +33,30 @@ class TrialLengthUnitType extends AbstractSource
     {
         /** @var array $optionList */
         $optionList = [
-            [
+/*            [
                 'value' => self::MINUTES,
                 'label' => __('Minutes'),
             ],
             [
                 'value' => self::HOURS,
                 'label' => __('Hours'),
-            ],
+            ],*/
             [
                 'value' => self::DAYS,
                 'label' => __('Days'),
             ],
-            [
+/*            [
                 'value' => self::WEEKS,
                 'label' => __('Weeks'),
-            ],
+            ],*/
             [
                 'value' => self::MONTHS,
                 'label' => __('Months'),
             ],
-            [
+/*            [
                 'value' => self::YEARS,
                 'label' => __('Years'),
-            ],
+            ],*/
         ];
 
         return $optionList;

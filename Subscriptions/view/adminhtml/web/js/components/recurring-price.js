@@ -64,7 +64,9 @@ define([
                 recurringPrice = productPrice;
 
                 if (offerDiscountComponent.checked()) { // Offer flat discount is enabled
-                    discountAmount = discountAmountComponent.value();
+                    if (typeof discountAmountComponent != 'undefined') {
+                        discountAmount = discountAmountComponent.value();
+                    }
 
                     if (typeof discountAmount == 'undefined' || discountAmount == '') {
                         discountAmount = 0;
@@ -106,7 +108,7 @@ define([
             this.value(formatPrice.formatPrice(recurringPrice, priceFormat));
 
             if (notice != '') {     //if calculated notice isn't empty we form whole necessary message to show
-                notice += ' ' + $.mage.__('savings to the end consumer');
+                notice += ' ' + $.mage.__('savings to the customer');
             } else {
                 notice = ' ';
             }
@@ -140,7 +142,6 @@ define([
             var priceFormat = this.getPriceFormat();
             var productPrice = 0;
             var productPriceComponent = registry.get('index=price');
-
 
             if ((typeof productPriceComponent != 'undefined')
                 && (typeof productPriceComponent.value() != 'undefined')) {

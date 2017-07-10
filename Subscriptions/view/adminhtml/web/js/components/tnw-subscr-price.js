@@ -41,34 +41,40 @@ define([
             if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
                 priceFormat = $.parseJSON(this.priceFormat);
             }
-            var productPriceComponent = registry.get('index=price');
-            var productPrice = 0;
-            var commentPrice = 0;
             //Get current component integer value.
             var trialPrice = this.value();
             if (typeof trialPrice == 'string') {
                 trialPrice = formatPrice.formatToNumber(trialPrice, priceFormat);
             }
 
-            //Find product price.
-            if ((typeof productPriceComponent != 'undefined')
-                && (typeof productPriceComponent.value() != 'undefined')) {
-                productPrice = formatPrice.formatToNumber(productPriceComponent.value(), priceFormat);
-            }
+            if (trialPrice != 0) {
+                var productPriceComponent = registry.get('index=price');
+                var productPrice = 0;
+                var commentPrice = 0;
 
-            //If current component value and product price are not 0 we can calculate amount to show in comment.
-            if (trialPrice != 0 && productPrice != 0) {
-                commentPrice = productPrice - trialPrice;
-            }
 
-            //If amount for comment isn't 0 we can calculate comment ro show it.
-            if (commentPrice != 0) {
-                commentPrice = formatPrice.formatPrice(commentPrice, priceFormat);
-                this.notice = $.mage.__('Estimated');
-                this.notice += ' ' + this.addbefore + commentPrice + ' ';
-                this.notice += $.mage.__('savings to the end consumer during the trial period.');
+                //Find product price.
+                if ((typeof productPriceComponent != 'undefined')
+                    && (typeof productPriceComponent.value() != 'undefined')) {
+                    productPrice = formatPrice.formatToNumber(productPriceComponent.value(), priceFormat);
+                }
+
+                //If product price is not 0 we can calculate amount to show in comment.
+                if (productPrice != 0) {
+                    commentPrice = productPrice - trialPrice;
+                }
+
+                //If amount for comment isn't 0 we can calculate comment to show it.
+                if (commentPrice != 0) {
+                    commentPrice = formatPrice.formatPrice(commentPrice, priceFormat);
+                    this.notice = $.mage.__('Estimated');
+                    this.notice += ' ' + this.addbefore + commentPrice + ' ';
+                    this.notice += $.mage.__('savings to the customer during the trial period.');
+                } else {
+                    this.notice = ' ';
+                }
             } else {
-                this.notice = ' ';
+                this.notice = $.mage.__('Product is FREE for the trial period.');
             }
 
             $('#'+this.noticeId).children().html(this.notice);
