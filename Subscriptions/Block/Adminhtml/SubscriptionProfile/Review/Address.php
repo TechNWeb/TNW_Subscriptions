@@ -48,6 +48,7 @@ class Address extends Template
      *
      * @param Template\Context $context
      * @param Create $create
+     * @param Config $addressConfig
      * @param string $addressType
      * @param array $data
      */
@@ -72,14 +73,10 @@ class Address extends Template
      */
     public function getAddress()
     {
-        switch ($this->addressType) {
-            case self::SHIPPING:
-                $address = $this->create->getShippingAddress();
-                break;
-            case self::BILLING:
-            default:
-                $address = $this->create->getBillingAddress();
-                break;
+        if ($this->addressType === self::SHIPPING) {
+            $address = $this->create->getShippingAddress();
+        } else {
+            $address = $this->create->getBillingAddress();
         }
 
         return $this->format($address);
