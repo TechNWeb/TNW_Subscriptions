@@ -81,11 +81,7 @@ define([
 
                 this.notice = $j.mage.__('Estimated ') + discount + $j.mage.__(' savings to the end consumer');
 
-                if (this.notice) {
-                    if ($j('#' + this.noticeId).length) {
-                        $j('#' + this.noticeId).html(this.notice);
-                    }
-                }
+                $j('#' + this.noticeId).html(this.notice);
             }
         }
     });

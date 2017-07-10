@@ -407,7 +407,7 @@ class LinkedProducts extends AbstractModifier
      * @param ProductBillingFrequencyInterface $linkItem
      * @return float|null|string
      */
-    public function getPrice(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
+    private function getPrice(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
     {
         $lockProductPriceStatus = $this->config->lockProductPriceStatus();
 

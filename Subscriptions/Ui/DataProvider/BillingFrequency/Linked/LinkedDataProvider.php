@@ -74,10 +74,7 @@ class LinkedDataProvider extends AbstractDataProvider
     private function joinTables(\Magento\Catalog\Model\ResourceModel\Product\Collection $collection)
     {
         $collection->joinTable(
-            [
-                $collection->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE),
-                'pr_b_f',
-            ],
+            $collection->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE),
             'magento_product_id=entity_id',
             [
                 ProductBillingFrequencyInterface::INITIAL_FEE,
