@@ -13,10 +13,10 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Escaper;
 
 class Context
 {
-
     /**
      * @var ManagerInterface
      */
@@ -37,13 +37,27 @@ class Context
      * @var TimezoneInterface
      */
     private $localeDate;
+    /**
+     * @var Escaper
+     */
+    private $escaper;
 
+    /**
+     * Context constructor.
+     * @param ManagerInterface $messageManager
+     * @param LoggerInterface $logger
+     * @param Config $config
+     * @param PriceCurrencyInterface $priceCurrency
+     * @param TimezoneInterface $localeDate
+     * @param Escaper $escaper
+     */
     public function __construct(
         ManagerInterface $messageManager,
         LoggerInterface $logger,
         Config $config,
         PriceCurrencyInterface $priceCurrency,
-        TimezoneInterface $localeDate
+        TimezoneInterface $localeDate,
+        Escaper $escaper
     ) {
 
         $this->messageManager = $messageManager;
@@ -51,6 +65,7 @@ class Context
         $this->logger = $logger;
         $this->priceCurrency = $priceCurrency;
         $this->localeDate = $localeDate;
+        $this->escaper = $escaper;
     }
 
     /**
@@ -113,5 +128,13 @@ class Context
     public function getLocaleDate()
     {
         return $this->localeDate;
+    }
+
+    /**
+     * @return Escaper
+     */
+    public function getEscaper()
+    {
+        return $this->escaper;
     }
 }

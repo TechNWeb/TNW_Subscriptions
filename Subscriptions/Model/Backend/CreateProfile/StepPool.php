@@ -16,14 +16,14 @@ class StepPool
     const STEP_PARAM_TYPE_CUSTOMER = 'customer';
     const STEP_PARAM_TYPE_STORE = 'store';
     const STEP_PARAM_TYPE_ACCOUNT_INFORMATION = 'account';
-    const STEP_PARAM_TYPE_SHIPPING_BILLING = 'payment_and_billing';
+    const STEP_PARAM_TYPE_PAYMENT_BILLING = 'payment_and_billing';
     const STEP_PARAM_TYPE_REVIEW = 'review';
 
     protected $stepArray = [
         self::STEP_PARAM_TYPE_CUSTOMER,
         self::STEP_PARAM_TYPE_STORE,
         self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION,
-        self::STEP_PARAM_TYPE_SHIPPING_BILLING,
+        self::STEP_PARAM_TYPE_PAYMENT_BILLING,
         self::STEP_PARAM_TYPE_REVIEW
     ];
 
@@ -78,7 +78,7 @@ class StepPool
      */
     public function setCurrentStep($currentStep)
     {
-        in_array($currentStep, $this->getStepArray())
+        in_array($currentStep, $this->getStepArray(), true)
             ? $this->currentStep = $currentStep
             : $this->currentStep = self::STEP_PARAM_TYPE_CUSTOMER;
 
@@ -96,7 +96,7 @@ class StepPool
     {
         $result = false;
 
-        if ($this->getCurrentStep() != self::STEP_PARAM_TYPE_REVIEW) {
+        if ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_REVIEW) {
 
             $stepKey = array_search($this->getCurrentStep(), $this->getStepArray());
 
@@ -119,7 +119,7 @@ class StepPool
     {
         $result = false;
 
-        if ($this->getCurrentStep() != self::STEP_PARAM_TYPE_CUSTOMER) {
+        if ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER) {
 
             $stepKey = array_search($this->getCurrentStep(), $this->getStepArray());
 
