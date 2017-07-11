@@ -42,14 +42,14 @@ class Create
     const SUBSCRIPTION_BUY_REQUEST_PARAM_NAME = 'subscription_data';
 
     /**
-     * Last part off path to unique subscription fields in product buy request.
+     * Last part of path to unique subscription fields in product buy request.
      *
      * Using for checking the ability to add product to subscription quote.
      */
     const UNIQUE = '/unique';
 
     /**
-     * Last part off path to non_unique fields in product buy request.
+     * Last part of path to non_unique fields in product buy request.
      */
     const NON_UNIQUE = '/non_unique';
 
