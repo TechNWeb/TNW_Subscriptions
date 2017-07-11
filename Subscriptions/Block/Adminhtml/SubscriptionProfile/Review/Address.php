@@ -16,12 +16,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
  */
 class Address extends Template
 {
-    /* billing addresss type.*/
-    const BILLING = 'billing';
-
-    /* shipping address type.*/
-    const SHIPPING = 'shipping';
-
     /**
      * Help retrieve address by type(Shipping, Billing).
      *
@@ -56,7 +50,7 @@ class Address extends Template
         Template\Context $context,
         Create $create,
         Config $addressConfig,
-        $addressType = self::BILLING,
+        $addressType = QuoteAddress::ADDRESS_TYPE_SHIPPING,
         array $data = []
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/address.phtml');
@@ -73,7 +67,7 @@ class Address extends Template
      */
     public function getAddress()
     {
-        return $this->addressType === self::SHIPPING
+        return $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
             ? $this->format($this->create->getShippingAddress())
             : $this->format($this->create->getBillingAddress());
     }
