@@ -5,4 +5,20 @@
  */
 -->
 <div class="data-grid-cell-content subscription-shipping-title" translate="'Shipping Method'"/>
-<div class="data-grid-cell-content subscription-shipping-method" html="$col.getLabel($row())"/>
+
+
+<div if="$col.hasLabel($row())" daa-for = "$col.getForm()" class="data-grid-cell-content subscription-shipping-method" html="$col.getLabel($row())"/>
+
+<select if="$col.hasOptions($row())" class="admin__control-select" data-bind="
+    attr: {
+        name: 'shipping_methods[$col.getId($row())]',
+        id: ++ko.uid,
+    },
+    hasFocus: false,
+    optgroup: $col.getOptions($row()),
+    value: $col.getValue($row()),
+    optionsCaption: false,
+    optionsValue: 'value',
+    optionsText: 'label'",
+    data-form-part= "$col.getForm()"
+/>

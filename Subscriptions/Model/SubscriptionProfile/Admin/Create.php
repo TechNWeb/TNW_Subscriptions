@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
@@ -9,6 +13,7 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Customer\Model\Metadata\Form;
 use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -18,55 +23,97 @@ use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\AddressFactory;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
-use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
-use Magento\Customer\Model\Metadata\Form;
 
+/**
+ * Class for creating subscriptions in admin
+ */
 class Create
 {
     const SUBSCRIPTION_BUY_REQUEST_PARAM_NAME = 'subscription_data';
 
-    /** @var Context */
-    protected $context;
+    /**
+     * @var Context
+     */
+    private $context;
 
-    /** @var Quote */
-    protected $session;
+    /**
+     * Session.
+     *
+     * @var Quote
+     */
+    private $session;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $storeManager;
+    /**
+     * Repository for retrieving quotes.
+     *
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
 
-    /** @var \Magento\Quote\Api\CartRepositoryInterface */
-    protected $cartRepository;
+    /**
+     * Repository for retrieving products.
+     *
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
 
-    /** @var ProductRepositoryInterface */
-    protected $productRepository;
+    /**
+     * Buy request onject
+     *
+     * @var DataObject
+     */
+    private $buyRequest;
 
-    /** @var DataObject */
-    protected $buyRequest;
+    /**
+     * Factory for creating quotes.
+     *
+     * @var ModelQuoteFactory
+     */
+    private $quoteFactory;
 
-    /** @var ModelQuoteFactory */
-    protected $quoteFactory;
+    /**
+     * Repository for retrieving customers.
+     *
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
 
-    /** @var CustomerRepositoryInterface */
-    protected $customerRepository;
+    /**
+     * Customer groups manager
+     *
+     * @var GroupManagementInterface
+     */
+    private $groupManagement;
 
-    /** @var GroupManagementInterface */
-    protected $groupManagement;
+    /**
+     * Factory for creating addresses.
+     *
+     * @var AddressFactory
+     */
+    private $addressFactory;
 
-    /** @var AddressFactory */
-    protected $addressFactory;
+    /**
+     * Factory for creating customer metadata form.
+     *
+     * @var FormFactory
+     */
+    private $formFactory;
 
-    /** @var FormFactory */
-    protected $formFactory;
+    /**
+     * Repository for retrieving addresses.
+     *
+     * @var AddressRepositoryInterface
+     */
+    private $addressRepository;
 
     /**
      * Create constructor.
      * @param Context $context
      * @param Quote $session
-     * @param StoreManagerInterface $storeManager
      * @param CartRepositoryInterface $cartRepository
      * @param ModelQuoteFactory $quoteFactory
      * @param AddressFactory $addressFactory
@@ -79,7 +126,6 @@ class Create
     public function __construct(
         Context $context,
         Quote $session,
-        StoreManagerInterface $storeManager,
         CartRepositoryInterface $cartRepository,
         ModelQuoteFactory $quoteFactory,
         AddressFactory $addressFactory,
@@ -91,7 +137,6 @@ class Create
     ) {
         $this->context = $context;
         $this->session = $session;
-        $this->storeManager = $storeManager;
         $this->cartRepository = $cartRepository;
         $this->quoteFactory = $quoteFactory;
         $this->addressFactory = $addressFactory;
@@ -103,6 +148,8 @@ class Create
     }
 
     /**
+     * Returns product buy request.
+     *
      * @return DataObject
      */
     public function getBuyRequest()
@@ -111,6 +158,8 @@ class Create
     }
 
     /**
+     * Adds product into new or already existing subscription quote.
+     *
      * @param [] $productData
      * @return array
      */
@@ -143,7 +192,9 @@ class Create
     }
 
     /**
-     * @param $productId
+     * Returns product object.
+     *
+     * @param int $productId
      * @return ProductInterface
      */
     protected function getProduct($productId)
@@ -152,6 +203,8 @@ class Create
     }
 
     /**
+     * Returns new or already existing quote for adding in to it requested product.
+     *
      * @return ModelQuote|null
      */
     protected function getSubQuote()
@@ -180,6 +233,8 @@ class Create
     }
 
     /**
+     * Checks whether it is possible to add a product in to quote.
+     *
      * @param ModelQuote $subQuote
      * @return bool
      */
@@ -205,7 +260,10 @@ class Create
     }
 
     /**
+     * Prepares product buy request.
+     *
      * @param [] $productData
+     * @return void
      */
     protected function prepareBuyRequest($productData)
     {
@@ -229,6 +287,8 @@ class Create
     }
 
     /**
+     * Prepares product to adding product in to quote.
+     *
      * @param $productData
      * @return ProductInterface
      */
@@ -242,6 +302,8 @@ class Create
     }
 
     /**
+     * Creates empty quote and assigns customer if there is a customer id in session.
+     *
      * @return int|string
      */
     protected function createSubCart()
@@ -263,7 +325,7 @@ class Create
             $quote = $this->cartRepository->get($quote->getId(), [$this->session->getStoreId()]);
 
             if ($this->session->getCustomerId() &&
-                $this->session->getCustomerId() != $quote->getCustomerId()
+                $this->session->getCustomerId() !== $quote->getCustomerId()
             ) {
                 $customer = $this->customerRepository->getById($this->session->getCustomerId());
                 $quote->assignCustomer($customer);
@@ -279,6 +341,8 @@ class Create
     }
 
     /**
+     * Calculates start date for subscription.
+     *
      * @param $startOn
      * @return mixed
      */
@@ -303,6 +367,8 @@ class Create
     }
 
     /**
+     * Validates and sets shipping address to all subscription quotes.
+     *
      * @param $address
      * @param null $customerAddressId
      * @return array
@@ -312,7 +378,7 @@ class Create
         $result = [];
 
         /** @var Address $shippingAddress */
-        $shippingAddress = $this->getShippingAddress();
+        $shippingAddress = $this->addressFactory->create();
 
         $shippingAddress->setAddressType(Address::TYPE_SHIPPING);
 
@@ -324,11 +390,11 @@ class Create
                 // do nothing if customer is not found by id
             }
 
-            if ($addressData->getCustomerId() != $this->session->getCustomerId()) {
-                return [__('The customer address is not valid.')];
+            if ($addressData->getCustomerId() !== $this->session->getCustomerId()) {
+                $result = [__('The customer address is not valid.')];
+            } else {
+                $result = $this->checkCustomerAddress($shippingAddress, $addressData);
             }
-
-            $result = $this->checkCustomerAddress($shippingAddress, $addressData);
 
         } elseif (is_array($address)) {
             $shippingAddress->setData($address);
@@ -339,13 +405,17 @@ class Create
         //check if we have errors on address validation
         //may be make sense don't do this and always save address to quotes
         if ($result === true) {
-            $saveInAddressBook = (int)(!empty($address['save_in_address_book']));
 
-            $shippingAddress->setSaveInAddressBook($saveInAddressBook);
+            if (!empty($address['save_in_address_book'])) {
+                $shippingAddress->setSaveInAddressBook($address['save_in_address_book']);
+            }
+
             $shippingAddress->setSameAsBilling(0);
 
             foreach ($this->session->getSubQuotes() as $subQuote) {
                 $subQuote->setShippingAddress($shippingAddress);
+                $subQuote->setTotalsCollectedFlag(false);
+                $subQuote->getShippingAddress()->setCollectShippingRates(true);
                 $this->cartRepository->save($subQuote);
             }
         }
@@ -354,15 +424,17 @@ class Create
     }
 
     /**
+     * Validates and sets billing address to all subscription quotes.
+     *
      * @param $address
      * @param null $customerAddressId
-     * @return array
+     * @return array|bool
      */
     public function setBillingAddress($address, $customerAddressId = null)
     {
         $result = [];
         /** @var Address $shippingAddress */
-        $billingAddress = $this->getBillingAddress();
+        $billingAddress = $this->addressFactory->create();
         $billingAddress->setAddressType(Address::TYPE_BILLING);
 
         if ($customerAddressId) {
@@ -373,11 +445,11 @@ class Create
                 // do nothing if customer is not found by id
             }
 
-            if ($addressData->getCustomerId() != $this->session->getCustomerId()) {
-                return [__('The customer address is not valid.')];
+            if ($addressData->getCustomerId() !== $this->session->getCustomerId()) {
+                $result = [__('The customer address is not valid.')];
+            } else {
+                $result = $this->checkCustomerAddress($billingAddress, $addressData);
             }
-
-            $result = $this->checkCustomerAddress($billingAddress, $addressData);
 
         } elseif (is_array($address)) {
             if ($address['same_as_shipping']) {
@@ -386,7 +458,7 @@ class Create
                 $billingAddress->setAddressType(Address::TYPE_BILLING);
                 $billingAddress->setSaveInAddressBook(0);
                 $result = true;
-            }else{
+            } else {
                 $billingAddress->setData($address);
                 $result = $this->checkQuoteAddress($billingAddress, $address);
             }
@@ -395,8 +467,10 @@ class Create
         //check if we have errors on address validation
         //may be make sense don't do this and always save address to quotes
         if ($result === true) {
-            $saveInAddressBook = (int)(!empty($address['save_in_address_book']));
-            $billingAddress->setData('save_in_address_book', $saveInAddressBook);
+
+            if (!empty($address['save_in_address_book'])) {
+                $billingAddress->setSaveInAddressBook($address['save_in_address_book']);
+            }
 
             foreach ($this->session->getSubQuotes() as $subQuote) {
                 $subQuote->setBillingAddress($billingAddress);
@@ -408,6 +482,8 @@ class Create
     }
 
     /**
+     * Returns shipping address from the first subscription quote or empty address object.
+     *
      * @return Address
      */
     public function getShippingAddress()
@@ -426,6 +502,8 @@ class Create
     }
 
     /**
+     * Imports customer address data into address nd validates it in customer form.
+     *
      * @param Address $address
      * @param AddressInterface $customerAddressData
      * @return array|bool
@@ -434,12 +512,12 @@ class Create
     {
         $address->importCustomerAddressData($customerAddressData)->setSaveInAddressBook(0);
 
-        $addressErrors = $this->getCustomerForm()->validateData($address->getData());
-
-        return $addressErrors;
+        return $this->getCustomerForm()->validateData($address->getData());
     }
 
     /**
+     * Prepares and validates address data in customer form.
+     *
      * @param Address $address
      * @param [] $data
      * @return array
@@ -457,7 +535,7 @@ class Create
 
         if ($errors !== true) {
 
-            if ($address->getAddressType() == Address::TYPE_SHIPPING) {
+            if ($address->getAddressType() === Address::TYPE_SHIPPING) {
                 $typeName = __('Shipping Address: ');
             } else {
                 $typeName = __('Billing Address: ');
@@ -475,6 +553,8 @@ class Create
     }
 
     /**
+     * Returns customer form. It is needed for address data validation.
+     *
      * @return Form
      */
     protected function getCustomerForm()
@@ -484,13 +564,15 @@ class Create
             'adminhtml_customer_address',
             [],
             false,
-            false,
-            []
+            false
         );
+
         return $addressForm;
     }
 
     /**
+     * Returns billing address from the first subscription quote or empty address object.
+     *
      * @return Address
      */
     public function getBillingAddress()

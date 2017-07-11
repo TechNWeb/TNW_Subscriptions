@@ -22,6 +22,18 @@
             </argument>
         </arguments>
     </virtualType>
+    <virtualType name="SubscriptionProfilePreviewBillingAddress"
+                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
+        <arguments>
+            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SubscriptionProfilePreviewShippingAddress"
+                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
+        <arguments>
+            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING</argument>
+        </arguments>
+    </virtualType>
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\RecurringOptions">
         <arguments>
             <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
