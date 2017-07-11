@@ -33,3 +33,4 @@
 "today","today"
 "Select a product","Select a product"
 "Total of %s shipment(s). Products will be shipped every %s starting %s.","Total of %s shipment(s). Products will be shipped every %s starting %s."
+"Shipping method is required and can't be empty.","Shipping method is required and can't be empty."

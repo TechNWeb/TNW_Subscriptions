@@ -23,19 +23,12 @@ define([
             return row[this.index].methods;
         },
         getLabel: function (row) {
-            debugger;
             return row[this.index].label;
         },
-        getValue: function (row) {
-            return '';
-        },
         getForm: function () {
-            debugger;
             return this.saveForm;
         },
         getId: function (row) {
-            debugger;
-            alert(1);
             return row[this.index].sub_quote_id;
         }
     });

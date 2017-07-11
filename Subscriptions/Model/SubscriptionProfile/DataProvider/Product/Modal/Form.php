@@ -120,8 +120,9 @@ class Form extends AbstractDataProvider
 
             if ($frequency->getDefaultBillingFrequency()) {
                 $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
+                $data[self::FORM_DATA_VALUE]['price'] = $frequency->getPrice();
             }
-            $data[self::FORM_DATA_VALUE]['price'] = $frequency->getPrice();
+
             $data[self::FORM_DATA_VALUE]['product_frequencies'][$frequency->getBillingFrequencyId()] = $frequency->getPrice();
         }
 

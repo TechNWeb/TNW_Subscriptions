@@ -310,9 +310,9 @@ class Product extends AbstractDataProvider
 
         $label = __('Selected on next step');
 
-        if ($this->stepPool->getCurrentStep() == StepPool::STEP_PARAM_TYPE_REVIEW) {
+        if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
             $label = $this->shippingMethods->getCurrentMethodLabel();
-        } elseif ($this->stepPool->getCurrentStep() == StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+        } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
             $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
             $label = '';
         }
@@ -320,7 +320,8 @@ class Product extends AbstractDataProvider
         return [
             'label' => $label,
             'methods' => $shippingMethods,
-            'sub_quote_id' => $quote->getId()
+            'sub_quote_id' => $quote->getId(),
+            'value' => $quote->getShippingAddress()->getShippingMethod()
         ];
     }
 
