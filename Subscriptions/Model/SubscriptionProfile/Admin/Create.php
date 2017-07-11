@@ -433,12 +433,14 @@ class Create
     public function setBillingAddress($address, $customerAddressId = null)
     {
         $result = [];
+
         /** @var Address $shippingAddress */
         $billingAddress = $this->addressFactory->create();
         $billingAddress->setAddressType(Address::TYPE_BILLING);
 
         if ($customerAddressId) {
             $addressData = null;
+
             try {
                 $addressData = $this->addressRepository->getById($customerAddressId);
             } catch (NoSuchEntityException $e) {
@@ -585,6 +587,42 @@ class Create
             $result = $quote->getBillingAddress();
         } else {
             $result = $this->addressFactory->create();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sets into subscription quotes shipping methods.
+     *
+     * @param $methods
+     * @return array
+     */
+    public function setShippingMethods($methods)
+    {
+        $result = [];
+
+        $subQuotes = $this->session->getSubQuotes();
+
+        foreach ($subQuotes as $subQuote) {
+
+            /** @var string|null $method */
+            $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;
+
+            if ($method) {
+                try {
+                    $subQuote->getShippingAddress()->setShippingMethod($method);
+                    $subQuote->getShippingAddress()->setCollectShippingRates(true);
+                    $this->cartRepository->save($subQuote);
+                } catch ( \Exception $e) {
+                   $this->context->log($e->getMessage());
+
+                   $result[] = __('Can not set shipping method - ' . $method . ' to quote with id - ' . $subQuote->getId());
+                }
+
+            } else {
+                $result[] = __("Shipping method is required and can't be empty.");
+            }
         }
 
         return $result;

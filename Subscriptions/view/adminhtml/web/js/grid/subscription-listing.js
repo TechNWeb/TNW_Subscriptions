@@ -55,8 +55,13 @@ define([
 
             show = this.rows.length > 0;
 
-            addButton.set('displayPrimary', !show);
-            modifyButton.set('visible', show);
+            if (addButton){
+                addButton.set('displayPrimary', !show);
+            }
+
+            if (modifyButton){
+                modifyButton.set('visible', show);
+            }
         }
     });
 });
