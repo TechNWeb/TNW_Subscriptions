@@ -16,6 +16,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
@@ -100,6 +101,13 @@ class Form extends AbstractDataProvider
     private $trialPeriod;
 
     /**
+     * Help calculate product price for billing frequency.
+     *
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+    /**
      * Form constructor.
      *
      * @param string $name
@@ -110,6 +118,7 @@ class Form extends AbstractDataProvider
      * @param BillingFrequencyRepository $frequencyRepository
      * @param RequestInterface $request
      * @param TrialLengthUnitType $unitType
+     * @param PriceCalculator $priceCalculator
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -123,6 +132,7 @@ class Form extends AbstractDataProvider
         BillingFrequencyRepository $frequencyRepository,
         RequestInterface $request,
         TrialLengthUnitType $unitType,
+        PriceCalculator $priceCalculator,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -133,6 +143,7 @@ class Form extends AbstractDataProvider
         $this->request = $request;
         $this->unitType = $unitType;
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
+        $this->priceCalculator = $priceCalculator;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -148,12 +159,14 @@ class Form extends AbstractDataProvider
         /** @var ProductBillingFrequencyInterface $frequency */
         foreach ($this->getProductBillingFrequencies() as $frequency) {
 
+            $billingFrequencyId = $frequency->getBillingFrequencyId();
             if ($frequency->getDefaultBillingFrequency()) {
                 $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
-                $data[self::FORM_DATA_VALUE]['price'] = $frequency->getPrice();
+                $data[self::FORM_DATA_VALUE]['price'] = $this->geBillingFrequencytPrice($billingFrequencyId);
             }
             $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$frequency->getBillingFrequencyId()] = $frequency->getPrice();
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]
+                = $this->geBillingFrequencytPrice($billingFrequencyId);
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
@@ -416,5 +429,18 @@ class Form extends AbstractDataProvider
     private function showTrialPeriod()
     {
         return $this->getTrialPeriod() ? true : false;
+    }
+
+    /**
+     * Get calculated product price for billing frequency.
+     *
+     * @param string $billingFrequencyId
+     * @return string
+     */
+    private function geBillingFrequencytPrice($billingFrequencyId)
+    {
+        $productId = (int)$this->request->getParam('product_id', 0);
+
+        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId);
     }
 }

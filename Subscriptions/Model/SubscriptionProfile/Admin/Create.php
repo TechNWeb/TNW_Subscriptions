@@ -26,14 +26,32 @@ use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
 /**
- * Class for creating subscriptions in admin
+ * Class for creating subscriptions in admin.
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * todo: refactor this class when it's finished to reduce coupling between objects.
  */
 class Create
 {
+    /**
+     * First part of path to subscription fields.
+     */
     const SUBSCRIPTION_BUY_REQUEST_PARAM_NAME = 'subscription_data';
+
+    /**
+     * Last part off path to unique subscription fields in product buy request.
+     *
+     * Using for checking the ability to add product to subscription quote.
+     */
+    const UNIQUE = '/unique';
+
+    /**
+     * Last part off path to non_unique fields in product buy request.
+     */
+    const NON_UNIQUE = '/non_unique';
 
     /**
      * @var Context
@@ -111,6 +129,13 @@ class Create
     private $addressRepository;
 
     /**
+     * Help retrieve calculated product price.
+     *
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+    /**
      * Create constructor.
      * @param Context $context
      * @param Quote $session
@@ -122,6 +147,7 @@ class Create
      * @param CustomerRepositoryInterface $customerRepository
      * @param FormFactory $formFactory
      * @param AddressRepositoryInterface $addressRepository
+     * @param PriceCalculator $priceCalculator
      */
     public function __construct(
         Context $context,
@@ -133,7 +159,8 @@ class Create
         ProductRepositoryInterface $productRepository,
         CustomerRepositoryInterface $customerRepository,
         FormFactory $formFactory,
-        AddressRepositoryInterface $addressRepository
+        AddressRepositoryInterface $addressRepository,
+        PriceCalculator $priceCalculator
     ) {
         $this->context = $context;
         $this->session = $session;
@@ -145,6 +172,7 @@ class Create
         $this->customerRepository = $customerRepository;
         $this->formFactory = $formFactory;
         $this->addressRepository = $addressRepository;
+        $this->priceCalculator = $priceCalculator;
     }
 
     /**
@@ -247,9 +275,9 @@ class Create
         $item = $quoteItems ? reset($quoteItems) : null;
 
         if ($item) {
-            $request = $item->getBuyRequest()->getData(self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+            $request = $item->getBuyRequest()->getDataByPath(self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
 
-            $newRequest = $this->buyRequest->getData(self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+            $newRequest = $this->buyRequest->getDataByPath(self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
 
             if ($request == $newRequest) {
                 $result = true;
@@ -275,11 +303,19 @@ class Create
         $data = [
             'qty' => $productData['qty'],
             self::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
-                'billing_frequency' => $productData['product_billing_frequency'],
-                'term' => $productData['term'],
-                'period' => $productData['period'],
-                'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
-                'start_on' => $this->getStartOnDate($productData['start_on']),
+                'unique' => [
+                    'billing_frequency' => $productData['product_billing_frequency'],
+                    'term' => $productData['term'],
+                    'period' => $productData['period'],
+                    'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
+                    'start_on' => $this->getStartOnDate($productData['start_on']),
+                ],
+                'non_unique' => [
+                    'price' => $this->priceCalculator->getUnitPrice(
+                        $product->getId(),
+                        $productData['product_billing_frequency']
+                    )
+                ]
             ],
         ];
 
@@ -296,7 +332,12 @@ class Create
     {
         $product = $this->getProduct($productData['product_id']);
 
-        $product->setPrice($productData['price']);
+        $price = $this->priceCalculator->getUnitPrice(
+            $product->getId(),
+            $productData['product_billing_frequency'],
+            true
+        );
+        $product->setPrice($price);
 
         return $product;
     }
