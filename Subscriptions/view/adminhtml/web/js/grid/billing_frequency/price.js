@@ -68,7 +68,7 @@ define([
                 discount = formatPrice.formatPrice(discount);
 
                 var currencySymbol = typeof this.imports.currencySymbol == "undefined"
-                    ? this.imports.currencySymbol : '$';
+                    ? '$' : this.imports.currencySymbol;
 
                 var discountType
                     = uiRegistry.get('index=linked').source.data.links.linked[index].tnw_subscr_discount_type;
