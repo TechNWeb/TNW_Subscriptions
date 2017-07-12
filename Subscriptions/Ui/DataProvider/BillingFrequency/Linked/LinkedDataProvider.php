@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductLinkRepositoryInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Ui\DataProvider\Product\Related\AbstractDataProvider;
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
@@ -17,7 +18,6 @@ use \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
 use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
-use \Magento\Framework\App\Response\RedirectInterface;
 
 /**
  * Class LinkedDataProvider
@@ -32,11 +32,11 @@ class LinkedDataProvider extends AbstractDataProvider
     private $tablesJoined = false;
 
     /**
-     * Redirect.
+     * Data Persistor.
      *
-     * @var RedirectInterface
+     * @var DataPersistorInterface
      */
-    private $redirect;
+    private $dataPersistor;
 
     /**
      * @param string $name
@@ -47,7 +47,7 @@ class LinkedDataProvider extends AbstractDataProvider
      * @param ProductRepositoryInterface $productRepository
      * @param StoreRepositoryInterface $storeRepository
      * @param ProductLinkRepositoryInterface $productLinkRepository
-     * @param RedirectInterface $redirect
+     * @param DataPersistorInterface $dataPersistor
      * @param array $addFieldStrategies
      * @param array $addFilterStrategies
      * @param array $meta
@@ -62,13 +62,13 @@ class LinkedDataProvider extends AbstractDataProvider
         ProductRepositoryInterface $productRepository,
         StoreRepositoryInterface $storeRepository,
         ProductLinkRepositoryInterface $productLinkRepository,
-        RedirectInterface $redirect,
+        DataPersistorInterface $dataPersistor,
         array $addFieldStrategies,
         array $addFilterStrategies,
         array $meta = [],
         array $data = []
     ) {
-        $this->redirect = $redirect;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($name,
             $primaryFieldName,
@@ -158,17 +158,11 @@ class LinkedDataProvider extends AbstractDataProvider
     /**
      * Get billing frequency id.
      *
-     * @return null|string
+     * @return mixed
      */
     private function getBillingFrequencyId()
     {
-        $id = null;
-        $url = $this->redirect->getRefererUrl();
-
-        //get id from url
-        if (preg_match('/\/id\/(?<id>\d+)(?:\/)?/', $url, $match)) {
-            $id = $match['id'];
-        }
+        $id = $this->dataPersistor->get('tnw_' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID);
 
         return $id;
     }
