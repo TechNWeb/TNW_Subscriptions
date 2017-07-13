@@ -19,7 +19,7 @@
     </argument>
     <dataSource name="tnw_subscriptionprofile_create_payment_and_billing_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling</argument>
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_payment_and_billing_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
@@ -41,6 +41,8 @@
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" xsi:type="string" translate="true">Payment Information</item>
                 <item name="sortOrder" xsi:type="number">20</item>
+                <item name="additionalClasses" xsi:type="string">sub-fieldset</item>
+                <item name="dataScope" xsi:type="string">payment</item>
             </item>
         </argument>
     </fieldset>
