@@ -160,13 +160,13 @@ class Form extends AbstractDataProvider
         foreach ($this->getProductBillingFrequencies() as $frequency) {
 
             $billingFrequencyId = $frequency->getBillingFrequencyId();
+            $billingFrequencyUnitPrice = $this->geBillingFrequencytPrice($billingFrequencyId);
             if ($frequency->getDefaultBillingFrequency()) {
                 $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
-                $data[self::FORM_DATA_VALUE]['price'] = $this->geBillingFrequencytPrice($billingFrequencyId);
+                $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
             }
             $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]
-                = $this->geBillingFrequencytPrice($billingFrequencyId);
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId] = $billingFrequencyUnitPrice;
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
