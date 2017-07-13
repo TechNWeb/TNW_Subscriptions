@@ -490,7 +490,7 @@ class RecurringOptions extends BaseModifier
                     'config' => [
                         'formElement' => Checkbox::NAME,
                         'componentType' => Field::NAME,
-                        'component' => 'TNW_Subscriptions/js/components/recurring-checkbox',
+                        'component' => 'TNW_Subscriptions/js/components/extended-checkbox',
                         'parentContainer' => static::CONTAINER_OPTION,
                         'parentSelections' => static::GRID_OPTIONS_NAME,
                         'dataType' => Boolean::NAME,

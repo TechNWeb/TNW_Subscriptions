@@ -25,8 +25,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\ShippingMethods;
-
+use TNW\Subscriptions\Model\Source\ShippingMethods;
 
 class Product extends AbstractDataProvider
 {

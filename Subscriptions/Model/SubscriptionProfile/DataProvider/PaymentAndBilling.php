@@ -6,27 +6,47 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Magento\Framework\Api\Filter;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-class ShippingAndBilling extends AbstractDataProvider
+class PaymentAndBilling extends AbstractDataProvider
 {
+    /**#@+
+     * Form data scope
+     */
+    const DATA_SCOPE_PAYMENT_AND_BILLING_FORM = 'tnw_subscriptionprofile_create_payment_and_billing_form';
+    /**#@-*/
+
     /** @var [] */
-    protected $loadedData;
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
+    private $loadedData;
 
     /**
-     * DataProvider constructor.
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
+     * @var StepPool
+     */
+    private $stepPool;
+
+    /**
+     * @var PoolInterface
+     */
+    private $pool;
+
+    /**
+     * PaymentAndBilling constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
+     * @param PoolInterface $pool
      * @param array $meta
      * @param array $data
      */
@@ -36,23 +56,15 @@ class ShippingAndBilling extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
+        PoolInterface $pool,
         array $meta = [],
         array $data = []
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
+        $this->pool = $pool;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
-    }
-
-    /**
-     * Get data
-     *
-     * @return array
-     */
-    public function getData()
-    {
-        return [];
     }
 
     /**
@@ -78,5 +90,35 @@ class ShippingAndBilling extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
 
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $this->loadedData = [];
+
+        /** @var ModifierInterface $modifier */
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $this->loadedData = $modifier->modifyData($this->loadedData);
+        }
+
+        return $this->loadedData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
+
+        /** @var ModifierInterface $modifier */
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $meta = $modifier->modifyMeta($meta);
+        }
+
+        return $meta;
     }
 }

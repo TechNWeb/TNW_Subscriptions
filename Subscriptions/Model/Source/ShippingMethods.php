@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
+namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Quote\Model\Quote as ModelQuote;
 use TNW\Subscriptions\Model\Context;
