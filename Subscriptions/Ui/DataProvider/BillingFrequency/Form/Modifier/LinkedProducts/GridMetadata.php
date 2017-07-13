@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
+use Magento\Framework\UrlFactory;
 use Magento\Ui\Component\Form\Element\DataType\Number;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
@@ -46,18 +47,28 @@ class GridMetadata
     private $registry;
 
     /**
+     * URL instance
+     *
+     * @var UrlFactory
+     */
+    protected $urlFactory;
+
+    /**
      * @param BillingFrequencyUnitType $billingFrequencyUnitType
      * @param StoreManagerInterface $storeManager
      * @param Registry $registry
+     * @param UrlFactory $urlFactory
      */
     public function __construct(
         BillingFrequencyUnitType $billingFrequencyUnitType,
         StoreManagerInterface $storeManager,
-        Registry $registry
+        Registry $registry,
+        UrlFactory $urlFactory
     ) {
         $this->billingFrequencyUnitType = $billingFrequencyUnitType;
         $this->storeManager = $storeManager;
         $this->registry = $registry;
+        $this->urlFactory = $urlFactory;
     }
 
     /**
@@ -218,12 +229,28 @@ class GridMetadata
         $imageColumn = $this->getColumnBaseData('thumbnail', true, __('Image'), 10);
         $imageColumn = $this->setColumnSpecialData(
             $imageColumn,
-            '',
-            'ui/dynamic-rows/cells/thumbnail'
+            'TNW_Subscriptions/js/grid/action-a-href',
+            'TNW_Subscriptions/grid/cells/thumbnail-a-href',
+            [],
+            null,
+            null,
+            null,
+            true,
+            ['url' => $this->getProductUrl()]
         );
 
         $nameColumn = $this->getColumnBaseData('name', false, __('Name'), 20);
-        $nameColumn = $this->setColumnSpecialData($nameColumn);
+        $nameColumn = $this->setColumnSpecialData(
+            $nameColumn,
+            'TNW_Subscriptions/js/grid/action-a-href',
+            'TNW_Subscriptions/grid/cells/action-a-href',
+            [],
+            null,
+            null,
+            null,
+            true,
+            ['url' => $this->getProductUrl()]
+        );
 
         $skuColumn = $this->getColumnBaseData('sku', false, __('SKU'), 30);
         $skuColumn = $this->setColumnSpecialData($skuColumn);
@@ -363,5 +390,17 @@ class GridMetadata
         ];
 
         return $columns;
+    }
+
+    /**
+     * Get url for product edit page.
+     *
+     * @return string
+     */
+    private function getProductUrl()
+    {
+        $url = $this->urlFactory->create();
+
+        return $url->getUrl('catalog/product/edit', ['id' => '?']);
     }
 }
