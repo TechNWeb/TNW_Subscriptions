@@ -21,6 +21,7 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
@@ -170,7 +171,9 @@ class Product extends AbstractDataProvider
             /** @var Item $item */
             foreach ($subQuote->getAllItems() as $item) {
                 if (!$subscriptionData) {
-                    $subscriptionData = $item->getBuyRequest()->getDataByKey('subscription_data');
+                    $subscriptionData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . Create::UNIQUE
+                    );
                 }
 
                 $imageHelper = $this->imageHelper->init(

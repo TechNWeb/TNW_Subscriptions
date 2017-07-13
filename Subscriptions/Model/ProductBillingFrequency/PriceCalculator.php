@@ -1,0 +1,231 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Model\ProductBillingFrequency;
+
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\Exception\NoSuchEntityException;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
+use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
+
+/**
+ * Calculate unit price for billing frequency.
+ */
+class PriceCalculator
+{
+    /**
+     * Help retrieve product data from Db.
+     *
+     * @var ProductRepository
+     */
+    private $productRepository;
+
+    /**
+     * Create collection for product billing frequency.
+     *
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
+     * PriceCalculator constructor.
+     *
+     * @param ProductRepository $productRepository
+     * @param CollectionFactory $productBillingFrequencyCollectionFactory
+     */
+    public function __construct(
+        ProductRepository $productRepository,
+        CollectionFactory $productBillingFrequencyCollectionFactory
+    ) {
+        $this->productRepository = $productRepository;
+        $this->collectionFactory = $productBillingFrequencyCollectionFactory;
+    }
+
+    /**
+     * Get calculated product price for billing frequency.
+     *
+     * Return calculated product price based on conditions:
+     * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" > 0 then:
+     *     price = "Trial price"(product) + "Initial fee"(billing frequency).
+     * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" = 0 then:
+     *     price = 0.
+     *
+     * If product "Is trial offered" is "No" then:
+     *     If "Lock product price"(product) = "No" then:
+     *         price = "Price"(billing frequency) + "Initial fee"(billing frequency).
+     *     If "Lock product price"(product) = "Yes" then:
+     *         price = "Price"(product) + "Initial fee"(billing frequency) - "Discount amount"(product)
+     *         (if "Offer flat discount" = On).
+     *
+     * "Discount amount" calculated based on conditions:
+     *    If "Discount amount type" = "Flat fee" then:
+     *        "Discount amount" = "Discount amount"(product).
+     *    If "Discount amount type" = "Percent" then:
+     *        "Discount amount" = "Price"(product) * "Discount amount"(product).
+     *
+     * @param int $productId
+     * @param int $billingFrequencyId
+     * @param bool $useTrial
+     * @throws NoSuchEntityException when requested product doesn't exists in Db.
+     * @return string
+     */
+    public function getUnitPrice($productId, $billingFrequencyId, $useTrial = false)
+    {
+        $price = 0;
+        if ($productId && $billingFrequencyId) {
+            $product = $this->productRepository->getById($productId);
+            $trialOffered = $this->getTrialOfferedStatus($product);
+            $initialFee = $this->getInitialFee($billingFrequencyId, $productId);
+            $lockProductPrice = $this->getProductLockPriceSatus($product);
+            if ($trialOffered && $useTrial) {
+                $trialPrice = $this->getTrialPrice($product);
+                $price = $trialPrice ? $trialPrice + $initialFee : 0;
+            } else {
+                if ($lockProductPrice) {
+                    $productPrice = $product->getPrice();
+                    $discountAmount = $this->getDiscountAmount($product);
+                    $price = $productPrice + $initialFee - $discountAmount;
+                } else {
+                    $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
+                    $price = $billingFrequencyPrice + $initialFee;
+                }
+            }
+        }
+
+        return (string)$price;
+    }
+
+    /**
+     * Get trial offered status.
+     *
+     * @param Product $product
+     * @return bool
+     */
+    private function getTrialOfferedStatus(Product $product)
+    {
+        return $product->getCustomAttribute(Trial::CODE_TRIAL)
+            ? (bool)$product->getCustomAttribute(Trial::CODE_TRIAL)->getValue()
+            : false;
+    }
+
+    /**
+     * Get billing frequency initial fee.
+     *
+     * @param int $billingFrequencyId
+     * @param int $productId
+     * @return float
+     */
+    private function getInitialFee($billingFrequencyId, $productId)
+    {
+        $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+
+        return (float)$productBillingFrequency->getInitialFee() ?: 0;
+    }
+
+    /**
+     * Get trial price value for product.
+     *
+     * @param Product $product
+     * @return float
+     */
+    private function getTrialPrice(Product $product)
+    {
+        return $product->getCustomAttribute(Trial::CODE_TRIAL_PRICE)
+            ? (float)$product->getCustomAttribute(Trial::CODE_TRIAL_PRICE)->getValue()
+            : 0;
+    }
+
+    /**
+     * Get lock product price status.
+     *
+     * @param Product $product
+     * @return bool
+     */
+    private function getProductLockPriceSatus(Product $product)
+    {
+        return $product->getCustomAttribute(LockPrice::CODE_LOCK_PRICE)
+            ? (bool)$product->getCustomAttribute(LockPrice::CODE_LOCK_PRICE)->getValue()
+            : false;
+    }
+
+    /**
+     * Get offer flat discount status.
+     *
+     * @param Product $product
+     * @return bool
+     */
+    private function getOfferFlatDiscount(Product $product)
+    {
+        return $product->getCustomAttribute(LockPrice::CODE_FLAT_DISCOUNT)
+            ? (bool)$product->getCustomAttribute(LockPrice::CODE_FLAT_DISCOUNT)->getValue()
+            : false;
+    }
+
+    /**
+     * Get product discount amount considering discount type.
+     *
+     * @param Product $product
+     * @return float
+     */
+    private function getDiscountAmount(Product $product)
+    {
+        $discountAmount = 0;
+        if ($this->getOfferFlatDiscount($product)) {
+            $discountType = $product->getCustomAttribute(DiscountAmount::CODE_DISCOUNT_TYPE)
+                ? $product->getCustomAttribute(DiscountAmount::CODE_DISCOUNT_TYPE)->getValue()
+                : 0;
+            if ($discountType) {
+                $discountAmount = $product->getCustomAttribute(Discount::CODE_DISCOUNT_AMOUNT)
+                    ? $product->getCustomAttribute(Discount::CODE_DISCOUNT_AMOUNT)->getValue()
+                    : 0;
+                if ($discountType == DiscountAmount::PERCENT_DISCOUNT && $discountAmount) {
+                    $discountAmount = $product->getPrice() * $discountAmount / 100;
+                }
+            }
+        }
+
+        return $discountAmount;
+    }
+
+    /**
+     * Get billing frequency price.
+     *
+     * @param $billingFrequencyId
+     * @param $productId
+     * @return float
+     */
+    private function getBillingFrequencyPrice($billingFrequencyId, $productId)
+    {
+        $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+
+        return (float)$productBillingFrequency->getPrice() ?: 0;
+    }
+
+    /**
+     * Get product billing frequency considering billing frequency and product.
+     *
+     * @param $billingFrequencyId
+     * @param $productId
+     * @return ProductBillingFrequencyInterface
+     */
+    private function getProductBillingFrequency($billingFrequencyId, $productId)
+    {
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToSelect(ProductBillingFrequencyInterface::INITIAL_FEE);
+        $collection->addFieldToSelect(ProductBillingFrequencyInterface::PRICE);
+        $collection->addFieldToFilter(ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID, $billingFrequencyId);
+        $collection->addFieldToFilter(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID, $productId);
+
+        return $collection->getFirstItem();
+    }
+}
