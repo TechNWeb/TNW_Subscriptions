@@ -6,8 +6,9 @@ define([
     'underscore',
     'Magento_Ui/js/grid/listing',
     'rjsResolver',
-    'uiRegistry'
-], function (_, Listing, resolver, registry) {
+    'uiRegistry',
+    'jquery'
+], function (_, Listing, resolver, registry, $j) {
     'use strict';
 
     return Listing.extend({
@@ -44,6 +45,9 @@ define([
         onDataReloaded: function () {
             var addButton,
                 modifyButton,
+                continueButton,
+                saveFormButton,
+                reviewAndCreateButton,
                 show;
 
             this.set('estimatedPayment', this.source.data.estimatedPayment);
@@ -52,6 +56,9 @@ define([
 
             addButton = registry.get('index=button_add_product');
             modifyButton = registry.get('index=button_modify_subscriptions');
+            saveFormButton = $j('#save');
+            continueButton = registry.get('index=continue');
+            reviewAndCreateButton = registry.get('index=review_and_create');
 
             show = this.rows.length > 0;
 
@@ -62,6 +69,17 @@ define([
             if (modifyButton){
                 modifyButton.set('visible', show);
             }
+
+            if (continueButton){
+                continueButton.set('disabled', !show);
+            }
+
+            if (reviewAndCreateButton){
+                reviewAndCreateButton.set('disabled', !show);
+            }
+
+            // main save button near 'cancel' or 'back'
+            saveFormButton.prop('disabled', !show);
         }
     });
 });
