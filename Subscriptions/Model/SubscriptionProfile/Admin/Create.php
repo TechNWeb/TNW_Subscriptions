@@ -434,7 +434,7 @@ class Create
             if ($addressData->getCustomerId() !== $this->session->getCustomerId()) {
                 $result = [__('The customer address is not valid.')];
             } else {
-                $result = $this->checkCustomerAddress($shippingAddress, $addressData);
+                $result = $this->importAndValidateCustomerAddress($shippingAddress, $addressData);
             }
 
         } elseif (is_array($address)) {
@@ -491,7 +491,7 @@ class Create
             if ($addressData->getCustomerId() !== $this->session->getCustomerId()) {
                 $result = [__('The customer address is not valid.')];
             } else {
-                $result = $this->checkCustomerAddress($billingAddress, $addressData);
+                $result = $this->importAndValidateCustomerAddress($billingAddress, $addressData);
             }
 
         } elseif (is_array($address)) {
@@ -545,13 +545,13 @@ class Create
     }
 
     /**
-     * Imports customer address data into address nd validates it in customer form.
+     * Imports customer address data into address and validates it in customer form.
      *
      * @param Address $address
      * @param AddressInterface $customerAddressData
      * @return array|bool
      */
-    protected function checkCustomerAddress($address, $customerAddressData)
+    protected function importAndValidateCustomerAddress($address, $customerAddressData)
     {
         $address->importCustomerAddressData($customerAddressData)->setSaveInAddressBook(0);
 
