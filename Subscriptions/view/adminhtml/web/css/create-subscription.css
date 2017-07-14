@@ -2,7 +2,8 @@
   max-width: 100%;
 }
 
-.subscription-profile-products-container .sub-button-left{
+.subscription-profile-products-container .sub-button-left,
+.fieldset-wrapper .admin__fieldset .sub-button-left{
   display: block;
   padding-top: .6875em;
   padding-bottom: .6875em;
@@ -26,8 +27,6 @@
   font-size: 2.1rem;
   float: left;
 }
-
-
 
 .subscriptions-add-product-modal-form-container{
   float: left;
