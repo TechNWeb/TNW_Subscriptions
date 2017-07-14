@@ -151,5 +151,16 @@
                 </item>
             </argument>
         </field>
+        <field name="continue">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="title" translate="true" xsi:type="string">Continue >></item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button-subscription</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                </item>
+            </argument>
+        </field>
     </fieldset>
 </form>

@@ -224,3 +224,16 @@
   float: none;
   margin: 0 auto;
 }
+
+.sub-fieldset .admin__fieldset{
+  padding: 0;
+}
+
+.sub-fieldset .payment-checkbox{
+  margin-bottom: 0;
+}
+
+.sub-fieldset .payment-additional-fieldset{
+  margin-top: 3rem;
+  margin-left: 2.6rem;
+}

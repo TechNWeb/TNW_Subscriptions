@@ -112,7 +112,7 @@
                     <item name="label" xsi:type="string" translate="true">Trial Period</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
-                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/trial-period</item>
+                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
                     <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
                 </item>
             </argument>

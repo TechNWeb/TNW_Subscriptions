@@ -73,6 +73,8 @@ class Process extends Create
         $this->processShippingMethods($requestData);
 
         $this->processPaymentAndBillingData($requestData);
+
+        $this->getSubCreateModel()->recollectSubscriptions();
     }
 
     /**
@@ -159,6 +161,19 @@ class Process extends Create
                 : null;
 
             $result = $this->getSubCreateModel()->setBillingAddress($data['billing'], $customerAddressId);
+
+            $this->checkProcessResult($result);
+        }
+
+        if (isset($data['payment'])){
+            $result = [];
+
+            foreach ($data['payment'] as $code => $methodData){
+               if ($methodData['method']){
+                   $result = $this->getSubCreateModel()->setPayment($code, $methodData['additional']);
+                   break;
+               }
+            }
 
             $this->checkProcessResult($result);
         }
