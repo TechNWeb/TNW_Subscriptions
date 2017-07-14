@@ -12,7 +12,9 @@ define([
 
     return Button.extend({
         defaults: {
-            displayPrimary: true
+            displayPrimary: true,
+            subButtonLeft: false,
+            subButtonRight: false
         },
 
         /** @inheritdoc */
@@ -20,7 +22,9 @@ define([
             return this._super()
                 .observe([
                     'disabled',
-                    'displayPrimary'
+                    'displayPrimary',
+                    'subButtonLeft',
+                    'subButtonRight'
                 ]);
         },
 
