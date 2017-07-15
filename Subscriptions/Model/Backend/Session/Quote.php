@@ -134,7 +134,7 @@ class Quote extends SessionManager
     {
         $subQuoteIds = $this->getSubQuoteIds() ? $this->getSubQuoteIds() : [];
 
-        array_push($subQuoteIds, $subQuoteId);
+        $subQuoteIds[] = $subQuoteId;
 
         $this->storage->setSubQuoteIds($subQuoteIds);
 

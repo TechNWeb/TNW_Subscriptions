@@ -290,13 +290,15 @@ class Config
      *
      * @param $path
      * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|\Magento\Store\Api\Data\StoreInterface $storeId
      * @return mixed|null|string
      */
-    protected function getStoreConfig($path, $websiteId = null)
+    public function getStoreConfig($path, $websiteId = null, $storeId = null)
     {
         $result = null;
         $websiteId = $websiteId ?: $this->getWebsiteId();
-        $storeId = $websiteId ? null : $this->getStoreId();
+        $storeId = $storeId ?: $this->getStoreId();
+        $storeId = $websiteId ? null : $storeId;
         if ($storeId) {
             $result = $this->scopeConfig->getValue(
                 $path,

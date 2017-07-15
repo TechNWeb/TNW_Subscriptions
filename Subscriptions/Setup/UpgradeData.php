@@ -179,6 +179,44 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        //this upgrade of the attributes 'tnw_subscr_trial_price', 'tnw_subscr_discount_amount'
+        // has to be moved to install where this attribute is added
+        if (version_compare($context->getVersion(), "2.0.8", "<")) {
+            $this->updateProductTrialDiscountAttributes($eavSetup);
+        }
+
         $setup->endSetup();
+    }
+
+
+    /**
+     * @param EavSetup $eavSetup
+     */
+    private function updateProductTrialDiscountAttributes($eavSetup)
+    {
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            'tnw_subscr_trial_price',
+            'is_required',
+            'false'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            'tnw_subscr_discount_amount',
+            'frontend_class',
+            'discount-less-then-price'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            'tnw_subscr_discount_amount',
+            'frontend_class',
+            'discount-less-then-price'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            'tnw_subscr_discount_amount',
+            'backend_model',
+            'TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount'
+        );
     }
 }

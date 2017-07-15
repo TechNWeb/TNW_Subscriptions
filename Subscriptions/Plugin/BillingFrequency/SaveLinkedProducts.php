@@ -77,6 +77,7 @@ class SaveLinkedProducts
             ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $this->prepareValue($data,'default_billing_frequency'),
             ProductBillingFrequencyInterface::PRICE => $this->prepareValue($data,'price'),
             ProductBillingFrequencyInterface::INITIAL_FEE => $this->prepareValue($data,'initial_fee'),
+            ProductBillingFrequencyInterface::PRESET_QTY => $this->prepareValue($data,'preset_qty'),
             'sort_order' => $maxOrder
         ];
 

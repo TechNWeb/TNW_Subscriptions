@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 use Magento\Framework\EntityManager\Operation\ExtensionInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Model\ProductBillingFrequency;
 
 /**
  * Class ReadHandler
@@ -20,14 +23,20 @@ class ReadHandler implements ExtensionInterface
      */
     private $recurringOptionRepository;
 
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
 
     /**
      * @param RecurringOptionRepository $recurringOptionRepository
      */
     public function __construct(
-        RecurringOptionRepository $recurringOptionRepository
+        RecurringOptionRepository $recurringOptionRepository,
+        BillingFrequencyRepository $billingFrequencyRepository
     ) {
         $this->recurringOptionRepository = $recurringOptionRepository;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
     }
 
     /**
@@ -38,12 +47,17 @@ class ReadHandler implements ExtensionInterface
      */
     public function execute($entity, $arguments = [])
     {
-
         $options = [];
 
         /** @var ProductBillingFrequencyInterface $option */
         foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option) {
-            $option->setTitle('Billed & Shipped every ' . $option->getBillingFrequencyId() . ' //TODO');
+            $title = 'Billed & Shipped';
+            $billingFrequencyData = $this->getBillingFrequencyData($option);
+            if ($billingFrequencyData) {
+                $title .= ' every %s';
+            }
+            $title = sprintf(__($title), $billingFrequencyData);
+            $option->setTitle($title);
             $option->setProduct($entity);
             $options[] = $option;
         }
@@ -51,5 +65,29 @@ class ReadHandler implements ExtensionInterface
         $entity->setRecurringOptions($options);
 
         return $entity;
+    }
+
+    /**
+     * Get Billing Frequency data for title in Recurring options grid.
+     *
+     * @param ProductBillingFrequency $option
+     * @return string
+     */
+    private function getBillingFrequencyData($option)
+    {
+        $billingFrequencyData = '';
+        $billingFrequencyId = $option->getBillingFrequencyId();
+
+        if ($billingFrequencyId) {
+            /** @var BillingFrequencyInterface $billingFrequency */
+            $billingFrequency = $this->billingFrequencyRepository->getById($billingFrequencyId);
+
+            if ($billingFrequency->getId()) {
+                $billingFrequencyData = $this->billingFrequencyRepository
+                    ->getBillingFrequencyPeriodLabel($billingFrequency);
+            }
+        }
+
+        return $billingFrequencyData;
     }
 }

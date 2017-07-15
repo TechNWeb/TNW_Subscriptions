@@ -86,17 +86,17 @@ class RecurringOptions extends BaseModifier
     /**
      * @var \Magento\Catalog\Model\Locator\LocatorInterface
      */
-    protected $locator;
+    private $locator;
 
     /**
      * @var ArrayManager
      */
-    protected $arrayManager;
+    private $arrayManager;
 
     /**
      * @var array
      */
-    protected $meta = [];
+    private $meta = [];
 
     /**
      * @var BillingFrequencyRepository
@@ -166,7 +166,7 @@ class RecurringOptions extends BaseModifier
      * @param array $data
      * @return array
      */
-    protected function formatPriceByPath($path, array $data)
+    private function formatPriceByPath($path, array $data)
     {
         $value = $this->arrayManager->get($path, $data);
 
@@ -194,7 +194,7 @@ class RecurringOptions extends BaseModifier
      *
      * @return $this
      */
-    protected function createRecurringOptionsPanel()
+    private function createRecurringOptionsPanel()
     {
 
         $this->meta = array_merge_recursive(
@@ -220,7 +220,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getHeaderContainerConfig($sortOrder)
+    private function getHeaderContainerConfig($sortOrder)
     {
 
         $content = __(
@@ -270,7 +270,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getOptionsGridConfig($sortOrder)
+    private function getOptionsGridConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -336,7 +336,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getEnableFieldConfig($sortOrder)
+    private function getEnableFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -360,7 +360,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getCommonContainerConfig($sortOrder)
+    private function getCommonContainerConfig($sortOrder)
     {
         $commonContainer = [
             'arguments' => [
@@ -397,7 +397,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getProductBillingFrequencyIdFieldConfig($sortOrder)
+    private function getProductBillingFrequencyIdFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -420,7 +420,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getTitleFieldConfig($sortOrder)
+    private function getTitleFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -438,15 +438,15 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
-
     /**
      * Get config for "Billing Frequencies" field
      *
      * @param int $sortOrder
      * @return array
      */
-    protected function getBillingFrequencyFieldConfig($sortOrder)
+    private function getBillingFrequencyFieldConfig($sortOrder)
     {
+        $billingFrequenciesData = $this->getBillingFrequencies();
         return [
             'arguments' => [
                 'data' => [
@@ -459,7 +459,7 @@ class RecurringOptions extends BaseModifier
                         'dataScope' => static::FIELD_BILLING_FREQUENCY_NAME,
                         'dataType' => Text::NAME,
                         'sortOrder' => $sortOrder,
-                        'options' => $this->getBillingFrequencies(),
+                        'options' => $billingFrequenciesData['options'],
                         'disableLabel' => true,
                         'multiple' => false,
                         'selectedPlaceholders' => [
@@ -468,7 +468,8 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'required-entry' => true
                         ],
-                        'notice' => __('Recurring schedule to be picked by the end consumer'),
+                        'notice' => __('Recurring schedule to be picked by the customer'),
+                        'periodLabels' => $billingFrequenciesData['periodLabels'],
                     ],
                 ],
             ],
@@ -481,7 +482,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getIsDefaultFieldConfig($sortOrder)
+    private function getIsDefaultFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -489,7 +490,7 @@ class RecurringOptions extends BaseModifier
                     'config' => [
                         'formElement' => Checkbox::NAME,
                         'componentType' => Field::NAME,
-                        'component' => 'TNW_Subscriptions/js/components/recurring-checkbox',
+                        'component' => 'TNW_Subscriptions/js/components/extended-checkbox',
                         'parentContainer' => static::CONTAINER_OPTION,
                         'parentSelections' => static::GRID_OPTIONS_NAME,
                         'dataType' => Boolean::NAME,
@@ -514,7 +515,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getPositionFieldConfig($sortOrder)
+    private function getPositionFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -538,7 +539,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getPriceFieldConfig($sortOrder)
+    private function getPriceFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -576,7 +577,7 @@ class RecurringOptions extends BaseModifier
      * @param int $sortOrder
      * @return array
      */
-    protected function getInitialFeeFieldConfig($sortOrder)
+    private function getInitialFeeFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -601,13 +602,14 @@ class RecurringOptions extends BaseModifier
 
 
     /**
-     * Get options for drop-down control with billing frequencies
+     * Get data for drop-down control with billing frequencies
      *
      * @return array
      */
-    protected function getBillingFrequencies()
+    private function getBillingFrequencies()
     {
         $options = [];
+        $periodLabels = [];
 
         /** @var SearchCriteria $searchCriteria */
         $searchCriteria = $this->searchCriteriaBuilder->create();
@@ -618,9 +620,15 @@ class RecurringOptions extends BaseModifier
                 'value' => $item->getId(),
                 'label' => $item->getLabel(),
             ];
+            $periodLabels[$item->getId()] = $this->billingFrequencyRepository->getBillingFrequencyPeriodLabel($item);
         }
 
-        return $options;
+        $data = [
+            'options' => $options,
+            'periodLabels' => $periodLabels,
+        ];
+
+        return $data;
     }
 
     /**
@@ -628,7 +636,7 @@ class RecurringOptions extends BaseModifier
      *
      * @return string
      */
-    protected function getCurrencySymbol()
+    private function getCurrencySymbol()
     {
         return $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
     }

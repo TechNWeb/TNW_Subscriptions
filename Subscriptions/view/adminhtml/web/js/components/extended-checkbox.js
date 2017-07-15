@@ -5,8 +5,9 @@
 
 define([
     'Magento_Ui/js/form/element/single-checkbox',
-    'uiRegistry'
-], function (Checkbox, registry) {
+    'uiRegistry',
+    'underscore'
+], function (Checkbox, registry, _) {
     'use strict';
 
     return Checkbox.extend({
@@ -45,13 +46,16 @@ define([
             var records = registry.filter(this.retrieveSearchCriteria(this.parentSelections , this.index)),
                 uid = this.uid;
 
-            records.filter(function (comp) {
+            records = records.filter(function (comp) {
                 return comp.uid !== uid;
-            }).each(function (comp) {
+            });
+
+            _.each(records, function (comp) {
                 comp.clearing = true;
                 comp.clear();
                 comp.clearing = false;
             });
+
         },
 
         retrieveSearchCriteria: function (parentSelection, index) {
@@ -66,9 +70,11 @@ define([
             var records = registry.filter(this.retrieveSearchCriteria(this.parentSelections , this.index)),
                 uid = this.uid;
 
-            records.filter(function (comp) {
+            records = records.filter(function (comp) {
                 return comp.uid !== uid;
-            }).each(function (comp) {
+            });
+
+            _.each(records, function (comp) {
                 if (comp.value() == 1) {
                     return existIsDefault = true;
                 }

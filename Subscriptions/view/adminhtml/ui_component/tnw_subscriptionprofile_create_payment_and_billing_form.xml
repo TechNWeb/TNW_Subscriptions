@@ -19,7 +19,7 @@
     </argument>
     <dataSource name="tnw_subscriptionprofile_create_payment_and_billing_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling</argument>
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_payment_and_billing_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
@@ -41,6 +41,8 @@
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" xsi:type="string" translate="true">Payment Information</item>
                 <item name="sortOrder" xsi:type="number">20</item>
+                <item name="additionalClasses" xsi:type="string">sub-fieldset</item>
+                <item name="dataScope" xsi:type="string">payment</item>
             </item>
         </argument>
     </fieldset>
@@ -71,7 +73,7 @@
         </field>
         <field name="customer_address_id">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\CustomerAddress</item>
+                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddress</item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" xsi:type="boolean">false</item>
@@ -81,6 +83,18 @@
                     <item name="imports" xsi:type="array">
                         <item name="visible" xsi:type="string">!${ $.parentName}.same_as_shipping:checked</item>
                     </item>
+                </item>
+            </argument>
+        </field>
+        <field name="review_and_create">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="title" translate="true" xsi:type="string">Review &amp; Create</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button-subscription</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="subButtonLeft" xsi:type="string">true</item>
                 </item>
             </argument>
         </field>
