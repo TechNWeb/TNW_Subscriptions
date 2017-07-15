@@ -49,8 +49,19 @@
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" xsi:type="string" translate="true">Shipping Information</item>
                 <item name="sortOrder" xsi:type="number">20</item>
+                <item name="additionalClasses" xsi:type="string">admin__address-information-preview admin__shipping-information-preview</item>
             </item>
         </argument>
+        <container name="shipping_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">SubscriptionProfilePreviewShippingAddress</argument>
+            </htmlContent>
+        </container>
     </fieldset>
     <fieldset name="billing_information">
         <argument name="data" xsi:type="array">
@@ -58,6 +69,38 @@
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" xsi:type="string" translate="true">Billing Information</item>
                 <item name="sortOrder" xsi:type="number">30</item>
+                <item name="additionalClasses" xsi:type="string">admin__address-information-preview</item>
+            </item>
+        </argument>
+        <container name="billing_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">SubscriptionProfilePreviewBillingAddress</argument>
+            </htmlContent>
+        </container>
+        <field name="create">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="title" translate="true" xsi:type="string">Create</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button-subscription</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="subButtonLeft" xsi:type="string">true</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="payment_details">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Payment Details</item>
+                <item name="sortOrder" xsi:type="number">30</item>
+                <item name="additionalClasses" xsi:type="string">admin__payment-details-preview</item>
             </item>
         </argument>
     </fieldset>

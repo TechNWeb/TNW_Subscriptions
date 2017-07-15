@@ -21,10 +21,11 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-
+use TNW\Subscriptions\Model\Source\ShippingMethods;
 
 class Product extends AbstractDataProvider
 {
@@ -57,21 +58,47 @@ class Product extends AbstractDataProvider
     const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_create_product_listing';
     /**#@-*/
 
-    protected $scopeName = '';
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
-    /** @var Quote */
-    protected $session;
-    /** @var Image */
-    protected $imageHelper;
-    /** @var Context */
-    protected $context;
-    /** @var BillingFrequencyRepository */
-    protected $frequencyRepository;
-    /** @var BillingFrequencyUnitType */
-    protected $frequencyUnitType;
+    private $scopeName;
+
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
+     * @var StepPool
+     */
+    private $stepPool;
+
+    /**
+     * @var Quote
+     */
+    private $session;
+
+    /**
+     * @var Image
+     */
+    private $imageHelper;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $frequencyRepository;
+
+    /**
+     * @var BillingFrequencyUnitType
+     */
+    private $frequencyUnitType;
+
+    /**
+     * @var ShippingMethods
+     */
+    private $shippingMethods;
 
     /**
      * Product constructor.
@@ -85,6 +112,7 @@ class Product extends AbstractDataProvider
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
+     * @param ShippingMethods $shippingMethods
      * @param array $meta
      * @param array $data
      * @param string $scopeName
@@ -100,6 +128,7 @@ class Product extends AbstractDataProvider
         Context $context,
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
+        ShippingMethods $shippingMethods,
         array $meta = [],
         array $data = [],
         $scopeName = ''
@@ -111,6 +140,7 @@ class Product extends AbstractDataProvider
         $this->context = $context;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->frequencyRepository = $frequencyRepository;
+        $this->shippingMethods = $shippingMethods;
         $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
@@ -140,7 +170,9 @@ class Product extends AbstractDataProvider
             /** @var Item $item */
             foreach ($subQuote->getAllItems() as $item) {
                 if (!$subscriptionData) {
-                    $subscriptionData = $item->getBuyRequest()->getDataByKey('subscription_data');
+                    $subscriptionData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . Create::UNIQUE
+                    );
                 }
 
                 $imageHelper = $this->imageHelper->init(
@@ -171,7 +203,7 @@ class Product extends AbstractDataProvider
                     $subscriptionData,
                     $startDate
                 ),
-                'shipping_method' => __('Selected on next step'),
+                'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
 
             $products = [];
@@ -270,6 +302,32 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * @param ModelQuote $quote
+     * @return array
+     */
+    protected function getShippingMethodData($quote)
+    {
+        $this->shippingMethods->setQuote($quote);
+        $shippingMethods = [];
+
+        $label = __('Selected on next step');
+
+        if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
+            $label = $this->shippingMethods->getCurrentMethodLabel();
+        } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+            $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
+            $label = '';
+        }
+
+        return [
+            'label' => $label,
+            'methods' => $shippingMethods,
+            'sub_quote_id' => $quote->getId(),
+            'value' => $quote->getShippingAddress()->getShippingMethod()
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getMeta()
@@ -300,7 +358,7 @@ class Product extends AbstractDataProvider
     {
         $result = [];
 
-        if ($this->stepPool->getCurrentStep() != StepPool::STEP_PARAM_TYPE_REVIEW) {
+        if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_REVIEW) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS => [
@@ -368,6 +426,7 @@ class Product extends AbstractDataProvider
                 ]
             ];
         }
+
         return $result;
     }
 

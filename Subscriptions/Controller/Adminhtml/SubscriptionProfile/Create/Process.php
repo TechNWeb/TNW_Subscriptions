@@ -12,7 +12,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
 class Process extends Create
 {
-    protected $errors = [];
+    /**
+     * Errors list
+     *
+     * @var array
+     */
+    private $errors = [];
 
     /**
      * Start order create action
@@ -24,13 +29,13 @@ class Process extends Create
         $this->resetErrors();
 
         $this->processRequestData();
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
 
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
             StepPool::STEP_PARAM_TYPE_CUSTOMER
         );
 
+        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         if (!empty($this->errors)){
 
@@ -53,7 +58,7 @@ class Process extends Create
         );
     }
 
-    protected function processRequestData()
+    private function processRequestData()
     {
         $requestData = $this->getRequest()->getParams();
 
@@ -65,18 +70,31 @@ class Process extends Create
 
         $this->processAccountData($requestData);
 
+        $this->processShippingMethods($requestData);
+
         $this->processPaymentAndBillingData($requestData);
+
+        $this->getSubCreateModel()->recollectSubscriptions();
     }
 
-    protected function processStoreData($data)
+    /**
+     * Process post data from store form.
+     *
+     * @param $data
+     */
+    private function processStoreData($data)
     {
         if (isset($data['store_id'])){
             $this->_getSession()->setStoreId($data['store_id']);
         }
     }
 
-
-    protected function processCustomerData($data)
+    /**
+     * Process request data from "choose customer" page.
+     *
+     * @param $data
+     */
+    private function processCustomerData($data)
     {
         if (isset($data['customer_id'])){
             $this->_getSession()->setCustomerId($data['customer_id']);
@@ -89,17 +107,27 @@ class Process extends Create
         }
     }
 
-    protected function processCurrencyData($data)
+    /**
+     * Process post data from currency form.
+     *
+     * @param $data
+     */
+    private function processCurrencyData($data)
     {
         if (isset($data['currency_id'])){
             $this->_getSession()->setCurrencyId($data['currency_id']);
         }
     }
 
-    protected function processAccountData($data)
+    /**
+     * Process post data from account form.
+     *
+     * @param $data
+     */
+    private function processAccountData($data)
     {
         if (isset($data['account'])){
-            $customerAddressId = isset($data['account']['customer_address_id'])
+            $customerAddressId = !empty($data['account']['customer_address_id'])
                 ? $data['account']['customer_address_id']
                 : null;
 
@@ -109,10 +137,26 @@ class Process extends Create
         }
     }
 
-    protected function processPaymentAndBillingData($data)
+
+    private function processShippingMethods($data)
+    {
+        if (isset($data['shipping_methods'])){
+
+            $result = $this->getSubCreateModel()->setShippingMethods($data['shipping_methods']);
+
+            $this->checkProcessResult($result);
+        }
+    }
+
+    /**
+     * Process post data from payment and billing form.
+     *
+     * @param $data
+     */
+    private function processPaymentAndBillingData($data)
     {
         if (isset($data['billing'])){
-            $customerAddressId = isset($data['billing']['customer_address_id'])
+            $customerAddressId = !empty($data['billing']['customer_address_id'])
                 ? $data['billing']['customer_address_id']
                 : null;
 
@@ -120,19 +164,37 @@ class Process extends Create
 
             $this->checkProcessResult($result);
         }
+
+        if (isset($data['payment'])){
+            $result = [];
+
+            foreach ($data['payment'] as $code => $methodData){
+               if ($methodData['method']){
+                   $result = $this->getSubCreateModel()->setPayment($code, $methodData['additional']);
+                   break;
+               }
+            }
+
+            $this->checkProcessResult($result);
+        }
     }
 
     /**
+     *  Adds to errors array errors from process request data methods.
+     *
      * @param [] $result
      */
-    protected function checkProcessResult($result)
+    private function checkProcessResult($result)
     {
         if (is_array($result)){
             $this->errors = array_merge($this->errors, $result);
         }
     }
 
-    protected function resetErrors()
+    /**
+     * Resets errors array.
+     */
+    private function resetErrors()
     {
         $this->errors = [];
     }
@@ -146,7 +208,7 @@ class Process extends Create
     private function getAdditionalParams($currentStep)
     {
         $additionalParams = [];
-        if ($currentStep == StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+        if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
             $additionalParams = [
                 Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
             ];

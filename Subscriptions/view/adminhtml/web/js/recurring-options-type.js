@@ -1,13 +1,14 @@
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 
 define([
     'jquery',
     'underscore',
     'uiRegistry',
-    'Magento_Ui/js/form/element/ui-select'
+    'Magento_Ui/js/form/element/ui-select',
+    'mage/translate'
 ], function ($, _, registry, UiSelect) {
     'use strict';
 
@@ -17,7 +18,8 @@ define([
             groupsConfig: {},
             valuesMap: {},
             indexesMap: {},
-            filterPlaceholder: 'ns = ${ $.ns }, parentScope = ${ $.parentScope }'
+            filterPlaceholder: 'ns = ${ $.ns }, parentScope = ${ $.parentScope }',
+            periodLabels: {}
         },
 
         /**
@@ -28,7 +30,8 @@ define([
             return this
                 ._super()
                 .initMapping()
-                .updateComponents(this.initialValue, true);
+                .updateComponents(this.initialValue, true)
+                .updateHeader(this.initialValue);
         },
 
         /**
@@ -62,6 +65,7 @@ define([
          */
         onUpdate: function (currentValue) {
             this.updateComponents(currentValue);
+            this.updateHeader(currentValue);
 
             return this._super();
         },
@@ -116,6 +120,29 @@ define([
             }
 
             return this;
+        },
+
+        /**
+         * Updates Grid header depends on the source data.
+         *
+         * @param currentValue
+         */
+        updateHeader:function (currentValue) {
+            var regExp = /.*?(\.\d+)/ig;
+            var containerName = regExp.exec(this.parentName);
+            if (containerName != null) {
+                containerName = containerName[0];
+                var container = registry.get(containerName);
+                var message = 'Billed & Shipped';
+                var currentLabel = '';
+                if (typeof this.periodLabels[currentValue] != 'undefined') {
+                    message += ' every %s';
+                    currentLabel = this.periodLabels[currentValue];
+                }
+
+                message = $.mage.__(message).replace('%s', currentLabel);
+                container.label(message);
+            }
         }
     });
 });

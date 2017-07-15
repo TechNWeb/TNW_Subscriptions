@@ -4,7 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\Config\Source;
+namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;

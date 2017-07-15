@@ -58,4 +58,12 @@ interface BillingFrequencyRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function deleteById($id);
+
+    /**
+     * Get billing frequency unit and period label.
+     *
+     * @param \TNW\Subscriptions\Api\Data\BillingFrequencyInterface $billingFrequency
+     * @return string
+     */
+    public function getBillingFrequencyPeriodLabel($billingFrequency);
 }

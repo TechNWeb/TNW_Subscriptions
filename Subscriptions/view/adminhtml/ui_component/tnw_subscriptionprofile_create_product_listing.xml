@@ -75,7 +75,9 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="fieldClass" xsi:type="string">sub-product-shipping-method</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/shipping-method</item>
                     <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/cells/shipping-method</item>
+                    <item name="saveForm" xsi:type="string">tnw_subscriptionprofile_create_payment_and_billing_form</item>
                     <item name="sortOrder" xsi:type="number">90</item>
                 </item>
             </argument>

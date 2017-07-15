@@ -22,12 +22,12 @@ class Discount extends BaseModifier
     /**
      * @var ArrayManager
      */
-    protected $arrayManager;
+    private $arrayManager;
 
     /**
      * @var LocatorInterface
      */
-    protected $locator;
+    private $locator;
 
     /**
      * @param LocatorInterface $locator
@@ -78,6 +78,9 @@ class Discount extends BaseModifier
                 'percentSymbol' => '%',
                 'additionalClasses' => 'admin__field-small long_note',
                 'priceFormat' => $this->getPriceFormatData(),
+                'validation' => [
+                    'discount-less-then-price' => true
+                ],
             ]
         );
 
