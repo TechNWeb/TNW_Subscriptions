@@ -1,0 +1,197 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Model\ProductBillingFrequency;
+
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Context;
+
+/**
+ * Create description for billing frequency.
+ */
+class DescriptionCreator
+{
+
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $frequencyRepository;
+    /**
+     * @var BillingFrequencyUnitType
+     */
+    private $frequencyUnitType;
+    /**
+     * @var TrialLengthUnitType
+     */
+    private $trialLengthUnitType;
+
+    /**
+     * DescriptionCreator constructor.
+     *
+     * @param Context $context
+     * @param BillingFrequencyRepository $frequencyRepository
+     * @param BillingFrequencyUnitType $frequencyUnitType
+     * @param TrialLengthUnitType $trialLengthUnitType
+     */
+    public function __construct(
+        Context $context,
+        BillingFrequencyRepository $frequencyRepository,
+        BillingFrequencyUnitType $frequencyUnitType,
+        TrialLengthUnitType $trialLengthUnitType
+    )
+    {
+        $this->context = $context;
+        $this->frequencyRepository = $frequencyRepository;
+        $this->frequencyUnitType = $frequencyUnitType;
+        $this->trialLengthUnitType = $trialLengthUnitType;
+    }
+
+    /**
+     * Create description for billing frequency
+     *
+     * Used variables:
+     *  [trial total] : calculates like SUM ( (product_trial_price + product_initial_fee) * qty).
+     *      If [trial total] = 0 then [trial total] = 'Free';
+     *      Example:"Free for 6 day(s) and then ...".
+     *  [total]: calculates like SUM ( (product_frequency_price) * qty).
+     *  [Billing frequency Unit]: its a field from Billing Frequency.
+     *  [subscription period]: field from "Add to Subscription" form.
+     *  [subscription start date]: start date of subscription
+     *
+     * Create description for billing frequency based on conditions:
+     * If product trial is "On":
+     *      "[trial total] for [Billing frequency trial period] and then [total] / every [Billing frequency Unit].
+     *      Total of [subscription period] shipments. Products will be shipped every [Billing frequency Unit]
+     *      starting [subscription start date]".
+     *
+     *      Example:" $5.99 for 6 day(s) and then $10.25 / every month(s).
+     *          Total of 3 shipments. Products will be shipped every month(s) starting today".
+     *
+     * If product trial is "Off":
+     *      "[total] / [Billing frequency Unit]. Total of [subscription period] shipments.
+     *      Products will be shipped every [Billing frequency Unit] starting [subscription start date]".
+     *
+     *      Example: "$10.25 / every month(s). Total of 3 shipments. Products will be shipped every month(s) starting today".
+     *
+     * @param ModelQuote $quote
+     * @param array $subscriptionData
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getDescription(ModelQuote $quote, array $subscriptionData)
+    {
+        $isTrial = $subscriptionData[Create::UNIQUE]['is_trial'];
+        $formattedPrice = $this->formatPrice($quote->getBaseGrandTotal());
+        $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[Create::UNIQUE]['billing_frequency']);
+        $subscriptionPeriod = $subscriptionData[Create::UNIQUE]['period'];
+
+        $startDate = $this->formatStartDate($subscriptionData[Create::UNIQUE]['start_on']);
+        $total = $formattedPrice;
+        $trialPart = '';
+        if ($isTrial) {
+            $trialTotal = $formattedPrice;
+            $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
+                $subscriptionData[Create::UNIQUE]['trial_period'],
+                $subscriptionData[Create::UNIQUE]['trial_unit_id'])
+            ;
+            $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
+            $total = $this->formatPrice($subscriptionData[Create::NON_UNIQUE]['price']);
+        }
+        $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
+        $shippingInformation = sprintf(
+            __('Total of %s shipment(s). Products will be shipped every %s starting %s.'),
+            $subscriptionPeriod,
+            $frequencyUnit,
+            $startDate
+        );
+        return $trialPart . $priceWithUnit . $shippingInformation;
+    }
+
+    /**
+     * Return Billing Frequency with unit (e.g. "6 months")
+     *
+     * @param string|int $billingFrequencyId
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getFrequencyWithUnit($billingFrequencyId)
+    {
+        $billingFrequency = $this->frequencyRepository->getById(
+            $billingFrequencyId
+        );
+        $unit = $this->frequencyUnitType->getLabelByValue($billingFrequency->getUnit());
+        $result = $unit;
+        if ($billingFrequency->getFrequency() > 1) {
+            $result = $billingFrequency->getFrequency() . ' ' . $unit;
+        }
+        return strtolower($result);
+    }
+
+    /**
+     * Return Billing Frequency Trial with unit (e.g. "6 months")
+     *
+     * @param $period
+     * @param $unitId
+     * @return string
+     */
+    private function getFrequencyTrialWithUnit($period, $unitId)
+    {
+        $unitLabel = $this->trialLengthUnitType->getLabelByValue($unitId);
+        $result = $unitLabel;
+        if ($period > 1) {
+            $result = $period . ' ' . $unitLabel;
+        }
+        return strtolower($result);
+    }
+
+    /**
+     * Return formatted Start Date
+     *
+     * @param $startDate
+     * @return \Magento\Framework\Phrase|string
+     */
+    private function formatStartDate($startDate)
+    {
+        $nowDate = new \DateTime();
+        $nowDate = $nowDate->format('Y-m-d');
+        if ($startDate === $nowDate) {
+            $startDate = __('today');
+        } else {
+            $startDate = $this->context->getLocaleDate()->formatDate(
+                $startDate,
+                \IntlDateFormatter::LONG,
+                false
+            );
+        }
+        return $startDate;
+    }
+
+    /**
+     * Return formatted price
+     *
+     * @param $price
+     * @return float
+     */
+    private function formatPrice($price)
+    {
+        return $this->context->getPriceCurrency()->format(
+            $price,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION
+        );
+    }
+
+
+}

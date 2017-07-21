@@ -25,12 +25,12 @@ class Create extends AbstractCreate
      *
      * Using for checking the ability to add product to subscription quote.
      */
-    const UNIQUE = '/unique';
+    const UNIQUE = 'unique';
 
     /**
      * Last part of path to non_unique fields in product buy request.
      */
-    const NON_UNIQUE = '/non_unique';
+    const NON_UNIQUE = 'non_unique';
 
     /**
      * Quote address creator.
@@ -192,10 +192,10 @@ class Create extends AbstractCreate
 
         if ($item) {
             $request = $item->getBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
+                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
 
             $newRequest = $this->productModifier->getPreparedBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
+                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
 
             if ($request == $newRequest) {
                 $result = true;
