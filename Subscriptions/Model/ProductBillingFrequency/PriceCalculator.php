@@ -61,7 +61,8 @@ class PriceCalculator
      *
      * If product "Is trial offered" is "No" then:
      *     If "Lock product price"(product) = "No" then:
-     *         price = "Price"(billing frequency) + "Initial fee"(billing frequency).
+     *         If isset $productPrice then price = $productPrice
+     *         else price = "Price"(billing frequency) + "Initial fee"(billing frequency).
      *     If "Lock product price"(product) = "Yes" then:
      *         price = "Price"(product) + "Initial fee"(billing frequency) - "Discount amount"(product)
      *         (if "Offer flat discount" = On).
@@ -74,11 +75,12 @@ class PriceCalculator
      *
      * @param int $productId
      * @param int $billingFrequencyId
+     * @param float|string $productPrice
      * @param bool $useTrial
      * @throws NoSuchEntityException when requested product doesn't exists in Db.
      * @return string
      */
-    public function getUnitPrice($productId, $billingFrequencyId, $useTrial = false)
+    public function getUnitPrice($productId, $billingFrequencyId, $productPrice = null, $useTrial = false)
     {
         $price = 0;
         if ($productId && $billingFrequencyId) {
@@ -91,11 +93,12 @@ class PriceCalculator
                 $price = $trialPrice ? $trialPrice + $initialFee : 0;
             } else {
                 if ($lockProductPrice) {
-                    $productPrice = $product->getPrice();
+                    $lockPrice = $product->getPrice();
                     $discountAmount = $this->getDiscountAmount($product);
-                    $price = $productPrice + $initialFee - $discountAmount;
+                    $price = $lockPrice + $initialFee - $discountAmount;
                 } else {
                     $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
+                    $billingFrequencyPrice =  isset($productPrice) ? $productPrice : $billingFrequencyPrice;
                     $price = $billingFrequencyPrice + $initialFee;
                 }
             }
