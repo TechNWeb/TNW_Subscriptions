@@ -127,11 +127,16 @@ class Process extends Create
     private function processAccountData($data)
     {
         if (isset($data['account'])){
-            $customerAddressId = !empty($data['account']['customer_address_id'])
-                ? $data['account']['customer_address_id']
+
+        }
+
+        if (!empty($data['shipping_address']) && !empty($data['shipping_info'])) {
+            $address = array_merge($data['shipping_address'], $data['shipping_info']);
+            $customerAddressId = !empty($data['shipping_address']['customer_address_id'])
+                ? $data['shipping_address']['customer_address_id']
                 : null;
 
-            $result = $this->getSubCreateModel()->setShippingAddress($data['account'], $customerAddressId);
+            $result = $this->getSubCreateModel()->setShippingAddress($address, $customerAddressId);
 
             $this->checkProcessResult($result);
         }

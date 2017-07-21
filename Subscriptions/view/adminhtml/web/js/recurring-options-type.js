@@ -127,16 +127,16 @@ define([
          *
          * @param currentValue
          */
-        updateHeader:function (currentValue) {
+        updateHeader:function (currentValue) {debugger;
             var regExp = /.*?(\.\d+)/ig;
             var containerName = regExp.exec(this.parentName);
             if (containerName != null) {
                 containerName = containerName[0];
                 var container = registry.get(containerName);
-                var message = 'Billed & Shipped';
+                var message = 'Please select billing frequency';
                 var currentLabel = '';
                 if (typeof this.periodLabels[currentValue] != 'undefined') {
-                    message += ' every %s';
+                    message += 'Billed & Shipped every %s';
                     currentLabel = this.periodLabels[currentValue];
                 }
 

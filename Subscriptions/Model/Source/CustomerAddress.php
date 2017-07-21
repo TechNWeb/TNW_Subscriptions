@@ -22,19 +22,19 @@ use TNW\Subscriptions\Model\Backend\Session\Quote;
 class CustomerAddress extends AbstractSource
 {
     /** @var Quote */
-    protected $session;
+    private $session;
     /** @var Address */
-    protected $addressHelper;
+    private $addressHelper;
     /** @var AddressRepositoryInterface */
-    protected $addressService;
+    private $addressService;
     /** @var SearchCriteriaBuilder */
-    protected $criteriaBuilder;
+    private $criteriaBuilder;
     /** @var FilterBuilder */
-    protected $filterBuilder;
+    private $filterBuilder;
     /** @var Mapper */
-    protected $addressMapper;
+    private $addressMapper;
     /** @var Escaper */
-    protected $escaper;
+    private $escaper;
 
     /**
      * CustomerAddress constructor.
@@ -76,7 +76,17 @@ class CustomerAddress extends AbstractSource
             $optionList[] = [
                 'value' => $address->getId(),
                 'label' => $this->getAddressAsString($address),
+                'empty' => false
             ];
+        }
+
+        if (count($optionList) > 0) {
+            $optionList[] = [
+                'value' => 0,
+                'label' => '',
+                'empty' => true
+            ];
+
         }
 
         return $optionList;

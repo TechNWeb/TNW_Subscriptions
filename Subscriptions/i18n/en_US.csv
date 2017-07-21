@@ -37,4 +37,8 @@
 "Product is FREE for the trial period.","Product is FREE for the trial period."
 "The discount cannot exceed the total product cost.","The discount cannot exceed the total product cost."
 "Billed & Shipped every %s","Billed & Shipped every %s"
+"(Line %s)","(Line %s)"
+"Add New Address","Add New Address"
+"Pick from saved addresses","Pick from saved addresses"
 "Shipping method is required and can't be empty.","Shipping method is required and can't be empty."
+"Please select billing frequency","Please select billing frequency"

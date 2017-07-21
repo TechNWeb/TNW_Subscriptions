@@ -236,3 +236,18 @@
   margin-top: 3rem;
   margin-left: 2.6rem;
 }
+.wide-select select{
+    width:100%;
+}
+.subscr-container-title {
+    font-size: 2rem;
+    font-weight: 400;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label .admin__field-control{
+    float: left;
+    position: absolute;
+}

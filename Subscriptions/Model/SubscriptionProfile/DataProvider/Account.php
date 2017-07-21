@@ -7,10 +7,14 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
+use TNW\Subscriptions\Model\Backend\Session\Quote;
 
 class Account extends AbstractDataProvider
 {
@@ -20,15 +24,21 @@ class Account extends AbstractDataProvider
     const FORM_DATA_KEY = 'account_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
+
+    const ADDRESS_MODIFIER = 'TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\AddressModifier';
     
     /** @var UrlInterface */
     protected $urlBuilder;
     /** @var StepPool */
     protected $stepPool;
-    /** @var \TNW\Subscriptions\Model\Backend\Session\Quote */
+    /** @var Quote */
     private $session;
     /** @var CustomerRepository */
     private $customerRepository;
+    /** @var \TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\Pool */
+    private $modifiersPool;
+    /** @var ObjectManagerInterface */
+    private $objectManager;
 
     /**
      * DataProvider constructor.
@@ -37,8 +47,10 @@ class Account extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param \TNW\Subscriptions\Model\Backend\Session\Quote $session
+     * @param Quote $session
      * @param CustomerRepository $customerRepository
+     * PoolInterface $modifiersPool
+     * ObjectManagerInterface $objectManager
      * @param array $meta
      * @param array $data
      */
@@ -48,8 +60,10 @@ class Account extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
+        Quote $session,
         CustomerRepository $customerRepository,
+        PoolInterface $modifiersPool,
+        ObjectManagerInterface $objectManager,
         array $meta = [],
         array $data = []
     ) {
@@ -57,6 +71,8 @@ class Account extends AbstractDataProvider
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->customerRepository = $customerRepository;
+        $this->modifiersPool = $modifiersPool;
+        $this->objectManager = $objectManager;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
@@ -83,7 +99,9 @@ class Account extends AbstractDataProvider
                 ],
             ];
         }
-        
+
+        $data = $this->modifyPool($data, 'modifyData');
+
         return $data;
     }
 
@@ -110,5 +128,56 @@ class Account extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
 
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
+
+        $meta = $this->modifyPool($meta, 'modifyMeta');
+
+        return $meta;
+    }
+
+    /**
+     * Calls UIComponent modifiers.
+     *
+     * @param array $modificationData
+     * @param string $method
+     * @return array
+     */
+    private function modifyPool($modificationData, $method)
+    {
+        foreach ($this->modifiersPool->getModifiers() as $modifierData) {
+            $modifierClass = $modifierData['class'];
+            $modifier = $this->getModifierInstance($modifierClass);
+            if ($modifierClass == self::ADDRESS_MODIFIER) {
+                $modifier->setIsShippingFieldSet(true);
+            }
+            $modificationData = $modifier->$method($modificationData);
+        }
+
+        return $modificationData;
+
+    }
+
+    /**
+     * @param string $modifierClass
+     * @return ModifierInterface
+     */
+    private function getModifierInstance($modifierClass)
+    {
+        /** @var ModifierInterface $modifierClass */
+        $modifier = $this->objectManager->get($modifierClass);
+        if (!$modifier instanceof ModifierInterface) {
+            throw new \InvalidArgumentException(
+                'Type "' . $modifierClass . '" is not an instance of ' . ModifierInterface::class
+            );
+        }
+
+        return $modifier;
     }
 }
