@@ -22,11 +22,11 @@ use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-use TNW\Subscriptions\Model\Source\ShippingMethods;
 
 class Product extends AbstractDataProvider
 {
@@ -119,7 +119,7 @@ class Product extends AbstractDataProvider
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
      * @param ShippingMethods $shippingMethods
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\DescriptionCreator $frequencyDescriptionCreator
+     * @param DescriptionCreator $frequencyDescriptionCreator
      * @param array $meta
      * @param array $data
      * @param string $scopeName
@@ -251,9 +251,6 @@ class Product extends AbstractDataProvider
             $this->session->getCurrencyId()
         );
     }
-
-
-
 
     /**
      * @param ModelQuote $quote

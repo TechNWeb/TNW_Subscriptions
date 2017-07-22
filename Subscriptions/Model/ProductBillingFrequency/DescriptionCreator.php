@@ -8,11 +8,11 @@ namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 /**
  * Create description for billing frequency.
@@ -50,8 +50,7 @@ class DescriptionCreator
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
         TrialLengthUnitType $trialLengthUnitType
-    )
-    {
+    ) {
         $this->context = $context;
         $this->frequencyRepository = $frequencyRepository;
         $this->frequencyUnitType = $frequencyUnitType;
@@ -104,8 +103,7 @@ class DescriptionCreator
             $trialTotal = $formattedPrice;
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[Create::UNIQUE]['trial_period'],
-                $subscriptionData[Create::UNIQUE]['trial_unit_id'])
-            ;
+                $subscriptionData[Create::UNIQUE]['trial_unit_id']);
             $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
             $total = $this->formatPrice($subscriptionData[Create::NON_UNIQUE]['price']);
         }
