@@ -200,4 +200,13 @@
                 sortOrder="10"
                 disabled="false"/>
     </type>
+
+    <type name="Magento\Eav\Model\Entity\AttributeCache">
+        <arguments>
+            <argument name="unsupportedTypes" xsi:type="array">
+                <item name="subscription_profile" xsi:type="string">subscription_profile</item>
+                <item name="tnw_product_subscription_profile" xsi:type="string">tnw_product_subscription_profile</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

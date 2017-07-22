@@ -13,6 +13,8 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use Magento\Catalog\Model\Product;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
 /**
  * Class Manager
@@ -144,10 +146,16 @@ class Manager
         );
 
         if (!empty($buyRequest)) {
+            $this->getProfileProduct()->setInitialFee(
+                $this->getProductInitialFee(
+                    $product,
+                    $buyRequest[Create::UNIQUE]['billing_frequency']
+                )
+            );
             $this->getProfileProduct()->setTrialPrice(null);
             $this->getProfileProduct()->setPrice($item->getPrice());
 
-            if ($buyRequest['unique']['is_trial']) {
+            if ($buyRequest[Create::UNIQUE]['is_trial']) {
                 $this->getProfileProduct()->setTrialPrice($item->getPrice());
                 $this->getProfileProduct()->setPrice($buyRequest['non_unique']['price']);
             }
@@ -156,5 +164,27 @@ class Manager
         $this->getProfileProduct()->setQty($item->getQty());
 
         return $this;
+    }
+
+    /**
+     * @param Product $product
+     * @param int $frequencyId
+     * @return null
+     */
+    private function getProductInitialFee($product, $frequencyId)
+    {
+        $initialFee = null;
+
+        if ($product->getData('recurring_options')){
+            /** @var ProductBillingFrequencyInterface $option */
+            foreach ($product->getData('recurring_options') as $option) {
+                if ($option->getBillingFrequencyId() === $frequencyId){
+                    $initialFee = $option->getInitialFee();
+                    break;
+                }
+            }
+        }
+
+        return $initialFee;
     }
 }

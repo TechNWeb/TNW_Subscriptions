@@ -218,7 +218,7 @@ class PriceCalculator
      * @param $productId
      * @return ProductBillingFrequencyInterface
      */
-    private function getProductBillingFrequency($billingFrequencyId, $productId)
+    public function getProductBillingFrequency($billingFrequencyId, $productId)
     {
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();

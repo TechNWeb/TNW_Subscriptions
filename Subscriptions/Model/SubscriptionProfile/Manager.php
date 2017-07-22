@@ -19,6 +19,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use Magento\Sales\Api\Data\OrderInterface;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 
 /**
  * Class Manager
@@ -250,13 +251,13 @@ class Manager
                 ->setFrequency($frequency->getFrequency())
                 ->setUnit($frequency->getUnit())
                 ->setStatus(ProfileStatus::STATUS_PENDING)
-                ->setTrialStartDate(null);
-            //TODO add here trial length and unit to profile when they will be in buy request.
+                ->setTrialStartDate(null)
+                ->setTrialLength($request['trial_period'])
+                ->setTrialLengthUnit($request['trial_unit_id']);
 
             if ($request['is_trial']){
                 $this->getProfile()->setTrialStartDate($request['start_on']);
-                //TODO add here Start date calculation ( = trial start date + trial period)
-                $this->getProfile()->setStartDate(null);
+                $this->getProfile()->setStartDate($this->calculateStartDate());
             }
 
             $this->getProfile()->setAddresses(
@@ -316,7 +317,7 @@ class Manager
             /** @var Item $item */
             $item = reset($items);
             $result = $item->getBuyRequest()->getDataByPath(
-                Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . Create::UNIQUE
+                Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
             );
         }
 
@@ -340,5 +341,38 @@ class Manager
         }
 
         return $profileProducts;
+    }
+
+    /**
+     * Calculates start date of subscription when trial period is set.
+     *
+     * @return null|string
+     * @throws \Exception
+     */
+    private function calculateStartDate()
+    {
+        $result = null;
+
+        if ($this->getProfile()->getTrialStartDate()){
+            $startDate = new \DateTime($this->getProfile()->getTrialStartDate());
+
+            switch ($this->getProfile()->getTrialLengthUnit()){
+                case TrialLengthUnitType::DAYS:
+                    $intervalUnit = 'D';
+                    break;
+                case TrialLengthUnitType::MONTHS:
+                    $intervalUnit = 'M';
+                    break;
+                default:
+                    throw new \Exception('Undefined trial length unit type.');
+                    break;
+            }
+
+            $expretion = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
+            $result = $startDate->add(new \DateInterval($expretion))
+                ->format('Y-m-d');
+        }
+
+        return $result;
     }
 }

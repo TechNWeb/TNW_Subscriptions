@@ -138,16 +138,16 @@ class Product extends Create
                 'qty' => $productData['qty'],
                 'custom_price' => $product->getPrice(),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
-                    'unique' => [
+                    static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency_id'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
                         'is_trial' => $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
-                        'trial_period' => $product->getData(Trial::CODE_TRIAL_LENGTH),
-                        'trial_unit_id' => (int)$product->getData(Trial::CODE_TRIAL_LENGTH_UNIT),
+                        'trial_period' => $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
+                        'trial_unit_id' => (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
                     ],
-                    'non_unique' => [
+                    static::NON_UNIQUE => [
                         'price' => $this->priceCalculator->getUnitPrice(
                             $product->getId(),
                             $productData['billing_frequency_id'],
