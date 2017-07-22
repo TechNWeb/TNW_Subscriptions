@@ -161,12 +161,17 @@ class Form extends AbstractDataProvider
 
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId);
+            $billingFrequencyPresetQty = $frequency->getPresetQty();
             if ($frequency->getDefaultBillingFrequency()) {
                 $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
                 $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
+                $data[self::FORM_DATA_VALUE]['preset_qty'] = $billingFrequencyPresetQty;
             }
             $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId] = $billingFrequencyUnitPrice;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['price'] =
+                $billingFrequencyUnitPrice;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['preset_qty'] =
+                $billingFrequencyPresetQty;
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
@@ -358,7 +363,7 @@ class Form extends AbstractDataProvider
      */
     protected function getProductBillingFrequencies()
     {
-        if (!is_array($this->productBillingFrequencies)) {
+        if ($this->productBillingFrequencies === null) {
 
             $this->productBillingFrequencies = [];
 
