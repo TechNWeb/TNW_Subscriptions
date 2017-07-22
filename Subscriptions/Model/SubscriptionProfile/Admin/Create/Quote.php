@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
 use Magento\Customer\Api\GroupManagementInterface;
 use TNW\Subscriptions\Model\Context;
@@ -106,8 +107,9 @@ class Quote extends AbstractCreate
 
             if (!$this->getSession()->getCustomerId()) {
                 $quote->setBillingAddress($this->addressCreator->getEmptyAddress());
-                $quote->setShippingAddress($this->addressCreator->getEmptyAddress());
             }
+
+            $this->setShippingAddress($quote);
 
             $this->cartRepository->save($quote);
             $quote = $this->cartRepository->get($quote->getId(), [$this->getSession()->getStoreId()]);
@@ -126,5 +128,34 @@ class Quote extends AbstractCreate
         $quote->setData('is_super_mode', true);
 
         return $quote;
+    }
+
+    /**
+     * Set Shipping address for quote
+     *
+     * Set Shipping address from old quote if we already have quote.
+     * Otherwise create empty address except case when we have customer.
+     *
+     * @param ModelQuote $quote
+     * @return $this
+     */
+    private function setShippingAddress(ModelQuote $quote)
+    {
+        $subQuotes = $this->getSession()->getSubQuotes();
+        $donorQuote = null;
+        if (count($subQuotes)) {
+            /** @var ModelQuote $donorQuote */
+            $donorQuote = reset($subQuotes);
+            /** @var AddressInterface $shippingAddressData */
+            $shippingAddressData = $donorQuote->getShippingAddress()->exportCustomerAddress();
+            $quote->getShippingAddress()->importCustomerAddressData($shippingAddressData);
+            $quote->getShippingAddress()->setCollectShippingRates(true);
+        } else {
+            if (!$this->getSession()->getCustomerId()) {
+                $quote->setShippingAddress($this->addressCreator->getEmptyAddress());
+            }
+        }
+
+        return $this;
     }
 }
