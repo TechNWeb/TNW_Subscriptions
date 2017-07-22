@@ -141,6 +141,8 @@ class Product extends AbstractCreate
                         'period' => $productData['period'],
                         'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
+                        'trial_period' => $product->getData(Trial::CODE_TRIAL_LENGTH),
+                        'trial_unit_id' => (int)$product->getData(Trial::CODE_TRIAL_LENGTH_UNIT),
                     ],
                     'non_unique' => [
                         'price' => $this->priceCalculator->getUnitPrice(
@@ -151,10 +153,8 @@ class Product extends AbstractCreate
                     ],
                 ],
             ];
-
             $this->buyRequest = new DataObject($data);
         }
-
 
         return $this->buyRequest;
     }
