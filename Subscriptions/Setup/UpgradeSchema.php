@@ -12,6 +12,7 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -103,6 +104,301 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'default' => null
                 ]
             );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.10", "<")) {
+            //TODO don't add this attributes to subscription profile entity
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                'shipping_address_id'
+            );
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                'billing_address_id'
+            );
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                'label'
+            );
+
+            //TODO don't add this attributes to subscription profile product entity
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                'trial_start_date'
+            );
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                'start_date'
+            );
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                'trial_length'
+            );
+            $setup->getConnection()->dropColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                'trial_length_unit'
+            );
+
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                SubscriptionProfile::TRIAL_START_DATE,
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME,
+                    'comment' => 'Trial Start Date',
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                SubscriptionProfile::START_DATE,
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DATETIME,
+                    'comment' => 'Start Date',
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TERM,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'length' => 1,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'default' => '0',
+                    'comment' => 'Term',
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TOTAL_BILLING_CYCLES,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'default' => '0',
+                    'comment' => 'Total Billing Cycles',
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_METHOD,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => false,
+                    'comment' => 'Shipping Method',
+                    'length' => 40
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_DESCRIPTION,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => false,
+                    'comment' => 'Shipping Description',
+                    'length' => 255
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::PROFILE_CURRENCY_CODE,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => false,
+                    'comment' => 'Profile Currency Code',
+                    'length' => 255
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TRIAL_LENGTH,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'length' => 5,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'default' => '0',
+                    'comment' => 'Trial Length',
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TRIAL_LENGTH_UNIT,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'length' => 1,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'default' => '0',
+                    'comment' => 'Trial Length Unit',
+                ]
+            );
+
+            //TODO on install add new foreign key
+            $tableName = 'tnw_subscriptions_subscription_profile_order';
+            $setup->getConnection()->dropForeignKey(
+                $tableName,
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile',
+                    'id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile',
+                    'id'
+                ),
+                $tableName,
+                'subscription_profile_id',
+                'tnw_subscriptions_subscription_profile_entity',
+                'entity_id',
+                'NO ACTION'
+            );
+
+            $table = $setup->getConnection()->newTable(
+                $setup->getTable('tnw_subscriptions_subscription_profile_address')
+            )->addColumn(
+                'id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+                'Id'
+            )->addColumn(
+                'profile_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+                'Profile Id'
+            )->addColumn(
+                'created_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Created At'
+            )->addColumn(
+                'updated_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_UPDATE],
+                'Updated At'
+            )->addColumn(
+                'customer_address_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true],
+                'Customer Address Id'
+            )->addColumn(
+                'address_type',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                10,
+                [],
+                'Address Type'
+            )->addColumn(
+                'prefix',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                40,
+                [],
+                'Prefix'
+            )->addColumn(
+                'firstname',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Firstname'
+            )->addColumn(
+                'middlename',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Middlename'
+            )->addColumn(
+                'lastname',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Lastname'
+            )->addColumn(
+                'suffix',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                40,
+                [],
+                'Suffix'
+            )->addColumn(
+                'company',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                [],
+                'Company'
+            )->addColumn(
+                'street',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                40,
+                [],
+                'Street'
+            )->addColumn(
+                'city',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                40,
+                [],
+                'City'
+            )->addColumn(
+                'region',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                40,
+                [],
+                'Region'
+            )->addColumn(
+                'region_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true],
+                'Region Id'
+            )->addColumn(
+                'postcode',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Postcode'
+            )->addColumn(
+                'country_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                30,
+                [],
+                'Country Id'
+            )->addColumn(
+                'telephone',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Phone Number'
+            )->addColumn(
+                'fax',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                20,
+                [],
+                'Fax'
+            )->addIndex(
+                $setup->getIdxName('tnw_subscriptions_subscription_profile_address', ['profile_id']),
+                ['profile_id']
+            )->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_subscription_profile_address',
+                    'profile_id',
+                    'tnw_subscriptions_subscription_profile_entity',
+                    'entity_id'
+                ),
+                'profile_id',
+                $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
+                'entity_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )->setComment(
+                'Subscription Profile Address'
+            );
+            $setup->getConnection()->createTable($table);
         }
 
         $setup->endSetup();

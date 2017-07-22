@@ -6,25 +6,23 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier;
 
-use Magento\Ui\Component\Form\Fieldset;
-use Magento\Ui\Component\Modal;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
+use Magento\Eav\Api\AttributeSetRepositoryInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\DynamicRows;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Modal;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use Magento\Eav\Api\AttributeSetRepositoryInterface;
-use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Catalog\Model\Product\Attribute\Source\Status;
-use \TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
 
 /**
  * Class LinkedProducts
@@ -35,28 +33,60 @@ class LinkedProducts extends AbstractModifier
     const GROUP_LINKED_PRODUCTS = 'linked';
     const DEFAULT_SCOPE_NAME = 'tnw_billingfrequency_form.tnw_billingfrequency_form';
 
-    /** @var UrlInterface */
+    /**
+     * Url builder.
+     *
+     * @var UrlInterface
+     */
     private $urlBuilder;
 
-    /** @var string */
+    /**
+     * Scope name.
+     *
+     * @var string
+     */
     private $scopeName;
 
-    /** @var Registry */
+    /**
+     * Registry.
+     *
+     * @var Registry
+     */
     private $registry;
 
-    /** @var ProductBillingFrequencyRepositoryInterface */
+    /**
+     * Repository for retrieving product billing frequencies.
+     *
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
     private $productBillingFrequencyRepository;
 
-    /** @var ProductRepositoryInterface */
+    /**
+     * Repository for retrieving products.
+     *
+     * @var ProductRepositoryInterface
+     */
     private $productRepository;
 
-    /** @var ImageHelper */
+    /**
+     * Image helper.
+     *
+     * @var ImageHelper
+     */
     private $imageHelper;
 
-    /** @var Status */
+    /**
+     * Product status source.
+     *
+     * @var Status
+     */
     private $status;
 
-    /** @var AttributeSetRepositoryInterface */
+    /**
+     * Repository for retrieving attribute sets.
+     *
+     * @var AttributeSetRepositoryInterface
+     */
     private $attributeSetRepository;
 
     /**
@@ -183,14 +213,14 @@ class LinkedProducts extends AbstractModifier
     }
 
     /**
-     * Retrieve button set
+     * Retrieve button set.
      *
      * @param Phrase $content
      * @param Phrase $buttonTitle
      * @param string $scope
      * @return array
      */
-    protected function getButtonSet(Phrase $content, Phrase $buttonTitle, $scope)
+    private function getButtonSet(Phrase $content, Phrase $buttonTitle, $scope)
     {
         $modalTarget = $this->scopeName . '.' . $scope . '.modal';
 
@@ -235,13 +265,13 @@ class LinkedProducts extends AbstractModifier
     }
 
     /**
-     * Prepares config for modal slide-out panel
+     * Prepares config for modal slide-out panel.
      *
      * @param Phrase $title
      * @param string $scope
      * @return array
      */
-    protected function getGenericModal(Phrase $title, $scope)
+    private function getGenericModal(Phrase $title, $scope)
     {
         $listingTarget = $scope . '_product_listing';
 
@@ -306,13 +336,13 @@ class LinkedProducts extends AbstractModifier
     }
 
     /**
-     * Retrieve grid
+     * Retrieve grid.
      *
      * @param string $scope
      * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getGrid($scope)
+    private function getGrid($scope)
     {
         $dataProvider = $scope . '_product_listing';
 
@@ -342,11 +372,11 @@ class LinkedProducts extends AbstractModifier
                             'thumbnail' => 'thumbnail_src',
                             'initial_fee' => 'initial_fee',
                             'preset_qty' => 'preset_qty',
-                            UnlockPresetQty::CODE_UNLOCK_PRESET_QTY => UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
-                            LockPrice::CODE_LOCK_PRICE => LockPrice::CODE_LOCK_PRICE,
-                            Discount::CODE_DISCOUNT_TYPE => Discount::CODE_DISCOUNT_TYPE,
-                            Discount::CODE_DISCOUNT_AMOUNT => Discount::CODE_DISCOUNT_AMOUNT,
-                            LockPrice::CODE_FLAT_DISCOUNT => LockPrice::CODE_FLAT_DISCOUNT,
+                            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+                            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+                            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
                         ],
                         'links' => [
                             'insertData' => '${ $.provider }:${ $.dataProvider }'
@@ -375,13 +405,13 @@ class LinkedProducts extends AbstractModifier
     }
 
     /**
-     * Prepare data column
+     * Prepare data column.
      *
      * @param ProductInterface $linkedProduct
      * @param ProductBillingFrequencyInterface $linkItem
      * @return array
      */
-    protected function fillData(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
+    private function fillData(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
     {
         return [
             'id' => $linkedProduct->getId(),
@@ -392,11 +422,11 @@ class LinkedProducts extends AbstractModifier
             'price' => $this->getPrice($linkedProduct, $linkItem),
             ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee(),
             ProductBillingFrequencyInterface::PRESET_QTY => $linkItem->getPresetQty(),
-            UnlockPresetQty::CODE_UNLOCK_PRESET_QTY => $linkedProduct->getData(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY),
-            LockPrice::CODE_LOCK_PRICE => $linkedProduct->getData(LockPrice::CODE_LOCK_PRICE),
-            LockPrice::CODE_FLAT_DISCOUNT => $linkedProduct->getData(LockPrice::CODE_FLAT_DISCOUNT),
-            Discount::CODE_DISCOUNT_TYPE => $linkedProduct->getData(Discount::CODE_DISCOUNT_TYPE),
-            Discount::CODE_DISCOUNT_AMOUNT => $linkedProduct->getData(Discount::CODE_DISCOUNT_AMOUNT),
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => $linkedProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY),
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $linkedProduct->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $linkedProduct->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
         ];
     }
 

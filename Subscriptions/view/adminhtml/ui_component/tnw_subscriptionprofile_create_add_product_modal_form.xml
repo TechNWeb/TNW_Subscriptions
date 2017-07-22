@@ -41,7 +41,7 @@
                 <item name="sortOrder" xsi:type="number">10</item>
             </item>
         </argument>
-        <field name="product_billing_frequency">
+        <field name="billing_frequency_id">
             <argument name="data" xsi:type="array">
                 <item name="multiple" xsi:type="boolean">false</item>
                 <item name="config" xsi:type="array">
@@ -49,7 +49,7 @@
                     <item name="dataType" xsi:type="string">boolean</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">radioset</item>
-                    <item name="dataScope" xsi:type="string">product_billing_frequency</item>
+                    <item name="dataScope" xsi:type="string">billing_frequency_id</item>
                     <item name="additionalClasses" xsi:type="string">sub-legend admin__field-wide</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>

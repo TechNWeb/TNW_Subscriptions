@@ -6,32 +6,27 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class for creating subscriptions in admin.
  */
-class Create extends AbstractCreate
+class Create extends BaseCreate
 {
-    /**
-     * Last part of path to unique subscription fields in product buy request.
-     *
-     * Using for checking the ability to add product to subscription quote.
-     */
-    const UNIQUE = 'unique';
-
-    /**
-     * Last part of path to non_unique fields in product buy request.
-     */
-    const NON_UNIQUE = 'non_unique';
-
     /**
      * Quote address creator.
      *
@@ -61,23 +56,61 @@ class Create extends AbstractCreate
     private $needCollect;
 
     /**
+     * Subscription profile manager.
+     *
+     * @var Manager
+     */
+    private $profileManager;
+
+    /**
+     * Customer creator.
+     *
+     * @var Customer
+     */
+    private $customerCreator;
+
+    /**
+     * @var CartManagementInterface
+     */
+    private $quoteManagement;
+
+    /**
+     * Core event manager.
+     *
+     * @var ManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      * Create constructor.
      * @param Context $context
-     * @param Session $session
+     * @param SessionManagerInterface $session
      * @param Address $addressCreator
      * @param Quote $quoteCreator
      * @param Product $productModifier
+     * @param Customer $customerCreator
+     * @param Manager $profileManager
+     * @param CartManagementInterface $quoteManagement
+     * @param ManagerInterface $eventManager
      */
     public function __construct(
         Context $context,
-        Session $session,
+        SessionManagerInterface $session,
         Address $addressCreator,
         Quote $quoteCreator,
-        Product $productModifier
+        Product $productModifier,
+        Customer $customerCreator,
+        Manager $profileManager,
+        CartManagementInterface $quoteManagement,
+        ManagerInterface $eventManager
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
         $this->productModifier = $productModifier;
+        $this->customerCreator = $customerCreator;
+        $this->profileManager = $profileManager;
+        $this->quoteManagement = $quoteManagement;
+        $this->eventManager = $eventManager;
         parent::__construct($context, $session);
     }
 
@@ -104,7 +137,9 @@ class Create extends AbstractCreate
     public function recollectSubscriptions()
     {
         if ($this->isNeedCollect()) {
-            foreach ($this->getSession()->getSubQuotes() as $subQuote) {
+            /** @var Session $session */
+            $session = $this->getSession();
+            foreach ($session->getSubQuotes() as $subQuote) {
                 $subQuote->collectTotals();
                 $this->quoteCreator->getCartRepository()->save($subQuote);
             }
@@ -154,9 +189,9 @@ class Create extends AbstractCreate
     private function getSubQuote()
     {
         $result = null;
-
-        $subQuotes = $this->getSession()->getSubQuotes();
-
+        /** @var Session $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
         $canAdd = false;
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
@@ -171,7 +206,7 @@ class Create extends AbstractCreate
             $result = $this->createSubCart();
         }
 
-        $this->getSession()->addSubQuote($result);
+        $session->addSubQuote($result);
 
         return $result;
     }
@@ -182,7 +217,7 @@ class Create extends AbstractCreate
      * @param ModelQuote $subQuote
      * @return bool
      */
-    private function canAddProduct($subQuote)
+    private function canAddProduct(ModelQuote $subQuote)
     {
         $result = false;
 
@@ -218,7 +253,7 @@ class Create extends AbstractCreate
     /**
      * Validates and sets shipping address to all subscription quotes.
      *
-     * @param $address
+     * @param [] $address
      * @param null $customerAddressId
      * @return array
      */
@@ -240,7 +275,7 @@ class Create extends AbstractCreate
     /**
      * Validates and sets billing address to all subscription quotes.
      *
-     * @param $address
+     * @param [] $address
      * @param null $customerAddressId
      * @return array|bool
      */
@@ -288,8 +323,9 @@ class Create extends AbstractCreate
     public function setShippingMethods($methods)
     {
         $result = [];
-
-        $subQuotes = $this->getSession()->getSubQuotes();
+        /** @var Session $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
 
@@ -330,7 +366,9 @@ class Create extends AbstractCreate
 
         try {
             $data['method'] = $method;
-            $subQuotes = $this->getSession()->getSubQuotes();
+            /** @var Session $session */
+            $session = $this->getSession();
+            $subQuotes = $session->getSubQuotes();
 
             foreach ($subQuotes as $subQuote) {
                 $subQuote->getPayment()->importData($data);
@@ -351,7 +389,9 @@ class Create extends AbstractCreate
      */
     public function getPayment()
     {
-        $quotes = $this->getSession()->getSubQuotes();
+        /** @var Session $session */
+        $session = $this->getSession();
+        $quotes = $session->getSubQuotes();
 
         if (!empty($quotes)) {
             $quote = reset($quotes);
@@ -362,5 +402,69 @@ class Create extends AbstractCreate
         }
 
         return $result;
+    }
+
+    /**
+     * Creates subscription profiles.
+     *
+     * @return SubscriptionProfileInterface[]
+     */
+    public function createSubscriptions()
+    {
+        $profiles = [];
+
+        try {
+            $customer = $this->customerCreator->prepareCustomer();
+            /** @var Session $session */
+            $session = $this->getSession();
+            $subQuotes = $session->getSubQuotes();
+
+            foreach ($subQuotes as $subQuote) {
+                $this->quoteCreator->fillCustomerData($customer);
+                $errors = $this->quoteCreator->validate($subQuote);
+
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        $this->getContext()->log($error);
+                        $this->getContext()->getMessageManager()->addError($error);
+                    }
+                    //Maybe we need to delete customer in this case.
+                    throw new \Exception(__('Quote validation is failed.'));
+                }
+
+                $profile = $this->createProfile($subQuote);
+
+                if ($profile) {
+                    $order = $this->quoteManagement->submit($subQuote);
+                    $this->profileManager->assignOrderToProfile($order, $profile);
+                    $this->eventManager->dispatch(
+                        'checkout_submit_all_after',
+                        ['order' => $order, 'quote' => $subQuote]
+                    );
+                    $profiles[] = $profile;
+                    //TODO add here email sending
+                }
+            }
+        } catch (\Exception $e) {
+            $this->getContext()->log($e->getMessage());
+            $this->getContext()->getMessageManager()->addError($e->getMessage());
+        }
+
+        return $profiles;
+    }
+
+    /**
+     * Creates subscription profile.
+     *
+     * @param $subQuote
+     * @return SubscriptionProfileInterface
+     */
+    private function createProfile($subQuote)
+    {
+        $profile = $this->profileManager->reset()
+            ->populateProfileData($subQuote)
+            ->saveProfile();
+
+        return $profile;
     }
 }

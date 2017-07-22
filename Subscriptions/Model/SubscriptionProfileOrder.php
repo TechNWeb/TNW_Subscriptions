@@ -7,21 +7,22 @@
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use Magento\Framework\Model\AbstractModel;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as Resource;
 
-class SubscriptionProfileOrder extends \Magento\Framework\Model\AbstractModel implements SubscriptionProfileOrderInterface
+class SubscriptionProfileOrder extends AbstractModel
+    implements SubscriptionProfileOrderInterface
 {
-
     /**
-     * @return void
+     * {@inheritdoc}
      */
     protected function _construct()
     {
-        $this->_init('TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder');
+        $this->_init(Resource::class);
     }
 
     /**
-     * Get id
-     * @return string
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -29,9 +30,7 @@ class SubscriptionProfileOrder extends \Magento\Framework\Model\AbstractModel im
     }
 
     /**
-     * Set id
-     * @param string $id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     * {@inheritdoc}
      */
     public function setId($id)
     {
@@ -39,8 +38,7 @@ class SubscriptionProfileOrder extends \Magento\Framework\Model\AbstractModel im
     }
 
     /**
-     * Get subscription_profile_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getSubscriptionProfileId()
     {
@@ -48,18 +46,15 @@ class SubscriptionProfileOrder extends \Magento\Framework\Model\AbstractModel im
     }
 
     /**
-     * Set subscription_profile_id
-     * @param string $subscription_profile_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     * {@inheritdoc}
      */
-    public function setSubscriptionProfileId($subscription_profile_id)
+    public function setSubscriptionProfileId($subscriptionProfileId)
     {
-        return $this->setData(self::SUBSCRIPTION_PROFILE_ID, $subscription_profile_id);
+        return $this->setData(self::SUBSCRIPTION_PROFILE_ID, $subscriptionProfileId);
     }
 
     /**
-     * Get magento_order_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getMagentoOrderId()
     {
@@ -67,12 +62,10 @@ class SubscriptionProfileOrder extends \Magento\Framework\Model\AbstractModel im
     }
 
     /**
-     * Set magento_order_id
-     * @param string $magento_order_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     * {@inheritdoc}
      */
-    public function setMagentoOrderId($magento_order_id)
+    public function setMagentoOrderId($magentoOrderId)
     {
-        return $this->setData(self::MAGENTO_ORDER_ID, $magento_order_id);
+        return $this->setData(self::MAGENTO_ORDER_ID, $magentoOrderId);
     }
 }

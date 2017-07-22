@@ -6,19 +6,20 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\BillingFrequencyInterfaceFactory;
+use TNW\Subscriptions\Api\Data\BillingFrequencySearchResultsInterfaceFactory;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency as ResourceBillingFrequency;
-use TNW\Subscriptions\Api\Data\BillingFrequencySearchResultsInterfaceFactory;
-use TNW\Subscriptions\Api\Data\BillingFrequencyInterfaceFactory;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Framework\Api\SortOrder;
-use Magento\Framework\Exception\NoSuchEntityException;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory as BillingFrequencyCollectionFactory;
-use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Store\Model\StoreManagerInterface;
 
 class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
 {
@@ -68,6 +69,11 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
     private $billingFrequencyUnitType;
 
     /**
+     * @var BillingFrequencyInterface[]
+     */
+    private $instances;
+
+    /**
      * @param ResourceBillingFrequency $resource
      * @param BillingFrequencyFactory $billingFrequencyFactory
      * @param BillingFrequencyInterfaceFactory $dataBillingFrequencyFactory
@@ -103,13 +109,8 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function save(
-        \TNW\Subscriptions\Api\Data\BillingFrequencyInterface $billingFrequency
-    ) {
-        /* if (empty($billingFrequency->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $billingFrequency->setStoreId($storeId);
-        } */
+    public function save(BillingFrequencyInterface $billingFrequency)
+    {
         try {
             $this->resource->save($billingFrequency);
         } catch (\Exception $exception) {
@@ -118,6 +119,8 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
                 $exception->getMessage()
             ));
         }
+        unset($this->instances[$billingFrequency->getId()]);
+
         return $billingFrequency;
     }
 
@@ -126,12 +129,17 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
      */
     public function getById($billingFrequencyId)
     {
-        $billingFrequency = $this->billingFrequencyFactory->create();
-        $billingFrequency->load($billingFrequencyId);
-        if (!$billingFrequency->getId()) {
-            throw new NoSuchEntityException(__('BillingFrequency with id "%1" does not exist.', $billingFrequencyId));
+        if (!isset($this->instances[$billingFrequencyId])) {
+            $billingFrequency = $this->billingFrequencyFactory->create();
+            $billingFrequency->load($billingFrequencyId);
+            if (!$billingFrequency->getId()) {
+                throw new NoSuchEntityException(__('BillingFrequency with id "%1" does not exist.',
+                    $billingFrequencyId));
+            }
+            $this->instances[$billingFrequencyId] = $billingFrequency;
         }
-        return $billingFrequency;
+
+        return $this->instances[$billingFrequencyId];
     }
 
     /**
@@ -186,7 +194,7 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        \TNW\Subscriptions\Api\Data\BillingFrequencyInterface $billingFrequency
+        BillingFrequencyInterface $billingFrequency
     ) {
         try {
             $this->resource->delete($billingFrequency);
@@ -196,6 +204,8 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
                 $exception->getMessage()
             ));
         }
+        unset($this->instances[$billingFrequency->getId()]);
+
         return true;
     }
 

@@ -6,25 +6,10 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-use Magento\Framework\Exception\LocalizedException;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-class Save extends \Magento\Backend\App\Action
+class Save extends SubscriptionProfile
 {
-
-    protected $dataPersistor;
-
-    /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
-     */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
-    ) {
-        $this->dataPersistor = $dataPersistor;
-        parent::__construct($context);
-    }
-
     /**
      * Save action
      *
@@ -34,37 +19,15 @@ class Save extends \Magento\Backend\App\Action
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $data = $this->getRequest()->getPostValue();
-        if ($data) {
-            $id = $this->getRequest()->getParam('id');
+        $profiles = $this->getSubCreateModel()->createSubscriptions();
+        $this->_getSession()->clearStorage();
 
-            $model = $this->_objectManager->create('TNW\Subscriptions\Model\SubscriptionProfile')->load($id);
-            if (!$model->getId() && $id) {
-                $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
-                return $resultRedirect->setPath('*/*/');
-            }
-
-            $model->setData($data);
-
-            try {
-                $model->save();
-                $this->messageManager->addSuccessMessage(__('You saved the Subscription Profile.'));
-                $this->dataPersistor->clear('tnw_subscriptions_subscriptionprofile');
-
-                if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('*/*/edit', ['id' => $model->getId()]);
-                }
-                return $resultRedirect->setPath('*/*/');
-            } catch (LocalizedException $e) {
-                $this->messageManager->addErrorMessage($e->getMessage());
-            } catch (\Exception $e) {
-                $this->messageManager->addExceptionMessage($e,
-                    __('Something went wrong while saving the Subscription Profile.'));
-            }
-
-            $this->dataPersistor->set('tnw_subscriptions_subscriptionprofile', $data);
-            return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+        if ($profiles){
+            $this->messageManager->addSuccessMessage(
+                sprintf(__('Total of %s profiles was created.'), count($profiles))
+            );
         }
+
         return $resultRedirect->setPath('*/*/');
     }
 

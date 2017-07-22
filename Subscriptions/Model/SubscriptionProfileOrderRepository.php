@@ -6,36 +6,59 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Framework\Api\SortOrder;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory as SubscriptionProfileOrderCollectionFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Exception\CouldNotDeleteException;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory as SubscriptionProfileOrderCollectionFactory;
 
 class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepositoryInterface
 {
-
+    /**
+     * @var DataObjectHelper
+     */
     private $dataObjectHelper;
 
+    /**
+     * @var SubscriptionProfileOrderSearchResultsInterfaceFactory
+     */
     private $searchResultsFactory;
 
+    /**
+     * @var SubscriptionProfileOrderFactory
+     */
     private $subscriptionProfileOrderFactory;
 
+    /**
+     * @var SubscriptionProfileOrderInterfaceFactory
+     */
     private $dataSubscriptionProfileOrderFactory;
 
+    /**
+     * @var StoreManagerInterface
+     */
     private $storeManager;
 
+    /**
+     * @var ResourceSubscriptionProfileOrder
+     */
     private $resource;
 
+    /**
+     * @var DataObjectProcessor
+     */
     private $dataObjectProcessor;
 
+    /**
+     * @var SubscriptionProfileOrderCollectionFactory
+     */
     private $subscriptionProfileOrderCollectionFactory;
 
 

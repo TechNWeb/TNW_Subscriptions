@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Address;
+
+use Magento\Framework\EntityManager\Operation\ExtensionInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
+
+/**
+ * Saves profile addresses after saving subscription profile.
+ */
+class SaveHandler implements ExtensionInterface
+{
+    /**
+     * Repository for saving/retrieving profile addresses.
+     *
+     * @var AddressRepository
+     */
+    private $addressRepository;
+
+    /**
+     * SaveHandler constructor.
+     * @param AddressRepository $addressRepository
+     */
+    public function __construct(
+        AddressRepository $addressRepository
+    ) {
+        $this->addressRepository = $addressRepository;
+    }
+
+
+    /**
+     * @param SubscriptionProfileInterface $entity
+     * @param array $arguments
+     * @return SubscriptionProfileInterface
+     */
+    public function execute($entity, $arguments = [])
+    {
+        $addresses = $entity->getAddresses();
+
+        if (!empty($addresses)){
+            foreach ($addresses as $address) {
+                $address->setProfileId($entity->getId());
+                $this->addressRepository->save($address);
+            }
+        }
+
+        return $entity;
+    }
+}
