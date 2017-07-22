@@ -131,8 +131,14 @@ class Process extends Create
                 ? $data['account']['customer_address_id']
                 : null;
 
-            $result = $this->getSubCreateModel()->setShippingAddress($data['account'], $customerAddressId);
-
+            $account = !empty($data['account']['email']) ? $data['account']['email'] : null;
+            $group = !empty($data['account']['group']) ? $data['account']['group'] : null;
+            $this->_getSession()->setCustomerEmail($account);
+            $this->_getSession()->setCustomerGroup($group);
+            $result = $this->getSubCreateModel()->setShippingAddress(
+                    $data['account'],
+                    $customerAddressId
+                );
             $this->checkProcessResult($result);
         }
     }

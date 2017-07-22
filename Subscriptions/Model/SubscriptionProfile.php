@@ -6,16 +6,17 @@
 
 namespace TNW\Subscriptions\Model;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\Framework\Model\AbstractModel;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 
 /**
  * Subscription Profile model.
  */
 class SubscriptionProfile extends AbstractModel implements SubscriptionProfileInterface
 {
-    const TNW_SUBSCRIPTION_CREATE_ORDER_ACTION_NAME = 'tnw_subscriptions_subscriptionprofile_edit';
-
     /**
      * Entity for subscription profile.
      */
@@ -27,16 +28,15 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
-     * @return void
+     * {@inheritdoc}
      */
     protected function _construct()
     {
-        $this->_init('TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile');
+        $this->_init(Resource::class);
     }
 
     /**
-     * Get id
-     * @return string
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -44,9 +44,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set id
-     * @param string $id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setId($id)
     {
@@ -54,8 +52,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Get customer_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getCustomerId()
     {
@@ -63,18 +60,15 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set customer_id
-     * @param string $customer_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setCustomerId($customer_id)
+    public function setCustomerId($customerId)
     {
-        return $this->setData(self::CUSTOMER_ID, $customer_id);
+        return $this->setData(self::CUSTOMER_ID, $customerId);
     }
 
     /**
-     * Get billing_frequency_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getBillingFrequencyId()
     {
@@ -82,38 +76,24 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set billing_frequency_id
-     * @param string $billing_frequency_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setBillingFrequencyId($billing_frequency_id)
+    public function setBillingFrequencyId($billingFrequencyId)
     {
         return $this->setData(self::BILLING_FREQUENCY_ID,
-            $billing_frequency_id);
+            $billingFrequencyId);
     }
 
     /**
-     * Get label
-     * @return string
+     * {@inheritdoc}
      */
     public function getLabel()
     {
-        return $this->getData(self::LABEL);
+        return sprintf('#S-%s', $this->getId());
     }
 
     /**
-     * Set label
-     * @param string $label
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
-     */
-    public function setLabel($label)
-    {
-        return $this->setData(self::LABEL, $label);
-    }
-
-    /**
-     * Get unit
-     * @return string
+     * {@inheritdoc}
      */
     public function getUnit()
     {
@@ -121,9 +101,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set unit
-     * @param string $unit
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setUnit($unit)
     {
@@ -131,8 +109,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Get website_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getWebsiteId()
     {
@@ -140,18 +117,15 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set website_id
-     * @param string $website_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setWebsiteId($website_id)
+    public function setWebsiteId($websiteId)
     {
-        return $this->setData(self::WEBSITE_ID, $website_id);
+        return $this->setData(self::WEBSITE_ID, $websiteId);
     }
 
     /**
-     * Get status
-     * @return string
+     * {@inheritdoc}
      */
     public function getStatus()
     {
@@ -159,9 +133,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set status
-     * @param string $status
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setStatus($status)
     {
@@ -169,8 +141,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Get frequency
-     * @return string
+     * {@inheritdoc}
      */
     public function getFrequency()
     {
@@ -178,9 +149,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Set frequency
-     * @param string $frequency
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setFrequency($frequency)
     {
@@ -188,8 +157,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * Get engine code
-     * @return string
+     * {@inheritdoc}
      */
     public function getEngineCode()
     {
@@ -197,8 +165,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * @param string $engine
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setEngineCode($engine)
     {
@@ -206,36 +173,213 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getBillingAddressId()
+    public function getAddresses()
     {
-        return $this->getData(self::BILLING_ADDRESS_ID);
+        return $this->getData(self::PROFILE_ADDRESSES);
     }
 
     /**
-     * @param string $addressId
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setBillingAddressId($addressId)
+    public function setAddresses($addresses)
     {
-        return $this->setData(self::BILLING_ADDRESS_ID, $addressId);
+        return $this->setData(self::PROFILE_ADDRESSES, $addresses);
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getShippingAddressId()
+    public function getShippingAddress()
     {
-        return $this->getData(self::SHIPPING_ADDRESS_ID);
+        $result = null;
+        foreach ($this->getAddresses() as $address) {
+            if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
+                $result = $address;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * @param string $addressId
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setShippingAddressId($addressId)
+    public function getBillingAddress()
     {
-        return $this->setData(self::SHIPPING_ADDRESS_ID, $addressId);
+        $result = null;
+        foreach ($this->getAddresses() as $address) {
+            if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING) {
+                $result = $address;
+                break;
+            }
+        }
+
+        return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStartDate()
+    {
+        return $this->getData(self::START_DATE);
+    }
+
+    /**
+     * @param string $startDate
+     * @return $this
+     */
+    public function setStartDate($startDate)
+    {
+        return $this->setData(self::START_DATE, $startDate);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTrialStartDate()
+    {
+        return $this->getData(self::TRIAL_START_DATE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTrialStartDate($trialStartDate)
+    {
+        return $this->setData(self::TRIAL_START_DATE, $trialStartDate);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTerm()
+    {
+        return $this->getData(self::TERM);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTerm($term)
+    {
+        return $this->setData(self::TERM, $term);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTotalBillingCycles()
+    {
+        return $this->getData(self::TOTAL_BILLING_CYCLES);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTotalBillingCycles($totalBillingCycles)
+    {
+        return $this->setData(self::TOTAL_BILLING_CYCLES, $totalBillingCycles);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShippingMethod()
+    {
+        return $this->getData(self::SHIPPING_METHOD);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShippingMethod($shippingMethod)
+    {
+        return $this->setData(self::SHIPPING_METHOD, $shippingMethod);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShippingDescription()
+    {
+        return $this->getData(self::SHIPPING_DESCRIPTION);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShippingDescription($shippingDescription)
+    {
+        return $this->setData(self::SHIPPING_DESCRIPTION, $shippingDescription);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProfileCurrencyCode()
+    {
+        return $this->getData(self::PROFILE_CURRENCY_CODE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setProfileCurrencyCode($profileCurrencyCode)
+    {
+        return $this->setData(self::PROFILE_CURRENCY_CODE, $profileCurrencyCode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTrialLength()
+    {
+        return $this->getData(self::TRIAL_LENGTH);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTrialLength($trialLength)
+    {
+        return $this->setData(self::TRIAL_LENGTH, $trialLength);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTrialLengthUnit()
+    {
+        return $this->getData(self::TRIAL_LENGTH_UNIT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTrialLengthUnit($trialLengthUnit)
+    {
+        return $this->setData(self::TRIAL_LENGTH_UNIT, $trialLengthUnit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProducts()
+    {
+        return $this->getData(self::PROFILE_PRODUCTS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setProducts($products)
+    {
+        return $this->setData(self::PROFILE_PRODUCTS, $products);
+    }
+
+
 }

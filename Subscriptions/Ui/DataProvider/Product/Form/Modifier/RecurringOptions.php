@@ -9,21 +9,22 @@ namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
-use Magento\Ui\Component\Form\Fieldset;
-use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Element\Checkbox;
+use Magento\Ui\Component\Form\Element\DataType\Boolean;
+use Magento\Ui\Component\Form\Element\DataType\Number;
+use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
-use Magento\Ui\Component\Form\Element\DataType\Text;
-use Magento\Ui\Component\Form\Element\DataType\Number;
-use Magento\Ui\Component\Form\Element\DataType\Boolean;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use Magento\Ui\Component\Form\Field;
+use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
+use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Data provider for "Recurring Options" panel
@@ -557,12 +558,12 @@ class RecurringOptions extends BaseModifier
                             'validate-zero-or-greater' => true
                         ],
                         'imports' => [
-                            'disabled' => 'ns = ${ $.ns }, index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
+                            'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                             'changeCommentAndValue' => 'index = price:value',
-                            'changeCommentLockPrice' => 'index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
-                            'changeCommentOfferDiscount' => 'index = ' . Discount::CODE_FLAT_DISCOUNT . ':checked',
-                            'changeCommentDiscountAmount' => 'index = ' . Discount::CODE_DISCOUNT_AMOUNT . ':value',
-                            'changeCommentDiscountType' => 'index = ' . Discount::CODE_DISCOUNT_TYPE . ':value',
+                            'changeCommentLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE  . ':checked',
+                            'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
+                            'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT . ':value',
+                            'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                     ],
@@ -682,7 +683,7 @@ class RecurringOptions extends BaseModifier
                             'validate-zero-or-greater' => true
                         ],
                         'imports' => [
-                            'disabled' => '!ns = ${ $.ns }, index = ' . UnlockPresetQty::CODE_UNLOCK_PRESET_QTY. ':checked',
+                            'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY. ':checked',
                         ],
                     ],
                 ],

@@ -74,4 +74,10 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\PaymentAndBilling\Form\Modifier\Pool</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Create">
+        <arguments>
+            <argument name="session" xsi:type="object">TNW\Subscriptions\Model\Backend\Session\Quote</argument>
+        </arguments>
+    </type>
 </config>

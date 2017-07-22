@@ -8,7 +8,9 @@ namespace TNW\Subscriptions\Api\Data;
 
 interface SubscriptionProfileInterface
 {
-
+    /**#@+
+     * Constants for field names
+     */
     const WEBSITE_ID = 'website_id';
     const UNIT = 'unit';
     const CUSTOMER_ID = 'customer_id';
@@ -18,151 +20,335 @@ interface SubscriptionProfileInterface
     const LABEL = 'label';
     const BILLING_FREQUENCY_ID = 'billing_frequency_id';
     const ENGINE_CODE = 'engine_code';
-    const BILLING_ADDRESS_ID = 'billing_address_id';
-    const SHIPPING_ADDRESS_ID = 'billing_shipping_id';
+    const START_DATE = 'start_date';
+    const TRIAL_START_DATE = 'trial_start_date';
+    const TERM = 'term';
+    const TOTAL_BILLING_CYCLES = 'total_billing_cycles';
+    const SHIPPING_METHOD = 'shipping_method';
+    const SHIPPING_DESCRIPTION = 'shipping_description';
+    const PROFILE_CURRENCY_CODE = 'profile_currency_code';
+    const TRIAL_LENGTH = 'trial_length';
+    const TRIAL_LENGTH_UNIT = 'trial_length_unit';
+    /**#@-*/
 
+    /**#@+
+     * Constants for subscription profile addresses
+     */
+    const PROFILE_ADDRESSES = 'profile_addresses';
+    const PROFILE_SHIPPING_ADDRESSES = 'profile_billing_address';
+    const PROFILE_BILLING_ADDRESSES = 'profile_shipping_address';
+    /**#@-*/
+
+    /**#@+
+     * Constant for subscription profile products
+     */
+    const PROFILE_PRODUCTS = 'profile_products';
+    /**#@-*/
 
     /**
-     * Get id
+     * Gets id.
+     *
      * @return string|null
      */
     public function getId();
 
     /**
-     * Set id
+     * Sets id.
+     *
      * @param $id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @return $this
      * @internal param string $id
      */
     public function setId($id);
 
     /**
-     * Get customer_id
+     * Gets customer id.
+     *
      * @return string|null
      */
     public function getCustomerId();
 
     /**
-     * Set customer_id
-     * @param string $customer_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * Sets customer id.
+     *
+     * @param string $customerId
+     * @return $this
      */
-    public function setCustomerId($customer_id);
+    public function setCustomerId($customerId);
 
     /**
-     * Get billing_frequency_id
+     * Gets billing frequency id.
+     *
      * @return string|null
      */
     public function getBillingFrequencyId();
 
     /**
-     * Set billing_frequency_id
-     * @param string $billing_frequency_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * Sets billing frequency id.
+     *
+     * @param string $billingFrequencyId
+     * @return $this
      */
-    public function setBillingFrequencyId($billing_frequency_id);
+    public function setBillingFrequencyId($billingFrequencyId);
 
     /**
-     * Get label
+     * Gets label.
+     *
      * @return string|null
      */
     public function getLabel();
 
     /**
-     * Set label
-     * @param string $label
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
-     */
-    public function setLabel($label);
-
-    /**
-     * Get unit
+     * Gets unit.
+     *
      * @return string|null
      */
     public function getUnit();
 
     /**
-     * Set unit
+     * Sets unit.
+     *
      * @param string $unit
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @return $this
      */
     public function setUnit($unit);
 
     /**
-     * Get website_id
+     * Gets website id.
+     *
      * @return string|null
      */
     public function getWebsiteId();
 
     /**
-     * Set website_id
-     * @param string $website_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * Sets website id.
+     *
+     * @param string $websiteId
+     * @return $this
      */
-    public function setWebsiteId($website_id);
+    public function setWebsiteId($websiteId);
 
     /**
-     * Get status
+     * Gets status.
+     *
      * @return string|null
      */
     public function getStatus();
 
     /**
-     * Set status
+     * Sets status.
+     *
      * @param string $status
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @return $this
      */
     public function setStatus($status);
 
     /**
-     * Get frequency
+     * Gets frequency.
+     *
      * @return string|null
      */
     public function getFrequency();
 
     /**
-     * Set frequency
+     * Sets frequency.
+     *
      * @param string $frequency
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @return $this
      */
     public function setFrequency($frequency);
 
     /**
-     * Get engine
+     * Gets engine.
+     *
      * @return string|null
      */
     public function getEngineCode();
 
     /**
-     * Set engine code
+     * Sets engine code.
+     *
      * @param string $engineCode
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @return $this
      */
     public function setEngineCode($engineCode);
 
     /**
-     * Get billing address id
+     * Gets subscription profile addresses.
+     *
+     * @return SubscriptionProfileAddressInterface[]
+     */
+    public function getAddresses();
+
+    /**
+     * Sets subscription profile addresses.
+     *
+     * @param SubscriptionProfileAddressInterface[] $addresses
+     * @return $this
+     */
+    public function setAddresses($addresses);
+
+    /**
+     * Gets subscription profile products.
+     *
+     * @return ProductSubscriptionProfileInterface[]
+     */
+    public function getProducts();
+
+    /**
+     * Sets subscription profile products.
+     *
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return $this
+     */
+    public function setProducts($products);
+
+    /**
+     * Gets subscription profile shipping address.
+     *
+     * @return SubscriptionProfileAddressInterface
+     */
+    public function getShippingAddress();
+
+    /**
+     * Gets subscription profile billing address.
+     *
+     * @return SubscriptionProfileAddressInterface
+     */
+    public function getBillingAddress();
+
+    /**
+     * Gets start date.
+     *
      * @return string|null
      */
-    public function getBillingAddressId();
+    public function getStartDate();
 
     /**
-     * Set billing address id
-     * @param string $addressId
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * Sets start date.
+     *
+     * @param string $startDate
+     * @return $this
      */
-    public function setBillingAddressId($addressId);
+    public function setStartDate($startDate);
 
     /**
-     * Get shipping address id
+     * Gets trial start date.
+     *
      * @return string|null
      */
-    public function getShippingAddressId();
+    public function getTrialStartDate();
 
     /**
-     * Set shipping address id
-     * @param string $addressId
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * Sets trial start date.
+     *
+     * @param string $trialStartDate
+     * @return $this
      */
-    public function setShippingAddressId($addressId);
+    public function setTrialStartDate($trialStartDate);
+
+    /**
+     * Gets term.
+     *
+     * @return string|null
+     */
+    public function getTerm();
+
+    /**
+     * Sets term.
+     *
+     * @param string $term
+     * @return $this
+     */
+    public function setTerm($term);
+
+    /**
+     * Gets total billing cycles.
+     *
+     * @return int|null
+     */
+    public function getTotalBillingCycles();
+
+    /**
+     * Sets total billing cycles.
+     *
+     * @param int $totalBillingCycles
+     * @return $this
+     */
+    public function setTotalBillingCycles($totalBillingCycles);
+
+    /**
+     * Gets shipping method.
+     *
+     * @return string|null
+     */
+    public function getShippingMethod();
+
+    /**
+     * Sets shipping method.
+     *
+     * @param string $shippingMethod
+     * @return $this
+     */
+    public function setShippingMethod($shippingMethod);
+
+    /**
+     * Gets shipping description.
+     *
+     * @return string|null
+     */
+    public function getShippingDescription();
+
+    /**
+     * Sets shipping description.
+     *
+     * @param string $shippingDescription
+     * @return $this
+     */
+    public function setShippingDescription($shippingDescription);
+
+    /**
+     * Gets profile currency code.
+     *
+     * @return string|null
+     */
+    public function getProfileCurrencyCode();
+
+    /**
+     * Sets profile currency code.
+     *
+     * @param string $profileCurrencyCode
+     * @return $this
+     */
+    public function setProfileCurrencyCode($profileCurrencyCode);
+
+    /**
+     * Gets  trial length.
+     *
+     * @return string|null
+     */
+    public function getTrialLength();
+
+    /**
+     * Sets trial length.
+     *
+     * @param string $trialLength
+     * @return $this
+     */
+    public function setTrialLength($trialLength);
+
+    /**
+     * Gets  trial length unit.
+     *
+     * @return string|null
+     */
+    public function getTrialLengthUnit();
+
+    /**
+     * Sets trial length unit.
+     *
+     * @param string $trialLengthUnit
+     * @return $this
+     */
+    public function setTrialLengthUnit($trialLengthUnit);
 }

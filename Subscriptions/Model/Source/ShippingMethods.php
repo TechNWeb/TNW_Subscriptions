@@ -12,10 +12,13 @@ use Magento\Quote\Model\Quote\Address\Rate;
 use Magento\Tax\Helper\Data;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 
+/**
+ * Class ShippingMethods
+ */
 class ShippingMethods
 {
     /**
-     * @var
+     * @var ModelQuote
      */
     private $quote;
 

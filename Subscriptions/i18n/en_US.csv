@@ -38,3 +38,8 @@
 "The discount cannot exceed the total product cost.","The discount cannot exceed the total product cost."
 "Billed & Shipped every %s","Billed & Shipped every %s"
 "Shipping method is required and can't be empty.","Shipping method is required and can't be empty."
+"Customer validation failed.","Customer validation failed."
+"Payment: ","Payment: "
+"Quote validation is failed.","Quote validation is failed."
+"Total of %s profiles was created.","Total of %s profiles was created."
+"Can not create profile with empty frequency.","Can not create profile with empty frequency."

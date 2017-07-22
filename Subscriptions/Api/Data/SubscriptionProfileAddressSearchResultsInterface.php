@@ -8,19 +8,19 @@ namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Framework\Api\SearchResultsInterface;
 
-interface SubscriptionProfileOrderSearchResultsInterface extends SearchResultsInterface
+interface SubscriptionProfileAddressSearchResultsInterface extends SearchResultsInterface
 {
     /**
-     * Gets Subscription Profile Order list.
+     * Get SubscriptionProfileOrder list.
      *
-     * @return SubscriptionProfileOrderInterface[]
+     * @return SubscriptionProfileAddressInterface[]
      */
     public function getItems();
 
     /**
-     * Sets sSubscription Profile Order list.
+     * Set subscription_profile_id list.
      *
-     * @param SubscriptionProfileOrderInterface[] $items
+     * @param SubscriptionProfileAddressInterface[] $items
      * @return $this
      */
     public function setItems(array $items);
