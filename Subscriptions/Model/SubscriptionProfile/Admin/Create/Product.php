@@ -144,6 +144,8 @@ class Product extends Create
                         'period' => $productData['period'],
                         'is_trial' => $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
+                        'trial_period' => $product->getData(Trial::CODE_TRIAL_LENGTH),
+                        'trial_unit_id' => (int)$product->getData(Trial::CODE_TRIAL_LENGTH_UNIT),
                     ],
                     'non_unique' => [
                         'price' => $this->priceCalculator->getUnitPrice(
@@ -154,10 +156,8 @@ class Product extends Create
                     ],
                 ],
             ];
-
             $this->buyRequest = new DataObject($data);
         }
-
 
         return $this->buyRequest;
     }

@@ -227,10 +227,10 @@ class Create extends BaseCreate
 
         if ($item) {
             $request = $item->getBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
+                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
 
             $newRequest = $this->productModifier->getPreparedBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . self::UNIQUE);
+                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
 
             if ($request == $newRequest) {
                 $result = true;

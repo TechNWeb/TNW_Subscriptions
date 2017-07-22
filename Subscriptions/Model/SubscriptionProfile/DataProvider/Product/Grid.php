@@ -44,6 +44,7 @@ class Grid extends ProductDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $collectionFactory,
             $addFieldStrategies, $addFilterStrategies, $meta, $data
         );
+        $this->addField('tnw_subscr_unlock_preset_qty');
     }
 
     /**
