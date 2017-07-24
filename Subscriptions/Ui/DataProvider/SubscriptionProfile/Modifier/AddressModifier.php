@@ -34,10 +34,16 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     const INFO_FIELDSET_NAME = 'info_fields';
     const ADDRESS_FIELDSET_NAME = 'address_fields';
     /**#@-*/
+
+    /**
+     * Select form component with customer addresses list.
+     */
+    const CUSTOMER_ADDRESS_SELECT = 'customer_address_id';
+
     /**
      * Information fieldSet attributes.
      */
-    const INFO_ATTRIBUTES = [
+    private $infoAttributes = [
         'firstname',
         'lastname',
         'company',
@@ -47,17 +53,12 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     /**
      * Attributes that will not be shown.
      */
-    const SKIPPED_ATTRIBUTES = [
+    private $skippedAttributes = [
         'region',
         'prefix',
         'middlename',
         'suffix'
     ];
-
-    /**
-     * Select form component with customer addresses list.
-     */
-    const CUSTOMER_ADDRESS_SELECT = 'customer_address_id';
 
     /**
      * Frontend inputs and form elements mapping.
@@ -264,7 +265,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         $sortOrder = 2;
         /** @var Attribute $attribute */
         foreach ($attributes as $attribute) {
-            if (!in_array($attribute->getAttributeCode(), self::SKIPPED_ATTRIBUTES)) {
+            if (!in_array($attribute->getAttributeCode(), $this->skippedAttributes)) {
                 $lineCount = $attribute->getMultilineCount();
                 $i = 0;
                 //The cycle here is for multiline attributes (to show all necessary lines on the form)
@@ -594,7 +595,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getFieldSetName($attributeCode)
     {
-        if (in_array($attributeCode, self::INFO_ATTRIBUTES)) {
+        if (in_array($attributeCode, $this->infoAttributes)) {
             $fieldSetName = static::INFO_FIELDSET_NAME;
         } else {
             $fieldSetName = static::ADDRESS_FIELDSET_NAME;
@@ -640,7 +641,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     private function getImportsData($attributeCode)
     {
         $imports = [];
-        if (!in_array($attributeCode, self::INFO_ATTRIBUTES)) {
+        if (!in_array($attributeCode, $this->infoAttributes)) {
             $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
         }
 
@@ -721,7 +722,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     private function getAddressData($addressData)
     {
         $addressArray = [];
-        foreach (self::INFO_ATTRIBUTES as $attributeCode) {
+        foreach ($this->infoAttributes as $attributeCode) {
             /** @var string $attributeCode */
             if (isset($addressData[$attributeCode])) {
                 $addressArray[$attributeCode] = $addressData[$attributeCode];

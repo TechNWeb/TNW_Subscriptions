@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Framework\Api\Filter;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
@@ -69,7 +68,6 @@ class Account extends AbstractDataProvider
      * @param Quote $session
      * @param CustomerRepository $customerRepository
      * @param PoolInterface $modifiersPool
-     * @param ObjectManagerInterface $objectManager
      * @param array $meta
      * @param array $data
      */
@@ -82,7 +80,6 @@ class Account extends AbstractDataProvider
         Quote $session,
         CustomerRepository $customerRepository,
         PoolInterface $modifiersPool,
-        ObjectManagerInterface $objectManager,
         array $meta = [],
         array $data = []
     ) {
@@ -91,7 +88,6 @@ class Account extends AbstractDataProvider
         $this->stepPool = $stepPool;
         $this->customerRepository = $customerRepository;
         $this->modifiersPool = $modifiersPool;
-        $this->objectManager = $objectManager;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
