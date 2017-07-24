@@ -21,11 +21,12 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-use TNW\Subscriptions\Model\Source\ShippingMethods;
 
 class Product extends AbstractDataProvider
 {
@@ -101,6 +102,11 @@ class Product extends AbstractDataProvider
     private $shippingMethods;
 
     /**
+     * @var DescriptionCreator
+     */
+    private $frequencyDescriptionCreator;
+
+    /**
      * Product constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -113,6 +119,7 @@ class Product extends AbstractDataProvider
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
      * @param ShippingMethods $shippingMethods
+     * @param DescriptionCreator $frequencyDescriptionCreator
      * @param array $meta
      * @param array $data
      * @param string $scopeName
@@ -129,6 +136,7 @@ class Product extends AbstractDataProvider
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
         ShippingMethods $shippingMethods,
+        DescriptionCreator $frequencyDescriptionCreator,
         array $meta = [],
         array $data = [],
         $scopeName = ''
@@ -141,6 +149,7 @@ class Product extends AbstractDataProvider
         $this->frequencyUnitType = $frequencyUnitType;
         $this->frequencyRepository = $frequencyRepository;
         $this->shippingMethods = $shippingMethods;
+        $this->frequencyDescriptionCreator = $frequencyDescriptionCreator;
         $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
@@ -162,6 +171,7 @@ class Product extends AbstractDataProvider
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subscriptionData = null;
+            $fullSubscriptionData = null;
 
             if (empty($subQuote->getAllItems())) {
                 continue;
@@ -171,9 +181,21 @@ class Product extends AbstractDataProvider
             foreach ($subQuote->getAllItems() as $item) {
                 if (!$subscriptionData) {
                     $subscriptionData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . Create::UNIQUE
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
                     );
                 }
+                if (!$fullSubscriptionData) {
+                    $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
+                    );
+                } else {
+                    $nonUniqueData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
+                    );
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
+                        isset($nonUniqueData['price']) ? $nonUniqueData['price'] : 0;
+                }
+
 
                 $imageHelper = $this->imageHelper->init(
                     $item->getProduct(),
@@ -193,15 +215,12 @@ class Product extends AbstractDataProvider
 
             $estimatedPayment += ((double)$subTotal * (int)$subscriptionData['period']);
 
-            $startDate = $this->getFormattedStartDate($subscriptionData['start_on']);
-
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
-                'frequency_description' => $this->getFrequencyDescription(
-                    $subTotal,
-                    $subscriptionData,
-                    $startDate
+                'frequency_description' => $this->frequencyDescriptionCreator->getDescription(
+                    $subQuote,
+                    $fullSubscriptionData
                 ),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
@@ -231,74 +250,6 @@ class Product extends AbstractDataProvider
             $this->session->getStoreId(),
             $this->session->getCurrencyId()
         );
-    }
-
-
-    /**
-     * @param $startDate
-     * @return \Magento\Framework\Phrase|string
-     */
-    protected function getFormattedStartDate($startDate)
-    {
-        $nowDate = new \DateTime();
-        $nowDate = $nowDate->format('Y-m-d');
-
-        if ($startDate == $nowDate) {
-            $startDate = __('today');
-        } else {
-            $startDate = $this->context->getLocaleDate()->formatDate(
-                $startDate,
-                \IntlDateFormatter::LONG,
-                false
-            );
-        }
-
-        return $startDate;
-    }
-
-    /**
-     * @param float|string $totalPrice
-     * @param [] $subscriptionData
-     * @param string $startDate
-     * @return string
-     */
-    protected function getFrequencyDescription($totalPrice, $subscriptionData, $startDate)
-    {
-        $formattedPrice = $this->formatPrice($totalPrice);
-
-        $frequencyWithUnit = $this->getFrequencyWithUnit($subscriptionData['billing_frequency']);
-
-        $priceWithUnit = sprintf('<span>%s / %s %s</span>. ', $formattedPrice, __('every'), $frequencyWithUnit);
-        $description = sprintf(
-            __('Total of %s shipment(s). Products will be shipped every %s starting %s.'),
-            $subscriptionData['period'],
-            $frequencyWithUnit,
-            $startDate
-        );
-
-        return $priceWithUnit . $description;
-    }
-
-    /**
-     * @param string|int $billingFrequencyId
-     * @return string
-     */
-    protected function getFrequencyWithUnit($billingFrequencyId)
-    {
-        $billingFrequency = $this->frequencyRepository->getById(
-            $billingFrequencyId
-        );
-
-        $unit = $this->frequencyUnitType->getLabelByValue($billingFrequency->getUnit());
-
-
-        $result = $unit;
-
-        if ($billingFrequency->getFrequency() > 1) {
-            $result = $billingFrequency->getFrequency() . ' ' . $unit;
-        }
-
-        return strtolower($result);
     }
 
     /**
@@ -341,7 +292,6 @@ class Product extends AbstractDataProvider
 
         return $meta;
     }
-
 
     /**
      * @inheritdoc

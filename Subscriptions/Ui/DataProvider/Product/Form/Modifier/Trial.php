@@ -9,19 +9,13 @@ namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
 * Customize Trial field
 */
 class Trial extends BaseModifier
 {
-    const CODE_TRIAL = 'tnw_subscr_trial_status';
-    const CODE_TRIAL_LENGTH = 'tnw_subscr_trial_length';
-    const CODE_TRIAL_LENGTH_UNIT = 'tnw_subscr_trial_length_unit';
-    const CODE_TRIAL_PRICE = 'tnw_subscr_trial_price';
-    const CODE_TRIAL_START_DATE = 'tnw_subscr_trial_start_date';
-    const CODE_START_DATE = 'tnw_subscr_start_date';
-
     /**
      * @var ArrayManager
      */
@@ -53,13 +47,13 @@ class Trial extends BaseModifier
     public function modifyMeta(array $meta)
     {
         $trialLengthPath = $this->arrayManager->findPath(
-            self::CODE_TRIAL_LENGTH,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH,
             $meta,
             null,
             'children'
         );
         $trialLengthUnitPath = $this->arrayManager->findPath(
-            self::CODE_TRIAL_LENGTH_UNIT,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             $meta,
             null,
             'children'
@@ -72,7 +66,7 @@ class Trial extends BaseModifier
             $meta,
             [
                 'imports' => [
-                    'changeComment' => 'index = ' . static::CODE_TRIAL_LENGTH_UNIT . ':value',
+                    'changeComment' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT . ':value',
                 ],
                 'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
@@ -85,13 +79,13 @@ class Trial extends BaseModifier
                 'breakLine' => false,
                 'component' => 'Magento_Ui/js/form/components/group',
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                 ],
             ]
         );
         $meta = $this->arrayManager->set(
-            $trialLengthContainerPath . '/children/' . self::CODE_TRIAL_LENGTH_UNIT,
+            $trialLengthContainerPath . '/children/' . Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             $meta,
             $this->arrayManager->get($trialLengthUnitPath, $meta)
         );
@@ -99,7 +93,7 @@ class Trial extends BaseModifier
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_TRIAL_PRICE,
+                Attribute::SUBSCRIPTION_TRIAL_PRICE,
                 $meta,
                 null,
                 'children'
@@ -107,8 +101,8 @@ class Trial extends BaseModifier
             $meta,
             [
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':checked',
                     'changeComment' => 'index = price:value',
                 ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
@@ -120,7 +114,7 @@ class Trial extends BaseModifier
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_TRIAL_START_DATE,
+                Attribute::SUBSCRIPTION_TRIAL_START_DATE,
                 $meta,
                 null,
                 'children'
@@ -128,8 +122,8 @@ class Trial extends BaseModifier
             $meta,
             [
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',
@@ -138,7 +132,7 @@ class Trial extends BaseModifier
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_START_DATE,
+                Attribute::SUBSCRIPTION_START_DATE,
                 $meta,
                 null,
                 'children'
@@ -146,8 +140,8 @@ class Trial extends BaseModifier
             $meta,
             [
                 'imports' => [
-                    'visible' => '!ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
-                    'disabled' => 'ns = ${ $.ns }, index = ' . static::CODE_TRIAL . ':checked',
+                    'visible' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',

@@ -5,13 +5,13 @@
  */
 namespace TNW\Subscriptions\Model\Backend\Product\Attribute;
 
+use TNW\Subscriptions\Model\Product\Attribute;
+
 /**
  * tnw_subscr_discount_amount attribute backend model.
  */
 class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Price
 {
-    const CODE_DISCOUNT_TYPE = 'tnw_subscr_discount_type';
-    const CODE_FLAT_DISCOUNT = 'tnw_subscr_offer_flat_discount';
     const FLAT_FEE_DISCOUNT = 1;
     const PERCENT_DISCOUNT = 2;
 
@@ -46,11 +46,11 @@ class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Pr
      */
     private function checkDiscountLessProductPrice($object, $attrCode)
     {
-        $offerFlatDiscount = $object->getData(self::CODE_FLAT_DISCOUNT);
+        $offerFlatDiscount = $object->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT);
         if ($offerFlatDiscount) {
             $valueWithDiscount = 0;
             $discountAmountValue = $this->localeFormat->getNumber($object->getData($attrCode));
-            $discountAmountType = $object->getData(self::CODE_DISCOUNT_TYPE);
+            $discountAmountType = $object->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE);
             $productPrice = $this->localeFormat->getNumber($object->getPrice());
 
             if ($discountAmountType == self::FLAT_FEE_DISCOUNT) {

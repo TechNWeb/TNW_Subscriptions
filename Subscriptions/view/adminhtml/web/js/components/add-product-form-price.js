@@ -24,7 +24,7 @@ define([
             var frequencyPrices = this.source.data.product_frequencies;
 
             if (frequencyPrices && value && frequencyPrices[value]){
-                this.value(frequencyPrices[value]);
+                this.value(frequencyPrices[value].price);
             }
         }
     });

@@ -6,22 +6,22 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 class Checkmo extends Base
 {
     /**
-     * @param SubscriptionProfile $profile
+     * @param SubscriptionProfileInterface $profile
      */
-    public function processProfile(SubscriptionProfile $profile)
+    public function processProfile(SubscriptionProfileInterface $profile)
     {
         // TODO: Implement processProfile() method.
     }
 
     /**
-     * @param SubscriptionProfile $profile
+     * @param SubscriptionProfileInterface $profile
      */
-    public function updateProfile(SubscriptionProfile $profile)
+    public function updateProfile(SubscriptionProfileInterface $profile)
     {
         // TODO: Implement updateProfile() method.
     }

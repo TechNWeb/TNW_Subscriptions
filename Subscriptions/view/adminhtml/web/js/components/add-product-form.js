@@ -13,6 +13,9 @@ define(
                 modalForm: null,
                 ajaxSave: true,
                 configurableModal: null,
+                imports: {
+                    refreshProductQty: 'index = product_billing_frequency:value'
+                },
                 listens: {
                     responseStatus: 'processResponseStatus'
                 }
@@ -42,6 +45,60 @@ define(
             },
 
             /**
+             * Refresh product qty in modal grid.
+             *
+             * @param {string|integer} value
+             * @returns {void}
+             */
+            refreshProductQty: function (value) {
+                var rowIndex,
+                    grid,
+                    modalForm = this.getModalForm(),
+                    productId;
+
+                productId = (
+                    modalForm.configurableData != undefined &&
+                    modalForm.configurableData.hasOwnProperty('product_id')
+                ) ? modalForm.configurableData.product_id : null;
+
+                if (!productId) {
+                    return;
+                }
+
+                if (this.isConfigureRequired(productId)) {
+                    return;
+                }
+
+                grid = registry.get('index='+ this.source.modalGrid);
+
+                _.each(grid.externalSource().data.items, function (item, key) {
+                    if (item.entity_id === productId){
+                        rowIndex = key;
+                    }
+                });
+
+                if (rowIndex !== undefined) {
+
+                    var frequencyPrices = this.source.data.product_frequencies;
+                    if (frequencyPrices && value && frequencyPrices[value]) {
+
+                        grid.externalSource().set(
+                            'data.items.' + rowIndex + '.input_qty',
+                            frequencyPrices[value].preset_qty
+                        );
+                        grid.externalSource().set(
+                            'data.items.' + rowIndex + '.actions.view.label',
+                            '[' + $.mage.__('Change') + ']'
+                        );
+                    }
+
+                    // Update current qty for billing frequency.
+                    modalForm.configurableData.qty = frequencyPrices[value].preset_qty;
+                }
+            },
+
+            /**
+             * Run specified action for product.
              *
              * @param action
              * @param id
@@ -52,9 +109,11 @@ define(
                     product_id: id
                 };
 
-                this.openConfigurableModal();
-                // Add here logic when we have qty set by merchant
-                // this.renderForm();
+                if (this.isConfigureRequired(id)) {
+                    this.openConfigurableModal();
+                } else {
+                    this.renderForm(this.getModalForm(), this.getModalForm().configurableData);
+                }
             },
 
             /**
@@ -161,6 +220,31 @@ define(
 
                     this.submit();
                 }
+            },
+
+            /**
+             * Is configuration form should be displayed or not?
+             *
+             * @param {string|integer} productId
+             * @returns {boolean}
+             */
+            isConfigureRequired: function (productId) {
+                var grid = registry.get('index='+ this.source.modalGrid),
+                    items = grid.externalSource().data.items,
+                    result = false;
+
+                for (var index in items) {
+                    var product = items[index];
+                    if (product.hasOwnProperty('entity_id') && product.entity_id == productId) {
+                        result = (
+                            product.hasOwnProperty('tnw_subscr_unlock_preset_qty') &&
+                            product.tnw_subscr_unlock_preset_qty == 1
+                        );
+                        break;
+                    }
+                }
+
+                return !result;
             }
         });
     }

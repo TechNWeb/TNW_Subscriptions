@@ -168,6 +168,20 @@ class Quote extends SessionManager
     }
 
     /**
+     * @return bool|ModelQuote
+     */
+    public function getFirstQuote()
+    {
+        $result = false;
+
+        if (!empty($this->quotes)){
+            $result = reset($this->quotes);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param ModelQuote|int|string $quote
      * @return $this
      */
@@ -179,44 +193,6 @@ class Quote extends SessionManager
 
         $this->addSubQuoteId($quote->getId());
         $this->quotes[] = $quote;
-
-        return $this;
-    }
-
-    /**
-     * @return []|null
-     */
-    public function getBillingAddressData()
-    {
-        return $this->storage->getSubBillingAddressData();
-    }
-
-    /**
-     * @param [] $data
-     * @return $this
-     */
-    public function setBillingAddressData($data)
-    {
-        $this->storage->setSubBillingAddressData($data);
-
-        return $this;
-    }
-
-    /**
-     * @return []|null
-     */
-    public function getShippingAddressData()
-    {
-        return $this->storage->getSubShippingAddressData();
-    }
-
-    /**
-     * @param [] $data
-     * @return $this
-     */
-    public function setShippingAddressData($data)
-    {
-        $this->storage->setSubShippingAddressData($data);
 
         return $this;
     }
@@ -240,6 +216,44 @@ class Quote extends SessionManager
         return $this->storage->getCreateNewCustomer();
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setCustomerEmail($value)
+    {
+        $this->storage->setCustomerEmail($value);
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCustomerEmail()
+    {
+        return $this->storage->getCustomerEmail();
+    }
+
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setCustomerGroup($value)
+    {
+        $this->storage->setCustomerGroup($value);
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCustomerGroup()
+    {
+        return $this->storage->getCustomerGroup();
+    }
 
     public function clearStorage()
     {

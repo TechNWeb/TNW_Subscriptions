@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Product\Attribute;
+
 /**
  * Model to set product default attributes from configuration.
  */
@@ -52,19 +54,19 @@ class ProductDefaultAttributes
         $websiteId = $product ? $product->getStore()->getWebsiteId() : null;
         $dataDefault = [
             // General
-            'tnw_subscr_purchase_type' => $this->config->purchaseType($websiteId),
-            'tnw_subscr_start_date' => $this->config->startDateType($websiteId),
-            'tnw_subscr_lock_product_price' => $this->config->lockProductPriceStatus($websiteId) ? '1' : '0',
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE => $this->config->purchaseType($websiteId),
+            Attribute::SUBSCRIPTION_START_DATE => $this->config->startDateType($websiteId),
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $this->config->lockProductPriceStatus($websiteId) ? '1' : '0',
             // Discount
-            'tnw_subscr_offer_flat_discount' => $this->config->offerFlatDiscountStatus($websiteId) ? '1' : '0',
-            'tnw_subscr_discount_amount' => $this->config->discountAmount($websiteId),
-            'tnw_subscr_discount_type' => $this->config->discountType($websiteId),
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $this->config->offerFlatDiscountStatus($websiteId) ? '1' : '0',
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $this->config->discountAmount($websiteId),
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $this->config->discountType($websiteId),
             // Trial
-            'tnw_subscr_trial_status' => $this->config->trialStatus($websiteId) ? '1' : '0',
-            'tnw_subscr_trial_length' => $this->config->trialLength($websiteId),
-            'tnw_subscr_trial_length_unit' => $this->config->trialLengthUnit($websiteId),
-            'tnw_subscr_trial_price' => $this->config->trialPrice($websiteId),
-            'tnw_subscr_trial_start_date' => $this->config->trialStartDateType($websiteId),
+            Attribute::SUBSCRIPTION_TRIAL_STATUS => $this->config->trialStatus($websiteId) ? '1' : '0',
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH => $this->config->trialLength($websiteId),
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT => $this->config->trialLengthUnit($websiteId),
+            Attribute::SUBSCRIPTION_TRIAL_PRICE => $this->config->trialPrice($websiteId),
+            Attribute::SUBSCRIPTION_TRIAL_START_DATE => $this->config->trialStartDateType($websiteId),
         ];
 
         return $dataDefault;

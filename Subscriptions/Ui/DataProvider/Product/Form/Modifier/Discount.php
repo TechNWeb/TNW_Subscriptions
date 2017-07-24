@@ -9,16 +9,13 @@ namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
 * Customize Discount field
 */
 class Discount extends BaseModifier
 {
-    const CODE_DISCOUNT_TYPE = 'tnw_subscr_discount_type';
-    const CODE_DISCOUNT_AMOUNT = 'tnw_subscr_discount_amount';
-    const CODE_FLAT_DISCOUNT = 'tnw_subscr_offer_flat_discount';
-
     /**
      * @var ArrayManager
      */
@@ -50,13 +47,13 @@ class Discount extends BaseModifier
     public function modifyMeta(array $meta)
     {
         $discountAmountPath = $this->arrayManager->findPath(
-            self::CODE_DISCOUNT_AMOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
             $meta,
             null,
             'children'
         );
         $discountTypePath = $this->arrayManager->findPath(
-            self::CODE_DISCOUNT_TYPE,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             $meta,
             null,
             'children'
@@ -70,7 +67,7 @@ class Discount extends BaseModifier
             $meta,
             [
                 'imports' => [
-                    'changeComment' => 'index = ' . static::CODE_DISCOUNT_TYPE . ':value',
+                    'changeComment' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-discount-amount',
                 'componentType' => 'field',
@@ -91,13 +88,13 @@ class Discount extends BaseModifier
                 'breakLine' => false,
                 'component' => 'TNW_Subscriptions/js/components/discount-group',
                 'imports' => [
-                    'changedOfferDiscount' => 'index = ' . static::CODE_FLAT_DISCOUNT . ':checked',
-                    'changedLockPrice' => 'index = ' . LockPrice::CODE_LOCK_PRICE . ':checked',
+                    'changedOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
+                    'changedLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                 ],
             ]
         );
         $meta = $this->arrayManager->set(
-            $discountAmountContainerPath . '/children/' . self::CODE_DISCOUNT_TYPE,
+            $discountAmountContainerPath . '/children/' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             $meta,
             $this->arrayManager->get($discountTypePath, $meta)
         );

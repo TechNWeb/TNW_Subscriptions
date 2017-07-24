@@ -6,23 +6,23 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 interface EngineInterface
 {
     /**
      * Process profile
      *
-     * @param SubscriptionProfile $profile
+     * @param SubscriptionProfileInterface $profile
      * @return mixed
      */
-    public function processProfile(SubscriptionProfile $profile);
+    public function processProfile(SubscriptionProfileInterface $profile);
 
     /**
      * Update profile
      *
-     * @param SubscriptionProfile $profile
-     * @return SubscriptionProfile
+     * @param SubscriptionProfileInterface $profile
+     * @return SubscriptionProfileInterface
      */
-    public function updateProfile(SubscriptionProfile $profile);
+    public function updateProfile(SubscriptionProfileInterface $profile);
 }

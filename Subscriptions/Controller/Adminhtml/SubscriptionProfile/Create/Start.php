@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
 class Start extends SubscriptionProfile
 {

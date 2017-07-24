@@ -15,9 +15,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class LinkedDataProvider
@@ -100,7 +98,7 @@ class LinkedDataProvider extends AbstractDataProvider
     {
         $collection = parent::getCollection();
         $collection->addAttributeToFilter(
-            'tnw_subscr_purchase_type',
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             [
                 'in' => [
                     PurchaseType::RECURRING_PURCHASE_TYPE,
@@ -110,11 +108,11 @@ class LinkedDataProvider extends AbstractDataProvider
         );
 
         $collection->addAttributeToSelect([
-            UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
-            LockPrice::CODE_LOCK_PRICE,
-            LockPrice::CODE_FLAT_DISCOUNT,
-            Discount::CODE_DISCOUNT_AMOUNT,
-            Discount::CODE_DISCOUNT_TYPE,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE
         ]);
 
         if (!$this->tablesJoined) {

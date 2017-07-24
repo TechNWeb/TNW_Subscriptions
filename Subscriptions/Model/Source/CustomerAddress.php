@@ -10,30 +10,63 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Helper\Address;
 use Magento\Customer\Model\Address\Mapper;
-use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Escaper;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
+use Magento\Framework\Data\OptionSourceInterface;
 
 /**
- * Trial length unit type attribute and configuration data source.
+ * Customer addresses data source.
  */
-class CustomerAddress extends AbstractSource
+class CustomerAddress implements OptionSourceInterface
 {
-    /** @var Quote */
+    /**
+     * Admin session.
+     *
+     * @var Quote
+     */
     private $session;
-    /** @var Address */
+
+    /**
+     * Address helper.
+     *
+     * @var Address
+     */
     private $addressHelper;
-    /** @var AddressRepositoryInterface */
+
+    /**
+     * Repository for retrieving customer addresses.
+     *
+     * @var AddressRepositoryInterface
+     */
     private $addressService;
-    /** @var SearchCriteriaBuilder */
+
+    /**
+     * Search criteria builder.
+     *
+     * @var SearchCriteriaBuilder
+     */
     private $criteriaBuilder;
-    /** @var FilterBuilder */
+
+    /**
+     * Filter builder.
+     *
+     * @var FilterBuilder
+     */
     private $filterBuilder;
-    /** @var Mapper */
+
+
+    /**
+     * Address mapper.
+     *
+     * @var Mapper
+     */
     private $addressMapper;
-    /** @var Escaper */
+
+    /**
+     * @var Escaper
+     */
     private $escaper;
 
     /**
@@ -68,7 +101,7 @@ class CustomerAddress extends AbstractSource
     /**
      * @return array
      */
-    public function getAllOptions()
+    public function toOptionArray()
     {
         $optionList = [];
 
@@ -93,10 +126,13 @@ class CustomerAddress extends AbstractSource
     }
 
     /**
+     * Returns list of customer addresses.
+     *
      * @return AddressInterface[]
      */
     protected function getAddressCollection()
     {
+        $result = [];
         if ($this->getCustomerId()) {
             $filter = $this->filterBuilder
                 ->setField('parent_id')
@@ -105,17 +141,20 @@ class CustomerAddress extends AbstractSource
                 ->create();
             $this->criteriaBuilder->addFilters([$filter]);
             $searchCriteria = $this->criteriaBuilder->create();
-            $result = $this->addressService->getList($searchCriteria);
-            return $result->getItems();
+            $result = $this->addressService->getList($searchCriteria)
+                ->getItems();
         }
-        return [];
+
+        return $result;
     }
 
     /**
+     * Returns converted customer address.
+     *
      * @param AddressInterface $address
      * @return string
      */
-    protected function getAddressAsString(AddressInterface $address)
+    private function getAddressAsString(AddressInterface $address)
     {
         $formatTypeRenderer = $this->addressHelper->getFormatTypeRenderer('oneline');
         $result = '';
@@ -126,7 +165,12 @@ class CustomerAddress extends AbstractSource
         return $this->escaper->escapeHtml($result);
     }
 
-    protected function getCustomerId()
+    /**
+     * Returns customer id from session.
+     *
+     * @return int
+     */
+    private function getCustomerId()
     {
         return $this->session->getCustomerId();
     }
