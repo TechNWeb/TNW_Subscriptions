@@ -157,7 +157,7 @@ class Manager
 
             if ($buyRequest[Create::UNIQUE]['is_trial']) {
                 $this->getProfileProduct()->setTrialPrice($item->getPrice());
-                $this->getProfileProduct()->setPrice($buyRequest['non_unique']['price']);
+                $this->getProfileProduct()->setPrice($buyRequest[Create::NON_UNIQUE]['price']);
             }
         }
 
