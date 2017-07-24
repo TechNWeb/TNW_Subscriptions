@@ -109,7 +109,17 @@ class CustomerAddress implements OptionSourceInterface
             $optionList[] = [
                 'value' => $address->getId(),
                 'label' => $this->getAddressAsString($address),
+                'empty' => false
             ];
+        }
+
+        if (count($optionList) > 0) {
+            $optionList[] = [
+                'value' => 0,
+                'label' => '',
+                'empty' => true
+            ];
+
         }
 
         return $optionList;

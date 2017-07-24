@@ -45,6 +45,13 @@ class Address extends Create
     private $customerFormFactory;
 
     /**
+     * Customer metadata form.
+     *
+     * @var Form
+     */
+    private $addressForm;
+
+    /**
      * Address constructor.
      * @param Context $context
      * @param SessionManagerInterface $session
@@ -104,7 +111,9 @@ class Address extends Create
                 $addressObject->setSaveInAddressBook(false);
                 $result = true;
             } else {
+                $address = $this->formatMultiLineAttributes($address);
                 $addressObject->setData($address);
+                $addressObject->setAddressType($addressType);
                 $result = $this->checkQuoteAddress($addressObject, $address);
             }
         }
@@ -112,7 +121,7 @@ class Address extends Create
         //check if we have errors on address validation
         //may be make sense don't do this and always save address to quotes
         if ($result === true) {
-            $addressObject->setSaveInAddressBook(!empty($address['save_in_address_book']));
+            $addressObject->setSaveInAddressBook(!empty($address['save_address']));
 
             foreach ($session->getSubQuotes() as $subQuote) {
                 if ($addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING) {
@@ -187,11 +196,11 @@ class Address extends Create
      *
      * @param QuoteAddress $address
      * @param [] $data
-     * @return array
+     * @return array|bool
      */
     private function checkQuoteAddress(QuoteAddress $address, array $data)
     {
-        $result = [];
+        $result = true;
 
         $addressForm = $this->getCustomerForm();
 
@@ -226,14 +235,44 @@ class Address extends Create
      */
     private function getCustomerForm()
     {
-        $addressForm = $this->customerFormFactory->create(
-            'customer_address',
-            'adminhtml_customer_address',
-            [],
-            false,
-            false
-        );
+        if (!$this->addressForm) {
+            $this->addressForm = $this->customerFormFactory->create(
+                'customer_address',
+                'adminhtml_customer_address',
+                [],
+                false,
+                false
+            );
 
-        return $addressForm;
+        }
+
+        return $this->addressForm;
+    }
+
+    /**
+     * Format multiline attributes for validation and save into the database.
+     *
+     * @param array $address
+     * @return array
+     */
+    private function formatMultiLineAttributes($address)
+    {
+        $addressForm = $this->getCustomerForm();
+        $allowedAttributes = $addressForm->getAllowedAttributes();
+
+        /** @var \Magento\Customer\Api\Data\AttributeMetadataInterface $attribute */
+        foreach ($allowedAttributes as $attributeCode => $attribute) {
+            if ($attribute->getFrontendInput() == 'multiline') {
+                foreach ($address as $key => $addressValue) {
+                    if (stripos($key, $attributeCode) !== false) {
+                        $attributeKey = explode($attributeCode, $key)[1];
+                        $address[$attributeCode][$attributeKey] = $addressValue;
+                        unset($address[$key]);
+                    }
+                }
+            }
+        }
+
+        return $address;
     }
 }
