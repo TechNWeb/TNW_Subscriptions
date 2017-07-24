@@ -82,6 +82,7 @@ class PriceCalculator
     {
         $price = 0;
         if ($productId && $billingFrequencyId) {
+            /** @var Product $product */
             $product = $this->productRepository->getById($productId);
             $trialOffered = $this->getTrialOfferedStatus($product);
             $initialFee = $this->getInitialFee($billingFrequencyId, $productId);
@@ -91,7 +92,7 @@ class PriceCalculator
                 $price = $trialPrice ? $trialPrice + $initialFee : 0;
             } else {
                 if ($lockProductPrice) {
-                    $lockPrice = $product->getPrice();
+                    $lockPrice = $product->getOrigData('price');
                     $discountAmount = $this->getDiscountAmount($product);
                     $price = $lockPrice + $initialFee - $discountAmount;
                 } else {
