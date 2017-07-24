@@ -127,7 +127,7 @@ define([
          *
          * @param currentValue
          */
-        updateHeader:function (currentValue) {debugger;
+        updateHeader:function (currentValue) {
             var regExp = /.*?(\.\d+)/ig;
             var containerName = regExp.exec(this.parentName);
             if (containerName != null) {

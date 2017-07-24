@@ -7,14 +7,14 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
+use Magento\Framework\Api\Filter;
 use Magento\Framework\ObjectManagerInterface;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Magento\Framework\Api\Filter;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\Pool;
 
 class Account extends AbstractDataProvider
 {
@@ -25,23 +25,42 @@ class Account extends AbstractDataProvider
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
 
-    const ADDRESS_MODIFIER = 'TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\AddressModifier';
-    
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
-    /** @var Quote */
-    private $session;
-    /** @var CustomerRepository */
-    private $customerRepository;
-    /** @var \TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\Pool */
-    private $modifiersPool;
-    /** @var ObjectManagerInterface */
-    private $objectManager;
+    /**
+     * Url Builder.
+     *
+     * @var UrlInterface
+     */
+    private $urlBuilder;
 
     /**
-     * DataProvider constructor.
+     * Steps pool for creating subscription.
+     *
+     * @var StepPool
+     */
+    private $stepPool;
+
+    /**
+     * Admin session.
+     *
+     * @var Quote
+     */
+    private $session;
+
+    /** Customers retrieving repository.
+     *
+     * @var CustomerRepository
+     */
+    private $customerRepository;
+
+    /**
+     * Modifiers pool.
+     *
+     * @var Pool
+     */
+    private $modifiersPool;
+
+    /**
+     * Account constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -49,8 +68,8 @@ class Account extends AbstractDataProvider
      * @param StepPool $stepPool
      * @param Quote $session
      * @param CustomerRepository $customerRepository
-     * PoolInterface $modifiersPool
-     * ObjectManagerInterface $objectManager
+     * @param PoolInterface $modifiersPool
+     * @param ObjectManagerInterface $objectManager
      * @param array $meta
      * @param array $data
      */
@@ -78,9 +97,7 @@ class Account extends AbstractDataProvider
     }
 
     /**
-     * Get data
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getData()
     {
@@ -100,13 +117,15 @@ class Account extends AbstractDataProvider
             ];
         }
 
-        $data = $this->modifyPool($data, 'modifyData');
+        foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            $data = $modifier->modifyData($data);
+        }
 
         return $data;
     }
 
     /**
-     * @return array|mixed
+     * @inheritdoc
      */
     public function getConfigData()
     {
@@ -137,47 +156,10 @@ class Account extends AbstractDataProvider
     {
         $meta = parent::getMeta();
 
-        $meta = $this->modifyPool($meta, 'modifyMeta');
+        foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            $meta = $modifier->modifyMeta($meta);
+        }
 
         return $meta;
-    }
-
-    /**
-     * Calls UIComponent modifiers.
-     *
-     * @param array $modificationData
-     * @param string $method
-     * @return array
-     */
-    private function modifyPool($modificationData, $method)
-    {
-        foreach ($this->modifiersPool->getModifiers() as $modifierData) {
-            $modifierClass = $modifierData['class'];
-            $modifier = $this->getModifierInstance($modifierClass);
-            if ($modifierClass == self::ADDRESS_MODIFIER) {
-                $modifier->setIsShippingFieldSet(true);
-            }
-            $modificationData = $modifier->$method($modificationData);
-        }
-
-        return $modificationData;
-
-    }
-
-    /**
-     * @param string $modifierClass
-     * @return ModifierInterface
-     */
-    private function getModifierInstance($modifierClass)
-    {
-        /** @var ModifierInterface $modifierClass */
-        $modifier = $this->objectManager->get($modifierClass);
-        if (!$modifier instanceof ModifierInterface) {
-            throw new \InvalidArgumentException(
-                'Type "' . $modifierClass . '" is not an instance of ' . ModifierInterface::class
-            );
-        }
-
-        return $modifier;
     }
 }

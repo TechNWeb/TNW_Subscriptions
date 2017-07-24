@@ -127,9 +127,9 @@ class Process extends Create
     private function processAccountData($data)
     {
         if (isset($data['account'])){
-            $account = !empty($data['account']['email']) ? $data['account']['email'] : null;
+            $email = !empty($data['account']['email']) ? $data['account']['email'] : null;
             $group = !empty($data['account']['group']) ? $data['account']['group'] : null;
-            $this->_getSession()->setCustomerEmail($account);
+            $this->_getSession()->setCustomerEmail($email);
             $this->_getSession()->setCustomerGroup($group);
         }
 

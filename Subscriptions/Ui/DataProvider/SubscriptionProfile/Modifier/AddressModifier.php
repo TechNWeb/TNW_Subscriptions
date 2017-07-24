@@ -149,7 +149,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         AddressRepository $addressRepository,
         AddressMapper $addressMapper,
         CustomerMapper $customerMapper,
-        \TNW\Subscriptions\Model\Backend\Session\Quote $session
+        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
+        $isShipping
     ) {
         $this->attributeMetadataDataProvider = $attributeMetadataDataProvider;
         $this->customerRepository = $customerRepository;
@@ -157,6 +158,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         $this->addressMapper = $addressMapper;
         $this->customerMapper = $customerMapper;
         $this->session = $session;
+        $this->isShipping = $isShipping;
     }
 
     /**
@@ -428,15 +430,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         }
 
         return array($attributeMeta, $additionalClasses);
-    }
-
-    /**
-     * @param bool $isShipping
-     * @return void
-     */
-    public function setIsShippingFieldSet($isShipping)
-    {
-        $this->isShipping = $isShipping;
     }
 
     /**
