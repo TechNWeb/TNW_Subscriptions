@@ -13,6 +13,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Catalog\Model\Product;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 class InstallData implements InstallDataInterface
 {
@@ -43,7 +44,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_purchase_type',
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -72,7 +73,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_trial_status',
+            Attribute::SUBSCRIPTION_TRIAL_STATUS,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -101,7 +102,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_trial_length',
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH,
             [
                 'type' => 'varchar',
                 'backend' => '',
@@ -130,7 +131,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_trial_length_unit',
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -159,7 +160,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_trial_price',
+            Attribute::SUBSCRIPTION_TRIAL_PRICE,
             [
                 'type' => 'varchar',
                 'backend' => '',
@@ -188,7 +189,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_trial_start_date',
+            Attribute::SUBSCRIPTION_TRIAL_START_DATE,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -217,7 +218,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_start_date',
+            Attribute::SUBSCRIPTION_START_DATE,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -246,7 +247,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_lock_product_price',
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -275,7 +276,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_offer_flat_discount',
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
             [
                 'type' => 'int',
                 'backend' => '',
@@ -304,7 +305,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_discount_amount',
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
             [
                 'type' => 'varchar',
                 'backend' => '',
@@ -333,7 +334,7 @@ class InstallData implements InstallDataInterface
 
         $eavSetup->addAttribute(
             Product::ENTITY,
-            'tnw_subscr_discount_type',
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             [
                 'type' => 'varchar',
                 'backend' => '',

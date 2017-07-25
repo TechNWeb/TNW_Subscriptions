@@ -9,15 +9,13 @@ namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
 * Customize Price field
 */
 class LockPrice extends AbstractModifier
 {
-    const CODE_LOCK_PRICE = 'tnw_subscr_lock_product_price';
-    const CODE_FLAT_DISCOUNT = 'tnw_subscr_offer_flat_discount';
-
     /**
      * @var ArrayManager
      */
@@ -47,7 +45,7 @@ class LockPrice extends AbstractModifier
     {
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_LOCK_PRICE,
+                Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
                 $meta,
                 null,
                 'children'
@@ -61,7 +59,7 @@ class LockPrice extends AbstractModifier
 
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_FLAT_DISCOUNT,
+                Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
                 $meta,
                 null,
                 'children'
@@ -69,8 +67,8 @@ class LockPrice extends AbstractModifier
             $meta,
             [
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . static::CODE_LOCK_PRICE . ':checked',
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
+                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                 ],
                 'notice' =>  __('Apply a flat discount on top of the product price.'),
             ]

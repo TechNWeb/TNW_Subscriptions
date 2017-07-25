@@ -63,10 +63,7 @@ class Review extends AbstractDataProvider
         $configData = parent::getConfigData();
 
         $configData['submit_url'] = $this->urlBuilder->getUrl(
-            '*/subscriptionprofile_create/process',
-            [
-                StepPool::STEP_PARAM_NAME => $this->stepPool->getNextStep()
-            ]
+            '*/subscriptionprofile/save'
         );
 
         return $configData;

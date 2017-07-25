@@ -92,7 +92,7 @@ class Attribute
             $this->eavEntityType->loadByCode(ProductSubscriptionProfile::ENTITY);
             $groupCollection = $this->groupCollectionFactory->create()
                 ->setAttributeSetFilter($this->eavEntityType->getDefaultAttributeSetId())
-                ->addFieldToFilter('attribute_group_code', ProductSubscriptionProfile::DEFAUL_GROUP_CODE)
+                ->addFieldToFilter('attribute_group_code', ProductSubscriptionProfile::DEFAULT_GROUP_CODE)
                 ->setPageSize(1)
                 ->load();
             $group = $groupCollection->getFirstItem();

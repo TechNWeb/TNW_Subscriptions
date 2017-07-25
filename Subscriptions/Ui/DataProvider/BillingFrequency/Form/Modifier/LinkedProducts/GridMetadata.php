@@ -6,19 +6,17 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
+use Magento\Framework\Phrase;
+use Magento\Framework\Registry;
 use Magento\Framework\UrlFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form\Element\DataType\Number;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
-use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Phrase;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use Magento\Framework\Registry;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class Metadata for LinkedProducts
@@ -269,9 +267,9 @@ class GridMetadata
         );
 
         $lockProductPriceColumn = $this->getColumnBaseData(
-            LockPrice::CODE_LOCK_PRICE,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
             false,
-            __(LockPrice::CODE_LOCK_PRICE),
+            __(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
             50
         );
         $lockProductPriceColumn = $this->setColumnSpecialData(
@@ -286,9 +284,9 @@ class GridMetadata
         );
 
         $codeFlatDiscountColumn = $this->getColumnBaseData(
-            LockPrice::CODE_FLAT_DISCOUNT,
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
             false,
-            __(LockPrice::CODE_FLAT_DISCOUNT),
+            __(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
             60
         );
         $codeFlatDiscountColumn = $this->setColumnSpecialData(
@@ -303,9 +301,9 @@ class GridMetadata
         );
 
         $discountAmountColumn = $this->getColumnBaseData(
-            Discount::CODE_DISCOUNT_AMOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
             false,
-            __( Discount::CODE_DISCOUNT_AMOUNT),
+            __(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
             70
         );
         $discountAmountColumn = $this->setColumnSpecialData(
@@ -320,9 +318,9 @@ class GridMetadata
         );
 
         $discountTypeColumn = $this->getColumnBaseData(
-            Discount::CODE_DISCOUNT_TYPE,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             true,
-            __(Discount::CODE_DISCOUNT_TYPE),
+            __(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
             80
         );
         $discountTypeColumn = $this->setColumnSpecialData(
@@ -357,9 +355,9 @@ class GridMetadata
             ''
         );
 
-        $unlockPresetQtyColumn = $this->getColumnBaseData(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
+        $unlockPresetQtyColumn = $this->getColumnBaseData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             false,
-            __(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY),
+            __(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY),
             120
         );
         $unlockPresetQtyColumn = $this->setColumnSpecialData(

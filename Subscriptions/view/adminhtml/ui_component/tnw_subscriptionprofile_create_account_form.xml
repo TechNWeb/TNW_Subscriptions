@@ -78,67 +78,67 @@
             </field>
         </container>
     </fieldset>
-    <fieldset name="shipping">
+    <fieldset name="address_fields">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" xsi:type="string" translate="true">Shipping Information</item>
-                <item name="sortOrder" xsi:type="number">20</item>
-            </item>
-        </argument>
-        <field name="first_name">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">First Name</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.first_name</item>
-                </item>
-            </argument>
-        </field>
-        <field name="last_name">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Last Name</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.last_name</item>
-                </item>
-            </argument>
-        </field>
-        <field name="company">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Company</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.company</item>
-                </item>
-            </argument>
-        </field>
-        <field name="telephone">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Telephone</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.telephone</item>
-                </item>
-            </argument>
-        </field>
-    </fieldset>
-    <fieldset name="shipping_address">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" xsi:type="string" translate="true">Shipping Address</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/address-fieldset</item>
                 <item name="sortOrder" xsi:type="number">30</item>
             </item>
         </argument>
+        <container name="address_header">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/buttons</item>
+                    <item name="sortOrder" xsi:type="number">0</item>
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                </item>
+            </argument>
+            <field name="add_new_address_button">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" translate="true" xsi:type="string">Add New Address</item>
+                        <item name="formElement" xsi:type="string">button</item>
+                        <item name="componentType" xsi:type="string">button</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                        <item name="displayAsLink" xsi:type="boolean">true</item>
+                        <item name="sortOrder" xsi:type="number">0</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = customer_address_id:visible</item>
+                        </item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = address_fields</item>
+                                <item name="actionName" xsi:type="string">openAddressForm</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="pick_from_saved_button">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" translate="true" xsi:type="string">Pick from saved addresses</item>
+                        <item name="formElement" xsi:type="string">button</item>
+                        <item name="componentType" xsi:type="string">button</item>
+                        <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/button</item>
+                        <item name="displayAsLink" xsi:type="boolean">true</item>
+                        <item name="sortOrder" xsi:type="number">1</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="checkVisibility" xsi:type="string">!ns = ${ $.ns }, index = customer_address_id:visible</item>
+                        </item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = address_fields</item>
+                                <item name="actionName" xsi:type="string">closeAddressForm</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </container>
         <field name="customer_address_id">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddress</item>
@@ -147,7 +147,31 @@
                     <item name="label" xsi:type="boolean">false</item>
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="dataScope" xsi:type="string">account.customer_address_id</item>
+                    <item name="dataScope" xsi:type="string">customer_address_id</item>
+                    <item name="additionalClasses" xsi:type="string">wide-select</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/customer-address-id</item>
+                    <item name="sortOrder" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </field>
+        <field name="save_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="label" translate="true" xsi:type="string">Save in address book</item>
+                    <item name="dataScope" xsi:type="string">save_address</item>
+                    <item name="additionalClasses" xsi:type="string">admin_right-label</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/left-checkbox</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = add_new_address_button:visible</item>
+                    </item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="number">1</item>
+                        <item name="false" xsi:type="number">0</item>
+                    </item>
+
                 </item>
             </argument>
         </field>
@@ -159,6 +183,8 @@
                     <item name="formElement" xsi:type="string">button</item>
                     <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button-subscription</item>
                     <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="subButtonLeft" xsi:type="string">true</item>
+                    <item name="sortOrder" xsi:type="number">201</item>
                 </item>
             </argument>
         </field>

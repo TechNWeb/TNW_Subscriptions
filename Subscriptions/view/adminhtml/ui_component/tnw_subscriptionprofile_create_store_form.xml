@@ -43,7 +43,7 @@
         <field name="store_id">
             <argument name="data" xsi:type="array">
                 <item name="multiple" xsi:type="boolean">false</item>
-                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Store</item>
+                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Store</item>
                 <item name="config" xsi:type="array">
                     <item name="additionalClasses" xsi:type="string">subscription-store-fieldset</item>
                     <item name="dataType" xsi:type="string">text</item>
