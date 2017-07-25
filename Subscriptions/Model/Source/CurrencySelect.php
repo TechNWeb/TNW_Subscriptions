@@ -6,37 +6,51 @@
 
 namespace TNW\Subscriptions\Model\Source;
 
-use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
-use Magento\Store\Model\StoreManagerInterface;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 use Magento\Directory\Model\CurrencyFactory;
+use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Framework\Locale\CurrencyInterface;
+use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
+use Magento\Directory\Model\Currency;
 
+/**
+ * Class CurrencySelect
+ */
 class CurrencySelect extends AbstractSource
 {
-
     /**
+     * Store manager.
+     *
      * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var SessionQuote
+     * Admin session.
+     *
+     * @var SessionManagerInterface
      */
-    private $sessionQuote;
+    private $session;
 
     /**
+     * Current store.
+     *
      * @var StoreManagerInterface
      */
     private $store;
 
     /**
+     * Factory for creating Currency.
+     *
      * @var CurrencyFactory
      */
     private $currencyFactory;
 
     /**
+     * Provides access to currency config information.
+     *
      * @var CurrencyInterface
      */
     private $localeCurrency;
@@ -44,18 +58,18 @@ class CurrencySelect extends AbstractSource
     /**
      * CurrencySelect constructor.
      * @param StoreManagerInterface $storeManager
-     * @param SessionQuote $sessionQuote
+     * @param SessionManagerInterface $session
      * @param CurrencyFactory $currencyFactory
      * @param CurrencyInterface $localeCurrency
      */
     public function __construct(
         StoreManagerInterface $storeManager,
-        SessionQuote $sessionQuote,
+        SessionManagerInterface $session,
         CurrencyFactory $currencyFactory,
         CurrencyInterface $localeCurrency
     ) {
         $this->storeManager = $storeManager;
-        $this->sessionQuote = $sessionQuote;
+        $this->session = $session;
         $this->currencyFactory = $currencyFactory;
         $this->localeCurrency = $localeCurrency;
     }
@@ -100,9 +114,9 @@ class CurrencySelect extends AbstractSource
         $dirtyCodes = $this->getSelectedStore()->getAvailableCurrencyCodes();
         $codes = [];
         if (is_array($dirtyCodes) && count($dirtyCodes)) {
-            /** @var \Magento\Directory\Model\Currency $currency */
+            /** @var Currency $currency */
             $currency = $this->currencyFactory->create();
-            $rates =  $currency->getCurrencyRates(
+            $rates = $currency->getCurrencyRates(
                 $this->storeManager->getStore()->getBaseCurrency(),
                 $dirtyCodes
             );
@@ -123,8 +137,10 @@ class CurrencySelect extends AbstractSource
     public function getSelectedStore()
     {
         if ($this->store === null) {
-            $this->store = $this->storeManager->getStore($this->sessionQuote->getStoreId());
-            $currencyId = $this->sessionQuote->getCurrencyId();
+            /** @var SessionQuote $session */
+            $session = $this->session;
+            $this->store = $this->storeManager->getStore($session->getStoreId());
+            $currencyId = $session->getCurrencyId();
             if ($currencyId) {
                 $this->store->setCurrentCurrencyCode($currencyId);
             }
@@ -145,8 +161,9 @@ class CurrencySelect extends AbstractSource
         if ($this->store === null) {
             $this->getSelectedStore();
         }
-
-        $currencyId = $this->sessionQuote->getCurrencyId();
+        /** @var SessionQuote $session */
+        $session = $this->session;
+        $currencyId = $session->getCurrencyId();
         if ($currencyId) {
             $result = $currencyId;
         }
