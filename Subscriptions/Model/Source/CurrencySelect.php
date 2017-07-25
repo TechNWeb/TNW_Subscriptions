@@ -11,6 +11,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\Locale\CurrencyInterface;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
 class CurrencySelect extends AbstractSource
 {
@@ -151,5 +152,23 @@ class CurrencySelect extends AbstractSource
         }
 
         return $result;
+    }
+
+    /**
+     * Retrieve current data form part name from current step.
+     *
+     * @param string $currentStep
+     * @return string
+     */
+    public function getCurrentDataFormPartFromStep($currentStep)
+    {
+        $dataFormPart = '';
+
+        if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION
+            || $currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+            $dataFormPart = 'tnw_subscriptionprofile_create_' . $currentStep . '_form';
+        }
+
+        return $dataFormPart;
     }
 }
