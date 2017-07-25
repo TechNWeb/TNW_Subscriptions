@@ -67,7 +67,7 @@
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
                 <item name="billing-address" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\BillingAddressModifier</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
