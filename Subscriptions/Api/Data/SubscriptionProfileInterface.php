@@ -77,6 +77,13 @@ interface SubscriptionProfileInterface
     public function setCustomerId($customerId);
 
     /**
+     * Gets customer.
+     *
+     * @return \Magento\Customer\Api\Data\CustomerInterface|null
+     */
+    public function getCustomer();
+
+    /**
      * Gets billing frequency id.
      *
      * @return string|null

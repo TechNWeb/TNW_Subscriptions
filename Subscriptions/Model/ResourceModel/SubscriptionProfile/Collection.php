@@ -47,8 +47,8 @@ class Collection extends AbstractCollection
         ModelEntityFactory $eavEntityFactory,
         Helper $resourceHelper,
         UniversalFactory $universalFactory,
-        AdapterInterface $connection,
-        SubscriptionProfile $subscriptionProfile
+        SubscriptionProfile $subscriptionProfile,
+        AdapterInterface $connection = null
     ) {
         $this->_entity = $subscriptionProfile;
 
