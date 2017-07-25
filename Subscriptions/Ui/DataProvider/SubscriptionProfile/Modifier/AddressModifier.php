@@ -396,7 +396,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                         'field' => 'country_id',
                     ],
                     'validation' => [
-                        'required-entry' => true,
+                        'required-entry' => (!($this->getShippingId() || $this->isShippingFieldSet())),
                     ],
                     'additionalClass' => ($this->checkIfIssetShippingId())? ' hidden': '',
                 ],
@@ -541,7 +541,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             }
         }
         //For multiline attribute required entry validation must be shown only on the first line
-        if ($attributeLine == 0) {
+        if ($attributeLine == 0 && $attribute->getAttributeCode() != 'region_id') {
             $validation['required-entry'] = (bool)$attribute->getIsRequired();
         }
 
@@ -642,7 +642,15 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         $imports = [];
         if (!in_array($attributeCode, $this->infoAttributes)) {
-            $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
+
+            if ($this->getShippingId() || $this->isShippingFieldSet()) {
+                $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
+            } else {
+                $imports['visible'] = '!ns = ${ $.ns }, index = same_as_shipping:checked';
+            }
+
+        } else {
+            $imports['visible'] = '!${ $.parentName}.same_as_shipping:checked';
         }
 
         return $imports;

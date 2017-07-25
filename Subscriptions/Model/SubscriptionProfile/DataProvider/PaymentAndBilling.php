@@ -21,6 +21,13 @@ class PaymentAndBilling extends AbstractDataProvider
     const DATA_SCOPE_PAYMENT_AND_BILLING_FORM = 'tnw_subscriptionprofile_create_payment_and_billing_form';
     /**#@-*/
 
+    /**#@+
+     * Form request values
+     */
+    const FORM_DATA_KEY = 'billing_form_data';
+    const FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
+
     /** @var [] */
     private $loadedData;
 
