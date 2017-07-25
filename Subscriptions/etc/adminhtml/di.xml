@@ -67,7 +67,7 @@
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
                 <item name="billing-address" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\BillingAddressModifier</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
@@ -78,8 +78,8 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier\Pool</argument>
         </arguments>
     </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\BillingAddressModifier"
-                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\AddressModifier">
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
             <argument name="isShipping" xsi:type="string">0</argument>
         </arguments>
