@@ -114,8 +114,12 @@ class Process extends Create
      */
     private function processCurrencyData($data)
     {
-        if (isset($data['currency_id'])){
+        if (isset($data['currency_id'])) {
             $this->_getSession()->setCurrencyId($data['currency_id']);
+
+            $result = $this->getSubCreateModel()->setCurrency($data['currency_id']);
+
+            $this->checkProcessResult($result);
         }
     }
 

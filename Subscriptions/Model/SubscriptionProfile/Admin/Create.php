@@ -467,4 +467,30 @@ class Create extends BaseCreate
 
         return $profile;
     }
+
+    /**
+     * Set selected currency to all subscription quotes
+     * and start recollect quotes.
+     *
+     * @param $currencyCode
+     */
+    public function setCurrency($currencyCode)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
+
+        $needRecollect = false;
+
+        foreach ($subQuotes as $subQuote) {
+            if (!$subQuote->getQuoteCurrencyCode() || $subQuote->getQuoteCurrencyCode() != $currencyCode) {
+                $subQuote->setQuoteCurrencyCode($currencyCode);
+                $needRecollect= true;
+            }
+        }
+
+        if ($needRecollect) {
+            $this->setNeedCollect(true);
+        }
+    }
 }
