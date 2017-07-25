@@ -14,6 +14,7 @@ use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -27,6 +28,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
+use TNW\Subscriptions\Model\Source\CurrencySelect;
 
 class Product extends AbstractDataProvider
 {
@@ -57,6 +59,12 @@ class Product extends AbstractDataProvider
      * Subscription listing data scope
      */
     const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_create_product_listing';
+    /**#@-*/
+
+    /**#@+
+     * Subscription currency data scope
+     */
+    const GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT = 'tnw_subscriptionprofile_create_currency_select';
     /**#@-*/
 
     private $scopeName;
@@ -107,6 +115,11 @@ class Product extends AbstractDataProvider
     private $frequencyDescriptionCreator;
 
     /**
+     * @var CurrencySelect
+     */
+    private $currencySelect;
+
+    /**
      * Product constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -118,6 +131,7 @@ class Product extends AbstractDataProvider
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
+     * @param CurrencySelect $currencySelect
      * @param ShippingMethods $shippingMethods
      * @param DescriptionCreator $frequencyDescriptionCreator
      * @param array $meta
@@ -135,6 +149,7 @@ class Product extends AbstractDataProvider
         Context $context,
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
+        CurrencySelect $currencySelect,
         ShippingMethods $shippingMethods,
         DescriptionCreator $frequencyDescriptionCreator,
         array $meta = [],
@@ -148,6 +163,7 @@ class Product extends AbstractDataProvider
         $this->context = $context;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->frequencyRepository = $frequencyRepository;
+        $this->currencySelect = $currencySelect;
         $this->shippingMethods = $shippingMethods;
         $this->frequencyDescriptionCreator = $frequencyDescriptionCreator;
         $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
@@ -311,6 +327,39 @@ class Product extends AbstractDataProvider
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_REVIEW) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
             $result = [
+                self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
+                    'children' => [
+                        'currency_id' => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'options' => $this->currencySelect->getAllOptions(),
+                                        'value' => $this->currencySelect->getSelectedCurrencyId(),
+                                        'formElement' => Select::NAME,
+                                        'componentType' => Select::NAME,
+                                        'label' => 'Order Currency:',
+                                        'source' => 'SubscriptionProfile',
+                                        'template' => 'TNW_Subscriptions/form/element/select',
+                                        'data_form_part' => 'tnw_subscriptionprofile_create_account_form',
+                                        'dataScope' => '$data.account.currency_id',
+                                        'sortOrder' => 0,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'additionalClasses' => 'admin__fieldset-section subscription-profile-currency',
+                                'label' => false,
+                                'collapsible' => false,
+                                'componentType' => Fieldset::NAME,
+                                'sortOrder' => 0,
+                            ],
+                        ],
+                    ],
+                ],
                 self::GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS => [
                     'children' => [
                         'button_add_product' => [
@@ -368,7 +417,7 @@ class Product extends AbstractDataProvider
                                 'collapsible' => false,
                                 'componentType' => Fieldset::NAME,
                                 'dataScope' => '',
-                                'sortOrder' => 0,
+                                'sortOrder' => 1,
                                 'style' => 'max-width: 100%'
                             ],
                         ],
