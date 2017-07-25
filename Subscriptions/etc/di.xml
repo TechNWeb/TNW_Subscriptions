@@ -126,9 +126,6 @@
                     <item name="entityTableName" xsi:type="string">tnw_subscriptions_subscription_profile_entity</item>
                     <item name="eavEntityType" xsi:type="string">subscription_profile</item>
                     <item name="identifierField" xsi:type="string">entity_id</item>
-<!--                    <item name="entityContext" xsi:type="array">
-                        <item name="store" xsi:type="string">Magento\Store\Model\DefaultStoreScopeProvider</item>
-                    </item>-->
                 </item>
             </argument>
         </arguments>

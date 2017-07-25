@@ -48,4 +48,11 @@
 "Total of %s profiles was created.","Total of %s profiles was created."
 "Can not create profile with empty frequency.","Can not create profile with empty frequency."
 "Undefined trial length unit type.","Undefined trial length unit type."
+"This Subscription Profile no longer exists.","This Subscription Profile no longer exists."
+"Subscription (%s) for %s %s","Subscription (%s) for %s %s"
+"Subscription &amp; Account Information","Subscription &amp; Account Information"
+"Future Orders","Future Orders"
+"Upcoming Orders","Upcoming Orders"
+"Subscription Change History","Subscription Change History"
+"Change History","Change History"
 

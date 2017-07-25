@@ -6,8 +6,12 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use Magento\Framework\Model\Context as ModelContext;
+use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
@@ -26,6 +30,33 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      * Entity code.
      */
     const ENTITY = 'subscription_profile';
+
+    /**
+     * Repository for retrieving customers.
+     *
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * Profile customer.
+     *
+     * @var CustomerInterface
+     */
+    private $customer;
+
+    public function __construct(
+        ModelContext $context,
+        Registry $registry,
+        CustomerRepositoryInterface $customerRepository,
+        Resource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->customerRepository = $customerRepository;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+
 
     /**
      * {@inheritdoc}
@@ -381,5 +412,17 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
         return $this->setData(self::PROFILE_PRODUCTS, $products);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getCustomer()
+    {
+        if (!$this->customer) {
+            $this->customer = $this->customerRepository->getById(
+                $this->getCustomerId()
+            );
+        }
 
+        return $this->customer;
+    }
 }
