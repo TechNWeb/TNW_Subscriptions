@@ -78,8 +78,8 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier\Pool</argument>
         </arguments>
     </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\BillingAddressModifier"
-                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier\AddressModifier">
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
             <argument name="isShipping" xsi:type="string">0</argument>
         </arguments>
