@@ -287,7 +287,7 @@ class Create extends BaseCreate
             $customerAddressId
         );
 
-        if (empty($result)) {
+        if ($result === true) {
             $this->setNeedCollect(true);
         }
 
