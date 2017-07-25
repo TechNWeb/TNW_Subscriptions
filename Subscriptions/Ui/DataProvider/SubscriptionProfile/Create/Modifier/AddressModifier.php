@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
 
 use Magento\Customer\Api\AddressMetadataInterface;
 use Magento\Customer\Model\Attribute;

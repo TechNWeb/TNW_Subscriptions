@@ -1,30 +1,28 @@
 <?xml version="1.0" ?>
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+      class="TNW\Subscriptions\Ui\Component\SubscriptionProfile\Form">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">tnw_subscriptionprofile_form.subscriptionprofile_form_data_source</item>
             <item name="deps" xsi:type="string">tnw_subscriptionprofile_form.subscriptionprofile_form_data_source</item>
         </item>
-        <item name="label" translate="true" xsi:type="string">General Information</item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_form</item>
         </item>
-        <item name="template" xsi:type="string">templates/form/collapsible</item>
-        <item name="buttons" xsi:type="array">
-            <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\BackButton</item>
-            <item name="save" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\SaveButton</item>
-            <item name="save_and_continue"
-                  xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\SaveAndContinueButton</item>
+        <item name="layout" xsi:type="array">
+            <item name="type" xsi:type="string">tabs</item>
+            <item name="navContainerName" xsi:type="string">left</item>
         </item>
+        <item name="reverseMetadataMerge" xsi:type="boolean">true</item>
     </argument>
     <dataSource name="subscriptionprofile_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider</argument>
             <argument name="name" xsi:type="string">subscriptionprofile_form_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">id</argument>
-            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">entity_id</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="submit_url" path="*/*/save" xsi:type="url"/>
@@ -37,118 +35,49 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="General">
+    <fieldset name="dashboard">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" xsi:type="string"/>
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Overview</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Dashboard</item>
             </item>
         </argument>
-        <field name="customer_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Customer Id</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">110</item>
-                    <item name="dataScope" xsi:type="string">customer_id</item>
-                    <item name="disabled" xsi:type="boolean">true</item>
-                </item>
-            </argument>
-        </field>
-        <field name="billing_frequency_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Billing Frequency Id</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">120</item>
-                    <item name="dataScope" xsi:type="string">billing_frequency_id</item>
-                    <item name="disabled" xsi:type="boolean">true</item>
-                </item>
-            </argument>
-        </field>
-        <field name="label">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Label</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">130</item>
-                    <item name="dataScope" xsi:type="string">label</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
-        <field name="unit">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType</item>
-
-                <item name="config" xsi:type="array">
-                    <item name="formElement" xsi:type="string">select</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">unit</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">140</item>
-                    <item name="dataScope" xsi:type="string">unit</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
-        <field name="website_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Website Id</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">150</item>
-                    <item name="dataScope" xsi:type="string">website_id</item>
-                    <item name="disabled" xsi:type="boolean">true</item>
-                </item>
-            </argument>
-        </field>
-        <field name="status">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">boolean</item>
-                    <item name="formElement" xsi:type="string">checkbox</item>
-                    <item name="source" xsi:type="string">BillingFrequency</item>
-                    <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="valueMap" xsi:type="array">
-                        <item name="true" xsi:type="number">1</item>
-                        <item name="false" xsi:type="number">0</item>
-                    </item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                    <item name="default" xsi:type="number">1</item>
-                    <item name="label" translate="true" xsi:type="string">Status</item>
-                    <item name="sortOrder" xsi:type="number">160</item>
-                    <item name="dataScope" xsi:type="string">status</item>
-                </item>
-            </argument>
-        </field>
-        <field name="frequency">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Frequency</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="source" xsi:type="string">SubscriptionProfile</item>
-                    <item name="sortOrder" xsi:type="number">170</item>
-                    <item name="dataScope" xsi:type="string">frequency</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
+    </fieldset>
+    <fieldset name="summary">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Subscription &amp; Account Information</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Summary</item>
+            </item>
+        </argument>
+    </fieldset>
+    <fieldset name="upcoming_orders">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Future Orders</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Upcoming Orders</item>
+            </item>
+        </argument>
+    </fieldset>
+    <fieldset name="order_history">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Order History</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Order History</item>
+            </item>
+        </argument>
+    </fieldset>
+    <fieldset name="change_history">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Subscription Change History</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Change History</item>
+            </item>
+        </argument>
     </fieldset>
 </form>
