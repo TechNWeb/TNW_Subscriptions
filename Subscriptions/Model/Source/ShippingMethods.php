@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Quote\Model\Quote as ModelQuote;
+use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Model\Context;
 use Magento\Quote\Model\Quote\Address\Rate;
 use Magento\Tax\Helper\Data;
@@ -17,6 +18,11 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
  */
 class ShippingMethods
 {
+    const UNAVAILABLE_PRODUCT_TYPES = [
+        \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL,
+        \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE
+    ];
+
     /**
      * @var ModelQuote
      */
@@ -197,5 +203,23 @@ class ShippingMethods
             PriceCurrencyInterface::DEFAULT_PRECISION,
             $this->getQuote()->getStore()
         );
+    }
+
+    /**
+     * Do not show shipping method label for virtual/downloadable products
+     *
+     * @return bool
+     */
+    public function canShowShippingMethodLabel()
+    {
+        $result = false;
+        $quoteItems = $this->quote->getAllItems();
+        /** @var Item $quoteItem */
+        foreach ($quoteItems as $quoteItem) {
+            if (!in_array($quoteItem->getProductType(), $this::UNAVAILABLE_PRODUCT_TYPES, true)) {
+                $result = true;
+            }
+        }
+        return $result;
     }
 }
