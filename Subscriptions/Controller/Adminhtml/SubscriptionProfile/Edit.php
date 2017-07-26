@@ -48,7 +48,7 @@ class Edit extends SubscriptionProfile
     public function execute()
     {
         $result = null;
-        $profileId = $this->getRequest()->getParam('id');
+        $profileId = $this->getRequest()->getParam('entity_id');
         $model = $this->_objectManager->create(ProfileModel::class);
 
         if ($profileId) {

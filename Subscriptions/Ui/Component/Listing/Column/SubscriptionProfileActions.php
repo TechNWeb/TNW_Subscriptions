@@ -6,23 +6,40 @@
 
 namespace TNW\Subscriptions\Ui\Component\Listing\Column;
 
-class SubscriptionProfileActions extends \Magento\Ui\Component\Listing\Columns\Column
-{
+use Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Framework\UrlInterface;
 
-    protected $urlBuilder;
+/**
+ * Subscription profilegrid actions column modifier.
+ */
+class SubscriptionProfileActions extends Column
+{
+    /**
+     * Url builder.
+     *
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
+     * Url path for subscription profile edit page.
+     */
     const URL_PATH_EDIT = 'tnw_subscriptions/subscriptionprofile/edit';
 
     /**
-     * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
-     * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * SubscriptionProfileActions constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param UrlInterface $urlBuilder
      * @param array $components
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
-        \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
-        \Magento\Framework\UrlInterface $urlBuilder,
+        ContextInterface $context,
+        UiComponentFactory $uiComponentFactory,
+        UrlInterface $urlBuilder,
         array $components = [],
         array $data = []
     ) {
@@ -46,7 +63,7 @@ class SubscriptionProfileActions extends \Magento\Ui\Component\Listing\Columns\C
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_EDIT,
                                 [
-                                    'id' => $item['entity_id']
+                                    'entity_id' => $item['entity_id']
                                 ]
                             ),
                             'label' => __('Edit')

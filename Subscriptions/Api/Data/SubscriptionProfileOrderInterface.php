@@ -9,6 +9,12 @@ namespace TNW\Subscriptions\Api\Data;
 interface SubscriptionProfileOrderInterface
 {
     /**#@+
+     * Main table name.
+     */
+    const MAIN_TABLE = 'tnw_subscriptions_subscription_profile_order';
+    /**#@-*/
+
+    /**#@+
      * Constants for field names
      */
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
