@@ -6,9 +6,14 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel;
 
-class SubscriptionProfileOrder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
-{
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+/**
+ * Resource model for SubscriptionProfileOrder
+ */
+class SubscriptionProfileOrder extends AbstractDb
+{
     /**
      * Define resource model
      *
@@ -16,6 +21,8 @@ class SubscriptionProfileOrder extends \Magento\Framework\Model\ResourceModel\Db
      */
     protected function _construct()
     {
-        $this->_init('tnw_subscriptions_subscription_profile_order', 'id');
+        $this->_init(SubscriptionProfileOrderInterface::MAIN_TABLE,
+            SubscriptionProfileOrderInterface::ID
+        );
     }
 }
