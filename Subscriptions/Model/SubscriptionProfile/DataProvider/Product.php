@@ -274,18 +274,18 @@ class Product extends AbstractDataProvider
      */
     protected function getShippingMethodData($quote)
     {
-        $this->shippingMethods->setQuote($quote);
         $shippingMethods = [];
-
-        $label = __('Selected on next step');
-
-        if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
-            $label = $this->shippingMethods->getCurrentMethodLabel();
-        } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
-            $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
-            $label = '';
+        $label = '';
+        $this->shippingMethods->setQuote($quote);
+        if ($this->shippingMethods->canShowShippingMethodLabel()) {
+            $label = __('Selected on next step');
+            if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
+                $label = $this->shippingMethods->getCurrentMethodLabel();
+            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+                $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
+                $label = '';
+            }
         }
-
         return [
             'label' => $label,
             'methods' => $shippingMethods,
