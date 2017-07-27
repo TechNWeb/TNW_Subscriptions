@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action;
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
@@ -32,17 +33,27 @@ class CheckCustomerEmail extends Action
     private $customerRepository;
 
     /**
+     * Data Persistor.
+     *
+     * @var DataPersistorInterface
+     */
+    private $dataPersistor;
+
+    /**
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
      * @param CustomerRepository $customerRepository
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
-        CustomerRepository $customerRepository
+        CustomerRepository $customerRepository,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->resultJsonFactory = $jsonFactory;
         $this->customerRepository = $customerRepository;
+        $this->dataPersistor = $dataPersistor;
 
         parent::__construct($context);
     }
@@ -65,8 +76,14 @@ class CheckCustomerEmail extends Action
         }
 
         if (isset($customer) && $customer && $customer->getId()) {
-            $response->setData('fistname', $customer->getFirstname());
-            $response->setData('lastname', $customer->getLastname());
+            $response->setData('customerName', $customer->getFirstname() . $customer->getLastname());
+            $response->setData('customerEmail', $email);
+
+            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . $customer->getLastname());
+            $this->dataPersistor->set('existsCustomerEmail', $email);
+        } else {
+            $this->dataPersistor->clear('existsCustomerName');
+            $this->dataPersistor->clear('existsCustomerEmail');
         }
 
         return $this->resultJsonFactory->create()->setJsonData($response->toJson());

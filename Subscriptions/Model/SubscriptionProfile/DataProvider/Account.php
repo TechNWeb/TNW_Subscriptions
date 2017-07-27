@@ -14,6 +14,10 @@ use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Pool;
+use Magento\Ui\Component\Container;
+use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Modal;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CustomerExistsForm;
 
 class Account extends AbstractDataProvider
 {
@@ -23,6 +27,8 @@ class Account extends AbstractDataProvider
     const FORM_DATA_KEY = 'account_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
+
+    const CUSTOMER_EXISTS_FORM_HANDLER = 'tnw_subscriptions_subscriptionprofile_customer_exists';
 
     /**
      * Url Builder.
@@ -88,8 +94,14 @@ class Account extends AbstractDataProvider
         $this->stepPool = $stepPool;
         $this->customerRepository = $customerRepository;
         $this->modifiersPool = $modifiersPool;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 
     /**
@@ -156,6 +168,90 @@ class Account extends AbstractDataProvider
             $meta = $modifier->modifyMeta($meta);
         }
 
+        $meta = array_merge_recursive(
+            $meta,
+            $this->getMetaData()
+        );
+
         return $meta;
+    }
+
+    /**
+     * @return array
+     */
+    private function getMetaData()
+    {
+        $result = [
+            'customer_account_already_exists' => [
+                'children' => [
+                    'customerModal' => $this->getCustomerExistModal(),
+                ],
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => '',
+                            'collapsible' => false,
+                            'componentType' => Fieldset::NAME,
+                            'dataScope' => '',
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function getCustomerExistModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'componentType' => Modal::NAME,
+                        'options' => [
+                            'modalClass' => 'modal-popup',
+                        ],
+                    ],
+                ],
+            ],
+            'children' => [
+                'customer_account_already_exists' => $this->getCustomerExistForm()
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getCustomerExistForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => true,
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => self::CUSTOMER_EXISTS_FORM_HANDLER
+                            ]
+                        ),
+                        'autoRender' => true,
+                        'ns' => CustomerExistsForm::DATA_SCOPE_CUSTOMER_ALREADY_EXISTS_MODAL_FORM,
+                        'externalProvider' => CustomerExistsForm::DATA_SCOPE_CUSTOMER_ALREADY_EXISTS_MODAL_FORM
+                            . '.' . CustomerExistsForm::DATA_SCOPE_CUSTOMER_ALREADY_EXISTS_MODAL_FORM
+                            . '_data_source',
+                    ],
+                ],
+            ]
+        ];
     }
 }
