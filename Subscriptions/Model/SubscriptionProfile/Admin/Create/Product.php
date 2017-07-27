@@ -131,6 +131,9 @@ class Product extends Create
 
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productData['product_id']);
+            $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
+            $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
+            $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
@@ -142,10 +145,10 @@ class Product extends Create
                         'billing_frequency' => $productData['billing_frequency_id'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
-                        'is_trial' => $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false,
+                        'is_trial' => $isTrial,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
-                        'trial_period' => $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
-                        'trial_unit_id' => (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                        'trial_period' => $trialPeriod,
+                        'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
                         'price' => $this->priceCalculator->getUnitPrice(
