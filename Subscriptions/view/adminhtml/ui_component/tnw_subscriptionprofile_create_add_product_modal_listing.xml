@@ -99,6 +99,11 @@
                     <item name="add_field" xsi:type="boolean">true</item>
                     <item name="label" xsi:type="string" translate="true">Inventory</item>
                     <item name="sortOrder" xsi:type="number">40</item>
+                    <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/cells/cell-with-warning</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/inventory</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description"  translate="true" xsi:type="string">Check inventory options.</item>
+                    </item>
                 </item>
             </argument>
         </column>
