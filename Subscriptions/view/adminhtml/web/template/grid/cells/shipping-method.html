@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 -->
-<div if="$col.hasLabel($row())" class="data-grid-cell-content subscription-shipping-title" translate="'Shipping Method'"/>
+<div if="$col.hasLabel($row())||$col.hasOptions($row())" class="data-grid-cell-content subscription-shipping-title" translate="'Shipping Method'"/>
 
 
 <div if="$col.hasLabel($row())" class="data-grid-cell-content subscription-shipping-method" html="$col.getLabel($row())"/>
