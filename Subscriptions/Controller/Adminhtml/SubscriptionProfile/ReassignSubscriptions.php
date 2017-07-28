@@ -11,12 +11,12 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
-use Magento\Framework\Exception\NoSuchEntityException;
+use TNW\Subscriptions\Model\Backend\Session\Quote;
 
 /**
- * Check if customer with such email exists.
+ * Reassign subscription to customer.
  */
-class CheckCustomerEmail extends Action
+class ReassignSubscriptions extends Action
 {
     /**
      * Result json factory.
@@ -40,20 +40,30 @@ class CheckCustomerEmail extends Action
     private $dataPersistor;
 
     /**
+     * Admin session.
+     *
+     * @var Quote
+     */
+    private $session;
+
+    /**
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
      * @param CustomerRepository $customerRepository
      * @param DataPersistorInterface $dataPersistor
+     * @param Quote $session
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
         CustomerRepository $customerRepository,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        Quote $session
     ) {
         $this->resultJsonFactory = $jsonFactory;
         $this->customerRepository = $customerRepository;
         $this->dataPersistor = $dataPersistor;
+        $this->session = $session;
 
         parent::__construct($context);
     }
@@ -64,28 +74,15 @@ class CheckCustomerEmail extends Action
     public function execute()
     {
         $response = new DataObject();
-        $response->setData('exist', true);
+        $response->setData('result', true);
 
-        $request = $this->getRequest();
-        $email = $request->getParam('email');
+        $customerId = $this->dataPersistor->get('existsCustomerId');
 
-        try {
-            $customer = $this->customerRepository->get($email);
-        } catch (NoSuchEntityException $e) {
-            $response->setData('exist', false);
-        }
-
-        if (isset($customer) && $customer && $customer->getId()) {
-            $response->setData('customerName', $customer->getFirstname() . $customer->getLastname());
-            $response->setData('customerEmail', $email);
-
-            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . $customer->getLastname());
-            $this->dataPersistor->set('existsCustomerEmail', $email);
-            $this->dataPersistor->set('existsCustomerId', $customer->getId());
+        if ($customerId) {
+            //todo ask Misha if need to do some more ?
+            $this->session->setCustomerId($customerId);
         } else {
-            $this->dataPersistor->clear('existsCustomerName');
-            $this->dataPersistor->clear('existsCustomerEmail');
-            $this->dataPersistor->clear('existsCustomerId');
+            $response->setData('result', false);
         }
 
         return $this->resultJsonFactory->create()->setJsonData($response->toJson());

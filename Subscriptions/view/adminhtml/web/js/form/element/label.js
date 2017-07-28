@@ -24,8 +24,8 @@ define([
             var secondPart = $j.mage.__(' and email address ');
             var thirdPart = $j.mage.__('. What would you like to do?');
 
-            var name = typeof this.customerName == "undefined" ? '' : this.customerName;
-            var email= typeof this.customerEmail == "undefined" ? '' : this.customerEmail;
+            var name = typeof this.imports.customerName == "undefined" ? '' : this.imports.customerName;
+            var email= typeof this.imports.customerEmail == "undefined" ? '' : this.imports.customerEmail;
 
             this.text = firstPart + name + secondPart + email + thirdPart;
 

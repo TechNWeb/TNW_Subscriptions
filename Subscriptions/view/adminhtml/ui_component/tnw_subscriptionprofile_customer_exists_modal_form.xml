@@ -56,7 +56,7 @@
                 </item>
             </argument>
         </field>
-        <field name="confirm">
+        <field name="confirm" class="TNW\Subscriptions\Model\SubscriptionProfile\Field\CustomerConfirmButton">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
