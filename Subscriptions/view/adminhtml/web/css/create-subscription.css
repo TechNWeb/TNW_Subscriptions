@@ -236,3 +236,105 @@
   margin-top: 3rem;
   margin-left: 2.6rem;
 }
+.wide-select select{
+    width:100%;
+}
+.subscr-container-title {
+    font-size: 2rem;
+    font-weight: 400;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label .admin__field-control{
+    float: left;
+    position: absolute;
+}
+.subscription-profile-currency {
+  background: #f1f1f1;
+  border: 1px solid #e3e3e3;
+  margin-bottom: 15px;
+}
+.subscription-profile-currency .admin__fieldset {
+  color: #666;
+  padding: 3rem 2rem;
+}
+.subscription-profile-currency .admin__fieldset>.admin__field {
+  padding: 0 20px;
+}
+.subscription-profile-currency .admin__fieldset .admin__field-label {
+  display: block;
+  margin: 0 0 1rem;
+  text-align: left;
+}
+.subscription-profile-currency .admin__fieldset .admin__control-select{
+  width: 100%;
+}
+.in-stock span {
+  display: none;
+}
+/*warning not in stock tooltip*/
+.warning-not-in-stock .admin__grid-tooltip {
+  display: none;
+}
+.warning-not-in-stock {
+  display: inline-block;
+  position: absolute;
+}
+.admin_grid_col_with_tooltip {
+  display: inline-block;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip {
+  display: block;
+  background: #f1f1f1;
+  border: 1px solid #f1f1f1;
+  border-radius: 1px;
+  box-shadow: 0 3px 9px 0 rgba(0,0,0,0.3);
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.36;
+  padding: 1.5rem;
+  position: absolute;
+  text-transform: none;
+  width: 27rem;
+  word-break: normal;
+  z-index: 2;
+  left: -2.2rem;
+  bottom: 1.8rem;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:before {
+  border: 15px solid transparent;
+  height: 0;
+  width: 0;
+  content: '';
+  display: block;
+  left: 2rem;
+  position: absolute;
+  top: 100%;
+  z-index: 3;
+  border-top-color: #bfbfbf;
+  margin-top: 1px;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:after {
+  border: 15px solid transparent;
+  height: 0;
+  width: 0;
+  content: '';
+  display: block;
+  left: 2rem;
+  position: absolute;
+  top: 100%;
+  border-top-color: #f1f1f1;
+  margin-top: -1px;
+  z-index: 4;
+}
+.qty-warning:after {
+  color: #eb5202;
+  content: '\e623';
+  font-family: 'Admin Icons';
+  font-size: 1.7rem;
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+}

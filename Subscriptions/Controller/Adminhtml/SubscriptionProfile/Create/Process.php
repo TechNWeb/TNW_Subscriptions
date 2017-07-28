@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling;
 
 class Process extends Create
 {
@@ -114,8 +115,12 @@ class Process extends Create
      */
     private function processCurrencyData($data)
     {
-        if (isset($data['currency_id'])){
+        if (isset($data['currency_id'])) {
             $this->_getSession()->setCurrencyId($data['currency_id']);
+
+            $result = $this->getSubCreateModel()->setCurrency($data['currency_id']);
+
+            $this->checkProcessResult($result);
         }
     }
 
@@ -127,11 +132,19 @@ class Process extends Create
     private function processAccountData($data)
     {
         if (isset($data['account'])){
-            $customerAddressId = !empty($data['account']['customer_address_id'])
-                ? $data['account']['customer_address_id']
+            $email = !empty($data['account']['email']) ? $data['account']['email'] : null;
+            $group = !empty($data['account']['group']) ? $data['account']['group'] : null;
+            $this->_getSession()->setCustomerEmail($email);
+            $this->_getSession()->setCustomerGroup($group);
+        }
+
+        if (!empty($data['shipping_address']) && !empty($data['shipping_info'])) {
+            $address = array_merge($data['shipping_address'], $data['shipping_info']);
+            $customerAddressId = !empty($data['shipping_address']['customer_address_id'])
+                ? $data['shipping_address']['customer_address_id']
                 : null;
 
-            $result = $this->getSubCreateModel()->setShippingAddress($data['account'], $customerAddressId);
+            $result = $this->getSubCreateModel()->setShippingAddress($address, $customerAddressId);
 
             $this->checkProcessResult($result);
         }
@@ -155,12 +168,15 @@ class Process extends Create
      */
     private function processPaymentAndBillingData($data)
     {
-        if (isset($data['billing'])){
-            $customerAddressId = !empty($data['billing']['customer_address_id'])
-                ? $data['billing']['customer_address_id']
+        $address = isset($data['billing_address']) ? $data['billing_address'] : [];
+        $info = isset($data['billing_info']) ? $data['billing_info'] : [];
+        $billing = array_merge($address, $info);
+        if (!empty($billing)){
+            $customerAddressId = !empty($billing['customer_address_id'])
+                ? $billing['customer_address_id']
                 : null;
 
-            $result = $this->getSubCreateModel()->setBillingAddress($data['billing'], $customerAddressId);
+            $result = $this->getSubCreateModel()->setBillingAddress($billing, $customerAddressId);
 
             $this->checkProcessResult($result);
         }
@@ -212,6 +228,11 @@ class Process extends Create
             $additionalParams = [
                 Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
             ];
+        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+            $additionalParams = [
+                PaymentAndBilling::FORM_DATA_KEY => PaymentAndBilling::FORM_DATA_VALUE,
+            ];
+
         }
 
         return $additionalParams;

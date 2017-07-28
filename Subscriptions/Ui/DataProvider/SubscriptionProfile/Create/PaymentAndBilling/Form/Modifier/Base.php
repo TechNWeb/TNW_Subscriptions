@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\PaymentAndBilling\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier;
 
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Fieldset;

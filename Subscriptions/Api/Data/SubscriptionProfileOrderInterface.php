@@ -8,49 +8,62 @@ namespace TNW\Subscriptions\Api\Data;
 
 interface SubscriptionProfileOrderInterface
 {
+    /**#@+
+     * Main table name.
+     */
+    const MAIN_TABLE = 'tnw_subscriptions_subscription_profile_order';
+    /**#@-*/
 
+    /**#@+
+     * Constants for field names
+     */
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const MAGENTO_ORDER_ID = 'magento_order_id';
     const ID = 'id';
-
+    /**#@-*/
 
     /**
-     * Get id
+     * Gets id.
+     *
      * @return string|null
      */
     public function getId();
 
     /**
-     * Set id
-     * @param $id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
-     * @internal param string $id
+     * Sets  id.
+     *
+     * @param string $id
+     * @return $this
      */
     public function setId($id);
 
     /**
-     * Get subscription_profile_id
+     * Gets subscription profile id.
+     *
      * @return string|null
      */
     public function getSubscriptionProfileId();
 
     /**
-     * Set subscription_profile_id
-     * @param string $subscription_profile_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     * Sets subscription_profile_id.
+     *
+     * @param string $subscriptionProfileId
+     * @return $this
      */
-    public function setSubscriptionProfileId($subscription_profile_id);
+    public function setSubscriptionProfileId($subscriptionProfileId);
 
     /**
-     * Get magento_order_id
+     * Gets magento order id.
+     *
      * @return string|null
      */
     public function getMagentoOrderId();
 
     /**
-     * Set magento_order_id
-     * @param string $magento_order_id
-     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     * Sets magento order id.
+     *
+     * @param string $magentoOrderId
+     * @return $this
      */
-    public function setMagentoOrderId($magento_order_id);
+    public function setMagentoOrderId($magentoOrderId);
 }

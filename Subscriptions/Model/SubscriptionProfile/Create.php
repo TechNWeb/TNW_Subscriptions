@@ -4,18 +4,30 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
+namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
+use Magento\Framework\Session\SessionManagerInterface;
 
 
-abstract class AbstractCreate
+class Create
 {
     /**
      * First part of path to subscription fields.
      */
     const SUBSCRIPTION_BUY_REQUEST_PARAM_NAME = 'subscription_data';
+
+    /**
+     * Last part of path to unique subscription fields in product buy request.
+     *
+     * Using for checking the ability to add product to subscription quote.
+     */
+    const UNIQUE = 'unique';
+
+    /**
+     * Last part of path to non_unique fields in product buy request.
+     */
+    const NON_UNIQUE = 'non_unique';
 
     /**
      * @var Context
@@ -25,18 +37,18 @@ abstract class AbstractCreate
     /**
      * Session.
      *
-     * @var Quote
+     * @var SessionManagerInterface
      */
     private $session;
 
     /**
      * AbstractCreate constructor.
      * @param Context $context
-     * @param Quote $session
+     * @param SessionManagerInterface $session
      */
     public function __construct(
         Context $context,
-        Quote $session
+        SessionManagerInterface $session
     ) {
         $this->context = $context;
         $this->session = $session;
@@ -55,7 +67,7 @@ abstract class AbstractCreate
     /**
      * Returns subscription admin session.
      *
-     * @return Quote
+     * @return SessionManagerInterface
      */
     public function getSession()
     {

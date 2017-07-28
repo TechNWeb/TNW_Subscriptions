@@ -6,12 +6,14 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
 
 /**
  * Product subscription profile model.
  */
-class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
+class ProductSubscriptionProfile extends AbstractModel
     implements ProductSubscriptionProfileInterface
 {
     /**
@@ -27,19 +29,18 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     /*
      * Default group code for custom attributes.
      */
-    const DEFAUL_GROUP_CODE = 'additional-information';
+    const DEFAULT_GROUP_CODE = 'additional-information';
 
     /**
-     * @return void
+     * {@inheritdoc}
      */
     protected function _construct()
     {
-        $this->_init(\TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class);
+        $this->_init(Resource::class);
     }
 
     /**
-     * Get id
-     * @return string
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -47,9 +48,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set id
-     * @param string $id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setId($id)
     {
@@ -57,8 +56,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get subscription_profile_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getSubscriptionProfileId()
     {
@@ -66,18 +64,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set subscription_profile_id
-     * @param string $subscription_profile_id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setSubscriptionProfileId($subscription_profile_id)
+    public function setSubscriptionProfileId($subscriptionProfileId)
     {
-        return $this->setData(self::SUBSCRIPTION_PROFILE_ID, $subscription_profile_id);
+        return $this->setData(self::SUBSCRIPTION_PROFILE_ID, $subscriptionProfileId);
     }
 
     /**
-     * Get magento_product_id
-     * @return string
+     * {@inheritdoc}
      */
     public function getMagentoProductId()
     {
@@ -85,18 +80,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set magento_product_id
-     * @param string $magento_product_id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setMagentoProductId($magento_product_id)
+    public function setMagentoProductId($magentoProductId)
     {
-        return $this->setData(self::MAGENTO_PRODUCT_ID, $magento_product_id);
+        return $this->setData(self::MAGENTO_PRODUCT_ID, $magentoProductId);
     }
 
     /**
-     * Get price
-     * @return string
+     * {@inheritdoc}
      */
     public function getPrice()
     {
@@ -104,9 +96,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set price
-     * @param string $price
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setPrice($price)
     {
@@ -114,8 +104,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get initial_fee
-     * @return string
+     * {@inheritdoc}
      */
     public function getInitialFee()
     {
@@ -123,18 +112,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set initial_fee
-     * @param string $initial_fee
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setInitialFee($initial_fee)
+    public function setInitialFee($initialFee)
     {
-        return $this->setData(self::INITIAL_FEE, $initial_fee);
+        return $this->setData(self::INITIAL_FEE, $initialFee);
     }
 
     /**
-     * Get qty
-     * @return string
+     * {@inheritdoc}
      */
     public function getQty()
     {
@@ -142,9 +128,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set qty
-     * @param string $qty
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
     public function setQty($qty)
     {
@@ -152,8 +136,7 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Get purchase_type
-     * @return string
+     * {@inheritdoc}
      */
     public function getPurchaseType()
     {
@@ -161,18 +144,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set purchase_type
-     * @param string $purchase_type
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setPurchaseType($purchase_type)
+    public function setPurchaseType($purchaseType)
     {
-        return $this->setData(self::PURCHASE_TYPE, $purchase_type);
+        return $this->setData(self::PURCHASE_TYPE, $purchaseType);
     }
 
     /**
-     * Get trial_status
-     * @return string
+     * {@inheritdoc}
      */
     public function getTrialStatus()
     {
@@ -180,56 +160,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set trial_status
-     * @param string $trial_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setTrialStatus($trial_status)
+    public function setTrialStatus($trialStatus)
     {
-        return $this->setData(self::TRIAL_STATUS, $trial_status);
+        return $this->setData(self::TRIAL_STATUS, $trialStatus);
     }
 
     /**
-     * Get trial_length
-     * @return string
-     */
-    public function getTrialLength()
-    {
-        return $this->getData(self::TRIAL_LENGTH);
-    }
-
-    /**
-     * Set trial_length
-     * @param string $trial_length
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     */
-    public function setTrialLength($trial_length)
-    {
-        return $this->setData(self::TRIAL_LENGTH, $trial_length);
-    }
-
-    /**
-     * Get trial_length_unit
-     * @return string
-     */
-    public function getTrialLengthUnit()
-    {
-        return $this->getData(self::TRIAL_LENGTH_UNIT);
-    }
-
-    /**
-     * Set trial_length_unit
-     * @param string $trial_length_unit
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     */
-    public function setTrialLengthUnit($trial_length_unit)
-    {
-        return $this->setData(self::TRIAL_LENGTH_UNIT, $trial_length_unit);
-    }
-
-    /**
-     * Get trial_price
-     * @return string
+     * {@inheritdoc}
      */
     public function getTrialPrice()
     {
@@ -237,37 +176,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set trial_price
-     * @param string $trial_price
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setTrialPrice($trial_price)
+    public function setTrialPrice($trialPrice)
     {
-        return $this->setData(self::TRIAL_PRICE, $trial_price);
+        return $this->setData(self::TRIAL_PRICE, $trialPrice);
     }
 
     /**
-     * Get start_date
-     * @return string
-     */
-    public function getStartDate()
-    {
-        return $this->getData(self::START_DATE);
-    }
-
-    /**
-     * Set start_date
-     * @param string $start_date
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     */
-    public function setStartDate($start_date)
-    {
-        return $this->setData(self::START_DATE, $start_date);
-    }
-
-    /**
-     * Get lock_product_price_status
-     * @return string
+     * {@inheritdoc}
      */
     public function getLockProductPriceStatus()
     {
@@ -275,18 +192,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set lock_product_price_status
-     * @param string $lock_product_price_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setLockProductPriceStatus($lock_product_price_status)
+    public function setLockProductPriceStatus($lockProductPriceStatus)
     {
-        return $this->setData(self::LOCK_PRODUCT_PRICE_STATUS, $lock_product_price_status);
+        return $this->setData(self::LOCK_PRODUCT_PRICE_STATUS, $lockProductPriceStatus);
     }
 
     /**
-     * Get offer_flat_discount_status
-     * @return string
+     * {@inheritdoc}
      */
     public function getOfferFlatDiscountStatus()
     {
@@ -294,18 +208,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set offer_flat_discount_status
-     * @param string $offer_flat_discount_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setOfferFlatDiscountStatus($offer_flat_discount_status)
+    public function setOfferFlatDiscountStatus($offerFlatDiscountStatus)
     {
-        return $this->setData(self::OFFER_FLAT_DISCOUNT_STATUS, $offer_flat_discount_status);
+        return $this->setData(self::OFFER_FLAT_DISCOUNT_STATUS, $offerFlatDiscountStatus);
     }
 
     /**
-     * Get discount_amount
-     * @return string
+     * {@inheritdoc}
      */
     public function getDiscountAmount()
     {
@@ -313,18 +224,15 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set discount_amount
-     * @param string $discount_amount
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setDiscountAmount($discount_amount)
+    public function setDiscountAmount($discountAmount)
     {
-        return $this->setData(self::DISCOUNT_AMOUNT, $discount_amount);
+        return $this->setData(self::DISCOUNT_AMOUNT, $discountAmount);
     }
 
     /**
-     * Get discount_type
-     * @return string
+     * {@inheritdoc}
      */
     public function getDiscountType()
     {
@@ -332,12 +240,10 @@ class ProductSubscriptionProfile extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Set discount_type
-     * @param string $discount_type
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * {@inheritdoc}
      */
-    public function setDiscountType($discount_type)
+    public function setDiscountType($discountType)
     {
-        return $this->setData(self::DISCOUNT_TYPE, $discount_type);
+        return $this->setData(self::DISCOUNT_TYPE, $discountType);
     }
 }

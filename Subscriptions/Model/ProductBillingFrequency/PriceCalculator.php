@@ -11,11 +11,9 @@ use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\LockPrice;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
 /**
  * Calculate unit price for billing frequency.
@@ -84,6 +82,7 @@ class PriceCalculator
     {
         $price = 0;
         if ($productId && $billingFrequencyId) {
+            /** @var Product $product */
             $product = $this->productRepository->getById($productId);
             $trialOffered = $this->getTrialOfferedStatus($product);
             $initialFee = $this->getInitialFee($billingFrequencyId, $productId);
@@ -93,12 +92,12 @@ class PriceCalculator
                 $price = $trialPrice ? $trialPrice + $initialFee : 0;
             } else {
                 if ($lockProductPrice) {
-                    $lockPrice = $product->getPrice();
+                    $lockPrice = $product->getOrigData('price');
                     $discountAmount = $this->getDiscountAmount($product);
                     $price = $lockPrice + $initialFee - $discountAmount;
                 } else {
                     $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
-                    $billingFrequencyPrice =  isset($productPrice) ? $productPrice : $billingFrequencyPrice;
+                    $billingFrequencyPrice = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
                     $price = $billingFrequencyPrice + $initialFee;
                 }
             }
@@ -115,8 +114,8 @@ class PriceCalculator
      */
     private function getTrialOfferedStatus(Product $product)
     {
-        return $product->getCustomAttribute(Trial::CODE_TRIAL)
-            ? (bool)$product->getCustomAttribute(Trial::CODE_TRIAL)->getValue()
+        return $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS)
+            ? (bool)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS)->getValue()
             : false;
     }
 
@@ -142,8 +141,8 @@ class PriceCalculator
      */
     private function getTrialPrice(Product $product)
     {
-        return $product->getCustomAttribute(Trial::CODE_TRIAL_PRICE)
-            ? (float)$product->getCustomAttribute(Trial::CODE_TRIAL_PRICE)->getValue()
+        return $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)
+            ? (float)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)->getValue()
             : 0;
     }
 
@@ -155,8 +154,8 @@ class PriceCalculator
      */
     private function getProductLockPriceSatus(Product $product)
     {
-        return $product->getCustomAttribute(LockPrice::CODE_LOCK_PRICE)
-            ? (bool)$product->getCustomAttribute(LockPrice::CODE_LOCK_PRICE)->getValue()
+        return $product->getCustomAttribute(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
+            ? (bool)$product->getCustomAttribute(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)->getValue()
             : false;
     }
 
@@ -168,8 +167,8 @@ class PriceCalculator
      */
     private function getOfferFlatDiscount(Product $product)
     {
-        return $product->getCustomAttribute(LockPrice::CODE_FLAT_DISCOUNT)
-            ? (bool)$product->getCustomAttribute(LockPrice::CODE_FLAT_DISCOUNT)->getValue()
+        return $product->getCustomAttribute(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT)
+            ? (bool)$product->getCustomAttribute(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT)->getValue()
             : false;
     }
 
@@ -183,12 +182,12 @@ class PriceCalculator
     {
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {
-            $discountType = $product->getCustomAttribute(DiscountAmount::CODE_DISCOUNT_TYPE)
-                ? $product->getCustomAttribute(DiscountAmount::CODE_DISCOUNT_TYPE)->getValue()
+            $discountType = $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)
+                ? $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)->getValue()
                 : 0;
             if ($discountType) {
-                $discountAmount = $product->getCustomAttribute(Discount::CODE_DISCOUNT_AMOUNT)
-                    ? $product->getCustomAttribute(Discount::CODE_DISCOUNT_AMOUNT)->getValue()
+                $discountAmount = $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)
+                    ? $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)->getValue()
                     : 0;
                 if ($discountType == DiscountAmount::PERCENT_DISCOUNT && $discountAmount) {
                     $discountAmount = $product->getPrice() * $discountAmount / 100;
@@ -220,7 +219,7 @@ class PriceCalculator
      * @param $productId
      * @return ProductBillingFrequencyInterface
      */
-    private function getProductBillingFrequency($billingFrequencyId, $productId)
+    public function getProductBillingFrequency($billingFrequencyId, $productId)
     {
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();

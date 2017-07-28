@@ -2,24 +2,41 @@
 
 namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
-use Magento\Framework\ObjectManagerInterface;
-use Magento\Store\Model\StoreManagerInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
+use Magento\Store\Model\Store;
 
+/**
+ * Class StepPool
+ */
 class StepPool
 {
+    /**#@+
+     * Request and session param names
+     */
     const STEP_PARAM_NAME = 'step';
     const PERSISTOR_STEP_PARAM_NAME = 'tnw_subscription_profile_step';
+    /**#@-*/
 
+    /**#@+
+     * Constants for subscription profile creation steps
+     */
     const STEP_PARAM_TYPE_CUSTOMER = 'customer';
     const STEP_PARAM_TYPE_STORE = 'store';
     const STEP_PARAM_TYPE_ACCOUNT_INFORMATION = 'account';
     const STEP_PARAM_TYPE_PAYMENT_BILLING = 'payment_and_billing';
     const STEP_PARAM_TYPE_REVIEW = 'review';
+    /**#@-*/
 
-    protected $stepArray = [
+    /**
+     * List of subscription profile creation steps
+     *
+     * @var array
+     */
+    private $stepArray = [
         self::STEP_PARAM_TYPE_CUSTOMER,
         self::STEP_PARAM_TYPE_STORE,
         self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION,
@@ -27,29 +44,56 @@ class StepPool
         self::STEP_PARAM_TYPE_REVIEW
     ];
 
-    protected $currentStep;
-        /** @var DataPersistorInterface */
-    protected $dataPersistor;
-    /** @var StoreManagerInterface */
-    protected $storeManager;
-    /** @var  ObjectManagerInterface */
-    private $_objectManager;
-    /** @var \Magento\Customer\Api\CustomerRepositoryInterface */
-    private $_customerRepository;
+    /**
+     * @var string
+     */
+    private $currentStep;
+
+    /**
+     * Data Persistor.
+     *
+     * @var DataPersistorInterface
+     */
+    private $dataPersistor;
+
+    /**
+     * Store manager.
+     *
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * Admin session.
+     *
+     * @var Quote
+     */
+    private $session;
+
+    /**
+     * Repository for retrieving customers.
+     *
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
 
     /**
      * StepPool constructor.
      * @param StoreManagerInterface $storeManager
      * @param DataPersistorInterface $dataPersistor
+     * @param Quote $session
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor,
-        ObjectManagerInterface $objectManager
+        Quote $session,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->storeManager = $storeManager;
         $this->dataPersistor = $dataPersistor;
-        $this->_objectManager = $objectManager;
+        $this->session = $session;
+        $this->customerRepository = $customerRepository;
     }
 
 
@@ -90,6 +134,8 @@ class StepPool
     }
 
     /**
+     * Returns next step.
+     *
      * @return bool|string
      */
     public function getNextStep()
@@ -104,7 +150,7 @@ class StepPool
                 $result = $this->getStepArray()[$stepKey + 1];
             }
 
-            if ($this->storeManager->hasSingleStore() && $result == self::STEP_PARAM_TYPE_STORE){
+            if ($this->storeManager->hasSingleStore() && $result == self::STEP_PARAM_TYPE_STORE) {
                 $result = self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION;
             }
         }
@@ -113,6 +159,8 @@ class StepPool
     }
 
     /**
+     * Returns previous step.
+     *
      * @return bool|string
      */
     public function getPrevStep()
@@ -127,7 +175,7 @@ class StepPool
                 $result = $this->getStepArray()[$stepKey - 1];
             }
 
-            if ($this->storeManager->isSingleStoreMode() && $result == self::STEP_PARAM_TYPE_STORE){
+            if ($this->storeManager->isSingleStoreMode() && $result == self::STEP_PARAM_TYPE_STORE) {
                 $result = self::STEP_PARAM_TYPE_CUSTOMER;
             }
         }
@@ -152,18 +200,16 @@ class StepPool
     public function getCurrentStepTitle()
     {
         $title = '';
-        /** @var \TNW\Subscriptions\Model\Backend\Session\Quote $session */
-        $session = $this->_getSession();
 
-        if ($session->getCustomerId()) {
-            $customerName = $this->_getCustomerName($session->getCustomerId());
+        if ($this->session->getCustomerId()) {
+            $customerName = $this->getCustomerName($this->session->getCustomerId());
             $title .= ' ' . sprintf(__('for %s'), $customerName);
-        } elseif ($this->getCurrentStep() != self::STEP_PARAM_TYPE_CUSTOMER && $session->getCreateNewCustomer()) {
+        } elseif ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER && $this->session->getCreateNewCustomer()) {
             $title .= ' ' . __('for a New Customer');
         }
 
-        /** @var \Magento\Store\Api\Data\StoreInterface|Store $store */
-        $store = $session->getStore();
+        /** @var Store $store */
+        $store = $this->session->getStore();
         if ($store && $store->getId()) {
             /** @var Website $website */
             $website = $store->getWebsite();
@@ -175,26 +221,16 @@ class StepPool
     }
 
     /**
-     * Returns current session.
-     *
-     * @return \TNW\Subscriptions\Model\Backend\Session\Quote
-     */
-    private function _getSession()
-    {
-        return $this->_objectManager->get(Quote::class);
-    }
-
-    /**
      * Returns customer first name and last name from customer model.
      *
-     * @param $customerId
+     * @param int $customerId
      * @return string
      */
-    private function _getCustomerName($customerId)
+    private function getCustomerName($customerId)
     {
         $customerName = '';
         if ($customerId) {
-            $customer = $this->_getCustomerRepository()->getById($customerId);
+            $customer = $this->customerRepository->getById($customerId);
             if ($customer->getId()) {
                 $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
             }
@@ -204,30 +240,14 @@ class StepPool
     }
 
     /**
-     * Returns customer repository object.
-     *
-     * @return \Magento\Customer\Api\CustomerRepositoryInterface
-     */
-    private function _getCustomerRepository()
-    {
-        if (!$this->_customerRepository) {
-            $this->_customerRepository= $this->_objectManager->create(
-                \Magento\Customer\Api\CustomerRepositoryInterface::class
-            );
-        }
-
-        return $this->_customerRepository;
-    }
-
-    /**
      * Cleares customer data from session.
      *
-     * @param $currentStep
+     * @param string $currentStep
      */
     private function clearCustomer($currentStep)
     {
         if ($currentStep == self::STEP_PARAM_TYPE_CUSTOMER) {
-            $this->_getSession()->setCustomerId(null);
+            $this->session->setCustomerId(null);
         }
     }
 }

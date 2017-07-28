@@ -8,7 +8,9 @@ namespace TNW\Subscriptions\Api\Data;
 
 interface ProductSubscriptionProfileInterface
 {
-
+    /**#@+
+     * Constants for field names
+     */
     const ID = 'entity_id';
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
@@ -16,234 +18,206 @@ interface ProductSubscriptionProfileInterface
     const INITIAL_FEE = 'initial_fee';
     const QTY = 'qty';
     const PURCHASE_TYPE = 'purchase_type';
-    CONST TRIAL_STATUS = 'trial_status';
-    CONST TRIAL_LENGTH = 'trial_length';
-    CONST TRIAL_LENGTH_UNIT = 'trial_length_unit';
-    CONST TRIAL_PRICE = 'trial_price';
-    CONST START_DATE = 'start_date';
-    CONST LOCK_PRODUCT_PRICE_STATUS = 'lock_product_price_status';
-    CONST OFFER_FLAT_DISCOUNT_STATUS = 'offer_flat_discount_status';
-    CONST DISCOUNT_AMOUNT = 'discount_amount';
-    CONST DISCOUNT_TYPE = 'discount_type';
+    const TRIAL_STATUS = 'trial_status';
+    const TRIAL_PRICE = 'trial_price';
+    const LOCK_PRODUCT_PRICE_STATUS = 'lock_product_price_status';
+    const OFFER_FLAT_DISCOUNT_STATUS = 'offer_flat_discount_status';
+    const DISCOUNT_AMOUNT = 'discount_amount';
+    const DISCOUNT_TYPE = 'discount_type';
+    /**#@-*/
 
     /**
-     * Get id
+     * Gets id.
+     *
      * @return string|null
      */
     public function getId();
 
     /**
-     * Set id
-     * @param $id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $id
+     * Sets id.
+     *
+     * @param string $id
+     * @return $this
      */
     public function setId($id);
 
     /**
-     * Get subscription_profile_id
+     * Gets subscription profile id.
+     *
      * @return string|null
      */
     public function getSubscriptionProfileId();
 
     /**
-     * Set subscription_profile_id
-     * @param string $subscription_profile_id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * Sets subscription profile id.
+     *
+     * @param string $subscriptionProfileId
+     * @return $this
      */
-    public function setSubscriptionProfileId($subscription_profile_id);
+    public function setSubscriptionProfileId($subscriptionProfileId);
 
     /**
-     * Get magento_product_id
+     * Gets magento product id.
+     *
      * @return string|null
      */
     public function getMagentoProductId();
 
     /**
-     * Set magento_product_id
-     * @param string $magento_product_id
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * Sets magento product id.
+     *
+     * @param string $magentoProductId
+     * @return $this
      */
-    public function setMagentoProductId($magento_product_id);
+    public function setMagentoProductId($magentoProductId);
 
     /**
-     * Get price
+     * Gets price.
+     *
      * @return string|null
      */
     public function getPrice();
 
     /**
-     * Set price
+     * Sets price.
+     *
      * @param string $price
-     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface
+     * @return $this
      */
     public function setPrice($price);
 
     /**
-     * Get initial_fee
+     * Gets initial fee.
+     *
      * @return string|null
      */
     public function getInitialFee();
 
     /**
-     * Set initial_fee
-     * @param string $initial_fee
-     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface
+     * Sets initial fee.
+     *
+     * @param string $initialFee
+     * @return $this
      */
-    public function setInitialFee($initial_fee);
+    public function setInitialFee($initialFee);
 
     /**
-     * Get qty
+     * Gets qty.
+     *
      * @return string|null
      */
     public function getQty();
 
     /**
-     * Set
-     * @param $qty
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $qty
+     * Sets qty.
+     *
+     * @param string $qty
+     * @return $this
      */
     public function setQty($qty);
 
     /**
-     * Get purchase_type
+     * Gets purchase type.
+     *
      * @return string|null
      */
     public function getPurchaseType();
 
     /**
-     * Set purchase_type
-     * @param $purchase_type
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $purchase_type
+     * Sets purchase type.
+     *
+     * @param $purchaseType
+     * @return string
      */
-    public function setPurchaseType($purchase_type);
+    public function setPurchaseType($purchaseType);
 
     /**
-     * Get trial_status
+     * Gets trial status.
+     *
      * @return string
      */
     public function getTrialStatus();
 
     /**
-     * Set trial_status
-     * @param $trial_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $trial_status
+     * Sets trial status.
+     *
+     * @param string $trialStatus
+     * @return $this
      */
-    public function setTrialStatus($trial_status);
+    public function setTrialStatus($trialStatus);
 
     /**
-     * Get trial_length
-     * @return string
-     */
-    public function getTrialLength();
-
-    /**
-     * Set trial_length
-     * @param $trial_length
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $trial_length
-     */
-    public function setTrialLength($trial_length);
-
-    /**
-     * Get trial_length_unit
-     * @return string
-     */
-    public function getTrialLengthUnit();
-
-    /**
-     * Set trial_length_unit
-     * @param $trial_length_unit
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $trial_length_unit
-     */
-    public function setTrialLengthUnit($trial_length_unit);
-
-    /**
-     * Get trial_price
+     * Gets trial price.
+     *
      * @return string
      */
     public function getTrialPrice();
 
     /**
-     * Set trial_price
-     * @param $trial_price
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $trial_price
+     * Sets trial price.
+     *
+     * @param string $trialPrice
+     * @return $this
      */
-    public function setTrialPrice($trial_price);
+    public function setTrialPrice($trialPrice);
 
     /**
-     * Get start_date
-     * @return string
-     */
-    public function getStartDate();
-
-    /**
-     * Set start_date
-     * @param $start_date
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $start_date
-     */
-    public function setStartDate($start_date);
-
-    /**
-     * Get lock_product_price_status
+     * Gets lock product price status.
+     *
      * @return string
      */
     public function getLockProductPriceStatus();
 
     /**
-     * Set lock_product_price_status
-     * @param $lock_product_price_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $lock_product_price_status
+     * Sets lock product price status.
+     *
+     * @param string $lockProductPriceStatus
+     * @return $this
      */
-    public function setLockProductPriceStatus($lock_product_price_status);
+    public function setLockProductPriceStatus($lockProductPriceStatus);
 
     /**
-     * Get offer_flat_discount_status
+     * Gets offer flat discount status.
+     *
      * @return string
      */
     public function getOfferFlatDiscountStatus();
 
     /**
-     * Set offer_flat_discount_status
-     * @param $offer_flat_discount_status
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $offer_flat_discount_status
+     * Sets offer flat discount status.
+     *
+     * @param string $offerFlatDiscountStatus
+     * @return $this
      */
-    public function setOfferFlatDiscountStatus($offer_flat_discount_status);
+    public function setOfferFlatDiscountStatus($offerFlatDiscountStatus);
 
     /**
-     * Get discount_amount
+     * Gets discount amount.
+     *
      * @return string
      */
     public function getDiscountAmount();
 
     /**
-     * Set discount_amount
-     * @param $discount_amount
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $discount_amount
+     * Sets discount amount.
+     *
+     * @param string $discountAmount
+     * @return $this
      */
-    public function setDiscountAmount($discount_amount);
+    public function setDiscountAmount($discountAmount);
 
     /**
-     * Get discount_type
+     * Gets discount type.
+     *
      * @return string
      */
     public function getDiscountType();
 
     /**
-     * Set discount_type
-     * @param $discount_type
-     * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
-     * @internal param string $discount_type
+     * Sets discount type.
+     *
+     * @param $discountType
+     * @return $this
      */
-    public function setDiscountType($discount_type);
-
+    public function setDiscountType($discountType);
 }

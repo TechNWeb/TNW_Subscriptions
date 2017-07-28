@@ -16,9 +16,9 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
 
 /**
  * Modal form for adding single product to subscription.
@@ -148,9 +148,7 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * Get data
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getData()
     {
@@ -161,12 +159,17 @@ class Form extends AbstractDataProvider
 
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId);
+            $billingFrequencyPresetQty = $frequency->getPresetQty();
             if ($frequency->getDefaultBillingFrequency()) {
-                $data[self::FORM_DATA_VALUE]['product_billing_frequency'] = $frequency->getBillingFrequencyId();
+                $data[self::FORM_DATA_VALUE]['billing_frequency_id'] = $frequency->getBillingFrequencyId();
                 $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
+                $data[self::FORM_DATA_VALUE]['preset_qty'] = $billingFrequencyPresetQty;
             }
             $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId] = $billingFrequencyUnitPrice;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['price'] =
+                $billingFrequencyUnitPrice;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['preset_qty'] =
+                $billingFrequencyPresetQty;
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
@@ -175,7 +178,7 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @return mixed
+     * @inheritdoc
      */
     public function getConfigData()
     {
@@ -187,7 +190,7 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @return array
+     * @inheritdoc
      */
     public function getMeta()
     {
@@ -211,6 +214,8 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns billing frequency field set meta data.
+     *
      * @return array
      */
     protected function getFieldsMetaData()
@@ -218,7 +223,7 @@ class Form extends AbstractDataProvider
         return $result = [
             'billing_frequency' => [
                 'children' => [
-                    'product_billing_frequency' => [
+                    'billing_frequency_id' => [
                         'arguments' => [
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
@@ -263,7 +268,7 @@ class Form extends AbstractDataProvider
                                         'validate-zero-or-greater' => true,
                                     ],
                                     'imports' => [
-                                        'changeValue' => 'index = product_billing_frequency:value',
+                                        'changeValue' => 'index = billing_frequency_id:value',
                                     ],
                                 ],
                             ],
@@ -276,9 +281,11 @@ class Form extends AbstractDataProvider
 
 
     /**
+     * Returns buttons meta data.
+     *
      * @return array
      */
-    protected function getButtonsMetaData()
+    private function getButtonsMetaData()
     {
         return $result = [
             'add_to_subscription' => [
@@ -304,9 +311,11 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns additional list of Ui component names.
+     *
      * @return array
      */
-    protected function getAdditionalConfig()
+    private function getAdditionalConfig()
     {
         return [
             'subProductListing' => Product::DATA_SCOPE_SUBSCRIPTION_LISTING,
@@ -319,7 +328,12 @@ class Form extends AbstractDataProvider
         ];
     }
 
-    protected function getStartOnFieldConfig()
+    /**
+     * Returns config fot start on field.
+     *
+     * @return array
+     */
+    private function getStartOnFieldConfig()
     {
         $visible = false;
         $value = null;
@@ -332,17 +346,17 @@ class Form extends AbstractDataProvider
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
-            if ($product->getData(Trial::CODE_TRIAL)) {
-                if ($product->getData(Trial::CODE_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+            if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
+                if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
                     $visible = true;
                 } else {
-                    $value = $product->getData(Trial::CODE_TRIAL_START_DATE);
+                    $value = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
                 }
             } else {
-                if ($product->getData(Trial::CODE_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+                if ($product->getData(Attribute::SUBSCRIPTION_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
                     $visible = true;
                 } else {
-                    $value = $product->getData(Trial::CODE_START_DATE);
+                    $value = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
                 }
             }
         }
@@ -354,11 +368,13 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns list of product billing frequencies.
+     *
      * @return array
      */
-    protected function getProductBillingFrequencies()
+    private function getProductBillingFrequencies()
     {
-        if (!is_array($this->productBillingFrequencies)) {
+        if ($this->productBillingFrequencies === null) {
 
             $this->productBillingFrequencies = [];
 
@@ -375,6 +391,8 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns product billing frequencies as array.
+     *
      * @return array
      */
     public function getProductBillingFrequenciesAsOptionArray()
@@ -407,11 +425,11 @@ class Form extends AbstractDataProvider
             $trialUnit = 0;
             if ($productId) {
                 $product = $this->productRepository->getById($productId);
-                $trialLength = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)
-                    ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH)->getValue()
+                $trialLength = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
+                    ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)->getValue()
                     : 0;
-                $trialUnit = $product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)
-                    ? (int)$product->getCustomAttribute(Trial::CODE_TRIAL_LENGTH_UNIT)->getValue()
+                $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
+                    ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
                     : 0;
                 $trialUnit = $this->unitType->getLabelByValue($trialUnit);
             }

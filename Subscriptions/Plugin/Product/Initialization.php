@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Plugin\Product;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterfaceFactory;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 class Initialization
 {
@@ -84,7 +84,7 @@ class Initialization
      */
     private function processPresetQty($product, $recurringOptionData)
     {
-        if ((int)$product->getData(UnlockPresetQty::CODE_UNLOCK_PRESET_QTY) === 0) {
+        if ((int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY) === 0) {
             unset($recurringOptionData['preset_qty']);
         }
 

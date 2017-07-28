@@ -59,6 +59,19 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfileOrderRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfileOrder"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileAddressRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\Address"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -106,6 +119,53 @@
         </arguments>
     </type>
 
+    <type name="Magento\Framework\EntityManager\MetadataPool">
+        <arguments>
+            <argument name="metadata" xsi:type="array">
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">tnw_subscriptions_subscription_profile_entity</item>
+                    <item name="eavEntityType" xsi:type="string">subscription_profile</item>
+                    <item name="identifierField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\HydratorPool">
+        <arguments>
+            <argument name="hydrators" xsi:type="array">
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="string">Magento\Framework\EntityManager\AbstractModelHydrator</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Model\Entity\RepositoryFactory">
+        <arguments>
+            <argument name="entities" xsi:type="array">
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="string">TNW\Subscriptions\Api\Data\SubscriptionProfileInterface</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
+                    <!-- Save/load subscription profile addresses/products -->
+                    <item name="read" xsi:type="array">
+                        <item name="profile_address_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\ReadHandler</item>
+                        <item name="profile_product_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\ReadHandler</item>
+                    </item>
+                    <item name="create" xsi:type="array">
+                        <item name="profile_address_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="profile_address_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- Product builder plugin to setup default attributes values on create new product request -->
     <type name="Magento\Catalog\Controller\Adminhtml\Product\Builder">
         <plugin name="subscriptions_product_builder"
@@ -137,4 +197,20 @@
                 sortOrder="10"
                 disabled="false"/>
     </type>
+
+    <type name="Magento\Eav\Model\Entity\AttributeCache">
+        <arguments>
+            <argument name="unsupportedTypes" xsi:type="array">
+                <item name="subscription_profile" xsi:type="string">subscription_profile</item>
+                <item name="tnw_product_subscription_profile" xsi:type="string">tnw_product_subscription_profile</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Product copier plugin for duplicating subscription options -->
+    <type name="Magento\Catalog\Model\Product\Copier">
+        <plugin name="subscriptions_product_billing_frequency_duplicate"
+                type="TNW\Subscriptions\Plugin\Product\Copier" />
+    </type>
+
 </config>

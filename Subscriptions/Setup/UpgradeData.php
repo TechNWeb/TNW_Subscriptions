@@ -15,7 +15,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Upgrade data for TNW Subscriptions.
@@ -119,7 +119,24 @@ class UpgradeData implements UpgradeDataInterface
 
             if ($setup->tableExists('tnw_subscriptions_product_subscription_profile')) {
                 $select = $setup->getConnection()->select()
-                    ->from($setup->getTable('tnw_subscriptions_product_subscription_profile'));
+                    ->from(
+                        $setup->getTable('tnw_subscriptions_product_subscription_profile'),
+                        [
+                            'id',
+                            'subscription_profile_id',
+                            'magento_product_id',
+                            'price',
+                            'initial_fee',
+                            'qty',
+                            'purchase_type',
+                            'trial_status',
+                            'trial_price',
+                            'lock_product_price_status',
+                            'offer_flat_discount_status',
+                            'discount_amount',
+                            'discount_type',
+                        ]
+                    );
                 $select = $setup->getConnection()->insertFromSelect(
                     $select,
                     $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
@@ -132,11 +149,7 @@ class UpgradeData implements UpgradeDataInterface
                         'qty',
                         'purchase_type',
                         'trial_status',
-                        'trial_length',
-                        'trial_length_unit',
                         'trial_price',
-                        'trial_start_date',
-                        'start_date',
                         'lock_product_price_status',
                         'offer_flat_discount_status',
                         'discount_amount',
@@ -151,7 +164,7 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), "2.0.7", "<")) {
             $eavSetup->addAttribute(
                 Product::ENTITY,
-                UnlockPresetQty::CODE_UNLOCK_PRESET_QTY,
+                Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
                 [
                     'type' => 'int',
                     'backend' => '',
@@ -179,10 +192,159 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
-        //this upgrade of the attributes 'tnw_subscr_trial_price', 'tnw_subscr_discount_amount'
-        // has to be moved to install where this attribute is added
+        //TODO this upgrade of the attributes 'tnw_subscr_trial_price', 'tnw_subscr_discount_amount' has to be moved to install where this attribute is added
         if (version_compare($context->getVersion(), "2.0.8", "<")) {
             $this->updateProductTrialDiscountAttributes($eavSetup);
+        }
+
+
+        if (version_compare($context->getVersion(), "2.0.10", "<")) {
+            //TODO don't add this attributes to subscription profile entity
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+            $subscriptionSetup->removeAttribute($profileEntityTypeId, 'shipping_address_id');
+            $subscriptionSetup->removeAttribute($profileEntityTypeId, 'billing_address_id');
+            $subscriptionSetup->removeAttribute($profileEntityTypeId, 'label');
+            //TODO don't add this attributes to subscription profile product entity
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->removeAttribute($profileProductEntityTypeId, 'trial_start_date');
+            $subscriptionSetup->removeAttribute($profileProductEntityTypeId, 'start_date');
+
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID,
+                [
+                    'type' => 'static',
+                    'label' => 'Subscription Profile Id',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 100,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::MAGENTO_PRODUCT_ID,
+                [
+                    'type' => 'static',
+                    'label' => 'Magento Product Id',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 110,
+                ]
+            );
+
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TRIAL_START_DATE,
+                [
+                    'type' => 'static',
+                    'label' => 'Trial Start Date',
+                    'input' => 'date',
+                    'required' => false,
+                    'visible' => true,
+                    'sort_order' => 100,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::START_DATE,
+                [
+                    'type' => 'static',
+                    'label' => 'Start Date',
+                    'input' => 'date',
+                    'required' => false,
+                    'visible' => true,
+                    'sort_order' => 110
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TRIAL_LENGTH,
+                [
+                    'type' => 'static',
+                    'label' => 'Trial Length',
+                    'input' => 'text',
+                    'required' => false,
+                    'frontend_class' => 'validate-number',
+                    'sort_order' => 120,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TRIAL_LENGTH_UNIT,
+                [
+                    'type' => 'static',
+                    'label' => 'Trial Length Unit',
+                    'input' => 'select',
+                    'required' => false,
+                    'source' => \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::class,
+                    'sort_order' => 130,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TERM,
+                [
+                    'type' => 'static',
+                    'label' => 'Term',
+                    'input' => 'text',
+                    'required' => false,
+                    'frontend_class' => 'validate-number',
+                    'sort_order' => 140,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TOTAL_BILLING_CYCLES,
+                [
+                    'type' => 'static',
+                    'label' => 'Total billing cycles',
+                    'input' => 'text',
+                    'required' => false,
+                    'frontend_class' => 'validate-number',
+                    'sort_order' => 150,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::SHIPPING_METHOD,
+                [
+                    'type' => 'static',
+                    'label' => 'Shipping Method',
+                    'input' => 'text',
+                    'required' => true,
+                    'frontend_class' => 'validate-length maximum-length-40',
+                    'sort_order' => 160,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::SHIPPING_DESCRIPTION,
+                [
+                    'type' => 'static',
+                    'label' => 'Shipping Description',
+                    'input' => 'text',
+                    'required' => false,
+                    'frontend_class' => 'validate-length maximum-length-255',
+                    'sort_order' => 170,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::PROFILE_CURRENCY_CODE,
+                [
+                    'type' => 'static',
+                    'label' => 'Profile currency code',
+                    'input' => 'text',
+                    'required' => true,
+                    'frontend_class' => 'validate-length maximum-length-255',
+                    'sort_order' => 170,
+                ]
+            );
         }
 
         $setup->endSetup();

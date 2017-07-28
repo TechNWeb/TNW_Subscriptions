@@ -10,14 +10,17 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\DataObject;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
+use Magento\Framework\Session\SessionManagerInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\AbstractCreate;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\Product\Attribute;
 
-class Product extends AbstractCreate
+/**
+ * Class Product
+ */
+class Product extends Create
 {
     /**
      * Repository for retrieving products.
@@ -48,13 +51,13 @@ class Product extends AbstractCreate
     /**
      * Product constructor.
      * @param Context $context
-     * @param Quote $session
+     * @param SessionManagerInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      */
     public function __construct(
         Context $context,
-        Quote $session,
+        SessionManagerInterface $session,
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator
     ) {
@@ -107,7 +110,7 @@ class Product extends AbstractCreate
 
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
-            $productData['product_billing_frequency'],
+            $productData['billing_frequency_id'],
             $productData['price'],
             true
         );
@@ -128,6 +131,9 @@ class Product extends AbstractCreate
 
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productData['product_id']);
+            $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
+            $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
+            $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
@@ -135,26 +141,26 @@ class Product extends AbstractCreate
                 'qty' => $productData['qty'],
                 'custom_price' => $product->getPrice(),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
-                    'unique' => [
-                        'billing_frequency' => $productData['product_billing_frequency'],
+                    static::UNIQUE => [
+                        'billing_frequency' => $productData['billing_frequency_id'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
-                        'is_trial' => $product->getData(Trial::CODE_TRIAL) ? true : false,
+                        'is_trial' => $isTrial,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
+                        'trial_period' => $trialPeriod,
+                        'trial_unit_id' => $trialUnitId,
                     ],
-                    'non_unique' => [
+                    static::NON_UNIQUE => [
                         'price' => $this->priceCalculator->getUnitPrice(
                             $product->getId(),
-                            $productData['product_billing_frequency'],
+                            $productData['billing_frequency_id'],
                             $productData['price']
                         )
                     ],
                 ],
             ];
-
             $this->buyRequest = new DataObject($data);
         }
-
 
         return $this->buyRequest;
     }

@@ -6,21 +6,34 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile as ProfileModel;
+
+class Edit extends SubscriptionProfile
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        Registry $coreRegistry,
+        DataPersistorInterface $dataPersistor,
+        PageFactory $resultPageFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
 
@@ -30,35 +43,30 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
     /**
      * Edit action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        // 1. Get ID and create model
-        $id = $this->getRequest()->getParam('id');
-        $model = $this->_objectManager->create(\TNW\Subscriptions\Model\SubscriptionProfile::class);
+        $result = null;
+        $profileId = $this->getRequest()->getParam('entity_id');
+        $model = $this->_objectManager->create(ProfileModel::class);
 
-        // 2. Initial checking
-        if ($id) {
-            $model->load($id);
+        if ($profileId) {
+            $model->load($profileId);
             if (!$model->getId()) {
                 $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
-                /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+                /** @var Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             }
         }
-        $this->_coreRegistry->register('tnw_subscriptions_subscriptionprofile', $model);
 
-        // 5. Build edit form
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+        $this->_coreRegistry->register('tnw_subscription_profile', $model);
+        /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
-        $this->initPage($resultPage)->addBreadcrumb(
-            $id ? __('Edit Subscription Profile') : __('New Subscription Profile'),
-            $id ? __('Edit Subscription Profile') : __('New Subscription Profile')
-        );
-        $resultPage->getConfig()->getTitle()->prepend(__('Subscriptionprofiles'));
-        $resultPage->getConfig()->getTitle()->prepend($model->getId() ? $model->getTitle() : __('New Subscription Profile'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Subscription'));
+        $resultPage->getConfig()->getTitle()->prepend($this->getSubscriptionTitle($model));
+
         return $resultPage;
     }
 
@@ -71,6 +79,24 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
     {
         return $this->_authorization->isAllowed(
             'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
+
+    /**
+     * Returns title for subscription profile.
+     *
+     * @param ProfileModel $model
+     * @return \Magento\Framework\Phrase
+     */
+    private function getSubscriptionTitle(ProfileModel $model)
+    {
+        return __(
+            sprintf(
+                'Subscription (%s) for %s %s',
+                $model->getLabel(),
+                $model->getCustomer()->getFirstname(),
+                $model->getCustomer()->getLastname()
+            )
         );
     }
 }

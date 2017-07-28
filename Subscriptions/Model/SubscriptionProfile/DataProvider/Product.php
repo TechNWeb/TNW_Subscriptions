@@ -14,6 +14,7 @@ use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -21,11 +22,13 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\Source\CurrencySelect;
 
 class Product extends AbstractDataProvider
 {
@@ -56,6 +59,12 @@ class Product extends AbstractDataProvider
      * Subscription listing data scope
      */
     const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_create_product_listing';
+    /**#@-*/
+
+    /**#@+
+     * Subscription currency data scope
+     */
+    const GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT = 'tnw_subscriptionprofile_create_currency_select';
     /**#@-*/
 
     private $scopeName;
@@ -101,6 +110,16 @@ class Product extends AbstractDataProvider
     private $shippingMethods;
 
     /**
+     * @var DescriptionCreator
+     */
+    private $frequencyDescriptionCreator;
+
+    /**
+     * @var CurrencySelect
+     */
+    private $currencySelect;
+
+    /**
      * Product constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -112,7 +131,9 @@ class Product extends AbstractDataProvider
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
+     * @param CurrencySelect $currencySelect
      * @param ShippingMethods $shippingMethods
+     * @param DescriptionCreator $frequencyDescriptionCreator
      * @param array $meta
      * @param array $data
      * @param string $scopeName
@@ -128,7 +149,9 @@ class Product extends AbstractDataProvider
         Context $context,
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
+        CurrencySelect $currencySelect,
         ShippingMethods $shippingMethods,
+        DescriptionCreator $frequencyDescriptionCreator,
         array $meta = [],
         array $data = [],
         $scopeName = ''
@@ -140,7 +163,9 @@ class Product extends AbstractDataProvider
         $this->context = $context;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->frequencyRepository = $frequencyRepository;
+        $this->currencySelect = $currencySelect;
         $this->shippingMethods = $shippingMethods;
+        $this->frequencyDescriptionCreator = $frequencyDescriptionCreator;
         $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
@@ -162,6 +187,7 @@ class Product extends AbstractDataProvider
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subscriptionData = null;
+            $fullSubscriptionData = null;
 
             if (empty($subQuote->getAllItems())) {
                 continue;
@@ -171,9 +197,21 @@ class Product extends AbstractDataProvider
             foreach ($subQuote->getAllItems() as $item) {
                 if (!$subscriptionData) {
                     $subscriptionData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . Create::UNIQUE
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
                     );
                 }
+                if (!$fullSubscriptionData) {
+                    $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
+                    );
+                } else {
+                    $nonUniqueData = $item->getBuyRequest()->getDataByPath(
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
+                    );
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
+                        isset($nonUniqueData['price']) ? $nonUniqueData['price'] : 0;
+                }
+
 
                 $imageHelper = $this->imageHelper->init(
                     $item->getProduct(),
@@ -193,15 +231,12 @@ class Product extends AbstractDataProvider
 
             $estimatedPayment += ((double)$subTotal * (int)$subscriptionData['period']);
 
-            $startDate = $this->getFormattedStartDate($subscriptionData['start_on']);
-
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
-                'frequency_description' => $this->getFrequencyDescription(
-                    $subTotal,
-                    $subscriptionData,
-                    $startDate
+                'frequency_description' => $this->frequencyDescriptionCreator->getDescription(
+                    $subQuote,
+                    $fullSubscriptionData
                 ),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
@@ -233,92 +268,24 @@ class Product extends AbstractDataProvider
         );
     }
 
-
-    /**
-     * @param $startDate
-     * @return \Magento\Framework\Phrase|string
-     */
-    protected function getFormattedStartDate($startDate)
-    {
-        $nowDate = new \DateTime();
-        $nowDate = $nowDate->format('Y-m-d');
-
-        if ($startDate == $nowDate) {
-            $startDate = __('today');
-        } else {
-            $startDate = $this->context->getLocaleDate()->formatDate(
-                $startDate,
-                \IntlDateFormatter::LONG,
-                false
-            );
-        }
-
-        return $startDate;
-    }
-
-    /**
-     * @param float|string $totalPrice
-     * @param [] $subscriptionData
-     * @param string $startDate
-     * @return string
-     */
-    protected function getFrequencyDescription($totalPrice, $subscriptionData, $startDate)
-    {
-        $formattedPrice = $this->formatPrice($totalPrice);
-
-        $frequencyWithUnit = $this->getFrequencyWithUnit($subscriptionData['billing_frequency']);
-
-        $priceWithUnit = sprintf('<span>%s / %s %s</span>. ', $formattedPrice, __('every'), $frequencyWithUnit);
-        $description = sprintf(
-            __('Total of %s shipment(s). Products will be shipped every %s starting %s.'),
-            $subscriptionData['period'],
-            $frequencyWithUnit,
-            $startDate
-        );
-
-        return $priceWithUnit . $description;
-    }
-
-    /**
-     * @param string|int $billingFrequencyId
-     * @return string
-     */
-    protected function getFrequencyWithUnit($billingFrequencyId)
-    {
-        $billingFrequency = $this->frequencyRepository->getById(
-            $billingFrequencyId
-        );
-
-        $unit = $this->frequencyUnitType->getLabelByValue($billingFrequency->getUnit());
-
-
-        $result = $unit;
-
-        if ($billingFrequency->getFrequency() > 1) {
-            $result = $billingFrequency->getFrequency() . ' ' . $unit;
-        }
-
-        return strtolower($result);
-    }
-
     /**
      * @param ModelQuote $quote
      * @return array
      */
     protected function getShippingMethodData($quote)
     {
-        $this->shippingMethods->setQuote($quote);
         $shippingMethods = [];
-
-        $label = __('Selected on next step');
-
-        if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
-            $label = $this->shippingMethods->getCurrentMethodLabel();
-        } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
-            $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
-            $label = '';
+        $label = '';
+        $this->shippingMethods->setQuote($quote);
+        if ($this->shippingMethods->canShowShippingMethodLabel()) {
+            $label = __('Selected on next step');
+            if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
+                $label = $this->shippingMethods->getCurrentMethodLabel();
+            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+                $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
+                $label = '';
+            }
         }
-
         return [
             'label' => $label,
             'methods' => $shippingMethods,
@@ -342,7 +309,6 @@ class Product extends AbstractDataProvider
         return $meta;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -361,6 +327,39 @@ class Product extends AbstractDataProvider
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_REVIEW) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
             $result = [
+                self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
+                    'children' => [
+                        'currency_id' => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'options' => $this->currencySelect->getAllOptions(),
+                                        'value' => $this->currencySelect->getSelectedCurrencyId(),
+                                        'formElement' => Select::NAME,
+                                        'componentType' => Select::NAME,
+                                        'label' => 'Order Currency:',
+                                        'source' => 'SubscriptionProfile',
+                                        'template' => 'TNW_Subscriptions/form/element/select',
+                                        'data_form_part' => $this->currencySelect->getCurrentDataFormPartFromStep($this->stepPool->getCurrentStep()),
+                                        'dataScope' => '$data.currency_id',
+                                        'sortOrder' => 0,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'additionalClasses' => 'admin__fieldset-section subscription-profile-currency',
+                                'label' => false,
+                                'collapsible' => false,
+                                'componentType' => Fieldset::NAME,
+                                'sortOrder' => 0,
+                            ],
+                        ],
+                    ],
+                ],
                 self::GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS => [
                     'children' => [
                         'button_add_product' => [
@@ -418,7 +417,7 @@ class Product extends AbstractDataProvider
                                 'collapsible' => false,
                                 'componentType' => Fieldset::NAME,
                                 'dataScope' => '',
-                                'sortOrder' => 0,
+                                'sortOrder' => 1,
                                 'style' => 'max-width: 100%'
                             ],
                         ],

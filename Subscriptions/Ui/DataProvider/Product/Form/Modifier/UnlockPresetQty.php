@@ -9,14 +9,13 @@ namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Data provider for "Unlock preset qty" switcher.
  */
 class UnlockPresetQty extends AbstractModifier
 {
-    const CODE_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
-
     /**
      * Subscriptions config.
      *
@@ -53,7 +52,7 @@ class UnlockPresetQty extends AbstractModifier
         $value = $this->config->unlockPresetQtyStatus();
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                self::CODE_UNLOCK_PRESET_QTY,
+                Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
                 $meta,
                 null,
                 'children'
