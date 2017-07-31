@@ -48,7 +48,7 @@ class Checkmo extends Base
             ];
         }
 
-        if ($mailingAddress) {
+        if ($payableTo) {
             $result[static::ADDITIONAL_FIELD_PAYABLE_TO] = [
                 'arguments' => [
                     'data' => [
