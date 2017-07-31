@@ -4,17 +4,20 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\ProductDetails;
 
+use Magento\Framework\Locale\CurrencyInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use TNW\Subscriptions\Model\Context;
-use Magento\Quote\Model\Quote as ModelQuote;
-use Magento\Framework\Locale\CurrencyInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
-class ProductDetailsBase implements ModifierInterface
+/**
+ * Base form modifier to display payment details.
+ */
+class Base implements ModifierInterface
 {
     /**#@+
      * Name of payment details fieldset.

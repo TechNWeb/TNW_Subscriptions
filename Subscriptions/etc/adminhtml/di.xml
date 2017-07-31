@@ -146,7 +146,7 @@
         <arguments>
             <argument name="modifiers" xsi:type="array">
                 <item name="modifier_name" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\ProductDetailsCheckmo</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\ProductDetails\Checkmo</item>
                     <item name="sortOrder" xsi:type="number">1</item>
                 </item>
             </argument>

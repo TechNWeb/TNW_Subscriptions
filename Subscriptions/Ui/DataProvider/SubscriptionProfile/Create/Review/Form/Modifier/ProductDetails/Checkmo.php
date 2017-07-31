@@ -4,9 +4,12 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\ProductDetails;
 
-class ProductDetailsCheckmo extends ProductDetailsBase
+/**
+ * Form modifier to display payment details for payment method Checkmo.
+ */
+class Checkmo extends Base
 {
     /**#@+
      * Checkmo additional field names.
