@@ -496,4 +496,25 @@ class Create extends BaseCreate
             $this->setNeedCollect(true);
         }
     }
+
+    /**
+     * Returns SubQuotes grand total.
+     *
+     * @return int
+     */
+    public function getSubQuotesGrandTotal()
+    {
+        $grandTotal = 0;
+        /** @var Session $session */
+        $session = $this->getSession();
+        $quotes = $session->getSubQuotes();
+
+        if (!empty($quotes)) {
+            foreach ($quotes as $quote) {
+                $grandTotal += $quote->getGrandTotal() * 1;
+            }
+        }
+
+        return $grandTotal;
+    }
 }

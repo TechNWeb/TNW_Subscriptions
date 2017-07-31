@@ -338,3 +338,27 @@
   top: -0.5rem;
   left: 0.5rem;
 }
+.admin__payment-details-preview .admin__fieldset>.admin__field {
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  width: calc((100%) * .50 );
+  text-align: left;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-control {
+  text-align: right;
+  line-height: 3.2rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field:nth-child(odd)/*>.admin__field-label*/ {
+  background-color: #f1f1f1;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+.admin__payment-details-preview>.admin__fieldset-wrapper-content>fieldset {
+  padding-top: 1rem;
+}

@@ -186,7 +186,8 @@ class Process extends Create
 
             foreach ($data['payment'] as $code => $methodData){
                if ($methodData['method']){
-                   $result = $this->getSubCreateModel()->setPayment($code, $methodData['additional']);
+                   $additonalData = isset($methodData['additional']) ? $methodData['additional'] : [];
+                   $result = $this->getSubCreateModel()->setPayment($code, $additonalData);
                    break;
                }
             }
