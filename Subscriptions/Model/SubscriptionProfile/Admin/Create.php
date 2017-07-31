@@ -328,6 +328,9 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
+            if ($subQuote->isVirtual()){
+                continue;
+            }
 
             /** @var string|null $method */
             $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;

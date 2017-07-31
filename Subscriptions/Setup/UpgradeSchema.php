@@ -401,6 +401,46 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $setup->getConnection()->createTable($table);
         }
 
+        if (version_compare($context->getVersion(), "2.0.11", "<")) {
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::IS_VIRTUAL,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Is virtual',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_METHOD,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Shipping Method',
+                    'length' => 40,
+                    'default' => null
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_DESCRIPTION,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Shipping Description',
+                    'length' => 255,
+                    'default' => null
+                ]
+            );
+        }
+
+
         $setup->endSetup();
     }
 
@@ -680,7 +720,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_datetime', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_datetime', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -732,7 +773,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addIndex(
                 $setup->getIdxName(
                     ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
-                    [ 'entity_id', 'attribute_id', 'store_id'],
+                    ['entity_id', 'attribute_id', 'store_id'],
                     \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
                 ['entity_id', 'attribute_id', 'store_id'],
@@ -775,7 +816,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_decimal', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_decimal', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -1060,7 +1102,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_varchar', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_varchar', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -1079,7 +1122,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function migrateSubscriptionProfileToEav(SchemaSetupInterface $setup) {
+    private function migrateSubscriptionProfileToEav(SchemaSetupInterface $setup)
+    {
         /**
          * Create table 'tnw_subscriptions_subscription_profile_entity'.
          */

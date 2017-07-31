@@ -399,6 +399,22 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     /**
      * {@inheritdoc}
      */
+    public function getIsVirtual()
+    {
+        return $this->getData(self::IS_VIRTUAL);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsVirtual($isVirtual)
+    {
+        return $this->setData(self::IS_VIRTUAL, $isVirtual);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProducts()
     {
         return $this->getData(self::PROFILE_PRODUCTS);
