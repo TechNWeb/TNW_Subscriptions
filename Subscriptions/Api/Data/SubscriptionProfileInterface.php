@@ -29,6 +29,7 @@ interface SubscriptionProfileInterface
     const PROFILE_CURRENCY_CODE = 'profile_currency_code';
     const TRIAL_LENGTH = 'trial_length';
     const TRIAL_LENGTH_UNIT = 'trial_length_unit';
+    const IS_VIRTUAL = 'is_virtual';
     /**#@-*/
 
     /**#@+
@@ -358,4 +359,19 @@ interface SubscriptionProfileInterface
      * @return $this
      */
     public function setTrialLengthUnit($trialLengthUnit);
+
+    /**
+     * Gets is virtual flag.
+     *
+     * @return string|null
+     */
+    public function getIsVirtual();
+
+    /**
+     * Sets is virtual flag.
+     *
+     * @param bool $isVirtual
+     * @return $this
+     */
+    public function setIsVirtual($isVirtual);
 }
