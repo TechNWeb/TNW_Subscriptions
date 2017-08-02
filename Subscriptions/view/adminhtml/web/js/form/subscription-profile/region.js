@@ -6,8 +6,9 @@
 define([
     'Magento_Ui/js/form/element/region',
     'uiLayout',
-    'mageUtils'
-], function (Select, layout, utils) {
+    'mageUtils',
+    'uiRegistry'
+], function (Select, layout, utils, registry) {
     'use strict';
     var inputNode = {
         parent: '${ $.$data.parentName }',
@@ -35,6 +36,23 @@ define([
 
             return this;
         },
+
+        checkValidation: function (checkedSame) {
+            this.setValidation('required-entry', checkedSame);
+        },
+
+        checkVisibility: function () {
+            var customerAddressId = registry.get('index=customer_address_id');
+            var options = this.options();
+            var optionsLength = 0;
+            if (typeof options == 'Array') {
+                optionsLength = options.length;
+            }
+            if (!customerAddressId.visible() && optionsLength > 0) {
+                this.setVisible(true);
+            }
+        }
+
     });
 });
 

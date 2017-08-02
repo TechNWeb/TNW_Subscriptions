@@ -29,12 +29,14 @@ class Process extends Create
     {
         $this->resetErrors();
 
-        $this->processRequestData();
-
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
             StepPool::STEP_PARAM_TYPE_CUSTOMER
         );
+
+        $this->processBackActions($currentStep);
+
+        $this->processRequestData();
 
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
@@ -87,6 +89,7 @@ class Process extends Create
     {
         if (isset($data['store_id'])){
             $this->_getSession()->setStoreId($data['store_id']);
+            $this->getSubCreateModel()->deleteQuoteIfStoreChanged();
         }
     }
 
@@ -106,6 +109,11 @@ class Process extends Create
             $this->_getSession()->setCreateNewCustomer($data['create_new_customer']);
             $this->_getSession()->setCustomerId(null);
         }
+
+        if (isset($data['customer_id']) || isset($data['create_new_customer'])) {
+            $this->getSubCreateModel()->changeCustomerInQuote();
+        }
+
     }
 
     /**
@@ -237,5 +245,24 @@ class Process extends Create
         }
 
         return $additionalParams;
+    }
+
+    /**
+     * Process data if 'Back' button was pressed.
+     *
+     * @param string $currentStep
+     * @return void
+     */
+    private function processBackActions($currentStep)
+    {
+        $back = $this->getRequest()->getParam('back', 0);
+
+        if ($back) {
+            if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+                $this->getSubCreateModel()->clearAccountStepData();
+            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+                $this->getSubCreateModel()->clearPaymenBillingStepData();
+            }
+        }
     }
 }
