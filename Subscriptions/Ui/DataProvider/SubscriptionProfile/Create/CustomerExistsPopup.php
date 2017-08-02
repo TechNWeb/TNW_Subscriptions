@@ -40,7 +40,9 @@ class CustomerExistsPopup implements OptionSourceInterface
         $result =
             [
                 [
-                    'label' => __('Subscription should be linked to the existing account for ' . $customerName),
+                    'label' => __(
+                        'Subscription should be linked to the existing account for <b>' . $customerName . '</b>'
+                    ),
                     'value' => 'link'
                 ],
                 [

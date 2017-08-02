@@ -50,6 +50,7 @@
                     <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">radioset</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/checkbox-set-with-html-label</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>

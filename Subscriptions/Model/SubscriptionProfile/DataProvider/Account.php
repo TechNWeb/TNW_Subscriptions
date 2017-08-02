@@ -199,7 +199,6 @@ class Account extends AbstractDataProvider
             ]
         ];
 
-
         return $result;
     }
 
@@ -213,9 +212,11 @@ class Account extends AbstractDataProvider
                 'data' => [
                     'config' => [
                         'componentType' => Modal::NAME,
+                        'component' => 'TNW_Subscriptions/js/modal/modal-component-customer-exists-popup',
                         'options' => [
                             'modalClass' => 'modal-popup',
                         ],
+                        'onCancel' => 'closePopup'
                     ],
                 ],
             ],

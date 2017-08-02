@@ -52,6 +52,11 @@ define([
             }
         },
 
+        /**
+         * Send ajax and assign subscriptions to existing customer.
+         *
+         * @param url
+         */
         sendAjaxAssignSubscriptionsToCustomer: function (url) {
             $j.ajax({
                 showLoader: true,

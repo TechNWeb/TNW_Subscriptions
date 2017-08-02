@@ -11,7 +11,7 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Framework\UrlInterface;
 
 /**
- * Class Email
+ * Class for email field in Subscription Profile creating page.
  */
 class Email extends \Magento\Ui\Component\Form\Field
 {

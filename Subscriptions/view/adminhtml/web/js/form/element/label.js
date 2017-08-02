@@ -20,9 +20,9 @@ define([
         setInitialValue: function () {
             this._super();
 
-            var firstPart = $j.mage.__('We found a customer account for ');
-            var secondPart = $j.mage.__(' and email address ');
-            var thirdPart = $j.mage.__('. What would you like to do?');
+            var firstPart = $j.mage.__('We found a customer account for <b>');
+            var secondPart = $j.mage.__('</b> and email address <b>');
+            var thirdPart = $j.mage.__('</b>. What would you like to do?');
 
             var name = typeof this.imports.customerName == "undefined" ? '' : this.imports.customerName;
             var email= typeof this.imports.customerEmail == "undefined" ? '' : this.imports.customerEmail;

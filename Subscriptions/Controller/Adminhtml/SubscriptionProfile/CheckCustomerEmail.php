@@ -76,10 +76,11 @@ class CheckCustomerEmail extends Action
         }
 
         if (isset($customer) && $customer && $customer->getId()) {
-            $response->setData('customerName', $customer->getFirstname() . $customer->getLastname());
+            $customerName = $customer->getFirstname() . ' ' .  $customer->getLastname();
+            $response->setData('customerName', $customerName);
             $response->setData('customerEmail', $email);
 
-            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . $customer->getLastname());
+            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . ' ' .  $customer->getLastname());
             $this->dataPersistor->set('existsCustomerEmail', $email);
             $this->dataPersistor->set('existsCustomerId', $customer->getId());
         } else {

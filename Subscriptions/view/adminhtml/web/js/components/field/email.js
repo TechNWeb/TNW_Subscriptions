@@ -80,13 +80,13 @@ define([
          * @param customerEmail
          */
         updateQuestion: function (customerName, customerEmail) {
-            var firstPart = $j.mage.__('We found a customer account for ');
-            var secondPart = $j.mage.__(' and email address ');
-            var thirdPart = $j.mage.__('. What would you like to do?');
+            var firstPart = $j.mage.__('We found a customer account for <b>');
+            var secondPart = $j.mage.__('</b> and email address <b>');
+            var thirdPart = $j.mage.__('</b>. What would you like to do?');
 
             var text = firstPart + customerName + secondPart + customerEmail + thirdPart;
 
-            $j('.admin__fieldset #customer-exists-label').text(text);
+            $j('.admin__fieldset #customer-exists-label').html(text);
         },
 
         /**
@@ -96,7 +96,8 @@ define([
          */
         updateRadio: function (customerName) {
             // make message for label.
-            var text = $j.mage.__('Subscription should be linked to the existing account for ') + customerName;
+            var text = $j.mage.__('Subscription should be linked to the existing account for <b>') +
+                customerName + '</b>';
 
             //change label due to first name and last name of customer changed.
             var option = $j('.admin__field.admin__field-option :input[value="link"]');
@@ -105,7 +106,7 @@ define([
                 var label = option.parent().find('.admin__field-label');
 
                 if (label) {
-                    label.text(text);
+                    label.html(text);
                 }
             }
         }
