@@ -79,7 +79,6 @@ class ReassignSubscriptions extends Action
         $customerId = $this->dataPersistor->get('existsCustomerId');
 
         if ($customerId) {
-            //todo ask Misha if need to do some more ?
             $this->session->setCustomerId($customerId);
         } else {
             $response->setData('result', false);
