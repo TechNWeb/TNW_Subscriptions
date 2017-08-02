@@ -328,6 +328,9 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
+            if ($subQuote->isVirtual()){
+                continue;
+            }
 
             /** @var string|null $method */
             $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;
@@ -492,5 +495,26 @@ class Create extends BaseCreate
         if ($needRecollect) {
             $this->setNeedCollect(true);
         }
+    }
+
+    /**
+     * Returns SubQuotes grand total.
+     *
+     * @return int
+     */
+    public function getSubQuotesGrandTotal()
+    {
+        $grandTotal = 0;
+        /** @var Session $session */
+        $session = $this->getSession();
+        $quotes = $session->getSubQuotes();
+
+        if (!empty($quotes)) {
+            foreach ($quotes as $quote) {
+                $grandTotal += $quote->getGrandTotal() * 1;
+            }
+        }
+
+        return $grandTotal;
     }
 }

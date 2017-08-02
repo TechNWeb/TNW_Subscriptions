@@ -46,7 +46,7 @@ class Checkmo extends Base
 
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getPaymentCode()
     {
@@ -54,17 +54,21 @@ class Checkmo extends Base
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getPaymentTitle()
     {
         return $this->checkmoPayment->getTitle();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getAdditionalFields()
     {
-        return [
-            static::ADDITIONAL_FIELD_MAILING_ADDRESS => [
+        $mailingAddress = $this->checkmoPayment->getMailingAddress();
+        if ($mailingAddress) {
+            $result[static::ADDITIONAL_FIELD_MAILING_ADDRESS] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
@@ -79,8 +83,12 @@ class Checkmo extends Base
                         ],
                     ],
                 ],
-            ],
-            static::ADDITIONAL_FIELD_PAYABLE_TO => [
+            ];
+        }
+
+        $payableTo = $this->checkmoPayment->getPayableTo();
+        if ($payableTo) {
+            $result[static::ADDITIONAL_FIELD_PAYABLE_TO] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
@@ -95,7 +103,7 @@ class Checkmo extends Base
                         ],
                     ],
                 ],
-            ]
-        ];
+            ];
+        }
     }
 }

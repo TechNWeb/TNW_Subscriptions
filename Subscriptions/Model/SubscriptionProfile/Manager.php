@@ -243,6 +243,7 @@ class Manager
                 ->setEngineCode($quote->getPayment()->getMethod())
                 ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
                 ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
+                ->setIsVirtual($quote->getIsVirtual())
                 ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
                 ->setTerm($request['term'])
                 ->setTotalBillingCycles($request['period'])

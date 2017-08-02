@@ -272,22 +272,113 @@
 .subscription-profile-currency .admin__fieldset .admin__control-select{
   width: 100%;
 }
+.in-stock span {
+  display: none;
+}
+/*warning not in stock tooltip*/
+.warning-not-in-stock .admin__grid-tooltip {
+  display: none;
+}
+.warning-not-in-stock {
+  display: inline-block;
+  position: absolute;
+}
+.admin_grid_col_with_tooltip {
+  display: inline-block;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip {
+  display: block;
+  background: #f1f1f1;
+  border: 1px solid #f1f1f1;
+  border-radius: 1px;
+  box-shadow: 0 3px 9px 0 rgba(0,0,0,0.3);
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.36;
+  padding: 1.5rem;
+  position: absolute;
+  text-transform: none;
+  width: 27rem;
+  word-break: normal;
+  z-index: 2;
+  left: -2.2rem;
+  bottom: 1.8rem;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:before {
+  border: 15px solid transparent;
+  height: 0;
+  width: 0;
+  content: '';
+  display: block;
+  left: 2rem;
+  position: absolute;
+  top: 100%;
+  z-index: 3;
+  border-top-color: #bfbfbf;
+  margin-top: 1px;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:after {
+  border: 15px solid transparent;
+  height: 0;
+  width: 0;
+  content: '';
+  display: block;
+  left: 2rem;
+  position: absolute;
+  top: 100%;
+  border-top-color: #f1f1f1;
+  margin-top: -1px;
+  z-index: 4;
+}
+.qty-warning:after {
+  color: #eb5202;
+  content: '\e623';
+  font-family: 'Admin Icons';
+  font-size: 1.7rem;
+  position: absolute;
+  top: -0.5rem;
+  left: 0.5rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field {
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  width: calc((100%) * .50 );
+  text-align: left;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-control {
+  text-align: right;
+  line-height: 3.2rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field:nth-child(odd)/*>.admin__field-label*/ {
+  background-color: #f1f1f1;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+.admin__payment-details-preview>.admin__fieldset-wrapper-content>fieldset {
+  padding-top: 1rem;
+}
 .my_class .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
 .my_class .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1)
 {
-  display: block;
+    display: block;
 }
 .my_class .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
 .my_class .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before
 {
-  display: none;
+    display: none;
 }
 .my_class .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
 .my_class .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option
 {
-  display: block;
-  margin-left: 0;
+    display: block;
+    margin-left: 0;
 }
 .my_class .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
-  margin-top: .9rem;
+    margin-top: .9rem;
 }
