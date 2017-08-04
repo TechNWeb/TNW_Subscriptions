@@ -363,22 +363,28 @@
 .admin__payment-details-preview>.admin__fieldset-wrapper-content>fieldset {
   padding-top: 1rem;
 }
+
 .customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1)
-{
-    display: block;
-}
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before
-{
-    display: none;
-}
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option
-{
-    display: block;
-    margin-left: 0;
-}
 .customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
-    margin-top: .9rem;
+  display: block;
 }
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before {
+  display: none;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
+  display: block;
+  margin-left: 0;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+  margin-top: .9rem;
+}
+
+.customer_exists_popup .admin__fieldset-wrapper-content .admin__fieldset {
+  padding-bottom: 0;
+}
+

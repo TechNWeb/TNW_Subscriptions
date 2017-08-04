@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Api\CartManagementInterface;
@@ -82,7 +83,11 @@ class Create extends BaseCreate
     protected $eventManager;
 
     /**
-     * Create constructor.
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
      * @param Context $context
      * @param SessionManagerInterface $session
      * @param Address $addressCreator
@@ -92,6 +97,7 @@ class Create extends BaseCreate
      * @param Manager $profileManager
      * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         Context $context,
@@ -102,7 +108,8 @@ class Create extends BaseCreate
         Customer $customerCreator,
         Manager $profileManager,
         CartManagementInterface $quoteManagement,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -111,6 +118,8 @@ class Create extends BaseCreate
         $this->profileManager = $profileManager;
         $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
+        $this->customerRepository = $customerRepository;
+
         parent::__construct($context, $session);
     }
 
@@ -126,7 +135,7 @@ class Create extends BaseCreate
     /**
      * @param bool $needCollect
      */
-    public function setNeedCollect(bool $needCollect)
+    public function setNeedCollect($needCollect)
     {
         $this->needCollect = $needCollect;
     }
@@ -328,7 +337,7 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->isVirtual()){
+            if ($subQuote->isVirtual()) {
                 continue;
             }
 
@@ -488,7 +497,7 @@ class Create extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             if (!$subQuote->getQuoteCurrencyCode() || $subQuote->getQuoteCurrencyCode() != $currencyCode) {
                 $subQuote->setQuoteCurrencyCode($currencyCode);
-                $needRecollect= true;
+                $needRecollect = true;
             }
         }
 
@@ -516,5 +525,36 @@ class Create extends BaseCreate
         }
 
         return $grandTotal;
+    }
+
+    /**
+     * Reassign quotes by customer id.
+     *
+     * @param int $customerId
+     */
+    public function reassignQuote($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+
+        $customer = $this->customerRepository->getById($customerId);
+
+        foreach ($session->getSubQuotes() as $quote) {
+            $quote->assignCustomer($customer);
+            $this->quoteCreator->getCartRepository()->save($quote);
+        }
+    }
+
+    /**
+     * Change customer id value in session.
+     *
+     * @param int $customerId
+     * @return void
+     */
+    public function changeCustomerIdInSession($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $session->setCustomerId($customerId);
     }
 }

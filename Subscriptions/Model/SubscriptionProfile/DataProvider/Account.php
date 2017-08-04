@@ -214,15 +214,15 @@ class Account extends AbstractDataProvider
                         'componentType' => Modal::NAME,
                         'component' => 'TNW_Subscriptions/js/modal/modal-component-customer-exists-popup',
                         'options' => [
-                            'modalClass' => 'modal-popup',
+                            'modalClass' => 'modal-popup customer_exists_popup',
                         ],
-                        'onCancel' => 'closePopup'
+                        'onCancel' => 'closePopup',
                     ],
                 ],
             ],
             'children' => [
                 'customer_account_already_exists' => $this->getCustomerExistForm()
-            ]
+            ],
         ];
     }
 

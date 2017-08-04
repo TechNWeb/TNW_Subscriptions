@@ -10,8 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
-use Magento\Customer\Model\ResourceModel\CustomerRepository;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 /**
  * Reassign subscription to customer.
@@ -26,13 +25,6 @@ class ReassignSubscriptions extends Action
     private $resultJsonFactory;
 
     /**
-     * Customer repository.
-     *
-     * @var CustomerRepository
-     */
-    private $customerRepository;
-
-    /**
      * Data Persistor.
      *
      * @var DataPersistorInterface
@@ -40,30 +32,25 @@ class ReassignSubscriptions extends Action
     private $dataPersistor;
 
     /**
-     * Admin session.
-     *
-     * @var Quote
+     * @var Create
      */
-    private $session;
+    private $createSubscriptionProfile;
 
     /**
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
-     * @param CustomerRepository $customerRepository
      * @param DataPersistorInterface $dataPersistor
-     * @param Quote $session
+     * @param Create $createSubscriptionProfile
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
-        CustomerRepository $customerRepository,
         DataPersistorInterface $dataPersistor,
-        Quote $session
+        Create $createSubscriptionProfile
     ) {
         $this->resultJsonFactory = $jsonFactory;
-        $this->customerRepository = $customerRepository;
         $this->dataPersistor = $dataPersistor;
-        $this->session = $session;
+        $this->createSubscriptionProfile = $createSubscriptionProfile;
 
         parent::__construct($context);
     }
@@ -79,7 +66,8 @@ class ReassignSubscriptions extends Action
         $customerId = $this->dataPersistor->get('existsCustomerId');
 
         if ($customerId) {
-            $this->session->setCustomerId($customerId);
+            $this->createSubscriptionProfile->changeCustomerIdInSession($customerId);
+            $this->createSubscriptionProfile->reassignQuote($customerId);
         } else {
             $response->setData('result', false);
         }

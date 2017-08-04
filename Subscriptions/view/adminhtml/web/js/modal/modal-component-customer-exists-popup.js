@@ -5,15 +5,28 @@
 
 define([
     'Magento_Ui/js/modal/modal-component',
-    'uiRegistry'
-], function (ModalComponent, uiRegistry) {
+    'uiRegistry',
+    'jquery'
+], function (ModalComponent, uiRegistry, $j) {
     'use strict';
 
     return ModalComponent.extend({
-       closePopup: function () {
-           uiRegistry.get('index=email').clear();
+        /**
+         * Close customer exists popup.
+         */
+        closePopup: function () {
+            uiRegistry.get('index=email').clear();
 
-           this.closeModal();
-       }
+            this.closeModal();
+        },
+
+        /**
+         * {@inheritdoc}
+         */
+        initModal: function () {
+            this._super();
+
+            $j('.customer_exists_popup .modal-header').hide();
+        }
     });
 });
