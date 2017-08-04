@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Field;
+namespace TNW\Subscriptions\Ui\Component\Field;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;

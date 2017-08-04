@@ -4,9 +4,9 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Field;
+namespace TNW\Subscriptions\Ui\Component\Field;
 
-use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Form\Field;
@@ -14,30 +14,28 @@ use Magento\Ui\Component\Form\Field;
 /**
  * Form question in customer exists popup.
  */
-class CustomerExistsQuestion extends Field
+class CustomerConfirmButton extends Field
 {
     /**
-     * Data Persistor.
-     *
-     * @var DataPersistorInterface
+     * @var UrlInterface
      */
-    private $dataPersistor;
+    private $url;
 
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param DataPersistorInterface $dataPersistor
+     * @param UrlInterface $url
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        DataPersistorInterface $dataPersistor,
+        UrlInterface $url,
         $components = [],
         array $data = []
     ) {
-        $this->dataPersistor = $dataPersistor;
+        $this->url = $url;
 
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
@@ -49,20 +47,18 @@ class CustomerExistsQuestion extends Field
     {
         parent::prepare();
 
-        $customerName = $this->dataPersistor->get('existsCustomerName');
-        $customerEmail = $this->dataPersistor->get('existsCustomerEmail');
+        $url = $this->url->getUrl('tnw_subscriptions/subscriptionprofile/reassignsubscriptions');
 
-        $customerData = [
+        $import = [
             'imports' => [
-                'customerEmail' => $customerEmail,
-                'customerName' => $customerName,
+                'url' => $url,
             ]
         ];
 
         $this->wrappedComponent->setData(
             'config',
             array_replace_recursive(
-                $customerData,
+                $import,
                 (array) $this->wrappedComponent->getData('config')
             )
         );
@@ -70,7 +66,7 @@ class CustomerExistsQuestion extends Field
         $this->setData(
             'config',
             array_replace_recursive(
-                $customerData,
+                $import,
                 (array) $this->getData('config')
             )
         );

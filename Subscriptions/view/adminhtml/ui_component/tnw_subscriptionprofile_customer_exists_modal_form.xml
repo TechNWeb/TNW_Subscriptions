@@ -32,7 +32,7 @@
                 <item name="label" translate="true" xsi:type="string">Customer account already exists</item>
             </item>
         </argument>
-        <field name="customer_exists_question" class="TNW\Subscriptions\Model\SubscriptionProfile\Field\CustomerExistsQuestion">
+        <field name="customer_exists_question" class="TNW\Subscriptions\Ui\Component\Field\CustomerExistsQuestion">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
@@ -57,7 +57,7 @@
                 </item>
             </argument>
         </field>
-        <field name="confirm" class="TNW\Subscriptions\Model\SubscriptionProfile\Field\CustomerConfirmButton">
+        <field name="confirm" class="TNW\Subscriptions\Ui\Component\Field\CustomerConfirmButton">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
