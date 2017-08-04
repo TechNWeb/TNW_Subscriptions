@@ -60,7 +60,7 @@
                      </item>
                 </argument>
             </field>
-            <field name="email">
+            <field name="email" class="TNW\Subscriptions\Ui\Component\Field\Email">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="dataType" xsi:type="string">text</item>
@@ -69,6 +69,10 @@
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">email</item>
                         <item name="additionalClasses" xsi:type="string">admin__control-label-up input</item>
+                        <item name="component" xsi:type="string">TNW_Subscriptions/js/components/field/email</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="validate-email" xsi:type="boolean">true</item>
+                        </item>
                     </item>
                 </argument>
             </field>
