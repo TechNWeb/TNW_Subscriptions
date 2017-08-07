@@ -6,11 +6,6 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\AddressInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
-use Magento\Customer\Api\Data\CustomerInterfaceFactory;
-use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Api\CartManagementInterface;
@@ -81,18 +76,6 @@ class Create extends BaseCreate
     private $quoteManagement;
 
     /**
-     * Repository for retrieving customers.
-     *
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
-    /**
-     * @var CustomerInterfaceFactory
-     */
-    private $customerDataFactory;
-
-    /**
      * Core event manager.
      *
      * @var ManagerInterface
@@ -109,8 +92,6 @@ class Create extends BaseCreate
      * @param Manager $profileManager
      * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
-     * @param CustomerRepositoryInterface $customerRepository
-     * @param CustomerInterfaceFactory $customerDataFactory
      */
     public function __construct(
         Context $context,
@@ -121,9 +102,7 @@ class Create extends BaseCreate
         Customer $customerCreator,
         Manager $profileManager,
         CartManagementInterface $quoteManagement,
-        ManagerInterface $eventManager,
-        CustomerRepositoryInterface $customerRepository,
-        CustomerInterfaceFactory $customerDataFactory
+        ManagerInterface $eventManager
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -132,8 +111,6 @@ class Create extends BaseCreate
         $this->profileManager = $profileManager;
         $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
-        $this->customerRepository = $customerRepository;
-        $this->customerDataFactory = $customerDataFactory;
         parent::__construct($context, $session);
     }
 
@@ -552,7 +529,7 @@ class Create extends BaseCreate
         /** @var Session $session */
         $session = $this->getSession();
 
-        $customer = $this->customerRepository->getById($customerId);
+        $customer = $this->customerCreator->getCustomer($customerId);
 
         foreach ($session->getSubQuotes() as $quote) {
             $quote->assignCustomer($customer);
@@ -605,8 +582,7 @@ class Create extends BaseCreate
         $sessionCustomerId = $session->getCustomerId();
         $customer = null;
         if ($sessionCustomerId) {
-            /** @var CustomerInterface $customer */
-            $customer = $this->customerRepository->getById($sessionCustomerId);
+            $customer = $this->customerCreator->getCustomer($sessionCustomerId);
         }
 
         /** @var array $subQuotes */
@@ -633,7 +609,7 @@ class Create extends BaseCreate
                     $shippingAddress = $customer->getAddressById($defaultShippingId);
                 } else {
                     /** @var QuoteAddress $shippingAddress */
-                    $shippingAddress = $this->getEmptyAddress($customerEmail);
+                    $shippingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
                 }
                 //If there is default billing address we load it. Otherwise we get empty address.
                 if ($defaultBillingId) {
@@ -641,15 +617,14 @@ class Create extends BaseCreate
                     $billingAddress = $customer->getAddressById($defaultBillingId);
                 } else {
                     /** @var QuoteAddress $billingAddress */
-                    $billingAddress = $this->getEmptyAddress($customerEmail);
+                    $billingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
                 }
                 //If there is existing customer we assign his to the quote.
                 //Otherewise we assign empty customer and empty addresses.
                 if ($customer) {
                     $subQuote->assignCustomerWithAddressChange($customer, $billingAddress, $shippingAddress);
                 } else {
-                    /** @var CustomerInterface $customerDataObject */
-                    $customerDataObject = $this->customerDataFactory->create();
+                    $customerDataObject = $this->customerCreator->getCustomer();
                     $subQuote->setBillingAddress($billingAddress);
                     $subQuote->setShippingAddress($shippingAddress);
                     $subQuote->setCustomer($customerDataObject);
@@ -663,23 +638,6 @@ class Create extends BaseCreate
         }
     }
 
-    /**
-     * Returns empty address.
-     *
-     * @return AddressInterface
-     */
-    private function getEmptyAddress($customerEmail)
-    {
-        /** @var QuoteAddress $address */
-        $address = $this->addressCreator->getEmptyAddress();
-        /** @var AddressInterface $customerAddress */
-        $customerAddress = $address->exportCustomerAddress();
-        /** @var AddressInterface $emptyAddress */
-        $emptyAddress = $address->importCustomerAddressData($customerAddress);
-        $emptyAddress->setEmail($customerEmail);
-
-        return $emptyAddress;
-    }
 
     /**
      * Cleares extra data on account step (ex. customer_address_id from quote address if it is exist).
@@ -694,7 +652,6 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
-            /** @var AbstractCollection $quoteAddresses */
             $quoteAddresses = $subQuote->getAddressesCollection();
             $this->clearCustomerAddressId($quoteAddresses);
             $this->setNeedCollect(true);
@@ -717,8 +674,9 @@ class Create extends BaseCreate
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $this->clearCustomerAddressId([$subQuote->getBillingAddress()]);
-            $this->clearShippingMethod($subQuote->getShippingAddress());
-            $this->clearPaymentMethod($subQuote->getPayment());
+            $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
+            $subQuote->getShippingAddress()->setCollectShippingRates(true);
+            $subQuote->getPayment()->setMethod('');
             $this->setNeedCollect(true);
         }
     }
@@ -726,37 +684,13 @@ class Create extends BaseCreate
     /**
      * Cleares customer_address_id fro quote addresses.
      *
-     * @param AbstractCollection| array $quoteAddresses
+     * @param array $quoteAddresses
      * @return void
      */
     private function clearCustomerAddressId($quoteAddresses)
     {
         foreach ($quoteAddresses as $quoteAddress) {
             $quoteAddress->setCustomerAddressId(null);
-
         }
-    }
-
-    /**
-     * Cleares shipping method from quote shipping address.
-     *
-     * @param QuoteAddress $shippingAddress
-     * @return void
-     */
-    private function clearShippingMethod($shippingAddress)
-    {
-        $shippingAddress->setShippingMethod('')->setShippingDescription('');
-        $shippingAddress->setCollectShippingRates(true);
-    }
-
-    /**
-     * Cleares payment method from quote payment model.
-     *
-     * @param Payment $payment
-     * @return void
-     */
-    private function clearPaymentMethod($payment)
-    {
-        $payment->setMethod('');
     }
 }

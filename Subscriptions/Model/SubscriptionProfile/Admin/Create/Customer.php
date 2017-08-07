@@ -108,6 +108,10 @@ class Customer extends Create
             $customer = $this->validateCustomerData(
                 $this->getNewCustomer($customer, $store)
             );
+            $customer = $this->accountManagement->createAccountWithPasswordHash(
+                $customer,
+                null
+            );
         }
 
         $alreadySaveBilling = false;
@@ -121,17 +125,21 @@ class Customer extends Create
                     $customer = $this->saveCustomerAddress($customer, $subQuote->getBillingAddress());
                     $alreadySaveBilling = true;
                 }
-                $address = $subQuote->getBillingAddress()->setCustomerId($customer->getId());
-                $subQuote->setBillingAddress($address);
             }
+            $address = $subQuote->getBillingAddress()->setCustomerId($customer->getId());
+            $address->setSaveInAddressBook(false);
+            $subQuote->setBillingAddress($address);
 
             if (!$subQuote->isVirtual() && $subQuote->getShippingAddress()->getSaveInAddressBook()) {
                 // save only first shipping address, because shipping address is the same for all subscription quotes
                 if (!$alreadySaveShipping) {
                     $customer = $this->saveCustomerAddress($customer, $subQuote->getShippingAddress());
+                    $subQuote->getShippingAddress()->setSaveInAddressBook(false);
                     $alreadySaveShipping = true;
                 }
+            }elseif (!$subQuote->isVirtual()){
                 $address = $subQuote->getShippingAddress()->setCustomerId($customer->getId());
+                $address->setSaveInAddressBook(false);
                 $subQuote->setShippingAddress($address);
             }
         }
@@ -232,7 +240,7 @@ class Customer extends Create
      * @param int|null $customerId
      * @return CustomerInterface
      */
-    private function getCustomer($customerId = null)
+    public function getCustomer($customerId = null)
     {
         $customer = null;
         if (!$customerId) {
