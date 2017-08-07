@@ -88,8 +88,14 @@ class Account extends AbstractDataProvider
         $this->stepPool = $stepPool;
         $this->customerRepository = $customerRepository;
         $this->modifiersPool = $modifiersPool;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 
     /**

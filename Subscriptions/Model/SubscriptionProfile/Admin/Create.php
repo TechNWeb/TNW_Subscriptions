@@ -100,7 +100,6 @@ class Create extends BaseCreate
     protected $eventManager;
 
     /**
-     * Create constructor.
      * @param Context $context
      * @param SessionManagerInterface $session
      * @param Address $addressCreator
@@ -150,7 +149,7 @@ class Create extends BaseCreate
     /**
      * @param bool $needCollect
      */
-    public function setNeedCollect(bool $needCollect)
+    public function setNeedCollect($needCollect)
     {
         $this->needCollect = $needCollect;
     }
@@ -352,7 +351,7 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->isVirtual()){
+            if ($subQuote->isVirtual()) {
                 continue;
             }
 
@@ -513,7 +512,7 @@ class Create extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             if (!$subQuote->getQuoteCurrencyCode() || $subQuote->getQuoteCurrencyCode() != $currencyCode) {
                 $subQuote->setQuoteCurrencyCode($currencyCode);
-                $needRecollect= true;
+                $needRecollect = true;
             }
         }
 
@@ -544,9 +543,38 @@ class Create extends BaseCreate
     }
 
     /**
-     * If store changed we need to delete existing quotes.
+     * Reassign quotes by customer id.
      *
-     * @return bool
+     * @param int $customerId
+     */
+    public function reassignQuote($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+
+        $customer = $this->customerRepository->getById($customerId);
+
+        foreach ($session->getSubQuotes() as $quote) {
+            $quote->assignCustomer($customer);
+            $this->quoteCreator->getCartRepository()->save($quote);
+        }
+    }
+
+    /**
+     * Change customer id value in session.
+     *
+     * @param int $customerId
+     * @return void
+     */
+    public function changeCustomerIdInSession($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $session->setCustomerId($customerId);
+    }
+
+    /**
+     * If store changed we need to delete existing quotes.
      */
     public function deleteQuoteIfStoreChanged()
     {
@@ -569,8 +597,6 @@ class Create extends BaseCreate
 
     /**
      * If customer on the first step is changed we need to change customer in all quotes.
-     *
-     * @return bool
      */
     public function changeCustomerInQuote()
     {

@@ -110,6 +110,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">1</item>
                 </item>
+                <item name="customer_popup_modifier" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Account\CustomerPopupModifier</item>
+                    <item name="sortOrder" xsi:type="number">2</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
