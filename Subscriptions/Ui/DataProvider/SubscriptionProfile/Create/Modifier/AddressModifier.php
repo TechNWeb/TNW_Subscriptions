@@ -399,6 +399,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                         'required-entry' => (!($this->getShippingId() || $this->isShippingFieldSet())),
                     ],
                     'additionalClass' => ($this->checkIfIssetShippingId())? ' hidden': '',
+                    'imports' => [
+                        'checkValidation' => '!ns = ${ $.ns }, index = same_as_shipping:checked',
+                        'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
+                    ],
+                    'customScope' => 'region'
                 ],
             ]
         );
@@ -643,10 +648,12 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         $imports = [];
         if (!in_array($attributeCode, $this->infoAttributes)) {
 
-            if ($this->getShippingId() || $this->isShippingFieldSet()) {
-                $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
-            } else {
-                $imports['visible'] = '!ns = ${ $.ns }, index = same_as_shipping:checked';
+            if ($attributeCode != 'region_id') {
+                if ($this->getShippingId() || $this->isShippingFieldSet()) {
+                    $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
+                } else {
+                    $imports['visible'] = '!ns = ${ $.ns }, index = same_as_shipping:checked';
+                }
             }
 
         } else {
@@ -661,6 +668,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     public function modifyData(array $data)
     {
+        $getFromQuoteAddress = false;
         $dataArray = [];
         $addressId = $this->getShippingId();
 
@@ -673,11 +681,19 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $customerModel = $this->customerRepository->getById($customerId);
                 $dataArray = $this->customerMapper->toFlatArray($customerModel);
             }
+
+            $firstQuote = $this->session->getFirstQuote();
+
+            if ($firstQuote) {
+                $getFromQuoteAddress = true;
+            }
         }
 
-        if (count($dataArray)) {
-            $scopeName = $this->getInfoFieldSetDataScope();
-            $data[Account::FORM_DATA_VALUE][$scopeName] = $this->getAddressData($dataArray);
+        if (count($dataArray) || $getFromQuoteAddress) {
+            $data = array_merge_recursive(
+                $data,
+                $this->getAddressData($dataArray, $getFromQuoteAddress)
+            );
         }
 
         if ($addressId) {
@@ -686,10 +702,13 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $this->modifyShippingIdData($addressId)
             );
         } else {
-            $data = array_merge_recursive(
-                $data,
-                $this->modifyCountryIdData()
-            );
+            if (!isset ($data[Account::FORM_DATA_VALUE][$this->getAddressDataFieldSetdataScope()]['country_id']) ||
+            !$data[Account::FORM_DATA_VALUE][$this->getAddressDataFieldSetdataScope()]['country_id']) {
+                $data = array_merge_recursive(
+                    $data,
+                    $this->modifyCountryIdData()
+                );
+            }
         }
 
         return $data;
@@ -713,7 +732,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 foreach ($addresses as $address) {
                     /** @var array $addressData */
                     $addressData = $this->addressMapper->toFlatArray($address);
-                    $data[$address->getId()] = $this->getAddressData($addressData);
+                    $addressData = $this->getAddressData($addressData, false);
+                    $customerInfo = $addressData[Account::FORM_DATA_VALUE][$this->getInfoFieldSetDataScope()];
+                    $data[$address->getId()] = $customerInfo;
                 }
             }
         }
@@ -721,23 +742,55 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         return $data;
     }
 
+
     /**
-     * Returns neseccary customer address data.
+     * Returns necessary customer address data.
      *
      * @param array $addressData
+     * @param bool $getFromQuoteAddress
      * @return array
      */
-    private function getAddressData($addressData)
+    private function getAddressData($addressData, $getFromQuoteAddress)
     {
-        $addressArray = [];
-        foreach ($this->infoAttributes as $attributeCode) {
-            /** @var string $attributeCode */
-            if (isset($addressData[$attributeCode])) {
-                $addressArray[$attributeCode] = $addressData[$attributeCode];
+        $infoArray = [];
+        $addressDataArray = [];
+
+        if ($getFromQuoteAddress) {
+            //If there is a quote and we retrieve some address data from quote address we have to devide it
+            //for two fieldsets.
+            $firstQuote = $this->session->getFirstQuote();
+            $customerAddressDataObject = $firstQuote->getShippingAddress()->exportCustomerAddress();
+            $addressData = array_merge(
+                $addressData,
+                $this->addressMapper->toFlatArray($customerAddressDataObject)
+            );
+
+            foreach ($this->getAddressAttributes() as $addressAttribute) {
+                $attributeCode = $addressAttribute->getAttributeCode();
+
+                $attributeData = $this->getAddressAttributeData($addressData, $addressAttribute);
+
+                if (in_array($attributeCode, $this->infoAttributes)) {
+                    $infoArray = array_merge_recursive($infoArray, $attributeData);
+                } else {
+                    $addressDataArray = array_merge_recursive($addressDataArray, $attributeData);
+                }
+            }
+        } else {
+            foreach ($this->infoAttributes as $attributeCode) {
+                /** @var string $attributeCode */
+                if (isset($addressData[$attributeCode])) {
+                    $infoArray[$attributeCode] = $addressData[$attributeCode];
+                }
             }
         }
 
-        return $addressArray;
+        return [
+            Account::FORM_DATA_VALUE => [
+                $this->getInfoFieldSetDataScope() => $infoArray,
+                $this->getAddressDataFieldSetdataScope() => $addressDataArray,
+            ]
+        ];
     }
 
     /**
@@ -820,5 +873,48 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         }
 
         return $this->addressId;
+    }
+
+    /**
+     * Returns address attribute data from customer address or quote address.
+     *
+     * @param array $addressData
+     * @param Attribute $addressAttribute
+     * @return array
+     */
+    private function getAddressAttributeData($addressData, $addressAttribute)
+    {
+        $attributeData = [];
+        $attributeCode = $addressAttribute->getAttributeCode();
+        //To show all necessary data for multiline attributes we need to add cycle.
+        if ($addressAttribute->getFrontendInput() == 'multiline') {
+            $lineCount = $addressAttribute->getMultilineCount();
+            $i = 0;
+                do {
+                    if (isset($addressData[$attributeCode][$i])) {
+                        $attributeLineData = [
+                            $attributeCode . $i => $addressData[$attributeCode][$i]
+                        ];
+                    } else {
+                        $attributeLineData = [
+                            $attributeCode . $i => '',
+                        ];
+                    }
+
+                    $attributeData = array_merge($attributeData, $attributeLineData);
+                    $i++;
+                    $lineCount--;
+                } while ($lineCount > 0);
+        } elseif (isset($addressData[$attributeCode])) {
+            $attributeData = [
+                $attributeCode => $addressData[$attributeCode]
+            ];
+        } elseif ($attributeCode != 'country_id') {
+            $attributeData = [
+                $attributeCode => ''
+            ];
+        }
+
+        return $attributeData;
     }
 }

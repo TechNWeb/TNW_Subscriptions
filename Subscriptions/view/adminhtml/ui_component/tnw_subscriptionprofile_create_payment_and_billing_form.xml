@@ -165,6 +165,15 @@
                 </item>
             </argument>
         </field>
+    </fieldset>
+    <fieldset name="review_create">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/address-fieldset</item>
+                <item name="sortOrder" xsi:type="number">40</item>
+            </item>
+        </argument>
         <field name="review_and_create">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

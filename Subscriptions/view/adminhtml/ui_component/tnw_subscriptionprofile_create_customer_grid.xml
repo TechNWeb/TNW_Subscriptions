@@ -7,7 +7,7 @@
         </item>
         <item name="spinner" xsi:type="string">tnw_subscriptionprofile_columns</item>
         <item name="buttons" xsi:type="array">
-            <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\BackButton</item>
+            <item name="cancel" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\CancelButton</item>
             <item name="continue" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\NewCustomerButton</item>
         </item>
     </argument>

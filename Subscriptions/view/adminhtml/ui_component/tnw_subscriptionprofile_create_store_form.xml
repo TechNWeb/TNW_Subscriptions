@@ -14,6 +14,7 @@
         <item name="template" xsi:type="string">templates/form/collapsible</item>
         <item name="buttons" xsi:type="array">
             <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\BackButton</item>
+            <item name="cancel" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\CancelButton</item>
             <item name="save" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\ContinueButton</item>
         </item>
     </argument>

@@ -7,12 +7,17 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
@@ -76,16 +81,23 @@ class Create extends BaseCreate
     private $quoteManagement;
 
     /**
+     * Repository for retrieving customers.
+     *
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * @var CustomerInterfaceFactory
+     */
+    private $customerDataFactory;
+
+    /**
      * Core event manager.
      *
      * @var ManagerInterface
      */
     protected $eventManager;
-
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
 
     /**
      * @param Context $context
@@ -98,6 +110,7 @@ class Create extends BaseCreate
      * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
      * @param CustomerRepositoryInterface $customerRepository
+     * @param CustomerInterfaceFactory $customerDataFactory
      */
     public function __construct(
         Context $context,
@@ -109,7 +122,8 @@ class Create extends BaseCreate
         Manager $profileManager,
         CartManagementInterface $quoteManagement,
         ManagerInterface $eventManager,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        CustomerInterfaceFactory $customerDataFactory
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -119,7 +133,7 @@ class Create extends BaseCreate
         $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
         $this->customerRepository = $customerRepository;
-
+        $this->customerDataFactory = $customerDataFactory;
         parent::__construct($context, $session);
     }
 
@@ -397,7 +411,7 @@ class Create extends BaseCreate
     /**
      * Returns Payment from the first subscription quote or false if there is no quotes.
      *
-     * @return bool|ModelQuote\Payment
+     * @return bool|Payment
      */
     public function getPayment()
     {
@@ -432,6 +446,7 @@ class Create extends BaseCreate
             $subQuotes = $session->getSubQuotes();
 
             foreach ($subQuotes as $subQuote) {
+                $subQuote->setCustomer($customer);
                 $this->quoteCreator->fillCustomerData($customer);
                 $errors = $this->quoteCreator->validate($subQuote);
 
@@ -556,5 +571,192 @@ class Create extends BaseCreate
         /** @var Session $session */
         $session = $this->getSession();
         $session->setCustomerId($customerId);
+    }
+
+    /**
+     * If store changed we need to delete existing quotes.
+     */
+    public function deleteQuoteIfStoreChanged()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $sessionStoreId = $session->getStoreId();
+        $subQuotes = $session->getSubQuotes();
+
+        foreach ($subQuotes as $subQuote) {
+            $subQuoteStoreId = $subQuote->getStoreId();
+
+            if ($subQuoteStoreId != $sessionStoreId) {
+                $this->quoteCreator->getCartRepository()->delete($subQuote);
+                $session->removeSubQuoteId($subQuote->getId());
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * If customer on the first step is changed we need to change customer in all quotes.
+     */
+    public function changeCustomerInQuote()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $sessionCustomerId = $session->getCustomerId();
+        $customer = null;
+        if ($sessionCustomerId) {
+            /** @var CustomerInterface $customer */
+            $customer = $this->customerRepository->getById($sessionCustomerId);
+        }
+
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $subQuoteCustomerId = $subQuote->getCustomerId();
+
+            if ($sessionCustomerId != $subQuoteCustomerId) {
+                $defaultShippingId = null;
+                $defaultBillingId = null;
+                $customerEmail = null;
+
+                //If there is a customer we find customer's default addresses
+                if ($customer) {
+                    $defaultShippingId = $customer->getDefaultShipping();
+                    $defaultBillingId = $customer->getDefaultBilling();
+                    $customerEmail = $customer->getEmail();
+                }
+                //If there is default shipping address we load it. Otherwise we get empty address.
+                if ($defaultShippingId) {
+                    /** @var QuoteAddress $shippingAddress */
+                    $shippingAddress = $customer->getAddressById($defaultShippingId);
+                } else {
+                    /** @var QuoteAddress $shippingAddress */
+                    $shippingAddress = $this->getEmptyAddress($customerEmail);
+                }
+                //If there is default billing address we load it. Otherwise we get empty address.
+                if ($defaultBillingId) {
+                    /** @var QuoteAddress $billingAddress */
+                    $billingAddress = $customer->getAddressById($defaultBillingId);
+                } else {
+                    /** @var QuoteAddress $billingAddress */
+                    $billingAddress = $this->getEmptyAddress($customerEmail);
+                }
+                //If there is existing customer we assign his to the quote.
+                //Otherewise we assign empty customer and empty addresses.
+                if ($customer) {
+                    $subQuote->assignCustomerWithAddressChange($customer, $billingAddress, $shippingAddress);
+                } else {
+                    /** @var CustomerInterface $customerDataObject */
+                    $customerDataObject = $this->customerDataFactory->create();
+                    $subQuote->setBillingAddress($billingAddress);
+                    $subQuote->setShippingAddress($shippingAddress);
+                    $subQuote->setCustomer($customerDataObject);
+                }
+
+                $subQuote->getShippingAddress()->setCollectShippingRates(true);
+                $this->setNeedCollect(true);
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Returns empty address.
+     *
+     * @return AddressInterface
+     */
+    private function getEmptyAddress($customerEmail)
+    {
+        /** @var QuoteAddress $address */
+        $address = $this->addressCreator->getEmptyAddress();
+        /** @var AddressInterface $customerAddress */
+        $customerAddress = $address->exportCustomerAddress();
+        /** @var AddressInterface $emptyAddress */
+        $emptyAddress = $address->importCustomerAddressData($customerAddress);
+        $emptyAddress->setEmail($customerEmail);
+
+        return $emptyAddress;
+    }
+
+    /**
+     * Cleares extra data on account step (ex. customer_address_id from quote address if it is exist).
+     *
+     * @return void
+     */
+    public function clearAccountStepData()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        foreach ($subQuotes as $subQuote) {
+            /** @var AbstractCollection $quoteAddresses */
+            $quoteAddresses = $subQuote->getAddressesCollection();
+            $this->clearCustomerAddressId($quoteAddresses);
+            $this->setNeedCollect(true);
+        }
+    }
+
+    /**
+     * Cleares extra data on payment and billing step
+     * (ex. customer_address_id, payment method, shipping method).
+     *
+     * @return void
+     */
+    public function clearPaymenBillingStepData()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $this->clearCustomerAddressId([$subQuote->getBillingAddress()]);
+            $this->clearShippingMethod($subQuote->getShippingAddress());
+            $this->clearPaymentMethod($subQuote->getPayment());
+            $this->setNeedCollect(true);
+        }
+    }
+
+    /**
+     * Cleares customer_address_id fro quote addresses.
+     *
+     * @param AbstractCollection| array $quoteAddresses
+     * @return void
+     */
+    private function clearCustomerAddressId($quoteAddresses)
+    {
+        foreach ($quoteAddresses as $quoteAddress) {
+            $quoteAddress->setCustomerAddressId(null);
+
+        }
+    }
+
+    /**
+     * Cleares shipping method from quote shipping address.
+     *
+     * @param QuoteAddress $shippingAddress
+     * @return void
+     */
+    private function clearShippingMethod($shippingAddress)
+    {
+        $shippingAddress->setShippingMethod('')->setShippingDescription('');
+        $shippingAddress->setCollectShippingRates(true);
+    }
+
+    /**
+     * Cleares payment method from quote payment model.
+     *
+     * @param Payment $payment
+     * @return void
+     */
+    private function clearPaymentMethod($payment)
+    {
+        $payment->setMethod('');
     }
 }
