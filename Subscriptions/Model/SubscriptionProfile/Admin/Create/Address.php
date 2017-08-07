@@ -177,6 +177,25 @@ class Address extends Create
     }
 
     /**
+     * Returns empty address object.
+     *
+     * @param $customerEmail
+     * @return AddressInterface
+     */
+    public function getEmptyAddressObject($customerEmail)
+    {
+        /** @var QuoteAddress $address */
+        $address = $this->getEmptyAddress();
+        /** @var AddressInterface $customerAddress */
+        $customerAddress = $address->exportCustomerAddress();
+        /** @var AddressInterface $emptyAddress */
+        $emptyAddress = $address->importCustomerAddressData($customerAddress);
+        $emptyAddress->setEmail($customerEmail);
+
+        return $emptyAddress;
+    }
+
+    /**
      * Imports customer address data into address nd validates it in customer form.
      *
      * @param QuoteAddress $address
