@@ -14,7 +14,8 @@ define([
 
     return Abstract.extend({
         defaults: {
-            notice: $j.mage.__('No estimated savings.')
+            notice: $j.mage.__('No estimated savings.'),
+            customAddAfter: ''
         },
 
         /**
@@ -23,25 +24,14 @@ define([
         setInitialValue: function () {
             this._super();
 
+            this.addCustomAddAfter();
+
             var index = this.inputName.replace(/[^\d.]/g, '');
 
             this.updateFieldEnabling(index);
             this.updatePriceNotice(index);
 
             return this;
-        },
-        /**
-         * {@inheritdoc}
-         */
-        getInitialValue: function () {
-            var value = this._super();
-
-            var currencySymbol = typeof this.imports.currencySymbol == "undefined"
-                ? '$' : this.imports.currencySymbol;
-
-            value = currencySymbol + ' ' + value;
-
-            return value;
         },
 
         /**
@@ -96,6 +86,11 @@ define([
 
                 $j('#' + this.noticeId).html(this.notice);
             }
+        },
+
+        addCustomAddAfter: function () {
+            this.customAddAfter = typeof this.imports.customAddAfter == "undefined"
+                ? 'ea.' : this.imports.customAddAfter;
         }
     });
 });
