@@ -259,8 +259,8 @@ class GridMetadata
             'TNW_Subscriptions/js/grid/billing_frequency/price',
             '',
             [],
-            $this->getCurrencySymbol(),
-            'ea.',
+            null,
+            __('ea.'),
             null,
             true,
             ['currencySymbol' => $this->getCurrencySymbol()]

@@ -10,6 +10,10 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 class SaveButton extends GenericButton implements ButtonProviderInterface
 {
+    /**
+     * Label for save button.
+     */
+    const LABEL = 'Save Billing Frequency';
 
     /**
      * @return array
@@ -17,7 +21,7 @@ class SaveButton extends GenericButton implements ButtonProviderInterface
     public function getButtonData()
     {
         return [
-            'label' => __('Save Billing Frequency'),
+            'label' => __(self::LABEL),
             'class' => 'save primary',
             'data_attribute' => [
                 'mage-init' => ['button' => ['event' => 'save']],

@@ -18,7 +18,7 @@ define([
         },
 
         /**
-         * Sets initial value of the element and subscribes to it's changes.
+         * {@inheritdoc}
          */
         setInitialValue: function () {
             this._super();
@@ -29,6 +29,19 @@ define([
             this.updatePriceNotice(index);
 
             return this;
+        },
+        /**
+         * {@inheritdoc}
+         */
+        getInitialValue: function () {
+            var value = this._super();
+
+            var currencySymbol = typeof this.imports.currencySymbol == "undefined"
+                ? '$' : this.imports.currencySymbol;
+
+            value = currencySymbol + ' ' + value;
+
+            return value;
         },
 
         /**
