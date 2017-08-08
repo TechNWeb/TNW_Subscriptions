@@ -365,6 +365,38 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.12", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TOKEN_HASH,
+                [
+                    'type' => 'static',
+                    'label' => 'Token hash',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 180
+                ]
+            );
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::PAYMENT_ADDITIONAL_INFO,
+                [
+                    'type' => 'static',
+                    'label' => 'Payment Additional Info',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 190
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

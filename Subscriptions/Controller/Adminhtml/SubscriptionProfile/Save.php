@@ -19,10 +19,23 @@ class Save extends SubscriptionProfile
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
+
+        //process additional payment data
+        $paymentPostData = $this->getRequest()->getParam('payment', []);
+        $additionalData = [];
+        foreach ($paymentPostData as  $code => $methodData) {
+            if ($methodData['method']) {
+                $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
+                $additionalData['method'] = $code;
+                break;
+            }
+        }
+
+        $this->getSubCreateModel()->setPaymentData($additionalData);
         $profiles = $this->getSubCreateModel()->createSubscriptions();
         $this->_getSession()->clearStorage();
 
-        if ($profiles){
+        if ($profiles) {
             $this->messageManager->addSuccessMessage(
                 sprintf(__('Total of %s profiles was created.'), count($profiles))
             );

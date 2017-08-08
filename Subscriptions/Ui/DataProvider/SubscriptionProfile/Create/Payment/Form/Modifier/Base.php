@@ -4,13 +4,13 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 /**
  * Base form modifier to display payment method.
@@ -82,6 +82,8 @@ class Base implements ModifierInterface
      */
     private function getPaymentFields()
     {
+        $additionalConfig = $this->getAdditionalConfig();
+
         return [
             static::PAYMENT_INFORMATION_FIELD_SET_NAME => [
                 'children' => [
@@ -89,15 +91,18 @@ class Base implements ModifierInterface
                         'children' => $this->getChildren(),
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'label' => false,
-                                    'collapsible' => false,
-                                    'visible' => true,
-                                    'opened' => true,
-                                    'dataScope' => $this->getPaymentCode(),
-                                    'componentType' => Fieldset::NAME,
-                                    'additionalClasses' => 'fieldset-wrapper-title'
-                                ],
+                                'config' => array_merge(
+                                    [
+                                        'label' => false,
+                                        'collapsible' => false,
+                                        'visible' => true,
+                                        'opened' => true,
+                                        'dataScope' => $this->getPaymentCode(),
+                                        'componentType' => Fieldset::NAME,
+                                        'additionalClasses' => 'fieldset-wrapper-title'
+                                    ],
+                                    $additionalConfig
+                                ),
                             ],
                         ],
                     ],
@@ -148,35 +153,55 @@ class Base implements ModifierInterface
         $result = [
             'method' => $this->getField(),
         ];
-
-        $checkBoxName = PaymentAndBilling::DATA_SCOPE_PAYMENT_AND_BILLING_FORM .
-            '.' . PaymentAndBilling::DATA_SCOPE_PAYMENT_AND_BILLING_FORM .
-            '.' . static::PAYMENT_INFORMATION_FIELD_SET_NAME .
-            '.' . $this->getPaymentCode() .
-            '.method';
-
-        if (!empty($this->getAdditionalFields())) {
-            $result['additional_fields'] = [
-                'children' => $this->getAdditionalFields(),
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'componentType' =>  Fieldset::NAME,
-                            'label' => false,
-                            'visible' => false,
-                            'dataScope' => 'additional',
-                            'additionalClasses' => 'payment-additional-fieldset',
-                            'collapsible' => false,
-                            'opened' => true,
-                            'imports' => [
-                                'visible' => $checkBoxName . ':checked'
-                            ],
+        $fieldsetName = $this->getFieldsetName();
+        $checkBoxName = $fieldsetName . '.method';
+        $result['additional_fields'] = [
+            'children' => $this->getAdditionalFields(),
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'componentType' => Fieldset::NAME,
+                        'label' => false,
+                        'visible' => false,
+                        'dataScope' => 'additional',
+                        'additionalClasses' => 'payment-additional-fieldset',
+                        'collapsible' => false,
+                        'opened' => true,
+                        'imports' => [
+                            'visible' => $checkBoxName . ':checked'
+                        ],
+                        'exports' => [
+                            'visible' => $fieldsetName . ':checked'
                         ],
                     ],
                 ],
-            ];
-        }
+            ],
+        ];
 
         return $result;
+    }
+
+    /**
+     * Returns additional payment method fieldset config.
+     *
+     * @return array
+     */
+    protected function getAdditionalConfig()
+    {
+        return [];
+    }
+
+    /**
+     * Returns full name of current fieldset.
+     *
+     * @return string
+     */
+    protected function getFieldsetName()
+    {
+        $fieldsetName = Payment::DATA_SCOPE_PAYMENT_FORM .
+            '.' . Payment::DATA_SCOPE_PAYMENT_FORM .
+            '.' . static::PAYMENT_INFORMATION_FIELD_SET_NAME
+            . '.' . $this->getPaymentCode();
+        return $fieldsetName;
     }
 }

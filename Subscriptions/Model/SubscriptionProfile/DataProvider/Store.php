@@ -13,6 +13,14 @@ use Magento\Framework\Api\Filter;
 
 class Store extends AbstractDataProvider
 {
+    /**#@+
+     * Form request values
+     */
+    const FORM_DATA_KEY = 'store_form_data';
+    const FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
+
+
     /** @var [] */
     protected $loadedData;
     /** @var UrlInterface */

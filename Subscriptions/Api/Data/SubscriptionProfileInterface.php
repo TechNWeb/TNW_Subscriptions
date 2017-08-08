@@ -30,6 +30,8 @@ interface SubscriptionProfileInterface
     const TRIAL_LENGTH = 'trial_length';
     const TRIAL_LENGTH_UNIT = 'trial_length_unit';
     const IS_VIRTUAL = 'is_virtual';
+    const TOKEN_HASH = 'token_hash';
+    const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
     /**#@-*/
 
     /**#@+
@@ -374,4 +376,34 @@ interface SubscriptionProfileInterface
      * @return $this
      */
     public function setIsVirtual($isVirtual);
+
+    /**
+     * Gets payment token.
+     *
+     * @return string|null
+     */
+    public function getPaymentToken();
+
+    /**
+     * Sets payment token.
+     *
+     * @param string $tokenHash
+     * @return $this
+     */
+    public function setPaymentToken($tokenHash);
+
+    /**
+     * Gets payment additional info.
+     *
+     * @return []|null
+     */
+    public function getPaymentAdditionalInfo();
+
+    /**
+     * Sets payment additional info.
+     *
+     * @param [] $info
+     * @return $this
+     */
+    public function setPaymentAdditionalInfo($info);
 }

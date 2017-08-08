@@ -6,23 +6,21 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use Magento\OfflinePayments\Model\Checkmo as CheckmoPayment;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 class Checkmo extends Base
 {
     /**
-     * @param SubscriptionProfileInterface $profile
+     * {@inheritdoc}
      */
-    public function processProfile(SubscriptionProfileInterface $profile)
+    public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
-        // TODO: Implement processProfile() method.
+        return [
+            OrderPaymentInterface::METHOD => CheckmoPayment::PAYMENT_METHOD_CHECKMO_CODE
+        ];
     }
 
-    /**
-     * @param SubscriptionProfileInterface $profile
-     */
-    public function updateProfile(SubscriptionProfileInterface $profile)
-    {
-        // TODO: Implement updateProfile() method.
-    }
 }

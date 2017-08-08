@@ -9,17 +9,19 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
-use Magento\Sales\Api\Data\OrderInterface;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Framework\Api\SimpleDataObjectConverter;
 
 /**
  * Class Manager
@@ -223,7 +225,7 @@ class Manager
      * @return $this
      * @throws \Exception
      */
-    public function populateProfileData($quote)
+    public function populateProfileData(Quote $quote)
     {
         $request = $this->getUniqueBuyRequest($quote);
 
@@ -273,6 +275,37 @@ class Manager
         return $this;
     }
 
+    /**
+     * Sets payment information for a profile depending on the engine code.
+     *
+     * @param Payment $payment
+     * @return $this
+     */
+    public function populatePaymentData(Payment $payment)
+    {
+        $data = $this->getEngine()->getProfilePaymentInfo($payment);
+        foreach ($data as $key => $value) {
+            $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
+            $this->getProfile()->$method($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets to quote payment additional information from profile.
+     *
+     * @param Quote $quote
+     */
+    public function updatePaymentInformation(Quote $quote)
+    {
+        $quote->getPayment()->importData(
+            $this->getEngine()->getPaymentInfo($this->getProfile())
+        );
+        $quote->getPayment()->setAdditionalInformation(
+            $this->getEngine()->getPaymentAdditionalInfo($this->getProfile())
+        );
+    }
 
     /**
      * Returns list of profile addresses created from billing and shipping addresses.
@@ -280,7 +313,7 @@ class Manager
      * @param Quote $quote
      * @return array
      */
-    private function populateAddressesData($quote)
+    private function populateAddressesData(Quote $quote)
     {
         /** @var SubscriptionProfileAddressInterface $profileBillingAddress */
         $profileBilling = $this->profileAddressFactory->create();

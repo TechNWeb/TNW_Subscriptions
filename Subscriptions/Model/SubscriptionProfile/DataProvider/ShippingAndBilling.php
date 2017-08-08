@@ -13,12 +13,12 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-class PaymentAndBilling extends AbstractDataProvider
+class ShippingAndBilling extends AbstractDataProvider
 {
     /**#@+
      * Form data scope
      */
-    const DATA_SCOPE_PAYMENT_AND_BILLING_FORM = 'tnw_subscriptionprofile_create_payment_and_billing_form';
+    const DATA_SCOPE_SHIPPING_AND_BILLING_FORM = 'tnw_subscriptionprofile_create_shipping_and_billing_form';
     /**#@-*/
 
     /**#@+
@@ -47,7 +47,7 @@ class PaymentAndBilling extends AbstractDataProvider
     private $pool;
 
     /**
-     * PaymentAndBilling constructor.
+     * ShippingAndBilling constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName

@@ -4,10 +4,11 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier;
+namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\OfflinePayments\Model\Checkmo as CheckmoPayment;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 /**
  * Form modifier to display payment method Checkmo.
@@ -66,6 +67,7 @@ class Checkmo extends Base
      */
     protected function getAdditionalFields()
     {
+        $result = [];
         $mailingAddress = $this->checkmoPayment->getMailingAddress();
         if ($mailingAddress) {
             $result[static::ADDITIONAL_FIELD_MAILING_ADDRESS] = [
@@ -105,5 +107,21 @@ class Checkmo extends Base
                 ],
             ];
         }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAdditionalConfig()
+    {
+        return [
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
+            'options' => [
+                'gateway' => $this->getPaymentCode(),
+                'formName' => Payment::DATA_SCOPE_PAYMENT_FORM
+            ]
+        ];
     }
 }

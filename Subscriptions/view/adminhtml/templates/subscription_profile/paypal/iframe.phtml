@@ -1,0 +1,26 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var \Magento\Payment\Block\Transparent\Iframe $block
+ */
+$params = $block->getParams();
+
+?>
+<html>
+<head>
+<script>
+    var require = window.top.require;
+    require(['uiRegistry'], function(registry) {
+        registry.get('index = tnw_subscriptionprofile_create_payment_form').triggerSave(
+            <?php /* @noEscape */ echo $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($params['error_messages']); ?>
+        );
+    });
+</script>
+</head>
+<body>
+</body>
+</html>
