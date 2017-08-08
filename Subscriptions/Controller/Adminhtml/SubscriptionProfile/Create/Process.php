@@ -10,6 +10,7 @@ use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
 
 class Process extends Create
 {
@@ -241,7 +242,10 @@ class Process extends Create
             $additionalParams = [
                 PaymentAndBilling::FORM_DATA_KEY => PaymentAndBilling::FORM_DATA_VALUE,
             ];
-
+        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_STORE) {
+            $additionalParams = [
+                Store::FORM_DATA_KEY => Store::FORM_DATA_VALUE,
+            ];
         }
 
         return $additionalParams;
