@@ -22,12 +22,18 @@ class Store extends AbstractDataProvider
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
 
-
-    /** @var [] */
-    private $loadedData;
-    /** @var UrlInterface */
+    /**
+     * Url Builder.
+     *
+     * @var UrlInterface
+     */
     private $urlBuilder;
-    /** @var StepPool */
+
+    /**
+     * Steps pool for creating subscription.
+     *
+     * @var StepPool
+     */
     private $stepPool;
 
     /**
