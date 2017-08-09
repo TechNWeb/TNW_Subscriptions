@@ -249,6 +249,17 @@
   float: none;
   margin: 0 auto;
 }
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option {
+  display: block;
+  margin: 0;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option:before, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option:before {
+  display: none;
+}
 
 .sub-fieldset .admin__fieldset{
   padding: 0;
