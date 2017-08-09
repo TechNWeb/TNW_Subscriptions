@@ -357,24 +357,49 @@ class Create extends BaseCreate
     }
 
     /**
-     * Set payment into subscription quotes.
+     * Set payment data into subscription quotes.
      *
-     * @param string $method
      * @param [] $data
      * @return array
      */
-    public function setPayment($method, $data)
+    public function setPaymentData($data)
     {
         $result = [];
 
         try {
-            $data['method'] = $method;
             /** @var Session $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
 
             foreach ($subQuotes as $subQuote) {
                 $subQuote->getPayment()->importData($data);
+            }
+            $this->setNeedCollect(true);
+        } catch (\Exception $e) {
+            $result[] = __('Payment: ') . $e->getMessage();
+            $this->getContext()->log($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sets payment method in to subscription quotes.
+     *
+     * @param $method
+     * @return array
+     */
+    public function setPaymentMethod($method)
+    {
+        $result = [];
+
+        try {
+            /** @var Session $session */
+            $session = $this->getSession();
+            $subQuotes = $session->getSubQuotes();
+
+            foreach ($subQuotes as $subQuote) {
+                $subQuote->getPayment()->setMethod($method);
             }
             $this->setNeedCollect(true);
         } catch (\Exception $e) {
@@ -421,7 +446,9 @@ class Create extends BaseCreate
             /** @var Session $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
-
+            //
+            $basicPayment = $session->getFirstQuote()->getPayment();
+            /** @var ModelQuote $subQuote */
             foreach ($subQuotes as $subQuote) {
                 $subQuote->setCustomer($customer);
                 $this->quoteCreator->fillCustomerData($customer);
@@ -436,11 +463,12 @@ class Create extends BaseCreate
                     throw new \Exception(__('Quote validation is failed.'));
                 }
 
-                $profile = $this->createProfile($subQuote);
+                $profile = $this->createProfile($subQuote, $basicPayment);
 
                 if ($profile) {
+                    $this->profileManager->updatePaymentInformation($subQuote);
                     $order = $this->quoteManagement->submit($subQuote);
-                    $this->profileManager->assignOrderToProfile($order, $profile);
+                    $this->profileManager->assignOrderToProfile($order);
                     $this->eventManager->dispatch(
                         'checkout_submit_all_after',
                         ['order' => $order, 'quote' => $subQuote]
@@ -460,13 +488,15 @@ class Create extends BaseCreate
     /**
      * Creates subscription profile.
      *
-     * @param $subQuote
+     * @param ModelQuote $subQuote
+     * @param $payment
      * @return SubscriptionProfileInterface
      */
-    private function createProfile($subQuote)
+    private function createProfile($subQuote, $payment)
     {
         $profile = $this->profileManager->reset()
             ->populateProfileData($subQuote)
+            ->populatePaymentData($payment)
             ->saveProfile();
 
         return $profile;
@@ -660,11 +690,11 @@ class Create extends BaseCreate
 
     /**
      * Cleares extra data on payment and billing step
-     * (ex. customer_address_id, payment method, shipping method).
+     * (ex. customer_address_id, shipping method).
      *
      * @return void
      */
-    public function clearPaymenBillingStepData()
+    public function cleaBillingStepData()
     {
         /** @var Session $session */
         $session = $this->getSession();
@@ -676,7 +706,6 @@ class Create extends BaseCreate
             $this->clearCustomerAddressId([$subQuote->getBillingAddress()]);
             $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
             $subQuote->getShippingAddress()->setCollectShippingRates(true);
-            $subQuote->getPayment()->setMethod('');
             $this->setNeedCollect(true);
         }
     }

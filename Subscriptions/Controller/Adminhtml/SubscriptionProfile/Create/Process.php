@@ -6,14 +6,38 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
+use Magento\Framework\Controller\Result\JsonFactory;
 
 class Process extends Create
 {
+    /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    public function __construct(
+        Context $context,
+        Registry $coreRegistry,
+        DataPersistorInterface $dataPersistor,
+        StepPool $stepPool,
+        PageFactory $resultPageFactory,
+        JsonFactory $resultJsonFactory
+    ) {
+        $this->resultJsonFactory = $resultJsonFactory;
+        parent::__construct($context, $coreRegistry, $dataPersistor, $stepPool,
+            $resultPageFactory);
+    }
+
+
     /**
      * Errors list
      *
@@ -22,13 +46,13 @@ class Process extends Create
     private $errors = [];
 
     /**
-     * Start order create action
-     *
-     * @return \Magento\Backend\Model\View\Result\Redirect
+     * @return \Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
         $this->resetErrors();
+
+        $this->processRequestData();
 
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
@@ -40,26 +64,36 @@ class Process extends Create
         $this->processRequestData();
 
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
-        $resultRedirect = $this->resultRedirectFactory->create();
-        if (!empty($this->errors)){
+        $result = $this->resultRedirectFactory->create();
 
-            foreach ($this->errors as $error){
-                $this->messageManager->addErrorMessage($error);
+        if ($this->getRequest()->getParam('isAjax', false)) {
+            $result = $this->resultJsonFactory->create();
+            $result->setData(
+                $this->getJsonResponse()
+            );
+        } else {
+            if (!empty($this->errors)) {
+
+                foreach ($this->errors as $error) {
+                    $this->messageManager->addErrorMessage($error);
+                }
+
+                $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
             }
 
-            $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
+            $redirectParams = [
+                StepPool::STEP_PARAM_NAME => $currentStep,
+            ];
+
+            $redirectParams = array_merge($redirectParams, $this->getAdditionalParams($currentStep));
+
+            $result->setPath(
+                'tnw_subscriptions/subscriptionprofile/create',
+                $redirectParams
+            );
         }
 
-        $redirectParams = [
-            StepPool::STEP_PARAM_NAME => $currentStep,
-        ];
-
-        $redirectParams = array_merge($redirectParams, $this->getAdditionalParams($currentStep));
-
-        return $resultRedirect->setPath(
-            'tnw_subscriptions/subscriptionprofile/create',
-            $redirectParams
-        );
+        return $result;
     }
 
     private function processRequestData()
@@ -76,7 +110,9 @@ class Process extends Create
 
         $this->processShippingMethods($requestData);
 
-        $this->processPaymentAndBillingData($requestData);
+        $this->processBillingData($requestData);
+
+        $this->processPaymentData($requestData);
 
         $this->getSubCreateModel()->recollectSubscriptions();
     }
@@ -114,7 +150,6 @@ class Process extends Create
         if (isset($data['customer_id']) || isset($data['create_new_customer'])) {
             $this->getSubCreateModel()->changeCustomerInQuote();
         }
-
     }
 
     /**
@@ -175,7 +210,7 @@ class Process extends Create
      *
      * @param $data
      */
-    private function processPaymentAndBillingData($data)
+    private function processBillingData($data)
     {
         $address = isset($data['billing_address']) ? $data['billing_address'] : [];
         $info = isset($data['billing_info']) ? $data['billing_info'] : [];
@@ -189,16 +224,23 @@ class Process extends Create
 
             $this->checkProcessResult($result);
         }
+    }
 
+    /**
+     * Process post data from payment and billing form.
+     *
+     * @param $data
+     */
+    private function processPaymentData($data)
+    {
         if (isset($data['payment'])){
             $result = [];
 
             foreach ($data['payment'] as $code => $methodData){
-               if ($methodData['method']){
-                   $additonalData = isset($methodData['additional']) ? $methodData['additional'] : [];
-                   $result = $this->getSubCreateModel()->setPayment($code, $additonalData);
-                   break;
-               }
+                if ($methodData['method']){
+                    $result = $this->getSubCreateModel()->setPaymentMethod($code);
+                    break;
+                }
             }
 
             $this->checkProcessResult($result);
@@ -238,9 +280,9 @@ class Process extends Create
             $additionalParams = [
                 Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
             ];
-        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
             $additionalParams = [
-                PaymentAndBilling::FORM_DATA_KEY => PaymentAndBilling::FORM_DATA_VALUE,
+                ShippingAndBilling::FORM_DATA_KEY => ShippingAndBilling::FORM_DATA_VALUE,
             ];
         } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_STORE) {
             $additionalParams = [
@@ -249,6 +291,26 @@ class Process extends Create
         }
 
         return $additionalParams;
+    }
+
+    /**
+     * @return array
+     */
+    private function getJsonResponse()
+    {
+        $result = [
+            'data' => [],
+            'error' => false
+        ];
+
+        if (!empty($this->errors)){
+            $result = [
+                'error_messages' => $this->errors,
+                'error' => true
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -264,8 +326,8 @@ class Process extends Create
         if ($back) {
             if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
                 $this->getSubCreateModel()->clearAccountStepData();
-            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
-                $this->getSubCreateModel()->clearPaymenBillingStepData();
+            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+                $this->getSubCreateModel()->cleaBillingStepData();
             }
         }
     }

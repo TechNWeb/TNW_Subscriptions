@@ -440,6 +440,129 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.12", "<")) {
+            //TODO add this attribute to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TOKEN_HASH,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Token Hash',
+                    'length' => 128,
+                    'default' => null
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::PAYMENT_ADDITIONAL_INFO,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Payment Additional Info',
+                    'default' => null
+                ]
+            );
+
+            //TODO on install add new foreign key
+            $tableName = 'tnw_subscriptions_subscription_profile_order';
+            $setup->getConnection()->dropForeignKey(
+                $tableName,
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile',
+                    'id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile_entity',
+                    'id'
+                ),
+                $tableName,
+                'subscription_profile_id',
+                'tnw_subscriptions_subscription_profile_entity',
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $tableName = 'tnw_subscriptions_subscription_profile_order';
+            $setup->getConnection()->dropForeignKey(
+                $tableName,
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'magento_order_id',
+                    'sales_order',
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'magento_order_id',
+                    'sales_order',
+                    'entity_id'
+                ),
+                $tableName,
+                'magento_order_id',
+                'sales_order',
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $setup->getConnection()->dropForeignKey(
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'subscription_profile_id',
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'subscription_profile_id',
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                    'entity_id'
+                ),
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                'subscription_profile_id',
+                SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $setup->getConnection()->dropForeignKey(
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'magento_product_id',
+                    'catalog_product_entity',
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'magento_product_id',
+                    'catalog_product_entity',
+                    'entity_id'
+                ),
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                'magento_product_id',
+                'catalog_product_entity',
+                'entity_id',
+                'CASCADE'
+            );
+        }
 
         $setup->endSetup();
     }

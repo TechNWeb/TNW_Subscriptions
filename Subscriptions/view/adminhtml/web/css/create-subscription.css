@@ -194,6 +194,19 @@
   display: inline-block;
   margin-top: 0px;
 }
+
+.payment-additional-fieldset legend{
+  opacity: 1 !important;
+}
+
+.payment-additional-fieldset._show{
+  margin-top: 0 !important;
+}
+
+.payment-additional-fieldset .payment-cvv input{
+  width: 6rem;
+}
+
 #anchor-content .admin_field_without_legend{
   width: calc( (100%) * .7 - 30px);
 }
@@ -209,6 +222,18 @@
   margin: 1%;
   float: left;
 }
+.admin__address-information-buttons{
+  display: block;
+  float:left;
+  margin: 0;
+  padding: 0;
+}
+
+.admin__address-information-buttons fieldset{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .admin__shipping-information-preview {
   margin-right: 50%
 }

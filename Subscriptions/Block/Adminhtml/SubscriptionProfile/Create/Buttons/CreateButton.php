@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 class CreateButton extends GenericButton implements ButtonProviderInterface
 {
@@ -17,17 +18,21 @@ class CreateButton extends GenericButton implements ButtonProviderInterface
     {
         return [
             'label' => __('Create'),
-            'class' => 'save primary',
-            'on_click' => sprintf("location.href = '%s';", $this->getCreateUrl()),
+            'class' => 'primary',
+            'on_click' => '',
+            'data_attribute' => [
+                'mage-init' => [
+                    'Magento_Ui/js/form/button-adapter' => [
+                        'actions' => [
+                            [
+                                'targetName' => 'index = ' . Payment::DATA_SCOPE_PAYMENT_FORM,
+                                'actionName' => 'beforeSubmit',
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'sort_order' => 20
         ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getCreateUrl()
-    {
-        return $this->getUrl('tnw_subscriptions/subscriptionprofile/save');
     }
 }

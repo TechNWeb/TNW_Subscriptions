@@ -22,6 +22,7 @@ class Store extends AbstractDataProvider
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
 
+
     /** @var [] */
     private $loadedData;
     /** @var UrlInterface */

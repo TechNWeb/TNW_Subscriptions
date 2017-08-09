@@ -15,6 +15,8 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Json\Helper\Data;
 
 /**
  * Subscription Profile model.
@@ -45,15 +47,44 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      */
     private $customer;
 
+    /**
+     * Provides basic logic for hashing strings.
+     *
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
+     * JSON helper.
+     *
+     * @var Data
+     */
+    private $jsonHelper;
+
+    /**
+     * SubscriptionProfile constructor.
+     * @param ModelContext $context
+     * @param Registry $registry
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param EncryptorInterface $encryptor
+     * @param Data $jsonHelper
+     * @param Resource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         ModelContext $context,
         Registry $registry,
         CustomerRepositoryInterface $customerRepository,
+        EncryptorInterface $encryptor,
+        Data $jsonHelper,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->customerRepository = $customerRepository;
+        $this->encryptor = $encryptor;
+        $this->jsonHelper = $jsonHelper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -440,5 +471,47 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
         }
 
         return $this->customer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentToken()
+    {
+        return $this->encryptor->decrypt(
+            $this->getData(self::TOKEN_HASH)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaymentToken($tokenHash)
+    {
+        return $this->setData(
+            self::TOKEN_HASH,
+            $this->encryptor->encrypt($tokenHash)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentAdditionalInfo()
+    {
+        return $this->jsonHelper->jsonDecode(
+            $this->getData(self::PAYMENT_ADDITIONAL_INFO)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaymentAdditionalInfo($info)
+    {
+        return $this->setData(
+            self::PAYMENT_ADDITIONAL_INFO,
+            $this->jsonHelper->jsonEncode($info)
+        );
     }
 }
