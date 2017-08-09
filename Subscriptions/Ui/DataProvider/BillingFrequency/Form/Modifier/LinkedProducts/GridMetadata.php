@@ -257,13 +257,16 @@ class GridMetadata
         $priceColumn = $this->setColumnSpecialData(
             $priceColumn,
             'TNW_Subscriptions/js/grid/billing_frequency/price',
-            '',
+            'TNW_Subscriptions/grid/cells/price',
             [],
             $this->getCurrencySymbol(),
-            'ea.',
+            null,
             null,
             true,
-            ['currencySymbol' => $this->getCurrencySymbol()]
+            [
+                'currencySymbol' => $this->getCurrencySymbol(),
+                'customAddAfter' => __('ea.'),
+            ]
         );
 
         $lockProductPriceColumn = $this->getColumnBaseData(

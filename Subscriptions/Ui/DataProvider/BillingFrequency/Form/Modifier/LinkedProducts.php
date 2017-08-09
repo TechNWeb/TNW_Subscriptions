@@ -182,9 +182,7 @@ class LinkedProducts extends AbstractModifier
                 static::GROUP_LINKED_PRODUCTS => [
                     'children' => [
                         'button_set' => $this->getButtonSet(
-                            $content,
-                            __('Manage Linked Products'),
-                            static::DATA_SCOPE_LINKED_PRODUCTS
+                            $content
                         ),
                         'modal' => $this->getGenericModal(
                             __('Manage Linked Products'),
@@ -216,13 +214,12 @@ class LinkedProducts extends AbstractModifier
      * Retrieve button set.
      *
      * @param Phrase $content
-     * @param Phrase $buttonTitle
-     * @param string $scope
+     *
      * @return array
      */
-    private function getButtonSet(Phrase $content, Phrase $buttonTitle, $scope)
+    private function getButtonSet(Phrase $content)
     {
-        $modalTarget = $this->scopeName . '.' . $scope . '.modal';
+        $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_LINKED_PRODUCTS . '.modal';
 
         return [
             'arguments' => [
@@ -237,7 +234,7 @@ class LinkedProducts extends AbstractModifier
                 ],
             ],
             'children' => [
-                'button_' . $scope => [
+                'button_' . static::DATA_SCOPE_LINKED_PRODUCTS => [
                     'arguments' => [
                         'data' => [
                             'config' => [
@@ -250,11 +247,27 @@ class LinkedProducts extends AbstractModifier
                                         'actionName' => 'toggleModal',
                                     ],
                                     [
-                                        'targetName' => $modalTarget . '.' . $scope . '_product_listing',
+                                        'targetName' => $modalTarget . '.' . static::DATA_SCOPE_LINKED_PRODUCTS
+                                            . '_product_listing',
                                         'actionName' => 'render',
                                     ]
                                 ],
-                                'title' => $buttonTitle,
+                                'title' => __('Manage Linked Products'),
+                                'provider' => null,
+                            ],
+                        ],
+                    ],
+                ],
+                'button_save_'  . static::DATA_SCOPE_LINKED_PRODUCTS => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => 'container',
+                                'componentType' => 'container',
+                                'component' => 'TNW_Subscriptions/js/components/save-button-linked',
+                                'template' => 'TNW_Subscriptions/form/element/primary-button',
+                                'title' =>
+                                    __(\TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit\SaveButton::LABEL),
                                 'provider' => null,
                             ],
                         ],
