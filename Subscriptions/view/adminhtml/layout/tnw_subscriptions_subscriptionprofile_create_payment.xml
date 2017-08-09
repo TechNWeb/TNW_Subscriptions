@@ -6,7 +6,7 @@
             <uiComponent name="tnw_subscriptionprofile_create_product_listing"/>
         </referenceContainer>
         <referenceContainer name="content">
-            <uiComponent name="tnw_subscriptionprofile_create_review_form"/>
+            <uiComponent name="tnw_subscriptionprofile_create_payment_form"/>
         </referenceContainer>
     </body>
 </page>

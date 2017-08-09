@@ -13,8 +13,14 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\Pool;
 
-class Review extends AbstractDataProvider
+class Payment extends AbstractDataProvider
 {
+    /**#@+
+     * Form data scope
+     */
+    const DATA_SCOPE_PAYMENT_FORM = 'tnw_subscriptionprofile_create_payment_form';
+    /**#@-*/
+
     /**
      * @var UrlInterface
      */
@@ -83,6 +89,10 @@ class Review extends AbstractDataProvider
 
         $configData['submit_url'] = $this->urlBuilder->getUrl(
             '*/subscriptionprofile/save'
+        );
+
+        $configData['process_url'] = $this->urlBuilder->getUrl(
+            '*/subscriptionprofile_create/process'
         );
 
         return $configData;
