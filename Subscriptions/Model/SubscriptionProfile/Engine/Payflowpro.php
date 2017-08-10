@@ -53,9 +53,7 @@ class Payflowpro extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            OrderPaymentInterface::ADDITIONAL_INFORMATION => [
-                PaypalPayflow::PNREF => $profile->getPaymentToken()
-            ],
+            PaypalPayflow::PNREF => $profile->getPaymentToken()
         ];
     }
 }
