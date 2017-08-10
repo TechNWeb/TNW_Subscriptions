@@ -35,10 +35,10 @@ define(
             },
 
             triggerSave:function (errors) {
-                debugger;
+                var current = this;
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1"){
-                        if (errors){
+                        if (errors && errors.length > 0){
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
                             return;
@@ -52,7 +52,7 @@ define(
                                 delete fields.additional.cc_cid;
                                 break;
                         }
-                        this.save();
+                        current.save();
                     }
                 });
             }
