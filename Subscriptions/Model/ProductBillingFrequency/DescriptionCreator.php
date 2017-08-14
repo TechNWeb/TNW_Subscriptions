@@ -129,11 +129,12 @@ class DescriptionCreator
         $billingFrequency = $this->frequencyRepository->getById(
             $billingFrequencyId
         );
-        $unit = $this->frequencyUnitType->getLabelByValue($billingFrequency->getUnit());
-        $result = $unit;
-        if ($billingFrequency->getFrequency() > 1) {
-            $result = $billingFrequency->getFrequency() . ' ' . $unit;
-        }
+
+        $result = $this->frequencyUnitType->getPeriodLabel(
+            $billingFrequency->getUnit(),
+            $billingFrequency->getFrequency()
+        );
+
         return strtolower($result);
     }
 

@@ -114,7 +114,7 @@
                 <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType</item>
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">select</item>
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/unit</item>
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="label" translate="true" xsi:type="string">Unit</item>
                 </item>

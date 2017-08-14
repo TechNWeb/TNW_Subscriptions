@@ -225,11 +225,12 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
         $billingFrequencyData = '';
         if ($billingFrequency->getFrequency()) {
             $unit = $billingFrequency->getUnit();
+            $frequency = $billingFrequency->getFrequency();
+
             if (!$unit) {
                 $unit = BillingFrequencyUnitType::DAYS;
             }
-            $unitLabel = $this->billingFrequencyUnitType->getLabelByValue($unit);
-            $billingFrequencyData = $billingFrequency->getFrequency() . ' ' . __($unitLabel);
+            $billingFrequencyData = $this->billingFrequencyUnitType->getPeriodLabel($unit, $frequency);
         }
 
         return $billingFrequencyData;

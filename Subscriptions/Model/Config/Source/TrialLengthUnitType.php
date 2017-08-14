@@ -43,7 +43,7 @@ class TrialLengthUnitType extends AbstractSource
             ],*/
             [
                 'value' => self::DAYS,
-                'label' => __('Days'),
+                'label' => __('Day'),
             ],
 /*            [
                 'value' => self::WEEKS,
@@ -51,7 +51,7 @@ class TrialLengthUnitType extends AbstractSource
             ],*/
             [
                 'value' => self::MONTHS,
-                'label' => __('Months'),
+                'label' => __('Month'),
             ],
 /*            [
                 'value' => self::YEARS,

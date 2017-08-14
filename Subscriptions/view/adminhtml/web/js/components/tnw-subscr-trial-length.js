@@ -12,12 +12,19 @@ define([
     'use strict';
 
     return Abstract.extend({
+        defaults: {
+            previousTrialLength: false,
+            selector : '[data-index = tnw_subscr_trial_length_unit] .admin__control-select [value=%1]',
+            plural: 's'
+        },
+
         /**
          * Callback that fires when 'value' property is updated.
          */
         onUpdate: function () {
             this._super();
             this.changeComment();
+
         },
 
         /**
@@ -44,15 +51,91 @@ define([
             //Calculate message to show.
             var option = unitComponent.getOption(unitValue);
             if (trialLength != 0 && (typeof option != 'undefined')) {
-                var optionLabel = unitComponent.getOption(unitValue).label;
-                this.notice = $.mage.__('Trial will end after');
-                this.notice += ' ' + trialLength + ' ' + optionLabel + '. ';
-                this.notice += $.mage.__('Leave blank if product trial is not offered.');
+                var optionLabel = this.getOptionLabel(unitComponent, unitValue, trialLength);
+                this.changeNotice(trialLength, optionLabel);
             } else {
                 this.notice = $.mage.__('Product trial is not offered.');
+                $('#' + this.noticeId).children().html(this.notice);
+            }
+        },
+
+        getOptionLabel: function (unitComponent, unitValue, trialLength) {
+            var options = unitComponent.indexedOptions;
+            var selector = this.selector.replace('%1', unitComponent.getOption(unitValue).value);
+            var value = 0;
+            debugger;
+            var label = $("[data-index = tnw_subscr_trial_length_unit] .admin__control-select option[value = '" + unitValue +"']").text();
+
+            if (this.previousTrialLength == 1 && trialLength != 1) {
+                //add 's' if trialLength is not 1 more.
+                for (value in options) {
+                    selector = this.selector.replace('%1', value);
+                    $(selector).text($(selector).text() + $.mage.__(this.plural));
+                }
+                label = unitComponent.getOption(unitValue).label + $.mage.__(this.plural);
+            } else if (
+                trialLength == 1
+                && this.previousTrialLength != 1
+                && this.previousTrialLength !== false
+            ) {
+                //if trialLength become 1 so we need remove 's' from the end.
+                for (value in options) {
+                    selector = this.selector.replace('%1', value);
+                    var labelText = $(selector).text();
+                    labelText = labelText.substr(0, labelText.length - $.mage.__(this.plural).length);
+                    $(selector).text(labelText);
+                }
+                label = unitComponent.getOption(unitValue).label;
             }
 
-            $('#'+this.noticeId).children().html(this.notice);
+            this.previousTrialLength = trialLength;
+
+            return label;
+        },
+
+        /**
+         * When element is rendering need to change label and notice depends on trial length.
+         */
+        onElementRender: function () {
+            var unitComponent = registry.get('index=tnw_subscr_trial_length_unit');
+            var trialLength = registry.get('index=tnw_subscr_trial_length');
+
+            if (unitComponent && trialLength) {
+                trialLength = trialLength.value();
+
+                var unitValue = unitComponent.value();
+                var label = unitComponent.getOption(unitValue).label;
+                var options = unitComponent.indexedOptions;
+
+                if (trialLength != 1) {
+                    //check if need add 's' when page is loading.
+                    for (var value in options) {
+                        var selector = this.selector.replace('%1', value);
+                        $(selector).text($(selector).text() + $.mage.__(this.plural));
+                    }
+                    label = unitComponent.getOption(unitValue).label + $.mage.__(this.plural);
+                }
+
+                this.changeNotice(trialLength, label);
+
+                this.previousTrialLength = trialLength;
+            }
+
+            return this;
+        },
+
+        /**
+         * Change notice by trial length and option label.
+         *
+         * @param trialLength
+         * @param optionLabel
+         */
+        changeNotice: function (trialLength, optionLabel) {
+            this.notice = $.mage.__('Trial will end after');
+            this.notice += ' ' + trialLength + ' ' + optionLabel + '. ';
+            this.notice += $.mage.__('Leave blank if product trial is not offered.');
+
+            $('#' + this.noticeId).children().html(this.notice);
         }
     });
 });
