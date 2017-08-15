@@ -71,7 +71,7 @@ class BillingFrequencyUnitType implements ArrayInterface
      * @param int $frequency
      * @return null|string
      */
-    private function getLabelByValueAndFrequency($value, $frequency)
+    public function getLabelByValueAndFrequency($value, $frequency)
     {
         $result = null;
 
