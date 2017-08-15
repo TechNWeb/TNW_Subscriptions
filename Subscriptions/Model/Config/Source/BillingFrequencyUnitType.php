@@ -65,6 +65,8 @@ class BillingFrequencyUnitType implements ArrayInterface
     }
 
     /**
+     * Get label by value depends on frequency.
+     *
      * @param int $value
      * @param int $frequency
      * @return null|string
@@ -86,6 +88,8 @@ class BillingFrequencyUnitType implements ArrayInterface
     }
 
     /**
+     * Get label with frequency + label.
+     *
      * @param int $unit
      * @param int $frequency
      * @return string

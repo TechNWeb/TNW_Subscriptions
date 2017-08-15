@@ -24,7 +24,6 @@ define([
         onUpdate: function () {
             this._super();
             this.changeComment();
-
         },
 
         /**
@@ -59,15 +58,22 @@ define([
             }
         },
 
+        /**
+         * Get label for option.
+         *
+         * @param unitComponent
+         * @param unitValue
+         * @param trialLength
+         * @returns {*|jQuery}
+         */
         getOptionLabel: function (unitComponent, unitValue, trialLength) {
             var options = unitComponent.indexedOptions;
             var selector = this.selector.replace('%1', unitComponent.getOption(unitValue).value);
             var value = 0;
-            debugger;
             var label = $("[data-index = tnw_subscr_trial_length_unit] .admin__control-select option[value = '" + unitValue +"']").text();
 
             if (this.previousTrialLength == 1 && trialLength != 1) {
-                //add 's' if trialLength is not 1 more.
+                //add 's' to all options if trialLength is not 1 more.
                 for (value in options) {
                     selector = this.selector.replace('%1', value);
                     $(selector).text($(selector).text() + $.mage.__(this.plural));
@@ -78,7 +84,7 @@ define([
                 && this.previousTrialLength != 1
                 && this.previousTrialLength !== false
             ) {
-                //if trialLength become 1 so we need remove 's' from the end.
+                //if trialLength become 1 so we need remove 's' from the end of all options.
                 for (value in options) {
                     selector = this.selector.replace('%1', value);
                     var labelText = $(selector).text();
@@ -101,14 +107,14 @@ define([
             var trialLength = registry.get('index=tnw_subscr_trial_length');
 
             if (unitComponent && trialLength) {
-                trialLength = trialLength.value();
+                var trialLengthValue = trialLength.value();
 
                 var unitValue = unitComponent.value();
                 var label = unitComponent.getOption(unitValue).label;
                 var options = unitComponent.indexedOptions;
 
-                if (trialLength != 1) {
-                    //check if need add 's' when page is loading.
+                if (trialLengthValue != 1) {
+                    //check if need add to all options 's' when page is loading.
                     for (var value in options) {
                         var selector = this.selector.replace('%1', value);
                         $(selector).text($(selector).text() + $.mage.__(this.plural));
@@ -116,9 +122,9 @@ define([
                     label = unitComponent.getOption(unitValue).label + $.mage.__(this.plural);
                 }
 
-                this.changeNotice(trialLength, label);
+                this.changeNotice(trialLengthValue, label);
 
-                this.previousTrialLength = trialLength;
+                this.previousTrialLength = trialLengthValue;
             }
 
             return this;

@@ -78,14 +78,15 @@ define([
             if (unitField && this.value() && frequencyField) {
                 var unitOption = unitField.value();
                 var unit = unitField.getOption(unitOption);
-
-                notice = $j.mage.__(this.noticeTemplate)
-                    .replace('%1', this.value())
-                    .replace('%2', unit.label.toLowerCase());
+                var template = this.noticeTemplate;
 
                 if (frequencyField.value() != 1) {
-                    notice += $j.mage.__(this.plural);
+                    template += this.plural;
                 }
+
+                notice = $j.mage.__(template)
+                    .replace('%1', this.value())
+                    .replace('%2', unit.label.toLowerCase());
             } else {
                 notice = $j.mage.__(this.defaultNotice);
             }
@@ -103,6 +104,7 @@ define([
         updateUnitValues: function () {
             var unitField = uiRegistry.get('index = unit');
             var frequencyField = uiRegistry.get('index = frequency');
+
             if (frequencyField && unitField && this.value()) {
                 var unitOption = unitField.value();
                 var unit = unitField.getOption(unitOption);
@@ -115,7 +117,7 @@ define([
                         //add 's' if frequency is not 1 more.
                         for (value in options) {
                             selector = '[data-index=unit] .admin__control-select [value=' + value + ']';
-                            $j(selector).text($j(selector).text() + $j.mage.__(this.plural));
+                            $j(selector).text($j.mage.__($j(selector).text() + this.plural));
                         }
                     } else if (
                         frequencyField.value() == 1
@@ -126,14 +128,14 @@ define([
                         for (value in options) {
                             selector = '[data-index=unit] .admin__control-select [value=' + value + ']';
                             var label = $j(selector).text();
-                            label = label.substr(0, label.length - $j.mage.__(this.plural).length);
-                            $j(selector).text(label);
+                            label = label.substr(0, label.length - this.plural.length);
+                            $j(selector).text($j.mage.__(label));
                         }
                     } else if (this.previousFrequency === false && frequencyField.value() != 1) {
                         //check if need add 's' when page is loading.
                         for (value in options) {
                             selector = '[data-index=unit] .admin__control-select [value=' + value + ']';
-                            $j(selector).text($j(selector).text() + $j.mage.__(this.plural));
+                            $j(selector).text($j.mage.__($j(selector).text() + this.plural));
                         }
                     }
 

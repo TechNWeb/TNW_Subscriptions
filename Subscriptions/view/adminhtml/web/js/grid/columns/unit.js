@@ -5,24 +5,25 @@
 define([
     'underscore',
     'Magento_Ui/js/grid/columns/select',
-    'uiRegistry'
-], function (_, Select, uiRegistry) {
+    'jquery'
+], function (_, Select, $) {
     'use strict';
 
     return Select.extend({
-
+        defaults: {
+            plural: "'s"
+        },
         /**
          * {@inheritdoc}
          */
-        getLabel: function () {
+        getLabel: function (row) {
             var label = this._super();
 
-            var uiFrequency = uiRegistry.get('index=frequency');
-
-            if (uiFrequency.containers[0].source.data.items) {
-                debugger;
+            if (row && row.frequency != 1) {
+                label = label + this.plural;
             }
-            return label + 's';
+
+            return $.mage.__(label);
         }
     });
 });

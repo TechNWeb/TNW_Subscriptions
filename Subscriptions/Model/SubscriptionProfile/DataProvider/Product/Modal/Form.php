@@ -431,7 +431,7 @@ class Form extends AbstractDataProvider
                 $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
                     ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
                     : 0;
-                $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+                $trialUnit = $this->unitType->getLabelByValueAndTrialLength($trialUnit, $trialLength);
             }
             $this->trialPeriod = $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : '';
         }

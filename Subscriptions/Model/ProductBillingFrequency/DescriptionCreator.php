@@ -147,7 +147,7 @@ class DescriptionCreator
      */
     private function getFrequencyTrialWithUnit($period, $unitId)
     {
-        $unitLabel = $this->trialLengthUnitType->getLabelByValue($unitId);
+        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndTrialLength($unitId, $period);
         $result = $unitLabel;
         if ($period > 1) {
             $result = $period . ' ' . $unitLabel;

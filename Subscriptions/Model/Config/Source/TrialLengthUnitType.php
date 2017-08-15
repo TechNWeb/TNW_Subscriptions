@@ -24,6 +24,8 @@ class TrialLengthUnitType extends AbstractSource
     const YEARS = 6;
     /**#@-*/
 
+    const PLURAL = "s";
+
     /**
      * Get options for TrialLengthUnit Type.
      *
@@ -63,17 +65,22 @@ class TrialLengthUnitType extends AbstractSource
     }
 
     /**
-     * Get trial length unit label by value.
+     * Get trial length unit label by value depends on length.
      *
      * @param int $value
+     * @param int $length
+     *
      * @return string
      */
-    public function getLabelByValue($value)
+    public function getLabelByValueAndTrialLength($value, $length)
     {
         $label = '';
         foreach ($this->getAllOptions() as $option) {
             if ($value === $option['value']) {
                 $label = $option['label'];
+                 if ($length != 1) {
+                     $label = $label . self::PLURAL;
+                 }
                 break;
             }
         }
