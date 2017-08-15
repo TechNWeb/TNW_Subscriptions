@@ -72,7 +72,7 @@ class TrialLengthUnitType extends AbstractSource
      *
      * @return string
      */
-    public function getLabelByValueAndTrialLength($value, $length)
+    public function getLabelByValueAndLength($value, $length)
     {
         $label = '';
         foreach ($this->getAllOptions() as $option) {

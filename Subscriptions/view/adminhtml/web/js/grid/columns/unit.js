@@ -13,6 +13,7 @@ define([
         defaults: {
             plural: "'s"
         },
+
         /**
          * {@inheritdoc}
          */
