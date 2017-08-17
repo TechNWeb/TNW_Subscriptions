@@ -37,6 +37,11 @@ class ActiveMethods extends Field
     private $activeMethodsTemplate = 'system/config/payment_methods/active_methods.phtml';
 
     /**
+     * @var \TNW\Subscriptions\Model\Config
+     */
+    private $config;
+
+    /**
      * Payment codes which is available for subscription.
      *
      * @var array
@@ -50,6 +55,7 @@ class ActiveMethods extends Field
      * @param Context $context
      * @param PaymentHelper $paymentHelper
      * @param Yesno $yesNo
+     * @param \TNW\Subscriptions\Model\Config $config
      * @param array $data
      */
     public function __construct(
@@ -61,7 +67,7 @@ class ActiveMethods extends Field
     ) {
         $this->yesNo = $yesNo;
         $this->paymentHelper = $paymentHelper;
-        $config->getAvailablePaymentsList();
+        $this->config = $config;
 
         parent::__construct($context, $data);
     }
@@ -123,10 +129,17 @@ class ActiveMethods extends Field
 
         foreach ($paymentMethods as $method) {
             if (in_array($method->getCode(), $this->availableMethodsCodes)) {
+                $code = $method->getCode();
+                if ($code === \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO) {
+                    $title = $this->config->getTitleForPaypal();
+                } else {
+                    $title = $method->getConfigData('title');
+                }
+
                 $result[] = [
-                    'title' => $method->getConfigData('title'),
-                    'code' => $method->getCode(),
-                    'config_name' => self::SECTION_ID . '/' . self::GROUP_ID . '/' . $method->getCode(),
+                    'title' => $title,
+                    'code' => $code,
+                    'config_name' => self::SECTION_ID . '/' . self::GROUP_ID . '/' . $code,
                 ];
             }
         }

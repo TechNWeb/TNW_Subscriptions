@@ -50,7 +50,7 @@ class Base implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        if (in_array($this->getPaymentCode(), $this->config->getAvailablePaymentsList())) {
+        if ($this->config->isPaymentMethodAvailableForSubscription($this->getPaymentCode())) {
             $meta = array_replace_recursive(
                 $meta,
                 $this->getPaymentFields()

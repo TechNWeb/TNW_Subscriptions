@@ -388,4 +388,39 @@ class Config
 
         return $isActive;
     }
+
+    /**
+     * Get title depends of active is payflow pro or paypal payments pro.
+     *
+     * @return string
+     */
+    public function getTitleForPaypal()
+    {
+        $title = 'Payments Pro';
+
+        if ($this->getStoreConfig('payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active')) {
+            $title = 'Payflow Pro';
+        }
+
+        return $title;
+    }
+
+    /**
+     * Check if payment method is available for subscription and it is on for Magento.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentMethodAvailableForSubscription($paymentCode)
+    {
+        $isAvailable = false;
+
+        if ((bool)$this->getStoreConfig('payment/' . $paymentCode . '/active')
+            && $this->isPaymentAvailable($paymentCode)
+        ) {
+            $isAvailable = true;
+        }
+
+        return $isAvailable;
+    }
 }
