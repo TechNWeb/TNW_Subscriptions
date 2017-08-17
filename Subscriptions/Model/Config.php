@@ -12,6 +12,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
 use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
+use Magento\Paypal\Model\Config as PaypalConfig;
 
 class Config
 {
@@ -66,18 +67,26 @@ class Config
     private $request;
 
     /**
+     * @var PaypalConfig
+     */
+    private $paypalConfig;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
+     * @param PaypalConfig $paypalConfig
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        Http $request
+        Http $request,
+        PaypalConfig $paypalConfig
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
+        $this->paypalConfig = $paypalConfig;
     }
 
     #region General section
@@ -415,9 +424,10 @@ class Config
     {
         $isAvailable = false;
 
-        if ((bool)$this->getStoreConfig('payment/' . $paymentCode . '/active')
-            && $this->isPaymentAvailable($paymentCode)
-        ) {
+        $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
+            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active');
+
+        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode)) {
             $isAvailable = true;
         }
 
