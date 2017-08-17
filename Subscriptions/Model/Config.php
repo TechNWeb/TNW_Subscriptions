@@ -11,6 +11,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
+use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
 
 class Config
 {
@@ -40,6 +41,13 @@ class Config
     private $xmlDiscountAmount = 'tnw_subscriptions_product/discount/discount_amount';
     private $xmlDiscountType = 'tnw_subscriptions_product/discount/discount_type';
     /**#@-*/
+
+    /**
+     * Config xml path for is Subscription module active.
+     *
+     * @var string
+     */
+    private $xmlIsModuleEnable = 'tnw_subscriptions_general/general/active';
 
 
     /**
@@ -318,4 +326,66 @@ class Config
         return $result;
     }
     #endregion
+
+    /**
+     * Check if Subscription module is enabled.
+     *
+     * @return bool
+     */
+    public function isModuleEnabled()
+    {
+        return (bool)$this->getStoreConfig($this->xmlIsModuleEnable);
+    }
+
+    /**
+     * Check if payment method is active in subscription config by code.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentAvailable($paymentCode)
+    {
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
+
+        return (bool)$this->getStoreConfig($path);
+    }
+
+    /**
+     * Get list of payments codes which are active in subscription config.
+     *
+     * @return array
+     */
+    public function getAvailablePaymentsList()
+    {
+        $availableMethods = [];
+
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID;
+
+        $methods = $this->getStoreConfig($path);
+
+        if (is_array($methods)) {
+            foreach ($methods as $methodCode => $isActive) {
+                if ($isActive == 1) {
+                    $availableMethods[] = $methodCode;
+                }
+            }
+        }
+
+        return $availableMethods;
+    }
+
+    /**
+     * Check if module enable and if at least one payment method is available for subscription.
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        $isActive = false;
+        if ($this->isModuleEnabled() && !isEmpty($this->getAvailablePaymentsList())) {
+            $isActive = true;
+        }
+
+        return $isActive;
+    }
 }
