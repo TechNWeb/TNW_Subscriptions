@@ -32,6 +32,9 @@ interface SubscriptionProfileInterface
     const IS_VIRTUAL = 'is_virtual';
     const TOKEN_HASH = 'token_hash';
     const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
+    const NEED_GENERATE_QUOTES = 'need_generate_quotes';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
     /**#@-*/
 
     /**#@+
@@ -137,6 +140,13 @@ interface SubscriptionProfileInterface
      * @return $this
      */
     public function setWebsiteId($websiteId);
+
+    /**
+     * Gets website.
+     *
+     * @return \Magento\Store\Model\Website
+     */
+    public function getWebsite();
 
     /**
      * Gets status.
@@ -377,6 +387,22 @@ interface SubscriptionProfileInterface
      */
     public function setIsVirtual($isVirtual);
 
+
+    /**
+     * Gets payment token hash.
+     *
+     * @return string|null
+     */
+    public function getTokenHash();
+
+    /**
+     * Sets payment token hash.
+     *
+     * @param string $tokenHash
+     * @return $this
+     */
+    public function setTokenHash($tokenHash);
+
     /**
      * Gets payment token.
      *
@@ -387,23 +413,83 @@ interface SubscriptionProfileInterface
     /**
      * Sets payment token.
      *
-     * @param string $tokenHash
+     * @param string $token
      * @return $this
      */
-    public function setPaymentToken($tokenHash);
+    public function setPaymentToken($token);
 
     /**
      * Gets payment additional info.
      *
      * @return []|null
      */
+    public function getDecodedPaymentAdditionalInfo();
+
+    /**
+     * Sets payment additional info.
+     *
+     * @param  [] $info
+     * @return $this
+     */
+    public function setEncodedPaymentAdditionalInfo($info);
+
+    /**
+     * Gets payment additional info.
+     *
+     * @return string|null
+     */
     public function getPaymentAdditionalInfo();
 
     /**
      * Sets payment additional info.
      *
-     * @param [] $info
+     * @param  string $info
      * @return $this
      */
     public function setPaymentAdditionalInfo($info);
+
+    /**
+     * Gets quotes generation flag.
+     *
+     * @return []|null
+     */
+    public function getNeedGenerateQuotes();
+
+    /**
+     * Sets quotes generation flag.
+     *
+     * @param bool $flag
+     * @return $this
+     */
+    public function setNeedGenerateQuotes($flag);
+
+    /**
+     * Gets created at date.
+     *
+     * @return []|null
+     */
+    public function getCreatedAt();
+
+    /**
+     * Sets created at date.
+     *
+     * @param bool $date
+     * @return $this
+     */
+    public function setCreatedAt($date);
+
+    /**
+     * Gets updated at date.
+     *
+     * @return []|null
+     */
+    public function getUpdatedAt();
+
+    /**
+     * Sets updated at date.
+     *
+     * @param bool $date
+     * @return $this
+     */
+    public function setUpdatedAt($date);
 }

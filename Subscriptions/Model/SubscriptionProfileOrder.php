@@ -68,4 +68,36 @@ class SubscriptionProfileOrder extends AbstractModel
     {
         return $this->setData(self::MAGENTO_ORDER_ID, $magentoOrderId);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMagentoQuoteId()
+    {
+        return $this->getData(self::MAGENTO_QUOTE_ID);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMagentoQuoteId($magentoQuoteId)
+    {
+        return $this->setData(self::MAGENTO_QUOTE_ID, $magentoQuoteId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getScheduledAt()
+    {
+        return $this->getData(self::SCHEDULED_AT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setScheduledAt($scheduledAt)
+    {
+        return $this->setData(self::SCHEDULED_AT, $scheduledAt);
+    }
 }

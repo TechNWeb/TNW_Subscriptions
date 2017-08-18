@@ -49,7 +49,7 @@ class UnlockPresetQty extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        $value = $this->config->unlockPresetQtyStatus();
+        $value = $this->config->getUnlockPresetQtyStatus();
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
