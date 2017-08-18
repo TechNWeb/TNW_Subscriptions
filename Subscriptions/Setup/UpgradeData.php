@@ -197,7 +197,6 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateProductTrialDiscountAttributes($eavSetup);
         }
 
-
         if (version_compare($context->getVersion(), "2.0.10", "<")) {
             //TODO don't add this attributes to subscription profile entity
             $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
@@ -343,6 +342,118 @@ class UpgradeData implements UpgradeDataInterface
                     'required' => true,
                     'frontend_class' => 'validate-length maximum-length-255',
                     'sort_order' => 170,
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.11", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::IS_VIRTUAL,
+                [
+                    'type' => 'static',
+                    'label' => 'Is virtual',
+                    'sort_order' => 180,
+                    'input' => 'select',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => true,
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.12", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::TOKEN_HASH,
+                [
+                    'type' => 'static',
+                    'label' => 'Token hash',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 180
+                ]
+            );
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::PAYMENT_ADDITIONAL_INFO,
+                [
+                    'type' => 'static',
+                    'label' => 'Payment Additional Info',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 190
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.13", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::NEED_GENERATE_QUOTES,
+                [
+                    'type' => 'static',
+                    'label' => 'Need generate quotes',
+                    'sort_order' => 180,
+                    'input' => 'select',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => true,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::CREATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 190,
+                    'visible' => false
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 200,
+                    'visible' => false
+                ]
+            );
+
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::CREATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 120,
+                    'visible' => false
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 130,
+                    'visible' => false
                 ]
             );
         }

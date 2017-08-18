@@ -229,7 +229,7 @@ class Product extends AbstractDataProvider
 
             $subTotal = $subQuote->getGrandTotal();
 
-            $estimatedPayment += ((double)$subTotal * (int)$subscriptionData['period']);
+            $estimatedPayment += (double)$subTotal;
 
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
@@ -279,9 +279,9 @@ class Product extends AbstractDataProvider
         $this->shippingMethods->setQuote($quote);
         if ($this->shippingMethods->canShowShippingMethodLabel()) {
             $label = __('Selected on next step');
-            if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_REVIEW) {
+            if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT) {
                 $label = $this->shippingMethods->getCurrentMethodLabel();
-            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT_BILLING) {
+            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
                 $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
                 $label = '';
             }
@@ -324,7 +324,7 @@ class Product extends AbstractDataProvider
     {
         $result = [];
 
-        if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_REVIEW) {
+        if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [

@@ -142,6 +142,27 @@ class Quote extends SessionManager
     }
 
     /**
+     * Removes subQuote Id from storage if it was deleted from database.
+     *
+     * @param int|string $subQuoteId
+     * @return $this
+     */
+    public function removeSubQuoteId($subQuoteId)
+    {
+        $subQuoteIds = $this->getSubQuoteIds() ? $this->getSubQuoteIds() : [];
+
+        foreach ($subQuoteIds as $key => $id) {
+            if ($subQuoteId == $id) {
+                unset($subQuoteIds[$key]);
+            }
+        }
+
+        $this->storage->setSubQuoteIds($subQuoteIds);
+
+        return $this;
+    }
+
+    /**
      * @return ModelQuote[]
      */
     public function getSubQuotes()
@@ -161,6 +182,10 @@ class Quote extends SessionManager
                     ->create();
 
                 $this->quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+
+                foreach ($this->quotes as $quote) {
+                    $quote->setIsSuperMode(true);
+                }
             }
         }
 
@@ -174,7 +199,7 @@ class Quote extends SessionManager
     {
         $result = false;
 
-        if (!empty($this->quotes)){
+        if (!empty($this->getSubQuotes())){
             $result = reset($this->quotes);
         }
 
@@ -235,7 +260,6 @@ class Quote extends SessionManager
         return $this->storage->getCustomerEmail();
     }
 
-
     /**
      * @param $value
      * @return $this
@@ -257,6 +281,7 @@ class Quote extends SessionManager
 
     public function clearStorage()
     {
+        $this->quotes = [];
         return parent::clearStorage();
     }
 }

@@ -9,17 +9,19 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
-use Magento\Sales\Api\Data\OrderInterface;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Framework\Api\SimpleDataObjectConverter;
 
 /**
  * Class Manager
@@ -76,7 +78,7 @@ class Manager
     private $productManager;
 
     /**
-     * Profile to order relation manager.
+     * Profile relation manager.
      *
      * @var OrderRelationManager
      */
@@ -130,7 +132,10 @@ class Manager
      */
     public function setProfile($profile)
     {
+        $this->reset();
         $this->profile = $profile;
+
+        return $this;
     }
 
     /**
@@ -143,6 +148,11 @@ class Manager
         return $this->subscriptionProfileFactory->create();
     }
 
+    /**
+     * Resets internal variables.
+     *
+     * @return $this
+     */
     public function reset()
     {
         $this->profile = null;
@@ -160,9 +170,9 @@ class Manager
     {
         if (!$this->engine) {
             $engineCode = $this->getProfile()->getEngineCode();
-
             /** @var EngineInterface $engine */
             $this->engine = $this->enginePool->getEngineByCode($engineCode);
+            $this->engine->setProfile($this->getProfile());
         }
 
         return $this->engine;
@@ -175,44 +185,101 @@ class Manager
      */
     public function saveProfile()
     {
-        $this->getEngine()->updateProfile(
-            $this->getProfile()
-        );
         $this->setProfile($this->subscriptionProfileRepository->save($this->getProfile()));
 
         return $this->getProfile();
     }
 
     /**
+     * Sets to profile status "Holded".
+     */
+    public function setHoldedStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_HOLDED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Active".
+     */
+    public function setActiveStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_ACTIVE);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Suspended".
+     */
+    public function setSuspendedStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_SUSPENDED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Trial".
+     */
+    public function setTrialStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Canceled".
+     */
+    public function setCanceledStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_CANCELED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Pending".
+     */
+    public function setPendingStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_PENDING);
+        return $this;
+    }
+
+    /**
      * Engine profile processing.
      *
-     * Processes subscription profile.
+     * @param Quote $quote
+     * @return OrderInterface
      */
-    public function processProfile()
+    public function processProfile(Quote $quote)
     {
-        $this->getEngine()->processProfile(
-            $this->getProfile()
-        );
+        return $this->getEngine()->processProfile($quote);
     }
 
     /**
      * Assigns order to profile.
      *
      * @param OrderInterface $order
-     * @param null $profile
+     * @param SubscriptionProfileInterface $profile
+     * @param null $date
      */
     public function assignOrderToProfile(
         OrderInterface $order,
-        $profile = null
+        SubscriptionProfileInterface $profile,
+        $date = null
     ) {
-        if (!$profile) {
-            $profile = $this->getProfile();
+        if (!$date) {
+            $date = new \DateTime();
+            $date = $date->format('Y-m-d');
         }
 
         $relation = $this->orderRelationManager
             ->getNewProfileOrderReletion()
             ->setSubscriptionProfileId($profile->getId())
-            ->setMagentoOrderId($order->getId());
+            ->setMagentoOrderId($order->getId())
+            ->setMagentoQuoteId($order->getQuoteId())
+            ->setScheduledAt(
+                $date
+            );
         $this->orderRelationManager->saveRelation($relation);
     }
 
@@ -223,7 +290,7 @@ class Manager
      * @return $this
      * @throws \Exception
      */
-    public function populateProfileData($quote)
+    public function populateProfileData(Quote $quote)
     {
         $request = $this->getUniqueBuyRequest($quote);
 
@@ -236,13 +303,14 @@ class Manager
             }
         }
 
-        if (isset($frequency)){
+        if (isset($frequency)) {
             $this->getProfile()
                 ->setCustomerId($quote->getCustomerId())
                 ->setWebsiteId($quote->getStore()->getWebsiteId())
                 ->setEngineCode($quote->getPayment()->getMethod())
                 ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
                 ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
+                ->setIsVirtual($quote->getIsVirtual())
                 ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
                 ->setTerm($request['term'])
                 ->setTotalBillingCycles($request['period'])
@@ -253,17 +321,18 @@ class Manager
                 ->setStatus(ProfileStatus::STATUS_PENDING)
                 ->setTrialStartDate(null)
                 ->setTrialLength($request['trial_period'])
-                ->setTrialLengthUnit($request['trial_unit_id']);
+                ->setTrialLengthUnit($request['trial_unit_id'])
+                ->setNeedGenerateQuotes(true);
 
-            if ($request['is_trial']){
+            if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($request['start_on']);
                 $this->getProfile()->setStartDate($this->calculateStartDate());
+                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
 
             $this->getProfile()->setAddresses(
                 $this->populateAddressesData($quote)
             );
-
             $this->getProfile()->setProducts(
                 $this->populateProductsData($quote->getAllItems())
             );
@@ -272,6 +341,22 @@ class Manager
         return $this;
     }
 
+    /**
+     * Sets payment information for a profile depending on the engine code.
+     *
+     * @param Payment $payment
+     * @return $this
+     */
+    public function populatePaymentData(Payment $payment)
+    {
+        $data = $this->getEngine()->getProfilePaymentInfo($payment);
+        foreach ($data as $key => $value) {
+            $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
+            $this->getProfile()->$method($value);
+        }
+
+        return $this;
+    }
 
     /**
      * Returns list of profile addresses created from billing and shipping addresses.
@@ -279,7 +364,7 @@ class Manager
      * @param Quote $quote
      * @return array
      */
-    private function populateAddressesData($quote)
+    private function populateAddressesData(Quote $quote)
     {
         /** @var SubscriptionProfileAddressInterface $profileBillingAddress */
         $profileBilling = $this->profileAddressFactory->create();
@@ -353,10 +438,10 @@ class Manager
     {
         $result = null;
 
-        if ($this->getProfile()->getTrialStartDate()){
+        if ($this->getProfile()->getTrialStartDate()) {
             $startDate = new \DateTime($this->getProfile()->getTrialStartDate());
 
-            switch ($this->getProfile()->getTrialLengthUnit()){
+            switch ($this->getProfile()->getTrialLengthUnit()) {
                 case TrialLengthUnitType::DAYS:
                     $intervalUnit = 'D';
                     break;
@@ -368,8 +453,8 @@ class Manager
                     break;
             }
 
-            $expretion = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
-            $result = $startDate->add(new \DateInterval($expretion))
+            $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
+            $result = $startDate->add(new \DateInterval($expression))
                 ->format('Y-m-d');
         }
 

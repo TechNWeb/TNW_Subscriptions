@@ -3,20 +3,21 @@
 }
 
 .subscription-profile-products-container .sub-button-left,
-.fieldset-wrapper .admin__fieldset .sub-button-left{
-  display: block;
-  padding-top: .6875em;
-  padding-bottom: .6875em;
-  float: left;
-  font-size: 16px;
+.fieldset-wrapper .admin__fieldset .sub-button-left {
+    display: inline-block;
+    padding-top: .6875em;
+    padding-bottom: .6875em;
+    font-size: 16px;
+    margin-bottom: 1.3rem;
+    margin-right: 1.3rem;
 }
 
-.subscription-profile-products-container .sub-button-right{
-  display: block;
-  padding-top: .6875em;
-  padding-bottom: .6875em;
-  float: right;
-  font-size: 16px;
+.subscription-profile-products-container .sub-button-right,
+.fieldset-wrapper .admin__fieldset .sub-button-right {
+    display: inline-block;
+    padding-top: .6875em;
+    padding-bottom: .6875em;
+    font-size: 16px;
 }
 
 .subscription-profile-products-container .admin__fieldset{
@@ -193,6 +194,19 @@
   display: inline-block;
   margin-top: 0px;
 }
+
+.payment-additional-fieldset legend{
+  opacity: 1 !important;
+}
+
+.payment-additional-fieldset._show{
+  margin-top: 0 !important;
+}
+
+.payment-additional-fieldset .payment-cvv input{
+  width: 6rem;
+}
+
 #anchor-content .admin_field_without_legend{
   width: calc( (100%) * .7 - 30px);
 }
@@ -208,6 +222,18 @@
   margin: 1%;
   float: left;
 }
+.admin__address-information-buttons{
+  display: block;
+  float:left;
+  margin: 0;
+  padding: 0;
+}
+
+.admin__address-information-buttons fieldset{
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .admin__shipping-information-preview {
   margin-right: 50%
 }
@@ -222,6 +248,17 @@
 .admin__fieldset>.subscription-store-fieldset>.admin__field-control {
   float: none;
   margin: 0 auto;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option {
+  display: block;
+  margin: 0;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option:before, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option:before {
+  display: none;
 }
 
 .sub-fieldset .admin__fieldset{
@@ -338,3 +375,52 @@
   top: -0.5rem;
   left: 0.5rem;
 }
+.admin__payment-details-preview .admin__fieldset>.admin__field {
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  width: calc((100%) * .50 );
+  text-align: left;
+  margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-control {
+  text-align: right;
+  line-height: 3.2rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field:nth-child(odd)/*>.admin__field-label*/ {
+  background-color: #f1f1f1;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+  padding: 0.5rem 0 0.5rem 1rem;
+}
+.admin__payment-details-preview>.admin__fieldset-wrapper-content>fieldset {
+  padding-top: 1rem;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+  display: block;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before {
+  display: none;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
+  display: block;
+  margin-left: 0;
+}
+
+.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+  margin-top: .9rem;
+}
+
+.customer_exists_popup .admin__fieldset-wrapper-content .admin__fieldset {
+  padding-bottom: 0;
+}
+

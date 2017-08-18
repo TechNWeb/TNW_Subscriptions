@@ -53,6 +53,12 @@
                 type="TNW\Subscriptions\Model\ProductBillingFrequency"/>
     <preference for="TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface"
+                type="TNW\Subscriptions\Model\ProductSubscriptionProfileRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface"
+                type="TNW\Subscriptions\Model\ProductSubscriptionProfile"/>
+    <preference for="TNW\Subscriptions\Api\Data\ProductSubscriptionProfileSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfileRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface"
@@ -71,7 +77,12 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Address"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
-
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface"
+                type="TNW\Subscriptions\Model\QueueRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface"
+                type="TNW\Subscriptions\Model\Queue"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileQueueSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -212,5 +223,12 @@
         <plugin name="subscriptions_product_billing_frequency_duplicate"
                 type="TNW\Subscriptions\Plugin\Product\Copier" />
     </type>
-
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
+                <item name="tnw_subscriptions_process_command" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessCommand</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

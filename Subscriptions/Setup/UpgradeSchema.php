@@ -7,15 +7,16 @@
 
 namespace TNW\Subscriptions\Setup;
 
-use Magento\Catalog\Model\Product;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\Queue;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -401,6 +402,375 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $setup->getConnection()->createTable($table);
         }
 
+        if (version_compare($context->getVersion(), "2.0.11", "<")) {
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::IS_VIRTUAL,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Is virtual',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_METHOD,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Shipping Method',
+                    'length' => 40,
+                    'default' => null
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::SHIPPING_DESCRIPTION,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Shipping Description',
+                    'length' => 255,
+                    'default' => null
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.12", "<")) {
+            //TODO add this attribute to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::TOKEN_HASH,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Token Hash',
+                    'length' => 128,
+                    'default' => null
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::PAYMENT_ADDITIONAL_INFO,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable' => true,
+                    'comment' => 'Payment Additional Info',
+                    'default' => null
+                ]
+            );
+
+            //TODO on install add new foreign key
+            $tableName = 'tnw_subscriptions_subscription_profile_order';
+            $setup->getConnection()->dropForeignKey(
+                $tableName,
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile',
+                    'id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile_entity',
+                    'id'
+                ),
+                $tableName,
+                'subscription_profile_id',
+                'tnw_subscriptions_subscription_profile_entity',
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $tableName = 'tnw_subscriptions_subscription_profile_order';
+            $setup->getConnection()->dropForeignKey(
+                $tableName,
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'magento_order_id',
+                    'sales_order',
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    'magento_order_id',
+                    'sales_order',
+                    'entity_id'
+                ),
+                $tableName,
+                'magento_order_id',
+                'sales_order',
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $setup->getConnection()->dropForeignKey(
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'subscription_profile_id',
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'subscription_profile_id',
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                    'entity_id'
+                ),
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                'subscription_profile_id',
+                SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                'entity_id',
+                'CASCADE'
+            );
+
+            //TODO on install add new foreign key
+            $setup->getConnection()->dropForeignKey(
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'magento_product_id',
+                    'catalog_product_entity',
+                    'entity_id'
+                )
+            );
+            $setup->getConnection()->addForeignKey(
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE,
+                    'magento_product_id',
+                    'catalog_product_entity',
+                    'entity_id'
+                ),
+                ProductSubscriptionProfile::ENTITY_TABLE,
+                'magento_product_id',
+                'catalog_product_entity',
+                'entity_id',
+                'CASCADE'
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.13", "<")) {
+            //TODO add this attribute to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::NEED_GENERATE_QUOTES,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need generate quotes',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfileOrder::MAIN_TABLE),
+                SubscriptionProfileOrder::MAGENTO_QUOTE_ID,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'nullable' => true,
+                    'comment' => 'Magento quote id',
+                    'unsigned' => true,
+                    'default' => null
+                ]
+            );
+
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfileOrder::MAIN_TABLE),
+                SubscriptionProfileOrder::SCHEDULED_AT,
+                [
+                    'type' => Table::TYPE_DATETIME,
+                    'comment' => 'Scheduled at',
+                ]
+            );
+
+            $setup->getConnection()->dropForeignKey(
+                SubscriptionProfileOrder::MAIN_TABLE,
+                $setup->getFkName(
+                    SubscriptionProfileOrder::MAIN_TABLE,
+                    'magento_order_id',
+                    'sales_order',
+                    'entity_id'
+                )
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfileOrder::MAIN_TABLE),
+                SubscriptionProfileOrder::MAGENTO_ORDER_ID,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'nullable' => true,
+                    'comment' => 'Magento order id',
+                    'unsigned' => true,
+                    'default' => null
+                ]
+            );
+            //TODO update main eav setup for this attributes
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::CREATED_AT,
+                [
+                    'type' => Table::TYPE_TIMESTAMP,
+                    'nullable' => false,
+                    'default' => Table::TIMESTAMP_INIT
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => Table::TYPE_TIMESTAMP,
+                    'nullable' => false,
+                    'default' => Table::TIMESTAMP_INIT_UPDATE
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfile::CREATED_AT,
+                [
+                    'type' => Table::TYPE_TIMESTAMP,
+                    'nullable' => false,
+                    'default' => Table::TIMESTAMP_INIT
+                ]
+            );
+
+            $setup->getConnection()->modifyColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => Table::TYPE_TIMESTAMP,
+                    'nullable' => false,
+                    'default' => Table::TIMESTAMP_INIT_UPDATE
+                ]
+            );
+
+            if (!$setup->tableExists(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE)) {
+                $table = $setup->getConnection()
+                    ->newTable(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE)
+                    ->addColumn(
+                        Queue::ID,
+                        Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'identity' => true,
+                            'unsigned' => true,
+                            'primary' => true,
+                            'nullable' => false
+                        ]
+                    )->addColumn(
+                        Queue::PROFILE_ORDER_ID,
+                        Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'unsigned' => true,
+                            'nullable' => false
+                        ]
+                    )->addColumn(
+                        Queue::STATUS,
+                        Table::TYPE_TEXT,
+                        255,
+                        [
+                            'nullable' => false,
+                            'default' => 'new'
+                        ]
+                    )->addColumn(
+                        Queue::ATTEMPT_COUNT,
+                        Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'unsigned' => true,
+                            'nullable' => false,
+                            'default' => 0
+                        ]
+                    )->addColumn(
+                        Queue::MESSAGE,
+                        Table::TYPE_TEXT,
+                        1024,
+                        [
+                            'unsigned' => true,
+                            'nullable' => true
+                        ],
+                        'Error when sync'
+                    )->addColumn(
+                        Queue::CREATED_AT,
+                        Table::TYPE_TIMESTAMP,
+                        null,
+                        ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
+                        'Creation Time'
+                    )
+                    ->addColumn(
+                        Queue::UPDATED_AT,
+                        Table::TYPE_TIMESTAMP,
+                        null,
+                        ['nullable' => false, 'default' => Table::TIMESTAMP_INIT_UPDATE],
+                        'Update Time'
+                    )->addIndex(
+                        $setup->getIdxName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            [Queue::CREATED_AT]
+                        ),
+                        Queue::CREATED_AT
+                    )->addIndex(
+                        $setup->getIdxName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            [Queue::UPDATED_AT]
+                        ),
+                        Queue::UPDATED_AT
+                    )->addIndex(
+                        $setup->getIdxName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            [Queue::STATUS]
+                        ),
+                        Queue::STATUS
+                    )->addIndex(
+                        $setup->getIdxName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            [Queue::ATTEMPT_COUNT]
+                        ),
+                        Queue::ATTEMPT_COUNT
+                    )->addIndex(
+                        $setup->getIdxName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            [Queue::PROFILE_ORDER_ID],
+                            AdapterInterface::INDEX_TYPE_UNIQUE
+                        ),
+                        Queue::PROFILE_ORDER_ID,
+                        ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
+                    )->addForeignKey(
+                        $setup->getConnection()->getForeignKeyName(
+                            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                            Queue::PROFILE_ORDER_ID,
+                            SubscriptionProfileOrder::MAIN_TABLE,
+                            SubscriptionProfileOrder::ID
+                        ),
+                        Queue::PROFILE_ORDER_ID,
+                        SubscriptionProfileOrder::MAIN_TABLE,
+                        SubscriptionProfileOrder::ID,
+                        AdapterInterface::FK_ACTION_CASCADE
+                    );
+
+                $setup->getConnection()->createTable($table);
+            }
+        }
+
         $setup->endSetup();
     }
 
@@ -680,7 +1050,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_datetime', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_datetime', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -732,7 +1103,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addIndex(
                 $setup->getIdxName(
                     ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
-                    [ 'entity_id', 'attribute_id', 'store_id'],
+                    ['entity_id', 'attribute_id', 'store_id'],
                     \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
                 ['entity_id', 'attribute_id', 'store_id'],
@@ -775,7 +1146,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_decimal', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_decimal', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -1060,7 +1432,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
             ->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_varchar', 'store_id', 'store', 'store_id'),
+                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_varchar', 'store_id', 'store',
+                    'store_id'),
                 'store_id',
                 $setup->getTable('store'),
                 'store_id',
@@ -1079,7 +1452,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function migrateSubscriptionProfileToEav(SchemaSetupInterface $setup) {
+    private function migrateSubscriptionProfileToEav(SchemaSetupInterface $setup)
+    {
         /**
          * Create table 'tnw_subscriptions_subscription_profile_entity'.
          */

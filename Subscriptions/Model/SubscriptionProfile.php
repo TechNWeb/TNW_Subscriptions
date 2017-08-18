@@ -7,6 +7,8 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Store\Api\WebsiteRepositoryInterface;
+use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
@@ -15,6 +17,8 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Json\Helper\Data;
 
 /**
  * Subscription Profile model.
@@ -32,11 +36,23 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
+     * Label prefix
+     */
+    const LABEL_PREFIX = '#S-';
+
+    /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface
      */
     private $customerRepository;
+
+    /**
+     * Repository for retrieving websites.
+     *
+     * @var WebsiteRepositoryInterface
+     */
+    private $websiteRepository;
 
     /**
      * Profile customer.
@@ -45,15 +61,53 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      */
     private $customer;
 
+    /**
+     * Profile website.
+     *
+     * @var WebsiteInterface
+     */
+    private $website;
+
+    /**
+     * Provides basic logic for hashing strings.
+     *
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
+     * JSON helper.
+     *
+     * @var Data
+     */
+    private $jsonHelper;
+
+    /**
+     * SubscriptionProfile constructor.
+     * @param ModelContext $context
+     * @param Registry $registry
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param EncryptorInterface $encryptor
+     * @param Data $jsonHelper
+     * @param Resource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         ModelContext $context,
         Registry $registry,
         CustomerRepositoryInterface $customerRepository,
+        WebsiteRepositoryInterface $websiteRepository,
+        EncryptorInterface $encryptor,
+        Data $jsonHelper,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->customerRepository = $customerRepository;
+        $this->websiteRepository = $websiteRepository;
+        $this->encryptor = $encryptor;
+        $this->jsonHelper = $jsonHelper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -120,7 +174,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      */
     public function getLabel()
     {
-        return sprintf('#S-%s', $this->getId());
+        return self::LABEL_PREFIX . $this->getId();
     }
 
     /**
@@ -153,6 +207,21 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function setWebsiteId($websiteId)
     {
         return $this->setData(self::WEBSITE_ID, $websiteId);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWebsite()
+    {
+        if (!$this->website) {
+            $this->website = $this->websiteRepository->getById(
+                $this->getWebsiteId()
+            );
+        }
+
+        return $this->website;
     }
 
     /**
@@ -225,7 +294,8 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function getShippingAddress()
     {
         $result = null;
-        foreach ($this->getAddresses() as $address) {
+        $addresses = $this->getAddresses() ? $this->getAddresses() : [];
+        foreach ($addresses as $address) {
             if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
                 $result = $address;
                 break;
@@ -241,7 +311,8 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function getBillingAddress()
     {
         $result = null;
-        foreach ($this->getAddresses() as $address) {
+        $addresses = $this->getAddresses() ? $this->getAddresses() : [];
+        foreach ($addresses as $address) {
             if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING) {
                 $result = $address;
                 break;
@@ -399,6 +470,22 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     /**
      * {@inheritdoc}
      */
+    public function getIsVirtual()
+    {
+        return $this->getData(self::IS_VIRTUAL);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsVirtual($isVirtual)
+    {
+        return $this->setData(self::IS_VIRTUAL, $isVirtual);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProducts()
     {
         return $this->getData(self::PROFILE_PRODUCTS);
@@ -424,5 +511,128 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
         }
 
         return $this->customer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentToken()
+    {
+        return $this->encryptor->decrypt(
+            $this->getData(self::TOKEN_HASH)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaymentToken($token)
+    {
+        return $this->setData(
+            self::TOKEN_HASH,
+            $this->encryptor->encrypt($token)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTokenHash()
+    {
+        return $this->getData(self::TOKEN_HASH);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTokenHash($tokenHash)
+    {
+        return $this->setData(self::TOKEN_HASH, $tokenHash);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentAdditionalInfo()
+    {
+        return $this->getData(self::PAYMENT_ADDITIONAL_INFO);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaymentAdditionalInfo($info)
+    {
+        return $this->setData(self::PAYMENT_ADDITIONAL_INFO, $info);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecodedPaymentAdditionalInfo()
+    {
+        return $this->jsonHelper->jsonDecode(
+            $this->getData(self::PAYMENT_ADDITIONAL_INFO)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEncodedPaymentAdditionalInfo($info)
+    {
+        return $this->setData(
+            self::PAYMENT_ADDITIONAL_INFO,
+            $this->jsonHelper->jsonEncode($info)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNeedGenerateQuotes()
+    {
+        return $this->getData(self::NEED_GENERATE_QUOTES);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNeedGenerateQuotes($flag)
+    {
+        return $this->setData(self::NEED_GENERATE_QUOTES, $flag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt()
+    {
+        return $this->getData(self::CREATED_AT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCreatedAt($date)
+    {
+        return $this->setData(self::CREATED_AT, $date);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getData(self::UPDATED_AT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUpdatedAt($date)
+    {
+        return $this->setData(self::UPDATED_AT, $date);
     }
 }

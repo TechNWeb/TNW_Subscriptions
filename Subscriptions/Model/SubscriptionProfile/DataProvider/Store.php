@@ -10,15 +10,45 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
+use TNW\Subscriptions\Model\Backend\Session\Quote;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Store extends AbstractDataProvider
 {
-    /** @var [] */
-    protected $loadedData;
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
+    /**#@+
+     * Form request values
+     */
+    const FORM_DATA_KEY = 'store_form_data';
+    const FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
+
+    /**
+     * Url Builder.
+     *
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
+     * Steps pool for creating subscription.
+     *
+     * @var StepPool
+     */
+    private $stepPool;
+
+    /**
+     * Admin session.
+     *
+     * @var Quote
+     */
+    private $session;
+
+    /**
+     * Store manager.
+     *
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * DataProvider constructor.
@@ -27,6 +57,8 @@ class Store extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
+     * @param Quote $session
+     * @param StoreManagerInterface $storeManager
      * @param array $meta
      * @param array $data
      */
@@ -36,11 +68,15 @@ class Store extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
+        Quote $session,
+        StoreManagerInterface $storeManager,
         array $meta = [],
         array $data = []
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
+        $this->session = $session;
+        $this->storeManager = $storeManager;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
     }
@@ -52,7 +88,14 @@ class Store extends AbstractDataProvider
      */
     public function getData()
     {
-        return [];
+        $data = [];
+
+        $data[self::FORM_DATA_VALUE]['store_id'] = $this->getDefaultStoreId();
+        if ($this->session->getStoreId()) {
+            $data[self::FORM_DATA_VALUE]['store_id'] = $this->session->getStoreId();
+        }
+
+        return $data;
     }
 
     /**
@@ -78,5 +121,15 @@ class Store extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
 
+    }
+
+    /**
+     * Get default store id
+     *
+     * @return int
+     */
+    private function getDefaultStoreId()
+    {
+        return $this->storeManager->getStore()->getId();
     }
 }

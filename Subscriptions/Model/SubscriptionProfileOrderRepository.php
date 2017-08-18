@@ -169,10 +169,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 $subscriptionProfileOrderModel->getData(),
                 'TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface'
             );
-            $items[] = $this->dataObjectProcessor->buildOutputDataArray(
-                $subscriptionProfileOrderData,
-                'TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface'
-            );
+            $items[] = $subscriptionProfileOrderData;
         }
         $searchResults->setItems($items);
         return $searchResults;

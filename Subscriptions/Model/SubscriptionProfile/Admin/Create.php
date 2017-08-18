@@ -12,6 +12,7 @@ use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
@@ -21,6 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class for creating subscriptions in admin.
@@ -82,7 +84,6 @@ class Create extends BaseCreate
     protected $eventManager;
 
     /**
-     * Create constructor.
      * @param Context $context
      * @param SessionManagerInterface $session
      * @param Address $addressCreator
@@ -126,7 +127,7 @@ class Create extends BaseCreate
     /**
      * @param bool $needCollect
      */
-    public function setNeedCollect(bool $needCollect)
+    public function setNeedCollect($needCollect)
     {
         $this->needCollect = $needCollect;
     }
@@ -245,7 +246,7 @@ class Create extends BaseCreate
      *
      * @return int|string
      */
-    private function createSubCart()
+    public function createSubCart()
     {
         return $this->quoteCreator->createSubCart();
     }
@@ -328,6 +329,9 @@ class Create extends BaseCreate
         $subQuotes = $session->getSubQuotes();
 
         foreach ($subQuotes as $subQuote) {
+            if ($subQuote->isVirtual()) {
+                continue;
+            }
 
             /** @var string|null $method */
             $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;
@@ -354,18 +358,16 @@ class Create extends BaseCreate
     }
 
     /**
-     * Set payment into subscription quotes.
+     * Set payment data into subscription quotes.
      *
-     * @param string $method
      * @param [] $data
      * @return array
      */
-    public function setPayment($method, $data)
+    public function setPaymentData($data)
     {
         $result = [];
 
         try {
-            $data['method'] = $method;
             /** @var Session $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
@@ -383,9 +385,36 @@ class Create extends BaseCreate
     }
 
     /**
+     * Sets payment method in to subscription quotes.
+     *
+     * @param $method
+     * @return array
+     */
+    public function setPaymentMethod($method)
+    {
+        $result = [];
+
+        try {
+            /** @var Session $session */
+            $session = $this->getSession();
+            $subQuotes = $session->getSubQuotes();
+
+            foreach ($subQuotes as $subQuote) {
+                $subQuote->getPayment()->setMethod($method);
+            }
+            $this->setNeedCollect(true);
+        } catch (\Exception $e) {
+            $result[] = __('Payment: ') . $e->getMessage();
+            $this->getContext()->log($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns Payment from the first subscription quote or false if there is no quotes.
      *
-     * @return bool|ModelQuote\Payment
+     * @return bool|Payment
      */
     public function getPayment()
     {
@@ -418,8 +447,11 @@ class Create extends BaseCreate
             /** @var Session $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
-
+            //
+            $basicPayment = $session->getFirstQuote()->getPayment();
+            /** @var ModelQuote $subQuote */
             foreach ($subQuotes as $subQuote) {
+                $subQuote->setCustomer($customer);
                 $this->quoteCreator->fillCustomerData($customer);
                 $errors = $this->quoteCreator->validate($subQuote);
 
@@ -432,11 +464,12 @@ class Create extends BaseCreate
                     throw new \Exception(__('Quote validation is failed.'));
                 }
 
-                $profile = $this->createProfile($subQuote);
+                $profile = $this->createProfile($subQuote, $basicPayment);
 
                 if ($profile) {
-                    $order = $this->quoteManagement->submit($subQuote);
+                    $order = $this->profileManager->processProfile($subQuote);
                     $this->profileManager->assignOrderToProfile($order, $profile);
+                    $this->updateProfileStatus($profile);
                     $this->eventManager->dispatch(
                         'checkout_submit_all_after',
                         ['order' => $order, 'quote' => $subQuote]
@@ -456,13 +489,17 @@ class Create extends BaseCreate
     /**
      * Creates subscription profile.
      *
-     * @param $subQuote
+     * @param ModelQuote $subQuote
+     * @param $payment
      * @return SubscriptionProfileInterface
      */
-    private function createProfile($subQuote)
-    {
+    private function createProfile(
+        ModelQuote $subQuote,
+        $payment
+    ) {
         $profile = $this->profileManager->reset()
             ->populateProfileData($subQuote)
+            ->populatePaymentData($payment)
             ->saveProfile();
 
         return $profile;
@@ -485,12 +522,220 @@ class Create extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             if (!$subQuote->getQuoteCurrencyCode() || $subQuote->getQuoteCurrencyCode() != $currencyCode) {
                 $subQuote->setQuoteCurrencyCode($currencyCode);
-                $needRecollect= true;
+                $needRecollect = true;
             }
         }
 
         if ($needRecollect) {
             $this->setNeedCollect(true);
         }
+    }
+
+    /**
+     * Returns SubQuotes grand total.
+     *
+     * @return int
+     */
+    public function getSubQuotesGrandTotal()
+    {
+        $grandTotal = 0;
+        /** @var Session $session */
+        $session = $this->getSession();
+        $quotes = $session->getSubQuotes();
+
+        if (!empty($quotes)) {
+            foreach ($quotes as $quote) {
+                $grandTotal += $quote->getGrandTotal() * 1;
+            }
+        }
+
+        return $grandTotal;
+    }
+
+    /**
+     * Reassign quotes by customer id.
+     *
+     * @param int $customerId
+     */
+    public function reassignQuote($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+
+        $customer = $this->customerCreator->getCustomer($customerId);
+
+        foreach ($session->getSubQuotes() as $quote) {
+            $quote->assignCustomer($customer);
+            $this->quoteCreator->getCartRepository()->save($quote);
+        }
+    }
+
+    /**
+     * Change customer id value in session.
+     *
+     * @param int $customerId
+     * @return void
+     */
+    public function changeCustomerIdInSession($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $session->setCustomerId($customerId);
+    }
+
+    /**
+     * If store changed we need to delete existing quotes.
+     */
+    public function deleteQuoteIfStoreChanged()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $sessionStoreId = $session->getStoreId();
+        $subQuotes = $session->getSubQuotes();
+
+        foreach ($subQuotes as $subQuote) {
+            $subQuoteStoreId = $subQuote->getStoreId();
+
+            if ($subQuoteStoreId != $sessionStoreId) {
+                $this->quoteCreator->getCartRepository()->delete($subQuote);
+                $session->removeSubQuoteId($subQuote->getId());
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * If customer on the first step is changed we need to change customer in all quotes.
+     */
+    public function changeCustomerInQuote()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $sessionCustomerId = $session->getCustomerId();
+        $customer = null;
+        if ($sessionCustomerId) {
+            $customer = $this->customerCreator->getCustomer($sessionCustomerId);
+        }
+
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $subQuoteCustomerId = $subQuote->getCustomerId();
+
+            if ($sessionCustomerId != $subQuoteCustomerId) {
+                $defaultShippingId = null;
+                $defaultBillingId = null;
+                $customerEmail = null;
+
+                //If there is a customer we find customer's default addresses
+                if ($customer) {
+                    $defaultShippingId = $customer->getDefaultShipping();
+                    $defaultBillingId = $customer->getDefaultBilling();
+                    $customerEmail = $customer->getEmail();
+                }
+                //If there is default shipping address we load it. Otherwise we get empty address.
+                if ($defaultShippingId) {
+                    /** @var QuoteAddress $shippingAddress */
+                    $shippingAddress = $customer->getAddressById($defaultShippingId);
+                } else {
+                    /** @var QuoteAddress $shippingAddress */
+                    $shippingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
+                }
+                //If there is default billing address we load it. Otherwise we get empty address.
+                if ($defaultBillingId) {
+                    /** @var QuoteAddress $billingAddress */
+                    $billingAddress = $customer->getAddressById($defaultBillingId);
+                } else {
+                    /** @var QuoteAddress $billingAddress */
+                    $billingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
+                }
+                //If there is existing customer we assign his to the quote.
+                //Otherewise we assign empty customer and empty addresses.
+                if ($customer) {
+                    $subQuote->assignCustomerWithAddressChange($customer, $billingAddress, $shippingAddress);
+                } else {
+                    $customerDataObject = $this->customerCreator->getCustomer();
+                    $subQuote->setBillingAddress($billingAddress);
+                    $subQuote->setShippingAddress($shippingAddress);
+                    $subQuote->setCustomer($customerDataObject);
+                }
+
+                $subQuote->getShippingAddress()->setCollectShippingRates(true);
+                $this->setNeedCollect(true);
+            } else {
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Cleares extra data on account step (ex. customer_address_id from quote address if it is exist).
+     *
+     * @return void
+     */
+    public function clearAccountStepData()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        foreach ($subQuotes as $subQuote) {
+            $quoteAddresses = $subQuote->getAddressesCollection();
+            $this->clearCustomerAddressId($quoteAddresses);
+            $this->setNeedCollect(true);
+        }
+    }
+
+    /**
+     * Cleares extra data on payment and billing step
+     * (ex. customer_address_id, shipping method).
+     *
+     * @return void
+     */
+    public function cleaBillingStepData()
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        /** @var array $subQuotes */
+        $subQuotes = $session->getSubQuotes();
+
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $this->clearCustomerAddressId([$subQuote->getBillingAddress()]);
+            $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
+            $subQuote->getShippingAddress()->setCollectShippingRates(true);
+            $this->setNeedCollect(true);
+        }
+    }
+
+    /**
+     * Cleares customer_address_id fro quote addresses.
+     *
+     * @param array $quoteAddresses
+     * @return void
+     */
+    private function clearCustomerAddressId($quoteAddresses)
+    {
+        foreach ($quoteAddresses as $quoteAddress) {
+            $quoteAddress->setCustomerAddressId(null);
+        }
+    }
+
+    /**
+     * Updates profile status after successful order creating.
+     *
+     * @param SubscriptionProfileInterface $profile
+     */
+    private function updateProfileStatus(SubscriptionProfileInterface $profile)
+    {
+        $this->profileManager
+            ->setProfile($profile)
+            ->setActiveStatus()
+            ->saveProfile();
     }
 }

@@ -123,9 +123,12 @@ class GridMetadata
         $frequency = $this->registry->registry('tnw_subscriptions_billingfrequency');
 
         if ($frequency && $frequency->getId()) {
-            $unit = $this->billingFrequencyUnitType->getLabelByValue($frequency->getUnit());
+            $periodLabel = $this->billingFrequencyUnitType->getPeriodLabel(
+                $frequency->getUnit(),
+                $frequency->getFrequency()
+            );
 
-            $priceLabel = $frequency->getFrequency() . ' ' . $unit . ' ' . $priceLabel;
+            $priceLabel = $periodLabel . ' ' . $priceLabel;
         }
 
         return $priceLabel;
@@ -257,13 +260,16 @@ class GridMetadata
         $priceColumn = $this->setColumnSpecialData(
             $priceColumn,
             'TNW_Subscriptions/js/grid/billing_frequency/price',
-            '',
+            'TNW_Subscriptions/grid/cells/price',
             [],
             $this->getCurrencySymbol(),
-            'ea.',
+            null,
             null,
             true,
-            ['currencySymbol' => $this->getCurrencySymbol()]
+            [
+                'currencySymbol' => $this->getCurrencySymbol(),
+                'customAddAfter' => __('ea.'),
+            ]
         );
 
         $lockProductPriceColumn = $this->getColumnBaseData(

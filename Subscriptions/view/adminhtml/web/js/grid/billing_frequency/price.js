@@ -14,14 +14,17 @@ define([
 
     return Abstract.extend({
         defaults: {
-            notice: $j.mage.__('No estimated savings.')
+            notice: $j.mage.__('No estimated savings.'),
+            customAddAfter: ''
         },
 
         /**
-         * Sets initial value of the element and subscribes to it's changes.
+         * {@inheritdoc}
          */
         setInitialValue: function () {
             this._super();
+
+            this.addCustomAddAfter();
 
             var index = this.inputName.replace(/[^\d.]/g, '');
 
@@ -83,6 +86,11 @@ define([
 
                 $j('#' + this.noticeId).html(this.notice);
             }
+        },
+
+        addCustomAddAfter: function () {
+            this.customAddAfter = typeof this.imports.customAddAfter == "undefined"
+                ? 'ea.' : this.imports.customAddAfter;
         }
     });
 });

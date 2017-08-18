@@ -59,23 +59,19 @@
                 sortOrder="10"
                 disabled="false"/>
     </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
-                <item name="checkmo" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier\Checkmo</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
                 <item name="billing-address" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
                 </item>
             </argument>
         </arguments>
     </virtualType>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\PaymentAndBilling">
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling">
         <arguments>
-            <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\PaymentAndBilling\Form\Modifier\Pool</argument>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool</argument>
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier"
@@ -110,6 +106,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">1</item>
                 </item>
+                <item name="customer_popup_modifier" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Account\CustomerPopupModifier</item>
+                    <item name="sortOrder" xsi:type="number">2</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -134,5 +134,29 @@
         <arguments>
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Pool</argument>
         </arguments>
+    </type>
+
+    <!--Add modifier for Subscription profile creation on review profile page-->
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="tnw_subscriptions_sales_order_grid_collection" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
     </type>
 </config>

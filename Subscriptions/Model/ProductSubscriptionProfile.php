@@ -6,10 +6,14 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
-
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Model\Context as ModelContext;
+use Magento\Framework\Registry;
 /**
  * Product subscription profile model.
  */
@@ -30,6 +34,41 @@ class ProductSubscriptionProfile extends AbstractModel
      * Default group code for custom attributes.
      */
     const DEFAULT_GROUP_CODE = 'additional-information';
+
+    /**
+     * Repository for retrieving products.
+     *
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
+
+    /**
+     * Magento product.
+     *
+     * @var Product
+     */
+    private $magentoProduct;
+
+    /**
+     * ProductSubscriptionProfile constructor.
+     * @param ModelContext $context
+     * @param Registry $registry
+     * @param ProductRepositoryInterface $productRepository
+     * @param Resource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        ModelContext $context,
+        Registry $registry,
+        ProductRepositoryInterface $productRepository,
+        Resource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->productRepository = $productRepository;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
 
     /**
      * {@inheritdoc}
@@ -86,6 +125,21 @@ class ProductSubscriptionProfile extends AbstractModel
     {
         return $this->setData(self::MAGENTO_PRODUCT_ID, $magentoProductId);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMagentoProduct()
+    {
+        if (!$this->magentoProduct) {
+            $this->magentoProduct = $this->productRepository->getById(
+                $this->getMagentoProductId()
+            );
+        }
+
+        return $this->magentoProduct;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -245,5 +299,37 @@ class ProductSubscriptionProfile extends AbstractModel
     public function setDiscountType($discountType)
     {
         return $this->setData(self::DISCOUNT_TYPE, $discountType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt()
+    {
+        return $this->getData(self::CREATED_AT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCreatedAt($date)
+    {
+        return $this->setData(self::CREATED_AT, $date);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getData(self::UPDATED_AT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUpdatedAt($date)
+    {
+        return $this->setData(self::UPDATED_AT, $date);
     }
 }

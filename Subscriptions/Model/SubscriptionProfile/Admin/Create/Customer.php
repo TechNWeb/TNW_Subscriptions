@@ -10,6 +10,7 @@ use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Model\Quote\Address;
@@ -52,6 +53,11 @@ class Customer extends Create
     private $dataObjectHelper;
 
     /**
+     * @var CustomerInterfaceFactory
+     */
+    private $customerDataFactory;
+
+    /**
      * Customer constructor.
      * @param Context $context
      * @param SessionManagerInterface $session
@@ -66,12 +72,14 @@ class Customer extends Create
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
         AddressRepositoryInterface $addressRepository,
-        DataObjectHelper $dataObjectHelper
+        DataObjectHelper $dataObjectHelper,
+        CustomerInterfaceFactory $customerDataFactory
     ) {
         $this->customerRepository = $customerRepository;
         $this->accountManagement = $accountManagement;
         $this->addressRepository = $addressRepository;
         $this->dataObjectHelper = $dataObjectHelper;
+        $this->customerDataFactory = $customerDataFactory;
         parent::__construct($context, $session);
     }
 
@@ -100,6 +108,10 @@ class Customer extends Create
             $customer = $this->validateCustomerData(
                 $this->getNewCustomer($customer, $store)
             );
+            $customer = $this->accountManagement->createAccountWithPasswordHash(
+                $customer,
+                null
+            );
         }
 
         $alreadySaveBilling = false;
@@ -110,20 +122,24 @@ class Customer extends Create
             if ($subQuote->getBillingAddress()->getSaveInAddressBook()) {
                 // save only first billing address, because billing address is the same for all subscription quotes
                 if (!$alreadySaveBilling) {
-                    $this->saveCustomerAddress($customer, $subQuote->getBillingAddress());
+                    $customer = $this->saveCustomerAddress($customer, $subQuote->getBillingAddress());
                     $alreadySaveBilling = true;
                 }
-                $address = $subQuote->getBillingAddress()->setCustomerId($customer->getId());
-                $subQuote->setBillingAddress($address);
             }
+            $address = $subQuote->getBillingAddress()->setCustomerId($customer->getId());
+            $address->setSaveInAddressBook(false);
+            $subQuote->setBillingAddress($address);
 
             if (!$subQuote->isVirtual() && $subQuote->getShippingAddress()->getSaveInAddressBook()) {
                 // save only first shipping address, because shipping address is the same for all subscription quotes
                 if (!$alreadySaveShipping) {
-                    $this->saveCustomerAddress($customer, $subQuote->getShippingAddress());
+                    $customer = $this->saveCustomerAddress($customer, $subQuote->getShippingAddress());
+                    $subQuote->getShippingAddress()->setSaveInAddressBook(false);
                     $alreadySaveShipping = true;
                 }
+            }elseif (!$subQuote->isVirtual()){
                 $address = $subQuote->getShippingAddress()->setCustomerId($customer->getId());
+                $address->setSaveInAddressBook(false);
                 $subQuote->setShippingAddress($address);
             }
         }
@@ -215,7 +231,7 @@ class Customer extends Create
         $addresses = (array)$customer->getAddresses();
         $addresses[] = $customerAddress;
         $customer->setAddresses($addresses);
-        $this->customerRepository->save($customer);
+        return $this->customerRepository->save($customer);
     }
 
     /**
@@ -224,15 +240,22 @@ class Customer extends Create
      * @param int|null $customerId
      * @return CustomerInterface
      */
-    private function getCustomer($customerId = null)
+    public function getCustomer($customerId = null)
     {
+        $customer = null;
         if (!$customerId) {
             /** @var Quote $session */
             $session = $this->getSession();
             $customerId = $session->getCustomerId();
         }
 
-        return $this->customerRepository->getById($customerId);
+        if ($customerId) {
+            $customer = $this->customerRepository->getById($customerId);
+        } else {
+            $customer = $this->customerDataFactory->create();
+        }
+
+        return $customer;
     }
 
     /**

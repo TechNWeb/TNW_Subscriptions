@@ -37,9 +37,10 @@ class BackButton extends GenericButton implements ButtonProviderInterface
         $params = [];
 
         if ($prevStep && $prevStep){
-            $url = 'tnw_subscriptions/subscriptionprofile/create';
+            $url = 'tnw_subscriptions/subscriptionprofile_create/process';
             $params = [
-                StepPool::STEP_PARAM_NAME => $prevStep
+                StepPool::STEP_PARAM_NAME => $prevStep,
+                'back' => 1
             ];
         }
 
