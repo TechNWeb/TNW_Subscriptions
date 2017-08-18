@@ -22,6 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class for creating subscriptions in admin.
@@ -245,7 +246,7 @@ class Create extends BaseCreate
      *
      * @return int|string
      */
-    private function createSubCart()
+    public function createSubCart()
     {
         return $this->quoteCreator->createSubCart();
     }
@@ -466,9 +467,9 @@ class Create extends BaseCreate
                 $profile = $this->createProfile($subQuote, $basicPayment);
 
                 if ($profile) {
-                    $this->profileManager->updatePaymentInformation($subQuote);
-                    $order = $this->quoteManagement->submit($subQuote);
-                    $this->profileManager->assignOrderToProfile($order);
+                    $order = $this->profileManager->processProfile($subQuote);
+                    $this->profileManager->assignOrderToProfile($order, $profile);
+                    $this->updateProfileStatus($profile);
                     $this->eventManager->dispatch(
                         'checkout_submit_all_after',
                         ['order' => $order, 'quote' => $subQuote]
@@ -492,8 +493,10 @@ class Create extends BaseCreate
      * @param $payment
      * @return SubscriptionProfileInterface
      */
-    private function createProfile($subQuote, $payment)
-    {
+    private function createProfile(
+        ModelQuote $subQuote,
+        $payment
+    ) {
         $profile = $this->profileManager->reset()
             ->populateProfileData($subQuote)
             ->populatePaymentData($payment)
@@ -721,5 +724,18 @@ class Create extends BaseCreate
         foreach ($quoteAddresses as $quoteAddress) {
             $quoteAddress->setCustomerAddressId(null);
         }
+    }
+
+    /**
+     * Updates profile status after successful order creating.
+     *
+     * @param SubscriptionProfileInterface $profile
+     */
+    private function updateProfileStatus(SubscriptionProfileInterface $profile)
+    {
+        $this->profileManager
+            ->setProfile($profile)
+            ->setActiveStatus()
+            ->saveProfile();
     }
 }

@@ -21,7 +21,7 @@ class ProfileStatus implements OptionSourceInterface
     const STATUS_PENDING = 2;    //Profile is created but have not yet created an order.
     const STATUS_TRIAL = 3;      //Profile is in trial period.
     const STATUS_HOLDED = 4;     //Profile does not creates orders.
-    const STATUS_SUSPENDED = 5;  //Profile Ccn not create an order and grace period is ended.
+    const STATUS_SUSPENDED = 5;  //Profile can not create an order and grace period is ended.
     /**#@-*/
 
     /**

@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+use Magento\Quote\Api\CartManagementInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
@@ -14,9 +16,11 @@ use TNW\Subscriptions\Model\Context;
 /**
  * Class Base
  */
-abstract class Base implements EngineInterface
+class Base implements EngineInterface
 {
     /**
+     * Config model.
+     *
      * @var Config
      */
     private $config;
@@ -27,16 +31,33 @@ abstract class Base implements EngineInterface
     private $context;
 
     /**
+     * Subscription profile.
+     *
+     * @var SubscriptionProfileInterface
+     */
+    private $profile;
+
+    /**
+     * Cart management.
+     *
+     * @var CartManagementInterface
+     */
+    private $cartManagement;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param Context $context
+     * @param CartManagementInterface $cartManagement
      */
     public function __construct(
         Config $config,
-        Context $context
+        Context $context,
+        CartManagementInterface $cartManagement
     ) {
         $this->config = $config;
         $this->context = $context;
+        $this->cartManagement = $cartManagement;
     }
 
     /**
@@ -60,19 +81,31 @@ abstract class Base implements EngineInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns cart management object.
+     *
+     * @return CartManagementInterface
      */
-    public function processProfile(SubscriptionProfileInterface $profile)
+    public function getCartManagement()
     {
-
+        return $this->cartManagement;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateProfile(SubscriptionProfileInterface $profile)
+    public function getProfile()
     {
+        return $this->profile;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setProfile(SubscriptionProfileInterface $profile)
+    {
+        $this->profile = $profile;
+
+        return $this;
     }
 
     /**
@@ -87,6 +120,34 @@ abstract class Base implements EngineInterface
      * {@inheritdoc}
      */
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processProfile(Quote $quote)
+    {
+        try {
+            $quote->getPayment()->importData(
+                $this->getPaymentInfo($this->getProfile())
+            );
+            $quote->getPayment()->setAdditionalInformation(
+                $this->getPaymentAdditionalInfo($this->getProfile())
+            );
+            return $this->getCartManagement()->submit($quote);
+        } catch (\Exception $e) {
+            $quote->setReservedOrderId(null);
+            $quote->save();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
         return [];
     }

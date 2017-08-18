@@ -12,6 +12,14 @@
             <general>
                 <active>0</active>
             </general>
+            <past_due_profile_options>
+                <attempt_count>10</attempt_count>
+                <attempt_interval>1</attempt_interval>
+                <grace_period>14</grace_period>
+            </past_due_profile_options>
+            <advanced>
+                <generated_quotes_count>30</generated_quotes_count>
+            </advanced>
         </tnw_subscriptions_general>
         <tnw_subscriptions_product>
             <general>

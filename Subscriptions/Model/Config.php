@@ -11,18 +11,38 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Api\Data\WebsiteInterface;
+use Magento\Store\Api\Data\StoreInterface;
 use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
 use Magento\Paypal\Model\Config as PaypalConfig;
 
+/**
+ * Class Config
+ */
 class Config
 {
     /**#@+
      * Config xml path for General section
      */
+    private $xmlIsActive = 'tnw_subscriptions_general/general/active';
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
     private $xmlUnlockPresetQty = 'tnw_subscriptions_product/general/unlock_preset_qty_status';
+    /**#@-*/
+
+    /**#@+
+     * Config xml path for past due profile options section
+     */
+    private $xmlAttemptCount = 'tnw_subscriptions_general/past_due_profile_options/attempt_count';
+    private $xmlAttemptInterval = 'tnw_subscriptions_general/past_due_profile_options/attempt_interval';
+    private $xmlGracePeriod = 'tnw_subscriptions_general/past_due_profile_options/grace_period';
+    /**#@-*/
+
+    /**#@+
+     * Config xml path for past advanced section
+     */
+    private $xmlGeneratedQuotesCount = 'tnw_subscriptions_general/advanced/generated_quotes_count';
     /**#@-*/
 
     /**#@+
@@ -46,14 +66,6 @@ class Config
     private $xmlUntilCanceled = 'tnw_subscriptions_product/term/until_canceled';
 
     /**
-     * Config xml path for is Subscription module active.
-     *
-     * @var string
-     */
-    private $xmlIsModuleEnable = 'tnw_subscriptions_general/general/active';
-
-
-    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
@@ -74,6 +86,11 @@ class Config
     private $paypalConfig;
 
     /**
+     * @var bool
+     */
+    private $isSubscriptionsActive;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
@@ -91,169 +108,214 @@ class Config
         $this->paypalConfig = $paypalConfig;
     }
 
-    #region General section
+    /**
+     * Get "Enable Subscriptions" config value for website or for all websites.
+     *
+     * @param int|null $websiteId
+     * @return bool|mixed|null|string
+     */
+    public function isSubscriptionsActive($websiteId = null)
+    {
+        $result = false;
+
+        if ($websiteId){
+            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
+        } else {
+            if ($this->isSubscriptionsActive === null) {
+                $this->isIntegrationActive = false;
+                foreach ($this->storeManager->getWebsites() as $website) {
+                    if ($this->getStoreConfig($this->xmlIsActive, $website->getId())
+                    && !empty($this->getAvailablePaymentsList($websiteId))) {
+                        $this->isIntegrationActive = true;
+                        $result = true;
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Get "Purchase type" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function purchaseType($websiteId = null)
+    public function getPurchaseType($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlPurchaseType, $websiteId);
+        return  $this->getStoreConfig($this->xmlPurchaseType, $websiteId);
+    }
 
-        return $value;
+    /**
+     * Get "Attempt count" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getAttemptCount($websiteId = null)
+    {
+        return  $this->getStoreConfig($this->xmlAttemptCount, $websiteId);
+    }
+
+    /**
+     * Get "Attempt interval" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getAttemptInterval($websiteId = null)
+    {
+        return  $this->getStoreConfig($this->xmlAttemptInterval, $websiteId);
+    }
+
+    /**
+     * Get "Grace period" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getGracePeriod($websiteId = null)
+    {
+        return  $this->getStoreConfig($this->xmlGracePeriod, $websiteId);
+    }
+
+    /**
+     * Get "Generated quotes count" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getGeneratedQuotesCount($websiteId = null)
+    {
+        return  $this->getStoreConfig($this->xmlGeneratedQuotesCount, $websiteId);
     }
 
     /**
      * Get "Start date type" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function startDateType($websiteId = null)
+    public function getStartDateType($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlStartDateType, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlStartDateType, $websiteId);
     }
 
     /**
      * Get "Lock product price status" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return bool
      */
-    public function lockProductPriceStatus($websiteId = null)
+    public function getLockProductPriceStatus($websiteId = null)
     {
         $value = $this->getStoreConfig($this->xmlLockProductPriceStatus, $websiteId);
-
         return $value ? true : false;
     }
 
     /**
      * Get "Unlock Preset Qty" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return bool
      */
-    public function unlockPresetQtyStatus($websiteId = null)
+    public function getUnlockPresetQtyStatus($websiteId = null)
     {
         $value = $this->getStoreConfig($this->xmlUnlockPresetQty, $websiteId);
-
         return $value ? true : false;
     }
-    #endregion
 
-    #region Discount section
     /**
      * Get "Offer flat discount status" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return bool
      */
-    public function offerFlatDiscountStatus($websiteId = null)
+    public function getOfferFlatDiscountStatus($websiteId = null)
     {
         $value = $this->getStoreConfig($this->xmlOfferFlatDiscountStatus, $websiteId);
-
         return $value ? true : false;
     }
 
     /**
      * Get "Discount amount" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function discountAmount($websiteId = null)
+    public function getDiscountAmount($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlDiscountAmount, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlDiscountAmount, $websiteId);
     }
 
     /**
      * Get "Discount type" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function discountType($websiteId = null)
+    public function getDiscountType($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlDiscountType, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlDiscountType, $websiteId);
     }
-    #endregion
 
-    #region Trial section
     /**
      * Get "Trial status" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return bool
      */
-    public function trialStatus($websiteId = null)
+    public function getTrialStatus($websiteId = null)
     {
         $value = $this->getStoreConfig($this->xmlTrialStatus, $websiteId);
-
         return $value ? true : false;
     }
 
     /**
      * Get "Trial length" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function trialLength($websiteId = null)
+    public function getTrialLength($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlTrialLength, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlTrialLength, $websiteId);
     }
 
     /**
      * Get "Trial length unit" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function trialLengthUnit($websiteId = null)
+    public function getTrialLengthUnit($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlTrialLengthUnit, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlTrialLengthUnit, $websiteId);
     }
 
     /**
      * Get "Trial price" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
     public function trialPrice($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlTrialPrice, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlTrialPrice, $websiteId);
     }
 
     /**
      * Get "Trial start date type" config value.
      *
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function trialStartDateType($websiteId = null)
+    public function getTrialStartDateType($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlTrialStartDateType, $websiteId);
-
-        return $value;
+        return $this->getStoreConfig($this->xmlTrialStartDateType, $websiteId);
     }
-    #endregion
 
-    #region Common methods to get config values
     /**
      * Get Store Id passed to request or get current if nothing.
      *
@@ -264,7 +326,7 @@ class Config
         $store = null;
         $storeId = $this->request->getParam('store');
         if ($storeId) {
-            if ($storeId == 'undefined') {
+            if ($storeId === 'undefined') {
                 $storeId = 0;
             }
             if (!is_array($storeId)) {
@@ -308,8 +370,8 @@ class Config
      * If no websiteId specified and no current scope detected it will get value for default scope
      *
      * @param $path
-     * @param null|bool|int|string|\Magento\Store\Api\Data\WebsiteInterface $websiteId
-     * @param null|bool|int|string|\Magento\Store\Api\Data\StoreInterface $storeId
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @param null|bool|int|string|StoreInterface $storeId
      * @return mixed|null|string
      */
     public function getStoreConfig($path, $websiteId = null, $storeId = null)
@@ -336,43 +398,32 @@ class Config
 
         return $result;
     }
-    #endregion
-
-    /**
-     * Check if Subscription module is enabled.
-     *
-     * @return bool
-     */
-    public function isModuleEnabled()
-    {
-        return (bool)$this->getStoreConfig($this->xmlIsModuleEnable);
-    }
 
     /**
      * Check if payment method is active in subscription config by code.
      *
-     * @param string $paymentCode
+     * @param $paymentCode
+     * @param null|int $websiteId
      * @return bool
      */
-    public function isPaymentAvailable($paymentCode)
+    public function isPaymentAvailable($paymentCode, $websiteId = null)
     {
         $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
 
-        return (bool)$this->getStoreConfig($path);
+        return (bool)$this->getStoreConfig($path, $websiteId);
     }
 
     /**
      * Get list of payments codes which are active in subscription config.
      *
+     * @param null|int $websiteId
      * @return array
      */
-    public function getAvailablePaymentsList()
+    public function getAvailablePaymentsList($websiteId = null)
     {
         $availableMethods = [];
-
         $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID;
-
-        $methods = $this->getStoreConfig($path);
+        $methods = $this->getStoreConfig($path, $websiteId);
 
         if (is_array($methods)) {
             foreach ($methods as $methodCode => $isActive) {
@@ -386,30 +437,19 @@ class Config
     }
 
     /**
-     * Check if module enable and if at least one payment method is available for subscription.
-     *
-     * @return bool
-     */
-    public function isActive()
-    {
-        $isActive = false;
-        if ($this->isModuleEnabled() && !isEmpty($this->getAvailablePaymentsList())) {
-            $isActive = true;
-        }
-
-        return $isActive;
-    }
-
-    /**
      * Get title depends of active is payflow pro or paypal payments pro.
      *
+     * @param null|int $websiteId
      * @return string
      */
-    public function getTitleForPaypal()
+    public function getTitleForPaypal($websiteId = null)
     {
         $title = 'Payments Pro';
 
-        if ($this->getStoreConfig('payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active')) {
+        if ($this->getStoreConfig(
+            'payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active',
+            $websiteId
+        )) {
             $title = 'Payflow Pro';
         }
 
@@ -419,17 +459,18 @@ class Config
     /**
      * Check if payment method is available for subscription and it is on for Magento.
      *
-     * @param string $paymentCode
+     * @param $paymentCode
+     * @param null|int $websiteId
      * @return bool
      */
-    public function isPaymentMethodAvailableForSubscription($paymentCode)
+    public function isPaymentMethodAvailableForSubscription($paymentCode, $websiteId = null)
     {
         $isAvailable = false;
 
         $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
-            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active');
+            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active', $websiteId);
 
-        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode)) {
+        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode, $websiteId)) {
             $isAvailable = true;
         }
 

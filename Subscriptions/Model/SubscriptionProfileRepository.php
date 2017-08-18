@@ -7,32 +7,46 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
 
+/**
+ * Class SubscriptionProfileRepository
+ */
 class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInterface
 {
     /**
+     * Data object helper.
+     *
      * @var DataObjectHelper
      */
     private $dataObjectHelper;
 
     /**
+     * Factory for creating search results.
+     *
      * @var SubscriptionProfileSearchResultsInterfaceFactory
      */
     private $searchResultsFactory;
 
     /**
+     * Factory for creating profile collections.
+     *
      * @var SubscriptionProfileCollectionFactory
      */
     private $subscriptionProfileCollectionFactory;
@@ -43,30 +57,54 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $dataSubscriptionProfileFactory;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
+     * Factory for creating profiles.
+     *
      * @var SubscriptionProfileFactory
      */
     private $subscriptionProfileFactory;
 
     /**
+     * Resource model.
+     *
      * @var ResourceSubscriptionProfile
      */
     private $resource;
 
     /**
+     * Data object processor for array serialization using class reflection.
+     *
      * @var DataObjectProcessor
      */
     private $dataObjectProcessor;
 
     /**
+     * Entity Manager.
+     *
      * @var EntityManager
      */
     private $entityManager;
 
+    /**
+     * Repository for saving/retrieving profile addresses.
+     *
+     * @var AddressRepository
+     */
+    private $addressRepository;
+
+    /**
+     * Repository for saving/retrieving profile products.
+     *
+     * @var ProductSubscriptionProfileRepository
+     */
+    private $productProfileRepository;
+
+
+    /**
+     * Search criteria builder.
+     *
+     * @var SearchCriteriaBuilder
+     */
+    private $criteriaBuilder;
 
     /**
      * SubscriptionProfileRepository constructor.
@@ -77,8 +115,9 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param SubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
-     * @param StoreManagerInterface $storeManager
      * @param EntityManager $entityManager
+     * @param AddressRepository $addressRepository
+     * @param ProductSubscriptionProfileRepository $productProfileRepository
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -88,8 +127,10 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         SubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        AddressRepository $addressRepository,
+        ProductSubscriptionProfileRepository $productProfileRepository,
+        SearchCriteriaBuilder $criteriaBuilder
     ) {
         $this->resource = $resource;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -98,15 +139,17 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->dataObjectHelper = $dataObjectHelper;
         $this->dataSubscriptionProfileFactory = $dataSubscriptionProfileFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
         $this->entityManager = $entityManager;
+        $this->addressRepository = $addressRepository;
+        $this->productProfileRepository = $productProfileRepository;
+        $this->criteriaBuilder = $criteriaBuilder;
     }
 
     /**
      * {@inheritdoc}
      */
     public function save(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface $subscriptionProfile
+        SubscriptionProfileInterface $subscriptionProfile
     ) {
         try {
             $this->entityManager->save($subscriptionProfile);
@@ -137,7 +180,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * {@inheritdoc}
      */
     public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria
+        SearchCriteriaInterface $criteria
     ) {
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
@@ -173,12 +216,11 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
             $this->dataObjectHelper->populateWithArray(
                 $subscriptionProfileData,
                 $subscriptionProfileModel->getData(),
-                'TNW\Subscriptions\Api\Data\SubscriptionProfileInterface'
+                SubscriptionProfileInterface::class
             );
-            $items[] = $this->dataObjectProcessor->buildOutputDataArray(
-                $subscriptionProfileData,
-                'TNW\Subscriptions\Api\Data\SubscriptionProfileInterface'
-            );
+
+            $this->assignProductsAndAddresses($subscriptionProfileData);
+            $items[] = $subscriptionProfileData;
         }
         $searchResults->setItems($items);
         return $searchResults;
@@ -188,7 +230,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * {@inheritdoc}
      */
     public function delete(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface $subscriptionProfile
+        SubscriptionProfileInterface $subscriptionProfile
     ) {
         try {
             $this->entityManager->delete($subscriptionProfile);
@@ -207,5 +249,32 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     public function deleteById($subscriptionProfileId)
     {
         return $this->delete($this->getById($subscriptionProfileId));
+    }
+
+    /**
+     * After loading profiles via method getList() assigns products and addresses to profile.
+     *
+     * @param SubscriptionProfileInterface $subscriptionProfileModel
+     */
+    private function assignProductsAndAddresses(
+        SubscriptionProfileInterface $subscriptionProfileModel
+    ) {
+        $this->criteriaBuilder->addFilter(
+            SubscriptionProfileAddressInterface::PROFILE_ID,
+            $subscriptionProfileModel->getId()
+        );
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $AddressSearchCriteria = $this->criteriaBuilder->create();
+        $addresses = $this->addressRepository->getList($AddressSearchCriteria)->getItems();
+        $subscriptionProfileModel->setAddresses($addresses);
+
+        $this->criteriaBuilder->addFilter(
+            ProductSubscriptionProfileInterface::SUBSCRIPTION_PROFILE_ID,
+            $subscriptionProfileModel->getId()
+        );
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $productSearchCriteria = $this->criteriaBuilder->create();
+        $products = $this->productProfileRepository->getList($productSearchCriteria)->getItems();
+        $subscriptionProfileModel->setProducts($products);
     }
 }

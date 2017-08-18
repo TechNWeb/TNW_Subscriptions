@@ -58,4 +58,11 @@
 "Not enough qty to sell.","Not enough qty to sell."
 "Check inventory options.","Check inventory options."
 "Initial Payment","Initial Payment"
+"New","New"
+"Running","Running"
+"Error","Error"
+"Process","Process"
+"Record can not be processed.","Record can not be processed."
+"Subscription Profile Queue","Subscription Profile Queue"
+"A total of %1 record(s) have been prepared for re-process.","A total of %1 record(s) have been prepared for re-process."
 
