@@ -1,2 +1,20 @@
 # TNW_Subscriptions
 Magento2 Subscriptions capability
+## Configuring subscription crons
+
+
+Before configuring crons run in console:
+
+cd \<magento install dir>
+
+php bin/magento setup:upgrade
+
+php bin/magento setup:di:compile
+
+###Server Configuration
+Configuration of crons is the same as configuration of default magento cron. See http://devdocs.magento.com/guides/v2.0/comp-mgr/prereq/prereq_cron.html
+Example:
+
+*/5 * * * * php <magento install dir>/bin/magento tnw_subscriptions:quotes:generate >> <magento install dir>/var/log/sub-generation.cron.log
+
+12 * * * * php <magento install dir>/bin/magento tnw_subscriptions:process >> <magento install dir>/var/log/sub-processing.cron.log
