@@ -123,9 +123,12 @@ class GridMetadata
         $frequency = $this->registry->registry('tnw_subscriptions_billingfrequency');
 
         if ($frequency && $frequency->getId()) {
-            $unit = $this->billingFrequencyUnitType->getLabelByValue($frequency->getUnit());
+            $periodLabel = $this->billingFrequencyUnitType->getPeriodLabel(
+                $frequency->getUnit(),
+                $frequency->getFrequency()
+            );
 
-            $priceLabel = $frequency->getFrequency() . ' ' . $unit . ' ' . $priceLabel;
+            $priceLabel = $periodLabel . ' ' . $priceLabel;
         }
 
         return $priceLabel;
