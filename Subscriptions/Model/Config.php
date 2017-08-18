@@ -13,6 +13,8 @@ use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\Data\StoreInterface;
+use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
+use Magento\Paypal\Model\Config as PaypalConfig;
 
 /**
  * Class Config
@@ -77,6 +79,11 @@ class Config
     private $request;
 
     /**
+     * @var PaypalConfig
+     */
+    private $paypalConfig;
+
+    /**
      * @var bool
      */
     private $isSubscriptionsActive;
@@ -85,15 +92,18 @@ class Config
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
+     * @param PaypalConfig $paypalConfig
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        Http $request
+        Http $request,
+        PaypalConfig $paypalConfig
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
+        $this->paypalConfig = $paypalConfig;
     }
 
     /**
@@ -288,7 +298,7 @@ class Config
      * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function getTrialPrice($websiteId = null)
+    public function trialPrice($websiteId = null)
     {
         return $this->getStoreConfig($this->xmlTrialPrice, $websiteId);
     }
@@ -385,5 +395,78 @@ class Config
         }
 
         return $result;
+    }
+
+    /**
+     * Check if payment method is active in subscription config by code.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentAvailable($paymentCode)
+    {
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
+
+        return (bool)$this->getStoreConfig($path);
+    }
+
+    /**
+     * Get list of payments codes which are active in subscription config.
+     *
+     * @return array
+     */
+    public function getAvailablePaymentsList()
+    {
+        $availableMethods = [];
+
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID;
+
+        $methods = $this->getStoreConfig($path);
+
+        if (is_array($methods)) {
+            foreach ($methods as $methodCode => $isActive) {
+                if ($isActive == 1) {
+                    $availableMethods[] = $methodCode;
+                }
+            }
+        }
+
+        return $availableMethods;
+    }
+
+    /**
+     * Get title depends of active is payflow pro or paypal payments pro.
+     *
+     * @return string
+     */
+    public function getTitleForPaypal()
+    {
+        $title = 'Payments Pro';
+
+        if ($this->getStoreConfig('payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active')) {
+            $title = 'Payflow Pro';
+        }
+
+        return $title;
+    }
+
+    /**
+     * Check if payment method is available for subscription and it is on for Magento.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentMethodAvailableForSubscription($paymentCode)
+    {
+        $isAvailable = false;
+
+        $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
+            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active');
+
+        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode)) {
+            $isAvailable = true;
+        }
+
+        return $isAvailable;
     }
 }

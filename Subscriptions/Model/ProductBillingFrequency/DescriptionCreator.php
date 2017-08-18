@@ -108,9 +108,12 @@ class DescriptionCreator
             $total = $this->formatPrice($subscriptionData[Create::NON_UNIQUE]['price']);
         }
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
+
+        $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
         $shippingInformation = sprintf(
-            __('Total of %s shipment(s). Products will be shipped every %s starting %s.'),
+            __('Total of %s %s. Products will be shipped every %s starting %s.'),
             $subscriptionPeriod,
+            $shipmentLabel,
             $frequencyUnit,
             $startDate
         );
@@ -129,12 +132,19 @@ class DescriptionCreator
         $billingFrequency = $this->frequencyRepository->getById(
             $billingFrequencyId
         );
-        $unit = $this->frequencyUnitType->getLabelByValue($billingFrequency->getUnit());
-        $result = $unit;
-        if ($billingFrequency->getFrequency() > 1) {
-            $result = $billingFrequency->getFrequency() . ' ' . $unit;
+
+        $frequency = $billingFrequency->getFrequency();
+
+        $label = $this->frequencyUnitType->getLabelByValueAndFrequency(
+            $billingFrequency->getUnit(),
+            $frequency
+        );
+
+        if ($frequency > 1) {
+            $label = $frequency . ' ' . $label;
         }
-        return strtolower($result);
+
+        return strtolower($label);
     }
 
     /**
@@ -146,12 +156,9 @@ class DescriptionCreator
      */
     private function getFrequencyTrialWithUnit($period, $unitId)
     {
-        $unitLabel = $this->trialLengthUnitType->getLabelByValue($unitId);
-        $result = $unitLabel;
-        if ($period > 1) {
-            $result = $period . ' ' . $unitLabel;
-        }
-        return strtolower($result);
+        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength($unitId, $period);
+
+        return strtolower($period . ' ' . $unitLabel);
     }
 
     /**
@@ -189,6 +196,23 @@ class DescriptionCreator
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION
         );
+    }
+
+    /**
+     * Get shipment label depends on subscription period.
+     *
+     * @param int $subscriptionPeriod
+     * @return \Magento\Framework\Phrase
+     */
+    private function getShipmentLabel($subscriptionPeriod)
+    {
+        $label = 'shipment';
+
+        if ($subscriptionPeriod != 1) {
+            $label .= "'s'";
+        }
+
+        return __($label);
     }
 
 

@@ -33,16 +33,19 @@ class Checkmo extends Base
     private $checkmoPayment;
 
     /**
-     * Checkmo constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
      * @param Context $context
      * @param CheckmoPayment $checkmoPayment
      */
     public function __construct(
+        \TNW\Subscriptions\Model\Config $config,
         Context $context,
         CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
+
+        parent::__construct($config);
     }
 
 
