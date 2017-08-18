@@ -117,13 +117,13 @@ class Config
         $result = false;
 
         if ($websiteId){
-            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId);
+            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
         } else {
             if ($this->isSubscriptionsActive === null) {
                 $this->isIntegrationActive = false;
                 foreach ($this->storeManager->getWebsites() as $website) {
-
-                    if ($this->getStoreConfig($this->xmlIsActive, $website->getId())) {
+                    if ($this->getStoreConfig($this->xmlIsActive, $website->getId())
+                    && !empty($this->getAvailablePaymentsList($websiteId))) {
                         $this->isIntegrationActive = true;
                         $result = true;
                     }
@@ -400,28 +400,28 @@ class Config
     /**
      * Check if payment method is active in subscription config by code.
      *
-     * @param string $paymentCode
+     * @param $paymentCode
+     * @param null|int $websiteId
      * @return bool
      */
-    public function isPaymentAvailable($paymentCode)
+    public function isPaymentAvailable($paymentCode, $websiteId = null)
     {
         $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
 
-        return (bool)$this->getStoreConfig($path);
+        return (bool)$this->getStoreConfig($path, $websiteId);
     }
 
     /**
      * Get list of payments codes which are active in subscription config.
      *
+     * @param null|int $websiteId
      * @return array
      */
-    public function getAvailablePaymentsList()
+    public function getAvailablePaymentsList($websiteId = null)
     {
         $availableMethods = [];
-
         $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID;
-
-        $methods = $this->getStoreConfig($path);
+        $methods = $this->getStoreConfig($path, $websiteId);
 
         if (is_array($methods)) {
             foreach ($methods as $methodCode => $isActive) {
@@ -437,13 +437,17 @@ class Config
     /**
      * Get title depends of active is payflow pro or paypal payments pro.
      *
+     * @param null|int $websiteId
      * @return string
      */
-    public function getTitleForPaypal()
+    public function getTitleForPaypal($websiteId = null)
     {
         $title = 'Payments Pro';
 
-        if ($this->getStoreConfig('payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active')) {
+        if ($this->getStoreConfig(
+            'payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active',
+            $websiteId
+        )) {
             $title = 'Payflow Pro';
         }
 
@@ -453,17 +457,18 @@ class Config
     /**
      * Check if payment method is available for subscription and it is on for Magento.
      *
-     * @param string $paymentCode
+     * @param $paymentCode
+     * @param null|int $websiteId
      * @return bool
      */
-    public function isPaymentMethodAvailableForSubscription($paymentCode)
+    public function isPaymentMethodAvailableForSubscription($paymentCode, $websiteId = null)
     {
         $isAvailable = false;
 
         $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
-            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active');
+            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active', $websiteId);
 
-        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode)) {
+        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode, $websiteId)) {
             $isAvailable = true;
         }
 
