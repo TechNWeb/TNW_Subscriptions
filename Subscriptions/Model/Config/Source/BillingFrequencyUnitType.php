@@ -24,6 +24,8 @@ class BillingFrequencyUnitType implements ArrayInterface
     const YEARS = 6;
     /**#@-*/
 
+    const PLURAL = "s";
+
     /**
      * Get options for Billing Frequency Unit Type Type.
      *
@@ -43,7 +45,7 @@ class BillingFrequencyUnitType implements ArrayInterface
 //            ],
             [
                 'value' => self::DAYS,
-                'label' => __('Day(s)'),
+                'label' => 'Day',
             ],
 //            [
 //                'value' => self::WEEKS,
@@ -51,7 +53,7 @@ class BillingFrequencyUnitType implements ArrayInterface
 //            ],
             [
                 'value' => self::MONTHS,
-                'label' => __('Month(s)'),
+                'label' => 'Month',
             ],
 //            [
 //                'value' => self::YEARS,
@@ -63,19 +65,39 @@ class BillingFrequencyUnitType implements ArrayInterface
     }
 
     /**
-     * @param $value
-     * @return null
+     * Get label by value depends on frequency.
+     *
+     * @param int $value
+     * @param int $frequency
+     * @return null|string
      */
-    public function getLabelByValue($value)
+    public function getLabelByValueAndFrequency($value, $frequency)
     {
         $result = null;
 
         foreach ($this->toOptionArray() as $option){
             if ($option['value'] == $value){
                 $result = $option['label'];
+                if ($frequency != 1) {
+                    $result = $result . self::PLURAL;
+                }
             }
         }
 
-        return $result;
+        return __($result);
+    }
+
+    /**
+     * Get label with frequency + label.
+     *
+     * @param int $unit
+     * @param int $frequency
+     * @return string
+     */
+    public function getPeriodLabel($unit, $frequency)
+    {
+        $label = $this->getLabelByValueAndFrequency($unit, $frequency);
+
+        return $frequency . ' ' . $label;
     }
 }

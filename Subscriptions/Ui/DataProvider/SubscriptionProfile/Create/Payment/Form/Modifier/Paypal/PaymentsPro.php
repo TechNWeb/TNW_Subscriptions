@@ -31,7 +31,17 @@ class PaymentsPro extends Base
     private $request;
     private $urlBuilder;
 
+    /**
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param Context $context
+     * @param Transparent $paymentPro
+     * @param Config $paymentConfig
+     * @param Repository $assetRepository
+     * @param RequestInterface $request
+     * @param UrlInterface $urlBuilder
+     */
     public function __construct(
+        \TNW\Subscriptions\Model\Config $config,
         Context $context,
         Transparent $paymentPro,
         Config $paymentConfig,
@@ -45,6 +55,9 @@ class PaymentsPro extends Base
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
+
+        parent::__construct($config);
+
     }
 
     /**

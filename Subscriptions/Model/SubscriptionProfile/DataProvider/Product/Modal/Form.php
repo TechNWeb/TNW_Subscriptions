@@ -460,7 +460,7 @@ class Form extends AbstractDataProvider
                 $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
                     ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
                     : 0;
-                $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+                $trialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
                 $trialPriceLabel = (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)->getValue()
                     . $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol()
                     . ' ' . __('for') . ' ';
