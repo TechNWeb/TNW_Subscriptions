@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -108,8 +109,18 @@ class Form extends AbstractDataProvider
     private $priceCalculator;
 
     /**
-     * Form constructor.
+     * Store Manager.
      *
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var \TNW\Subscriptions\Model\Config
+     */
+    private $config;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -119,6 +130,8 @@ class Form extends AbstractDataProvider
      * @param RequestInterface $request
      * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
+     * @param StoreManagerInterface $storeManager
+     * @param \TNW\Subscriptions\Model\Config $config
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -133,6 +146,8 @@ class Form extends AbstractDataProvider
         RequestInterface $request,
         TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
+        StoreManagerInterface $storeManager,
+        \TNW\Subscriptions\Model\Config $config,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -144,6 +159,9 @@ class Form extends AbstractDataProvider
         $this->unitType = $unitType;
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
         $this->priceCalculator = $priceCalculator;
+        $this->storeManager = $storeManager;
+        $this->config = $config;
+
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -228,7 +246,15 @@ class Form extends AbstractDataProvider
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
                             ],
-
+                        ],
+                    ],
+                    'term' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'checked' => $this->config->isUntilCanceledChecked(),
+                                ],
+                            ],
                         ],
                     ],
                     'period' => [
@@ -263,6 +289,8 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'config' => [
+                                    'addbefore' =>
+                                        $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol(),
                                     'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                                     'validation' => [
                                         'validate-zero-or-greater' => true,
@@ -423,6 +451,7 @@ class Form extends AbstractDataProvider
             $productId = (int)$this->request->getParam('product_id', 0);
             $trialLength = 0;
             $trialUnit = 0;
+            $trialPriceLabel = '';
             if ($productId) {
                 $product = $this->productRepository->getById($productId);
                 $trialLength = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
@@ -432,8 +461,11 @@ class Form extends AbstractDataProvider
                     ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
                     : 0;
                 $trialUnit = $this->unitType->getLabelByValue($trialUnit);
+                $trialPriceLabel = (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)->getValue()
+                    . $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol()
+                    . ' ' . __('for') . ' ';
             }
-            $this->trialPeriod = $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : '';
+            $this->trialPeriod = $trialLength && $trialUnit ? $trialPriceLabel . $trialLength . ' ' . $trialUnit : '';
         }
 
         return $this->trialPeriod;
@@ -446,7 +478,18 @@ class Form extends AbstractDataProvider
      */
     private function showTrialPeriod()
     {
-        return $this->getTrialPeriod() ? true : false;
+        $show = false;
+
+        $productId = (int)$this->request->getParam('product_id', 0);
+
+        if ($productId) {
+            $product = $this->productRepository->getById($productId);
+            $show = (bool)$product->getCustomAttribute(
+                \TNW\Subscriptions\Model\Product\Attribute::SUBSCRIPTION_TRIAL_STATUS
+            )->getValue();
+        }
+
+        return $show;
     }
 
     /**

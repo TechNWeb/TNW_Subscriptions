@@ -50,7 +50,8 @@
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">radioset</item>
                     <item name="dataScope" xsi:type="string">billing_frequency_id</item>
-                    <item name="additionalClasses" xsi:type="string">sub-legend admin__field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend
+                        admin__field-wide</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -58,7 +59,6 @@
                 </item>
             </argument>
         </field>
-
         <field name="term">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -120,7 +120,7 @@
         <field name="price">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Unit price:</item>
+                    <item name="label" xsi:type="string" translate="true">Post trial price:</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">input</item>
