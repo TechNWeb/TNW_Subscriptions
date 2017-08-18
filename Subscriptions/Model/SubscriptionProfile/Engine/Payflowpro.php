@@ -24,7 +24,7 @@ class Payflowpro extends Base
     {
         return [
             'payment_token' => $payment->getAdditionalInformation(PaypalPayflow::PNREF),
-            'payment_additional_info' => [
+            'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
@@ -38,8 +38,8 @@ class Payflowpro extends Base
      */
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
-        $result = !empty($profile->getPaymentAdditionalInfo())
-            ? $profile->getPaymentAdditionalInfo()
+        $result = !empty($profile->getDecodedPaymentAdditionalInfo())
+            ? $profile->getDecodedPaymentAdditionalInfo()
             : [];
 
         $result[OrderPaymentInterface::METHOD] = Config::METHOD_PAYFLOWPRO;
@@ -53,7 +53,7 @@ class Payflowpro extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            PaypalPayflow::PNREF => $profile->getPaymentToken()
+            PaypalPayflow::PNREF => 'A70AA49E0B44'
         ];
     }
 }

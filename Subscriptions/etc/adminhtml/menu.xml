@@ -35,5 +35,10 @@
              parent="TNW_Subscriptions::top_level" resource="TNW_Subscriptions::ProductSubscriptionProfile_attributes"
              sortOrder="9999"
              title="Product Subscription Profile Attributes" translate="title"/>
+        <!--Subscription profile queue editor-->
+        <add action="tnw_subscriptions/subscriptionprofile_queue/index"
+             id="TNW_Subscriptions::tnw_subscriptions_subscriptionprofile_queue_index" module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::top_level" resource="TNW_Subscriptions::SubscriptionProfile" sortOrder="9999"
+             title="Subscription Queue" translate="title"/>
     </menu>
 </config>

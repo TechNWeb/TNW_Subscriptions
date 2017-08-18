@@ -116,7 +116,7 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
 
         if (!$profileAddress->getId()) {
             throw new NoSuchEntityException(
-                __('Subscription profile with id "%1" does not exist.', $profileAddressId)
+                __('Subscription profile address with id "%1" does not exist.', $profileAddressId)
             );
         }
 
@@ -159,13 +159,13 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
         $items = [];
 
         foreach ($collection as $profileAddressModel) {
-            $billingFrequencyData = $this->dataAddressFactory->create();
+            $profileAddressData = $this->dataAddressFactory->create();
             $this->dataObjectHelper->populateWithArray(
-                $billingFrequencyData,
+                $profileAddressData,
                 $profileAddressModel->getData(),
                 SubscriptionProfileAddressInterface::class
             );
-            $items[] = $billingFrequencyData;
+            $items[] = $profileAddressData;
         }
         $searchResults->setItems($items);
 
@@ -182,7 +182,7 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
             $this->resource->delete($profileAddress);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__(
-                'Could not delete the Subscription Profile Address: %1',
+                'Could not delete the subscription profile address: %1',
                 $exception->getMessage()
             ));
         }

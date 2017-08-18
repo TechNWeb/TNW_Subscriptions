@@ -6,9 +6,11 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface as RelationRepository;
 use TNW\Subscriptions\Model\SubscriptionProfileOrderFactory;
-use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 
 /**
  * Class Manager
@@ -32,20 +34,31 @@ class Manager
     /**
      * Repository for saving/retrieving profile to order relations.
      *
-     * @var SubscriptionProfileOrderRepositoryInterface
+     * @var RelationRepository
      */
     private $profileOrderRepository;
 
     /**
+     * Search criteria builder.
+     *
+     * @var SearchCriteriaBuilder
+     */
+    private $criteriaBuilder;
+
+    /**
      * Manager constructor.
      * @param SubscriptionProfileOrderFactory $profileFactory
+     * @param RelationRepository $profileOrderRepository
+     * @param SearchCriteriaBuilder $criteriaBuilder
      */
     public function __construct(
         SubscriptionProfileOrderFactory $profileFactory,
-        SubscriptionProfileOrderRepositoryInterface $profileOrderRepository
+        RelationRepository $profileOrderRepository,
+        SearchCriteriaBuilder $criteriaBuilder
     ) {
         $this->profileOrderFactory = $profileFactory;
         $this->profileOrderRepository = $profileOrderRepository;
+        $this->criteriaBuilder = $criteriaBuilder;
     }
 
 
@@ -93,17 +106,45 @@ class Manager
     /**
      * Saves profile to order relation.
      *
-     * @param null $relation
-     * @return $this
+     * @param null|SubscriptionProfileOrderInterface $relation
+     * @return null|SubscriptionProfileOrderInterface
      */
     public function saveRelation($relation = null)
     {
-        if (!$relation){
+        if (!$relation) {
             $relation = $this->getProfileOrderRelation();
         }
 
-        $this->profileOrderRepository->save($relation);
+        $relation = $this->profileOrderRepository->save($relation);
 
-        return $this;
+        return $relation;
+    }
+
+    /**
+     * Returns list of all profile relations.
+     *
+     * @param int $profileId
+     * @return SubscriptionProfileOrderInterface[]
+     */
+    public function getAllProfileRelations($profileId)
+    {
+        $this->criteriaBuilder->addFilter(
+            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profileId
+        );
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder->create();
+
+        return $this->profileOrderRepository->getList($searchCriteria)->getItems();
+    }
+
+    /**
+     * Returns profile relation by id.
+     *
+     * @param int $id
+     * @return SubscriptionProfileOrderInterface
+     */
+    public function getRelationById($id)
+    {
+        return $this->profileOrderRepository->getById($id);
     }
 }

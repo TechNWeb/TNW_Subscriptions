@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\OfflinePayments\Model\Checkmo as CheckmoPayment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
@@ -22,5 +21,4 @@ class Checkmo extends Base
             OrderPaymentInterface::METHOD => CheckmoPayment::PAYMENT_METHOD_CHECKMO_CODE
         ];
     }
-
 }

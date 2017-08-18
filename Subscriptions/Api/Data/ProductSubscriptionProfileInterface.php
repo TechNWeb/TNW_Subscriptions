@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+use Magento\Catalog\Model\Product;
+
 interface ProductSubscriptionProfileInterface
 {
     /**#@+
@@ -24,6 +26,14 @@ interface ProductSubscriptionProfileInterface
     const OFFER_FLAT_DISCOUNT_STATUS = 'offer_flat_discount_status';
     const DISCOUNT_AMOUNT = 'discount_amount';
     const DISCOUNT_TYPE = 'discount_type';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    /**#@-*/
+
+    /**#@+
+     * Constant for profile magento product
+     */
+    const MAGENTO_PRODUCT = 'magento_product';
     /**#@-*/
 
     /**
@@ -70,6 +80,13 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setMagentoProductId($magentoProductId);
+
+    /**
+     * Gets magento product.
+     *
+     * @return Product|null
+     */
+    public function getMagentoProduct();
 
     /**
      * Gets price.
@@ -220,4 +237,34 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setDiscountType($discountType);
+
+    /**
+     * Gets created at date.
+     *
+     * @return []|null
+     */
+    public function getCreatedAt();
+
+    /**
+     * Sets created at date.
+     *
+     * @param bool $date
+     * @return $this
+     */
+    public function setCreatedAt($date);
+
+    /**
+     * Gets updated at date.
+     *
+     * @return []|null
+     */
+    public function getUpdatedAt();
+
+    /**
+     * Sets updated at date.
+     *
+     * @param bool $date
+     * @return $this
+     */
+    public function setUpdatedAt($date);
 }
