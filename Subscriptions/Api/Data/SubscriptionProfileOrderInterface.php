@@ -20,6 +20,8 @@ interface SubscriptionProfileOrderInterface
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const MAGENTO_ORDER_ID = 'magento_order_id';
     const ID = 'id';
+    const MAGENTO_QUOTE_ID = 'magento_quote_id';
+    const SCHEDULED_AT = 'scheduled_at';
     /**#@-*/
 
     /**
@@ -66,4 +68,35 @@ interface SubscriptionProfileOrderInterface
      * @return $this
      */
     public function setMagentoOrderId($magentoOrderId);
+
+    /**
+     * Gets magento quote id.
+     *
+     * @return string|null
+     */
+    public function getMagentoQuoteId();
+
+    /**
+     * Sets magento quote id.
+     *
+     * @param string $magentoQuoteId
+     * @return $this
+     */
+    public function setMagentoQuoteId($magentoQuoteId);
+
+
+    /**
+     * Gets the scheduled date for order.
+     *
+     * @return string|null
+     */
+    public function getScheduledAt();
+
+    /**
+     * Sets the scheduled date for order.
+     *
+     * @param string $scheduledAt
+     * @return $this
+     */
+    public function setScheduledAt($scheduledAt);
 }

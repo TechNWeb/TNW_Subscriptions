@@ -6,26 +6,35 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
+use Magento\Sales\Api\Data\OrderInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 interface EngineInterface
 {
     /**
-     * Processes profile.
+     * Sets profile to engine model.
      *
      * @param SubscriptionProfileInterface $profile
-     * @return mixed
+     * @return $this
      */
-    public function processProfile(SubscriptionProfileInterface $profile);
+    public function setProfile(SubscriptionProfileInterface $profile);
 
     /**
-     * Updates profile.
+     * Gets profile from engine model.
      *
-     * @param SubscriptionProfileInterface $profile
      * @return SubscriptionProfileInterface
      */
-    public function updateProfile(SubscriptionProfileInterface $profile);
+    public function getProfile();
+
+    /**
+     * Processes profile.
+     *
+     * @param Quote $quote
+     * @return OrderInterface
+     */
+    public function processProfile(Quote $quote);
 
     /**
      * Returns payment information needed for engine.

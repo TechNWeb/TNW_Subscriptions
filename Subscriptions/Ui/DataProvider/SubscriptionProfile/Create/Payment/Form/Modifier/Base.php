@@ -17,6 +17,19 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
  */
 class Base implements ModifierInterface
 {
+    /**
+     * @var \TNW\Subscriptions\Model\Config
+     */
+    private $config;
+
+    /**
+     * @param \TNW\Subscriptions\Model\Config $config
+     */
+    public function __construct(
+        \TNW\Subscriptions\Model\Config $config
+    ) {
+        $this->config = $config;
+    }
 
     /**#@+
      * Name of payment information fieldset.
@@ -37,10 +50,12 @@ class Base implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        $meta = array_replace_recursive(
-            $meta,
-            $this->getPaymentFields()
-        );
+        if ($this->config->isPaymentMethodAvailableForSubscription($this->getPaymentCode())) {
+            $meta = array_replace_recursive(
+                $meta,
+                $this->getPaymentFields()
+            );
+        }
 
         return $meta;
     }
@@ -202,6 +217,7 @@ class Base implements ModifierInterface
             '.' . Payment::DATA_SCOPE_PAYMENT_FORM .
             '.' . static::PAYMENT_INFORMATION_FIELD_SET_NAME
             . '.' . $this->getPaymentCode();
+
         return $fieldsetName;
     }
 }

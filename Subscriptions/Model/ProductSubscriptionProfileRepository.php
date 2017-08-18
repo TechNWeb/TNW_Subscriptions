@@ -146,10 +146,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                 $productSubscriptionProfileModel->getData(),
                 'TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface'
             );
-            $items[] = $this->dataObjectProcessor->buildOutputDataArray(
-                $productSubscriptionProfileData,
-                'TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface'
-            );
+            $items[] = $productSubscriptionProfileData;
         }
         $searchResults->setItems($items);
         return $searchResults;

@@ -160,4 +160,7 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="tnw_subscriptions_sales_order_grid_collection" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
+    </type>
 </config>

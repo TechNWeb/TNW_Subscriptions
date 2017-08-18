@@ -452,7 +452,7 @@ class LinkedProducts extends AbstractModifier
      */
     private function getPrice(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
     {
-        $lockProductPriceStatus = $this->config->lockProductPriceStatus();
+        $lockProductPriceStatus = $this->config->getLockProductPriceStatus();
 
         if ($lockProductPriceStatus) {
             $price = $linkedProduct->getPrice();

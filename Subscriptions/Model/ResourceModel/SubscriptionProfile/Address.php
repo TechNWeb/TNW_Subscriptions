@@ -16,7 +16,7 @@ class Address extends AbstractDb
      * @return void
      */
     protected function _construct()
-{
-    $this->_init('tnw_subscriptions_subscription_profile_address', 'address_id');
-}
+    {
+        $this->_init('tnw_subscriptions_subscription_profile_address', 'id');
+    }
 }

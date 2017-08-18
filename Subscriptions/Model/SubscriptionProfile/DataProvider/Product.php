@@ -229,7 +229,7 @@ class Product extends AbstractDataProvider
 
             $subTotal = $subQuote->getGrandTotal();
 
-            $estimatedPayment += ((double)$subTotal * (int)$subscriptionData['period']);
+            $estimatedPayment += (double)$subTotal;
 
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,

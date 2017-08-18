@@ -8,7 +8,7 @@
  * @var \Magento\Payment\Block\Transparent\Iframe $block
  */
 $params = $block->getParams();
-
+$errors = !empty($params['error_messages']) ? $params['error_messages'] : [];
 ?>
 <html>
 <head>
@@ -16,7 +16,7 @@ $params = $block->getParams();
     var require = window.top.require;
     require(['uiRegistry'], function(registry) {
         registry.get('index = tnw_subscriptionprofile_create_payment_form').triggerSave(
-            <?php /* @noEscape */ echo $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($params['error_messages']); ?>
+            <?php /* @noEscape */ echo $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($errors); ?>
         );
     });
 </script>

@@ -397,6 +397,67 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.13", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::NEED_GENERATE_QUOTES,
+                [
+                    'type' => 'static',
+                    'label' => 'Need generate quotes',
+                    'sort_order' => 180,
+                    'input' => 'select',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => true,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::CREATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 190,
+                    'visible' => false
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 200,
+                    'visible' => false
+                ]
+            );
+
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::CREATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 120,
+                    'visible' => false
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::UPDATED_AT,
+                [
+                    'type' => 'static',
+                    'input' => 'date',
+                    'sort_order' => 130,
+                    'visible' => false
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

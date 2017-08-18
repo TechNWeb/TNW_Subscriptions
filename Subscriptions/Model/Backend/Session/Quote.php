@@ -281,6 +281,7 @@ class Quote extends SessionManager
 
     public function clearStorage()
     {
+        $this->quotes = [];
         return parent::clearStorage();
     }
 }
