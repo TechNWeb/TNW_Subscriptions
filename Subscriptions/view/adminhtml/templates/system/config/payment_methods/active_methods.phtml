@@ -1,0 +1,24 @@
+<?php foreach ($block->getData('payment_list') as $paymentMethod): ?>
+    <tr>
+        <td class="label"><?php echo $paymentMethod['title'] ?></td>
+        <td class="value">
+            <select name="groups[<?php echo $block->getData('group_id') ?>][fields][<?php
+            echo $paymentMethod['code']; ?>][value]" class="select admin__control-select">
+                <?php foreach ($block->getData('source_model_values') as $modelValue): ?>
+                    <option value="<?php echo $modelValue['value']; ?>"
+                        <?php
+                        $isSelected = $modelValue['value'] == $block->getConfigData($paymentMethod['config_name']);
+                        if ($isSelected): ?>
+                            selected="selected"
+                        <?php endif; ?>
+                    >
+                        <?php echo $modelValue['label']->getText(); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+        <td class="scope-label"></td>
+        <td class=""></td>
+    </tr>
+<?php endforeach ?>
+

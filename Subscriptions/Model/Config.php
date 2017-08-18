@@ -11,6 +11,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
+use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
+use Magento\Paypal\Model\Config as PaypalConfig;
 
 class Config
 {
@@ -41,6 +43,13 @@ class Config
     private $xmlDiscountType = 'tnw_subscriptions_product/discount/discount_type';
     /**#@-*/
 
+    /**
+     * Config xml path for is Subscription module active.
+     *
+     * @var string
+     */
+    private $xmlIsModuleEnable = 'tnw_subscriptions_general/general/active';
+
 
     /**
      * @var ScopeConfigInterface
@@ -58,18 +67,26 @@ class Config
     private $request;
 
     /**
+     * @var PaypalConfig
+     */
+    private $paypalConfig;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
+     * @param PaypalConfig $paypalConfig
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        Http $request
+        Http $request,
+        PaypalConfig $paypalConfig
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
+        $this->paypalConfig = $paypalConfig;
     }
 
     #region General section
@@ -318,4 +335,102 @@ class Config
         return $result;
     }
     #endregion
+
+    /**
+     * Check if Subscription module is enabled.
+     *
+     * @return bool
+     */
+    public function isModuleEnabled()
+    {
+        return (bool)$this->getStoreConfig($this->xmlIsModuleEnable);
+    }
+
+    /**
+     * Check if payment method is active in subscription config by code.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentAvailable($paymentCode)
+    {
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
+
+        return (bool)$this->getStoreConfig($path);
+    }
+
+    /**
+     * Get list of payments codes which are active in subscription config.
+     *
+     * @return array
+     */
+    public function getAvailablePaymentsList()
+    {
+        $availableMethods = [];
+
+        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID;
+
+        $methods = $this->getStoreConfig($path);
+
+        if (is_array($methods)) {
+            foreach ($methods as $methodCode => $isActive) {
+                if ($isActive == 1) {
+                    $availableMethods[] = $methodCode;
+                }
+            }
+        }
+
+        return $availableMethods;
+    }
+
+    /**
+     * Check if module enable and if at least one payment method is available for subscription.
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        $isActive = false;
+        if ($this->isModuleEnabled() && !isEmpty($this->getAvailablePaymentsList())) {
+            $isActive = true;
+        }
+
+        return $isActive;
+    }
+
+    /**
+     * Get title depends of active is payflow pro or paypal payments pro.
+     *
+     * @return string
+     */
+    public function getTitleForPaypal()
+    {
+        $title = 'Payments Pro';
+
+        if ($this->getStoreConfig('payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active')) {
+            $title = 'Payflow Pro';
+        }
+
+        return $title;
+    }
+
+    /**
+     * Check if payment method is available for subscription and it is on for Magento.
+     *
+     * @param string $paymentCode
+     * @return bool
+     */
+    public function isPaymentMethodAvailableForSubscription($paymentCode)
+    {
+        $isAvailable = false;
+
+        $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
+            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active');
+
+        if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode)) {
+            $isAvailable = true;
+        }
+
+        return $isAvailable;
+    }
 }
