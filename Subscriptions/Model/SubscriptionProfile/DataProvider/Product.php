@@ -339,6 +339,7 @@ class Product extends AbstractDataProvider
                                         'componentType' => Select::NAME,
                                         'label' => 'Order Currency:',
                                         'source' => 'SubscriptionProfile',
+                                        'component' => 'TNW_Subscriptions/js/form/element/select',
                                         'template' => 'TNW_Subscriptions/form/element/select',
                                         'data_form_part' => $this->currencySelect->getCurrentDataFormPartFromStep($this->stepPool->getCurrentStep()),
                                         'dataScope' => '$data.currency_id',
@@ -608,5 +609,18 @@ class Product extends AbstractDataProvider
                 ],
             ]
         ];
+    }
+
+    /**
+     * Get config data
+     *
+     * @return mixed
+     */
+    public function getConfigData()
+    {
+        $data = parent::getConfigData();
+        $data['render_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
+        $data['update_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
+        return $data;
     }
 }
