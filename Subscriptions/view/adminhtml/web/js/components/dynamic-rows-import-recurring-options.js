@@ -7,7 +7,7 @@ define([
     'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
     'underscore',
     'uiRegistry',
-    'jquery',
+    'jquery'
 ], function (DynamicRows, _, registry, $) {
     'use strict';
 
