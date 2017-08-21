@@ -209,7 +209,7 @@ class DescriptionCreator
         $label = 'shipment';
 
         if ($subscriptionPeriod != 1) {
-            $label .= "'s'";
+            $label .= "s'";
         }
 
         return __($label);
