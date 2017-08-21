@@ -484,6 +484,6 @@ class Config
      */
     public function isUntilCanceledChecked()
     {
-        return (bool)$this->getStoreConfig($this->xmlUntilCanceled);
+        return $this->getStoreConfig($this->xmlUntilCanceled);
     }
 }
