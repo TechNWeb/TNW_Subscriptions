@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrderBuilder;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterfaceFactory;
@@ -50,6 +51,10 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
      */
     private $productRepository;
 
+    /**
+     * @var SortOrderBuilder
+     */
+    private $sortOrderBuilder;
 
     /**
      * @param ResourceProductBillingFrequency $resource
@@ -62,6 +67,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
      * @param StoreManagerInterface $storeManager
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductRepositoryInterface $productRepository
+     * @param SortOrderBuilder $sortOrderBuilder
      */
     public function __construct(
         ResourceProductBillingFrequency $resource,
@@ -73,7 +79,8 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        SortOrderBuilder $sortOrderBuilder
     ) {
         $this->resource = $resource;
         $this->productBillingFrequencyFactory = $productBillingFrequencyFactory;
@@ -85,6 +92,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $this->storeManager = $storeManager;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->productRepository = $productRepository;
+        $this->sortOrderBuilder = $sortOrderBuilder;
     }
 
     /**
@@ -216,6 +224,11 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
             $productId,
             'eq'
         );
+
+        /** @var \Magento\Framework\Api\SortOrder $sortOrder */
+        $sortOrder = $this->sortOrderBuilder->setField('sort_order')
+            ->setDirection(SortOrder::SORT_ASC)->create();
+        $this->searchCriteriaBuilder->setSortOrders([$sortOrder]);
 
         /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->searchCriteriaBuilder->create();

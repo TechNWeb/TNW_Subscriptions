@@ -38,7 +38,6 @@ class SaveHandler implements ExtensionInterface
      */
     public function execute($entity, $arguments = [])
     {
-
         /** @var ProductBillingFrequencyInterface $option */
         foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option){
             $this->recurringOptionRepository->delete($option);

@@ -298,7 +298,7 @@ class Config
      * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function trialPrice($websiteId = null)
+    public function getTrialPrice($websiteId = null)
     {
         return $this->getStoreConfig($this->xmlTrialPrice, $websiteId);
     }

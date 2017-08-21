@@ -3,21 +3,24 @@
 }
 
 .subscription-profile-products-container .sub-button-left,
-.fieldset-wrapper .admin__fieldset .sub-button-left {
-    display: inline-block;
+.fieldset-wrapper .admin__fieldset .sub-button-left,
+.subscription-profile-products-container .sub-button-right,
+.fieldset-wrapper .admin__fieldset .sub-button-right {
     padding-top: .6875em;
     padding-bottom: .6875em;
     font-size: 16px;
+}
+.fieldset-wrapper .admin__fieldset .sub-button-left { float: left; }
+.subscription-profile-products-container .sub-button-left {
+    display: inline-block;
+    float: none !important;
     margin-bottom: 1.3rem;
     margin-right: 1.3rem;
 }
-
-.subscription-profile-products-container .sub-button-right,
-.fieldset-wrapper .admin__fieldset .sub-button-right {
+.fieldset-wrapper .admin__fieldset .sub-button-right { float:right; }
+.subscription-profile-products-container .sub-button-right {
     display: inline-block;
-    padding-top: .6875em;
-    padding-bottom: .6875em;
-    font-size: 16px;
+    float: none !important;
 }
 
 .subscription-profile-products-container .admin__fieldset{
