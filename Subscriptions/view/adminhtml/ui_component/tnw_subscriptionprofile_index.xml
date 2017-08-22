@@ -24,7 +24,7 @@
     <dataSource name="tnw_subscriptionprofile_grid_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class"
-                      xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
+                      xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Grid</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_grid_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
             <argument name="requestFieldName" xsi:type="string">entity_id</argument>
@@ -76,32 +76,10 @@
         <column name="entity_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="sorting" xsi:type="string">asc</item>
                     <item name="label" translate="true" xsi:type="string">ID</item>
-                </item>
-            </argument>
-        </column>
-        <column name="customer_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Customer Id</item>
-                </item>
-            </argument>
-        </column>
-        <actionsColumn class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfileActions" name="actions">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">entity_id</item>
-                </item>
-            </argument>
-        </actionsColumn>
-        <column name="billing_frequency_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Billing Frequency Id</item>
                 </item>
             </argument>
         </column>
@@ -113,19 +91,38 @@
                 </item>
             </argument>
         </column>
-        <column name="unit">
+        <column name="customer_name">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Unit</item>
+                    <item name="label" translate="true" xsi:type="string">Customer name</item>
+                </item>
+            </argument>
+        </column>
+        <column name="customer_email">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Customer email</item>
+                </item>
+            </argument>
+        </column>
+        <column name="frequency_label">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Billing frequency</item>
                 </item>
             </argument>
         </column>
         <column name="website_id">
             <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Magento\Config\Model\Config\Source\Website</item>
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Website Id</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" translate="true" xsi:type="string">Website</item>
                 </item>
             </argument>
         </column>
@@ -134,16 +131,50 @@
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Status</item>
-                 </item>
-            </argument>
-        </column>
-        <column name="frequency">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Frequency</item>
                 </item>
             </argument>
         </column>
+
+        <column name="status">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" translate="true" xsi:type="string">Status</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="start_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\TrialEndDate">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Trial end date</item>
+                    <item name="dateFormat" xsi:type="string">MMMM dd, YYYY</item>
+                </item>
+            </argument>
+        </column>
+        <column name="next_billing_cycle_date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Next billing cycle date</item>
+                    <item name="dateFormat" xsi:type="string">MMMM dd, YYYY</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfileActions" name="actions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
     </columns>
 </listing>
