@@ -23,7 +23,7 @@
                 <item name="tnw_productbillingfrequency_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_grid_data_source"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Grid\Collection</item>
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\Collection</item>
                 <item name="tnw_subscriptionprofileorder_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection</item>
                 <item name="tnw_productsubscriptionprofile_grid_data_source"

@@ -42,7 +42,7 @@ class Grid extends DataProvider
         }
 
         if ($field === 'customer_name') {
-            $filter->setField('customer.name');
+            $filter->setField("CONCAT_WS(' ', customer.firstname, customer.lastname)");
         }
 
         if ($field === 'website_id') {
