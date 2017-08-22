@@ -6,11 +6,10 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Order\History;
 
-use Magento\Ui\DataProvider\AbstractDataProvider;
-use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
-use Magento\Sales\Model\ResourceModel\Order\Grid\Collection;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
+use Magento\Ui\DataProvider\AbstractDataProvider;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
 /**
  * Class Order history data provider
@@ -46,25 +45,30 @@ class DataProvider extends AbstractDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getCollection()
+    public function getData()
     {
-        /** @var Collection $collection */
-        $collection = parent::getCollection();
         $profileId = $this->request->getParam('subscription_profile_id', 0);
-
-        if ($profileId){
-            $collection->addFieldToFilter('subscription_profile_id' , $profileId);
+        if ($profileId) {
+            $this->getCollection()->addFieldToFilter('relation.subscription_profile_id', $profileId);
+            $this->getCollection()->getSelect()->join(
+                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                []
+            );
         }
 
-        $collection->join(
-            SubscriptionProfileOrderInterface::MAIN_TABLE,
-            $collection->getResource()->getIdFieldName() .'='. SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID
-        );
+        $arrItems = [
+            'totalRecords' => $this->getCollection()->getSize(),
+            'items' => [],
+        ];
 
-        return $collection;
+        foreach ($this->getCollection() as $item) {
+            $arrItems['items'][] = $item->toArray([]);
+        }
+
+        return $arrItems;
     }
 }
