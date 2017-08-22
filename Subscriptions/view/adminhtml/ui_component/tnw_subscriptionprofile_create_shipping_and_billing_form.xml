@@ -170,9 +170,16 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="title" translate="true" xsi:type="string">Continue >></item>
                     <item name="formElement" xsi:type="string">button</item>
-                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button-subscription</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button</item>
                     <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
                     <item name="subButtonLeft" xsi:type="string">true</item>
+                    <item name="displayPrimary" xsi:type="string">true</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_create_shipping_and_billing_form</item>
+                            <item name="actionName" xsi:type="string">save</item>
+                        </item>
+                    </item>
                 </item>
             </argument>
         </field>
