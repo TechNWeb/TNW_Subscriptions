@@ -9,16 +9,14 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\F
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Customer\Model\Group;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
+/**
+ * Class subscription and account information modifier
+ */
 class SubscriptionAndAccountInformation implements ModifierInterface
 {
-    /**#@+
-     * Form request values
-     */
-    const FORM_DATA_KEY = 'subscription_and_account_information';
-    const FORM_DATA_VALUE = 'new_subscription';
-    /**#@-*/
-
     /**
      * Admin session.
      *
@@ -34,24 +32,26 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     private $customerGroup;
 
     /**
-     * First subscription quote.
+     * Profile status
      *
-     * @var Quote
+     * @var ProfileStatus
      */
-    private $firstQuote;
+    private $profileStatus;
 
     /**
      * Modifier constructor.
      *
      * @param Quote $session
+     * @param Group $group
      */
     public function __construct(
         Quote $session,
-        Group $group
+        Group $group,
+        ProfileStatus $profileStatus
     ) {
         $this->session = $session;
         $this->customerGroup = $group;
-        $this->firstQuote = $session->getFirstQuote();
+        $this->profileStatus = $profileStatus;
     }
 
     /**
@@ -59,10 +59,12 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $data[self::FORM_DATA_VALUE] = [
+        $currentStatusLabel = $this->profileStatus->getLabelByValue(ProfileStatus::STATUS_PENDING);
+
+        $data[Payment::FORM_DATA_VALUE] = [
             'website_information' => $this->getCurrentWebsiteName(),
             'currency_information' => $this->getCurrentCurrencyCode(),
-            'status_information' => __('Pending'),
+            'status_information' => $currentStatusLabel,
             'customer_name_information' => $this->getCustomerFullName(),
             'email_information' => $this->getCustomerEmail(),
             'customer_group_information' => $this->getCustomerGroupName(),
@@ -76,7 +78,6 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        $meta = [];
         return $meta;
     }
 
@@ -87,7 +88,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCurrentWebsiteName()
     {
-        return $this->firstQuote->getStore()->getWebsite()->getName();
+        return $this->getFirstQuote()->getStore()->getWebsite()->getName();
     }
 
     /**
@@ -97,7 +98,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCurrentCurrencyCode()
     {
-        return $this->firstQuote->getQuoteCurrencyCode();
+        return $this->getFirstQuote()->getQuoteCurrencyCode();
     }
 
     /**
@@ -109,7 +110,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCustomerFullName()
     {
-        return $this->firstQuote->getCustomerFirstname() . ' ' . $this->firstQuote->getCustomerLastname();
+        return $this->getFirstQuote()->getCustomerFirstname() . ' ' . $this->firstQuote->getCustomerLastname();
     }
 
     /**
@@ -119,7 +120,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCustomerEmail()
     {
-        return $this->firstQuote->getCustomerEmail();
+        return $this->getFirstQuote()->getCustomerEmail();
     }
 
     /**
@@ -129,9 +130,19 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCustomerGroupName()
     {
-        $customerGroupId = $this->firstQuote->getCustomerGroupId();
+        $customerGroupId = $this->getFirstQuote()->getCustomerGroupId();
         $currentCustomerGroup = $this->customerGroup->load($customerGroupId);
 
         return $currentCustomerGroup->getCode();
+    }
+
+    /**
+     * Retunr first quote from subscription
+     *
+     * @return \Magento\Quote\Model\Quote
+     */
+    private function getFirstQuote()
+    {
+        return $this->session->getFirstQuote();
     }
 }

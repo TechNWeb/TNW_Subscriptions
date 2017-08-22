@@ -16,7 +16,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
 use Magento\Framework\Controller\Result\JsonFactory;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 class Process extends Create
 {
@@ -291,7 +291,7 @@ class Process extends Create
             ];
         } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $additionalParams = [
-                SubscriptionAndAccountInformation::FORM_DATA_KEY => SubscriptionAndAccountInformation::FORM_DATA_VALUE,
+                Payment::FORM_DATA_KEY => Payment::FORM_DATA_VALUE,
             ];
         }
 
