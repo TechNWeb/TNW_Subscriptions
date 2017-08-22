@@ -219,6 +219,15 @@ class QuoteCreator
             $existDates[] = $relation->getScheduledAt();
         }
         $neededDates = array_diff($neededDates, $existDates);
+        $resultDates = [];
+        //generate only future dates
+        $nowDate = new \DateTime();
+        $nowDate = $nowDate->format('Y-m-d H:i:s');
+        foreach ($neededDates as $neededDate) {
+            if ($neededDate > $nowDate){
+                $resultDates[] = $neededDate;
+            }
+        }
         $resultDates = array_slice(
             $neededDates,
             0,
