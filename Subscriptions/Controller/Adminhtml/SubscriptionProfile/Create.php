@@ -14,6 +14,9 @@ use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
+/**
+ * Create subscription profile.
+ */
 class Create extends SubscriptionProfile
 {
     /**
