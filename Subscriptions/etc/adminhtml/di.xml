@@ -127,6 +127,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\OrdersHistory</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="change_history" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ChangeHistory</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>

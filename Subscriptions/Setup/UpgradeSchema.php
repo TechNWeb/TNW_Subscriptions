@@ -771,6 +771,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
+
+        if (version_compare($context->getVersion(), "2.0.14", "<")) {
+            $this->addSubscriptionProfileMessageHistoryTable($setup);
+        }
         $setup->endSetup();
     }
 
@@ -1822,5 +1826,77 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         //drop old table if exist.
         $setup->getConnection()->dropTable($setup->getTable('tnw_subscriptions_subscription_profile'));
+    }
+
+    /**
+     * Create table 'tnw_subscriptions_subscription_profile_message_history'.
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addSubscriptionProfileMessageHistoryTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()->newTable(
+            $setup->getTable('tnw_subscriptions_subscription_profile_message_history')
+        )->addColumn(
+            'entity_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            null,
+            ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            'Entity Id'
+        )->addColumn(
+            'parent_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            null,
+            ['unsigned' => true, 'nullable' => false],
+            'Parent Id'
+        )->addColumn(
+            'is_visible_on_front',
+            \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+            null,
+            ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+            'Is Visible On Front'
+        )->addColumn(
+            'message',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            '64k',
+            [],
+            'Message'
+        )->addColumn(
+            'is_comment',
+            \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+            null,
+            ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+            'Is it comment or message.'
+        )->addColumn(
+            'created_at',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+            null,
+            ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+            'Created At'
+        )->addColumn(
+            'user_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            null,
+            ['nullable' => true],
+            'User id whose message it is'
+        )->addIndex(
+            $setup->getIdxName('tnw_subscriptions_subscription_profile_message_history', ['parent_id']),
+            ['parent_id']
+        )->addForeignKey(
+            $setup->getFkName(
+                'tnw_subscriptions_subscription_profile_message_history',
+                'parent_id',
+                'tnw_subscriptions_subscription_profile_entity',
+                'entity_id'
+            ),
+            'parent_id',
+            $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
+            'entity_id',
+            \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+        )->setComment(
+            'Subscription profile message history table.'
+        );
+
+        $setup->getConnection()->createTable($table);
     }
 }

@@ -20,9 +20,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class for creating subscriptions in admin.
@@ -84,6 +84,11 @@ class Create extends BaseCreate
     protected $eventManager;
 
     /**
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
      * @param Context $context
      * @param SessionManagerInterface $session
      * @param Address $addressCreator
@@ -93,6 +98,7 @@ class Create extends BaseCreate
      * @param Manager $profileManager
      * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
@@ -103,7 +109,8 @@ class Create extends BaseCreate
         Customer $customerCreator,
         Manager $profileManager,
         CartManagementInterface $quoteManagement,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -112,6 +119,8 @@ class Create extends BaseCreate
         $this->profileManager = $profileManager;
         $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
+        $this->messageHistoryLogger = $messageHistoryLogger;
+
         parent::__construct($context, $session);
     }
 
@@ -475,6 +484,16 @@ class Create extends BaseCreate
                         ['order' => $order, 'quote' => $subQuote]
                     );
                     $profiles[] = $profile;
+
+                    $message = sprintf(
+                        $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED),
+                        $profile->getLabel()
+                    );
+
+                    $this->messageHistoryLogger->log(
+                        $message,
+                        $profile->getId()
+                    );
                     //TODO add here email sending
                 }
             }

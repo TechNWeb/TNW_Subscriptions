@@ -83,6 +83,10 @@
                 type="TNW\Subscriptions\Model\Queue"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileQueueSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory"/>
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
