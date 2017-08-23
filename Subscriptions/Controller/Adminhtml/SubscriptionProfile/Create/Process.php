@@ -24,6 +24,14 @@ class Process extends Create
      */
     private $resultJsonFactory;
 
+    /**
+     * @param Context                $context
+     * @param Registry               $coreRegistry
+     * @param DataPersistorInterface $dataPersistor
+     * @param StepPool               $stepPool
+     * @param PageFactory            $resultPageFactory
+     * @param JsonFactory            $resultJsonFactory
+     */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
@@ -36,7 +44,6 @@ class Process extends Create
         parent::__construct($context, $coreRegistry, $dataPersistor, $stepPool,
             $resultPageFactory);
     }
-
 
     /**
      * Errors list
@@ -56,7 +63,7 @@ class Process extends Create
 
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
-            StepPool::STEP_PARAM_TYPE_CUSTOMER
+            StepPool::STEP_PARAM_TYPE_STORE
         );
 
         $this->processBackActions($currentStep);
@@ -68,9 +75,7 @@ class Process extends Create
 
         if ($this->getRequest()->getParam('isAjax', false)) {
             $result = $this->resultJsonFactory->create();
-            $result->setData(
-                $this->getJsonResponse()
-            );
+            $result->setData($this->getJsonResponse());
         } else {
             if (!empty($this->errors)) {
 
@@ -126,7 +131,6 @@ class Process extends Create
     {
         if (isset($data['store_id'])){
             $this->_getSession()->setStoreId($data['store_id']);
-            $this->getSubCreateModel()->deleteQuoteIfStoreChanged();
         }
     }
 
