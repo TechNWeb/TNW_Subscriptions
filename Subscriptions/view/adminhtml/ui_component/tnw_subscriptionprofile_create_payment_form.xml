@@ -22,8 +22,8 @@
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_payment_form_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">subscription_and_account_information</argument>
-            <argument name="requestFieldName" xsi:type="string">subscription_and_account_information</argument>
+            <argument name="primaryFieldName" xsi:type="string">payment_form_data</argument>
+            <argument name="requestFieldName" xsi:type="string">payment_form_data</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                 </item>

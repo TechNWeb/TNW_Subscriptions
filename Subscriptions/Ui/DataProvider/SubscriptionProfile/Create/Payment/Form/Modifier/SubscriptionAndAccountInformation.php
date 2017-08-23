@@ -61,7 +61,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     {
         $currentStatusLabel = $this->profileStatus->getLabelByValue(ProfileStatus::STATUS_PENDING);
 
-        $data[Payment::FORM_DATA_VALUE] = [
+        $data[Payment::PAYMENT_FORM_DATA_VALUE] = [
             'website_information' => $this->getCurrentWebsiteName(),
             'currency_information' => $this->getCurrentCurrencyCode(),
             'status_information' => $currentStatusLabel,
@@ -110,7 +110,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private function getCustomerFullName()
     {
-        return $this->getFirstQuote()->getCustomerFirstname() . ' ' . $this->firstQuote->getCustomerLastname();
+        return $this->getFirstQuote()->getCustomerFirstname() . ' ' . $this->getFirstQuote()->getCustomerLastname();
     }
 
     /**

@@ -24,8 +24,8 @@ class Payment extends AbstractDataProvider
     /**#@+
      * Form request values
      */
-    const FORM_DATA_KEY = 'subscription_and_account_information';
-    const FORM_DATA_VALUE = 'new_subscription';
+    const PAYMENT_FORM_DATA_KEY = 'payment_form_data';
+    const PAYMENT_FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
 
     /**

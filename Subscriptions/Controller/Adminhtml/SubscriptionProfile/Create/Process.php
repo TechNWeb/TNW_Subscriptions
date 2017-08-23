@@ -291,7 +291,7 @@ class Process extends Create
             ];
         } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $additionalParams = [
-                Payment::FORM_DATA_KEY => Payment::FORM_DATA_VALUE,
+                Payment::PAYMENT_FORM_DATA_KEY => Payment::PAYMENT_FORM_DATA_VALUE,
             ];
         }
 
