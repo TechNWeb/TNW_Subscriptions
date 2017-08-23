@@ -18,6 +18,15 @@ define([
             }
         },
 
+        /** @inheritdoc */
+        initObservable: function () {
+            return this._super()
+                .observe([
+                    'disabled',
+                ]);
+        },
+
+
         /**
          * Setting new selected currency and reload subscription products prices
          *

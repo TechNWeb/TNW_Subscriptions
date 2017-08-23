@@ -48,7 +48,8 @@ define([
                 continueButton,
                 saveFormButton,
                 reviewAndCreateButton,
-                show;
+                show,
+                currencySelect;
 
             this.set('estimatedPayment', this.source.data.estimatedPayment);
 
@@ -59,6 +60,7 @@ define([
             saveFormButton = $j('#save');
             continueButton = registry.get('index=continue');
             reviewAndCreateButton = registry.get('index=review_and_create');
+            currencySelect = registry.get('index=currency_id');
 
             show = this.rows.length > 0;
 
@@ -76,6 +78,10 @@ define([
 
             if (reviewAndCreateButton){
                 reviewAndCreateButton.set('disabled', !show);
+            }
+
+            if (currencySelect){
+                currencySelect.set('disabled', show);
             }
 
             // main save button near 'cancel' or 'back'
