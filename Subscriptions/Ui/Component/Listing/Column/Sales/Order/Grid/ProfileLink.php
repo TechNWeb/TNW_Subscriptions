@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 
 use Magento\Ui\Component\Listing\Columns\Column;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
 /**
@@ -30,10 +31,12 @@ class ProfileLink extends Column
                         'tnw_subscriptions/subscriptionprofile/edit/',
                         ['entity_id' => $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]]
                     );
+                    $gridLabel = SubscriptionProfileInterface::LABEL_PREFIX
+                        . $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID];
                     $html = sprintf(
                         "<a target=\"_blank\" href ='%s'\">%s</a>",
                         $url,
-                        $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]
+                        $gridLabel
                     );
                     $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID] = $html;
                 }
