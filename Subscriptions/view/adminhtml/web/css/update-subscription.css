@@ -1,0 +1,13 @@
+.admin__profile-dashboard-profit {
+    width: 47%;
+    float: left;
+}
+
+.admin__profile-dashboard-subscription-details {
+    width: 47%;
+    float: right;
+}
+
+.profile-dashboard-subscription-details-title-wrapper {
+    border-bottom: 1px solid #ffffff;
+}
