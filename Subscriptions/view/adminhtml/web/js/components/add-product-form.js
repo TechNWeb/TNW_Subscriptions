@@ -47,7 +47,7 @@ define(
             /**
              * Refresh product qty in modal grid.
              *
-             * @param {string|integer} value
+             * @param {string|number} value
              * @returns {void}
              */
             refreshProductQty: function (value) {
@@ -69,13 +69,10 @@ define(
                     return;
                 }
 
-                grid = registry.get('index='+ this.source.modalGrid);
+                grid = this.getModalGrid();
 
-                _.each(grid.externalSource().data.items, function (item, key) {
-                    if (item.entity_id === productId){
-                        rowIndex = key;
-                    }
-                });
+                this.resetQtyAndActions();
+                rowIndex = this.getProductRowIndex(productId);
 
                 if (rowIndex !== undefined) {
 
@@ -102,6 +99,7 @@ define(
              *
              * @param action
              * @param id
+             * @return {void}
              */
             setProductId: function (action, id) {
 
@@ -134,7 +132,64 @@ define(
             },
 
             /**
+             * Returns modal grid instance.
+             *
+             * @returns {*}
+             */
+            getModalGrid: function () {
+                return registry.get('index=' + this.source.modalGrid);
+            },
+
+            /**
+             * Returns row index by product Id.
+             *
+             * @param {string|number} productId
+             * @returns {*}
+             */
+            getProductRowIndex: function (productId) {
+                var rowIndex,
+                    grid;
+
+                grid = this.getModalGrid();
+
+                _.each(grid.externalSource().data.items, function (item, key) {
+                    if (item.entity_id === productId) {
+                        rowIndex = key;
+                    }
+                });
+
+                return rowIndex;
+            },
+
+            /**
+             * Reset "Qty" and "Action" columns.
+             *
+             * @return {void}
+             */
+            resetQtyAndActions: function () {
+                var grid = this.getModalGrid();
+
+                _.each(grid.externalSource().data.items, function (item, key) {
+                    grid.externalSource().set('data.items.' + key + '.input_qty', null);
+
+                    if (item.type_id === 'configurable') {
+                        grid.externalSource().set(
+                            'data.items.' + key + '.actions.view.label',
+                            '[' + $.mage.__('Configure & Add') + ']'
+                        );
+                    } else {
+                        grid.externalSource().set(
+                            'data.items.' + key + '.actions.view.label',
+                            '[' + $.mage.__('Add') + ']'
+                        );
+                    }
+                });
+            },
+
+            /**
              * Updates Modal grid action label and "qty" column
+             * 
+             * @return {void}
              */
             updateModalGrid: function () {
                 var rowIndex,
@@ -142,27 +197,20 @@ define(
                     productId;
 
                 productId = this.getModalForm().configurableData.product_id;
+                grid = this.getModalGrid();
 
-                grid = registry.get('index='+ this.source.modalGrid);
-
-                _.each(grid.externalSource().data.items, function (item, key) {
-                    if (item.entity_id === productId){
-                        rowIndex = key;
-                    }else {
-                        grid.externalSource().set('data.items.' + key + '.input_qty', null);
-
-                        if (item.type_id === 'configurable'){
-                            grid.externalSource().set('data.items.' + key + '.actions.view.label', '[' + $.mage.__('Configure & Add') + ']');
-                        }else {
-                            grid.externalSource().set('data.items.' + key + '.actions.view.label', '[' + $.mage.__('Add') + ']');
-                        }
-
-                    }
-                });
+                this.resetQtyAndActions();
+                rowIndex = this.getProductRowIndex(productId);
 
                 if (rowIndex !== undefined){
-                    grid.externalSource().set('data.items.' + rowIndex + '.input_qty', this.getModalForm().configurableData.qty);
-                    grid.externalSource().set('data.items.' + rowIndex + '.actions.view.label', '[' + $.mage.__('Change') + ']');
+                    grid.externalSource().set(
+                        'data.items.' + rowIndex + '.input_qty',
+                        this.getModalForm().configurableData.qty
+                    );
+                    grid.externalSource().set(
+                        'data.items.' + rowIndex + '.actions.view.label',
+                        '[' + $.mage.__('Change') + ']'
+                    );
                 }
             },
 
@@ -225,8 +273,8 @@ define(
             /**
              * Is configuration form should be displayed or not?
              *
-             * @param {string|integer} productId
-             * @returns {boolean}
+             * @param {string|number} productId
+             * @return {boolean}
              */
             isConfigureRequired: function (productId) {
                 var grid = registry.get('index='+ this.source.modalGrid),
