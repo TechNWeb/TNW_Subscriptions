@@ -6,52 +6,55 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Customer\Model\Group;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use Magento\Customer\Model\GroupRegistry;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use TNW\Subscriptions\Model\Backend\Session\Quote as QuoteSession;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 /**
- * Class subscription and account information modifier
+ * Class subscription and account information modifier.
  */
 class SubscriptionAndAccountInformation implements ModifierInterface
 {
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSession
      */
     private $session;
 
     /**
-     * Customer Group
-     *
-     * @var Group
-     */
-    private $customerGroup;
-
-    /**
-     * Profile status
+     * Profile status.
      *
      * @var ProfileStatus
      */
     private $profileStatus;
 
     /**
+     * Customer group.
+     *
+     * @var GroupRegistry
+     */
+    private $groupRegistry;
+
+    /**
      * Modifier constructor.
      *
-     * @param Quote $session
+     * @param QuoteSession $session
      * @param Group $group
+     * @param ProfileStatus $profileStatus
+     * @param GroupRegistry $groupRegistry
      */
     public function __construct(
-        Quote $session,
-        Group $group,
-        ProfileStatus $profileStatus
+        QuoteSession $session,
+        ProfileStatus $profileStatus,
+        GroupRegistry $groupRegistry
     ) {
         $this->session = $session;
-        $this->customerGroup = $group;
         $this->profileStatus = $profileStatus;
+        $this->groupRegistry = $groupRegistry;
     }
 
     /**
@@ -82,9 +85,9 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     }
 
     /**
-     * Get current selected website name
+     * Get current selected website name.
      *
-     * @return mixed|string
+     * @return string
      */
     private function getCurrentWebsiteName()
     {
@@ -92,9 +95,9 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     }
 
     /**
-     * Get current selected currency code
+     * Get current selected currency code.
      *
-     * @return mixed|string
+     * @return string
      */
     private function getCurrentCurrencyCode()
     {
@@ -102,42 +105,63 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     }
 
     /**
-     * Get current customer full name
-     * first name + last name
-     * e.g. "John Smith"
+     * Get current customer full name.
+     * first name + last name.
+     * e.g. "John Smith".
      *
      * @return string
      */
     private function getCustomerFullName()
     {
-        return $this->getFirstQuote()->getCustomerFirstname() . ' ' . $this->getFirstQuote()->getCustomerLastname();
+        if ($this->getFirstQuote()->getCustomerId()) {
+            $result = $this->getFirstQuote()->getCustomerFirstname()
+                . ' '
+                . $this->getFirstQuote()->getCustomerLastname();
+        } else {
+            /** @var \Magento\Quote\Model\Quote\Address\ $shippingAddress */
+            $shippingAddress = $this->getFirstQuote()->getShippingAddress();
+            $result = $shippingAddress->getFirstname()
+                . ' '
+                . $shippingAddress->getLastname();
+        }
+
+        return $result;
     }
 
     /**
-     * Get current customer email
+     * Get current customer email.
      *
      * @return string
      */
     private function getCustomerEmail()
     {
-        return $this->getFirstQuote()->getCustomerEmail();
+        $result = $this->session->getCustomerEmail();
+        if ($this->getFirstQuote()->getCustomerId()) {
+            $result = $this->getFirstQuote()->getCustomerEmail();
+        }
+
+        return $result;
     }
 
     /**
-     * Return customer group name
+     * Return customer group name.
      *
      * @return string
      */
     private function getCustomerGroupName()
     {
-        $customerGroupId = $this->getFirstQuote()->getCustomerGroupId();
-        $currentCustomerGroup = $this->customerGroup->load($customerGroupId);
+        $customerGroupId = $this->session->getCustomerGroup();
+        if ($this->getFirstQuote()->getCustomerId()) {
+            $customerGroupId = $this->getFirstQuote()->getCustomerGroupId();
+
+        }
+        $currentCustomerGroup = $this->groupRegistry->retrieve($customerGroupId);
 
         return $currentCustomerGroup->getCode();
     }
 
     /**
-     * Retunr first quote from subscription
+     * Return first quote from subscription.
      *
      * @return \Magento\Quote\Model\Quote
      */
