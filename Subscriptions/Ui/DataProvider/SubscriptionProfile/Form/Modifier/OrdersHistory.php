@@ -11,6 +11,9 @@ use Magento\Ui\Component\Form;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Registry;
 
+/**
+ * Prepare orders history ui layout.
+ */
 class OrdersHistory implements ModifierInterface
 {
     const GROUP_ORDER_HISTORY = 'order_history';

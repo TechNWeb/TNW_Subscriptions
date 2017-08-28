@@ -12,8 +12,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\Registry;
 
 /**
- * Class UpcomingOrders
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier
+ * Prepare upcoming orders ui layout.
  */
 class UpcomingOrders implements ModifierInterface
 {
