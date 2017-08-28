@@ -1,6 +1,6 @@
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 define([
     'underscore',
@@ -12,30 +12,27 @@ define([
     'use strict';
 
     return Abstract.extend({
-        defaults: {
-            listens: {
-                value: 'onChange'
-            }
-        },
 
         /** @inheritdoc */
         initObservable: function () {
             return this._super()
                 .observe([
-                    'disabled',
+                    'disabled'
                 ]);
         },
-
 
         /**
          * Setting new selected currency and reload subscription products prices
          *
-         * @param value
+         * @return {void}
          */
-        onChange: function (value) {
+        onUpdate: function () {
+            this._super();
             var subProductListing = registry.get('index=tnw_subscriptionprofile_create_product_listing');
-            subProductListing.source.set('params.currency_id', value);
-            subProductListing.source.set('params.t', Date.now());
-        },
+            if (subProductListing) {
+                subProductListing.source.set('params.currency_id', this.value());
+                subProductListing.source.set('params.t', Date.now());
+            }
+        }
     });
 });

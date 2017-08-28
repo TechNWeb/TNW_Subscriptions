@@ -339,8 +339,8 @@ class Product extends AbstractDataProvider
                                         'componentType' => Select::NAME,
                                         'label' => 'Order Currency:',
                                         'source' => 'SubscriptionProfile',
-                                        'component' => 'TNW_Subscriptions/js/form/element/select',
-                                        'template' => 'TNW_Subscriptions/form/element/select',
+                                        'component' => 'TNW_Subscriptions/js/form/element/currency-select',
+                                        'template' => 'TNW_Subscriptions/form/element/currency-select',
                                         'data_form_part' => $this->currencySelect->getCurrentDataFormPartFromStep($this->stepPool->getCurrentStep()),
                                         'dataScope' => '$data.currency_id',
                                         'sortOrder' => 0,
@@ -614,7 +614,7 @@ class Product extends AbstractDataProvider
     /**
      * Get config data
      *
-     * @return mixed
+     * @return array
      */
     public function getConfigData()
     {
