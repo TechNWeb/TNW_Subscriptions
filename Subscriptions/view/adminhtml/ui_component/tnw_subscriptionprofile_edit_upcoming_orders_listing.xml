@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="context" xsi:type="configurableObject">
+        <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\Context</argument>
+        <argument name="namespace" xsi:type="string">tnw_subscriptionprofile_edit_upcoming_orders_listing</argument>
+    </argument>
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_edit_upcoming_orders_listing.tnw_subscriptionprofile_edit_upcoming_orders_listing_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_edit_upcoming_orders_listing.tnw_subscriptionprofile_edit_upcoming_orders_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">tnw_subscriptionprofile_upcoming_orders_columns</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_edit_upcoming_orders_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class"
+                      xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Order\Upcoming\DataProvider</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_edit_upcoming_orders_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">entity_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" path="mui/index/render" xsi:type="url"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="tnw_subscriptionprofile_upcoming_orders_columns">
+        <column name="entity_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sorting" xsi:type="string">desc</item>
+                    <item name="label" xsi:type="string" translate="true">Quote</item>
+                </item>
+            </argument>
+        </column>
+        <column name="billing_name">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Bill To Name</item>
+                </item>
+            </argument>
+        </column>
+        <column name="shipping_name">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Ship To Name</item>
+                </item>
+            </argument>
+        </column>
+        <column name="scheduled_at" class="Magento\Ui\Component\Listing\Columns\Date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Completion Date</item>
+                    <item name="dateFormat" xsi:type="string">MMMM dd, YYYY, H:mm:SS A</item>
+                </item>
+            </argument>
+        </column>
+        <column name="shipping_details">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Shipping Details</item>
+                </item>
+            </argument>
+        </column>
+        <column name="grand_total">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Grand Total</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>
