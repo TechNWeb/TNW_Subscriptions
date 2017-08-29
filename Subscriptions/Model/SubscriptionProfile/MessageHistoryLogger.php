@@ -75,11 +75,11 @@ class MessageHistoryLogger
      * Log subscription profile action to show it in "Change History" tab.
      *
      * @param string $message
-     * @param int $subscriptionId
-     * @param bool $isUserMessage
+     * @param $subscriptionId
+     * @param bool $isComment
      * @param bool $isVisibleOnFront
      */
-    public function log($message, $subscriptionId, $isUserMessage = false, $isVisibleOnFront = false)
+    public function log($message, $subscriptionId, $isComment = false, $isVisibleOnFront = false)
     {
         $createdAt = $this->date->gmtTimestamp();
 
@@ -91,7 +91,7 @@ class MessageHistoryLogger
             ->setMessage($message)
             ->setUserId($user->getId())
             ->setParentId($subscriptionId)
-            ->setIsUserMessage($isUserMessage)
+            ->setIsComment($isComment)
             ->setIsVisibleOnFront($isVisibleOnFront)
             ->setCreatedAt($createdAt);
 

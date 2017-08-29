@@ -6,12 +6,17 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResultsInterfaceFactory;
+use Magento\Framework\Api\SortOrder;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as ResourceProfileMessageHistory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 
 class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepositoryInterface
 {
@@ -21,21 +26,44 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
     private $resource;
 
     /**
-     * @var MessageHistoryFactory
+     * @var SubscriptionProfileMessageHistoryInterfaceFactory
      */
     private $messageHistoryFactory;
 
     /**
-     * AddressRepository constructor.
+     * @var SearchResultsInterfaceFactory
+     */
+    private $searchResultsFactory;
+
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
      * @param ResourceProfileMessageHistory $resource
-     * @param MessageHistoryFactory $messageHistoryFactory
+     * @param SubscriptionProfileMessageHistoryInterfaceFactory $messageHistoryFactory
+     * @param SearchResultsInterfaceFactory $searchResultsFactory
+     * @param CollectionFactory $collectionFactory
+     * @param DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         ResourceProfileMessageHistory $resource,
-        MessageHistoryFactory $messageHistoryFactory
+        SubscriptionProfileMessageHistoryInterfaceFactory $messageHistoryFactory,
+        SearchResultsInterfaceFactory $searchResultsFactory,
+        CollectionFactory $collectionFactory,
+        DataObjectHelper $dataObjectHelper
     ) {
         $this->resource = $resource;
         $this->messageHistoryFactory = $messageHistoryFactory;
+        $this->searchResultsFactory = $searchResultsFactory;
+        $this->collectionFactory = $collectionFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
     }
 
     /**
@@ -80,7 +108,48 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
     public function getList(
         SearchCriteriaInterface $searchCriteria
     ) {
-        //todo
+        /** @var \Magento\Framework\Api\SearchResultsInterface $searchResults */
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($searchCriteria);
+
+        /** @var \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection $collection */
+        $collection = $this->collectionFactory->create();
+
+        foreach ($searchCriteria->getFilterGroups() as $filterGroup) {
+            foreach ($filterGroup->getFilters() as $filter) {
+                $condition = $filter->getConditionType() ?: 'eq';
+                $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
+            }
+        }
+        $searchResults->setTotalCount($collection->getSize());
+        $sortOrders = $searchCriteria->getSortOrders();
+
+        if ($sortOrders) {
+            /** @var SortOrder $sortOrder */
+            foreach ($searchCriteria->getSortOrders() as $sortOrder) {
+                $collection->addOrder(
+                    $sortOrder->getField(),
+                    ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                );
+            }
+        }
+        $collection->setCurPage($searchCriteria->getCurrentPage());
+        $collection->setPageSize($searchCriteria->getPageSize());
+        $orderHistories = [];
+
+        /** @var MessageHistory $customerModel */
+        foreach ($collection as $orderHistoryModel) {
+            $profileAddressData = $this->messageHistoryFactory->create();
+            $this->dataObjectHelper->populateWithArray(
+                $profileAddressData,
+                $orderHistoryModel->getData(),
+                SubscriptionProfileMessageHistoryInterface::class
+            );
+            $orderHistories[] = $profileAddressData;
+        }
+        $searchResults->setItems($orderHistories);
+
+        return $searchResults;
     }
 
     /**
