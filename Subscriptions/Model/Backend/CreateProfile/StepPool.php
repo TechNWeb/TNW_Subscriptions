@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
@@ -10,7 +14,7 @@ use TNW\Subscriptions\Model\Backend\Session\Quote;
 use Magento\Store\Model\Store;
 
 /**
- * Class StepPool
+ * Subscription profile creation steps pool.
  */
 class StepPool
 {
@@ -28,7 +32,7 @@ class StepPool
     const STEP_PARAM_TYPE_STORE = 'store';
     const STEP_PARAM_TYPE_ACCOUNT_INFORMATION = 'account';
     const STEP_PARAM_TYPE_SHIPPING_BILLING = 'shipping_and_billing';
-    const STEP_PARAM_TYPE_PAYMENT= 'payment';
+    const STEP_PARAM_TYPE_PAYMENT = 'payment';
     /**#@-*/
 
     /**
@@ -37,8 +41,8 @@ class StepPool
      * @var array
      */
     private $stepArray = [
-        self::STEP_PARAM_TYPE_CUSTOMER,
         self::STEP_PARAM_TYPE_STORE,
+        self::STEP_PARAM_TYPE_CUSTOMER,
         self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION,
         self::STEP_PARAM_TYPE_SHIPPING_BILLING,
         self::STEP_PARAM_TYPE_PAYMENT
@@ -78,10 +82,9 @@ class StepPool
     private $customerRepository;
 
     /**
-     * StepPool constructor.
-     * @param StoreManagerInterface $storeManager
-     * @param DataPersistorInterface $dataPersistor
-     * @param Quote $session
+     * @param StoreManagerInterface       $storeManager
+     * @param DataPersistorInterface      $dataPersistor
+     * @param Quote                       $session
      * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
@@ -96,7 +99,6 @@ class StepPool
         $this->customerRepository = $customerRepository;
     }
 
-
     /**
      * @return array
      */
@@ -106,29 +108,35 @@ class StepPool
     }
 
     /**
+     * Returns current step.
+     *
+     * If step is assigned - return it. In other case try to retrieve from session.
+     *
      * @return string|null
      */
     public function getCurrentStep()
     {
-        //if we have no step param in request, try to get it from session
-        return $this->currentStep
-            ? $this->currentStep
-            : $this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME);
+        return $this->currentStep ?: $this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME);
     }
 
     /**
+     * Set current step.
+     *
      * @param string $currentStep
      * @return $this
      */
     public function setCurrentStep($currentStep)
     {
-        in_array($currentStep, $this->getStepArray(), true)
-            ? $this->currentStep = $currentStep
-            : $this->currentStep = self::STEP_PARAM_TYPE_CUSTOMER;
+        $this->currentStep = in_array($currentStep, $this->getStepArray(), true)
+            ? $currentStep
+            : $this->currentStep = self::STEP_PARAM_TYPE_STORE;
 
-        //set step param in session
+        if ($this->currentStep === self::STEP_PARAM_TYPE_STORE && $this->storeManager->hasSingleStore()) {
+            $this->currentStep = self::STEP_PARAM_TYPE_CUSTOMER;
+        }
+
         $this->dataPersistor->set(self::PERSISTOR_STEP_PARAM_NAME, $this->currentStep);
-        $this->clearCustomer($currentStep);
+        $this->clearCustomer($this->currentStep);
 
         return $this;
     }
@@ -146,12 +154,12 @@ class StepPool
 
             $stepKey = array_search($this->getCurrentStep(), $this->getStepArray());
 
-            if ($stepKey !== false) {
+            if (false !== $stepKey) {
                 $result = $this->getStepArray()[$stepKey + 1];
             }
 
             if ($this->storeManager->hasSingleStore() && $result == self::STEP_PARAM_TYPE_STORE) {
-                $result = self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION;
+                $result = self::STEP_PARAM_TYPE_CUSTOMER;
             }
         }
 
@@ -167,16 +175,16 @@ class StepPool
     {
         $result = false;
 
-        if ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER) {
+        if ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_STORE) {
 
             $stepKey = array_search($this->getCurrentStep(), $this->getStepArray());
 
-            if ($stepKey !== false) {
+            if (false !== $stepKey) {
                 $result = $this->getStepArray()[$stepKey - 1];
             }
 
-            if ($this->storeManager->isSingleStoreMode() && $result == self::STEP_PARAM_TYPE_STORE) {
-                $result = self::STEP_PARAM_TYPE_CUSTOMER;
+            if ($this->storeManager->hasSingleStore() && $result == self::STEP_PARAM_TYPE_STORE) {
+                $result = false;
             }
         }
 
@@ -184,12 +192,14 @@ class StepPool
     }
 
     /**
+     * Is step allowed or not.
+     *
      * @param string $step
      * @return bool
      */
-    public function checkStep($step)
+    public function isAvailable($step)
     {
-        return in_array($step, $this->getStepArray()) ? true : false;
+        return in_array($step, $this->getStepArray());
     }
 
     /**
@@ -204,7 +214,10 @@ class StepPool
         if ($this->session->getCustomerId()) {
             $customerName = $this->getCustomerName($this->session->getCustomerId());
             $title .= ' ' . sprintf(__('for %s'), $customerName);
-        } elseif ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER && $this->session->getCreateNewCustomer()) {
+        } elseif (
+            $this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER
+            && $this->session->getCreateNewCustomer()
+        ) {
             $title .= ' ' . __('for a new customer');
         }
 
@@ -240,13 +253,14 @@ class StepPool
     }
 
     /**
-     * Cleares customer data from session.
+     * Clears customer data from session.
      *
      * @param string $currentStep
+     * @return void
      */
     private function clearCustomer($currentStep)
     {
-        if ($currentStep == self::STEP_PARAM_TYPE_CUSTOMER) {
+        if ($currentStep === self::STEP_PARAM_TYPE_CUSTOMER) {
             $this->session->setCustomerId(null);
         }
     }

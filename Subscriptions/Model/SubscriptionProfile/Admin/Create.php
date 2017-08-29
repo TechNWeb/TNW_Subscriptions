@@ -603,28 +603,6 @@ class Create extends BaseCreate
     }
 
     /**
-     * If store changed we need to delete existing quotes.
-     */
-    public function deleteQuoteIfStoreChanged()
-    {
-        /** @var Session $session */
-        $session = $this->getSession();
-        $sessionStoreId = $session->getStoreId();
-        $subQuotes = $session->getSubQuotes();
-
-        foreach ($subQuotes as $subQuote) {
-            $subQuoteStoreId = $subQuote->getStoreId();
-
-            if ($subQuoteStoreId != $sessionStoreId) {
-                $this->quoteCreator->getCartRepository()->delete($subQuote);
-                $session->removeSubQuoteId($subQuote->getId());
-            } else {
-                break;
-            }
-        }
-    }
-
-    /**
      * If customer on the first step is changed we need to change customer in all quotes.
      */
     public function changeCustomerInQuote()

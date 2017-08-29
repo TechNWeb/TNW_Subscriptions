@@ -117,6 +117,12 @@ class Account extends AbstractDataProvider
                     'email' => $dataModel->getEmail(),
                 ],
             ];
+        } else {
+            $data[static::FORM_DATA_VALUE] = [
+                'account' => [
+                    'email' => $this->session->getCustomerEmail(),
+                ],
+            ];
         }
 
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {

@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -19,6 +20,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
+use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 
 /**
  * Modal form for adding single product to subscription.
@@ -108,8 +110,28 @@ class Form extends AbstractDataProvider
     private $priceCalculator;
 
     /**
-     * Form constructor.
+     * Store Manager.
      *
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var \TNW\Subscriptions\Model\Config
+     */
+    private $config;
+
+    /**
+     * @var SessionQuote
+     */
+    private $sessionQuote;
+
+    /**
+     * @var \Magento\Directory\Model\CurrencyFactory
+     */
+    private $currencyFactory;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -119,6 +141,10 @@ class Form extends AbstractDataProvider
      * @param RequestInterface $request
      * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
+     * @param StoreManagerInterface $storeManager
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param SessionQuote $sessionQuote
+     * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -133,6 +159,10 @@ class Form extends AbstractDataProvider
         RequestInterface $request,
         TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
+        StoreManagerInterface $storeManager,
+        \TNW\Subscriptions\Model\Config $config,
+        SessionQuote $sessionQuote,
+        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -144,6 +174,11 @@ class Form extends AbstractDataProvider
         $this->unitType = $unitType;
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
         $this->priceCalculator = $priceCalculator;
+        $this->storeManager = $storeManager;
+        $this->config = $config;
+        $this->sessionQuote = $sessionQuote;
+        $this->currencyFactory = $currencyFactory;
+
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -228,7 +263,15 @@ class Form extends AbstractDataProvider
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
                             ],
-
+                        ],
+                    ],
+                    'term' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'value' => $this->config->isUntilCanceledChecked(),
+                                ],
+                            ],
                         ],
                     ],
                     'period' => [
@@ -254,7 +297,7 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'config' => [
-                                    'visible' => $this->showTrialPeriod(),
+                                    'visible' => $this->getTrialPeriod() ? true : false,
                                 ]
                             ]
                         ]
@@ -263,6 +306,7 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'config' => [
+                                    'addbefore' => $this->getCurrentCurrencySymbol(),
                                     'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                                     'validation' => [
                                         'validate-zero-or-greater' => true,
@@ -423,30 +467,32 @@ class Form extends AbstractDataProvider
             $productId = (int)$this->request->getParam('product_id', 0);
             $trialLength = 0;
             $trialUnit = 0;
+            $trialPriceLabel = '';
             if ($productId) {
                 $product = $this->productRepository->getById($productId);
-                $trialLength = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
-                    ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)->getValue()
-                    : 0;
-                $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
-                    ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
-                    : 0;
-                $trialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
+                $show = (bool)$product->getCustomAttribute(
+                    \TNW\Subscriptions\Model\Product\Attribute::SUBSCRIPTION_TRIAL_STATUS
+                )->getValue();
+
+                if ($show) {
+                    $trialLength = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
+                        ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)->getValue()
+                        : 0;
+                    $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
+                        ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
+                        : 0;
+                    $trialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
+
+                    $currencySymbol = $this->getCurrentCurrencySymbol();
+                    $trialPriceLabel = (int)$product->getCustomAttribute(
+                        Attribute::SUBSCRIPTION_TRIAL_PRICE
+                        )->getValue() . $currencySymbol . ' ' . __('for') . ' ';
+                }
             }
-            $this->trialPeriod = $trialLength && $trialUnit ? $trialLength . ' ' . $trialUnit : '';
+            $this->trialPeriod = $trialLength && $trialUnit ? $trialPriceLabel . $trialLength . ' ' . $trialUnit : '';
         }
 
         return $this->trialPeriod;
-    }
-
-    /**
-     * Provide visibility status for "Trial Period" field.
-     *
-     * @return bool
-     */
-    private function showTrialPeriod()
-    {
-        return $this->getTrialPeriod() ? true : false;
     }
 
     /**
@@ -460,5 +506,25 @@ class Form extends AbstractDataProvider
         $productId = (int)$this->request->getParam('product_id', 0);
 
         return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId);
+    }
+
+    /**
+     * Get currency symbol from session if exists here or from store manager.
+     *
+     * @return string
+     */
+    private function getCurrentCurrencySymbol()
+    {
+        $currencyCode = $this->sessionQuote->getCurrencyId();
+
+        if ($currencyCode) {
+            /** @var \Magento\Directory\Model\Currency $currency */
+            $currency = $this->currencyFactory->create()->load($currencyCode);
+            $currencySymbol = $currency->getCurrencySymbol();
+        } else {
+            $currencySymbol = $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
+        }
+
+        return $currencySymbol;
     }
 }
