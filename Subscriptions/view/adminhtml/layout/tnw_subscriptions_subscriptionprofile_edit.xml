@@ -4,7 +4,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <head>
-        <css src="TNW_Subscriptions::css/edit-subscription.css"/>
+        <css src="TNW_Subscriptions::css/update-subscription.css"/>
     </head>
     <body>
         <referenceContainer name="content">

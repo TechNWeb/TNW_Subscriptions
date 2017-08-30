@@ -161,6 +161,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
                 </item>
+                <item name="subscription_and_account_information" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>

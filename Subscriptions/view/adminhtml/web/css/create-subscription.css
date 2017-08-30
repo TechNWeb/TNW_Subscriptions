@@ -427,3 +427,28 @@
   padding-bottom: 0;
 }
 
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container {
+  float: left;
+  width: calc( (100%) * .49 );
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container:first-child {
+  margin-right: 1%;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field {
+  padding: 1% 1% 1% 2%;
+  line-height: 3.2rem;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field + .admin__field {
+  margin-top: 0;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-label {
+  float: left;
+  text-align: left;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
+  text-align: right;
+}
+

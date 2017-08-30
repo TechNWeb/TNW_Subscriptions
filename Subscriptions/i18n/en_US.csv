@@ -1,60 +1,321 @@
-"string","stringtranslated"
-"The iteration will occur every ...","The iteration will occur every ..."
-"The iteration will occur every %1 %2","The iteration will occur every %1 %2"
-"Day(s)","Day(s)"
-"Month(s)","Month(s)"
-"Trial will end after","Trial will end after"
-"Leave blank if product trial is not offered.","Leave blank if product trial is not offered."
+Back,Back
+"Delete Billing Frequency","Delete Billing Frequency"
+"Are you sure you want to do this?","Are you sure you want to do this?"
+"Save and Continue Edit","Save and Continue Edit"
+"Product Subscription Profile Attributes","Product Subscription Profile Attributes"
+"Add New Attribute","Add New Attribute"
+"Save Attribute","Save Attribute"
+"Delete Attribute","Delete Attribute"
+"Edit Product Subscription Profile Attribute ""%1""","Edit Product Subscription Profile Attribute ""%1"""
+"New Product Subscription Profile Attribute","New Product Subscription Profile Attribute"
+"Advanced Attribute Properties","Advanced Attribute Properties"
+"Attribute Code","Attribute Code"
+"This is used internally. Make sure you don't use spaces or more than %1 symbols.","This is used internally. Make sure you don't use spaces or more than %1 symbols."
+"Default Value","Default Value"
+"Unique Value","Unique Value"
+"Unique Value (not shared with other products)","Unique Value (not shared with other products)"
+"Not shared with other products.","Not shared with other products."
+"Input Validation for Store Owner","Input Validation for Store Owner"
+"Attribute Information","Attribute Information"
+Properties,Properties
+"Subscription Profile Attributes","Subscription Profile Attributes"
+"Edit Subscription Profile Attribute ""%1""","Edit Subscription Profile Attribute ""%1"""
+"New Subscription Profile Attribute","New Subscription Profile Attribute"
+"Unique Value (not shared with other Subscription Profiles)","Unique Value (not shared with other Subscription Profiles)"
+"Not shared with other Subscription Profiles.","Not shared with other Subscription Profiles."
+Gallery,Gallery
+Cancel,Cancel
+"Continue >>","Continue >>"
+Create,Create
+"Create a Customer","Create a Customer"
+Ok,Ok
+TNW,TNW
+"Billing Frequency","Billing Frequency"
+"You deleted the Billing Frequency.","You deleted the Billing Frequency."
+"We can't find a Billing Frequency to delete.","We can't find a Billing Frequency to delete."
+"This Billing Frequency no longer exists.","This Billing Frequency no longer exists."
+"Edit Billing Frequency","Edit Billing Frequency"
+"New Billing Frequency","New Billing Frequency"
+"Billing Frequencys","Billing Frequencys"
+BillingFrequency,BillingFrequency
+"You saved the Billing Frequency.","You saved the Billing Frequency."
+"Something went wrong while saving the Billing Frequency.","Something went wrong while saving the Billing Frequency."
+"Product Billing Frequency","Product Billing Frequency"
+"Product Subscription Profile","Product Subscription Profile"
+"Subscription Profile","Subscription Profile"
+Subscriptions,Subscriptions
+"Manage Subscription Profile Attributes","Manage Subscription Profile Attributes"
+"We can't delete the attribute.","We can't delete the attribute."
+"You deleted the Subscription Profile attribute.","You deleted the Subscription Profile attribute."
+"We can't find an attribute to delete.","We can't find an attribute to delete."
+"This attribute no longer exists.","This attribute no longer exists."
+"This attribute cannot be edited.","This attribute cannot be edited."
+"Edit Subscription Profile Attribute","Edit Subscription Profile Attribute"
+"Attribute code ""%1"" is invalid. Please use only letters (a-z), numbers (0-9) or underscore(_) in this field, first character should be a letter.","Attribute code ""%1"" is invalid. Please use only letters (a-z), numbers (0-9) or underscore(_) in this field, first character should be a letter."
+"We can't update the attribute.","We can't update the attribute."
+"You saved the Subscription Profile attribute.","You saved the Subscription Profile attribute."
+"An attribute with this code already exists.","An attribute with this code already exists."
+"An attribute with the same code (%1) already exists.","An attribute with the same code (%1) already exists."
+"The value of Admin must be unique.","The value of Admin must be unique."
+"Creating Subscription(s)","Creating Subscription(s)"
+"Your payment has been declined. Please try again.","Your payment has been declined. Please try again."
+"This Subscription Profile no longer exists.","This Subscription Profile no longer exists."
+Subscription,Subscription
+"Subscription Profiles","Subscription Profiles"
+"Subscription Profile Queue","Subscription Profile Queue"
+"Total of %s profiles was created.","Total of %s profiles was created."
+"Subscription Profile Order","Subscription Profile Order"
+"You deleted the product subscription profile attribute.","You deleted the product subscription profile attribute."
+"Edit Product Subscription Profile Attribute","Edit Product Subscription Profile Attribute"
+"You saved the product subscription profile attribute.","You saved the product subscription profile attribute."
+"for %s","for %s"
+"for a new customer","for a new customer"
+"in %s","in %s"
+"The discount cannot exceed the total product cost.","The discount cannot exceed the total product cost."
+"Could not save the billingFrequency: %1","Could not save the billingFrequency: %1"
+"BillingFrequency with id ""%1"" does not exist.","BillingFrequency with id ""%1"" does not exist."
+"Could not delete the BillingFrequency: %1","Could not delete the BillingFrequency: %1"
+"Flat Fee","Flat Fee"
+Percent,Percent
+"One-Time Purchase Only","One-Time Purchase Only"
+"Recurring Purchase Only","Recurring Purchase Only"
+"One-Time and Recurring","One-Time and Recurring"
+"Moment of purchase","Moment of purchase"
+"Defined by customer","Defined by customer"
+"Last day of the current month","Last day of the current month"
+Day,Day
+Month,Month
+"%s for %s and then ","%s for %s and then "
+every,every
+"Total of %s %s. Products will be shipped every %s starting %s.","Total of %s %s. Products will be shipped every %s starting %s."
+today,today
+"ProductSku should be specified","ProductSku should be specified"
+"Could not save the productBillingFrequency: %1","Could not save the productBillingFrequency: %1"
+"ProductBillingFrequency with id ""%1"" does not exist.","ProductBillingFrequency with id ""%1"" does not exist."
+"Could not delete the ProductBillingFrequency: %1","Could not delete the ProductBillingFrequency: %1"
+"Could not save the productSubscriptionProfile: %1","Could not save the productSubscriptionProfile: %1"
+"ProductSubscriptionProfile with id ""%1"" does not exist.","ProductSubscriptionProfile with id ""%1"" does not exist."
+"Could not delete the ProductSubscriptionProfile: %1","Could not delete the ProductSubscriptionProfile: %1"
+"Could not save the subscription profile queue item: %1","Could not save the subscription profile queue item: %1"
+"Subscription profile queue item with id ""%1"" does not exist.","Subscription profile queue item with id ""%1"" does not exist."
+"Could not delete the subscription profile queue item: %1","Could not delete the subscription profile queue item: %1"
+Canceled,Canceled
+Pending,Pending
+Active,Active
+Holded,Holded
+Suspended,Suspended
+Trial,Trial
+Running,Running
+Error,Error
+Complete,Complete
+"Incl. Tax","Incl. Tax"
+"Could not save the subscription profile address: %1","Could not save the subscription profile address: %1"
+"Subscription profile address with id ""%1"" does not exist.","Subscription profile address with id ""%1"" does not exist."
+"Could not delete the subscription profile address: %1","Could not delete the subscription profile address: %1"
+"'Can not set shipping method - ' . . ' to quote with id - ' .","'Can not set shipping method - ' . . ' to quote with id - ' ."
+"Shipping method is required and can't be empty.","Shipping method is required and can't be empty."
+"Payment: ","Payment: "
+"Quote validation is failed.","Quote validation is failed."
+"The customer address is not valid.","The customer address is not valid."
+"Shipping Address: ","Shipping Address: "
+"Billing Address: ","Billing Address: "
+"Customer validation failed.","Customer validation failed."
+"Please select a store","Please select a store"
+"Please specify order items.","Please specify order items."
+"Please specify a shipping method.","Please specify a shipping method."
+"Please specify a payment method.","Please specify a payment method."
+"This payment method is not available.","This payment method is not available."
+"Selected on next step","Selected on next step"
+"Add Products","Add Products"
+"Modify Subscription(s)","Modify Subscription(s)"
+"Select a product","Select a product"
+for,for
+"Can not create profile with empty frequency.","Can not create profile with empty frequency."
+"Could not save the subscriptionProfileOrder: %1","Could not save the subscriptionProfileOrder: %1"
+"SubscriptionProfileOrder with id ""%1"" does not exist.","SubscriptionProfileOrder with id ""%1"" does not exist."
+"Could not delete the SubscriptionProfileOrder: %1","Could not delete the SubscriptionProfileOrder: %1"
+"Could not save the subscriptionProfile: %1","Could not save the subscriptionProfile: %1"
+"SubscriptionProfile with id ""%1"" does not exist.","SubscriptionProfile with id ""%1"" does not exist."
+"Could not delete the SubscriptionProfile: %1","Could not delete the SubscriptionProfile: %1"
+Edit,Edit
+Delete,Delete
+"Delete ""${ $.$data.title }""","Delete ""${ $.$data.title }"""
+"Are you sure you wan't to delete a ""${ $.$data.title }"" record?","Are you sure you wan't to delete a ""${ $.$data.title }"" record?"
+[Add],[Add]
+Select,Select
+Process,Process
+"Merchants are able to configure recurring options for this iteration for all linked products in the products administrative area.","Merchants are able to configure recurring options for this iteration for all linked products in the products administrative area."
+"Manage Linked Products","Manage Linked Products"
+"Linked Products","Linked Products"
+"Add Selected Products","Add Selected Products"
+Remove,Remove
+Actions,Actions
+ID,ID
+Image,Image
+Name,Name
+SKU,SKU
+ea.,ea.
+"Initial Fee","Initial Fee"
+"Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.","Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee."
+Status,Status
+"Preset Qty","Preset Qty"
+"Recurring option price will always match the product price.","Recurring option price will always match the product price."
+"Apply a flat discount on top of the product price.","Apply a flat discount on top of the product price."
+"Recurring option allows the merchant to specify the billing frequency for the product along with other features","Recurring option allows the merchant to specify the billing frequency for the product along with other features"
+"Add Recurring Option","Add Recurring Option"
+"Add Option","Add Option"
+"New Option","New Option"
+"-- Please select --","-- Please select --"
+"Recurring schedule to be picked by the customer","Recurring schedule to be picked by the customer"
+Default,Default
+Price,Price
+"Product quantity is preset for the customer and cannot be changed.","Product quantity is preset for the customer and cannot be changed."
+"Subscription should be linked to the existing account for <b>' . . '</b>","Subscription should be linked to the existing account for <b>' . . '</b>"
+"I will re-enter the email address","I will re-enter the email address"
+"Shipping Information","Shipping Information"
+"Billing Information","Billing Information"
+"Shipping Address","Shipping Address"
+"Billing Address","Billing Address"
+"(Line %s)","(Line %s)"
+"Send Check to:","Send Check to:"
+"Make Check payable to:","Make Check payable to:"
+"Credit Card Type","Credit Card Type"
+"Credit Card Number","Credit Card Number"
+"Expiration Date","Expiration Date"
+"Card Verification Number","Card Verification Number"
+Type,Type
+Year,Year
+"Product Reviews","Product Reviews"
+Profit,Profit
+"Subscription Details","Subscription Details"
+"Current Value","Current Value"
+"* Estimated amount and it may change as the subscription goes through its lifecycle","* Estimated amount and it may change as the subscription goes through its lifecycle"
+"Changes have been made to this section that have not been saved.","Changes have been made to this section that have not been saved."
+"This tab contains invalid data. Please resolve this before saving.","This tab contains invalid data. Please resolve this before saving."
+Change,Change
+"Configure & Add","Configure & Add"
+Add,Add
+"We found a customer account for <b>","We found a customer account for <b>"
+"</b> and email address <b>","</b> and email address <b>"
+"</b>. What would you like to do?","</b>. What would you like to do?"
+"Subscription should be linked to the existing account for <b>","Subscription should be linked to the existing account for <b>"
+Estimated,Estimated
+"savings to the customer","savings to the customer"
+"discount will be offered for all recurring options below.","discount will be offered for all recurring options below."
+"savings to the customer during the trial period.","savings to the customer during the trial period."
+"Product is FREE for the trial period.","Product is FREE for the trial period."
 "Subscription will automatically start when customer completes the checkout.","Subscription will automatically start when customer completes the checkout."
 "Customer will specify when the subscription for the product should start.","Customer will specify when the subscription for the product should start."
 "Subscription will automatically start on the last day of the current month.","Subscription will automatically start on the last day of the current month."
-"Estimated","Estimated"
-"savings to the customer during the trial period.","savings to the customer during the trial period."
-"Recurring option price will always match the product price.","Recurring option price will always match the product price."
-"discount will be offered for all recurring options below.","discount will be offered for all recurring options below."
-"Recurring schedule to be picked by the customer","Recurring schedule to be picked by the customer"
-"Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.","Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee."
-"savings to the customer","savings to the customer"
 "Product trial is not offered.","Product trial is not offered."
-"for %s","for %s"
-"in %s","in %s"
-"Choose a Customer","Choose a Customer"
-"for a New Customer", "for a New Customer"
-"Add","Add"
-"Configure & Add","Configure & Add"
-"Change","Change"
-"Shipping Method","Shipping Method"
-"Estimated Payment","Estimated Payment"
-"Selected on next step","Selected on next step"
-"Subscription","Subscription"
-"every","every"
-"times","times"
-"&amp; bill","&amp; bill"
-"today","today"
-"Select a product","Select a product"
-"Total of %s shipment(s). Products will be shipped every %s starting %s.","Total of %s shipment(s). Products will be shipped every %s starting %s."
-"Apply a flat discount on top of the product price.","Apply a flat discount on top of the product price."
-"Product is FREE for the trial period.","Product is FREE for the trial period."
-"The discount cannot exceed the total product cost.","The discount cannot exceed the total product cost."
-"Billed & Shipped every %s","Billed & Shipped every %s"
-"(Line %s)","(Line %s)"
+"Trial will end after","Trial will end after"
+"Leave blank if product trial is not offered.","Leave blank if product trial is not offered."
+"No estimated savings.","No estimated savings."
+"Estimated ","Estimated "
+" savings to the end consumer"," savings to the end consumer"
+"Edit SubscriptionProfile","Edit SubscriptionProfile"
+"Save SubscriptionProfile","Save SubscriptionProfile"
+Attributes,Attributes
+"Subscription Queue","Subscription Queue"
+"TNW Subscriptions","TNW Subscriptions"
+General,General
+"Extension Version","Extension Version"
+"Enable Subscriptions","Enable Subscriptions"
+"Debug and Logging","Debug and Logging"
+"Enable Log","Enable Log"
+"Past due profile options","Past due profile options"
+"Attempt count","Attempt count"
+"Attempt interval","Attempt interval"
+"Grace period","Grace period"
+Advanced,Advanced
+"Count of generated quotes","Count of generated quotes"
+Product,Product
+"Purchase Type","Purchase Type"
+"Start Date","Start Date"
+"Lock Product Price","Lock Product Price"
+"Unlock preset qantity","Unlock preset qantity"
+Discount,Discount
+"Offer Flat Discount","Offer Flat Discount"
+"Discount Amount","Discount Amount"
+"Discount Type","Discount Type"
+"Is Trial Offered","Is Trial Offered"
+"Trial Length","Trial Length"
+"Trial Length Unit","Trial Length Unit"
+"Trial Price","Trial Price"
+"Trial Start Date","Trial Start Date"
+Term,Term
+"Until canceled","Until canceled"
+"Payment Methods","Payment Methods"
+"Active Methods","Active Methods"
+Thumbnail,Thumbnail
+"Attribute Set","Attribute Set"
+AttributeSetText,AttributeSetText
+StatusText,StatusText
+"General Information","General Information"
+Enabled,Enabled
+Website,Website
+Label,Label
+"This label will be shown to the end customer when they are shopping on your website for all eligible products","This label will be shown to the end customer when they are shopping on your website for all eligible products"
+Unit,Unit
+"Time unit to be used for setting up billing frequency","Time unit to be used for setting up billing frequency"
+Frequency,Frequency
+"The iteration will occur every ...","The iteration will occur every ..."
+Id,Id
+"Is Active","Is Active"
+"Account Information","Account Information"
+Group,Group
+Email,Email
 "Add New Address","Add New Address"
 "Pick from saved addresses","Pick from saved addresses"
-"Shipping method is required and can't be empty.","Shipping method is required and can't be empty."
-"Please select billing frequency","Please select billing frequency"
-"Customer validation failed.","Customer validation failed."
-"Payment: ","Payment: "
-"Quote validation is failed.","Quote validation is failed."
-"Total of %s profiles was created.","Total of %s profiles was created."
-"Can not create profile with empty frequency.","Can not create profile with empty frequency."
-"Undefined trial length unit type.","Undefined trial length unit type."
-"This Subscription Profile no longer exists.","This Subscription Profile no longer exists."
-"Subscription (%s) for %s %s","Subscription (%s) for %s %s"
-"Subscription &amp; Account Information","Subscription &amp; Account Information"
+"Save in address book","Save in address book"
+"Inventory options","Inventory options"
+Qty,Qty
+"Billing Frequency:","Billing Frequency:"
+Term:,Term:
+"& bill","& bill"
+times,times
+"Start on:","Start on:"
+"Trial Period","Trial Period"
+"Post trial price:","Post trial price:"
+Sku,Sku
+Inventory,Inventory
+"Check inventory options.","Check inventory options."
+"Choose a Customer","Choose a Customer"
+"Web Site","Web Site"
+"Payment Information","Payment Information"
+"Subscription and Account Information","Subscription and Account Information"
+"Billing information is the same as shipping information","Billing information is the same as shipping information"
+"Customer account already exists","Customer account already exists"
+Confirm,Confirm
+Order,Order
+"Bill To Name","Bill To Name"
+"Ship To Name","Ship To Name"
+"Purchase Date","Purchase Date"
+"Shipping Details","Shipping Details"
+"Grand Total","Grand Total"
+Overview,Overview
+Dashboard,Dashboard
+"Subscription & Account Information","Subscription & Account Information"
+Summary,Summary
 "Future Orders","Future Orders"
 "Upcoming Orders","Upcoming Orders"
+"Order History","Order History"
 "Subscription Change History","Subscription Change History"
 "Change History","Change History"
+"Create New Subscription Profile","Create New Subscription Profile"
+"Customer name","Customer name"
+"Customer email","Customer email"
+"Billing frequency","Billing frequency"
+"Trial end date","Trial end date"
+"Next billing cycle date","Next billing cycle date"
+Profile,Profile
+"Quote Id","Quote Id"
+"Attempt Count","Attempt Count"
+Message,Message
+"Created At","Created At"
+"Updated At","Updated At"
+"Scheduled At","Scheduled At"
+
 "Not enough qty to sell.","Not enough qty to sell."
 "Check inventory options.","Check inventory options."
 "Initial Payment","Initial Payment"
@@ -66,4 +327,4 @@
 "Subscription Profile Queue","Subscription Profile Queue"
 "Subscription Profiles","Subscription Profiles"
 "A total of %1 record(s) have been prepared for re-process.","A total of %1 record(s) have been prepared for re-process."
-
+"Pending","Pending"
