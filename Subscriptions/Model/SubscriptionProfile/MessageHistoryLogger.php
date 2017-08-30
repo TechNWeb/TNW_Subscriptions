@@ -40,9 +40,9 @@ class MessageHistoryLogger
     private $date;
 
     /**
-     * @var \Magento\Backend\Model\Auth\Session
+     * @var \Magento\Backend\Model\Auth\SessionFactory
      */
-    private $authSession;
+    private $authSessionFactory;
 
     /**
      * @var \Magento\Sales\Model\OrderRepository
@@ -64,20 +64,20 @@ class MessageHistoryLogger
      * @param SubscriptionProfileMessageHistoryInterfaceFactory $messageHistoryFactory
      * @param SubscriptionProfileMessageHistoryRepositoryInterface $messageHistoryRepository
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
-     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Magento\Backend\Model\Auth\SessionFactory $authSessionFactory
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
      */
     public function __construct(
         SubscriptionProfileMessageHistoryInterfaceFactory $messageHistoryFactory,
         SubscriptionProfileMessageHistoryRepositoryInterface $messageHistoryRepository,
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
-        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Backend\Model\Auth\SessionFactory $authSessionFactory,
         \Magento\Sales\Model\OrderRepository $orderRepository
     ) {
         $this->messageHistoryFactory = $messageHistoryFactory;
         $this->messageHistoryRepository = $messageHistoryRepository;
         $this->date = $date;
-        $this->authSession = $authSession;
+        $this->authSessionFactory = $authSessionFactory;
         $this->orderRepository = $orderRepository;
     }
 
@@ -109,7 +109,8 @@ class MessageHistoryLogger
             ->setCreatedAt($createdAt);
 
         if (!$isAutomatedProcess) {
-            $user = $this->authSession->getUser();
+            $authSession = $this->authSessionFactory->create();
+            $user = $authSession->getUser();
             $messageHistory->setUserId($user->getId());
         }
 
