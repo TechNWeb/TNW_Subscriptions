@@ -45,7 +45,7 @@ class DataProvider extends AbstractDataProvider
     {
         /** @var Collection $collection */
         $collection = parent::getCollection();
-
+        $collection->addFilterToMap('id', 'main_table.id');
         $collection->join(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
             'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.' . SubscriptionProfileOrderInterface::ID,
