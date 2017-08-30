@@ -45,12 +45,19 @@ class MessageHistoryLogger
     private $authSession;
 
     /**
+     * @var \Magento\Sales\Model\OrderRepository
+     */
+    private $orderRepository;
+
+    /**
      * Messages to log.
      *
      * @var array
      */
     private $messages = [
-        self::MESSAGE_SUBSCRIPTION_CREATED => 'Subscription Profile %s created.'
+        self::MESSAGE_SUBSCRIPTION_CREATED => 'Subscription Profile %s created.',
+        self::MESSAGE_QUOTE_CREATED => 'Quote #%s created. Quote is scheduled to process on %s.',
+        self::MESSAGE_ORDER_CREATED_FROM_QUOTE => 'Order #%s created from quote #%s.',
     ];
 
     /**
@@ -58,17 +65,20 @@ class MessageHistoryLogger
      * @param SubscriptionProfileMessageHistoryRepositoryInterface $messageHistoryRepository
      * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
      * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Magento\Sales\Model\OrderRepository $orderRepository
      */
     public function __construct(
         SubscriptionProfileMessageHistoryInterfaceFactory $messageHistoryFactory,
         SubscriptionProfileMessageHistoryRepositoryInterface $messageHistoryRepository,
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
-        \Magento\Backend\Model\Auth\Session $authSession
+        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Sales\Model\OrderRepository $orderRepository
     ) {
         $this->messageHistoryFactory = $messageHistoryFactory;
         $this->messageHistoryRepository = $messageHistoryRepository;
         $this->date = $date;
         $this->authSession = $authSession;
+        $this->orderRepository = $orderRepository;
     }
 
     /***
@@ -78,22 +88,30 @@ class MessageHistoryLogger
      * @param $subscriptionId
      * @param bool $isComment
      * @param bool $isVisibleOnFront
+     * @param bool $isAutomatedProcess
      */
-    public function log($message, $subscriptionId, $isComment = false, $isVisibleOnFront = false)
-    {
+    public function log(
+        $message,
+        $subscriptionId,
+        $isComment = false,
+        $isVisibleOnFront = false,
+        $isAutomatedProcess = false
+    ) {
         $createdAt = $this->date->gmtTimestamp();
-
-        $user = $this->authSession->getUser();
 
         /** @var SubscriptionProfileMessageHistoryInterface $messageHistory */
         $messageHistory = $this->messageHistoryFactory->create();
         $messageHistory
             ->setMessage($message)
-            ->setUserId($user->getId())
             ->setParentId($subscriptionId)
             ->setIsComment($isComment)
             ->setIsVisibleOnFront($isVisibleOnFront)
             ->setCreatedAt($createdAt);
+
+        if (!$isAutomatedProcess) {
+            $user = $this->authSession->getUser();
+            $messageHistory->setUserId($user->getId());
+        }
 
         $this->messageHistoryRepository->save($messageHistory);
     }
@@ -112,5 +130,31 @@ class MessageHistoryLogger
         }
 
         return $message;
+    }
+
+    /**
+     * Get order increment_id by id.
+     *
+     * @param $orderId
+     *
+     * @return null|string
+     */
+    public function getOrderIncrementIdById($orderId)
+    {
+        $order = $this->orderRepository->get($orderId);
+
+        return $order->getIncrementId();
+    }
+
+    /**
+     * Get quote id like increment_id
+     *
+     * @param $quoteId
+     *
+     * @return string
+     */
+    public function getConvertedQuoteId($quoteId)
+    {
+        return sprintf(\Magento\SalesSequence\Model\Sequence::DEFAULT_PATTERN, null, $quoteId, null);
     }
 }

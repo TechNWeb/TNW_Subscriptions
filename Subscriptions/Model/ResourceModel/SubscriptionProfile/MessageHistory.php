@@ -11,7 +11,7 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 class MessageHistory extends AbstractDb
 {
     /**
-     * Define resource model
+     * Define resource model.
      *
      * @return void
      */

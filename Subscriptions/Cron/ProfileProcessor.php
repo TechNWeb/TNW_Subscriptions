@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Cron;
 
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class ProfileProcessor
@@ -29,16 +30,23 @@ class ProfileProcessor
     private $queueManager;
 
     /**
-     * ProfileProcessor constructor.
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
      * @param Context $context
      * @param Manager $queueManager
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
-        Manager $queueManager
+        Manager $queueManager,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
+        $this->messageHistoryLogger = $messageHistoryLogger;
     }
 
     /**
@@ -54,6 +62,21 @@ class ProfileProcessor
         foreach ($itemsCollection as $item) {
             try {
                 $this->queueManager->processItem($item);
+
+                $message = sprintf(
+                    $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
+                    $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
+                    $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
+                );
+
+                $this->messageHistoryLogger->log(
+                    $message,
+                    $item->getSubscriptionProfileId(),
+                    false,
+                    false,
+                    true
+                );
+
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
                 $this->context->log(

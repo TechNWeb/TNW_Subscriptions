@@ -21,6 +21,7 @@ use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class QuoteCreator
@@ -84,6 +85,11 @@ class QuoteCreator
     private $queueManager;
 
     /**
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
      * QuoteCreator constructor.
      * @param SubscriptionProfileRepository $profileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
@@ -93,6 +99,7 @@ class QuoteCreator
      * @param QuoteFactory $quoteFactory
      * @param RelationManager $relationManager
      * @param Manager $queueManager
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         SubscriptionProfileRepository $profileRepository,
@@ -102,7 +109,8 @@ class QuoteCreator
         CartRepositoryInterface $cartRepository,
         QuoteFactory $quoteFactory,
         RelationManager $relationManager,
-        Manager $queueManager
+        Manager $queueManager,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->profileRepository = $profileRepository;
         $this->criteriaBuilder = $criteriaBuilder;
@@ -112,6 +120,7 @@ class QuoteCreator
         $this->quoteFactory = $quoteFactory;
         $this->relationManager = $relationManager;
         $this->queueManager = $queueManager;
+        $this->messageHistoryLogger = $messageHistoryLogger;
     }
 
     /**
@@ -300,7 +309,23 @@ class QuoteCreator
             ->setSubscriptionProfileId($profile->getId())
             ->setMagentoQuoteId($quote->getId())
             ->setScheduledAt($date);
-        return $this->relationManager->saveRelation($relation)->getId();
+        $id = $this->relationManager->saveRelation($relation)->getId();
+
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_QUOTE_CREATED),
+            $this->messageHistoryLogger->getConvertedQuoteId($relation->getMagentoQuoteId()),
+            $relation->getScheduledAt()
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $profile->getId(),
+            false,
+            false,
+            true
+        );
+
+        return $id;
     }
 
     /**

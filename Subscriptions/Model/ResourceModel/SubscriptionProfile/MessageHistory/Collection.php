@@ -50,6 +50,7 @@ class Collection extends AbstractCollection
         $this->addFilter(SubscriptionProfileMessageHistoryInterface::PARENT_ID, $parentId);
         $this->addUserDataToSelect();
         $this->setOrder(SubscriptionProfileMessageHistoryInterface::CREATED_AT);
+        $this->setPageSize(50);
 
         return $this->getData();
     }

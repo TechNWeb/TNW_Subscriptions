@@ -52,7 +52,11 @@ define([
                 },
                 type: "POST",
                 dataType: 'json'
-            }).done();
+            }).done(function (data) {
+                if (data.result) {
+                    $("textarea[name='dashboard[comment_area]']").val('');
+                }
+            })
         }
     });
 });
