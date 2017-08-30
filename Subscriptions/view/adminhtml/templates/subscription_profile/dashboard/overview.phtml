@@ -1,4 +1,13 @@
-<!--TODO implement render logic for subscription profile overview tab(SUB-77)-->
-<div class="admin__fieldset">
-    Overview Content
+<?php /* @var \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview $block */ ?>
+<div class="overview-content">
+    <table class="overview-table" style="width:100%">
+        <tr style="height:25%;">
+            <td rowspan="2" class="next-payment"><?php echo $block->getNextPaymentHtml() ?></td>
+            <td colspan="2" class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>"><?php echo $block->getMessageHtml() ?></td>
+        </tr>
+        <tr>
+            <td style="width:33%" class="bordered missed-payments"><?php echo $block->getMissedPaymentsHtml() ?></td>
+            <td style="width:33%" class="bordered status <?php echo $block->getBlockStatus()->getStatusClass() ?>"><?php echo $block->getStatusHtml() ?></td>
+        </tr>
+    </table>
 </div>

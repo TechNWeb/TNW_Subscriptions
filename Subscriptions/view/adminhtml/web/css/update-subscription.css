@@ -1,3 +1,72 @@
+.overview-content {
+    margin: -30px -15px -15px;
+}
+.overview-content .overview-table {
+    border-collapse: separate;
+    border-spacing: 15px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 400;
+}
+.overview-content .bordered {
+    border: 1px solid #999;
+}
+.overview-content .green {
+    background: #009e0f;
+}
+.overview-content .light-green {
+    background: #b6d7a8;
+}
+.overview-content .red {
+    background: #CF2A27;
+}
+.overview-content .orange {
+    background: #FFD966;
+}
+.overview-content .title {
+    padding: 10px 0 10px;
+}
+
+.overview-content .next-payment .date.day {
+    padding-top: 10px;
+    font-size: 9rem;
+    line-height: 9rem;
+}
+.overview-content .next-payment .date.month {
+    font-size: 3rem;
+    padding: 4px 0;
+}
+.overview-content .next-payment .cost {
+    margin-top: 30px;
+    padding: 5px 0 10px;
+    font-size: 4rem;
+    background-color: #eee;
+    border-top: 1px solid #999;
+}
+.overview-content .block-next-payment {
+    margin-right: 10px;
+}
+
+.overview-content .subscription-message {
+    font-size: 3rem;
+}
+.overview-content .missed-payments {
+    vertical-align: top;
+}
+.overview-content .missed-payments .value {
+    font-size: 9rem;
+    line-height: 15rem;
+}
+
+.overview-content .status {
+    vertical-align: top;
+    color: white;
+}
+.overview-content .status .value {
+    font-size: 5rem;
+    line-height: 15rem;
+}
+
 .admin__profile-dashboard-profit {
     width: 47%;
     float: left;

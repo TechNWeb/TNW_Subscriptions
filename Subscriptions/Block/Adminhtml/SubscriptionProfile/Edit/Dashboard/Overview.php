@@ -7,18 +7,239 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
+use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Message;
+use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\MissedPayments;
+use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\NextPayment;
+use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Status;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
- * todo: implement logic for rendering subscription profile overview information.(SUB-77)
+ * Subscription Overview block
  */
 class Overview extends Template
 {
     /**
      * @inheritdoc
      */
-    public function __construct(Template\Context $context, array $data = [])
-    {
-        $this->setTemplate('TNW_Subscriptions::subscription_profile/dashboard/overview.phtml');
+    protected $_template = 'TNW_Subscriptions::subscription_profile/dashboard/overview.phtml';
+
+    /**
+     * Registry model
+     *
+     * @var \Magento\Framework\Registry
+     */
+    private $registry;
+
+    /**
+     * Next Payment block
+     *
+     * @var NextPayment
+     */
+    private $blockNextPayment;
+
+    /**
+     * Next Payment block
+     *
+     * @var Message
+     */
+    private $blockMessage;
+
+    /**
+     * Missed Payments block
+     *
+     * @var MissedPayments
+     */
+    private $blockMissedPayments;
+
+    /**
+     * Status block
+     *
+     * @var Status
+     */
+    private $blockStatus;
+
+    /**
+     * @var SubscriptionProfileOrder
+     */
+    private $nextSubscriptionProfileOrder;
+
+    /**
+     * @var ProfileOrderCollection
+     */
+    private $profileOrderCollection;
+
+    /**
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param ProfileOrderCollection $profileOrderCollection,
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Framework\Registry $registry,
+        ProfileOrderCollection $profileOrderCollection,
+        array $data = []
+    ) {
+        $this->registry = $registry;
+        $this->profileOrderCollection = $profileOrderCollection;
         parent::__construct($context, $data);
+    }
+
+    /**
+     * Get current Subscription Profile model
+     *
+     * @return SubscriptionProfile|null
+     */
+    public function getSubscriptionProfile()
+    {
+        return $this->registry->registry('tnw_subscription_profile');
+    }
+
+    /**
+     * Retrieve next Subscription profile order
+     *
+     * @return SubscriptionProfileOrder|false
+     */
+    public function getNextSubscriptionProfileOrder()
+    {
+        if ($this->nextSubscriptionProfileOrder === null) {
+            $profile = $this->getSubscriptionProfile();
+            if (!$profile || !$profile->getId()) {
+                $this->nextSubscriptionProfileOrder = false;
+            } else {
+                $this->profileOrderCollection
+                    ->addFieldToFilter('subscription_profile_id', $profile->getId())
+                    ->addFieldToFilter('magento_quote_id', ['notnull' => true])
+                    ->addFieldToFilter('magento_order_id', ['null' => true])
+                    ->addOrder('scheduled_at', ProfileOrderCollection::SORT_ORDER_ASC)
+                    ->setPageSize(1);
+                $this->nextSubscriptionProfileOrder = $this->profileOrderCollection->getFirstItem();
+            }
+        }
+
+        return $this->nextSubscriptionProfileOrder;
+    }
+
+    /**
+     * Init child block
+     *
+     * @param Template $block
+     * @return Template
+     */
+    protected function initChildBlock(Template $block)
+    {
+        $block->setData('subscription_profile', $this->getSubscriptionProfile());
+        $block->setData('next_subscription_profile_order', $this->getNextSubscriptionProfileOrder());
+        return $block;
+    }
+
+    /**
+     * Retrieve instance of Next Payment block
+     *
+     * @return NextPayment
+     */
+    public function getBlockNextPayment()
+    {
+        if ($this->blockNextPayment === null) {
+            $this->blockNextPayment = $this->getLayout()->createBlock(
+                NextPayment::class,
+                'overview.next-payment'
+            );
+            $this->initChildBlock($this->blockNextPayment);
+        }
+        return $this->blockNextPayment;
+    }
+
+    /**
+     * Return HTML of Next Payment block
+     *
+     * @return string
+     */
+    public function getNextPaymentHtml()
+    {
+        return $this->getBlockNextPayment()->toHtml();
+    }
+
+    /**
+     * Retrieve instance of Message block
+     *
+     * @return Message
+     */
+    public function getBlockMessage()
+    {
+        if ($this->blockMessage === null) {
+            $this->blockMessage = $this->getLayout()->createBlock(
+                Message::class,
+                'overview.message'
+            );
+            $this->initChildBlock($this->blockMessage);
+        }
+        return $this->blockMessage;
+    }
+
+    /**
+     * Return HTML of Message block
+     *
+     * @return string
+     */
+    public function getMessageHtml()
+    {
+        return $this->getBlockMessage()->toHtml();
+    }
+
+    /**
+     * Retrieve instance of Missed Payments block
+     *
+     * @return MissedPayments
+     */
+    public function getBlockMissedPayments()
+    {
+        if ($this->blockMissedPayments === null) {
+            $this->blockMissedPayments = $this->getLayout()->createBlock(
+                MissedPayments::class,
+                'overview.missed-payments'
+            );
+            $this->initChildBlock($this->blockMissedPayments);
+        }
+        return $this->blockMissedPayments;
+    }
+
+    /**
+     * Return HTML of Missed Payments block
+     *
+     * @return string
+     */
+    public function getMissedPaymentsHtml()
+    {
+        return $this->getBlockMissedPayments()->toHtml();
+    }
+
+    /**
+     * Retrieve instance of Status block
+     *
+     * @return Status
+     */
+    public function getBlockStatus()
+    {
+        if ($this->blockStatus === null) {
+            $this->blockStatus = $this->getLayout()->createBlock(
+                Status::class,
+                'overview.status'
+            );
+            $this->initChildBlock($this->blockStatus);
+        }
+        return $this->blockStatus;
+    }
+
+    /**
+     * Return HTML of Status block
+     *
+     * @return string
+     */
+    public function getStatusHtml()
+    {
+        return $this->getBlockStatus()->toHtml();
     }
 }

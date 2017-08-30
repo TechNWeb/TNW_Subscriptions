@@ -16,12 +16,14 @@ class ProfileStatus implements OptionSourceInterface
     /**#@+
      * Constants for profile status.
      */
-    const STATUS_CANCELED = 0;   //Profile is canceled.
-    const STATUS_ACTIVE = 1;     //Profile is active.
-    const STATUS_PENDING = 2;    //Profile is created but have not yet created an order.
-    const STATUS_TRIAL = 3;      //Profile is in trial period.
-    const STATUS_HOLDED = 4;     //Profile does not creates orders.
-    const STATUS_SUSPENDED = 5;  //Profile can not create an order and grace period is ended.
+    const STATUS_CANCELED = 0;   // Profile is canceled.
+    const STATUS_ACTIVE = 1;     // Profile is active.
+    const STATUS_PENDING = 2;    // Profile is created but have not yet created an order.
+    const STATUS_TRIAL = 3;      // Profile is in trial period.
+    const STATUS_HOLDED = 4;     // Profile does not creates orders.
+    const STATUS_SUSPENDED = 5;  // Profile can not create an order and grace period is ended.
+    const STATUS_COMPLETE = 6;   // Profile is successfully completed.
+    const STATUS_PAST_DEE = 7;   //
     /**#@-*/
 
     /**
@@ -47,7 +49,7 @@ class ProfileStatus implements OptionSourceInterface
             ],
             [
                 'value' => self::STATUS_HOLDED,
-                'label' => __('Holded'),
+                'label' => __('On Hold'),
             ],
             [
                 'value' => self::STATUS_SUSPENDED,
@@ -56,6 +58,14 @@ class ProfileStatus implements OptionSourceInterface
             [
                 'value' => self::STATUS_TRIAL,
                 'label' => __('Trial'),
+            ],
+            [
+                'value' => self::STATUS_COMPLETE,
+                'label' => __('Complete'),
+            ],
+            [
+                'value' => self::STATUS_PAST_DEE,
+                'label' => __('Past Dee'),
             ],
         ];
 
@@ -74,9 +84,11 @@ class ProfileStatus implements OptionSourceInterface
             self::STATUS_CANCELED => __('Canceled'),
             self::STATUS_PENDING => __('Pending'),
             self::STATUS_ACTIVE => __('Active'),
-            self::STATUS_HOLDED => __('Holded'),
+            self::STATUS_HOLDED => __('On Hold'),
             self::STATUS_SUSPENDED => __('Suspended'),
             self::STATUS_TRIAL => __('Trial'),
+            self::STATUS_COMPLETE => __('Complete'),
+            self::STATUS_PAST_DEE => __('Past Dee'),
         ];
     }
 
@@ -84,18 +96,15 @@ class ProfileStatus implements OptionSourceInterface
      * Returns status label by value.
      *
      * @param $value
-     * @return null
+     * @return string|null
      */
     public function getLabelByValue($value)
     {
-        $result = null;
-
-        foreach ($this->getAllOptions() as $option){
-            if ($option['value'] == $value){
-                $result = $option['label'];
-            }
+        $options = $this->toOptionArray();
+        if (!isset($options[$value])) {
+            return null;
         }
 
-        return $result;
+        return $options[$value];
     }
 }

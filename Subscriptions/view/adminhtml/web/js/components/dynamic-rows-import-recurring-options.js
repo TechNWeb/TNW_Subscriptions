@@ -58,7 +58,7 @@ define([
         initDnd: function () {
             this._super();
             if (this.dndConfig.enabled) {
-                $(document).on(this.dndConfig.name + ':setPosition', this.refreshDefaultRecord.bind(this));
+                $(document).on(this.dndConfig.name + ':afterSetPosition', this.refreshDefaultRecord.bind(this));
             }
 
             return this;

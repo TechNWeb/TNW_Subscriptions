@@ -21,6 +21,13 @@ class Payment extends AbstractDataProvider
     const DATA_SCOPE_PAYMENT_FORM = 'tnw_subscriptionprofile_create_payment_form';
     /**#@-*/
 
+    /**#@+
+     * Form request values
+     */
+    const PAYMENT_FORM_DATA_KEY = 'payment_form_data';
+    const PAYMENT_FORM_DATA_VALUE = 'new_subscription';
+    /**#@-*/
+
     /**
      * @var UrlInterface
      */
