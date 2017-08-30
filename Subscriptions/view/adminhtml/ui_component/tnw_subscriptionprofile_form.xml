@@ -78,7 +78,6 @@
         <field name="comment_area">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="additionalClasses" xsi:type="string">sub-button-left</item>
                     <item name="label" xsi:type="string" translate="true">Comment</item>
                     <item name="componentType" xsi:type="string">field</item>
                     <item name="formElement" xsi:type="string">textarea</item>
