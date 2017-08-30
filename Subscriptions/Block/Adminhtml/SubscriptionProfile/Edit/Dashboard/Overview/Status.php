@@ -81,7 +81,7 @@ class Status extends Template
                 case ProfileStatus::STATUS_SUSPENDED:
                     return 'red';
                 case ProfileStatus::STATUS_CANCELED:
-                case ProfileStatus::STATUS_PAST_DEE:
+                case ProfileStatus::STATUS_PAST_DUE:
                     return 'orange';
             }
         }

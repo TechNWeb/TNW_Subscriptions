@@ -70,7 +70,7 @@ class Message extends Template
                     return __('%1 day%2 past due!', $days, $days !== 1 ? 's' : '');
                 case ProfileStatus::STATUS_CANCELED:
                     return __('Subscription is canceled');
-                case ProfileStatus::STATUS_PAST_DEE:
+                case ProfileStatus::STATUS_PAST_DUE:
                     $days = $this->getDaysUntilSuspended();
                     return __(
                         '%1 day%2 until suspended',
@@ -101,7 +101,7 @@ class Message extends Template
                     return 'light-green';
                 case ProfileStatus::STATUS_SUSPENDED:
                 case ProfileStatus::STATUS_CANCELED:
-                case ProfileStatus::STATUS_PAST_DEE:
+                case ProfileStatus::STATUS_PAST_DUE:
                     return 'orange';
             }
         }
