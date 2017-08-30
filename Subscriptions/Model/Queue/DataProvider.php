@@ -54,6 +54,14 @@ class DataProvider extends AbstractDataProvider
                 SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
                 SubscriptionProfileOrderInterface::SCHEDULED_AT
             ]
+        )->join(
+            [
+                'magento_quote' => $collection->getTable('quote')
+            ],
+            'magento_quote.entity_id = relation.magento_quote_id',
+            [
+                'magento_quote.grand_total'
+            ]
         );
 
         return $collection;
