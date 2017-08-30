@@ -64,7 +64,7 @@ class Overview extends Template
      * @var SubscriptionProfileOrder
      */
     private $nextSubscriptionProfileOrder;
-    
+
     /**
      * @var ProfileOrderCollection
      */
@@ -99,7 +99,7 @@ class Overview extends Template
 
     /**
      * Retrieve next Subscription profile order
-     * 
+     *
      * @return SubscriptionProfileOrder|false
      */
     public function getNextSubscriptionProfileOrder()

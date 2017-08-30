@@ -1,5 +1,5 @@
 .overview-content {
-    margin: -30px -15px -15px;
+    margin: -30px -15px 10px;
 }
 .overview-content .overview-table {
     border-collapse: separate;
@@ -65,4 +65,18 @@
 .overview-content .status .value {
     font-size: 5rem;
     line-height: 15rem;
+}
+
+.admin__profile-dashboard-profit {
+    width: 47%;
+    float: left;
+}
+
+.admin__profile-dashboard-subscription-details {
+    width: 47%;
+    float: right;
+}
+
+.profile-dashboard-subscription-details-title-wrapper {
+    border-bottom: 1px solid #ffffff;
 }
