@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
+/**
+ * Class of change status to "Active" button block on Subscription Profile edit form
+ */
 class ActivateButton extends ChangeStatusButton implements ButtonProviderInterface
 {
     /**

@@ -12,6 +12,9 @@ use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\GenericButton;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
+/**
+ * Abstract class of change status button block on Subscription Profile edit form
+ */
 abstract class ChangeStatusButton extends GenericButton
 {
     /**

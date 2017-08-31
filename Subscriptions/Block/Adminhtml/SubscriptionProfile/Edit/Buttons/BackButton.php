@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\GenericButton;
 
+/**
+ * Class of "Back Button on Subscription Profile edit form
+ */
 class BackButton extends GenericButton implements ButtonProviderInterface
 {
     /**
