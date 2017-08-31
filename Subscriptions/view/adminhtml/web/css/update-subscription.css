@@ -83,4 +83,35 @@
 
 .page-actions .page-actions-buttons>button.red-text {
     color: #e22626;
+
+.message-history .user-message {
+    font-size: 1.8rem;
+}
+.message-history .comment .user-message {
+    padding-left: 40px;
+    padding-top: 5px;
+}
+.message-history .comment {
+    font-size: 1.8rem;
+}
+.message-history .author-information {
+    font-style: italic;
+    display: inline-block;
+    padding-top: 10px;
+}
+.message-history .date {
+    float:right;
+    padding-top: 10px;
+}
+.message-history-block {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.message-history-block:nth-child(odd) {
+    background-color: #DCDCDC;
+}
+.float-left {
+    float: left;
 }

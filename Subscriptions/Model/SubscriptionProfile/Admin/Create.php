@@ -22,7 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class for creating subscriptions in admin.
@@ -84,6 +84,13 @@ class Create extends BaseCreate
     protected $eventManager;
 
     /**
+     * Message history logger.
+     *
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
      * @param Context $context
      * @param SessionManagerInterface $session
      * @param Address $addressCreator
@@ -93,6 +100,7 @@ class Create extends BaseCreate
      * @param Manager $profileManager
      * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
@@ -103,7 +111,8 @@ class Create extends BaseCreate
         Customer $customerCreator,
         Manager $profileManager,
         CartManagementInterface $quoteManagement,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -112,6 +121,8 @@ class Create extends BaseCreate
         $this->profileManager = $profileManager;
         $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
+        $this->messageHistoryLogger = $messageHistoryLogger;
+
         parent::__construct($context, $session);
     }
 
@@ -468,6 +479,8 @@ class Create extends BaseCreate
 
                 if ($profile) {
                     $order = $this->profileManager->processProfile($subQuote);
+                    $this->logMessageOrderCreated($profile->getId(), $order->getEntityId(), $subQuote->getId());
+
                     $this->profileManager->assignOrderToProfile($order, $profile);
                     $this->updateProfileStatus($profile);
                     $this->eventManager->dispatch(
@@ -475,6 +488,9 @@ class Create extends BaseCreate
                         ['order' => $order, 'quote' => $subQuote]
                     );
                     $profiles[] = $profile;
+
+                    $this->logToMessageCreateSubscription($profile);
+
                     //TODO add here email sending
                 }
             }
@@ -715,5 +731,48 @@ class Create extends BaseCreate
             ->setProfile($profile)
             ->setActiveStatus()
             ->saveProfile();
+    }
+
+    /**
+     * Log message for Subscription Profile creation.
+     *
+     * @param SubscriptionProfileInterface $profile
+     *
+     * @return void
+     */
+    private function logToMessageCreateSubscription(SubscriptionProfileInterface $profile)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED),
+            $profile->getLabel()
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $profile->getId()
+        );
+    }
+
+    /**
+     * Log message for Subscription Profile order creating from quote.
+     *
+     * @param int $profileId
+     * @param int $orderId
+     * @param int $quoteId
+     *
+     * @return void
+     */
+    private function logMessageOrderCreated($profileId, $orderId, $quoteId)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
+            $this->messageHistoryLogger->getOrderIncrementIdById($orderId),
+            $this->messageHistoryLogger->getConvertedQuoteId($quoteId)
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $profileId
+        );
     }
 }
