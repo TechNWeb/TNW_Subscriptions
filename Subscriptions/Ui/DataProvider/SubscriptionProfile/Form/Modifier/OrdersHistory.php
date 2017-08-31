@@ -75,8 +75,8 @@ class OrdersHistory implements ModifierInterface
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Product Reviews'),
-                        'collapsible' => true,
+                        'label' => false,
+                        'collapsible' => false,
                         'opened' => false,
                         'componentType' => Form\Fieldset::NAME,
                         'sortOrder' => 10

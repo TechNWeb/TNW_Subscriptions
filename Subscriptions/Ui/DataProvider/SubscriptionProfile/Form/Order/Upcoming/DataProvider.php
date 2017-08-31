@@ -6,9 +6,10 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Order\Upcoming;
 
-use Magento\Ui\DataProvider\AbstractDataProvider;
-use Magento\Quote\Model\ResourceModel\Quote\CollectionFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Quote\Model\ResourceModel\Quote\CollectionFactory;
+use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Context;
 
@@ -132,7 +133,7 @@ class DataProvider extends AbstractDataProvider
     /**
      * Preparing data from items.
      *
-     * @param $item
+     * @param $item \Magento\Quote\Model\Quote
      * @return array
      */
     private function prepareItemData($item)
@@ -145,7 +146,7 @@ class DataProvider extends AbstractDataProvider
         $shippingPrice = $this->subContext->getPriceCurrency()->format(
             $item->getShippingAmount(),
             false,
-            null,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
             null,
             $currencyCode
         );
@@ -153,7 +154,7 @@ class DataProvider extends AbstractDataProvider
         $grandTotal = $this->subContext->getPriceCurrency()->format(
             $item->getGrandTotal(),
             false,
-            null,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
             null,
             $currencyCode
         );
