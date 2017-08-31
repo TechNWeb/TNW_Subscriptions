@@ -25,6 +25,8 @@ abstract class ChangeStatusButton extends GenericButton
     private $registry;
 
     /**
+     * The Manager that define logic of status change on Subscription Profile
+     * 
      * @var StatusManager
      */
     private $statusManager;

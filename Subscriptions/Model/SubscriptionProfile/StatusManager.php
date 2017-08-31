@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
+/**
+ * The Manager that define logic of status change on Subscription Profile
+ */
 class StatusManager
 {
     /**

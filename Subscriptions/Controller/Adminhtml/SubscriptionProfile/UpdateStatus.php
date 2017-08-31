@@ -20,16 +20,22 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 class UpdateStatus extends Action
 {
     /**
+     * Repository profile
+     *
      * @var SubscriptionProfileRepository
      */
     private $profileRepository;
 
     /**
+     * The Manager that define logic of status change on Subscription Profile
+     *
      * @var StatusManager
      */
     private $statusManager;
 
     /**
+     * Profile status data source
+     *
      * @var ProfileStatus
      */
     private $statusSource;
