@@ -15,6 +15,8 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 class SuspendButton extends ChangeStatusButton implements ButtonProviderInterface
 {
     /**
+     * Retrieve button-specified settings
+     *
      * @return array
      */
     public function getButtonData()
