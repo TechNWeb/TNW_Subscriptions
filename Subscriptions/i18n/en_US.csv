@@ -29,6 +29,14 @@ Cancel,Cancel
 Create,Create
 "Create a Customer","Create a Customer"
 Ok,Ok
+"Subscription is current","Subscription is current"
+"Subscription is inactive","Subscription is inactive"
+"In trial period","In trial period"
+"Awaiting payment","Awaiting payment"
+"Subscription successfully completed","Subscription successfully completed"
+"%1 day%2 past due!","%1 day%2 past due!"
+"Subscription is canceled","Subscription is canceled"
+"%1 day%2 until suspended","%1 day%2 until suspended"
 TNW,TNW
 "Billing Frequency","Billing Frequency"
 "You deleted the Billing Frequency.","You deleted the Billing Frequency."
@@ -59,8 +67,8 @@ Subscriptions,Subscriptions
 "The value of Admin must be unique.","The value of Admin must be unique."
 "Creating Subscription(s)","Creating Subscription(s)"
 "Your payment has been declined. Please try again.","Your payment has been declined. Please try again."
-"This Subscription Profile no longer exists.","This Subscription Profile no longer exists."
 Subscription,Subscription
+"This Subscription Profile no longer exists.","This Subscription Profile no longer exists."
 "Subscription Profiles","Subscription Profiles"
 "Subscription Profile Queue","Subscription Profile Queue"
 "Total of %s profiles was created.","Total of %s profiles was created."
@@ -102,12 +110,13 @@ today,today
 Canceled,Canceled
 Pending,Pending
 Active,Active
-Holded,Holded
+"On Hold","On Hold"
 Suspended,Suspended
 Trial,Trial
+Complete,Complete
+"Past Due","Past Due"
 Running,Running
 Error,Error
-Complete,Complete
 "Incl. Tax","Incl. Tax"
 "Could not save the subscription profile address: %1","Could not save the subscription profile address: %1"
 "Subscription profile address with id ""%1"" does not exist.","Subscription profile address with id ""%1"" does not exist."
@@ -186,7 +195,12 @@ Price,Price
 Type,Type
 Year,Year
 "Product Reviews","Product Reviews"
-Profit,Profit
+"Total missed payments","Total missed payments"
+"Next Payment","Next Payment"
+"Profit (Total: %1)","Profit (Total: %1)"
+"%1 as of today","%1 as of today"
+"%1 remaining","%1 remaining"
+"* The graph above accounts for 1product(s) from the subscription with total of 1product(s)","* The graph above accounts for 1product(s) from the subscription with total of 1product(s)"
 "Subscription Details","Subscription Details"
 "Current Value","Current Value"
 "* Estimated amount and it may change as the subscription goes through its lifecycle","* Estimated amount and it may change as the subscription goes through its lifecycle"
@@ -284,6 +298,9 @@ Inventory,Inventory
 "Web Site","Web Site"
 "Payment Information","Payment Information"
 "Subscription and Account Information","Subscription and Account Information"
+Currency,Currency
+"Customer Name","Customer Name"
+"Customer Group","Customer Group"
 "Billing information is the same as shipping information","Billing information is the same as shipping information"
 "Customer account already exists","Customer account already exists"
 Confirm,Confirm
@@ -315,16 +332,3 @@ Message,Message
 "Created At","Created At"
 "Updated At","Updated At"
 "Scheduled At","Scheduled At"
-
-"Not enough qty to sell.","Not enough qty to sell."
-"Check inventory options.","Check inventory options."
-"Initial Payment","Initial Payment"
-"New","New"
-"Running","Running"
-"Error","Error"
-"Process","Process"
-"Record can not be processed.","Record can not be processed."
-"Subscription Profile Queue","Subscription Profile Queue"
-"Subscription Profiles","Subscription Profiles"
-"A total of %1 record(s) have been prepared for re-process.","A total of %1 record(s) have been prepared for re-process."
-"Pending","Pending"
