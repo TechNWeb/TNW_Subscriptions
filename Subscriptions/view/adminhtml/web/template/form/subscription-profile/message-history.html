@@ -12,7 +12,7 @@
 
         <!-- ko if: element.is_comment == 0 -->
         <div class="user-message">
-            <!-- ko text: element.message --><!-- /ko -->
+            <span data-bind="html: element.message"></span>
         </div>
         <!-- /ko -->
 
