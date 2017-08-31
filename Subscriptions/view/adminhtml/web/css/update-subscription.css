@@ -80,3 +80,7 @@
 .profile-dashboard-subscription-details-title-wrapper {
     border-bottom: 1px solid #ffffff;
 }
+
+.page-actions .page-actions-buttons>button.red-text {
+    color: #e22626;
+}
