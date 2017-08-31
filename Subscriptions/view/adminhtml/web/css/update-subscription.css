@@ -81,6 +81,9 @@
     border-bottom: 1px solid #ffffff;
 }
 
+.page-actions .page-actions-buttons>button.red-text {
+    color: #e22626;
+
 .message-history .user-message {
     font-size: 1.8rem;
 }
