@@ -67,9 +67,6 @@ class Edit extends SubscriptionProfile
                 return $this->redirectToList();
             }
         }
-        if (!$model) {
-            return $this->redirectToList();
-        }
         $this->_coreRegistry->register('tnw_subscription_profile', $model, true);
         /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
@@ -84,7 +81,7 @@ class Edit extends SubscriptionProfile
      *
      * @return Redirect
      */
-    public function redirectToList()
+    private function redirectToList()
     {
         $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
         /** @var Redirect $resultRedirect */
