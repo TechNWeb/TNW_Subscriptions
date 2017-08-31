@@ -70,15 +70,62 @@
 .admin__profile-dashboard-profit {
     width: 47%;
     float: left;
+    margin-bottom: 2%;
 }
 
 .admin__profile-dashboard-subscription-details {
     width: 47%;
     float: right;
+    margin-bottom: 9%;
 }
 
 .profile-dashboard-subscription-details-title-wrapper {
     border-bottom: 1px solid #ffffff;
+}
+
+/* todo: replace with actual diagram*/
+.admin__profile-dashboard-profit-diagram {
+    border: 2px solid;
+    width: 30%;
+    margin: 0 3% 0 3%;
+    padding-top: 30%;
+    float: left;
+    background-color: #f1f1f1;
+    border-radius: 100%
+}
+
+.admin__profile-dashboard-profit-diagram-legend {
+    width: 60%;
+    float: left;
+}
+
+.admin__profile-dashboard-profit-diagram-legend-text {
+    position: relative;
+    margin-bottom: 2%;
+}
+
+.profit-color {
+    display: inline-block;
+    border: 2px solid;
+    width: 9%;
+    padding-top: 9%;
+}
+
+.profit-remaining-color {
+    background-color: #f1f1f1;
+}
+
+.profit-for-today-color {
+    background-color: #858585;
+}
+
+.profit-text {
+    position: absolute;
+    padding: 2%;
+}
+
+.profit-content {
+    overflow: hidden;
 }
 
 .message-history .user-message {
