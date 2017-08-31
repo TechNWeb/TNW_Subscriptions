@@ -45,7 +45,7 @@ class DataProvider extends AbstractDataProvider
     {
         /** @var Collection $collection */
         $collection = parent::getCollection();
-
+        $collection->addFilterToMap('id', 'main_table.id');
         $collection->join(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
             'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.' . SubscriptionProfileOrderInterface::ID,
@@ -53,6 +53,14 @@ class DataProvider extends AbstractDataProvider
                 SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
                 SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
                 SubscriptionProfileOrderInterface::SCHEDULED_AT
+            ]
+        )->join(
+            [
+                'magento_quote' => $collection->getTable('quote')
+            ],
+            'magento_quote.entity_id = relation.magento_quote_id',
+            [
+                'magento_quote.grand_total'
             ]
         );
 
