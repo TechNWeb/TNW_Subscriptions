@@ -83,6 +83,10 @@
     border-bottom: 1px solid #ffffff;
 }
 
+.page-actions .page-actions-buttons>button.red-text {
+    color: #e22626;
+}
+
 /* todo: replace with actual diagram*/
 .admin__profile-dashboard-profit-diagram {
     border: 2px solid;
