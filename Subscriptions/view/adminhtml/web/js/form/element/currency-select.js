@@ -3,12 +3,9 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'underscore',
-    'mageUtils',
     'uiRegistry',
-    'Magento_Ui/js/form/element/select',
-    'uiLayout'
-], function (_, utils, registry, Abstract, layout) {
+    'Magento_Ui/js/form/element/select'
+], function (registry, Abstract) {
     'use strict';
 
     return Abstract.extend({
