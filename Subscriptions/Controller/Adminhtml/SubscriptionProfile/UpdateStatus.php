@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
@@ -39,22 +40,32 @@ class UpdateStatus extends Action
      * @var ProfileStatus
      */
     private $statusSource;
+
+    /**
+     * Message history logger
+     *
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
     
     /**
      * @param Context $context
      * @param SubscriptionProfileRepository $profileRepository
      * @param StatusManager $statusManager
      * @param ProfileStatus $statusSource
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
         SubscriptionProfileRepository $profileRepository,
         StatusManager $statusManager,
-        ProfileStatus $statusSource
+        ProfileStatus $statusSource,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->profileRepository = $profileRepository;
         $this->statusManager = $statusManager;
         $this->statusSource = $statusSource;
+        $this->messageHistoryLogger = $messageHistoryLogger;
         parent::__construct($context);
     }
 
@@ -79,8 +90,11 @@ class UpdateStatus extends Action
                 return $this->getRedirect();
             }
 
+            $oldStatus = $model->getStatus();
             $model->setStatus($newStatus);
             $this->profileRepository->save($model);
+            $this->logChangeStatus($model, $oldStatus);
+
             $this->messageManager->addSuccessMessage(__(
                 'Status successfully changed to "%1"',
                 $this->statusSource->getLabelByValue($newStatus)
@@ -92,6 +106,18 @@ class UpdateStatus extends Action
         }
 
         return $this->getRedirect();
+    }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
     }
 
     /**
@@ -107,14 +133,20 @@ class UpdateStatus extends Action
     }
 
     /**
-     * Acl check for admin
+     * Log change status in to Subscription Profile history
      *
-     * @return bool
+     * @param SubscriptionProfile $model
+     * @param int $oldStatus
+     * @return void
      */
-    protected function _isAllowed()
+    private function logChangeStatus(SubscriptionProfile $model, $oldStatus)
     {
-        return $this->_authorization->isAllowed(
-            'TNW_Subscriptions::SubscriptionProfile_edit'
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED),
+            $this->statusSource->getLabelByValue($oldStatus),
+            $this->statusSource->getLabelByValue($model->getStatus())
         );
+
+        $this->messageHistoryLogger->log($message, $model->getId());
     }
 }

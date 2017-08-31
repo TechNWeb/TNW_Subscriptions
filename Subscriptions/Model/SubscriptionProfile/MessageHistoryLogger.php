@@ -71,6 +71,7 @@ class MessageHistoryLogger
         self::MESSAGE_SUBSCRIPTION_CREATED => 'Subscription Profile %s created.',
         self::MESSAGE_QUOTE_CREATED => 'Quote #%s created. Quote is scheduled to process on %s.',
         self::MESSAGE_ORDER_CREATED_FROM_QUOTE => 'Order #%s created from quote #%s.',
+        self::MESSAGE_SUBSCRIPTION_STATUS_CHANGED => 'Subscription status changed from <b>%s</b> to <b>%s</b>',
     ];
 
     /**
