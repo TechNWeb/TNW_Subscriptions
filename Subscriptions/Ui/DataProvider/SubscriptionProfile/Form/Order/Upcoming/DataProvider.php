@@ -133,18 +133,18 @@ class DataProvider extends AbstractDataProvider
     /**
      * Preparing data from items.
      *
-     * @param $item \Magento\Quote\Model\Quote
+     * @param \Magento\Quote\Model\Quote $qoute
      * @return array
      */
-    private function prepareItemData($item)
+    private function prepareItemData($qoute)
     {
-        $itemData = [];
+        $quoteData = [];
 
-        $currencyCode = isset($item['quote_currency_code'])
-            ? $item['quote_currency_code']
+        $currencyCode = isset($qoute['quote_currency_code'])
+            ? $qoute['quote_currency_code']
             : null;
         $shippingPrice = $this->subContext->getPriceCurrency()->format(
-            $item->getShippingAmount(),
+            $qoute->getShippingAmount(),
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION,
             null,
@@ -152,24 +152,24 @@ class DataProvider extends AbstractDataProvider
         );
 
         $grandTotal = $this->subContext->getPriceCurrency()->format(
-            $item->getGrandTotal(),
+            $qoute->getGrandTotal(),
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION,
             null,
             $currencyCode
         );
 
-        $formatedEtityId = str_pad($item->getId(), 8, '0', STR_PAD_LEFT);
+        $formatedEtityId = str_pad($qoute->getId(), 8, '0', STR_PAD_LEFT);
 
-        $itemData['entity_id'] = $formatedEtityId;
-        $itemData['billing_name'] = $item->getBillingFirstname() . ' ' . $item->getBillingLastname();
-        $itemData['shipping_name'] = $item->getShippingFirstname() . ' ' . $item->getShippingLastname();
-        $itemData['scheduled_at'] = $item->getScheduledAt();
-        $itemData['shipping_details'] = $item->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
-        $itemData['scheduled_at'] = $item->getScheduledAt();
-        $itemData['grand_total'] = $grandTotal;
+        $quoteData['entity_id'] = $formatedEtityId;
+        $quoteData['billing_name'] = $qoute->getBillingFirstname() . ' ' . $qoute->getBillingLastname();
+        $quoteData['shipping_name'] = $qoute->getShippingFirstname() . ' ' . $qoute->getShippingLastname();
+        $quoteData['scheduled_at'] = $qoute->getScheduledAt();
+        $quoteData['shipping_details'] = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
+        $quoteData['scheduled_at'] = $qoute->getScheduledAt();
+        $quoteData['grand_total'] = $grandTotal;
 
-        return $itemData;
+        return $quoteData;
     }
 
 }
