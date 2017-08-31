@@ -8,10 +8,10 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use Magento\Framework\Controller\Result\Redirect;
-use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue;
+use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
@@ -34,6 +34,8 @@ class Process extends Action
     private $queueManager;
 
     /**
+     * Message history logger.
+     *
      * @var MessageHistoryLogger
      */
     private $messageHistoryLogger;
@@ -105,6 +107,8 @@ class Process extends Action
      * Log Message order create from quote.
      *
      * @param Queue $item
+     *
+     * @return void
      */
     private function logProcessItem(Queue $item)
     {

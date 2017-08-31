@@ -10,6 +10,9 @@ use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as ResourceMessageHistory;
 
+/**
+ * Model for Subscription profile change history.
+ */
 class MessageHistory extends AbstractModel implements SubscriptionProfileMessageHistoryInterface
 {
     /**

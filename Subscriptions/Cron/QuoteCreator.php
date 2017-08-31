@@ -14,14 +14,15 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteFactory;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class QuoteCreator
@@ -85,6 +86,8 @@ class QuoteCreator
     private $queueManager;
 
     /**
+     * Message history logger.
+     *
      * @var MessageHistoryLogger
      */
     private $messageHistoryLogger;
@@ -311,19 +314,7 @@ class QuoteCreator
             ->setScheduledAt($date);
         $id = $this->relationManager->saveRelation($relation)->getId();
 
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_QUOTE_CREATED),
-            $this->messageHistoryLogger->getConvertedQuoteId($relation->getMagentoQuoteId()),
-            $relation->getScheduledAt()
-        );
-
-        $this->messageHistoryLogger->log(
-            $message,
-            $profile->getId(),
-            false,
-            false,
-            true
-        );
+        $this->logToMessageHistory($relation, $profile->getId());
 
         return $id;
     }
@@ -375,5 +366,30 @@ class QuoteCreator
         $this->cartRepository->save($quote);
 
         return $quote;
+    }
+
+    /**
+     * Log message for Subscription Profile message history.
+     *
+     * @param SubscriptionProfileOrderInterface $relation
+     * @param $profileId
+     *
+     * @return void
+     */
+    private function logToMessageHistory(SubscriptionProfileOrderInterface $relation, $profileId)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_QUOTE_CREATED),
+            $this->messageHistoryLogger->getConvertedQuoteId($relation->getMagentoQuoteId()),
+            $relation->getScheduledAt()
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $profileId,
+            false,
+            false,
+            true
+        );
     }
 }

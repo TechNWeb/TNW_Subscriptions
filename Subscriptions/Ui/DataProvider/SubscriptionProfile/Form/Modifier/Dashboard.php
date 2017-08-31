@@ -7,22 +7,32 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 
+/**
+ * Dashboard for Subscription Profile.
+ */
 class Dashboard implements ModifierInterface
 {
+    /**
+     * Group name.
+     */
     const GROUP_DASHBOARD = 'dashboard';
 
     /**
+     * Url Interface.
+     *
      * @var UrlInterface
      */
     private $urlBuilder;
 
     /**
+     * Data Persistor.
+     *
      * @var DataPersistorInterface
      */
     private $dataPersistor;

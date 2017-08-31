@@ -6,28 +6,40 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
-use Magento\Ui\Component\Container;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Magento\Ui\Component\Form;
 use Magento\Framework\Registry;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 use Magento\Framework\UrlInterface;
+use Magento\Ui\Component\Container;
+use Magento\Ui\Component\Form;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
+/**
+ * Data provider for change history.
+ */
 class ChangeHistory implements ModifierInterface
 {
+    /**
+     * Group name.
+     */
     const GROUP_CHANGE_HISTORY = 'change_history';
 
     /**
+     * Registry.
+     *
      * @var Registry
      */
     private $registry;
 
     /**
+     * Url interface.
+     *
      * @var UrlInterface
      */
     private $urlBuilder;
 
     /**
+     * Collection Factory.
+     *
      * @var CollectionFactory
      */
     private $collectionFactory;

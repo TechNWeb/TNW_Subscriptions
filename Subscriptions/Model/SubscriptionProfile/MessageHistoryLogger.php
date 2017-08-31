@@ -6,10 +6,13 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface;
 
+/**
+ * Class to log Subscription Profile message history.
+ */
 class MessageHistoryLogger
 {
     /**#@+
@@ -25,26 +28,36 @@ class MessageHistoryLogger
     /**#@-*/
 
     /**
+     * Message history factory.
+     *
      * @var SubscriptionProfileMessageHistoryInterfaceFactory
      */
     private $messageHistoryFactory;
 
     /**
+     * Message history repository.
+     *
      * @var SubscriptionProfileMessageHistoryRepositoryInterface
      */
     private $messageHistoryRepository;
 
     /**
+     * Date.
+     *
      * @var \Magento\Framework\Stdlib\DateTime\DateTime
      */
     private $date;
 
     /**
+     * Auth session factory.
+     *
      * @var \Magento\Backend\Model\Auth\SessionFactory
      */
     private $authSessionFactory;
 
     /**
+     * Order repository.
+     *
      * @var \Magento\Sales\Model\OrderRepository
      */
     private $orderRepository;
@@ -85,7 +98,7 @@ class MessageHistoryLogger
      * Log subscription profile action to show it in "Change History" tab.
      *
      * @param string $message
-     * @param $subscriptionId
+     * @param int $subscriptionId
      * @param bool $isComment
      * @param bool $isVisibleOnFront
      * @param bool $isAutomatedProcess
@@ -136,7 +149,7 @@ class MessageHistoryLogger
     /**
      * Get order increment_id by id.
      *
-     * @param $orderId
+     * @param int $orderId
      *
      * @return null|string
      */
@@ -150,7 +163,7 @@ class MessageHistoryLogger
     /**
      * Get quote id like increment_id
      *
-     * @param $quoteId
+     * @param int $quoteId
      *
      * @return string
      */

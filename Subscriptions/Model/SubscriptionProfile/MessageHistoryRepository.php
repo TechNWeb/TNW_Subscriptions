@@ -10,37 +10,50 @@ use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterfaceFactory;
 use Magento\Framework\Api\SortOrder;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as ResourceProfileMessageHistory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 
+/**
+ * Repository for Subscription profile message history.
+ */
 class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepositoryInterface
 {
     /**
+     * Resource profile message history.
+     *
      * @var ResourceProfileMessageHistory
      */
     private $resource;
 
     /**
+     * Message history factory.
+     *
      * @var SubscriptionProfileMessageHistoryInterfaceFactory
      */
     private $messageHistoryFactory;
 
     /**
+     * Search result factory.
+     *
      * @var SearchResultsInterfaceFactory
      */
     private $searchResultsFactory;
 
     /**
+     * Collection factory.
+     *
      * @var CollectionFactory
      */
     private $collectionFactory;
 
     /**
+     * Data object helper.
+     *
      * @var DataObjectHelper
      */
     private $dataObjectHelper;
@@ -76,7 +89,7 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
             $this->resource->save($messageHistory);
         } catch (\Exception $e) {
             throw new CouldNotSaveException(__(
-                'Could not save the subscription profile Message history: %1',
+                'Could not save the subscription profile history message: %1',
                 $e->getMessage()
             ));
         }
@@ -85,7 +98,7 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
     }
 
     /**
-     * * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getById($id)
     {
@@ -95,7 +108,7 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
 
         if (!$messageHistory->getId()) {
             throw new NoSuchEntityException(
-                __('Subscription profile Message history with id "%1" does not exist.', $messageHistory)
+                __('Subscription profile history message with id "%1" does not exist.', $messageHistory)
             );
         }
 

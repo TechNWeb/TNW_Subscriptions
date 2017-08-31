@@ -4,10 +4,9 @@
  */
 
 define([
-    'underscore',
     'Magento_Ui/js/form/components/button',
-    'jquery',
-], function (_, Button, $) {
+    'jquery'
+], function (Button, $) {
     'use strict';
 
     return Button.extend({
@@ -30,8 +29,8 @@ define([
          * @inheritdoc
          */
         action: function () {
-            var url = typeof this.imports.url == "undefined" ? '' : this.imports.url;
-            var comment = $("textarea[name='dashboard[comment_area]']").val();
+            var url = typeof this.imports.url == "undefined" ? '' : this.imports.url,
+                comment = $("textarea[name='dashboard[comment_area]']").val();
 
             this.sendAjaxAddComment(url, comment)
         },
@@ -41,6 +40,8 @@ define([
          *
          * @param url
          * @param comment
+         *
+         * @return void
          */
         sendAjaxAddComment: function (url, comment) {
             $.ajax({

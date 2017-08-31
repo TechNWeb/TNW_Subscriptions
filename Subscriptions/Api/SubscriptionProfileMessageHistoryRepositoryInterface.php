@@ -9,8 +9,8 @@ namespace TNW\Subscriptions\Api;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 
 interface SubscriptionProfileMessageHistoryRepositoryInterface
 {
@@ -26,7 +26,7 @@ interface SubscriptionProfileMessageHistoryRepositoryInterface
     /**
      * Retrieves Subscription Profile Message History.
      *
-     * @param string $id
+     * @param int $id
      * @return SubscriptionProfileMessageHistoryInterface
      * @throws LocalizedException
      */

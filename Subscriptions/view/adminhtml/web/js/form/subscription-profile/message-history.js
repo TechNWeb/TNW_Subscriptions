@@ -4,7 +4,7 @@
  */
 
 define([
-    'Magento_Ui/js/form/element/abstract',
+    'Magento_Ui/js/form/element/abstract'
 ], function (Abstract) {
     'use strict';
 
@@ -13,6 +13,9 @@ define([
             data: []
         },
 
+        /**
+         * {@inheritdoc}
+         */
         setInitialValue: function () {
             this._super();
             this.data = typeof this.imports.messageHistoryData == "undefined" ? [] : this.imports.messageHistoryData;

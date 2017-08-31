@@ -17,6 +17,8 @@ use Magento\Ui\Component\Form\Field;
 class AddCommentButton extends Field
 {
     /**
+     * Url interface.
+     *
      * @var UrlInterface
      */
     private $url;

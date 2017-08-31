@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+/**
+ * Resource model class to log messages for Subscription Profile.
+ */
 class MessageHistory extends AbstractDb
 {
     /**

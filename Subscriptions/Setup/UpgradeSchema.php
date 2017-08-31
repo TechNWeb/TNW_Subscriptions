@@ -7,16 +7,16 @@
 
 namespace TNW\Subscriptions\Setup;
 
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
-use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use Magento\Framework\Setup\UpgradeSchemaInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
-use TNW\Subscriptions\Model\Queue;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 
 /**
  * Upgrade schema for TNW Subscriptions.

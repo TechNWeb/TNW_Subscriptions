@@ -30,6 +30,8 @@ class ProfileProcessor
     private $queueManager;
 
     /**
+     * Message history logger.
+     *
      * @var MessageHistoryLogger
      */
     private $messageHistoryLogger;
@@ -63,19 +65,7 @@ class ProfileProcessor
             try {
                 $this->queueManager->processItem($item);
 
-                $message = sprintf(
-                    $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
-                    $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
-                    $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
-                );
-
-                $this->messageHistoryLogger->log(
-                    $message,
-                    $item->getSubscriptionProfileId(),
-                    false,
-                    false,
-                    true
-                );
+                $this->logToMessageHistory($item);
 
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
@@ -87,5 +77,29 @@ class ProfileProcessor
         }
         $this->queueManager->makeCompleted($successIds);
         $this->queueManager->updateProfilesStatuses();
+    }
+
+    /**
+     * Log message for Subscription Profile message history.
+     *
+     * @param \TNW\Subscriptions\Model\Queue $item
+     *
+     * @return void
+     */
+    private function logToMessageHistory(\TNW\Subscriptions\Model\Queue $item)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
+            $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
+            $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $item->getSubscriptionProfileId(),
+            false,
+            false,
+            true
+        );
     }
 }

@@ -32,6 +32,8 @@ class AddComment extends Action
     private $dataPersistor;
 
     /**
+     * Message history logger.
+     *
      * @var MessageHistoryLogger
      */
     private $messageHistoryLogger;

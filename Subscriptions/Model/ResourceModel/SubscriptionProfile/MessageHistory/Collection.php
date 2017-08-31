@@ -8,9 +8,12 @@ namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHisto
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as ResourceMessageHistory;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory;
 
+/**
+ * Collection to log messages for Subscription Profile.
+ */
 class Collection extends AbstractCollection
 {
     /**
@@ -25,6 +28,8 @@ class Collection extends AbstractCollection
 
     /**
      * Add user data to select.
+     *
+     * @return void
      */
     private function addUserDataToSelect()
     {
@@ -41,7 +46,7 @@ class Collection extends AbstractCollection
     /**
      * Get sorted and filtered data for change history in admin panel.
      *
-     * @param $parentId
+     * @param int $parentId
      *
      * @return array
      */
@@ -50,7 +55,6 @@ class Collection extends AbstractCollection
         $this->addFilter(SubscriptionProfileMessageHistoryInterface::PARENT_ID, $parentId);
         $this->addUserDataToSelect();
         $this->setOrder(SubscriptionProfileMessageHistoryInterface::CREATED_AT);
-        $this->setPageSize(50);
 
         return $this->getData();
     }
