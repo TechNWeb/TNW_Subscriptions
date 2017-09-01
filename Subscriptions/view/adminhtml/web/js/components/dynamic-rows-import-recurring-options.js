@@ -5,8 +5,10 @@
 
 define([
     'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
-    'underscore'
-], function (DynamicRows, _) {
+    'underscore',
+    'uiRegistry',
+    'jquery'
+], function (DynamicRows, _, registry, $) {
     'use strict';
 
     var maxId = 0,
@@ -36,13 +38,28 @@ define([
             },
             identificationProperty: 'id',
             identificationDRProperty: 'id',
-            pageSize: 9999 //todo don't know how to clear values for "Default" field on other pages. They are not present in registry.
+            defaultRowIndexProperty: 'default_billing_frequency',
+            //TODO: don't know how to clear values for "Default" field on other pages. They are not present in registry.
+            pageSize: 9999,
+            dndConfig: {
+                component: 'TNW_Subscriptions/js/components/dynamic-rows/dnd'
+            }
         },
 
         /** @inheritdoc */
         initialize: function () {
             this._super();
             initMaxId(this.recordData());
+
+            return this;
+        },
+
+        /** @inheritdoc */
+        initDnd: function () {
+            this._super();
+            if (this.dndConfig.enabled) {
+                $(document).on(this.dndConfig.name + ':afterSetPosition', this.refreshDefaultRecord.bind(this));
+            }
 
             return this;
         },
@@ -73,6 +90,32 @@ define([
          */
         updateInsertData: function () {
             return false;
+        },
+
+        /**
+         * Refresh "default" record on reorder.
+         *
+         * @param {Event} event
+         * @param {Object} elem
+         * @return {void}
+         */
+        refreshDefaultRecord: function (event, elem) {
+            var records = this.retrieveElements(this.defaultRowIndexProperty);
+            _.each(records, function (record) {
+                if (record.value()) {
+                    record.checked.valueHasMutated();
+                }
+            });
+        },
+
+        /**
+         * Retrieve elements by index.
+         *
+         * @param {String} index
+         * @return {Array}
+         */
+        retrieveElements: function(index) {
+            return registry.filter('parentSelections = ' + this.index + ', index = ' + index + '');
         }
     });
 });

@@ -123,9 +123,21 @@
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
+                <item name="upcoming_orders" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
                 <item name="order_history" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\OrdersHistory</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="change_history" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ChangeHistory</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="dashboard" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Dashboard</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
                 </item>
             </argument>
         </arguments>
@@ -152,6 +164,10 @@
                 <item name="payflowpro" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="subscription_and_account_information" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
                 </item>
             </argument>
         </arguments>

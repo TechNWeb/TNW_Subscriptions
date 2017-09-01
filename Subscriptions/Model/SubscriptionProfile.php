@@ -36,11 +36,6 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
-     * Label prefix
-     */
-    const LABEL_PREFIX = '#S-';
-
-    /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface
@@ -634,5 +629,25 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function setUpdatedAt($date)
     {
         return $this->setData(self::UPDATED_AT, $date);
+    }
+
+    /**
+     * Get sum of all order's grand totals for current subscription profile.
+     *
+     * @return string
+     */
+    public function getCurrentValue()
+    {
+        return $this->getResource()->getCurrentValue($this);
+    }
+
+    /**
+     * Get sum of all generated non-paid quote's grand totals for current subscription profile.
+     *
+     * @return string
+     */
+    public function getTotalValue()
+    {
+        return $this->getResource()->getTotalValue($this);
     }
 }

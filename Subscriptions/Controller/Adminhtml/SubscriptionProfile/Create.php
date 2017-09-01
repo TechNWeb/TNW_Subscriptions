@@ -14,20 +14,27 @@ use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
+/**
+ * Create subscription profile.
+ */
 class Create extends SubscriptionProfile
 {
-    /** @var PageFactory */
-    protected $resultPageFactory;
-    /** @var StepPool */
+    /**
+     * @var PageFactory
+     */
+    private $resultPageFactory;
+
+    /**
+     * @var StepPool
+     */
     protected $stepPool;
 
     /**
-     * Create constructor.
-     * @param Context $context
-     * @param Registry $coreRegistry
+     * @param Context                $context
+     * @param Registry               $coreRegistry
      * @param DataPersistorInterface $dataPersistor
-     * @param StepPool $stepPool
-     * @param PageFactory $resultPageFactory
+     * @param StepPool               $stepPool
+     * @param PageFactory            $resultPageFactory
      */
     public function __construct(
         Context $context,
@@ -50,23 +57,22 @@ class Create extends SubscriptionProfile
 
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
-            StepPool::STEP_PARAM_TYPE_CUSTOMER
+            StepPool::STEP_PARAM_TYPE_STORE
         );
 
         $resultPage = $this->resultPageFactory->create();
-
         $pageTitle = __("Creating Subscription(s)");
 
-        if ($currentStep && $this->stepPool->checkStep($currentStep)) {
+        if ($currentStep && $this->stepPool->isAvailable($currentStep)) {
             $this->stepPool->setCurrentStep($currentStep);
             $resultPage->addHandle(
-                'tnw_subscriptions_subscriptionprofile_create_' . $currentStep
+                'tnw_subscriptions_subscriptionprofile_create_' . $this->stepPool->getCurrentStep()
             );
-
             $pageTitle .= $this->stepPool->getCurrentStepTitle();
         }
 
         $resultPage->getConfig()->getTitle()->prepend($pageTitle);
+
         return $resultPage;
     }
 
@@ -77,8 +83,6 @@ class Create extends SubscriptionProfile
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed(
-            'TNW_Subscriptions::SubscriptionProfile_create'
-        );
+        return $this->_authorization->isAllowed('TNW_Subscriptions::SubscriptionProfile_create');
     }
 }

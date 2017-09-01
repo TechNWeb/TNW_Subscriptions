@@ -38,6 +38,9 @@
                 <discount_amount>10</discount_amount> <!--10%-->
                 <discount_type>2</discount_type> <!--percents-->
             </discount>
+            <term>
+                <until_canceled>1</until_canceled>
+            </term>
         </tnw_subscriptions_product>
     </default>
 </config>

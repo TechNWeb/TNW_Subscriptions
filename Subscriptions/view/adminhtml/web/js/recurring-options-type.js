@@ -136,7 +136,7 @@ define([
                 var message = 'Please select billing frequency';
                 var currentLabel = '';
                 if (typeof this.periodLabels[currentValue] != 'undefined') {
-                    message += 'Billed & Shipped every %s';
+                    message = 'Billed & Shipped every %s';
                     currentLabel = this.periodLabels[currentValue];
                 }
 

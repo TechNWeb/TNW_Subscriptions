@@ -63,6 +63,8 @@ class Config
     private $xmlDiscountType = 'tnw_subscriptions_product/discount/discount_type';
     /**#@-*/
 
+    private $xmlUntilCanceled = 'tnw_subscriptions_product/term/until_canceled';
+
     /**
      * @var ScopeConfigInterface
      */
@@ -298,7 +300,7 @@ class Config
      * @param null|bool|int|string|WebsiteInterface $websiteId
      * @return null|string
      */
-    public function trialPrice($websiteId = null)
+    public function getTrialPrice($websiteId = null)
     {
         return $this->getStoreConfig($this->xmlTrialPrice, $websiteId);
     }
@@ -473,5 +475,15 @@ class Config
         }
 
         return $isAvailable;
+    }
+
+    /**
+     * Check if need check until canceled by default.
+     *
+     * @return bool
+     */
+    public function isUntilCanceledChecked()
+    {
+        return $this->getStoreConfig($this->xmlUntilCanceled);
     }
 }

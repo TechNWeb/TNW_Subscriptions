@@ -23,7 +23,7 @@
                 <item name="tnw_productbillingfrequency_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_grid_data_source"
-                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Grid\Collection</item>
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\Collection</item>
                 <item name="tnw_subscriptionprofileorder_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection</item>
                 <item name="tnw_productsubscriptionprofile_grid_data_source"
@@ -83,6 +83,10 @@
                 type="TNW\Subscriptions\Model\Queue"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileQueueSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory"/>
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>

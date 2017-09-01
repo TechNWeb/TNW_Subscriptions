@@ -142,27 +142,6 @@ class Quote extends SessionManager
     }
 
     /**
-     * Removes subQuote Id from storage if it was deleted from database.
-     *
-     * @param int|string $subQuoteId
-     * @return $this
-     */
-    public function removeSubQuoteId($subQuoteId)
-    {
-        $subQuoteIds = $this->getSubQuoteIds() ? $this->getSubQuoteIds() : [];
-
-        foreach ($subQuoteIds as $key => $id) {
-            if ($subQuoteId == $id) {
-                unset($subQuoteIds[$key]);
-            }
-        }
-
-        $this->storage->setSubQuoteIds($subQuoteIds);
-
-        return $this;
-    }
-
-    /**
      * @return ModelQuote[]
      */
     public function getSubQuotes()
