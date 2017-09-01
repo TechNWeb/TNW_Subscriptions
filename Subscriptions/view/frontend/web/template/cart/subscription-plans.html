@@ -3,7 +3,7 @@
         <h2 data-bind="i18n: 'Subscription plan #'"></h2>
     </div>
     <div class="content">
-        <div class="tnw-subscriptions-cart_subscription-plan-items" data-bind="css: items().length > 3 ? 'wide': 'narrow'">
+        <div class="tnw-subscriptions-cart_subscription-plan-items">
             <!-- ko foreach: items -->
             <div class="item" data-bind="visible: isSelected() || !$parent.isPlanSelected()">
                 <div class="item-content__container">

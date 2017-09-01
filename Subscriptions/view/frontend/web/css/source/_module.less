@@ -1,19 +1,14 @@
 & when (@media-common = true) {
   .tnw-subscriptions-cart__container {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
 
-    .block-main {
-      -webkit-flex: 3 1 auto;
-      -ms-flex: 3 1 auto;
-      flex: 3 1 auto;
+    .block-main,
+    .block-step {
+      display: -webkit-box;
+      display: -webkit-flex;
+
     }
 
+    .next-step,
     .block-sidebar {
       -webkit-flex: 1 0 auto;
       -ms-flex: 1 0 auto;
@@ -22,7 +17,7 @@
       margin-left: 15px;
     }
 
-    .main-sidebar {
+    .block-sidebar {
       background-color: #f0f0f0;
       padding: 20px;
       font-size: 1.4rem;
@@ -153,10 +148,6 @@
         width: 40px;
       }
 
-      .cart-items .update-cart-item {
-        margin: 0 0 4px 4px;
-      }
-
       .subtotal {
         font-size: 2.2rem;
         font-weight: 600;
@@ -184,7 +175,6 @@
     }
 
     .select-action.next-step {
-      padding-bottom: 10%;
       height: 45px;
 
       .action.primary {
@@ -192,150 +182,107 @@
         height: 100%;
       }
     }
-  }
 
-  .tnw-subscriptions-cart__progress-bar {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-    counter-reset: i;
-    padding-left: 0;
-
-    .progress-bar_item {
-      margin: 0 0 10px;
-      width: 25%;
-      display: inline-block;
-      position: relative;
-      text-align: center;
-      vertical-align: top;
-      -webkit-flex: 1 1 auto;
-      -ms-flex: 1 1 auto;
-      flex: 1 1 auto;
-    }
-
-    .progress-bar_item:before {
-      background: #e4e4e4;
-      top: 17px;
-      transition: background 0.3s;
-      content: '';
-      height: 7px;
-      left: 0;
-      position: absolute;
-      width: 100%;
-    }
-
-    .progress-bar_item._active > span:before,
-    .progress-bar_item._active:before {
-      background: #ff5501;
-    }
-
-    .progress-bar_item:first-child:before {
-      left: 50%;
-      width: 50%;
-    }
-
-    .progress-bar_item:last-child:before {
-      left: 0;
-      width: 50%;
-    }
-
-    .progress-bar_item > span {
-      display: inline-block;
-      padding-top: 45px;
-      width: 100%;
-      word-wrap: break-word;
-      color: #e4e4e4;
-      font-weight: 300;
-      font-size: 1.4rem;
-    }
-
-    .progress-bar_item._active > span {
-      color: #333333;
-    }
-
-    .progress-bar_item._complete > span {
-      color: #1979c3;
-    }
-
-    .progress-bar_item._complete > span:before,
-    .progress-bar_item._complete:before {
-      background: #1979c3;
-    }
-
-    .progress-bar_item > span:before,
-    .progress-bar_item > span:after {
-      background: #e4e4e4;
-      height: 38px;
-      margin-left: -19px;
-      transition: background 0.3s;
-      width: 38px;
-      border-radius: 50%;
-      content: '';
-      left: 50%;
-      position: absolute;
-      top: 0;
-    }
-
-    .progress-bar_item > span:after {
-      background: #ffffff;
-      height: 26px;
-      margin-left: -13px;
-      top: 6px;
-      width: 26px;
-      content: counter(i);
-      counter-increment: i;
-      color: #333333;
-      font-weight: 600;
-      font-size: 1.8rem;
-    }
-  }
-}
-
-@media (max-width: 640px) {
-  .tnw-subscriptions-cart__container {
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -webkit-align-items: stretch;
-    -ms-flex-align: stretch;
-    -ms-grid-row-align: stretch;
-    align-items: stretch;
-
-    .block-sidebar {
-      margin-left: 0;
-      max-width: 100%;
-    }
-  }
-
-  .tnw-subscriptions-cart_subscription-plan-items > .item {
-    .item-content__container {
+    .tnw-subscriptions-cart__progress-bar,
+    .tnw-subscriptions-cart_subscription-plans__container {
       display: -webkit-box;
       display: -webkit-flex;
       display: -ms-flexbox;
       display: flex;
-      -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-      flex-direction: column
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      counter-reset: i;
+      padding-left: 0;
+      width: 80%;
     }
-  }
 
-  .tnw-subscriptions-cart_subscription-plan-items.wide > .item {
-    .item-content__container {
-      -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-      flex-direction: column;
-
-      .block-description {
-        flex: 0 0 auto;
+    .tnw-subscriptions-cart__progress-bar {
+      .progress-bar_item {
+        margin: 0 0 10px;
+        width: 25%;
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        vertical-align: top;
+        -webkit-flex: 1 1 auto;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
       }
 
-      .block-details {
-        flex: 0 0 auto;
-        width: auto;
-        max-width: 100%;
+      .progress-bar_item:before {
+        background: #e4e4e4;
+        top: 17px;
+        transition: background 0.3s;
+        content: '';
+        height: 7px;
+        left: 0;
+        position: absolute;
+        width: 100%;
+      }
+
+      .progress-bar_item._active > span:before,
+      .progress-bar_item._active:before {
+        background: #ff5501;
+      }
+
+      .progress-bar_item:first-child:before {
+        left: 50%;
+        width: 50%;
+      }
+
+      .progress-bar_item:last-child:before {
+        left: 0;
+        width: 50%;
+      }
+
+      .progress-bar_item > span {
+        display: inline-block;
+        padding-top: 45px;
+        width: 100%;
+        word-wrap: break-word;
+        color: #e4e4e4;
+        font-weight: 300;
+        font-size: 1.4rem;
+      }
+
+      .progress-bar_item._active > span {
+        color: #333333;
+      }
+
+      .progress-bar_item._complete > span {
+        color: #1979c3;
+      }
+
+      .progress-bar_item._complete > span:before,
+      .progress-bar_item._complete:before {
+        background: #1979c3;
+      }
+
+      .progress-bar_item > span:before,
+      .progress-bar_item > span:after {
+        background: #e4e4e4;
+        height: 38px;
+        margin-left: -19px;
+        transition: background 0.3s;
+        width: 38px;
+        border-radius: 50%;
+        content: '';
+        left: 50%;
+        position: absolute;
+        top: 0;
+      }
+
+      .progress-bar_item > span:after {
+        background: #ffffff;
+        height: 26px;
+        margin-left: -13px;
+        top: 6px;
+        width: 26px;
+        content: counter(i);
+        counter-increment: i;
+        color: #333333;
+        font-weight: 600;
+        font-size: 1.8rem;
       }
     }
   }

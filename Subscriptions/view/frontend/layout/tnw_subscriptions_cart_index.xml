@@ -67,9 +67,6 @@
                                         <item name="displayArea" xsi:type="string">subscriptionPlans</item>
                                         <item name="config" xsi:type="array">
                                             <item name="template" xsi:type="string">TNW_Subscriptions/cart/subscription-plans</item>
-                                            <item name="selectBtnTitle" xsi:type="string" translate="true">Select Plan</item>
-                                            <item name="selectBtnTitleSelected" xsi:type="string" translate="true">Selected</item>
-                                            <item name="selectBtnTitleUnselect" xsi:type="string" translate="true">Unselect</item>
                                         </item>
                                     </item>
                                     <item name="crossSells" xsi:type="array">

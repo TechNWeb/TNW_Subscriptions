@@ -1,54 +1,8 @@
-<!-- ko if: isPlanSelected -->
 <div class="plan-summary">
     <strong class="title">
         <span data-bind="i18n: 'Subscription Plan'"></span>
     </strong>
-    <div class="content plan-summary-info">
-        <dl>
-            <dt class="label" data-bind="i18n: 'Number Of Payments'"></dt>
-            <dd class="value">
-                <span data-bind="text: numberOfPayments"></span>
-            </dd>
-        </dl>
-        <dl>
-            <dt class="label repeat" data-bind="i18n: 'Repeat'"></dt>
-            <dd class="value repeat">
-                <span data-bind="text: repeat"></span>
-            </dd>
-        </dl>
-        <!-- ko if: isTrialPeriodEnabled() && trialSubtotal() > 0 -->
-        <dl>
-            <dt class="label" data-bind="i18n: 'Trial Period'"></dt>
-            <dd class="value">
-                <span><!--ko text: trialPeriod --><!--/ko--> <!--ko i18n: 'Payments' --><!--/ko--></span>
-            </dd>
-        </dl>
-        <!-- /ko -->
-        <dl>
-            <dt class="label start" data-bind="i18n: 'Start'"></dt>
-            <dd class="value start">
-                <!-- ko ifnot: startDateType() == 'defined_by_customer' -->
-                <span data-bind="text: start"></span>
-                <!-- /ko -->
-                <!-- ko if: startDateType() == 'defined_by_customer' -->
-                <form data-role="start-date-form">
-                    <div class="calendar">
-                        <input type="text" class="required"
-                               data-bind="tnwSubscriptionsCartStartDate: {value: startDate}" />
-                    </div>
-                </form>
-                <!-- /ko -->
-            </dd>
-        </dl>
-    </div>
 </div>
-<div class="subtotal">
-    <span class="label" data-bind="i18n: 'Regular Payment Subtotal'"></span>
-    <span>
-        <span class="price-wrapper" data-bind="html: formatPrice(subtotal()) "></span>
-    </span>
-</div>
-<!-- /ko -->
 <div class="notice">
     <p data-bind="i18n: 'Some notice can be displayed here.'"></p>
 </div>

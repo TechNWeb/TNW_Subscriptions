@@ -6,37 +6,15 @@
 define(
     [
         'jquery',
-        'ko',
-        'underscore'
+        'ko'
     ],
-    function($, ko, _) {
+    function($, ko) {
         'use strict';
 
-        var cartData = ko.observable(window.tnwSubscriptionsCheckoutConfig.subscriptionsCart),
-            //cartItems = ko.observableArray(cartData().items),
-           // planId = ko.observable(cartData().subscription_plan_id),
-            //isPlanSelected = ko.observable(!!planId()),
-           // startDate = ko.observable(cartData().start_date),
-            shippingMethod = ko.observable(null);
-
-        cartData.subscribe(function (data) {
-            cartItems(data.items);
-            planId(data.subscription_plan_id);
-            isPlanSelected(!!planId());
-            startDate(data.start_date);
-        });
-        /*startDate.subscribe(function (startDate) {
-            //cartData().start_date = startDate;
-        });*/
+        var cartData = ko.observable(window.tnwSubscriptionsCheckoutConfig.subscriptionsCart);
 
         return {
             cartData: cartData,
-            cartItems: [],//cartItems,
-            planId: 1,//planId,
-            isPlanSelected: false,//isPlanSelected,
-            //startDate: startDate,
-            shippingMethod: shippingMethod,
-            guestEmail: null,
 
             /**
              * Get cart Id
@@ -44,7 +22,7 @@ define(
              * @returns {number}
              */
             getCartId: function () {
-                return 3;//cartData().cart_id;
+                return 3;
             },
 
             /**
