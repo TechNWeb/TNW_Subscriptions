@@ -85,13 +85,6 @@ define(
              * @returns {Object}
              */
             getAddressByType: function (addressType) {
-               /* var cartAddresses = this.cartData().addresses;
-
-                return cartAddresses
-                    ? _.find(cartAddresses, function (address) {
-                        return address.address_type == addressType
-                    })
-                    : {};*/
             }
         };
     }
