@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="TNW\Subscriptions\Block\Cart" name="tnw_subscriptions.cart" template="cart.phtml"
+                   cacheable="false">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="cart" xsi:type="array">
+                                <item name="component" xsi:type="string">uiComponent</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="errors" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">0</item>
+                                        <item name="component" xsi:type="string">Magento_Ui/js/view/messages</item>
+                                        <item name="displayArea" xsi:type="string">messages</item>
+                                    </item>
+                                    <item name="progressBar" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">10</item>
+                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/view/progress-bar</item>
+                                        <item name="displayArea" xsi:type="string">progressBar</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/progress-bar</item>
+                                            <item name="steps" xsi:type="array">
+                                                <item name="0" xsi:type="array">
+                                                    <item name="code" xsi:type="string">products</item>
+                                                    <item name="alias" xsi:type="string"/>
+                                                    <item name="title" xsi:type="string" translate="true">Products</item>
+                                                    <item name="sortOrder" xsi:type="string">0</item>
+                                                    <item name="isActive" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="1" xsi:type="array">
+                                                    <item name="code" xsi:type="string">registration</item>
+                                                    <item name="title" xsi:type="string" translate="true">Registration</item>
+                                                    <item name="sortOrder" xsi:type="string">1</item>
+                                                    <item name="isActive" xsi:type="boolean">false</item>
+                                                </item>
+                                                <item name="2" xsi:type="array">
+                                                    <item name="code" xsi:type="string">address</item>
+                                                    <item name="title" xsi:type="string" translate="true">Address</item>
+                                                    <item name="sortOrder" xsi:type="string">2</item>
+                                                    <item name="isActive" xsi:type="boolean">false</item>
+                                                </item>
+                                                <item name="3" xsi:type="array">
+                                                    <item name="code" xsi:type="string">payment</item>
+                                                    <item name="title" xsi:type="string" translate="true">Payment</item>
+                                                    <item name="sortOrder" xsi:type="string">3</item>
+                                                    <item name="isActive" xsi:type="boolean">false</item>
+                                                </item>
+                                                <item name="4" xsi:type="array">
+                                                    <item name="code" xsi:type="string">thank_you</item>
+                                                    <item name="title" xsi:type="string" translate="true">Thank You!</item>
+                                                    <item name="sortOrder" xsi:type="string">4</item>
+                                                    <item name="isActive" xsi:type="boolean">false</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="subscriptionPlans" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">20</item>
+                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/subscription-plans</item>
+                                        <item name="displayArea" xsi:type="string">subscriptionPlans</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/subscription-plans</item>
+                                            <item name="selectBtnTitle" xsi:type="string" translate="true">Select Plan</item>
+                                            <item name="selectBtnTitleSelected" xsi:type="string" translate="true">Selected</item>
+                                            <item name="selectBtnTitleUnselect" xsi:type="string" translate="true">Unselect</item>
+                                        </item>
+                                    </item>
+                                    <item name="crossSells" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">30</item>
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">crossSells</item>
+                                    </item>
+                                    <item name="next_step" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">40</item>
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">nextStep</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/next-step</item>
+                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/action/next-step</item>
+                                        </item>
+                                    </item>
+                                    <item name="sidebar" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">50</item>
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">sidebar</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/sidebar</item>
+                                        </item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="cartItems" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/cart-items</item>
+                                                <item name="displayArea" xsi:type="string">cartItems</item>
+                                                <item name="sortOrder" xsi:type="string">0</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/cart-items</item>
+                                                </item>
+                                            </item>
+                                            <item name="planSummary" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/subscription-plan-summary</item>
+                                                <item name="displayArea" xsi:type="string">planSummary</item>
+                                                <item name="sortOrder" xsi:type="string">10</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/subscription-plan-summary</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

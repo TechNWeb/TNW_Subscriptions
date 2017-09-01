@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--
+/**
+* Copyright © 2017 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="TNW\Subscriptions\Model\Checkout\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
+                <item name="payment" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Payment</item>
+                <item name="product" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
+                <item name="shipping" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Address</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

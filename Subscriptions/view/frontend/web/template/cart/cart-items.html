@@ -1,0 +1,92 @@
+<div class="cart-items">
+    <div class="content">
+        <ol class="list">
+            <!-- ko foreach: {data: items, as: 'item'} -->
+            <!-- ko ifnot: is_deleted-->
+            <strong class="title">
+                <span data-bind="i18n: 'Subscription #'" class="title"></span>
+            </strong>
+            <li>
+                <div class="product-item-details">
+                    <div class="block-product-item-name">
+                        <strong class="product-item-name" data-bind="text: name"></strong>
+                    </div>
+                    <div class="block-product-actions">
+                        <div class="secondary">
+                            <a href="#"
+                               data-bind="
+                                attr: {
+                                    'data-cart-item': item_id,
+                                    title: $t('Remove item')
+                                },
+                                click: $parent.onDeleteClick"
+                               class="action delete"
+                            >
+                                <span data-bind="i18n: 'Remove'">Remove</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- ko if: $parent.isPlanSelected -->
+                <div class="product-item-options">
+                    <dl>
+                        <dt class="label qty">
+                            <label data-bind="i18n: 'Qty', attr: {for: 'cart-item-' + item_id + '-qty'}"></label>
+                        </dt>
+                        <dd class="value qty">
+                            <input type="number"
+                                   size="4"
+                                   maxlength="12"
+                                   data-bind="
+                                        attr: {
+                                            id: 'cart-item-' + item_id + '-qty',
+                                            'data-item-id': item_id,
+                                            'data-orig-qty': qty
+                                        },
+                                        value: qty,
+                                        event: {keyup: $parent.onQtyKeyUp}
+                                   "/>
+                            <button data-bind="
+                                    attr: {
+                                        id: 'update-cart-item-' + item_id,
+                                        'data-item-id': item_id,
+                                        title: $t('Update')
+                                    },
+                                    click: $parent.onUpdateButtonClick"
+                                    data-role="update-button"
+                                    class="action primary update-cart-item"
+                                    style="display: none;">
+                                <span data-bind="i18n: 'Update'"></span>
+                            </button>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt class="label" data-bind="i18n: 'Each Payment (except Trial Period, excl. tax and shipping)'"></dt>
+                        <dd class="value">
+                            <span data-bind="html: $parent.formatPrice(item.regular_price)"></span>
+                        </dd>
+                    </dl>
+                    <!-- ko if: item.trial_price -->
+                    <dl>
+                        <dt class="label" data-bind="i18n: 'Trial Price'"></dt>
+                        <dd class="value">
+                            <span data-bind="html: $parent.formatPrice(item.trial_price)"></span>
+                        </dd>
+                    </dl>
+                    <!-- /ko -->
+                    <!-- ko if: item.initial_fee -->
+                    <dl>
+                        <dt class="label" data-bind="i18n: 'Initial Fee'"></dt>
+                        <dd class="value">
+                            <span data-bind="html: $parent.formatPrice(item.initial_fee)"></span>
+                        </dd>
+                    </dl>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+            </li>
+            <!-- /ko -->
+            <!-- /ko -->
+        </ol>
+    </div>
+</div>

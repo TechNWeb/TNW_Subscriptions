@@ -1,0 +1,7 @@
+<ul class="tnw-subscriptions-cart__progress-bar">
+    <!-- ko foreach: { data: getSteps().sort(sortItems), as: 'item' } -->
+    <li class="progress-bar_item" data-bind="css: item.isActive() ? '_active' : ($parent.isProcessed(item) ? '_complete' : '')">
+        <span data-bind="i18n: item.title"></span>
+    </li>
+    <!-- /ko -->
+</ul>
