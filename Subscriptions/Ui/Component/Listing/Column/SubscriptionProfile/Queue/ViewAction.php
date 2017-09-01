@@ -99,6 +99,6 @@ class ViewAction extends Column
     {
         $dateTime = new DateTime();
         $dateNow = $dateTime->strToTime($this->timezone->date()->format('Y-m-d H:i:s'));
-        return $dateNow < $dateTime->strToTime($scheduledAt);
+        return $dateNow > $dateTime->strToTime($scheduledAt);
     }
 }
