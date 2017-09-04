@@ -1,0 +1,31 @@
+<div class="message-history">
+    <!-- ko foreach: { data: data, as: 'element' } -->
+    <div class="message-history-block">
+        <!-- ko if: element.is_comment == 1 -->
+        <div class="comment">
+            <!-- ko text: element.comment_label --><!-- /ko -->
+            <div class="user-message">
+                "<!-- ko text: element.message --><!-- /ko -->"
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: element.is_comment == 0 -->
+        <div class="user-message">
+            <span data-bind="html: element.message"></span>
+        </div>
+        <!-- /ko -->
+
+        <div class="author-information">
+            <!-- ko text: element.author_name --><!-- /ko -->
+
+            <!-- ko if: element.author_email != null -->
+                (<!-- ko text: element.author_email --><!-- /ko -->)
+            <!-- /ko -->
+        </div>
+        <div class="date">
+            <!-- ko text: element.date --><!-- /ko -->
+        </div>
+    </div>
+    <!-- /ko -->
+</div>

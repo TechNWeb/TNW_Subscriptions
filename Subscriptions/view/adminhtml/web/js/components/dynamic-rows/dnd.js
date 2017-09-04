@@ -13,7 +13,7 @@ define([
         /** @inheritdoc */
         setPosition: function (depElem, depElementCtx, dragData) {
             this._super(depElem, depElementCtx, dragData);
-            $(this.body).trigger(this.name + ':setPosition', [ depElementCtx ]);
+            $(this.body).trigger(this.name + ':afterSetPosition', [ depElementCtx ]);
         }
     });
 });

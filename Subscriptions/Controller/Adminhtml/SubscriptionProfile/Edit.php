@@ -11,7 +11,6 @@ use Magento\Backend\Model\View\Result\Page;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
@@ -24,6 +23,7 @@ class Edit extends SubscriptionProfile
      * @var PageFactory
      */
     protected $resultPageFactory;
+
     /**
      * @var SubscriptionProfileRepositoryInterface
      */
@@ -51,7 +51,7 @@ class Edit extends SubscriptionProfile
     }
 
     /**
-     * Edit action
+     * Edit action.
      *
      * @return ResultInterface
      */
@@ -67,9 +67,6 @@ class Edit extends SubscriptionProfile
                 return $this->redirectToList();
             }
         }
-        if (!$model) {
-            return $this->redirectToList();
-        }
         $this->_coreRegistry->register('tnw_subscription_profile', $model, true);
         /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
@@ -80,11 +77,11 @@ class Edit extends SubscriptionProfile
     }
 
     /**
-     * Returns to list view
+     * Returns to list view.
      *
      * @return Redirect
      */
-    public function redirectToList()
+    private function redirectToList()
     {
         $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
         /** @var Redirect $resultRedirect */

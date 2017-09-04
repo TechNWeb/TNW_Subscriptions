@@ -156,7 +156,12 @@ class CurrencySelect extends AbstractSource
      */
     public function getSelectedCurrencyId()
     {
-        $result = "";
+        /** @var StoreManagerInterface $selectedStore */
+        $selectedStore = $this->getSelectedStore();
+        /** @var Currency $baseCurrency */
+        $baseCurrency = $selectedStore->getBaseCurrency();
+
+        $result = $baseCurrency->getCurrencyCode();
 
         if ($this->store === null) {
             $this->getSelectedStore();

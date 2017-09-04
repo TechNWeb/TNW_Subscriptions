@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Profit $block */
+?>
+<div class="admin__profile-dashboard-profit">
+    <div class="fieldset-wrapper-title">
+        <strong class="title" style="font-size:2rem; font-weight:400">
+            <span data-bind="i18n: label"><?php echo __('Profit (Total: %1)', $block->getTotalProfit()) ?></span>
+        </strong>
+    </div>
+    <div class="admin__fieldset profit-content">
+        <div class="admin__profile-dashboard-profit-diagram">
+        <!--todo: add actual diagram.-->
+        </div>
+        <div class="admin__profile-dashboard-profit-diagram-legend">
+            <div class="admin__profile-dashboard-profit-diagram-legend-text">
+                <div class="profit-color profit-for-today-color"></div>
+                <span class="profit-text"><?php echo  __('%1 as of today', $block->getAsOfTodayProfit())?></span>
+            </div>
+            <div class="admin__profile-dashboard-profit-diagram-legend-text">
+                <div class="profit-color profit-remaining-color"></div>
+                <span class="profit-text"><?php echo  __('%1 remaining', $block->getRemainingProfit())?></span>
+            </div>
+        </div>
+    </div>
+    <span class="admin__field-note"><?php echo __('* The graph above accounts for 1 product(s) from the subscription with total of 1 product(s)') ?></span>
+</div>

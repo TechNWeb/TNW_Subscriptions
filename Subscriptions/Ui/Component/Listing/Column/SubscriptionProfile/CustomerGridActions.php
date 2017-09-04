@@ -1,23 +1,35 @@
 <?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
 /**
  * Class CustomerGridActions
- * @package TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile
  */
 class CustomerGridActions extends Column
 {
-    /** @var UrlInterface */
-    protected $urlBuilder;
-    /** @var StepPool */
-    protected $stepPool;
+    /**
+     * Url builder.
+     *
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
+     * Step pool.
+     *
+     * @var StepPool
+     */
+    private $stepPool;
 
     /**
      * CustomerGridActions constructor.
@@ -58,7 +70,7 @@ class CustomerGridActions extends Column
                         'tnw_subscriptions/subscriptionprofile_create/process',
                         [
                             'customer_id' => $item['entity_id'],
-                             StepPool::STEP_PARAM_NAME => $step
+                            StepPool::STEP_PARAM_NAME => $step
                         ]
                     ),
                     'label' => __('Select'),

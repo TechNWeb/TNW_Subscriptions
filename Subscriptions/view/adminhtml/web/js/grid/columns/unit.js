@@ -1,7 +1,8 @@
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
+
 define([
     'underscore',
     'Magento_Ui/js/grid/columns/select',
@@ -11,7 +12,7 @@ define([
 
     return Select.extend({
         defaults: {
-            plural: "'s"
+            plural: "s"
         },
 
         /**

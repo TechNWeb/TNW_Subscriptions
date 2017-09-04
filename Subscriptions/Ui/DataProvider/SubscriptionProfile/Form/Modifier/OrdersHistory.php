@@ -11,6 +11,9 @@ use Magento\Ui\Component\Form;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Registry;
 
+/**
+ * Prepare orders history ui layout.
+ */
 class OrdersHistory implements ModifierInterface
 {
     const GROUP_ORDER_HISTORY = 'order_history';
@@ -27,6 +30,7 @@ class OrdersHistory implements ModifierInterface
 
     /**
      * @param UrlInterface $urlBuilder
+     * @param Registry $registry
      */
     public function __construct(
         UrlInterface $urlBuilder,
@@ -71,8 +75,8 @@ class OrdersHistory implements ModifierInterface
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Product Reviews'),
-                        'collapsible' => true,
+                        'label' => false,
+                        'collapsible' => false,
                         'opened' => false,
                         'componentType' => Form\Fieldset::NAME,
                         'sortOrder' => 10

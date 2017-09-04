@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface SubscriptionProfileInterface
+ */
 interface SubscriptionProfileInterface
 {
     /**#@+
@@ -50,6 +53,11 @@ interface SubscriptionProfileInterface
      */
     const PROFILE_PRODUCTS = 'profile_products';
     /**#@-*/
+
+    /**
+     * Label prefix
+     */
+    const LABEL_PREFIX = '#S-';
 
     /**
      * Gets id.

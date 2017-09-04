@@ -12,6 +12,8 @@ use TNW\Subscriptions\Model\ResourceModel\Queue as Resource;
 
 class Collection extends AbstractCollection
 {
+    protected $_idFieldName = 'id';
+
     /**
      * Define resource model
      *

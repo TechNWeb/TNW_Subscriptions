@@ -8,10 +8,11 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use Magento\Framework\Controller\Result\Redirect;
-use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue;
+use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class Process
@@ -33,18 +34,28 @@ class Process extends Action
     private $queueManager;
 
     /**
-     * Process constructor.
+     * Message history logger.
+     *
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
      * @param Context $context
      * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
      * @param Manager $queueManager
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
         SubscriptionProfileQueueRepositoryInterface $queueRepository,
-        Manager $queueManager
+        Manager $queueManager,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->queueRepository = $queueRepository;
         $this->queueManager = $queueManager;
+        $this->messageHistoryLogger = $messageHistoryLogger;
+
         parent::__construct($context);
     }
 
@@ -66,6 +77,8 @@ class Process extends Action
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->processItem($item);
+
+                        $this->logProcessItem($item);
                         $successIds[] = $item->getId();
                         $this->queueManager->makeCompleted($successIds);
                         $this->queueManager->updateProfilesStatuses();
@@ -89,4 +102,26 @@ class Process extends Action
             ->create()
             ->setPath($this->_redirect->getRefererUrl());
     }
+
+    /**
+     * Log Message order create from quote.
+     *
+     * @param Queue $item
+     *
+     * @return void
+     */
+    private function logProcessItem(Queue $item)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
+            $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
+            $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
+        );
+
+        $this->messageHistoryLogger->log(
+            $message,
+            $item->getSubscriptionProfileId()
+        );
+    }
+
 }

@@ -403,27 +403,52 @@
   padding-top: 1rem;
 }
 
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
   display: block;
 }
 
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before {
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before {
   display: none;
 }
 
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
   display: block;
   margin-left: 0;
 }
 
-.customer_exists_popup_options .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
   margin-top: .9rem;
 }
 
 .customer_exists_popup .admin__fieldset-wrapper-content .admin__fieldset {
   padding-bottom: 0;
+}
+
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container {
+  float: left;
+  width: calc( (100%) * .49 );
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container:first-child {
+  margin-right: 1%;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field {
+  padding: 1% 1% 1% 2%;
+  line-height: 3.2rem;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field + .admin__field {
+  margin-top: 0;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-label {
+  float: left;
+  text-align: left;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
+  text-align: right;
 }
 
