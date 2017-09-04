@@ -235,4 +235,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\History">
+        <plugin name="authentication" type="\Magento\Sales\Controller\Order\Plugin\Authentication"/>
+    </type>
 </config>
