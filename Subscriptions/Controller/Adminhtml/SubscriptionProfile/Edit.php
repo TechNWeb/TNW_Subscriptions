@@ -11,8 +11,10 @@ use Magento\Backend\Model\View\Result\Page;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile as ProfileModel;
 
@@ -22,22 +24,30 @@ class Edit extends SubscriptionProfile
      * @var PageFactory
      */
     protected $resultPageFactory;
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
 
     /**
      * @param Context $context
      * @param Registry $coreRegistry
-     * @param PageFactory $resultPageFactory
      * @param DataPersistorInterface $dataPersistor
+     * @param PageFactory $resultPageFactory
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
-        PageFactory $resultPageFactory
+        PageFactory $resultPageFactory,
+        SubscriptionProfileRepositoryInterface $profileRepository
     ) {
         $this->resultPageFactory = $resultPageFactory;
+        $this->profileRepository = $profileRepository;
 
         parent::__construct($context, $coreRegistry, $dataPersistor);
+
     }
 
     /**
@@ -49,25 +59,37 @@ class Edit extends SubscriptionProfile
     {
         $result = null;
         $profileId = $this->getRequest()->getParam('entity_id');
-        $model = $this->_objectManager->create(ProfileModel::class);
-
+        $model = null;
         if ($profileId) {
-            $model->load($profileId);
-            if (!$model->getId()) {
-                $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
-                /** @var Redirect $resultRedirect */
-                $resultRedirect = $this->resultRedirectFactory->create();
-                return $resultRedirect->setPath('*/*/');
+            try {
+                $model = $this->profileRepository->getById($profileId);
+            } catch (\Exception $e) {
+                return $this->redirectToList();
             }
         }
-
-        $this->_coreRegistry->register('tnw_subscription_profile', $model);
+        if (!$model) {
+            return $this->redirectToList();
+        }
+        $this->_coreRegistry->register('tnw_subscription_profile', $model, true);
         /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->prepend(__('Subscription'));
         $resultPage->getConfig()->getTitle()->prepend($this->getSubscriptionTitle($model));
 
         return $resultPage;
+    }
+
+    /**
+     * Returns to list view
+     *
+     * @return Redirect
+     */
+    public function redirectToList()
+    {
+        $this->messageManager->addErrorMessage(__('This Subscription Profile no longer exists.'));
+        /** @var Redirect $resultRedirect */
+        $resultRedirect = $this->resultRedirectFactory->create();
+        return $resultRedirect->setPath('*/*/');
     }
 
     /**

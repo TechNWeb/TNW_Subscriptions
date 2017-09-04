@@ -15,7 +15,6 @@
             <item name="type" xsi:type="string">tabs</item>
             <item name="navContainerName" xsi:type="string">left</item>
         </item>
-        <item name="reverseMetadataMerge" xsi:type="boolean">true</item>
     </argument>
     <dataSource name="subscriptionprofile_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">

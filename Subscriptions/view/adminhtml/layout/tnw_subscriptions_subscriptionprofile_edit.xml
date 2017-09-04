@@ -3,6 +3,9 @@
       layout="admin-2columns-left"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
+    <head>
+        <css src="TNW_Subscriptions::css/edit-subscription.css"/>
+    </head>
     <body>
         <referenceContainer name="content">
             <uiComponent name="tnw_subscriptionprofile_form"/>

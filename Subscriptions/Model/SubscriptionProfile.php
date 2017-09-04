@@ -41,6 +41,16 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const LABEL_PREFIX = '#S-';
 
     /**
+     * Edit state code
+     */
+    const STATE_EDIT = 'edit';
+
+    /**
+     * Create state code
+     */
+    const STATE_CREATE = 'create';
+
+    /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface

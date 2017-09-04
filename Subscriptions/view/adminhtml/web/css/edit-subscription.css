@@ -1,0 +1,30 @@
+.subscr-container-title {
+    font-size: 2rem;
+    font-weight: 400;
+}
+.admin__field-complex .admin__field-complex-elements.subscr-header, .subscr-header {
+  float:left;
+}
+button.profile__edit_button:before,
+button.profile__cancel-edit_button:before {
+    font-size: 2rem;
+    font-family: 'Admin Icons';
+}
+button.profile__edit_button,
+button.profile__cancel-edit_button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+button.profile__edit_button:before {
+    content: '\e631';
+}
+button.profile__cancel-edit_button:before{
+    content: '\e632';
+}
+.fieldset-wrapper.profile__edit_block {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+}

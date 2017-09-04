@@ -121,7 +121,7 @@
         </container>
         <field name="customer_address_id">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddress</item>
+                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileCreate</item>
                 <item name="config" xsi:type="array">
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="label" xsi:type="boolean">false</item>
