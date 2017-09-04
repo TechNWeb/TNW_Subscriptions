@@ -50,7 +50,6 @@ class Cart extends \Magento\Framework\View\Element\Template
      * Get subscriptions checkout configuration
      *
      * @return array
-     * @codeCoverageIgnore
      */
     public function getCheckoutConfig()
     {

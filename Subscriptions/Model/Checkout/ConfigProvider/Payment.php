@@ -24,7 +24,6 @@ class Payment implements ConfigProviderInterface
      * @param CcConfigProvider $ccConfigProvider
      */
     public function __construct(
-
         CcConfigProvider $ccConfigProvider
     ) {
         $this->ccConfigProvider = $ccConfigProvider;

@@ -186,13 +186,12 @@ class Customer implements ConfigProviderInterface
      * Is autocomplete enabled for storefront
      *
      * @return string
-     * @codeCoverageIgnore
      */
     private function isAutocompleteEnabled()
     {
-        return $this->scopeConfig->getValue(
+        return $this->scopeConfig->isSetFlag(
             \Magento\Customer\Model\Form::XML_PATH_ENABLE_AUTOCOMPLETE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE
         ) ? 'on' : 'off';
     }
 }
