@@ -854,12 +854,12 @@ class ModifyForm extends Form
     /**
      * Returns list of object items to display.
      *
-     * @param DataObject $subQuote
+     * @param DataObject $object
      * @return mixed
      */
-    protected function getObjectItems(DataObject $subQuote)
+    protected function getObjectItems(DataObject $object)
     {
-        return $subQuote->getAllItems();
+        return $object->getAllItems();
     }
 
     /**
