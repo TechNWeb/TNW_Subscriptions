@@ -10,8 +10,8 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 class Store extends AbstractDataProvider
 {
@@ -39,7 +39,7 @@ class Store extends AbstractDataProvider
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -57,7 +57,7 @@ class Store extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param StoreManagerInterface $storeManager
      * @param array $meta
      * @param array $data
@@ -68,7 +68,7 @@ class Store extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        Quote $session,
+        QuoteSessionInterface $session,
         StoreManagerInterface $storeManager,
         array $meta = [],
         array $data = []

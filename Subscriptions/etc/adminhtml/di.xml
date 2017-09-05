@@ -7,6 +7,8 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface" type="TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote"/>
+    <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Backend\Session\Quote" />
     <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool"
                  type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
@@ -96,18 +98,6 @@
             <argument name="isShipping" xsi:type="string">0</argument>
         </arguments>
     </virtualType>
-
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Create">
-        <arguments>
-            <argument name="session" xsi:type="object">TNW\Subscriptions\Model\Backend\Session\Quote</argument>
-        </arguments>
-    </type>
-
-    <type name="TNW\Subscriptions\Model\Source\CurrencySelect">
-        <arguments>
-            <argument name="session" xsi:type="object">TNW\Subscriptions\Model\Backend\Session\Quote</argument>
-        </arguments>
-    </type>
 
     <!--Add modifier for Subscription profile creation on shipping address page-->
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account">

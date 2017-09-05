@@ -15,9 +15,9 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Registry;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use Magento\Framework\Data\OptionSourceInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
@@ -29,7 +29,7 @@ class CustomerAddress implements OptionSourceInterface
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -89,7 +89,7 @@ class CustomerAddress implements OptionSourceInterface
 
     /**
      * CustomerAddress constructor.
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param Address $addressHelper
      * @param AddressRepositoryInterface $addressService
      * @param SearchCriteriaBuilder $criteriaBuilder
@@ -99,11 +99,9 @@ class CustomerAddress implements OptionSourceInterface
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param RequestInterface $request
      * @param $profileState
-     * @internal param Registry $registry
-     * @internal param $isProfileEdit
      */
     public function __construct(
-        Quote $session,
+        QuoteSessionInterface $session,
         Address $addressHelper,
         AddressRepositoryInterface $addressService,
         SearchCriteriaBuilder $criteriaBuilder,

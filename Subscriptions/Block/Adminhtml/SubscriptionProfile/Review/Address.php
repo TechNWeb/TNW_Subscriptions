@@ -15,7 +15,7 @@ use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
@@ -26,7 +26,7 @@ class Address extends Template
     /**
      * Help retrieve address by type(Shipping, Billing).
      *
-     * @var Create
+     * @var CreateProfile
      */
     private $create;
 
@@ -63,7 +63,7 @@ class Address extends Template
      * Address constructor.
      *
      * @param Template\Context $context
-     * @param Create $create
+     * @param CreateProfile $create
      * @param Config $addressConfig
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param RequestInterface $request
@@ -74,7 +74,7 @@ class Address extends Template
      */
     public function __construct(
         Template\Context $context,
-        Create $create,
+        CreateProfile $create,
         Config $addressConfig,
         SubscriptionProfileRepositoryInterface $profileRepository,
         RequestInterface $request,
