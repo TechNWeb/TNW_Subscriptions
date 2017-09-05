@@ -10,7 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Reassign subscription to customer.
@@ -32,7 +32,7 @@ class ReassignSubscriptions extends Action
     private $dataPersistor;
 
     /**
-     * @var Create
+     * @var CreateProfile
      */
     private $createSubscriptionProfile;
 
@@ -40,13 +40,13 @@ class ReassignSubscriptions extends Action
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
      * @param DataPersistorInterface $dataPersistor
-     * @param Create $createSubscriptionProfile
+     * @param CreateProfile $createSubscriptionProfile
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
         DataPersistorInterface $dataPersistor,
-        Create $createSubscriptionProfile
+        CreateProfile $createSubscriptionProfile
     ) {
         $this->resultJsonFactory = $jsonFactory;
         $this->dataPersistor = $dataPersistor;

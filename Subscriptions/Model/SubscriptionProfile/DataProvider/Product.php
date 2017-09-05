@@ -19,10 +19,10 @@ use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
@@ -80,7 +80,7 @@ class Product extends AbstractDataProvider
     private $stepPool;
 
     /**
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -126,7 +126,7 @@ class Product extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param Image $imageHelper
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
@@ -144,7 +144,7 @@ class Product extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        Quote $session,
+        QuoteSessionInterface $session,
         Image $imageHelper,
         Context $context,
         BillingFrequencyRepository $frequencyRepository,

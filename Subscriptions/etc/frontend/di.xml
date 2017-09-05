@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © 2017 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface" type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Quote"/>
+    <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
+</config>

@@ -6,9 +6,10 @@
 
 namespace TNW\Subscriptions\Ui\Component\Field;
 
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
-use Magento\Framework\UrlInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Class for email field in Subscription Profile creating page.
@@ -16,7 +17,7 @@ use Magento\Framework\UrlInterface;
 class Email extends \Magento\Ui\Component\Form\Field
 {
     /**
-     * @var \TNW\Subscriptions\Model\Backend\Session\Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -28,7 +29,7 @@ class Email extends \Magento\Ui\Component\Form\Field
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param \TNW\Subscriptions\Model\Backend\Session\Quote $session
+     * @param QuoteSessionInterface $session
      * @param UrlInterface $url
      * @param array $components
      * @param array $data
@@ -36,7 +37,7 @@ class Email extends \Magento\Ui\Component\Form\Field
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
+        QuoteSessionInterface $session,
         UrlInterface $url,
         $components = [],
         array $data = []
@@ -52,7 +53,7 @@ class Email extends \Magento\Ui\Component\Form\Field
      */
     public function prepare()
     {
-        $customerId = $this->session->getData('customer_id');
+        $customerId = $this->session->getCustomerId();
 
         $config = $this->getData('config');
         if ($customerId) {
