@@ -147,6 +147,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Returns list of subscription quote ids.
+     *
      * @return array|null
      */
     public function getSubQuoteIds()
@@ -155,6 +157,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Adds quote id to session storage.
+     *
      * @param int|string $subQuoteId
      * @return $this
      */
@@ -168,6 +172,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Returns list of subscription quotes.
+     *
      * @return ModelQuote[]
      */
     public function getSubQuotes()
@@ -190,7 +196,7 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
-     * Removes quote from sub quote list.
+     * Removes quote from subscription quotes list.
      *
      * @param ModelQuote $quote
      * @return $this
@@ -221,6 +227,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Returns first quote from subscription quotes list or false if list is empty.
+     *
      * @return bool|ModelQuote
      */
     public function getFirstQuote()
@@ -235,6 +243,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Adds quote to subscription quote list.
+     *
      * @param ModelQuote|int|string $quote
      * @return $this
      */

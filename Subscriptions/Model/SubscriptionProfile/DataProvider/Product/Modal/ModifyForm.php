@@ -15,18 +15,24 @@ use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use Magento\Framework\DataObject;
 
 /**
  * Class ModifyForm
  */
 class ModifyForm extends Form
 {
+    /**#@+
+     * Constants for container names.
+     */
     const CONTAINER_PREFIX = 'container_';
     const CONTAINER_ITEM_PREFIX = 'container_item_';
+    /**#@-*/
+
     /**#@+
      * Form data scope
      */
@@ -77,7 +83,7 @@ class ModifyForm extends Form
      * @param PriceCalculator $priceCalculator
      * @param StoreManagerInterface $storeManager
      * @param \TNW\Subscriptions\Model\Config $config
-     * @param SessionQuote $sessionQuote
+     * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param ImageHelper $imageHelper
      * @param string $scope
@@ -96,7 +102,7 @@ class ModifyForm extends Form
         PriceCalculator $priceCalculator,
         StoreManagerInterface $storeManager,
         \TNW\Subscriptions\Model\Config $config,
-        SessionQuote $sessionQuote,
+        QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         ImageHelper $imageHelper,
         $scope = '',
@@ -116,11 +122,11 @@ class ModifyForm extends Form
     public function getData()
     {
         $data = [];
-        foreach ($this->sessionQuote->getSubQuotes() as $subQuote) {
+        foreach ($this->getObjects() as $subQuote) {
             /** @var Item $item */
-            foreach ($subQuote->getAllItems() as $item) {
+            foreach ($this->getObjectItems($subQuote) as $item) {
                 $itemKey = 'item_' . $item->getId();
-                $product = $this->productRepository->getById($item->getProduct()->getId());
+                $product = $this->productRepository->getById($this->getProductFromItem($item)->getId());
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
                 $data[self::FORM_DATA_VALUE][$itemKey] = array_merge(
                     $subBuyRequest[Create::UNIQUE],
@@ -158,7 +164,7 @@ class ModifyForm extends Form
     {
         $iterator = 0;
         $result = [];
-        foreach ($this->sessionQuote->getSubQuotes() as $subQuote) {
+        foreach ($this->getObjects() as $subQuote) {
             $iterator++;
             $result[self::CONTAINER_PREFIX . $subQuote->getId()] = [
                 'children' => $this->getChildren($subQuote),
@@ -171,8 +177,8 @@ class ModifyForm extends Form
                             'additionalClasses' => 'subscription-container',
                             'dataScope' => '',
                             'sortOrder' => $iterator
-                        ],
-                    ],
+                        ]
+                    ]
                 ]
             ];
         }
@@ -190,11 +196,11 @@ class ModifyForm extends Form
     {
         $result = [];
         $orderIterator = 0;
-        foreach ($subQuote->getAllItems() as $item) {
+        foreach ($this->getObjectItems($subQuote) as $item) {
             $itemId = $item->getId();
             $objectId = $subQuote->getId();
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
-            $this->currentProduct = $item->getProduct();
+            $this->currentProduct = $this->getProductFromItem($item);
             $orderIterator++;
             $result[self::CONTAINER_ITEM_PREFIX . $itemId] = [
                 'children' => [
@@ -267,6 +273,8 @@ class ModifyForm extends Form
     }
 
     /**
+     * Return description fieldset definition.
+     *
      * @return array
      */
     protected function getDescriptionFieldset()
@@ -790,7 +798,7 @@ class ModifyForm extends Form
     }
 
     /**
-     * Returns qty edit bytton definition.
+     * Returns qty edit button definition.
      *
      * @return array
      */
@@ -831,5 +839,37 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * Returns list of objects to display.
+     *
+     * @return DataObject[]
+     */
+    protected function getObjects()
+    {
+        return $this->sessionQuote->getSubQuotes();
+    }
+
+    /**
+     * Returns list of object items to display.
+     *
+     * @param DataObject $subQuote
+     * @return mixed
+     */
+    protected function getObjectItems(DataObject $subQuote)
+    {
+        return $subQuote->getAllItems();
+    }
+
+    /**
+     * Returns product from object item.
+     *
+     * @param DataObject $item
+     * @return mixed
+     */
+    protected function getProductFromItem(DataObject $item)
+    {
+        return $item->getProduct();
     }
 }
