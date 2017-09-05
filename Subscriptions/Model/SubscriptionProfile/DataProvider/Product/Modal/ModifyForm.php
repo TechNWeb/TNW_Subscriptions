@@ -381,7 +381,15 @@ class ModifyForm extends Form
      */
     protected function getLeftContainerDefinition()
     {
-        $src = $this->imageHelper->init($this->currentProduct, 'product_listing_thumbnail')->getUrl();
+        $imageHelper = $this->imageHelper->init(
+            $this->currentProduct,
+            'category_page_grid',
+            [
+                'type' => 'small_image',
+                'width' => '240',
+                'height' => '240',
+            ]
+        );
 
         return [
             'arguments' => [
@@ -402,7 +410,8 @@ class ModifyForm extends Form
                                 'componentType' => UiForm\Element\Input::NAME,
                                 'formElement' => UiForm\Element\Input::NAME,
                                 'elementTmpl' => 'TNW_Subscriptions/form/element/image',
-                                'src' => $src
+                                'additionalClasses' => 'sub-product-image',
+                                'src' => $imageHelper->getUrl()
                             ]
                         ]
                     ]
@@ -453,7 +462,8 @@ class ModifyForm extends Form
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-primary position-left',
+                        'additionalClasses' => 'action-primary sub-button-right',
+                        'subButtonRight' => true,
                         'title' => __('Update'),
                         'actions' => [
                             [
@@ -651,7 +661,7 @@ class ModifyForm extends Form
      */
     protected function getStartOnDefinition()
     {
-        $startOnConfig = $this->getStartOnFieldConfig($this->currentProduct->getId());
+        $visibleOnEdit = $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'];
         $nowDate = new \DateTime();
 
         return [
@@ -668,10 +678,10 @@ class ModifyForm extends Form
                         'validation' => ['required-entry' => true],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-date',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'visibleOnEdit' => $visibleOnEdit,
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode'
-                        ],
-                        'visible' => $startOnConfig['visible']
+                        ]
                     ]
                 ]
             ]

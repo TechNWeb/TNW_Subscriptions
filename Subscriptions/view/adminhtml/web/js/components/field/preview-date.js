@@ -14,6 +14,7 @@ define([
             showPreview: false,
             current_date: null,
             previewLabel: '',
+            visibleOnEdit: false,
             previewElementTmpl: 'TNW_Subscriptions/form/element/template/preview-label',
             listens: {
                 showPreview: 'onShowPreviewChanged'
@@ -49,8 +50,13 @@ define([
          * @param value
          */
         onShowPreviewChanged: function (value) {
-            if (value && this.initialValue && this.value() !== this.initialValue){
-                this.reset();
+            if (value){
+                this.visible(true);
+                if (this.initialValue && this.value() !== this.initialValue){
+                    this.reset();
+                }
+            } else {
+                this.visibleOnEdit ? this.visible(true) : this.visible(false);
             }
         }
     });

@@ -30,7 +30,6 @@ class Save extends SubscriptionProfile
                 $requestData = $this->getRequest()->getParam('item_' . $objectItemId, false);
                 try {
                     $this->getSubCreateModel()->modifySubscriptions($requestData, $objectId, $objectItemId, $remove);
-                    $this->_getSession()->getSubQuoteIds();
                     $response = [
                         'error' => false,
                         'message' => '',

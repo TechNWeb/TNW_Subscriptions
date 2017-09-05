@@ -201,7 +201,7 @@ class CreateProfile extends BaseCreate
                 $this->quoteCreator->getCartRepository()->save($quote);
                 if (!$quote->getAllItems()){
                     $this->quoteCreator->getCartRepository()->delete($quote);
-                    /** @var Session $session */
+                    /** @var QuoteSessionInterface $session */
                     $session = $this->getSession();
                     $session->removeSubQuote($quote);
                 }

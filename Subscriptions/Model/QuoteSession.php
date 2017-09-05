@@ -172,10 +172,10 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      */
     public function getSubQuotes()
     {
-        if ($this->quotes === null){
+        if ($this->quotes === null) {
             $quoteIds = $this->getSubQuoteIds();
             $this->quotes = [];
-            if ($quoteIds){
+            if ($quoteIds) {
                 $searchCriteria = $this->searchCriteriaBuilder->addFilter(
                     ModelQuote::KEY_ENTITY_ID,
                     $quoteIds,
@@ -190,13 +190,44 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Removes quote from sub quote list.
+     *
+     * @param ModelQuote $quote
+     * @return $this
+     */
+    public function removeSubQuote($quote)
+    {
+        $quoteId = $quote->getId();
+        $this->removeSubQuoteId($quoteId);
+        $this->quotes = array_filter(
+            $this->getSubQuotes(),
+            function ($subQuote) use ($quoteId) {
+                return ($subQuote->getId() !== $quoteId);
+            }
+        );
+
+        return $this;
+    }
+
+    /**
+     * Removes quote id from session storage.
+     *
+     * @param $quoteId
+     */
+    protected function removeSubQuoteId($quoteId)
+    {
+        $quoteIds = array_diff($this->getSubQuoteIds(), [$quoteId]);
+        $this->storage->setSubQuoteIds($quoteIds);
+    }
+
+    /**
      * @return bool|ModelQuote
      */
     public function getFirstQuote()
     {
         $result = false;
 
-        if (!empty($this->getSubQuotes())){
+        if (!empty($this->getSubQuotes())) {
             $result = reset($this->quotes);
         }
 
@@ -209,7 +240,7 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      */
     public function addSubQuote($quote)
     {
-        if (!$quote instanceof ModelQuote){
+        if (!$quote instanceof ModelQuote) {
             $quote = $this->quoteRepository->get($quote);
         }
         $this->addSubQuoteId($quote->getId());
