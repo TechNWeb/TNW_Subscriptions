@@ -194,6 +194,39 @@ class Create extends BaseCreate
     }
 
     /**
+     * Modifies subscription product. (Actually removes and adds product again).
+     *
+     * @param array $request
+     * @param string|int $quoteId
+     * @param string|int $quoteItemId
+     * @param bool $remove
+     */
+    public function modifySubscriptions($request, $quoteId, $quoteItemId, $remove = false)
+    {
+        /** @var ModelQuote $quote */
+        $quote = $this->quoteCreator->getCartRepository()->get($quoteId);
+        /** @var Item $item */
+        foreach ($quote->getAllItems() as $item) {
+            if ($item->getId() === $quoteItemId) {
+                $request['product_id'] = $item->getProduct()->getId();
+                $item->isDeleted(true);
+                $this->quoteCreator->getCartRepository()->save($quote);
+                if (!$quote->getAllItems()){
+                    $this->quoteCreator->getCartRepository()->delete($quote);
+                    /** @var Session $session */
+                    $session = $this->getSession();
+                    $session->removeSubQuote($quote);
+                }
+                break;
+            }
+        }
+
+        if (!$remove){
+            $this->addToSubscription($request);
+        }
+    }
+
+    /**
      * Returns new or already existing quote for adding in to it requested product.
      *
      * @return ModelQuote|null

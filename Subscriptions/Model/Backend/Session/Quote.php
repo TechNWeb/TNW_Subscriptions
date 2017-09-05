@@ -2,6 +2,7 @@
 
 namespace TNW\Subscriptions\Model\Backend\Session;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
 use Magento\Framework\Session\Config\ConfigInterface;
@@ -13,10 +14,9 @@ use Magento\Framework\Session\ValidatorInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Quote\Model\Quote as ModelQuote;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Class Quote
@@ -196,9 +196,30 @@ class Quote extends SessionManager
         }
 
         $this->addSubQuoteId($quote->getId());
-        $this->quotes[] = $quote;
+        $this->quotes[$quote->getId()] = $quote;
 
         return $this;
+    }
+
+    /**
+     * @param ModelQuote $quote
+     * @return $this
+     */
+    public function removeSubQuote($quote)
+    {
+        $this->removeSubQuoteId($quote->getId());
+        unset($this->quotes[$quote->getId()]);
+
+        return $this;
+    }
+
+    /**
+     * @param $quoteId
+     */
+    protected function removeSubQuoteId($quoteId)
+    {
+        $quoteIds = array_diff($this->getSubQuoteIds(), [$quoteId]);
+        $this->storage->setSubQuoteIds($quoteIds);
     }
 
     /**

@@ -13,9 +13,9 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Session\SessionManagerInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class Product
@@ -110,7 +110,7 @@ class Product extends Create
 
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
-            $productData['billing_frequency_id'],
+            $productData['billing_frequency'],
             $productData['price'],
             true
         );
@@ -139,10 +139,10 @@ class Product extends Create
             // otherwise "start on" is start date of subscription
             $data = [
                 'qty' => $productData['qty'],
-                'custom_price' => $product->getPrice(),
+                'custom_price' => $this->getFormattedProductPrice($product),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
-                        'billing_frequency' => $productData['billing_frequency_id'],
+                        'billing_frequency' => $productData['billing_frequency'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
@@ -153,7 +153,7 @@ class Product extends Create
                     static::NON_UNIQUE => [
                         'price' => $this->priceCalculator->getUnitPrice(
                             $product->getId(),
-                            $productData['billing_frequency_id'],
+                            $productData['billing_frequency'],
                             $productData['price']
                         )
                     ],
@@ -189,5 +189,15 @@ class Product extends Create
         }
 
         return $result;
+    }
+
+    /**
+     * @param MagentoProduct $product
+     * @return mixed
+     */
+    private function getFormattedProductPrice(MagentoProduct $product)
+    {
+        return $this->getContext()->getPriceCurrency()->getCurrency()
+            ->format($product->getPrice(), array('symbol' => ''), false, false);
     }
 }

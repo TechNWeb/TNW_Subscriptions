@@ -58,7 +58,7 @@ class Form extends AbstractDataProvider
      *
      * @var ProductRepositoryInterface
      */
-    private $productRepository;
+    protected $productRepository;
 
     /**
      * Repository for retrieving product billing frequencies.
@@ -124,12 +124,12 @@ class Form extends AbstractDataProvider
     /**
      * @var SessionQuote
      */
-    private $sessionQuote;
+    protected $sessionQuote;
 
     /**
      * @var \Magento\Directory\Model\CurrencyFactory
      */
-    private $currencyFactory;
+    protected $currencyFactory;
 
     /**
      * @param string $name
@@ -196,7 +196,7 @@ class Form extends AbstractDataProvider
             $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId);
             $billingFrequencyPresetQty = $frequency->getPresetQty();
             if ($frequency->getDefaultBillingFrequency()) {
-                $data[self::FORM_DATA_VALUE]['billing_frequency_id'] = $frequency->getBillingFrequencyId();
+                $data[self::FORM_DATA_VALUE]['billing_frequency'] = $frequency->getBillingFrequencyId();
                 $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
                 $data[self::FORM_DATA_VALUE]['preset_qty'] = $billingFrequencyPresetQty;
             }
@@ -256,9 +256,9 @@ class Form extends AbstractDataProvider
     protected function getFieldsMetaData()
     {
         return $result = [
-            'billing_frequency' => [
+            'general' => [
                 'children' => [
-                    'billing_frequency_id' => [
+                    'billing_frequency' => [
                         'arguments' => [
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
@@ -312,7 +312,7 @@ class Form extends AbstractDataProvider
                                         'validate-zero-or-greater' => true,
                                     ],
                                     'imports' => [
-                                        'changeValue' => 'index = billing_frequency_id:value',
+                                        'changeValue' => 'index = billing_frequency:value',
                                     ],
                                 ],
                             ],
@@ -322,7 +322,6 @@ class Form extends AbstractDataProvider
             ],
         ];
     }
-
 
     /**
      * Returns buttons meta data.
@@ -375,15 +374,16 @@ class Form extends AbstractDataProvider
     /**
      * Returns config fot start on field.
      *
+     * @param null|int $productId
      * @return array
      */
-    private function getStartOnFieldConfig()
+    protected function getStartOnFieldConfig($productId = null)
     {
         $visible = false;
         $value = null;
-
-        $productId = $this->request->getParam('product_id', null);
-
+        if (!$productId) {
+            $productId = $this->request->getParam('product_id', null);
+        }
         if ($productId) {
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productId);
@@ -414,16 +414,16 @@ class Form extends AbstractDataProvider
     /**
      * Returns list of product billing frequencies.
      *
-     * @return array
+     * @param null|int $productId
+     * @return array|null|ProductBillingFrequencyInterface[]
      */
-    private function getProductBillingFrequencies()
+    private function getProductBillingFrequencies($productId = null)
     {
         if ($this->productBillingFrequencies === null) {
-
             $this->productBillingFrequencies = [];
-
-            $productId = $this->request->getParam('product_id', null);
-
+            if (!$productId) {
+                $productId = $this->request->getParam('product_id', null);
+            }
             if ($productId) {
                 $this->productBillingFrequencies = $this->recurringOptionRepository
                     ->getListByProductId($productId)
@@ -437,14 +437,15 @@ class Form extends AbstractDataProvider
     /**
      * Returns product billing frequencies as array.
      *
+     * @param null|int $productId
      * @return array
      */
-    public function getProductBillingFrequenciesAsOptionArray()
+    public function getProductBillingFrequenciesAsOptionArray($productId = null)
     {
         $result = [];
 
         /** @var ProductBillingFrequencyInterface $productFrequency */
-        foreach ($this->getProductBillingFrequencies() as $productFrequency) {
+        foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
 
             $result[] = [
@@ -459,12 +460,15 @@ class Form extends AbstractDataProvider
     /**
      * Get trial period as string for product.
      *
+     * @param null|int $productId
      * @return \Magento\Framework\Phrase|string
      */
-    private function getTrialPeriod()
+    protected function getTrialPeriod($productId = null)
     {
         if ($this->trialPeriod === null) {
-            $productId = (int)$this->request->getParam('product_id', 0);
+            if (!$productId) {
+                $productId = (int)$this->request->getParam('product_id', 0);
+            }
             $trialLength = 0;
             $trialUnit = 0;
             $trialPriceLabel = '';
@@ -485,7 +489,7 @@ class Form extends AbstractDataProvider
 
                     $currencySymbol = $this->getCurrentCurrencySymbol();
                     $trialPriceLabel = (int)$product->getCustomAttribute(
-                        Attribute::SUBSCRIPTION_TRIAL_PRICE
+                            Attribute::SUBSCRIPTION_TRIAL_PRICE
                         )->getValue() . $currencySymbol . ' ' . __('for') . ' ';
                 }
             }
@@ -513,7 +517,7 @@ class Form extends AbstractDataProvider
      *
      * @return string
      */
-    private function getCurrentCurrencySymbol()
+    protected function getCurrentCurrencySymbol()
     {
         $currencyCode = $this->sessionQuote->getCurrencyId();
 
