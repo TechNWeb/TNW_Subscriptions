@@ -12,9 +12,9 @@ use Magento\Customer\Helper\Address;
 use Magento\Customer\Model\Address\Mapper;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Escaper;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use Magento\Framework\Data\OptionSourceInterface;
+use Magento\Framework\Escaper;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Customer addresses data source.
@@ -24,7 +24,7 @@ class CustomerAddress implements OptionSourceInterface
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -71,7 +71,7 @@ class CustomerAddress implements OptionSourceInterface
 
     /**
      * CustomerAddress constructor.
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param Address $addressHelper
      * @param AddressRepositoryInterface $addressService
      * @param SearchCriteriaBuilder $criteriaBuilder
@@ -80,7 +80,7 @@ class CustomerAddress implements OptionSourceInterface
      * @param Escaper $escaper
      */
     public function __construct(
-        Quote $session,
+        QuoteSessionInterface $session,
         Address $addressHelper,
         AddressRepositoryInterface $addressService,
         SearchCriteriaBuilder $criteriaBuilder,

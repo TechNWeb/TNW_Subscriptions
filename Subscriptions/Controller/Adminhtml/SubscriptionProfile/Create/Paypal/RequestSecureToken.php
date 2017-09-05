@@ -12,7 +12,7 @@ use Magento\Framework\Session\Generic;
 use TNW\Subscriptions\Model\Payment\Paypal\SecureToken;
 use Magento\Paypal\Model\Payflow\Transparent;
 use Magento\Quote\Model\Quote;
-use TNW\Subscriptions\Model\Backend\Session\Quote as AdminSession;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Class RequestSecureToken
@@ -37,7 +37,7 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
     /**
      * Admin session.
      *
-     * @var AdminSession
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -49,14 +49,14 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
     /**
      * RequestSecureToken constructor.
      * @param Context $context
-     * @param AdminSession $session
+     * @param QuoteSessionInterface $session
      * @param Generic $sessionTransparent
      * @param Transparent $transparent
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        AdminSession $session,
+        QuoteSessionInterface $session,
         Generic $sessionTransparent,
         Transparent $transparent,
         SecureToken $secureTokenService

@@ -10,11 +10,11 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\DataObject;
-use Magento\Framework\Session\SessionManagerInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
@@ -51,13 +51,13 @@ class Product extends Create
     /**
      * Product constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator
     ) {

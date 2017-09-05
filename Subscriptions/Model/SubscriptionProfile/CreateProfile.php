@@ -4,30 +4,26 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin;
+namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Session\SessionManagerInterface;
-use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
- * Class for creating subscriptions in admin.
+ * Class for creating subscription profile.
  */
-class Create extends BaseCreate
+class CreateProfile extends BaseCreate
 {
     /**
      * Quote address creator.
@@ -39,7 +35,7 @@ class Create extends BaseCreate
     /**
      * Quote creator.
      *
-     * @var Quote
+     * @var QuoteCreateInterface
      */
     private $quoteCreator;
 
@@ -72,11 +68,6 @@ class Create extends BaseCreate
     private $customerCreator;
 
     /**
-     * @var CartManagementInterface
-     */
-    private $quoteManagement;
-
-    /**
      * Core event manager.
      *
      * @var ManagerInterface
@@ -92,25 +83,23 @@ class Create extends BaseCreate
 
     /**
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param Address $addressCreator
      * @param Quote $quoteCreator
      * @param Product $productModifier
      * @param Customer $customerCreator
      * @param Manager $profileManager
-     * @param CartManagementInterface $quoteManagement
      * @param ManagerInterface $eventManager
      * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         Address $addressCreator,
         Quote $quoteCreator,
         Product $productModifier,
         Customer $customerCreator,
         Manager $profileManager,
-        CartManagementInterface $quoteManagement,
         ManagerInterface $eventManager,
         MessageHistoryLogger $messageHistoryLogger
     ) {
@@ -119,7 +108,6 @@ class Create extends BaseCreate
         $this->productModifier = $productModifier;
         $this->customerCreator = $customerCreator;
         $this->profileManager = $profileManager;
-        $this->quoteManagement = $quoteManagement;
         $this->eventManager = $eventManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
 
@@ -149,7 +137,7 @@ class Create extends BaseCreate
     public function recollectSubscriptions()
     {
         if ($this->isNeedCollect()) {
-            /** @var Session $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->getSession();
             foreach ($session->getSubQuotes() as $subQuote) {
                 $subQuote->collectTotals();
@@ -234,7 +222,7 @@ class Create extends BaseCreate
     private function getSubQuote()
     {
         $result = null;
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $subQuotes = $session->getSubQuotes();
         $canAdd = false;
@@ -368,7 +356,7 @@ class Create extends BaseCreate
     public function setShippingMethods($methods)
     {
         $result = [];
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $subQuotes = $session->getSubQuotes();
 
@@ -412,7 +400,7 @@ class Create extends BaseCreate
         $result = [];
 
         try {
-            /** @var Session $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
 
@@ -439,7 +427,7 @@ class Create extends BaseCreate
         $result = [];
 
         try {
-            /** @var Session $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
 
@@ -462,7 +450,7 @@ class Create extends BaseCreate
      */
     public function getPayment()
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $quotes = $session->getSubQuotes();
 
@@ -488,7 +476,7 @@ class Create extends BaseCreate
 
         try {
             $customer = $this->customerCreator->prepareCustomer();
-            /** @var Session $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->getSession();
             $subQuotes = $session->getSubQuotes();
             //
@@ -562,7 +550,7 @@ class Create extends BaseCreate
      */
     public function setCurrency($currencyCode)
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $subQuotes = $session->getSubQuotes();
 
@@ -588,7 +576,7 @@ class Create extends BaseCreate
     public function getSubQuotesGrandTotal()
     {
         $grandTotal = 0;
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $quotes = $session->getSubQuotes();
 
@@ -608,7 +596,7 @@ class Create extends BaseCreate
      */
     public function reassignQuote($customerId)
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
 
         $customer = $this->customerCreator->getCustomer($customerId);
@@ -627,7 +615,7 @@ class Create extends BaseCreate
      */
     public function changeCustomerIdInSession($customerId)
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $session->setCustomerId($customerId);
     }
@@ -637,7 +625,7 @@ class Create extends BaseCreate
      */
     public function changeCustomerInQuote()
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $sessionCustomerId = $session->getCustomerId();
         $customer = null;
@@ -706,7 +694,7 @@ class Create extends BaseCreate
      */
     public function clearAccountStepData()
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         /** @var array $subQuotes */
         $subQuotes = $session->getSubQuotes();
@@ -726,7 +714,7 @@ class Create extends BaseCreate
      */
     public function cleaBillingStepData()
     {
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         /** @var array $subQuotes */
         $subQuotes = $session->getSubQuotes();

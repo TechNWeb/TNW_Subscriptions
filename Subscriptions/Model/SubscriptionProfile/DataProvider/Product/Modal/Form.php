@@ -19,8 +19,8 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 
 /**
  * Modal form for adding single product to subscription.
@@ -122,7 +122,7 @@ class Form extends AbstractDataProvider
     private $config;
 
     /**
-     * @var SessionQuote
+     * @var QuoteSessionInterface
      */
     protected $sessionQuote;
 
@@ -143,7 +143,7 @@ class Form extends AbstractDataProvider
      * @param PriceCalculator $priceCalculator
      * @param StoreManagerInterface $storeManager
      * @param \TNW\Subscriptions\Model\Config $config
-     * @param SessionQuote $sessionQuote
+     * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param string $scope
      * @param array $meta
@@ -161,7 +161,7 @@ class Form extends AbstractDataProvider
         PriceCalculator $priceCalculator,
         StoreManagerInterface $storeManager,
         \TNW\Subscriptions\Model\Config $config,
-        SessionQuote $sessionQuote,
+        QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         $scope = '',
         array $meta = [],

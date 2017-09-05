@@ -12,11 +12,10 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Store\Model\Store;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
@@ -60,7 +59,7 @@ class Customer extends Create
     /**
      * Customer constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param CustomerRepositoryInterface $customerRepository
      * @param AccountManagementInterface $accountManagement
      * @param AddressRepositoryInterface $addressRepository
@@ -68,7 +67,7 @@ class Customer extends Create
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
         AddressRepositoryInterface $addressRepository,
@@ -88,7 +87,7 @@ class Customer extends Create
      */
     public function prepareCustomer()
     {
-        /** @var Quote $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         /** @var Store $store */
         $store = $session->getStore();
@@ -191,6 +190,7 @@ class Customer extends Create
      *
      * @param CustomerInterface $customer
      * @param Address $quoteCustomerAddress
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     private function saveCustomerAddress(
         CustomerInterface $customer,
@@ -244,7 +244,7 @@ class Customer extends Create
     {
         $customer = null;
         if (!$customerId) {
-            /** @var Quote $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->getSession();
             $customerId = $session->getCustomerId();
         }
@@ -269,7 +269,7 @@ class Customer extends Create
         CustomerInterface $customer,
         Store $store
     ) {
-        /** @var Quote $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         $shippingAddress = $session->getFirstQuote()->getShippingAddress();
         $customerAddressObject = $shippingAddress->exportCustomerAddress();

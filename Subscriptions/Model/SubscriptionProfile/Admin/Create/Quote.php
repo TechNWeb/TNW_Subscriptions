@@ -8,25 +8,25 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Customer\Api\CustomerMetadataInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Customer\Model\Customer\Mapper;
 use Magento\Customer\Model\Metadata\Form;
 use Magento\Customer\Model\Metadata\FormFactory;
-use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
-use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
 
 /**
- * Class Quote
+ * Create quotes for subscription in admin area.
  */
-class Quote extends Create
+class Quote extends Create implements QuoteCreateInterface
 {
     /**
      * Factory for creating quotes.
@@ -80,7 +80,7 @@ class Quote extends Create
     /**
      * Quote constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param ModelQuoteFactory $quoteFactory
      * @param GroupManagementInterface $groupManagement
      * @param Address $addressCreator
@@ -91,7 +91,7 @@ class Quote extends Create
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         ModelQuoteFactory $quoteFactory,
         GroupManagementInterface $groupManagement,
         Address $addressCreator,
@@ -121,15 +121,13 @@ class Quote extends Create
     }
 
     /**
-     * Creates empty quote and assigns customer if there is a customer id in session.
-     *
-     * @return int|string
+     * @inheritdoc
      */
     public function createSubCart()
     {
         /** @var ModelQuote $quote */
         $quote = $this->quoteFactory->create();
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
 
         if ($session->getStoreId()) {
@@ -210,7 +208,7 @@ class Quote extends Create
                 $quoteData[$quoteCode] = $data[$attribute->getAttributeCode()];
             }
         }
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
 
         foreach ($session->getSubQuotes() as $subQuote) {
@@ -248,7 +246,7 @@ class Quote extends Create
     public function validate(ModelQuote $quote)
     {
         $errors = [];
-        /** @var Session $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
 
         if (!$session->getStore()->getId()) {
