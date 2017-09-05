@@ -12,7 +12,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Pool;
 
 class Account extends AbstractDataProvider
@@ -41,7 +41,7 @@ class Account extends AbstractDataProvider
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -65,7 +65,7 @@ class Account extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param CustomerRepository $customerRepository
      * @param PoolInterface $modifiersPool
      * @param array $meta
@@ -77,7 +77,7 @@ class Account extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        Quote $session,
+        QuoteSessionInterface $session,
         CustomerRepository $customerRepository,
         PoolInterface $modifiersPool,
         array $meta = [],

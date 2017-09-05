@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 abstract class SubscriptionProfile extends Action
 {
@@ -53,19 +54,19 @@ abstract class SubscriptionProfile extends Action
     }
 
     /**
-     * @return \TNW\Subscriptions\Model\Backend\Session\Quote
+     * @return QuoteSessionInterface
      */
     protected function _getSession()
     {
-        return $this->_objectManager->get('TNW\Subscriptions\Model\Backend\Session\Quote');
+        return $this->_objectManager->get(QuoteSessionInterface::class);
     }
 
     /**
-     * @return \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create
+     * @return \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile
      */
     protected function getSubCreateModel()
     {
-        return $this->_objectManager->get('TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create');
+        return $this->_objectManager->get(\TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile::class);
     }
 
 

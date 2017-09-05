@@ -23,13 +23,6 @@ use TNW\Subscriptions\Model\Product\Attribute;
 class LinkedDataProvider extends AbstractDataProvider
 {
     /**
-     * Was tables already joined to collection or not.
-     *
-     * @var bool
-     */
-    private $tablesJoined = false;
-
-    /**
      * Data Persistor.
      *
      * @var DataPersistorInterface
@@ -94,9 +87,9 @@ class LinkedDataProvider extends AbstractDataProvider
     /**
      * @inheritdoc
      */
-    public function getCollection()
+    public function getData()
     {
-        $collection = parent::getCollection();
+        $collection = $this->getCollection();
         $collection->addAttributeToFilter(
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             [
@@ -115,13 +108,11 @@ class LinkedDataProvider extends AbstractDataProvider
             Attribute::SUBSCRIPTION_DISCOUNT_TYPE
         ]);
 
-        if (!$this->tablesJoined) {
+        if ($this->getBillingFrequencyId()) {
             $this->joinTables($collection);
-
-            $this->tablesJoined = true;
         }
 
-        return $collection;
+        return parent::getData();
     }
 
     /**

@@ -14,6 +14,7 @@ use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Ui\Component\Form;
 use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
 class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
@@ -111,7 +112,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private $addressAttributes;
 
-    /** @var \TNW\Subscriptions\Model\Backend\Session\Quote */
+    /** @var QuoteSessionInterface */
     private $session;
 
     /** @var CustomerRepository */
@@ -142,7 +143,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param AddressRepository $addressRepository
      * @param AddressMapper $addressMapper
      * @param CustomerMapper $customerMapper
-     * @param \TNW\Subscriptions\Model\Backend\Session\Quote $session
+     * @param QuoteSessionInterface $session
      */
     public function __construct(
         AttributeMetadataDataProvider $attributeMetadataDataProvider,
@@ -150,7 +151,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         AddressRepository $addressRepository,
         AddressMapper $addressMapper,
         CustomerMapper $customerMapper,
-        \TNW\Subscriptions\Model\Backend\Session\Quote $session,
+        QuoteSessionInterface $session,
         $isShipping
     ) {
         $this->attributeMetadataDataProvider = $attributeMetadataDataProvider;

@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Model\Address\Config;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Block for render shipping and billing addresses on subscription profile review page.
@@ -19,7 +19,7 @@ class Address extends Template
     /**
      * Help retrieve address by type(Shipping, Billing).
      *
-     * @var Create
+     * @var CreateProfile
      */
     private $create;
 
@@ -41,14 +41,14 @@ class Address extends Template
      * Address constructor.
      *
      * @param Template\Context $context
-     * @param Create $create
+     * @param CreateProfile $create
      * @param Config $addressConfig
      * @param string $addressType
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        Create $create,
+        CreateProfile $create,
         Config $addressConfig,
         $addressType = QuoteAddress::ADDRESS_TYPE_SHIPPING,
         array $data = []
