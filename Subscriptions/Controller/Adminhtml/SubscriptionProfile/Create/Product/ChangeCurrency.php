@@ -7,8 +7,8 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Product;
 
 use Magento\Ui\Controller\Adminhtml\Index\Render;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Class changes currency on selecting new currency.
@@ -24,7 +24,7 @@ class ChangeCurrency extends Render
     {
         $currencyId = $this->getRequest()->getParam('currency_id');
         if (isset($currencyId)) {
-            /** @var SessionQuote $quoteSession */
+            /** @var QuoteSessionInterface $quoteSession */
             $quoteSession = $this->getQuoteSession();
             $quoteSession->setCurrencyId($currencyId);
             $this->getSubCreateModel()->setCurrency($currencyId);
@@ -44,20 +44,20 @@ class ChangeCurrency extends Render
     /**
      * Return admin session object.
      *
-     * @return SessionQuote
+     * @return QuoteSessionInterface
      */
     private function getQuoteSession()
     {
-        return $this->_objectManager->get(SessionQuote::class);
+        return $this->_objectManager->get(QuoteSessionInterface::class);
     }
 
     /**
      * Return subscription create model.
      *
-     * @return Create
+     * @return CreateProfile
      */
     private function getSubCreateModel()
     {
-        return $this->_objectManager->get(Create::class);
+        return $this->_objectManager->get(CreateProfile::class);
     }
 }

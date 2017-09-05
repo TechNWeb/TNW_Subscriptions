@@ -8,10 +8,10 @@ namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
-use Magento\Store\Model\Store;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Subscription profile creation steps pool.
@@ -45,7 +45,7 @@ class StepPool
         self::STEP_PARAM_TYPE_CUSTOMER,
         self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION,
         self::STEP_PARAM_TYPE_SHIPPING_BILLING,
-        self::STEP_PARAM_TYPE_PAYMENT
+        self::STEP_PARAM_TYPE_PAYMENT,
     ];
 
     /**
@@ -70,7 +70,7 @@ class StepPool
     /**
      * Admin session.
      *
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -82,15 +82,15 @@ class StepPool
     private $customerRepository;
 
     /**
-     * @param StoreManagerInterface       $storeManager
-     * @param DataPersistorInterface      $dataPersistor
-     * @param Quote                       $session
+     * @param StoreManagerInterface $storeManager
+     * @param DataPersistorInterface $dataPersistor
+     * @param QuoteSessionInterface $session
      * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor,
-        Quote $session,
+        QuoteSessionInterface $session,
         CustomerRepositoryInterface $customerRepository
     ) {
         $this->storeManager = $storeManager;

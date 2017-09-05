@@ -6,14 +6,13 @@
 
 namespace TNW\Subscriptions\Model\Source;
 
+use Magento\Directory\Model\Currency;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Framework\Locale\CurrencyInterface;
-use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
-use Magento\Directory\Model\Currency;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Class CurrencySelect
@@ -30,7 +29,7 @@ class CurrencySelect extends AbstractSource
     /**
      * Admin session.
      *
-     * @var SessionManagerInterface
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -58,13 +57,13 @@ class CurrencySelect extends AbstractSource
     /**
      * CurrencySelect constructor.
      * @param StoreManagerInterface $storeManager
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param CurrencyFactory $currencyFactory
      * @param CurrencyInterface $localeCurrency
      */
     public function __construct(
         StoreManagerInterface $storeManager,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         CurrencyFactory $currencyFactory,
         CurrencyInterface $localeCurrency
     ) {
@@ -137,7 +136,7 @@ class CurrencySelect extends AbstractSource
     public function getSelectedStore()
     {
         if ($this->store === null) {
-            /** @var SessionQuote $session */
+            /** @var QuoteSessionInterface $session */
             $session = $this->session;
             $this->store = $this->storeManager->getStore($session->getStoreId());
             $currencyId = $session->getCurrencyId();
@@ -166,7 +165,7 @@ class CurrencySelect extends AbstractSource
         if ($this->store === null) {
             $this->getSelectedStore();
         }
-        /** @var SessionQuote $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->session;
         $currencyId = $session->getCurrencyId();
         if ($currencyId) {
