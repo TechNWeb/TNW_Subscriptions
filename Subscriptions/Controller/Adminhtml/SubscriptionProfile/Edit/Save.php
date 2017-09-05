@@ -198,6 +198,7 @@ class Save extends Action
         $requestData = $this->getRequest()->getParams();
 
         $this->processShippingAddress($requestData);
+        $this->processBillingAddress($requestData);
     }
 
     /**
@@ -207,25 +208,53 @@ class Save extends Action
      */
     private function processShippingAddress($data)
     {
-        if (!empty($data['shipping_address']) && !empty($data['shipping_info'])) {
-            $address = array_merge($data['shipping_address'], $data['shipping_info']);
-            $customerAddressId = !empty($address['customer_address_id'])
-                ? $address['customer_address_id']
+        $this->processAddress($data, SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING);
+    }
+
+    /**
+     * Process billing data from request
+     *
+     * @param $data
+     */
+    private function processBillingAddress($data)
+    {
+        $this->processAddress($data, SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING);
+    }
+
+    /**
+     * Process billing/shipping data from request
+     *
+     * @param $data
+     * @param $type
+     */
+    private function processAddress($data, $type)
+    {
+        if ($type === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
+            $keyAddress = 'shipping_address';
+            $keyInfo = 'shipping_info';
+            $keyCustomer = 'customer_shipping_address_id';
+        } else {
+            $keyAddress = 'billing_address';
+            $keyInfo = 'billing_info';
+            $keyCustomer = 'customer_billing_address_id';
+        }
+        if (!empty($data[$keyAddress]) && !empty($data[$keyInfo])) {
+            $address = array_merge($data[$keyAddress], $data[$keyInfo]);
+            $customerAddressId = !empty($address[$keyCustomer])
+                ? $address[$keyCustomer]
                 : null;
             $saveAddress = isset($address['save_address']) && $address['save_address'];
-
             $address = $this->formatMultiLineAttributes($address);
-            /** @var SubscriptionProfileAddressInterface $profileShippingAddress */
-            $profileShippingAddress = $this->getProfileShippingAddress();
-
+            /** @var SubscriptionProfileAddressInterface $profileAddress */
+            $profileAddress = $this->getProfileAddress($type);
             $this->dataObjectHelper->populateWithArray(
-                $profileShippingAddress,
+                $profileAddress,
                 $address,
                 SubscriptionProfileAddressInterface::class
             );
 
             if ($saveAddress) {
-                $customerAddress = $profileShippingAddress->exportCustomerAddress();
+                $customerAddress = $profileAddress->exportCustomerAddress();
                 /** @var CustomerInterface $customer */
                 $customer = $this->getProfile()->getCustomer();
                 $addresses = (array)$customer->getAddresses();
@@ -235,8 +264,10 @@ class Save extends Action
                 $customerAddressId = $customerAddress->getId();
             }
 
-            $profileShippingAddress->setCustomerAddressId($customerAddressId);
-            $profileShippingAddress->setStreet('test');//TODO fix this
+            $profileAddress->setCustomerAddressId($customerAddressId);
+            $profileAddress->setStreet(
+                implode('\n', $profileAddress->getStreet())
+            );//TODO fix saving address field street (multiline)
         }
     }
 
@@ -245,9 +276,15 @@ class Save extends Action
      *
      * @return mixed|null|SubscriptionProfileAddressInterface
      */
-    private function getProfileShippingAddress()
+    private function getProfileAddress($type)
     {
-        return $this->getProfile()->getShippingAddress();
+        /** @var SubscriptionProfileAddressInterface $address */
+        if ($type === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
+            $address = $this->getProfile()->getShippingAddress();
+        } else {
+            $address = $this->getProfile()->getBillingAddress();
+        }
+        return $address;
     }
 
     /**

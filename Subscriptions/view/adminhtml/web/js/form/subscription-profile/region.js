@@ -26,6 +26,11 @@ define([
     };
 
     return Select.extend({
+
+        defaults:{
+            customerAddressSelector: 'customer_address_id'
+        },
+
         /**
          * Creates input from template, renders it via renderer.
          *
@@ -42,7 +47,7 @@ define([
         },
 
         checkVisibility: function () {
-            var customerAddressId = registry.get('index=customer_address_id');
+            var customerAddressId = registry.get('index=' + this.customerAddressSelector);
             var options = this.options();
             var optionsLength = 0;
             if (typeof options == 'Array') {

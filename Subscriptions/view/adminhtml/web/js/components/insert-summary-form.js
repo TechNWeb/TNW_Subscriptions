@@ -13,19 +13,20 @@ define(
                 ajaxSave: true,
                 listens: {
                     responseStatus: 'processResponseStatus'
-                }
+                },
+                insertFormName: null
             },
 
             /**
              * Process response status.
              */
             processResponseStatus: function () {
-                var shippingInsertFrom;
+                var insertFrom;
 
                 if (this.responseStatus()) {
-                    shippingInsertFrom = registry.get('index=' + this.source.shippingInsertForm);
-                    shippingInsertFrom.destroyInserted();
-                    shippingInsertFrom.render();
+                    insertFrom = registry.get('index=' + this.insertFormName);
+                    insertFrom.destroyInserted();
+                    insertFrom.render();
                 }
             },
 

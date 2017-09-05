@@ -73,10 +73,15 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         if (isset($customerAddressData['region_code'])) {
             $customerAddressDataWithRegion['region']['region_code'] = $customerAddressData['region_code'];
         }
-        if ($customerAddressData['region_id']) {
+        if (isset($customerAddressData['region_id'])) {
             $customerAddressDataWithRegion['region']['region_id'] = $customerAddressData['region_id'];
         }
         $customerAddressData = array_merge($customerAddressData, $customerAddressDataWithRegion);
+
+        //TODO fix saving address field street (multiline)
+        if (isset($customerAddressData['street'])) {
+            $customerAddressData['street'] = explode('\n', $customerAddressData['street']);
+        }
 
         $addressDataObject = $this->addressDataFactory->create();
         $this->dataObjectHelper->populateWithArray(

@@ -4,11 +4,12 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\Framework\App\RequestInterface;
+use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Framework\Api\Filter;
 use Magento\Customer\Model\Customer;
-use Magento\Framework\Registry;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Customer\Api\AddressMetadataInterface;
 use Magento\Customer\Model\Attribute;
 use Magento\Customer\Model\AttributeMetadataDataProvider;
@@ -17,15 +18,21 @@ use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Ui\Component\Form;
 use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class AddressInfo
+ * Data provider for summary form.
  */
-class AddressInfo implements ModifierInterface
+class SummaryAddressForm extends AbstractDataProvider
 {
-    const SUMMARY_FIELDSET = 'summary';
+    /**
+     * Form data scope.
+     */
+    const DATA_SCOPE_SUMMARY_SHIPPING_ADDRESS_FORM = 'tnw_subscriptionprofile_summary_shipping_address_form';
+    const DATA_SCOPE_SUMMARY_BILLING_ADDRESS_FORM = 'tnw_subscriptionprofile_summary_billing_address_form';
 
     const SHIPPING_INFORMATION_FIELDSET = 'shipping_information';
     const BILLING_INFORMATION_FIELDSET = 'billing_information';
@@ -53,7 +60,8 @@ class AddressInfo implements ModifierInterface
     /**
      * Select form component with customer addresses list.
      */
-    const CUSTOMER_ADDRESS_SELECT = 'customer_address_id';
+    const CUSTOMER_SHIPPING_ADDRESS_SELECT = 'customer_shipping_address_id';
+    const CUSTOMER_BILLING_ADDRESS_SELECT = 'customer_billing_address_id';
 
     /**
      * Information fieldSet attributes.
@@ -126,10 +134,14 @@ class AddressInfo implements ModifierInterface
      */
     private $addressAttributes;
 
-    /** @var CustomerRepository */
+    /**
+     * @var CustomerRepository
+     */
     private $customerRepository;
 
-    /** @var AddressRepository */
+    /**
+     * @var AddressRepository
+     */
     private $addressRepository;
 
     /**
@@ -145,45 +157,115 @@ class AddressInfo implements ModifierInterface
      * @var CustomerMapper
      */
     private $customerMapper;
-    /**
-     * @var Registry
-     */
-    private $registry;
 
     /**
-     * AddressModifier constructor.
-     *
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * SummaryForm constructor.
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
      * @param AttributeMetadataDataProvider $attributeMetadataDataProvider
      * @param CustomerRepository $customerRepository
      * @param AddressRepository $addressRepository
      * @param AddressMapper $addressMapper
      * @param CustomerMapper $customerMapper
-     * @param Registry $registry
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param RequestInterface $request
      * @param $isShipping
+     * @param array $meta
+     * @param array $data
+     * @internal param Registry $registry
+     * @internal param $isShipping
      */
     public function __construct(
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
         AttributeMetadataDataProvider $attributeMetadataDataProvider,
         CustomerRepository $customerRepository,
         AddressRepository $addressRepository,
         AddressMapper $addressMapper,
         CustomerMapper $customerMapper,
-        Registry $registry,
-        $isShipping
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        RequestInterface $request,
+        $isShipping,
+        array $meta = [],
+        array $data = []
     ) {
         $this->attributeMetadataDataProvider = $attributeMetadataDataProvider;
         $this->customerRepository = $customerRepository;
         $this->addressRepository = $addressRepository;
         $this->addressMapper = $addressMapper;
         $this->customerMapper = $customerMapper;
+        $this->profileRepository = $profileRepository;
+        $this->request = $request;
         $this->isShipping = $isShipping;
-        $this->registry = $registry;
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function modifyMeta(array $meta)
+    public function getData()
     {
+        $data =  [];
+        $addressId = $this->getAddressId();
+        if ($addressId) {
+            $dataObject = $this->addressRepository->getById($addressId);
+            $dataArray = $this->addressMapper->toFlatArray($dataObject);
+        } else {
+            $dataArray = $this->addressMapper->toFlatArray($this->getProfileAddress()->exportCustomerAddress());
+        }
+        if (count($dataArray)) {
+            $data = array_replace_recursive(
+                $data,
+                $this->getAddressData($dataArray, !$addressId)
+            );
+        }
+        $data = array_replace_recursive(
+            $data,
+            $this->modifyAddressIdData($addressId)
+        );
+        if (!$addressId) {
+            if (!isset($data[$this->getAddressDataFieldSetdataScope()]['country_id']) ||
+                !$data[$this->getAddressDataFieldSetdataScope()]['country_id']) {
+                $data = array_replace_recursive(
+                    $data,
+                    $this->modifyCountryIdData()
+                );
+            }
+        }
+
+        $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
+
+        return [
+            $this->getProfileId() => $data
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFilter(Filter $filter)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
         $fieldSetsChildren = $this->getFieldSetsChildren();
         $addressFieldSetName = $this->getAddressFieldsetName();
         $addressInfoFieldSetName = $this->getAddressInfoFieldsetName();
@@ -191,109 +273,47 @@ class AddressInfo implements ModifierInterface
         $meta = array_merge_recursive(
             $meta,
             [
-                static::SUMMARY_FIELDSET => [
-                    'children' => [
-                        $addressInfoFieldSetName => [
-                            'children' => array_merge(
-                                $this->getButtonsSet(),
-                                [
-                                    static::INFO_FIELDSET_NAME => [
-                                        'arguments' => [
-                                            'data' => [
-                                                'config' => [
-                                                    'label' => false,
-                                                    'collapsible' => false,
-                                                    'componentType' => Form\Fieldset::NAME,
-                                                    'sortOrder' => 20,
-                                                    'dataScope' => $this->getInfoFieldSetDataScope(),
-                                                    'imports' => [
-                                                        'visible' => '!ns = ${ $.ns }, index = ' .
-                                                            $addressInfoFieldSetName . ':preview'
-                                                    ]
-                                                ],
-                                            ],
+                $addressInfoFieldSetName => [
+                    'children' => array_merge(
+                        $this->getButtonsSet(),
+                        [
+                            static::INFO_FIELDSET_NAME => [
+                                'arguments' => [
+                                    'data' => [
+                                        'config' => [
+                                            'label' => false,
+                                            'collapsible' => false,
+                                            'componentType' => Form\Fieldset::NAME,
+                                            'sortOrder' => 20,
+                                            'dataScope' => $this->getInfoFieldSetDataScope(),
+                                            'imports' => [
+                                                'visible' => '!ns = ${ $.ns }, index = ' .
+                                                    $addressInfoFieldSetName . ':preview'
+                                            ]
                                         ],
-                                        'children' => $fieldSetsChildren[static::INFO_FIELDSET_NAME],
                                     ],
-                                    $addressFieldSetName => [
-                                        'arguments' => [
-                                            'data' => [
-                                                'config' => [
-                                                    'dataScope' => $this->getAddressDataFieldSetdataScope(),
-                                                ],
-                                            ],
+                                ],
+                                'children' => $fieldSetsChildren[static::INFO_FIELDSET_NAME],
+                            ],
+                            $addressFieldSetName => [
+                                'arguments' => [
+                                    'data' => [
+                                        'config' => [
+                                            'dataScope' => $this->getAddressDataFieldSetdataScope(),
                                         ],
-                                        'children' => array_merge(
-//                                        $this->getButtonsSet(),
-                                            $fieldSetsChildren[$addressFieldSetName],
-                                            $this->getAddressIdMeta()
-                                        )
                                     ],
-                                ]),
-                        ],
-                    ]
+                                ],
+                                'children' => array_merge(
+                                    $fieldSetsChildren[$addressFieldSetName],
+                                    $this->getAddressIdMeta()
+                                )
+                            ],
+                        ]
+                    ),
                 ],
-
             ]
         );
-
         return $meta;
-    }
-
-    /**
-     * Returns address fieldset name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getAddressFieldsetName()
-    {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_ADDRESS_FIELDSET_NAME
-            : self::BILLING_ADDRESS_FIELDSET_NAME;
-    }
-
-    /**
-     * Returns address info fieldset name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getAddressInfoFieldsetName()
-    {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_INFORMATION_FIELDSET
-            : self::BILLING_INFORMATION_FIELDSET;
-    }
-
-    /**
-     * Returns address info header name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getAddressInfoHeaderName()
-    {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_INFORMATION_HEADER
-            : self::BILLING_INFORMATION_HEADER;
-    }
-
-    /**
-     * Returns meta data for buttons container on the form.
-     *
-     * @return array
-     */
-    private function getButtonsSet()
-    {
-        return [
-            $this->getAddressInfoHeaderName() => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'content' => $this->getInfoFieldSetLabel(),
-                        ],
-                    ],
-                ]
-            ]
-        ];
     }
 
     /**
@@ -304,12 +324,12 @@ class AddressInfo implements ModifierInterface
     private function getAddressIdMeta()
     {
         return [
-            static::CUSTOMER_ADDRESS_SELECT => [
+            $this->getCustomerAddressSelect() => [
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'issetShippingAddress' => $this->checkIfIssetShippingId(),
-                            'visible' => $this->checkIfIssetShippingId(),
+                            'issetShippingAddress' => true,//(bool)$this->getAddressId(),
+                            'visible' => (bool)$this->getAddressId(),
                             'addressesData' => $this->getCustomerAddressesData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
                         ]
@@ -406,7 +426,6 @@ class AddressInfo implements ModifierInterface
                     'config' => [
                         'formElement' => $formElement,
                         'dataType' => 'text',
-
                     ]
                 ]
             );
@@ -460,17 +479,17 @@ class AddressInfo implements ModifierInterface
                     'elementTmpl' => 'ui/form/element/select',
                     'customEntry' => 'region',
                     'component' => 'TNW_Subscriptions/js/form/subscription-profile/region',
+                    'customerAddressSelector' => $this->getCustomerAddressSelect(),
                     'formElement' => 'select',
                     'filterBy' => [
                         'target' => '${ $.provider }:${ $.parentScope }.country_id',
                         'field' => 'country_id',
                     ],
                     'validation' => [
-                        'required-entry' => (!($this->getShippingId() || $this->isShippingFieldSet())),
+                        'required-entry' => (!($this->getAddressId())),
                     ],
-                    'additionalClass' => ($this->checkIfIssetShippingId())? ' hidden': '',
+                    'additionalClass' => ($this->getAddressId())? ' hidden': '',
                     'imports' => [
-                        'checkValidation' => '!ns = ${ $.ns }, index = same_as_shipping:checked',
                         'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
                     ],
                     'customScope' => 'region'
@@ -506,80 +525,6 @@ class AddressInfo implements ModifierInterface
         }
 
         return array($attributeMeta, $additionalClasses);
-    }
-
-    /**
-     * Checks if it is shipping address form.
-     *
-     * @return bool
-     */
-    private function isShippingFieldSet()
-    {
-        return $this->isShipping;
-    }
-
-    /**
-     * Returns shipping|billing information fieldset dataScope.
-     *
-     * @return string
-     */
-    private function getInfoFieldSetDataScope()
-    {
-        if (!$this->infoFieldSetName) {
-            $this->infoFieldSetName = self::SHIPPING_INFO_FIELDSET;
-            if (!$this->isShippingFieldSet()) {
-                $this->infoFieldSetName = self::BILLING_INFO_FIELDSET;
-            }
-        }
-
-        return $this->infoFieldSetName;
-    }
-
-    /**
-     * Returns shipping|billing address data fieldset dataScope.
-     *
-     * @return string
-     */
-    private function getAddressDataFieldSetdataScope()
-    {
-        if (!$this->addressDataFieldSetName) {
-            $this->addressDataFieldSetName = self::SHIPPING_ADDRESS_FIELDSET;
-            if (!$this->isShippingFieldSet()) {
-                $this->addressDataFieldSetName = self::BILLING_ADDRESS_FIELDSET;
-            }
-        }
-
-        return $this->addressDataFieldSetName;
-    }
-
-    /**
-     * Returns label for customer address information fieldset.
-     *
-     * @return string
-     */
-    private function getInfoFieldSetLabel()
-    {
-        $infoFieldSetLabel = __('Shipping Information');
-        if (!$this->isShippingFieldSet()) {
-            $infoFieldSetLabel = __('Billing Information');
-        }
-
-        return $infoFieldSetLabel;
-    }
-
-    /**
-     * Returns label for customer address data fieldset.
-     *
-     * @return string
-     */
-    private function getAddressFieldSetLabel()
-    {
-        $addressFieldSetLabel = __('Shipping Address');
-        if (!$this->isShippingFieldSet()) {
-            $addressFieldSetLabel = __('Billing Address');
-        }
-
-        return $addressFieldSetLabel;
     }
 
     /**
@@ -693,21 +638,6 @@ class AddressInfo implements ModifierInterface
     }
 
     /**
-     * Checks if customer has at least one address.
-     *
-     * @return bool
-     */
-    private function checkIfIssetShippingId()
-    {
-        $return = true;
-        if (!$this->getShippingId()) {
-            $return = false;
-        }
-
-        return $return;
-    }
-
-    /**
      * Get meta data for 'imports' property of UI component on the form.
      *
      * @param string $attributeCode
@@ -717,63 +647,14 @@ class AddressInfo implements ModifierInterface
     {
         $imports = [];
         if (!in_array($attributeCode, $this->infoAttributes)) {
-
             if ($attributeCode != 'region_id') {
-                if ($this->getShippingId() || $this->isShippingFieldSet()) {
+                if ($this->getAddressId()) {
                     $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
-                } else {
-                    $imports['visible'] = '!ns = ${ $.ns }, index = same_as_shipping:checked';
                 }
             }
-
-        } else {
-            $imports['visible'] = '!${ $.parentName}.same_as_shipping:checked';
         }
 
         return $imports;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function modifyData(array $data)
-    {
-        $dataArray = [];
-        $addressId = $this->getShippingId();
-
-        if ($addressId) {
-            $dataObject = $this->addressRepository->getById($addressId);
-            $dataArray = $this->addressMapper->toFlatArray($dataObject);
-        } else {
-            $customer = $this->getCustomer();
-            if ($customer) {
-                $dataArray = $this->customerMapper->toFlatArray($customer);
-            }
-        }
-
-        if (count($dataArray)) {
-            $data = array_replace_recursive(
-                $data,
-                $this->getAddressData($dataArray)
-            );
-        }
-
-        if ($addressId) {
-            $data = array_replace_recursive(
-                $data,
-                $this->modifyShippingIdData($addressId)
-            );
-        } else {
-            if (!isset ($data[$this->getProfileId()][static::SUMMARY_FIELDSET][static::SHIPPING_INFORMATION_FIELDSET][$this->getAddressDataFieldSetdataScope()]['country_id']) ||
-                !$data[$this->getProfileId()][static::SUMMARY_FIELDSET][static::SHIPPING_INFORMATION_FIELDSET][$this->getAddressDataFieldSetdataScope()]['country_id']) {
-                $data = array_replace_recursive(
-                    $data,
-                    $this->modifyCountryIdData()
-                );
-            }
-        }
-
-        return $data;
     }
 
     /**
@@ -794,7 +675,7 @@ class AddressInfo implements ModifierInterface
                     /** @var array $addressData */
                     $addressData = $this->addressMapper->toFlatArray($address);
                     $addressData = $this->getAddressData($addressData);
-                    $customerInfo = $addressData[$this->getProfileId()][static::SUMMARY_FIELDSET][static::SHIPPING_INFORMATION_FIELDSET][$this->getInfoFieldSetDataScope()];
+                    $customerInfo = $addressData[$this->getInfoFieldSetDataScope()];
                     $data[$address->getId()] = $customerInfo;
                 }
             }
@@ -802,7 +683,6 @@ class AddressInfo implements ModifierInterface
 
         return $data;
     }
-
 
     /**
      * Returns necessary customer address data.
@@ -817,14 +697,16 @@ class AddressInfo implements ModifierInterface
         $addressDataArray = [];
 
         if ($getFromProfileAddress) {
-            //If there is a quote and we retrieve some address data from quote address we have to devide it
-            //for two fieldsets.
-            $firstQuote = $this->session->getFirstQuote();
-            $customerAddressDataObject = $firstQuote->getShippingAddress()->exportCustomerAddress();
-            $addressData = array_merge(
-                $addressData,
-                $this->addressMapper->toFlatArray($customerAddressDataObject)
-            );
+            /** @var SubscriptionProfileAddressInterface $profileAddress */
+            $profileAddress = $this->getProfileAddress();
+            if ($profileAddress) {
+                $customerAddressDataObject = $profileAddress->exportCustomerAddress();
+                $addressData = array_merge(
+                    $addressData,
+                    $this->addressMapper->toFlatArray($customerAddressDataObject)
+                );
+
+            }
 
             foreach ($this->getAddressAttributes() as $addressAttribute) {
                 $attributeCode = $addressAttribute->getAttributeCode();
@@ -847,66 +729,24 @@ class AddressInfo implements ModifierInterface
         }
 
         return [
-            $this->getProfileId() => [
-                static::SUMMARY_FIELDSET => [
-                    static::SHIPPING_INFORMATION_FIELDSET => [
-                        $this->getInfoFieldSetDataScope() => $infoArray,
-                        $this->getAddressDataFieldSetdataScope() => $addressDataArray,
-                    ]
-                ]
-            ]
+            $this->getInfoFieldSetDataScope() => $infoArray,
+            $this->getAddressDataFieldSetdataScope() => $addressDataArray,
         ];
     }
 
     /**
-     * Returns selected $shipping address Id.
+     * Returns selected address Id.
      *
      * @param $addressId
      * @return array
      */
-    private function modifyShippingIdData($addressId)
+    private function modifyAddressIdData($addressId)
     {
         return [
-            $this->getProfileId() => [
-                static::SUMMARY_FIELDSET => [
-                    static::SHIPPING_INFORMATION_FIELDSET => [
-                        $this->getAddressDataFieldSetdataScope() => [
-                            static::CUSTOMER_ADDRESS_SELECT => $addressId
-                        ]
-                    ]
-                ]
+            $this->getAddressDataFieldSetdataScope() => [
+                $this->getCustomerAddressSelect() => $addressId
             ]
         ];
-    }
-
-    /**
-     * Returns default country id.
-     *
-     * @return array
-     */
-    private function modifyCountryIdData()
-    {
-        return [
-            $this->getProfileId() => [
-                static::SUMMARY_FIELDSET => [
-                    static::SHIPPING_INFORMATION_FIELDSET => [
-                        $this->getAddressDataFieldSetdataScope() => [
-                            'country_id' => 'US'
-                        ]
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Returns customer from subscription profile.
-     *
-     * @return Customer
-     */
-    private function getCustomer()
-    {
-        return $this->getProfile() ? $this->getProfile()->getCustomer() : null;
     }
 
     /**
@@ -919,27 +759,12 @@ class AddressInfo implements ModifierInterface
      *
      * @return int|null|string
      */
-    private function getShippingId()
+    private function getAddressId()
     {
         if ($this->addressId === false) {
-            $addressId = null;
-            /** @var Customer $customer */
-            $customer = $this->getCustomer();
-            if ($customer) {
-                $addressId = $customer->getDefaultShipping();
-
-                if (!$addressId) {
-                    $customerAddresses = $customer->getAddresses();
-                    $customerAddress = array_shift($customerAddresses);
-                    if ($customerAddress instanceof \Magento\Customer\Model\Data\Address) {
-                        $addressId = $customerAddress->getId();
-                    }
-                }
-            }
-
+            $addressId = $this->getProfileAddress()->getCustomerAddressId();
             $this->addressId = $addressId;
         }
-
         return $this->addressId;
     }
 
@@ -987,13 +812,35 @@ class AddressInfo implements ModifierInterface
     }
 
     /**
-     * Returns current subscription profile from registry
+     * Returns default country id.
+     *
+     * @return array
+     */
+    private function modifyCountryIdData()
+    {
+        return [
+            $this->getAddressDataFieldSetdataScope() => [
+                'country_id' => 'US'
+            ]
+        ];
+    }
+
+    /**
+     * Returns current subscription profile from request param.
      *
      * @return SubscriptionProfile|null
      */
     private function getProfile()
     {
-        return $this->registry->registry('tnw_subscription_profile');
+        $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
+        try {
+            /** @var SubscriptionProfile $profile */
+            $profile = $this->profileRepository->getById($profileId);
+        } catch (\Exception $e) {
+            $profile = null;
+        }
+
+        return $profile;
     }
 
     /**
@@ -1006,9 +853,167 @@ class AddressInfo implements ModifierInterface
         return $this->getProfile() ? $this->getProfile()->getId() : null;
     }
 
+    /**
+     * @return mixed|null|SubscriptionProfileAddressInterface
+     */
     private function getProfileAddress()
     {
-
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        $address = null;
+        if ($profile) {
+            $address =  $this->isShippingFieldSet()
+                ? $profile->getShippingAddress()
+                : $profile->getBillingAddress();
+        }
+        return $address;
     }
 
+    /**
+     * Returns customer from subscription profile.
+     *
+     * @return Customer
+     */
+    private function getCustomer()
+    {
+        return $this->getProfile() ? $this->getProfile()->getCustomer() : null;
+    }
+
+    /**
+     * Checks if it is shipping address form.
+     *
+     * @return bool
+     */
+    private function isShippingFieldSet()
+    {
+        return $this->isShipping;
+    }
+
+    /**
+     * Returns shipping|billing information fieldset dataScope.
+     *
+     * @return string
+     */
+    private function getInfoFieldSetDataScope()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_INFO_FIELDSET
+            : self::BILLING_INFO_FIELDSET;
+    }
+
+    /**
+     * Returns shipping|billing address data fieldset dataScope.
+     *
+     * @return string
+     */
+    private function getAddressDataFieldSetdataScope()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_ADDRESS_FIELDSET
+            : self::BILLING_ADDRESS_FIELDSET;
+    }
+
+    /**
+     * Returns label for customer address information fieldset.
+     *
+     * @return string
+     */
+    private function getInfoFieldSetLabel()
+    {
+        return $this->isShippingFieldSet()
+            ? __('Shipping Information')
+            : __('Billing Information');
+    }
+
+    /**
+     * Returns label for customer address data fieldset.
+     *
+     * @return string
+     */
+    private function getAddressFieldSetLabel()
+    {
+        return $this->isShippingFieldSet()
+            ? __('Shipping Address')
+            : __('Billing Address');
+    }
+
+    /**
+     * Returns address fieldset name depends on "isShipping" param
+     *
+     * @return string
+     */
+    private function getAddressFieldsetName()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_ADDRESS_FIELDSET_NAME
+            : self::BILLING_ADDRESS_FIELDSET_NAME;
+    }
+
+    /**
+     * Returns address info fieldset name depends on "isShipping" param
+     *
+     * @return string
+     */
+    private function getAddressInfoFieldsetName()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_INFORMATION_FIELDSET
+            : self::BILLING_INFORMATION_FIELDSET;
+    }
+
+    /**
+     * Returns container name depends on "isShipping" param
+     *
+     * @return string
+     */
+    private function getContainerName()
+    {
+        return $this->isShippingFieldSet()
+            ? SummaryInsertForm::SHIPPING_ADDRESS_CONTAINER
+            : SummaryInsertForm::BILLING_ADDRESS_CONTAINER;
+    }
+
+    /**
+     * Returns address info header name depends on "isShipping" param
+     *
+     * @return string
+     */
+    private function getAddressInfoHeaderName()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_INFORMATION_HEADER
+            : self::BILLING_INFORMATION_HEADER;
+    }
+
+    /**
+     * Return customer address select id
+     *
+     * @return string
+     */
+    private function getCustomerAddressSelect()
+    {
+        return $this->isShippingFieldSet()
+            ? self::CUSTOMER_SHIPPING_ADDRESS_SELECT
+            : self::CUSTOMER_BILLING_ADDRESS_SELECT;
+    }
+
+    /**
+     * Returns meta data for buttons container on the form.
+     *
+     * @return array
+     */
+    private function getButtonsSet()
+    {
+        return [
+            $this->getAddressInfoHeaderName() => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'content' => $this->getInfoFieldSetLabel(),
+                        ],
+                    ],
+                ]
+            ]
+        ];
+    }
 }

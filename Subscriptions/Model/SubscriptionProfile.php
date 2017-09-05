@@ -36,11 +36,6 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
-     * Label prefix
-     */
-    const LABEL_PREFIX = '#S-';
-
-    /**
      * Edit state code
      */
     const STATE_EDIT = 'edit';
