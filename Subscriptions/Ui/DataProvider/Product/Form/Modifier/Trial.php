@@ -9,6 +9,7 @@ namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -27,18 +28,21 @@ class Trial extends BaseModifier
     protected $locator;
 
     /**
+     * Trial constructor.
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
+     * @param Context $context
      */
     public function __construct(
         LocatorInterface $locator,
         ArrayManager $arrayManager,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Context $context
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
-        parent::__construct($storeManager);
+        parent::__construct($storeManager, $context);
     }
 
     /**

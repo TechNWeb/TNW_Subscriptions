@@ -7,13 +7,14 @@
 
 namespace TNW\Subscriptions\Model;
 
-
+use Magento\Framework\Locale\Format;
 use Magento\Framework\Message\ManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Locale\CurrencyInterface;
 
 class Context
 {
@@ -43,6 +44,16 @@ class Context
     private $escaper;
 
     /**
+     * @var Format
+     */
+    private $localeFormat;
+
+    /**
+     * @var CurrencyInterface
+     */
+    private $currencyInterface;
+
+    /**
      * Context constructor.
      * @param ManagerInterface $messageManager
      * @param LoggerInterface $logger
@@ -50,6 +61,8 @@ class Context
      * @param PriceCurrencyInterface $priceCurrency
      * @param TimezoneInterface $localeDate
      * @param Escaper $escaper
+     * @param Format $localeFormat
+     * @param CurrencyInterface $currencyInterface
      */
     public function __construct(
         ManagerInterface $messageManager,
@@ -57,7 +70,9 @@ class Context
         Config $config,
         PriceCurrencyInterface $priceCurrency,
         TimezoneInterface $localeDate,
-        Escaper $escaper
+        Escaper $escaper,
+        Format $localeFormat,
+        CurrencyInterface $currencyInterface
     ) {
 
         $this->messageManager = $messageManager;
@@ -66,6 +81,8 @@ class Context
         $this->priceCurrency = $priceCurrency;
         $this->localeDate = $localeDate;
         $this->escaper = $escaper;
+        $this->localeFormat = $localeFormat;
+        $this->currencyInterface = $currencyInterface;
     }
 
     /**
@@ -136,5 +153,29 @@ class Context
     public function getEscaper()
     {
         return $this->escaper;
+    }
+
+    /**
+     * Get price locale format data.
+     *
+     * @return string
+     */
+    public function getPriceFormatData($currencyCode)
+    {
+        /** @var \Magento\Framework\Currency $currency */
+        $currency = $this->currencyInterface->getCurrency($currencyCode);
+        $locale = $currency->getLocale();
+
+        /** @var array $priceFormat */
+        $priceFormat = $this->localeFormat->getPriceFormat($locale);
+        $priceFormatData = [
+            'requiredPrecision' => $priceFormat['precision'],
+            'integerRequired' => $priceFormat['integerRequired'],
+            'decimalSymbol' => $priceFormat['decimalSymbol'],
+            'groupSymbol' => $priceFormat['groupSymbol'],
+            'groupLength' => $priceFormat['groupLength']
+        ];
+
+        return json_encode($priceFormatData);
     }
 }

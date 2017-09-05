@@ -101,10 +101,7 @@ class DescriptionCreator
         $trialPart = '';
         if ($isTrial) {
             $trialTotal = $formattedPrice;
-            $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
-                $subscriptionData[Create::UNIQUE]['trial_period'],
-                $subscriptionData[Create::UNIQUE]['trial_unit_id']);
-            $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
+            $trialPart = sprintf(__('%s initial charge and then '), $trialTotal);
             $total = $this->formatPrice($subscriptionData[Create::NON_UNIQUE]['price']);
         }
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
