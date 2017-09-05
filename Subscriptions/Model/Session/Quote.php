@@ -80,11 +80,7 @@ class Quote extends QuoteSession
      */
     private function getCurrentStore()
     {
-        if ($this->store === null) {
-            $this->store = ObjectManager::getInstance()->get(StoreManagerInterface::class)->getStore();
-        }
-
-        return $this->store;
+        return $this->storeManager->getStore();
     }
 
     /**
