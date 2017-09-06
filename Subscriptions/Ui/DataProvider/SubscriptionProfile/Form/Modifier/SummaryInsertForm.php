@@ -18,16 +18,25 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddres
  */
 class SummaryInsertForm implements ModifierInterface
 {
+    /**
+     * Summary fieldset name
+     */
     const SUMMARY_FIELDSET = 'summary';
 
-    const SHIPPING_ADDRESS_CONTAINER = 'shipping_address';
-    const BILLING_ADDRESS_CONTAINER = 'billing_address';
-
+    /**
+     * Form data key
+     */
     const FORM_DATA_KEY = 'subscription_profile_id';
 
+    /**
+     * Address's insert form names
+     */
     const SHIPPING_INFORMATION_INSERT_FORM = 'shipping_information_insert_form';
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
 
+    /**
+     * Address's form handles
+     */
     const SHIPPING_INFORMATION_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_summary_shipping_address';
     const BILLING_INFORMATION_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_summary_billing_address';
 
@@ -39,11 +48,15 @@ class SummaryInsertForm implements ModifierInterface
     private $isShipping;
 
     /**
+     * Registry
+     *
      * @var Registry
      */
     private $registry;
 
     /**
+     * Url builder
+     *
      * @var UrlInterface
      */
     private $urlBuilder;
@@ -71,7 +84,6 @@ class SummaryInsertForm implements ModifierInterface
     public function modifyMeta(array $meta)
     {
         $addressInfoInsertFormName = $this->getAddressInfoInsertFormName();
-        $containerName = $this->getContainerName();
 
         $meta = array_merge_recursive(
             $meta,
@@ -110,7 +122,7 @@ class SummaryInsertForm implements ModifierInterface
                 'data' => [
                     'config' => [
                         'visible' => true,
-                        'label' => 'FORM',
+                        'label' => false,
                         'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
                         'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
@@ -164,18 +176,6 @@ class SummaryInsertForm implements ModifierInterface
         return $this->isShippingFieldSet()
             ? self::SHIPPING_INFORMATION_INSERT_FORM
             : self::BILLING_INFORMATION_INSERT_FORM;
-    }
-
-    /**
-     * Returns container name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getContainerName()
-    {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_ADDRESS_CONTAINER
-            : self::BILLING_ADDRESS_CONTAINER;
     }
 
     /**

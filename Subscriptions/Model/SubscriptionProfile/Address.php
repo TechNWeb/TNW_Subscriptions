@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\DataObject\Copy;
 use Magento\Framework\Model\AbstractModel;
@@ -13,18 +14,30 @@ use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Address as ResourceAddress;
 
+/**
+ * Class Address
+ */
 class Address extends AbstractModel implements SubscriptionProfileAddressInterface
 {
     const SUBSCRIPTION_PROFILE_ADDRESS_TABLE = 'tnw_subscriptions_subscription_profile_address';
+
     /**
+     * Copy service
+     *
      * @var Copy
      */
     private $objectCopyService;
+
     /**
+     * Address interface
+     *
      * @var AddressInterfaceFactory
      */
     private $addressDataFactory;
+
     /**
+     * Data object helper
+     *
      * @var DataObjectHelper
      */
     private $dataObjectHelper;
@@ -59,7 +72,7 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
     /**
      * Export data to customer address Data Object.
      *
-     * @return \Magento\Customer\Api\Data\AddressInterface
+     * @return AddressInterface
      */
     public function exportCustomerAddress()
     {
@@ -87,7 +100,7 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         $this->dataObjectHelper->populateWithArray(
             $addressDataObject,
             $customerAddressData,
-            '\Magento\Customer\Api\Data\AddressInterface'
+            AddressInterface::class
         );
         return $addressDataObject;
     }

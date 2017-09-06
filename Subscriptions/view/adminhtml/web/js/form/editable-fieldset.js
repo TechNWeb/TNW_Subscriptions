@@ -2,12 +2,10 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 define([
-    'Magento_Ui/js/form/components/fieldset',
-    'uiRegistry',
-    'jquery',
-    'underscore'
-], function (Fieldset, registry, $j, _) {
+    'Magento_Ui/js/form/components/fieldset'
+], function (Fieldset) {
     'use strict';
 
     return Fieldset.extend({
@@ -24,7 +22,6 @@ define([
         initObservable: function () {
             this._super()
                 .observe('preview');
-
             return this;
         },
 
@@ -46,13 +43,6 @@ define([
         disablePreview: function () {
             this.set('preview', false);
             return this;
-        },
-
-        /**
-         * Save data from this fieldset and reload it
-         */
-        saveAndUpdate: function () {
-
         }
     });
 });

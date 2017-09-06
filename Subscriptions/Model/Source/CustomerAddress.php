@@ -75,14 +75,22 @@ class CustomerAddress implements OptionSourceInterface
     private $escaper;
 
     /**
+     * Profile state
+     *
      * @var bool
      */
     private $profileState;
+
     /**
+     * Profile repository
+     *
      * @var SubscriptionProfileRepositoryInterface
      */
     private $profileRepository;
+
     /**
+     * Request
+     *
      * @var RequestInterface
      */
     private $request;
@@ -222,6 +230,8 @@ class CustomerAddress implements OptionSourceInterface
     }
 
     /**
+     * Returns customer id from profile
+     *
      * @return mixed|null|string
      */
     private function getCustomerIdFromProfile()

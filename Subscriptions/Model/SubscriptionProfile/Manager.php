@@ -139,6 +139,28 @@ class Manager
     }
 
     /**
+     * Load profile by id
+     *
+     * @param $profileId
+     * @return null|SubscriptionProfileInterface
+     */
+    public function loadProfile($profileId)
+    {
+        /** @var SubscriptionProfileInterface $model */
+        $model = null;
+        if ($profileId) {
+            try {
+                $model = $this->subscriptionProfileRepository->getById($profileId);
+                $this->setProfile($model);
+            } catch (\Exception $e) {
+                $model = null;
+            }
+        }
+
+        return $model;
+    }
+
+    /**
      * Returns empty subscription profile object.
      *
      * @return SubscriptionProfileInterface
