@@ -328,7 +328,7 @@ class SummaryAddressForm extends AbstractDataProvider
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'issetShippingAddress' => true,//(bool)$this->getAddressId(),
+                            'issetShippingAddress' => true,
                             'visible' => (bool)$this->getAddressId(),
                             'addressesData' => $this->getCustomerAddressesData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
@@ -648,9 +648,7 @@ class SummaryAddressForm extends AbstractDataProvider
         $imports = [];
         if (!in_array($attributeCode, $this->infoAttributes)) {
             if ($attributeCode != 'region_id') {
-                if ($this->getAddressId()) {
-                    $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
-                }
+                $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
             }
         }
 
@@ -959,18 +957,6 @@ class SummaryAddressForm extends AbstractDataProvider
         return $this->isShippingFieldSet()
             ? self::SHIPPING_INFORMATION_FIELDSET
             : self::BILLING_INFORMATION_FIELDSET;
-    }
-
-    /**
-     * Returns container name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getContainerName()
-    {
-        return $this->isShippingFieldSet()
-            ? SummaryInsertForm::SHIPPING_ADDRESS_CONTAINER
-            : SummaryInsertForm::BILLING_ADDRESS_CONTAINER;
     }
 
     /**
