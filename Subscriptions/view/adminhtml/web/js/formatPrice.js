@@ -61,7 +61,7 @@ define([
         }
 
         if (returnNumber.length > groupLength) {
-            returnNumber = returnNumber.replace(groupSymbol, '');
+            returnNumber = returnNumber.split(groupSymbol).join('');
         }
 
         returnNumber = returnNumber + decimalSymbol + fraction;

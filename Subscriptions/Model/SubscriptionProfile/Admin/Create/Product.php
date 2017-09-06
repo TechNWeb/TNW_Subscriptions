@@ -10,6 +10,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\DataObject;
+use Magento\Framework\Locale\Format;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -49,20 +50,28 @@ class Product extends Create
     private $data;
 
     /**
+     * @var Format
+     */
+    private $localeFormat;
+
+    /**
      * Product constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
+     * @param Format $localeFormat
      */
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
         ProductRepositoryInterface $productRepository,
-        PriceCalculator $priceCalculator
+        PriceCalculator $priceCalculator,
+        Format $localeFormat
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
+        $this->localeFormat = $localeFormat;
         parent::__construct($context, $session);
     }
 
@@ -134,6 +143,11 @@ class Product extends Create
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
+            $initialFee = $this->priceCalculator->getInitialFee(
+                $productData['billing_frequency_id'],
+                $productData['product_id'],
+                true
+            );
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
@@ -151,11 +165,8 @@ class Product extends Create
                         'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
-                        'price' => $this->priceCalculator->getUnitPrice(
-                            $product->getId(),
-                            $productData['billing_frequency_id'],
-                            $productData['price']
-                        )
+                        'price' => $this->localeFormat->getNumber($productData['price']),
+                        'initial_fee' => $initialFee
                     ],
                 ],
             ];

@@ -5,9 +5,10 @@
 define([
     'Magento_Ui/js/form/element/abstract',
     'TNW_Subscriptions/js/formatPrice',
+    'jquery',
     'mage/translate',
     'jquery/ui'
-], function (Abstract, formatPrice) {
+], function (Abstract, formatPrice, $) {
     'use strict';
 
     return Abstract.extend({
@@ -19,13 +20,43 @@ define([
             this.changeValue();
         },
 
-
+        /**
+         * Fires when Billing Frequency or current input is changed.
+         *
+         * @param value
+         */
         changeValue: function (value) {
             var frequencyPrices = this.source.data.product_frequencies;
+            var priceFormat = this.getPriceFormat();
+            var priceNumber = 0;
+            var priceValue = 0;
 
             if (frequencyPrices && value && frequencyPrices[value]){
-                this.value(frequencyPrices[value].price);
+                priceNumber = frequencyPrices[value].price;
+            } else {
+                var currentValue = '0';
+                if (this.value()) {
+                    currentValue = this.value();
+                }
+                priceNumber = formatPrice.formatToNumber(currentValue, priceFormat);
             }
+
+            priceValue = formatPrice.formatPrice(priceNumber, priceFormat);
+            this.value(priceValue);
+        },
+
+        /**
+         * Return current price format.
+         *
+         * @returns {*}
+         */
+        getPriceFormat: function() {
+            var priceFormat = null;
+            if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
+                priceFormat = $.parseJSON(this.priceFormat);
+            }
+
+            return priceFormat;
         }
     });
 });

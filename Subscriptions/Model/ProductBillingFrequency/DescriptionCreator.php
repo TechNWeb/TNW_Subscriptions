@@ -97,16 +97,22 @@ class DescriptionCreator
         $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
         $startDate = $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']);
-        $total = $formattedPrice;
         $trialPart = '';
+        $noTrialPart = '';
+
         if ($isTrial) {
             $trialTotal = $formattedPrice;
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
-            $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
+        } else {
+            if ($subscriptionData[CreateProfile::NON_UNIQUE]['initial_fee']) {
+                $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
+            }
         }
+
+        $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
 
         $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
@@ -117,7 +123,8 @@ class DescriptionCreator
             $frequencyUnit,
             $startDate
         );
-        return $trialPart . $priceWithUnit . $shippingInformation;
+
+        return $trialPart . $noTrialPart . $priceWithUnit . $shippingInformation;
     }
 
     /**

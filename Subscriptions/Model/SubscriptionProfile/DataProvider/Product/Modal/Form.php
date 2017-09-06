@@ -8,8 +8,10 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -17,6 +19,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -132,6 +135,17 @@ class Form extends AbstractDataProvider
     private $currencyFactory;
 
     /**
+     * @var Currency
+     */
+    private $currentCurrency;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * Form constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -145,6 +159,7 @@ class Form extends AbstractDataProvider
      * @param \TNW\Subscriptions\Model\Config $config
      * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
+     * @param Context $context
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -163,6 +178,7 @@ class Form extends AbstractDataProvider
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
+        Context $context,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -178,6 +194,7 @@ class Form extends AbstractDataProvider
         $this->config = $config;
         $this->sessionQuote = $sessionQuote;
         $this->currencyFactory = $currencyFactory;
+        $this->context = $context;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -205,6 +222,8 @@ class Form extends AbstractDataProvider
                 $billingFrequencyUnitPrice;
             $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['preset_qty'] =
                 $billingFrequencyPresetQty;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['initial_fee'] =
+                $this->getInitialFee($billingFrequencyId);
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
@@ -302,6 +321,15 @@ class Form extends AbstractDataProvider
                             ]
                         ]
                     ],
+                    'initial_fee' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'priceFormat' => $this->getPriceFormatData(),
+                                ]
+                            ]
+                        ]
+                    ],
                     'price' => [
                         'arguments' => [
                             'data' => [
@@ -314,6 +342,8 @@ class Form extends AbstractDataProvider
                                     'imports' => [
                                         'changeValue' => 'index = billing_frequency_id:value',
                                     ],
+                                    'label' => $this->getTrialPeriod() ? __('Post trial price:') : __('Price') . ':',
+                                    'priceFormat' => $this->getPriceFormatData(),
                                 ],
                             ],
                         ],
@@ -373,7 +403,7 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * Returns config fot start on field.
+     * Returns config for start on field.
      *
      * @return array
      */
@@ -446,9 +476,21 @@ class Form extends AbstractDataProvider
         /** @var ProductBillingFrequencyInterface $productFrequency */
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
+            $productId = (int)$this->request->getParam('product_id', 0);
+            $label = $frequency->getLabel();
+            if ($productId) {
+                $product = $this->productRepository->getById($productId);
+                $frequencyPrice = (int)$productFrequency->getPrice();
+                $productPrice = (int)$product->getPrice();
 
+                if ($productPrice > $frequencyPrice) {
+                    $savings = $this->formatPrice($productPrice - $frequencyPrice);
+                    $label .= '  '. sprintf(__('(SAVE %s)'), $savings) ;
+                }
+
+            }
             $result[] = [
-                'label' => $frequency->getLabel(),
+                'label' => $label,
                 'value' => $productFrequency->getBillingFrequencyId(),
             ];
         }
@@ -482,11 +524,12 @@ class Form extends AbstractDataProvider
                         ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
                         : 0;
                     $trialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
-
-                    $currencySymbol = $this->getCurrentCurrencySymbol();
-                    $trialPriceLabel = (int)$product->getCustomAttribute(
-                        Attribute::SUBSCRIPTION_TRIAL_PRICE
-                        )->getValue() . $currencySymbol . ' ' . __('for') . ' ';
+                    $formattedPrice = $this->formatPrice(
+                        (int)$product
+                            ->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)
+                            ->getValue()
+                    );
+                    $trialPriceLabel = $formattedPrice . ' ' . __('for') . ' ';
                 }
             }
             $this->trialPeriod = $trialLength && $trialUnit ? $trialPriceLabel . $trialLength . ' ' . $trialUnit : '';
@@ -505,7 +548,7 @@ class Form extends AbstractDataProvider
     {
         $productId = (int)$this->request->getParam('product_id', 0);
 
-        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId);
+        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId, null, false, false);
     }
 
     /**
@@ -515,16 +558,79 @@ class Form extends AbstractDataProvider
      */
     private function getCurrentCurrencySymbol()
     {
-        $currencyCode = $this->sessionQuote->getCurrencyId();
-
-        if ($currencyCode) {
-            /** @var \Magento\Directory\Model\Currency $currency */
-            $currency = $this->currencyFactory->create()->load($currencyCode);
-            $currencySymbol = $currency->getCurrencySymbol();
-        } else {
-            $currencySymbol = $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
-        }
+        $currency = $this->getCurrentCurrency();
+        $currencySymbol = $currency->getCurrencySymbol();
 
         return $currencySymbol;
+    }
+
+    /**
+     * Get currency model for session currency_id if exists here or for base_currency from store manager.
+     *
+     * @return Currency
+     */
+    private function getCurrentCurrency()
+    {
+        if ($this->currentCurrency == null) {
+            $currencyCode = $this->sessionQuote->getCurrencyId();
+
+            if ($currencyCode) {
+                $this->currentCurrency = $this->currencyFactory->create()->load($currencyCode);
+            } else {
+                $this->currentCurrency = $this->storeManager->getStore()->getBaseCurrency();
+            }
+
+        }
+
+        return $this->currentCurrency;
+    }
+
+    /**
+     * Format price according to locale settings.
+     *
+     * @param $price
+     * @return float
+     */
+    private function formatPrice($price)
+    {
+        return $this->context->getPriceCurrency()->format(
+            $price,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $this->sessionQuote->getStoreId(),
+            $this->getCurrentCurrency()
+        );
+    }
+
+    /**
+     * Returns price locale format data.
+     *
+     * @return string
+     */
+    private function getPriceFormatData()
+    {
+        $currencyModel = $this->getCurrentCurrency();
+        $currencyCode = $currencyModel->getCurrencyCode();
+
+        return $this->context->getPriceFormatData($currencyCode);
+    }
+
+    /**
+     * Returns initial fee for billing frequency and product.
+     *
+     * @param string $billingFrequencyId
+     * @return float|int
+     */
+    private function getInitialFee($billingFrequencyId)
+    {
+        $productId = (int)$this->request->getParam('product_id', 0);
+        $initialFee = $this->priceCalculator->getInitialFee($billingFrequencyId, $productId, true);
+        $returnInitialFee = 0;
+
+        if ($initialFee) {
+            $returnInitialFee = $this->formatPrice($initialFee);
+        }
+
+        return $returnInitialFee;
     }
 }
