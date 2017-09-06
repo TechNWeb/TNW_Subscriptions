@@ -93,7 +93,7 @@ Percent,Percent
 "Last day of the current month","Last day of the current month"
 Day,Day
 Month,Month
-"%s initial charge and then ","%s initial charge and then "
+"%s for %s and then ","%s for %s and then "
 every,every
 "Total of %s %s. Products will be shipped every %s starting %s.","Total of %s %s. Products will be shipped every %s starting %s."
 today,today
@@ -333,3 +333,4 @@ Message,Message
 "Updated At","Updated At"
 "Scheduled At","Scheduled At"
 "(SAVE %s)","(SAVE %s)"
+"%s initial charge and then ","%s initial charge and then "
