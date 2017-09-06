@@ -76,4 +76,36 @@ class SubscriptionProfile extends AbstractEntity
 
         return $this->getConnection()->query($select)->fetchColumn();
     }
+
+    /**
+     * Get subscription order data.
+     *
+     * @param \Magento\Framework\Model\AbstractModel $object
+     * @param $quoteSubmit bool
+     * @return array|false
+     */
+    public function getLastOrderData(\Magento\Framework\Model\AbstractModel $object, $quoteSubmit)
+    {
+        $result = false;
+        $id = $object->getId();
+
+        if ($id) {
+            $quoteSubmitExpression = $quoteSubmit ? 'main.magento_order_id IS NOT NULL'
+                : 'main.magento_order_id IS NULL';
+
+            $select = $this->getConnection()->select()
+                ->from(
+                    [
+                        'main' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)
+                    ]
+                )->where('main.subscription_profile_id = ?', $id)
+                ->where($quoteSubmitExpression)
+                ->order('main.scheduled_at DESC')
+                ->limit(1);
+
+            $result = $this->getConnection()->query($select)->fetch();
+        }
+
+        return $result;
+    }
 }
