@@ -6,13 +6,104 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Customer\Api\Data\AddressInterface;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\DataObject\Copy;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Address as ResourceAddress;
 
+/**
+ * Class Address
+ */
 class Address extends AbstractModel implements SubscriptionProfileAddressInterface
 {
     const SUBSCRIPTION_PROFILE_ADDRESS_TABLE = 'tnw_subscriptions_subscription_profile_address';
+
+    /**
+     * Copy service
+     *
+     * @var Copy
+     */
+    private $objectCopyService;
+
+    /**
+     * Address interface
+     *
+     * @var AddressInterfaceFactory
+     */
+    private $addressDataFactory;
+
+    /**
+     * Data object helper
+     *
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
+     * Address constructor.
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param Copy $objectCopyService
+     * @param AddressInterfaceFactory $addressDataFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        Copy $objectCopyService,
+        AddressInterfaceFactory $addressDataFactory,
+        DataObjectHelper $dataObjectHelper,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = [])
+    {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->objectCopyService = $objectCopyService;
+        $this->addressDataFactory = $addressDataFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
+    }
+
+    /**
+     * Export data to customer address Data Object.
+     *
+     * @return AddressInterface
+     */
+    public function exportCustomerAddress()
+    {
+        $customerAddressData = $this->objectCopyService->getDataFromFieldset(
+            'sales_convert_quote_address',
+            'to_customer_address',
+            $this
+        );
+        $customerAddressDataWithRegion = [];
+        $customerAddressDataWithRegion['region']['region'] = $customerAddressData['region'];
+        if (isset($customerAddressData['region_code'])) {
+            $customerAddressDataWithRegion['region']['region_code'] = $customerAddressData['region_code'];
+        }
+        if (isset($customerAddressData['region_id'])) {
+            $customerAddressDataWithRegion['region']['region_id'] = $customerAddressData['region_id'];
+        }
+        $customerAddressData = array_merge($customerAddressData, $customerAddressDataWithRegion);
+
+        //TODO fix saving address field street (multiline)
+        if (isset($customerAddressData['street'])) {
+            $customerAddressData['street'] = explode('\n', $customerAddressData['street']);
+        }
+
+        $addressDataObject = $this->addressDataFactory->create();
+        $this->dataObjectHelper->populateWithArray(
+            $addressDataObject,
+            $customerAddressData,
+            AddressInterface::class
+        );
+        return $addressDataObject;
+    }
 
     /**
      * @return void

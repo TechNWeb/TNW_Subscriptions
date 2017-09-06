@@ -16,18 +16,20 @@ define([
                 'container',
                 'button'
             ],
-            previousAddressId: null
+            previousAddressId: null,
+            customerAddressSelector: 'customer_address_id',
+            regionIdInputPreSelector: null,
+            countryIdSelection: null
         },
 
         /**
          * Hide addresses list select, show address form.
          */
         openAddressForm: function () {
-            var button = registry.get('index=add_new_address_button');
             this.setAddressSelectVisibility(false);
             this.fiterEmptyAddressOption(true);
-            $j( "[data-index=region_id_input" ).removeClass('hidden');
-            var countryId = registry.get('index=country_id');
+            $j( this.getPreSelector() + "[data-index=region_id_input" ).removeClass('hidden');
+            var countryId = registry.get(this.getSelectionForCountryId());
             countryId.value('US');
         },
 
@@ -38,7 +40,25 @@ define([
             this.fiterEmptyAddressOption(false);
             this.setAddressSelectVisibility(true);
             this.clearElemsData();
-            $j( "[data-index=region_id_input" ).addClass('hidden');
+            $j( this.getPreSelector() + "[data-index=region_id_input" ).addClass('hidden');
+        },
+
+        /**
+         * Get pre selector for region input
+         */
+        getPreSelector: function() {
+            return this.regionIdInputPreSelector
+                ? "[data-index=" + this.regionIdInputPreSelector + "] "
+                : "" ;
+        },
+
+        /**
+         * Get parent selection for country id field
+         */
+        getSelectionForCountryId: function() {
+            return this.countryIdSelection
+                ? 'inputName=' + this.countryIdSelection + '[country_id]'
+                : 'index=country_id';
         },
 
         /**
@@ -74,7 +94,7 @@ define([
          * @returns {*}
          */
         getAddressSelect: function () {
-            return registry.get('index=customer_address_id');
+            return registry.get('index=' + this.customerAddressSelector);
         },
 
         /**
@@ -83,9 +103,10 @@ define([
         clearElemsData: function () {
             var children = this.elems();
             var notUpdatableElems = this.notUpdatableElems;
+            var selector = this.customerAddressSelector;
 
             children.forEach(function(item, i, arr) {
-                if (item.index != 'customer_address_id' && (notUpdatableElems.indexOf(item.formElement) == -1)) {
+                if (item.index != selector && (notUpdatableElems.indexOf(item.formElement) == -1)) {
                     if (item.formElement == 'checkbox') {
                         item.checked(false);
                     } else if (typeof item.value() != 'undefined') {

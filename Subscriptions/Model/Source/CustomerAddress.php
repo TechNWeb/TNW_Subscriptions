@@ -12,9 +12,14 @@ use Magento\Customer\Helper\Address;
 use Magento\Customer\Model\Address\Mapper;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Data\OptionSourceInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Escaper;
+use Magento\Framework\Registry;
+use Magento\Framework\Data\OptionSourceInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Customer addresses data source.
@@ -70,6 +75,27 @@ class CustomerAddress implements OptionSourceInterface
     private $escaper;
 
     /**
+     * Profile state
+     *
+     * @var bool
+     */
+    private $profileState;
+
+    /**
+     * Profile repository
+     *
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * Request
+     *
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * CustomerAddress constructor.
      * @param QuoteSessionInterface $session
      * @param Address $addressHelper
@@ -78,6 +104,9 @@ class CustomerAddress implements OptionSourceInterface
      * @param FilterBuilder $filterBuilder
      * @param Mapper $addressMapper
      * @param Escaper $escaper
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param RequestInterface $request
+     * @param $profileState
      */
     public function __construct(
         QuoteSessionInterface $session,
@@ -86,7 +115,10 @@ class CustomerAddress implements OptionSourceInterface
         SearchCriteriaBuilder $criteriaBuilder,
         FilterBuilder $filterBuilder,
         Mapper $addressMapper,
-        Escaper $escaper
+        Escaper $escaper,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        RequestInterface $request,
+        $profileState
     ) {
         $this->session = $session;
         $this->addressHelper = $addressHelper;
@@ -95,6 +127,9 @@ class CustomerAddress implements OptionSourceInterface
         $this->filterBuilder = $filterBuilder;
         $this->addressMapper = $addressMapper;
         $this->escaper = $escaper;
+        $this->profileState = $profileState;
+        $this->profileRepository = $profileRepository;
+        $this->request = $request;
     }
 
 
@@ -166,12 +201,65 @@ class CustomerAddress implements OptionSourceInterface
     }
 
     /**
-     * Returns customer id from session.
+     * Returns customer id.
      *
      * @return int
      */
     private function getCustomerId()
     {
+        $customerId = null;
+        switch ($this->profileState) {
+            case SubscriptionProfile::STATE_EDIT :
+                $customerId = $this->getCustomerIdFromProfile();
+                break;
+            case SubscriptionProfile::STATE_CREATE :
+                $customerId = $this->getCustomerIdFromSession();
+                break;
+        }
+        return $customerId;
+    }
+
+    /**
+     * Returns customer id from session
+     *
+     * @return int
+     */
+    private function getCustomerIdFromSession()
+    {
         return $this->session->getCustomerId();
+    }
+
+    /**
+     * Returns customer id from profile
+     *
+     * @return mixed|null|string
+     */
+    private function getCustomerIdFromProfile()
+    {
+        $customerId = null;
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        if ($profile) {
+            $customerId = $profile->getCustomerId();
+        }
+        return $customerId;
+    }
+
+    /**
+     * Returns current subscription profile from request param.
+     *
+     * @return SubscriptionProfile|null
+     */
+    private function getProfile()
+    {
+        $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
+        try {
+            /** @var SubscriptionProfile $profile */
+            $profile = $this->profileRepository->getById($profileId);
+        } catch (\Exception $e) {
+            $profile = null;
+        }
+
+        return $profile;
     }
 }
