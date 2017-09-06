@@ -201,7 +201,7 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      * @param ModelQuote $quote
      * @return $this
      */
-    public function removeSubQuote($quote)
+    public function removeSubQuote(ModelQuote $quote)
     {
         $quoteId = $quote->getId();
         $this->removeSubQuoteId($quoteId);
@@ -218,12 +218,15 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     /**
      * Removes quote id from session storage.
      *
-     * @param $quoteId
+     * @param int $quoteId
+     * @return $this
      */
     protected function removeSubQuoteId($quoteId)
     {
         $quoteIds = array_diff($this->getSubQuoteIds(), [$quoteId]);
         $this->storage->setSubQuoteIds($quoteIds);
+
+        return $this;
     }
 
     /**

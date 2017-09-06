@@ -144,7 +144,7 @@ class Product extends Create
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
             $initialFee = $this->priceCalculator->getInitialFee(
-                $productData['billing_frequency_id'],
+                $productData['billing_frequency'],
                 $productData['product_id'],
                 true
             );
@@ -180,7 +180,7 @@ class Product extends Create
      * Calculates start date for subscription.
      *
      * @param $startOn
-     * @return mixed
+     * @return string
      */
     private function getStartOnDate($startOn)
     {
@@ -203,12 +203,14 @@ class Product extends Create
     }
 
     /**
+     * Returns formatted product price.
+     *
      * @param MagentoProduct $product
      * @return mixed
      */
     private function getFormattedProductPrice(MagentoProduct $product)
     {
         return $this->getContext()->getPriceCurrency()->getCurrency()
-            ->format($product->getPrice(), array('symbol' => ''), false, false);
+            ->format($product->getPrice(), ['symbol' => ''], false, false);
     }
 }

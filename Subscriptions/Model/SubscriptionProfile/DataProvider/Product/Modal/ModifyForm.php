@@ -16,6 +16,7 @@ use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -85,6 +86,7 @@ class ModifyForm extends Form
      * @param \TNW\Subscriptions\Model\Config $config
      * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
+     * @param Context $context
      * @param ImageHelper $imageHelper
      * @param string $scope
      * @param array $meta
@@ -104,6 +106,7 @@ class ModifyForm extends Form
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
+        Context $context,
         ImageHelper $imageHelper,
         $scope = '',
         array $meta = [],
@@ -112,7 +115,7 @@ class ModifyForm extends Form
         $this->imageHelper = $imageHelper;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
             $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
-            $currencyFactory, $scope, $meta, $data);
+            $currencyFactory, $context, $scope, $meta, $data);
     }
 
 

@@ -23,20 +23,22 @@ class Save extends SubscriptionProfile
     public function execute()
     {
         $objectId = $this->getRequest()->getParam('objectId', false);
-        if ($objectId){
+        if ($objectId) {
             $objectItemId = $this->getRequest()->getParam('objectItemId', false);
-            if ($objectItemId){
+            if ($objectItemId) {
                 $remove = $this->getRequest()->getParam('remove', false);
                 $requestData = $this->getRequest()->getParam('item_' . $objectItemId, false);
                 try {
-                    $this->getSubCreateModel()->modifySubscriptions($requestData, $objectId, $objectItemId, $remove);
+                    $this->getSubCreateModel()->removeSubscriptions($requestData, $objectId, $objectItemId);
+                    if ($remove) {
+                        $this->getSubCreateModel()->addToSubscription($requestData);
+                    }
                     $response = [
                         'error' => false,
                         'message' => '',
-                        'objects_count' => count( $this->_getSession()->getSubQuoteIds())
+                        'objects_count' => count($this->_getSession()->getSubQuoteIds())
                     ];
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $response = $this->getErrorResponse(
                         $e->getMessage()
                     );
@@ -53,18 +55,6 @@ class Save extends SubscriptionProfile
         }
 
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
-    }
-
-    /**
-     * Acl check for admin
-     *
-     * @return bool
-     */
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed(
-            'TNW_Subscriptions::SubscriptionProfile_create_product_save'
-        );
     }
 
     /**

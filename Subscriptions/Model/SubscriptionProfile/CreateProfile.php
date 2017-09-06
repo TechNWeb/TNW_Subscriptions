@@ -182,14 +182,14 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Modifies subscription product. (Actually removes and adds product again).
+     * Removes product from subscription.
      *
      * @param array $request
      * @param string|int $quoteId
      * @param string|int $quoteItemId
-     * @param bool $remove
+     * @return void
      */
-    public function modifySubscriptions($request, $quoteId, $quoteItemId, $remove = false)
+    public function removeSubscriptions(array $request, $quoteId, $quoteItemId)
     {
         /** @var ModelQuote $quote */
         $quote = $this->quoteCreator->getCartRepository()->get($quoteId);
@@ -207,10 +207,6 @@ class CreateProfile extends BaseCreate
                 }
                 break;
             }
-        }
-
-        if (!$remove){
-            $this->addToSubscription($request);
         }
     }
 
