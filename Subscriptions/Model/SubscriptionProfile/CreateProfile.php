@@ -187,7 +187,7 @@ class CreateProfile extends BaseCreate
      * @param array $request
      * @param string|int $quoteId
      * @param string|int $quoteItemId
-     * @return void
+     * @return array
      */
     public function removeSubscriptions(array $request, $quoteId, $quoteItemId)
     {
@@ -208,6 +208,8 @@ class CreateProfile extends BaseCreate
                 break;
             }
         }
+
+        return $request;
     }
 
     /**

@@ -29,9 +29,9 @@ class Save extends SubscriptionProfile
                 $remove = $this->getRequest()->getParam('remove', false);
                 $requestData = $this->getRequest()->getParam('item_' . $objectItemId, false);
                 try {
-                    $this->getSubCreateModel()->removeSubscriptions($requestData, $objectId, $objectItemId);
-                    if ($remove) {
-                        $this->getSubCreateModel()->addToSubscription($requestData);
+                    $request = $this->getSubCreateModel()->removeSubscriptions($requestData, $objectId, $objectItemId);
+                    if (!$remove) {
+                        $this->getSubCreateModel()->addToSubscription($request);
                     }
                     $response = [
                         'error' => false,
