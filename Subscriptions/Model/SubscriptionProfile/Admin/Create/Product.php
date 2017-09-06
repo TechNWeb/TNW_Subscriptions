@@ -143,6 +143,11 @@ class Product extends Create
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
+            $initialFee = $this->priceCalculator->getInitialFee(
+                $productData['billing_frequency_id'],
+                $productData['product_id'],
+                true
+            );
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
@@ -160,7 +165,8 @@ class Product extends Create
                         'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
-                        'price' => $this->localeFormat->getNumber($productData['price'])
+                        'price' => $this->localeFormat->getNumber($productData['price']),
+                        'initial_fee' => $initialFee
                     ],
                 ],
             ];

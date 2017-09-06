@@ -107,7 +107,9 @@ class DescriptionCreator
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
         } else {
-            $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
+            if ($subscriptionData[CreateProfile::NON_UNIQUE]['initial_fee']) {
+                $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
+            }
         }
 
         $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
