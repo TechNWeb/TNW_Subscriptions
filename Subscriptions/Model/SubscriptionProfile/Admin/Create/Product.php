@@ -120,7 +120,7 @@ class Product extends Create
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
             $productData['billing_frequency'],
-            $productData['price'],
+            $this->localeFormat->getNumber($productData['price']),
             true
         );
         $product->setPrice($price);
@@ -153,7 +153,7 @@ class Product extends Create
             // otherwise "start on" is start date of subscription
             $data = [
                 'qty' => $productData['qty'],
-                'custom_price' => $this->getFormattedProductPrice($product),
+                'custom_price' => sprintf("%F", $product->getPrice()),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
@@ -200,17 +200,5 @@ class Product extends Create
         }
 
         return $result;
-    }
-
-    /**
-     * Returns formatted product price.
-     *
-     * @param MagentoProduct $product
-     * @return mixed
-     */
-    private function getFormattedProductPrice(MagentoProduct $product)
-    {
-        return $this->getContext()->getPriceCurrency()->getCurrency()
-            ->format($product->getPrice(), ['symbol' => ''], false, false);
     }
 }

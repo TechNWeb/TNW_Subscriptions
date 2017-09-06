@@ -100,9 +100,9 @@ class PriceCalculator
                 $price = $trialPrice ? $trialPrice + $initialFee : 0;
             } else {
                 if ($lockProductPrice) {
-                    $lockPrice = $product->getOrigData('price');
                     $discountAmount = $this->getDiscountAmount($product);
-                    $price = $lockPrice + $initialFee - $discountAmount;
+                    $lockPrice = isset($productPrice) ? $productPrice : $product->getOrigData('price') - $discountAmount;
+                    $price = $lockPrice + $initialFee;
                 } else {
                     $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
                     $billingFrequencyPrice = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
