@@ -119,7 +119,7 @@ class Product extends Create
 
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
-            $productData['billing_frequency_id'],
+            $productData['billing_frequency'],
             $productData['price'],
             true
         );
@@ -144,7 +144,7 @@ class Product extends Create
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
             $initialFee = $this->priceCalculator->getInitialFee(
-                $productData['billing_frequency_id'],
+                $productData['billing_frequency'],
                 $productData['product_id'],
                 true
             );
@@ -153,10 +153,10 @@ class Product extends Create
             // otherwise "start on" is start date of subscription
             $data = [
                 'qty' => $productData['qty'],
-                'custom_price' => $product->getPrice(),
+                'custom_price' => $this->getFormattedProductPrice($product),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
-                        'billing_frequency' => $productData['billing_frequency_id'],
+                        'billing_frequency' => $productData['billing_frequency'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
@@ -180,7 +180,7 @@ class Product extends Create
      * Calculates start date for subscription.
      *
      * @param $startOn
-     * @return mixed
+     * @return string
      */
     private function getStartOnDate($startOn)
     {
@@ -200,5 +200,17 @@ class Product extends Create
         }
 
         return $result;
+    }
+
+    /**
+     * Returns formatted product price.
+     *
+     * @param MagentoProduct $product
+     * @return mixed
+     */
+    private function getFormattedProductPrice(MagentoProduct $product)
+    {
+        return $this->getContext()->getPriceCurrency()->getCurrency()
+            ->format($product->getPrice(), ['symbol' => ''], false, false);
     }
 }

@@ -147,6 +147,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Returns list of subscription quote ids.
+     *
      * @return array|null
      */
     public function getSubQuoteIds()
@@ -155,6 +157,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Adds quote id to session storage.
+     *
      * @param int|string $subQuoteId
      * @return $this
      */
@@ -168,14 +172,16 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Returns list of subscription quotes.
+     *
      * @return ModelQuote[]
      */
     public function getSubQuotes()
     {
-        if ($this->quotes === null){
+        if ($this->quotes === null) {
             $quoteIds = $this->getSubQuoteIds();
             $this->quotes = [];
-            if ($quoteIds){
+            if ($quoteIds) {
                 $searchCriteria = $this->searchCriteriaBuilder->addFilter(
                     ModelQuote::KEY_ENTITY_ID,
                     $quoteIds,
@@ -190,13 +196,49 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Removes quote from subscription quotes list.
+     *
+     * @param ModelQuote $quote
+     * @return $this
+     */
+    public function removeSubQuote(ModelQuote $quote)
+    {
+        $quoteId = $quote->getId();
+        $this->removeSubQuoteId($quoteId);
+        $this->quotes = array_filter(
+            $this->getSubQuotes(),
+            function ($subQuote) use ($quoteId) {
+                return ($subQuote->getId() !== $quoteId);
+            }
+        );
+
+        return $this;
+    }
+
+    /**
+     * Removes quote id from session storage.
+     *
+     * @param int $quoteId
+     * @return $this
+     */
+    protected function removeSubQuoteId($quoteId)
+    {
+        $quoteIds = array_diff($this->getSubQuoteIds(), [$quoteId]);
+        $this->storage->setSubQuoteIds($quoteIds);
+
+        return $this;
+    }
+
+    /**
+     * Returns first quote from subscription quotes list or false if list is empty.
+     *
      * @return bool|ModelQuote
      */
     public function getFirstQuote()
     {
         $result = false;
 
-        if (!empty($this->getSubQuotes())){
+        if (!empty($this->getSubQuotes())) {
             $result = reset($this->quotes);
         }
 
@@ -204,12 +246,14 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Adds quote to subscription quote list.
+     *
      * @param ModelQuote|int|string $quote
      * @return $this
      */
     public function addSubQuote($quote)
     {
-        if (!$quote instanceof ModelQuote){
+        if (!$quote instanceof ModelQuote) {
             $quote = $this->quoteRepository->get($quote);
         }
         $this->addSubQuoteId($quote->getId());

@@ -3,7 +3,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'Magento_Ui/js/form/element/abstract',
+    'TNW_Subscriptions/js/components/field/preview-field',
     'TNW_Subscriptions/js/formatPrice',
     'jquery',
     'mage/translate',
@@ -57,6 +57,15 @@ define([
             }
 
             return priceFormat;
+        },
+
+        /**
+         * Returns preview label.
+         *
+         * @returns {boolean, string}
+         */
+        getPreviewLabel: function () {
+            return this.previewLabelVisible ? this.completePreviewLabel() : false;
         }
     });
 });
