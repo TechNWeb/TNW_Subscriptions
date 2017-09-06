@@ -160,7 +160,6 @@ class Form extends AbstractDataProvider
      * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param Context $context
-     * @param Currency $currentCurrency
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -180,7 +179,6 @@ class Form extends AbstractDataProvider
         QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         Context $context,
-        Currency $currentCurrency,
         $scope = '',
         array $meta = [],
         array $data = []
