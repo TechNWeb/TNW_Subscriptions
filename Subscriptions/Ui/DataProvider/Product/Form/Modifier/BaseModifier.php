@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Locale\CurrencyInterface;
-use Magento\Framework\Locale\Format;
+use TNW\Subscriptions\Model\Context;
 
 class BaseModifier extends AbstractModifier
 {
@@ -24,18 +24,21 @@ class BaseModifier extends AbstractModifier
     protected $localeCurrency;
 
     /**
-     * @var Format
+     * @var Context
      */
-    private $localeFormat;
+    protected $context;
 
     /**
      * BaseModifier constructor.
      * @param StoreManagerInterface $storeManager
+     * @param Context $context
      */
     public function __construct(
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Context $context
     ) {
         $this->storeManager = $storeManager;
+        $this->context = $context;
     }
 
     /**
@@ -63,6 +66,7 @@ class BaseModifier extends AbstractModifier
     {
         $store = $this->storeManager->getStore();
         $currency = $this->getLocaleCurrency()->getCurrency($store->getBaseCurrencyCode());
+
         return $currency;
     }
 
@@ -83,44 +87,15 @@ class BaseModifier extends AbstractModifier
     }
 
     /**
-     * The getter function to get the locale format for real application code
-     *
-     * @return Format
-     *
-     * @deprecated
-     */
-    private function getLocaleFormat()
-    {
-        if ($this->localeFormat === null) {
-            $this->localeFormat = \Magento\Framework\App\ObjectManager::getInstance()->get(Format::class);
-        }
-
-        return $this->localeFormat;
-    }
-
-    /**
      * Get price locale format data.
      *
      * @return string
      */
     protected function getPriceFormatData()
     {
-        /** @var \Magento\Framework\Currency $currency */
-        $currency = $this->getCurrency();
-        $locale = $currency->getLocale();
+        $store = $this->storeManager->getStore();
+        $priceFormatData = $this->context->getPriceFormatData($store->getBaseCurrencyCode());
 
-        /** @var Format $localeFormat */
-        $localeFormat = $this->getLocaleFormat();
-        /** @var array $priceFormat */
-        $priceFormat = $localeFormat->getPriceFormat($locale);
-        $priceFormatData = [
-            'requiredPrecision' => $priceFormat['precision'],
-            'integerRequired' => $priceFormat['integerRequired'],
-            'decimalSymbol' => $priceFormat['decimalSymbol'],
-            'groupSymbol' => $priceFormat['groupSymbol'],
-            'groupLength' => $priceFormat['groupLength']
-        ];
-
-        return json_encode($priceFormatData);
+        return $priceFormatData;
     }
 }

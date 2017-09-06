@@ -54,6 +54,7 @@ class PriceCalculator
      * Return calculated product price based on conditions:
      * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" > 0 then:
      *     price = "Trial price"(product) + "Initial fee"(billing frequency).
+     *     (if "initial fee" should be calculated on current step")
      * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" = 0 then:
      *     price = 0.
      *
@@ -64,6 +65,7 @@ class PriceCalculator
      *     If "Lock product price"(product) = "Yes" then:
      *         price = "Price"(product) + "Initial fee"(billing frequency) - "Discount amount"(product)
      *         (if "Offer flat discount" = On).
+     *(if "initial fee" should be calculated on current step")
      *
      * "Discount amount" calculated based on conditions:
      *    If "Discount amount type" = "Flat fee" then:
@@ -75,17 +77,23 @@ class PriceCalculator
      * @param int $billingFrequencyId
      * @param float|string $productPrice
      * @param bool $useTrial
+     * @param bool $useInitialFee
      * @throws NoSuchEntityException when requested product doesn't exists in Db.
      * @return string
      */
-    public function getUnitPrice($productId, $billingFrequencyId, $productPrice = null, $useTrial = false)
-    {
+    public function getUnitPrice(
+        $productId,
+        $billingFrequencyId,
+        $productPrice = null,
+        $useTrial = false,
+        $useInitialFee = true
+    ) {
         $price = 0;
         if ($productId && $billingFrequencyId) {
             /** @var Product $product */
             $product = $this->productRepository->getById($productId);
             $trialOffered = $this->getTrialOfferedStatus($product);
-            $initialFee = $this->getInitialFee($billingFrequencyId, $productId);
+            $initialFee = $this->getInitialFee($billingFrequencyId, $productId, $useInitialFee);
             $lockProductPrice = $this->getProductLockPriceSatus($product);
             if ($trialOffered && $useTrial) {
                 $trialPrice = $this->getTrialPrice($product);
@@ -124,13 +132,18 @@ class PriceCalculator
      *
      * @param int $billingFrequencyId
      * @param int $productId
+     * @param bool $useInitialFee
      * @return float
      */
-    private function getInitialFee($billingFrequencyId, $productId)
+    public function getInitialFee($billingFrequencyId, $productId, $useInitialFee)
     {
-        $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+        $initialFee = 0;
+        if ($useInitialFee) {
+            $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+            $initialFee = (float)$productBillingFrequency->getInitialFee() ?: 0;
+        }
 
-        return (float)$productBillingFrequency->getInitialFee() ?: 0;
+        return $initialFee;
     }
 
     /**

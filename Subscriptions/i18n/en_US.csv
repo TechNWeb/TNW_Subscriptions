@@ -346,3 +346,5 @@ Message,Message
 "Subscription Plan","Subscription Plan"
 "A total of %1 record(s) have been prepared for re-process.","A total of %1 record(s) have been prepared for re-process."
 "Pending","Pending"
+"(SAVE %s)","(SAVE %s)"
+"%s initial charge and then ","%s initial charge and then "
