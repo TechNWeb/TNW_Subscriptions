@@ -1,11 +1,61 @@
 & when (@media-common = true) {
+  #step-registration {
+    display: inline-flex;
+    width: -webkit-fill-available;
+    margin-bottom: 5%;
+
+    .empty-space {
+      width: 6%
+    }
+
+    #new-customer,
+    #existing-customer {
+      position: relative;
+      width: 35%;
+      padding-bottom: 3%;
+      padding-right: 5%;
+      border-style: groove;
+      height: 100%;
+
+      .control-spaces {
+        margin-top: 5%;
+        margin-left: 5%;
+        margin-right: 5%;
+      }
+
+      .mage-error {
+        margin-left: 5%;
+      }
+
+      .action.primary {
+        margin-left: 25%;
+        width: 50%;
+        height: 45px;
+        position: absolute;
+        bottom: 6%;
+      }
+    }
+
+    #new-customer {
+      float: right;
+    }
+
+    #existing-customer {
+      float: left;
+
+      .forgot-password {
+        float: right;
+        text-decoration: underline;
+        margin-top: 3%;
+      }
+    }
+  }
   .tnw-subscriptions-cart__container {
 
     .block-main,
     .block-step {
       display: -webkit-box;
       display: -webkit-flex;
-
     }
 
     .next-step,

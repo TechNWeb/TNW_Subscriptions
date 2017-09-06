@@ -1,29 +1,29 @@
 <div class="block-step">
-    <!-- ko if: getActiveIndex() == 0 -->
+    <!-- ko if: getActiveIndex() == productsStepIndex -->
         <!-- ko foreach: getRegion('products') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
     <!--/ko-->
 
-    <!-- ko if: getActiveIndex() == 1 -->
+    <!-- ko if: getActiveIndex() == registrationStepIndex -->
         <!-- ko foreach: getRegion('registration') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
     <!--/ko-->
 
-    <!-- ko if: getActiveIndex() == 2 -->
+    <!-- ko if: getActiveIndex() == addressStepIndex-->
         <!-- ko foreach: getRegion('address') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
     <!--/ko-->
 
-    <!-- ko if: getActiveIndex() == 3 -->
+    <!-- ko if: getActiveIndex() == paymentStepIndex -->
         <!-- ko foreach: getRegion('payment') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
     <!--/ko-->
 
-    <!-- ko if: getActiveIndex() == 4 -->
+    <!-- ko if: getActiveIndex() == thankYouStepIndex -->
         <!-- ko foreach: getRegion('thank_you') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->

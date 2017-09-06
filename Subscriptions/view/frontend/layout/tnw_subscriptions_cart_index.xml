@@ -96,7 +96,7 @@
                                                 <item name="children" xsi:type="array">
                                                     <item name="existing_customer" xsi:type="array">
                                                         <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/existing-customer</item>
                                                         <item name="displayArea" xsi:type="string">existing_customer</item>
                                                         <item name="config" xsi:type="array">
                                                             <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration/existing-customer</item>
@@ -104,7 +104,7 @@
                                                     </item>
                                                     <item name="new_customer" xsi:type="array">
                                                         <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/new-customer</item>
                                                         <item name="displayArea" xsi:type="string">new_customer</item>
                                                         <item name="config" xsi:type="array">
                                                             <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration/new-customer</item>

@@ -24,8 +24,9 @@ define(
             /**
              * @inheritdoc
              */
-            initialize: function() {
+            initialize: function () {
                 this._super()
+                    .navigateAccordingToUrl()
                     .initSteps();
 
                 $(window).hashchange(_.bind(stepNavigator.handleHash, stepNavigator));
@@ -41,6 +42,24 @@ define(
                 $.each(this.steps, function () {
                     stepNavigator.registerStep(this);
                 });
+
+                return this;
+            },
+
+            /**
+             * Init steps
+             *
+             * @returns {exports}
+             */
+            navigateAccordingToUrl: function () {
+                var step = window.location.hash.substr(1);
+
+                if (step) {
+                    $.each(this.steps, function () {
+                        this.code === step ? this.isActive = true : this.isActive = false;
+                    });
+                }
+
                 return this;
             },
 
@@ -60,7 +79,7 @@ define(
              * @param {Object} itemTwo
              * @returns {*|number}
              */
-            sortItems: function(itemOne, itemTwo) {
+            sortItems: function (itemOne, itemTwo) {
                 return stepNavigator.sortItems(itemOne, itemTwo);
             },
 
@@ -69,7 +88,7 @@ define(
              *
              * @param {Object} step
              */
-            navigateTo: function(step) {
+            navigateTo: function (step) {
                 stepNavigator.navigateBackTo(step.code);
             },
 
@@ -79,7 +98,7 @@ define(
              * @param {Object} item
              * @returns {*|boolean}
              */
-            isProcessed: function(item) {
+            isProcessed: function (item) {
                 return stepNavigator.isProcessed(item.code);
             }
         });

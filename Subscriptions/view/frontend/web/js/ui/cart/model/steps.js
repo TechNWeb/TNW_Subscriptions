@@ -10,6 +10,12 @@ define([
         'use strict';
 
         return Component.extend({
+            productsStepIndex: 0,
+            registrationStepIndex: 1,
+            addressStepIndex: 2,
+            paymentStepIndex: 3,
+            thankYouStepIndex: 4,
+
             getActiveIndex: function () {
                 return stepNavigator._getActiveItemIndex();
             }
