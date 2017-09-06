@@ -11,6 +11,7 @@ use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Customer\Model\Metadata\Form;
+use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Framework\Api\DataObjectHelper;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
@@ -56,25 +57,35 @@ class Manager
     private $addressForm;
 
     /**
+     * Address mapper
+     *
+     * @var AddressMapper
+     */
+    private $addressMapper;
+
+    /**
      * Manager constructor.
      * @param DataObjectHelper $dataObjectHelper
      * @param CustomerRepositoryInterface $customerRepository
      * @param AddressInterfaceFactory $addressDataFactory
      * @param FormFactory $customerForm
      * @param ProfileManager $profileManager
+     * @param AddressMapper $addressMapper
      */
     public function __construct(
         DataObjectHelper $dataObjectHelper,
         CustomerRepositoryInterface $customerRepository,
         AddressInterfaceFactory $addressDataFactory,
         FormFactory $customerForm,
-        ProfileManager $profileManager
+        ProfileManager $profileManager,
+        AddressMapper $addressMapper
     ) {
         $this->dataObjectHelper = $dataObjectHelper;
         $this->customerRepository = $customerRepository;
         $this->addressDataFactory = $addressDataFactory;
         $this->customerForm = $customerForm;
         $this->profileManager = $profileManager;
+        $this->addressMapper = $addressMapper;
     }
 
     /**
@@ -117,23 +128,41 @@ class Manager
         if (!empty($data[$keyAddress]) && !empty($data[$keyInfo])) {
             $address = array_merge($data[$keyAddress], $data[$keyInfo]);
             $customerAddressId = !empty($address[$keyCustomer])
-                ? $address[$keyCustomer]
+                ? (int)$address[$keyCustomer]
                 : null;
             $saveAddress = isset($address['save_address']) && $address['save_address'];
-            $address = $this->formatMultiLineAttributes($address);
             /** @var SubscriptionProfileAddressInterface $profileAddress */
             $profileAddress = $this->getProfileAddress($type);
-            $this->dataObjectHelper->populateWithArray(
-                $profileAddress,
-                $address,
-                SubscriptionProfileAddressInterface::class
-            );
+            if ($customerAddressId) {
+                /** @var CustomerInterface $customer */
+                list($customer, $addresses) = $this->getCustomerAddresses();
+                $address = null;
+                if (is_array($addresses) && count($addresses) > 0) {
+                    /** @var \Magento\Customer\Api\Data\AddressInterface $curAddress */
+                    foreach ($addresses as $curAddress) {
+                        if ((int)$curAddress->getId() === $customerAddressId) {
+                            /** @var array $addressData */
+                            $address = $this->addressMapper->toFlatArray($curAddress);
+                            unset($address['id']);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $address = $this->formatMultiLineAttributes($address);
+            }
+
+            if ($address) {
+                $this->dataObjectHelper->populateWithArray(
+                    $profileAddress,
+                    $address,
+                    SubscriptionProfileAddressInterface::class
+                );
+            }
 
             if ($saveAddress) {
                 $customerAddress = $profileAddress->exportCustomerAddress();
-                /** @var CustomerInterface $customer */
-                $customer = $this->profileManager->getProfile()->getCustomer();
-                $addresses = (array)$customer->getAddresses();
+                list($customer, $addresses) = $this->getCustomerAddresses();
                 $addresses[] = $customerAddress;
                 $customer->setAddresses($addresses);
                 $this->saveCustomer($customer);
@@ -221,5 +250,16 @@ class Manager
         }
 
         return $address;
+    }
+
+    /**
+     * @return array
+     */
+    private function getCustomerAddresses()
+    {
+        /** @var CustomerInterface $customer */
+        $customer = $this->profileManager->getProfile()->getCustomer();
+        $addresses = (array)$customer->getAddresses();
+        return [$customer, $addresses];
     }
 }
