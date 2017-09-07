@@ -54,10 +54,10 @@ class ChangeBeforeAuthUrl extends Action
         $response = new \Magento\Framework\DataObject();
         $response->setData('error', false);
 
-        $routePath = $this->_request->getParam('route_path');
-        $hash = $this->_request->getParam('hash');
-
         try {
+            $routePath = $this->_request->getParam('route_path');
+            $hash = $this->_request->getParam('hash');
+
             $url = $this->_url->getUrl($routePath);
 
             $this->session->setBeforeAuthUrl($url . $hash);

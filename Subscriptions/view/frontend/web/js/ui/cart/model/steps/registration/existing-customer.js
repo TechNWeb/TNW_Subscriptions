@@ -36,11 +36,11 @@ define([
          * Local email validation.
          *
          * @param {Boolean} focused - input focus.
-         * @param {Boolean} firstTime.
+         * @param {Boolean} fromForm.
          *
          * @returns {Boolean} - validation result.
          */
-        validateEmail: function (focused) {
+        validateEmail: function (focused, fromForm) {
             var loginFormSelector = 'form[data-role=email-for-login]',
                 usernameSelector = loginFormSelector + ' input[name="login[username]"]',
                 loginForm = $(loginFormSelector),
@@ -52,16 +52,33 @@ define([
                 return !!$(usernameSelector).valid();
             }
 
+            if (focused === false && fromForm === true) {
+                return !!$(usernameSelector).valid();
+            }
+
             validator = loginForm.validate();
 
             return validator.check(usernameSelector);
+        },
+
+        validatePassword: function () {
+            var loginFormSelector = 'form[data-role=email-for-login]',
+                passwordSelector = loginFormSelector + ' input[name="login[password]"]',
+                loginForm = $(loginFormSelector);
+
+            loginForm.validation();
+
+            return !!$(passwordSelector).valid();
         },
 
         /**
          * Validate form on submit (if email has not been focused yet).
          */
         validateForm: function () {
-            return (this.validateEmail(false));
+            var validPassword = this.validatePassword(),
+                validEmail = this.validateEmail(false, true);
+
+            return validPassword && validEmail;
         }
     });
 });
