@@ -130,10 +130,24 @@ class Config
                         $result = true;
                     }
                 }
+            } else {
+                return $this->isIntegrationActive;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Get "Enable Subscriptions" config value for current website
+     *
+     * @return bool
+     */
+    public function isSubscriptionsActiveCurrent()
+    {
+        $currentWebsiteId = $this->storeManager->getWebsite()->getId();
+        return $this->getStoreConfig($this->xmlIsActive, $currentWebsiteId)
+            && !empty($this->getAvailablePaymentsList($currentWebsiteId));
     }
 
     /**
