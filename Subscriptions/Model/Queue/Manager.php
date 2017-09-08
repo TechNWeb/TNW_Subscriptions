@@ -24,6 +24,11 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 class Manager
 {
     /**
+     * Date format used on profile queue creating/processing.
+     */
+    const DATETIME_FORMAT = 'Y-m-d H:i:s';
+
+    /**
      * Factory for creating queue collection.
      *
      * @var CollectionFactory
@@ -135,14 +140,14 @@ class Manager
             'relation.subscription_profile_id = profile.entity_id',
             []
         );
-        $completeStatus = QueueStatus::QUEUE_STATUS_COMPLETE;
+        $pendingStatus = QueueStatus::QUEUE_STATUS_PENDING;
         $errorStatus = QueueStatus::QUEUE_STATUS_ERROR;
         $collection->getSelect()->where(
-            "relation.scheduled_at <= '{$this->getCurrentDate()}' AND main_table.status != '{$completeStatus}'"
+            "relation.scheduled_at <= '{$this->getCurrentDate()}' AND main_table.status = '{$pendingStatus}'"
         )->orWhere(
-            "main_table.updated_at <= '{$this->getAttemptDate()}' AND main_table.status = '{$errorStatus}'"
-        )->where(
-            'main_table.attempt_count <= ?', $this->config->getAttemptCount()
+            "main_table.updated_at <= '{$this->getAttemptDate()}' 
+            AND main_table.status = '{$errorStatus}' 
+            AND main_table.attempt_count <= {$this->config->getAttemptCount()}"
         )->where(
             'profile.status NOT IN (?)',
             [
@@ -350,7 +355,7 @@ class Manager
         $date = new \DateTime();
         $condition = 'P' . $this->config->getAttemptInterval() . 'D';
         $date->sub(new \DateInterval($condition));
-        return $date->format('Y-m-d');
+        return $date->format(self::DATETIME_FORMAT);
     }
 
     /**
@@ -361,7 +366,7 @@ class Manager
     private function getCurrentDate()
     {
         $date = new \DateTime();
-        return $date->format('Y-m-d');
+        return $date->format(self::DATETIME_FORMAT);
     }
 
     /**
@@ -374,7 +379,7 @@ class Manager
         $date = new \DateTime();
         $condition = 'P' . $this->config->getGracePeriod() . 'D';
         $date->sub(new \DateInterval($condition));
-        return $date->format('Y-m-d');
+        return $date->format(self::DATETIME_FORMAT);
     }
 
 

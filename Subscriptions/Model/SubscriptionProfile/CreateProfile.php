@@ -495,11 +495,10 @@ class CreateProfile extends BaseCreate
                 }
 
                 $profile = $this->createProfile($subQuote, $basicPayment);
+                $this->logToMessageCreateSubscription($profile);
 
                 if ($profile) {
                     $order = $this->profileManager->processProfile($subQuote);
-                    $this->logMessageOrderCreated($profile->getId(), $order->getEntityId(), $subQuote->getId());
-
                     $this->profileManager->assignOrderToProfile($order, $profile);
                     $this->updateProfileStatus($profile);
                     $this->eventManager->dispatch(
@@ -507,9 +506,6 @@ class CreateProfile extends BaseCreate
                         ['order' => $order, 'quote' => $subQuote]
                     );
                     $profiles[] = $profile;
-
-                    $this->logToMessageCreateSubscription($profile);
-
                     //TODO add here email sending
                 }
             }

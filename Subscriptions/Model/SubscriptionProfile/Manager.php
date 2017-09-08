@@ -291,7 +291,7 @@ class Manager
     ) {
         if (!$date) {
             $date = new \DateTime();
-            $date = $date->format('Y-m-d');
+            $date = $date->format('Y-m-d H:i:s');
         }
 
         $relation = $this->orderRelationManager
@@ -318,14 +318,13 @@ class Manager
 
         if (!empty($request)) {
             $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
-
-
             if (!$frequency || !$frequency->getId()) {
                 throw new \Exception(__('Can not create profile with empty frequency.'));
             }
         }
 
         if (isset($frequency)) {
+            $startDate = $this->getFullStartDate($request['start_on']);
             $this->getProfile()
                 ->setCustomerId($quote->getCustomerId())
                 ->setWebsiteId($quote->getStore()->getWebsiteId())
@@ -335,8 +334,8 @@ class Manager
                 ->setIsVirtual($quote->getIsVirtual())
                 ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
                 ->setTerm($request['term'])
-                ->setTotalBillingCycles($request['period'])
-                ->setStartDate($request['start_on'])
+                ->setTotalBillingCycles(!$startDate ? $request['period'] : 0)
+                ->setStartDate($startDate)
                 ->setBillingFrequencyId($frequency->getId())
                 ->setFrequency($frequency->getFrequency())
                 ->setUnit($frequency->getUnit())
@@ -347,7 +346,7 @@ class Manager
                 ->setNeedGenerateQuotes(true);
 
             if ($request['is_trial']) {
-                $this->getProfile()->setTrialStartDate($request['start_on']);
+                $this->getProfile()->setTrialStartDate($startDate);
                 $this->getProfile()->setStartDate($this->calculateStartDate());
                 $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
@@ -477,9 +476,27 @@ class Manager
 
             $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
             $result = $startDate->add(new \DateInterval($expression))
-                ->format('Y-m-d');
+                ->format('Y-m-d H:i:s');
         }
 
         return $result;
+    }
+
+    /**
+     * Returns full start date.
+     *
+     * @param $startOn
+     * @return mixed
+     */
+    private function getFullStartDate($startOn)
+    {
+        $currentDate = new \DateTime();
+        $startDate = new \DateTime($startOn);
+        $diff = $currentDate->diff($startDate, true);
+        //Add hours, minutes, and seconds to start date
+        $expression = 'PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S';
+        $startDate->add(new \DateInterval($expression));
+
+        return $startDate->format('Y-m-d H:i:s');
     }
 }
