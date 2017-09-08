@@ -485,8 +485,8 @@ class Manager
     /**
      * Returns full start date.
      *
-     * @param $startOn
-     * @return mixed
+     * @param string $startOn
+     * @return string
      */
     private function getFullStartDate($startOn)
     {

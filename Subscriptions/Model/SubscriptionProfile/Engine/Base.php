@@ -184,6 +184,7 @@ class Base implements EngineInterface
      * @param SubscriptionProfileInterface $profile
      * @param Quote $quote
      * @param OrderInterface $order
+     * @return void
      */
     private function logToMessageHistory(
         SubscriptionProfileInterface $profile,

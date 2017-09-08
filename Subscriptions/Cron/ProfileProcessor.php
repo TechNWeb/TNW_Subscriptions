@@ -55,6 +55,7 @@ class ProfileProcessor
      * Processes profile queue.
      *
      * @param int $websiteId
+     * @throws \RuntimeException.
      */
     public function process($websiteId)
     {
