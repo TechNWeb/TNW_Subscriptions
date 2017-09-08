@@ -1,7 +1,10 @@
 <div class="select-action next-step">
     <button type="button"
             class="action primary"
-            data-bind="click: onNextStepClick">
+            disable="disabled"
+            visible="visible"
+            click="onNextStepClick"
+            attr="'data-index': index">
         <span data-bind="i18n: buttonTitle"></span>
     </button>
 </div>

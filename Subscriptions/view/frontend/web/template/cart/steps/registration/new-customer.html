@@ -1,3 +1,24 @@
-<h1>
-    New customer
-</h1>
+<form data-mage-init='{"validation": {}}' class="form" novalidate="novalidate"
+      id="new-customer" data-role="email-for-register" data-bind="submit: validate"
+>
+
+    <h2 class="control-spaces">
+        New customer
+    </h2>
+
+    <input name="username" class="email control-spaces" type="email"
+           data-validate="{required:true, 'validate-email':true}"
+           data-bind="
+               attr: { placeholder: placeholderEmail },
+               textInput: email,
+               hasFocus: emailFocused"
+    />
+
+    <button type="submit"
+            class="action primary"
+            attr="'data-index': index"
+
+    >
+        <span data-bind="i18n: 'Register'"></span>
+    </button>
+</form>
