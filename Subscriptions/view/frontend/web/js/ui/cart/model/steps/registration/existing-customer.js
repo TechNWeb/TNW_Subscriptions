@@ -61,6 +61,11 @@ define([
             return validator.check(usernameSelector);
         },
 
+        /**
+         * Validate password field.
+         *
+         * @returns {boolean}
+         */
         validatePassword: function () {
             var loginFormSelector = 'form[data-role=email-for-login]',
                 passwordSelector = loginFormSelector + ' input[name="login[password]"]',
@@ -73,6 +78,8 @@ define([
 
         /**
          * Validate form on submit (if email has not been focused yet).
+         *
+         * @returns {boolean}
          */
         validateForm: function () {
             var validPassword = this.validatePassword(),

@@ -69,7 +69,7 @@ class Customer implements ConfigProviderInterface
     }
 
     /**
-     * Check if customer logged in
+     * Check if customer logged in.
      *
      * @return bool
      */
