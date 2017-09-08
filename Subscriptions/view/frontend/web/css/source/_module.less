@@ -286,4 +286,104 @@
       }
     }
   }
+
+  .catalog-product-view {
+    .addtocart-tabs {
+      padding-top: 20px;
+
+      .title-container {
+        display: inline-block;
+        width: 100%;
+
+        .tab-title {
+          display: inline-block;
+          float: left;
+          background: #f6f6f6;
+          border: 1px solid #cccccc;
+          border-bottom: none;
+          margin-right: -1px;
+
+          > a {
+            padding: 8px 15px;
+            line-height: 2.5em;
+            color: #7d7d7d;
+            text-decoration: none;
+          }
+        }
+        .tab-title.active {
+          > a {
+            padding-bottom: 10px;
+            color: #333333;
+            background: #ffffff;
+            cursor: default;
+          }
+        }
+      }
+      .content-container {
+        margin-top: -5px;
+        margin-bottom: 10px;
+        padding: 0 30px;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #cccccc;
+
+        .tab-content.subscribe-tab {
+          padding: 30px 0;
+
+          .fieldset {
+            margin: 0 0 20px;
+          }
+
+          .fieldset > .field > .label {
+            margin: 0 0 10px;
+          }
+
+          .fieldset > .field.required > .label:after,
+          .fieldset > .fields > .field.required > .label:after {
+            content: '';
+          }
+
+          .input-text.qty {
+            text-align: center;
+            width: 54px;
+          }
+
+          .field.until-cancelled {
+            margin-bottom: 10px;
+          }
+
+          .field.term .control {
+            position: relative;
+
+            >label {
+              margin-right: 3px;
+            }
+
+            >label.after-input {
+              position: absolute;
+              top: 6px;
+              left: 101px;
+            }
+          }
+
+          .field.date .control {
+            position: relative;
+
+            .ui-datepicker-trigger {
+              position: absolute;
+              top: 7px;
+              right: 0;
+            }
+          }
+
+          .action.primary {
+            padding: 14px 17px;
+            width: 49%;
+            line-height: 2.2rem;
+            font-size: 1.8rem;
+          }
+        }
+      }
+    }
+  }
 }

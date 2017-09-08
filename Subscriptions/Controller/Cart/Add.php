@@ -104,11 +104,12 @@ class Add extends Action
             if ($this->formKeyValidator->validate($this->getRequest()) && $this->initProduct()) {
                 $params = $this->getRequest()->getParams();
                 try {
-                    if (isset($params['qty'])) {
+                    if (isset($params['subscribe_qty'])) {
                         $filter = new \Zend_Filter_LocalizedToNormalized(
                             ['locale' => $this->_objectManager->get(ResolverInterface::class)->getLocale()]
                         );
-                        $params['qty'] = $filter->filter($params['qty']);
+                        $params['qty'] = $filter->filter($params['subscribe_qty']);
+                        unset($params['subscribe_qty']);
                     }
                     $response = $this->createProfile->addToSubscription($params);
                     $error = $response['error'];
@@ -158,6 +159,14 @@ class Add extends Action
      */
     private function processResponse($error, $message, $product = null)
     {
+        if ($message) {
+            if ($error) {
+                $this->messageManager->addErrorMessage($message);
+            } else {
+                $this->messageManager->addSuccessMessage($message);
+            }
+        }
+        
         $result['error'] = $error;
         $result['message'] = $message;
         if ($product && !$product->getIsSalable()) {
