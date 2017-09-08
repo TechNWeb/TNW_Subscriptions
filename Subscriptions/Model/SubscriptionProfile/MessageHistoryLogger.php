@@ -27,6 +27,13 @@ class MessageHistoryLogger
     const MESSAGE_ORDER_CREATED_FROM_QUOTE = 7;
     /**#@-*/
 
+    /**#@+
+     * Constants for process type.
+     */
+    const PROCESS_TYPE_FROM_ADMIN = 0;
+    const PROCESS_TYPE_AUTOMATED = 1;
+    /**#@-*/
+
     /**
      * Message history factory.
      *

@@ -256,10 +256,10 @@ class QuoteCreator
      * @param \DateTime $date
      * @param string $unit
      * @param int $length
-     * @return mixed
+     * @return \DateTime
      * @throws \Exception
      */
-    private function calculateScheduledDate($date, $unit, $length)
+    private function calculateScheduledDate(\DateTime $date, $unit, $length)
     {
         switch ($unit) {
             case BillingFrequencyUnitType::DAYS:
@@ -331,6 +331,8 @@ class QuoteCreator
         $quote = $this->quoteFactory->create();
         //Deactivate quote
         $quote->setIsActive(false);
+        $quote->setData('ignore_old_qty', true);
+        $quote->setData('is_super_mode', true);
         //Set store
         $quote->setStore(
             $profile->getWebsite()->getDefaultStore()

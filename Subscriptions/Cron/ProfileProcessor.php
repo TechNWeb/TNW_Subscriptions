@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Cron;
 
+use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
@@ -30,43 +31,41 @@ class ProfileProcessor
     private $queueManager;
 
     /**
-     * Message history logger.
+     * Registry.
      *
-     * @var MessageHistoryLogger
+     * @var Registry
      */
-    private $messageHistoryLogger;
+    private $registry;
 
     /**
      * @param Context $context
      * @param Manager $queueManager
-     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
-        MessageHistoryLogger $messageHistoryLogger
+        Registry $registry
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
-        $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->registry = $registry;
     }
 
     /**
      * Processes profile queue.
      *
      * @param int $websiteId
+     * @throws \RuntimeException.
      */
     public function process($websiteId)
     {
         $successIds = [];
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
-        $this->queueManager->makeRunning($itemsCollection->getAllIds());
+        $this->queueManager->makeRunning(array_keys($itemsCollection->getItems()));
+        $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
         foreach ($itemsCollection as $item) {
             try {
                 $this->queueManager->processItem($item);
-
-                $this->logToMessageHistory($item);
-
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
                 $this->context->log(
@@ -77,29 +76,5 @@ class ProfileProcessor
         }
         $this->queueManager->makeCompleted($successIds);
         $this->queueManager->updateProfilesStatuses();
-    }
-
-    /**
-     * Log message for Subscription Profile message history.
-     *
-     * @param \TNW\Subscriptions\Model\Queue $item
-     *
-     * @return void
-     */
-    private function logToMessageHistory(\TNW\Subscriptions\Model\Queue $item)
-    {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
-            $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
-            $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
-        );
-
-        $this->messageHistoryLogger->log(
-            $message,
-            $item->getSubscriptionProfileId(),
-            false,
-            false,
-            true
-        );
     }
 }

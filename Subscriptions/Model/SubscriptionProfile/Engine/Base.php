@@ -6,12 +6,15 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+use Magento\Framework\Registry;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
+use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class Base
@@ -45,19 +48,39 @@ class Base implements EngineInterface
     private $cartManagement;
 
     /**
+     * Profile comments logger.
+     *
+     * @var MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
+     * Registry.
+     *
+     * @var Registry
+     */
+    private $registry;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param Context $context
      * @param CartManagementInterface $cartManagement
+     * @param MessageHistoryLogger $historyLogger
+     * @param Registry $registry
      */
     public function __construct(
         Config $config,
         Context $context,
-        CartManagementInterface $cartManagement
+        CartManagementInterface $cartManagement,
+        MessageHistoryLogger $historyLogger,
+        Registry $registry
     ) {
         $this->config = $config;
         $this->context = $context;
         $this->cartManagement = $cartManagement;
+        $this->historyLogger = $historyLogger;
+        $this->registry = $registry;
     }
 
     /**
@@ -136,7 +159,10 @@ class Base implements EngineInterface
             $quote->getPayment()->setAdditionalInformation(
                 $this->getPaymentAdditionalInfo($this->getProfile())
             );
-            return $this->getCartManagement()->submit($quote);
+            $order = $this->getCartManagement()->submit($quote);
+            $this->logToMessageHistory($this->getProfile(), $quote, $order);
+
+            return $order;
         } catch (\Exception $e) {
             $quote->setReservedOrderId(null);
             $quote->save();
@@ -150,5 +176,33 @@ class Base implements EngineInterface
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
         return [];
+    }
+
+    /**
+     * Log to comment profile comment history created order.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param Quote $quote
+     * @param OrderInterface $order
+     * @return void
+     */
+    private function logToMessageHistory(
+        SubscriptionProfileInterface $profile,
+        Quote $quote,
+        OrderInterface $order
+    ) {
+        $message = sprintf(
+            $this->historyLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
+            $order->getIncrementId(),
+            $this->historyLogger->getConvertedQuoteId($quote->getId())
+        );
+
+        $this->historyLogger->log(
+            $message,
+            $profile->getId(),
+            false,
+            false,
+            $this->registry->registry('profile_process_type')
+        );
     }
 }
