@@ -8,8 +8,10 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -17,10 +19,11 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
-use TNW\Subscriptions\Model\Backend\Session\Quote as SessionQuote;
 
 /**
  * Modal form for adding single product to subscription.
@@ -58,7 +61,7 @@ class Form extends AbstractDataProvider
      *
      * @var ProductRepositoryInterface
      */
-    private $productRepository;
+    protected $productRepository;
 
     /**
      * Repository for retrieving product billing frequencies.
@@ -98,7 +101,7 @@ class Form extends AbstractDataProvider
     /**
      * Trial period holder.
      *
-     * @var string
+     * @var array
      */
     private $trialPeriod;
 
@@ -122,16 +125,27 @@ class Form extends AbstractDataProvider
     private $config;
 
     /**
-     * @var SessionQuote
+     * @var QuoteSessionInterface
      */
-    private $sessionQuote;
+    protected $sessionQuote;
 
     /**
      * @var \Magento\Directory\Model\CurrencyFactory
      */
-    private $currencyFactory;
+    protected $currencyFactory;
 
     /**
+     * @var Currency
+     */
+    private $currentCurrency;
+
+    /**
+     * @var Context
+     */
+    protected $context;
+
+    /**
+     * Form constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -143,8 +157,9 @@ class Form extends AbstractDataProvider
      * @param PriceCalculator $priceCalculator
      * @param StoreManagerInterface $storeManager
      * @param \TNW\Subscriptions\Model\Config $config
-     * @param SessionQuote $sessionQuote
+     * @param QuoteSessionInterface $sessionQuote
      * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
+     * @param Context $context
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -161,8 +176,9 @@ class Form extends AbstractDataProvider
         PriceCalculator $priceCalculator,
         StoreManagerInterface $storeManager,
         \TNW\Subscriptions\Model\Config $config,
-        SessionQuote $sessionQuote,
+        QuoteSessionInterface $sessionQuote,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
+        Context $context,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -178,6 +194,7 @@ class Form extends AbstractDataProvider
         $this->config = $config;
         $this->sessionQuote = $sessionQuote;
         $this->currencyFactory = $currencyFactory;
+        $this->context = $context;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -196,7 +213,7 @@ class Form extends AbstractDataProvider
             $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId);
             $billingFrequencyPresetQty = $frequency->getPresetQty();
             if ($frequency->getDefaultBillingFrequency()) {
-                $data[self::FORM_DATA_VALUE]['billing_frequency_id'] = $frequency->getBillingFrequencyId();
+                $data[self::FORM_DATA_VALUE]['billing_frequency'] = $frequency->getBillingFrequencyId();
                 $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
                 $data[self::FORM_DATA_VALUE]['preset_qty'] = $billingFrequencyPresetQty;
             }
@@ -205,6 +222,8 @@ class Form extends AbstractDataProvider
                 $billingFrequencyUnitPrice;
             $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['preset_qty'] =
                 $billingFrequencyPresetQty;
+            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['initial_fee'] =
+                $this->getInitialFee($billingFrequencyId);
         }
 
         $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
@@ -256,9 +275,9 @@ class Form extends AbstractDataProvider
     protected function getFieldsMetaData()
     {
         return $result = [
-            'billing_frequency' => [
+            'general' => [
                 'children' => [
-                    'billing_frequency_id' => [
+                    'billing_frequency' => [
                         'arguments' => [
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
@@ -302,6 +321,15 @@ class Form extends AbstractDataProvider
                             ]
                         ]
                     ],
+                    'initial_fee' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'priceFormat' => $this->getPriceFormatData(),
+                                ]
+                            ]
+                        ]
+                    ],
                     'price' => [
                         'arguments' => [
                             'data' => [
@@ -312,8 +340,10 @@ class Form extends AbstractDataProvider
                                         'validate-zero-or-greater' => true,
                                     ],
                                     'imports' => [
-                                        'changeValue' => 'index = billing_frequency_id:value',
+                                        'changeValue' => 'index = billing_frequency:value',
                                     ],
+                                    'label' => $this->getTrialPeriod() ? __('Post trial price:') : __('Price') . ':',
+                                    'priceFormat' => $this->getPriceFormatData(),
                                 ],
                             ],
                         ],
@@ -322,7 +352,6 @@ class Form extends AbstractDataProvider
             ],
         ];
     }
-
 
     /**
      * Returns buttons meta data.
@@ -373,17 +402,18 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * Returns config fot start on field.
+     * Returns config for start on field.
      *
+     * @param null|int $productId
      * @return array
      */
-    private function getStartOnFieldConfig()
+    protected function getStartOnFieldConfig($productId = null)
     {
         $visible = false;
         $value = null;
-
-        $productId = $this->request->getParam('product_id', null);
-
+        if (!$productId) {
+            $productId = $this->request->getParam('product_id', null);
+        }
         if ($productId) {
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productId);
@@ -414,20 +444,20 @@ class Form extends AbstractDataProvider
     /**
      * Returns list of product billing frequencies.
      *
-     * @return array
+     * @param null|int $productId
+     * @return array|ProductBillingFrequencyInterface[]
      */
-    private function getProductBillingFrequencies()
+    private function getProductBillingFrequencies($productId = null)
     {
         if ($this->productBillingFrequencies === null) {
-
-            $this->productBillingFrequencies = [];
-
-            $productId = $this->request->getParam('product_id', null);
-
-            if ($productId) {
+            $productId = $productId ?: $this->request->getParam('product_id');
+            try {
                 $this->productBillingFrequencies = $this->recurringOptionRepository
                     ->getListByProductId($productId)
                     ->getItems();
+            } catch (\Exception $e) {
+                $this->productBillingFrequencies = [];
+                $this->context->log($e->getMessage());
             }
         }
 
@@ -437,20 +467,35 @@ class Form extends AbstractDataProvider
     /**
      * Returns product billing frequencies as array.
      *
+     * @param null|int $productId
      * @return array
      */
-    public function getProductBillingFrequenciesAsOptionArray()
+    public function getProductBillingFrequenciesAsOptionArray($productId = null)
     {
         $result = [];
+        $productId = $productId ?: $this->request->getParam('product_id');
+        try {
+            $product = $this->productRepository->getById($productId);
+            $productPrice = (int)$product->getPrice();
+            /** @var ProductBillingFrequencyInterface $productFrequency */
+            foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
+                $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
+                $label = $frequency->getLabel();
+                if ($productId) {
+                    $frequencyPrice = (int)$productFrequency->getPrice();
+                    if ($productPrice > $frequencyPrice) {
+                        $savings = $this->formatPrice($productPrice - $frequencyPrice);
+                        $label .= '  '. sprintf(__('(SAVE %s)'), $savings) ;
+                    }
 
-        /** @var ProductBillingFrequencyInterface $productFrequency */
-        foreach ($this->getProductBillingFrequencies() as $productFrequency) {
-            $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
-
-            $result[] = [
-                'label' => $frequency->getLabel(),
-                'value' => $productFrequency->getBillingFrequencyId(),
-            ];
+                }
+                $result[] = [
+                    'label' => $label,
+                    'value' => $productFrequency->getBillingFrequencyId(),
+                ];
+            }
+        } catch (\Exception $e) {
+            $this->context->log($e->getMessage());
         }
 
         return $result;
@@ -459,40 +504,69 @@ class Form extends AbstractDataProvider
     /**
      * Get trial period as string for product.
      *
+     * @param null|int $productId
      * @return \Magento\Framework\Phrase|string
      */
-    private function getTrialPeriod()
+    protected function getTrialPeriod($productId = null)
     {
-        if ($this->trialPeriod === null) {
-            $productId = (int)$this->request->getParam('product_id', 0);
-            $trialLength = 0;
-            $trialUnit = 0;
-            $trialPriceLabel = '';
-            if ($productId) {
+        $productId = $productId ?: $this->request->getParam('product_id');
+        if ($productId && $this->trialPeriod[$productId] === null) {
+            $this->trialPeriod[$productId] = '';
+            try {
+                /** @var MagentoProduct $product */
                 $product = $this->productRepository->getById($productId);
-                $show = (bool)$product->getCustomAttribute(
-                    \TNW\Subscriptions\Model\Product\Attribute::SUBSCRIPTION_TRIAL_STATUS
-                )->getValue();
-
+                $show = $this->getProductCustomAttribute(
+                    $product,
+                    Attribute::SUBSCRIPTION_TRIAL_STATUS,
+                    false
+                );
                 if ($show) {
-                    $trialLength = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
-                        ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH)->getValue()
-                        : 0;
-                    $trialUnit = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
-                        ? (int)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)->getValue()
-                        : 0;
-                    $trialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
-
-                    $currencySymbol = $this->getCurrentCurrencySymbol();
-                    $trialPriceLabel = (int)$product->getCustomAttribute(
-                        Attribute::SUBSCRIPTION_TRIAL_PRICE
-                        )->getValue() . $currencySymbol . ' ' . __('for') . ' ';
+                    $trialLength = (int)$this->getProductCustomAttribute(
+                        $product,
+                        Attribute::SUBSCRIPTION_TRIAL_LENGTH,
+                        0
+                    );
+                    $trialUnit = (int)$this->getProductCustomAttribute(
+                        $product,
+                        Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
+                        0
+                    );
+                    $trialPrice = $this->getProductCustomAttribute(
+                        $product,
+                        Attribute::SUBSCRIPTION_TRIAL_PRICE,
+                        0
+                    );
+                    $formattedPrice = $this->formatPrice($trialPrice);
+                    $formattedTrialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
+                    $trialPriceLabel = $formattedPrice . $this->getCurrentCurrencySymbol() . ' ' . __('for') . ' ';
+                    if ($trialLength && $trialUnit) {
+                        $this->trialPeriod[$productId] = $trialPriceLabel . $trialLength . ' ' . $formattedTrialUnit;
+                    }
                 }
+            } catch (\Exception $e) {
+                $this->context->log($e->getMessage());
             }
-            $this->trialPeriod = $trialLength && $trialUnit ? $trialPriceLabel . $trialLength . ' ' . $trialUnit : '';
         }
 
-        return $this->trialPeriod;
+        return $this->trialPeriod[$productId];
+    }
+
+    /**
+     * Returns product custom attribute value or "default" value if attribute is not set.
+     *
+     * @param MagentoProduct $product
+     * @param string $attributeCode
+     * @param null|bool|int|string $default
+     * @return null|bool|int|string
+     */
+    private function getProductCustomAttribute(MagentoProduct $product, $attributeCode, $default = null)
+    {
+        $result = $default;
+        if ($product->getCustomAttribute($attributeCode)) {
+            $result = $product->getCustomAttribute($attributeCode)->getValue();
+        }
+
+        return $result;
     }
 
     /**
@@ -505,7 +579,7 @@ class Form extends AbstractDataProvider
     {
         $productId = (int)$this->request->getParam('product_id', 0);
 
-        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId);
+        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId, null, false, false);
     }
 
     /**
@@ -513,18 +587,70 @@ class Form extends AbstractDataProvider
      *
      * @return string
      */
-    private function getCurrentCurrencySymbol()
+    protected function getCurrentCurrencySymbol()
     {
-        $currencyCode = $this->sessionQuote->getCurrencyId();
+        return $this->getCurrentCurrency()->getCurrencySymbol();
+    }
 
-        if ($currencyCode) {
-            /** @var \Magento\Directory\Model\Currency $currency */
-            $currency = $this->currencyFactory->create()->load($currencyCode);
-            $currencySymbol = $currency->getCurrencySymbol();
-        } else {
-            $currencySymbol = $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
+    /**
+     * Get currency model for session currency_id if exists here or for base_currency from store manager.
+     *
+     * @return Currency
+     */
+    private function getCurrentCurrency()
+    {
+        if ($this->currentCurrency === null) {
+            $currencyCode = $this->sessionQuote->getCurrencyId();
+            if ($currencyCode) {
+                $this->currentCurrency = $this->currencyFactory->create()->load($currencyCode);
+            } else {
+                $this->currentCurrency = $this->storeManager->getStore()->getBaseCurrency();
+            }
         }
 
-        return $currencySymbol;
+        return $this->currentCurrency;
+    }
+
+    /**
+     * Format price according to locale settings.
+     *
+     * @param $price
+     * @return float
+     */
+    private function formatPrice($price)
+    {
+        return $this->context->getPriceCurrency()->format(
+            $price,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $this->sessionQuote->getStoreId(),
+            $this->getCurrentCurrency()
+        );
+    }
+
+    /**
+     * Returns price locale format data.
+     *
+     * @return string
+     */
+    private function getPriceFormatData()
+    {
+        $currencyCode = $this->getCurrentCurrency()->getCurrencyCode();
+
+        return $this->context->getPriceFormatData($currencyCode);
+    }
+
+    /**
+     * Returns initial fee for billing frequency and product.
+     *
+     * @param string $billingFrequencyId
+     * @return float|int
+     */
+    private function getInitialFee($billingFrequencyId)
+    {
+        $productId = (int)$this->request->getParam('product_id', 0);
+        $initialFee = $this->priceCalculator->getInitialFee($billingFrequencyId, $productId, true);
+
+        return $initialFee ? $this->formatPrice($initialFee) : 0;
     }
 }

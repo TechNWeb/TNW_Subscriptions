@@ -59,10 +59,21 @@
 .subscriptions-add-product-modal-form-container .sub-legend legend{
   opacity: 1;
 }
+.subscriptions-modify-modal-form-container .sub-legend legend {
+  opacity: 1;
+}
 
-.subscriptions-add-product-modal-form-container .sub-period-input input{
-  width: 4rem;
+.sub-period-input{
+  margin: 0 !important;
+}
+
+.sub-period-input input{
+  width: 4rem !important;
   margin: 0 0.5rem;
+}
+
+.sub-period-input .admin__field-control{
+  margin: 0 !important;
 }
 
 .subscriptions-add-product-modal-grid-container{
@@ -452,3 +463,170 @@
   text-align: right;
 }
 
+/* "action-editor" button */
+button.action-editor:before {
+  font-size: 2.5rem;
+  font-family: 'Admin Icons';
+  content: '\e631';
+}
+
+button.action-editor {
+  background: none;
+  border: none;
+  padding: 1rem;
+  margin: 0
+}
+
+/* "action-remove" button */
+button.remove-button-icon:before {
+  font-size: 2.5rem;
+  font-family: 'Admin Icons';
+  content: '\e630';
+}
+button.remove-button-icon {
+  background: none;
+  border: none;
+  padding: 1rem;
+  margin: 0
+}
+
+button.action-editor.active:before{
+  content: '\e632';
+}
+
+/* Modify modal */
+.modify-subscriptions-modal .modal-inner-wrap{
+  padding-right: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .action-close{
+  padding: 2.6rem 2.6rem 2.1rem 0;
+  right: inherit;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-header{
+  border-bottom: 1px solid #ccc;
+  line-height: 1.2;
+  padding-left: 0;
+  margin-left: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-header .modal-title{
+  padding-left: 4.8rem;
+  font-size: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-content {
+  padding-right: 0;
+}
+
+/* Modify item container */
+.subscription-container {
+  padding-top: 1.5rem;
+}
+
+.subscription-container .fieldset-wrapper-title {
+  border: none;
+}
+
+.subscription-container > .admin__fieldset-wrapper-content{
+  border: 1px solid #ccc;
+  padding: 0 2rem;
+}
+
+.subscription-container .fieldset-wrapper-title .title{
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.subscriptions-modify-modal-form-container .admin__fieldset {
+  padding: 0;
+}
+
+.subscription-container .admin__fieldset {
+  padding: 0;
+}
+
+.subscription-container .subscription-item-form:not(:last-child) {
+  border-bottom: 1px solid #ccc;
+}
+
+/* Modify item form */
+.subscription-item-form .description-fieldset{
+  display: inline-block;
+  width: 80%;
+  margin: 2rem 0 !important;
+}
+
+.subscription-item-form .description-fieldset .admin__field-label{
+  width: 3rem !important;
+}
+
+.subscription-item-form .description-fieldset .field-name{
+  font-size: 2.6rem;
+  margin-bottom: 0;
+}
+
+.subscription-item-form .description-fieldset .field-description{
+  margin-top: 0.5rem;
+}
+
+.subscription-item-form .description-fieldset .qty-container{
+  width: inherit;
+}
+
+.subscription-item-form .description-fieldset .qty-container .field-qty{
+  margin-right: 30px;
+}
+
+.subscription-item-form .description-fieldset .qty-container .admin__control-preview {
+  padding: 0.625rem;
+}
+
+.subscription-item-form .description-fieldset .qty-edit-button{
+  padding: 0.625rem;
+}
+
+
+.subscription-item-form .edit-fieldset{
+  display: inline-block;
+  width: 18%;
+  border-left: 1px solid #ccc;
+  padding-left: 2rem;
+  padding-right: 3rem;
+  margin: 2rem 0 !important;
+  position: relative;
+}
+
+.subscription-item-form .edit-fieldset .action-editor{
+  position: absolute;
+  right: -40px;
+  top: -20px;
+  padding: 2rem;
+}
+
+.subscription-item-form div{
+  vertical-align: top;
+}
+
+.subscription-item-form .description-fieldset .middle-container{
+  display: inline-block;
+  width: calc( (100%) * .8 - 2rem);
+}
+
+.subscription-item-form .description-fieldset .left-container{
+  display: inline-block;
+  width: calc( (100%) * .19);
+  text-align: center;
+  margin-right: 2rem;
+}
+
+.subscription-item-form .description-fieldset .left-container .sub-product-image{
+  margin-bottom: 0;
+}
+
+.subscription-item-form .description-fieldset .left-container .sub-product-image .admin__field-control{
+  width: 100%;
+  margin-left: 0;
+  padding-left: 30px;
+}

@@ -10,12 +10,13 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\DataObject;
-use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\Locale\Format;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
  * Class Product
@@ -49,20 +50,28 @@ class Product extends Create
     private $data;
 
     /**
+     * @var Format
+     */
+    private $localeFormat;
+
+    /**
      * Product constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
+     * @param Format $localeFormat
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         ProductRepositoryInterface $productRepository,
-        PriceCalculator $priceCalculator
+        PriceCalculator $priceCalculator,
+        Format $localeFormat
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
+        $this->localeFormat = $localeFormat;
         parent::__construct($context, $session);
     }
 
@@ -110,8 +119,8 @@ class Product extends Create
 
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
-            $productData['billing_frequency_id'],
-            $productData['price'],
+            $productData['billing_frequency'],
+            $this->localeFormat->getNumber($productData['price']),
             true
         );
         $product->setPrice($price);
@@ -134,15 +143,20 @@ class Product extends Create
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
+            $initialFee = $this->priceCalculator->getInitialFee(
+                $productData['billing_frequency'],
+                $productData['product_id'],
+                true
+            );
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
             $data = [
                 'qty' => $productData['qty'],
-                'custom_price' => $product->getPrice(),
+                'custom_price' => sprintf("%F", $product->getPrice()),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
-                        'billing_frequency' => $productData['billing_frequency_id'],
+                        'billing_frequency' => $productData['billing_frequency'],
                         'term' => $productData['term'],
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
@@ -151,11 +165,8 @@ class Product extends Create
                         'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
-                        'price' => $this->priceCalculator->getUnitPrice(
-                            $product->getId(),
-                            $productData['billing_frequency_id'],
-                            $productData['price']
-                        )
+                        'price' => $this->localeFormat->getNumber($productData['price']),
+                        'initial_fee' => $initialFee
                     ],
                 ],
             ];
@@ -169,7 +180,7 @@ class Product extends Create
      * Calculates start date for subscription.
      *
      * @param $startOn
-     * @return mixed
+     * @return string
      */
     private function getStartOnDate($startOn)
     {

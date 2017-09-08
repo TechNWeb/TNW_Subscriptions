@@ -24,6 +24,7 @@ use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -115,19 +116,21 @@ class RecurringOptions extends BaseModifier
      * @param ArrayManager $arrayManager
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Context $context
      */
     public function __construct(
         LocatorInterface $locator,
         StoreManagerInterface $storeManager,
         ArrayManager $arrayManager,
         BillingFrequencyRepository $billingFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        Context $context
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        parent::__construct($storeManager);
+        parent::__construct($storeManager, $context);
     }
 
     /**

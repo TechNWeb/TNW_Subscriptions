@@ -10,10 +10,13 @@ define([
     'use strict';
 
     return Element.extend({
+        defaults:{
+            customerAddressSelector: 'customer_address_id'
+        },
 
         checkVisibility: function () {
             var visible = true;
-            var addressSelect = registry.get('index=customer_address_id');
+            var addressSelect = registry.get('index=' + this.customerAddressSelector);
 
             if (addressSelect.visible() || !addressSelect.issetShippingAddress) {
                 visible = false;

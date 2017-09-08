@@ -19,15 +19,16 @@ use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\Source\CurrencySelect;
 
 class Product extends AbstractDataProvider
@@ -44,7 +45,7 @@ class Product extends AbstractDataProvider
      */
     const DATA_SCOPE_ADD_PRODUCT_MODAL_GRID = 'add_product_modal_grid';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'add_product_modal_form';
-    const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM_BUTTON = 'add_to_subscription_button';
+    const DATA_SCOPE_ADD_MODIFY_FORM = 'modify_modal_form';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
     /**#@-*/
 
@@ -53,6 +54,7 @@ class Product extends AbstractDataProvider
      */
     const FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product';
     const CONFIGURABLE_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product_configurable';
+    const MODIFY_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_modify_subscriptions';
     /**#@-*/
 
     /**#@+
@@ -80,7 +82,7 @@ class Product extends AbstractDataProvider
     private $stepPool;
 
     /**
-     * @var Quote
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -126,7 +128,7 @@ class Product extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param Quote $session
+     * @param QuoteSessionInterface $session
      * @param Image $imageHelper
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
@@ -144,7 +146,7 @@ class Product extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        Quote $session,
+        QuoteSessionInterface $session,
         Image $imageHelper,
         Context $context,
         BillingFrequencyRepository $frequencyRepository,
@@ -318,14 +320,17 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * Returns meta data for subscription listing.
+     *
      * @return array
      */
-    protected function getMetaData()
+    private function getMetaData()
     {
         $result = [];
 
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
+            $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
                     'children' => [
@@ -401,6 +406,20 @@ class Product extends AbstractDataProvider
                                         'subButtonRight' => true,
                                         'visible' => !empty($this->session->getSubQuoteIds()),
                                         'title' => __('Modify Subscription(s)'),
+                                        'actions' => [
+                                            [
+                                                'targetName' => $modifyModalTarget,
+                                                'actionName' => 'toggleModal',
+                                            ],
+                                            [
+                                                'targetName' => $modifyModalTarget . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
+                                                'actionName' => 'destroyInserted',
+                                            ],
+                                            [
+                                                'targetName' => $modifyModalTarget . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
+                                                'actionName' => 'render',
+                                            ]
+                                        ],
                                         'provider' => null,
                                     ],
                                 ],
@@ -408,6 +427,7 @@ class Product extends AbstractDataProvider
 
                         ],
                         'modal' => $this->getModal(),
+                        'modifyModal' => $this->getModifyModal(),
                         'configurableModal' => $this->getConfigurableModal(),
                     ],
                     'arguments' => [
@@ -431,9 +451,11 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * Returns meta data for "Add product" modal window.
+     *
      * @return array
      */
-    protected function getModal()
+    private function getModal()
     {
         return [
             'arguments' => [
@@ -490,9 +512,55 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * Returns meta data for "Modify Subscription(s)" modal window.
+     *
      * @return array
      */
-    protected function getGrid()
+    private function getModifyModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'component' => 'TNW_Subscriptions/js/modal/modify-subscriptions-modal',
+                        'options' => [
+                            'title' => __('Subscription(s)') .' '. $this->stepPool->getCurrentStepTitle(),
+                            'modalClass' => 'modify-subscriptions-modal',
+                        ]
+                    ],
+                ],
+            ],
+            'children' => [
+                'form_container' => [
+                    'children' => [
+                        self::DATA_SCOPE_ADD_MODIFY_FORM => $this->getModifyForm()
+                    ],
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => null,
+                                'collapsible' => false,
+                                'visible' => true,
+                                'opened' => true,
+                                'additionalClasses' => 'subscriptions-modify-modal-form-container',
+                                'componentType' => Fieldset::NAME,
+                                'sortOrder' => 1
+                            ],
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for products grid in "Add product" modal window.
+     *
+     * @return array
+     */
+    private function getGrid()
     {
         return [
             'arguments' => [
@@ -523,9 +591,11 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * Returns meta data for form in "Add product" modal window.
+     *
      * @return array
      */
-    protected function getForm()
+    private function getForm()
     {
         return [
             'arguments' => [
@@ -556,8 +626,47 @@ class Product extends AbstractDataProvider
         ];
     }
 
-    /** @return array */
-    protected function getConfigurableModal()
+    /**
+     * Returns meta data for form in "Modify Subscriptions" modal window.
+     *
+     * @return array
+     */
+    private function getModifyForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => '',
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'dataScope' => '',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => self::MODIFY_HANDLE,
+                                ModifyForm::FORM_DATA_KEY => ModifyForm::FORM_DATA_VALUE,
+                                'buttons' => 1
+                            ]
+                        ),
+                        'autoRender' => false,
+                        'ns' => ModifyForm::DATA_SCOPE_MODAL_FORM,
+                        'externalProvider' => ModifyForm::DATA_SCOPE_MODAL_FORM . '.' . ModifyForm::DATA_SCOPE_MODAL_FORM . '_data_source',
+                        'toolbarContainer' => '${ $.parentName }',
+                        'formSubmitType' => 'ajax'
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for configurable modal window.
+     *
+     * @return array
+     */
+    private function getConfigurableModal()
     {
         return [
             'arguments' => [
@@ -579,9 +688,11 @@ class Product extends AbstractDataProvider
     }
 
     /**
+     * Returns meta data for configurable form.
+     *
      * @return array
      */
-    protected function getConfigurableForm()
+    private function getConfigurableForm()
     {
         return [
             'arguments' => [

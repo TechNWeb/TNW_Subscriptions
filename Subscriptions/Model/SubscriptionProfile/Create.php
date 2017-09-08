@@ -7,9 +7,12 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use TNW\Subscriptions\Model\Context;
-use Magento\Framework\Session\SessionManagerInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 
+/**
+ * Base subscription create class.
+ */
 class Create
 {
     /**
@@ -37,18 +40,18 @@ class Create
     /**
      * Session.
      *
-     * @var SessionManagerInterface
+     * @var QuoteSessionInterface
      */
     private $session;
 
     /**
      * AbstractCreate constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session
+        QuoteSessionInterface $session
     ) {
         $this->context = $context;
         $this->session = $session;
@@ -67,7 +70,7 @@ class Create
     /**
      * Returns subscription admin session.
      *
-     * @return SessionManagerInterface
+     * @return QuoteSessionInterface
      */
     public function getSession()
     {

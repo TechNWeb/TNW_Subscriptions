@@ -1,0 +1,253 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_summary_shipping_address_form.tnw_subscriptionprofile_summary_shipping_address_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_summary_shipping_address_form.tnw_subscriptionprofile_summary_shipping_address_form_data_source</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="ajaxSaveType" xsi:type="string">simple</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-summary-form</item>
+            <item name="insertFormName" xsi:type="string">shipping_information_insert_form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_summary_shipping_address_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_summary_shipping_address_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\ShippingInformationForm</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_summary_shipping_address_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">subscription_profile_id</argument>
+            <argument name="requestFieldName" xsi:type="string">subscription_profile_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" path="tnw_subscriptions/subscriptionprofile_edit/save" xsi:type="url"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="shipping_information">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/editable-fieldset</item>
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="boolean">false</item>
+                <item name="additionalClasses" xsi:type="string">profile__edit_block</item>
+            </item>
+        </argument>
+        <field name="subscription_profile_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                </item>
+            </argument>
+        </field>
+        <container name="shipping_information_header">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/edit/buttons</item>
+                    <item name="sortOrder" xsi:type="number">0</item>
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                </item>
+            </argument>
+            <field name="edit_shipping_address">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" xsi:type="boolean">false</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                        <item name="formElement" xsi:type="string">button</item>
+                        <item name="componentType" xsi:type="string">button</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                        <item name="displayAsLink" xsi:type="boolean">false</item>
+                        <item name="sortOrder" xsi:type="number">0</item>
+                        <item name="additionalClasses" xsi:type="string">profile__edit_button</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = shipping_information:preview</item>
+                        </item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_information</item>
+                                <item name="actionName" xsi:type="string">disablePreview</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="cancel_edit_shipping_address">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" xsi:type="boolean">false</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                        <item name="formElement" xsi:type="string">button</item>
+                        <item name="componentType" xsi:type="string">button</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                        <item name="displayAsLink" xsi:type="boolean">false</item>
+                        <item name="sortOrder" xsi:type="number">1</item>
+                        <item name="additionalClasses" xsi:type="string">profile__cancel-edit_button</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = shipping_information:preview</item>
+                        </item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_information</item>
+                                <item name="actionName" xsi:type="string">enablePreview</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </container>
+        <container name="shipping_address_view">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">SubscriptionProfileEditPreviewShippingAddress</argument>
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = shipping_information:preview</item>
+                        </item>
+                    </item>
+                </argument>
+            </htmlContent>
+        </container>
+        <fieldset name="shipping_address_fields">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="collapsible" xsi:type="boolean">false</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/address-fieldset</item>
+                    <item name="customerAddressSelector" xsi:type="string">customer_shipping_address_id</item>
+                    <item name="countryIdSelection" xsi:type="string">shipping_address</item>
+                    <item name="regionIdInputPreSelector" xsi:type="string">shipping_address_fields</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = shipping_information:preview</item>
+                    </item>
+                </item>
+            </argument>
+            <container name="address_header">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/buttons</item>
+                        <item name="sortOrder" xsi:type="number">0</item>
+                        <item name="label" xsi:type="boolean">false</item>
+                        <item name="formElement" xsi:type="string">container</item>
+                        <item name="componentType" xsi:type="string">container</item>
+                    </item>
+                </argument>
+                <field name="add_new_address_button">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="title" translate="true" xsi:type="string">Add New Address</item>
+                            <item name="formElement" xsi:type="string">button</item>
+                            <item name="componentType" xsi:type="string">button</item>
+                            <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                            <item name="displayAsLink" xsi:type="boolean">true</item>
+                            <item name="sortOrder" xsi:type="number">0</item>
+                            <item name="imports" xsi:type="array">
+                                <item name="visible" xsi:type="string">ns = ${ $.ns }, index = customer_shipping_address_id:visible</item>
+                            </item>
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_address_fields</item>
+                                    <item name="actionName" xsi:type="string">openAddressForm</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </field>
+                <field name="pick_from_saved_button">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="title" translate="true" xsi:type="string">Pick from saved addresses</item>
+                            <item name="formElement" xsi:type="string">button</item>
+                            <item name="componentType" xsi:type="string">button</item>
+                            <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/button</item>
+                            <item name="customerAddressSelector" xsi:type="string">customer_shipping_address_id</item>
+                            <item name="displayAsLink" xsi:type="boolean">true</item>
+                            <item name="sortOrder" xsi:type="number">1</item>
+                            <item name="imports" xsi:type="array">
+                                <item name="checkVisibility" xsi:type="string">!ns = ${ $.ns }, index = customer_shipping_address_id:visible</item>
+                            </item>
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_address_fields</item>
+                                    <item name="actionName" xsi:type="string">closeAddressForm</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <field name="customer_shipping_address_id">
+                <argument name="data" xsi:type="array">
+                    <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</item>
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="boolean">false</item>
+                        <item name="formElement" xsi:type="string">select</item>
+                        <item name="source" xsi:type="string">SubscriptionProfile</item>
+                        <item name="dataScope" xsi:type="string">customer_shipping_address_id</item>
+                        <item name="additionalClasses" xsi:type="string">wide-select</item>
+                        <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/customer-address-id</item>
+                        <item name="sortOrder" xsi:type="number">1</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="save_address">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">boolean</item>
+                        <item name="formElement" xsi:type="string">checkbox</item>
+                        <item name="label" translate="true" xsi:type="string">Save in address book</item>
+                        <item name="dataScope" xsi:type="string">save_address</item>
+                        <item name="additionalClasses" xsi:type="string">admin_right-label</item>
+                        <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/left-checkbox</item>
+                        <item name="sortOrder" xsi:type="number">200</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = add_new_address_button:visible</item>
+                        </item>
+                        <item name="valueMap" xsi:type="array">
+                            <item name="true" xsi:type="number">1</item>
+                            <item name="false" xsi:type="number">0</item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="save">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="title" translate="true" xsi:type="string">Save</item>
+                        <item name="formElement" xsi:type="string">button</item>
+                        <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button</item>
+                        <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                        <item name="subButtonLeft" xsi:type="string">true</item>
+                        <item name="sortOrder" xsi:type="number">201</item>
+                        <item name="displayPrimary" xsi:type="boolean">true</item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_summary_shipping_address_form</item>
+                                <item name="actionName" xsi:type="string">save</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+    </fieldset>
+</form>

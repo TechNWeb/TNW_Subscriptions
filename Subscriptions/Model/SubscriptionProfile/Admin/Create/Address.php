@@ -13,9 +13,8 @@ use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\AddressFactory;
-use TNW\Subscriptions\Model\Backend\Session\Quote;
-use Magento\Framework\Session\SessionManagerInterface;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
@@ -54,14 +53,14 @@ class Address extends Create
     /**
      * Address constructor.
      * @param Context $context
-     * @param SessionManagerInterface $session
+     * @param QuoteSessionInterface $session
      * @param FormFactory $customerForm
      * @param AddressFactory $addressFactory
      * @param AddressRepositoryInterface $addressRepository
      */
     public function __construct(
         Context $context,
-        SessionManagerInterface $session,
+        QuoteSessionInterface $session,
         FormFactory $customerForm,
         AddressFactory $addressFactory,
         AddressRepositoryInterface $addressRepository
@@ -83,7 +82,7 @@ class Address extends Create
      */
     public function setAddress($address, $addressType, $customerAddressId = null)
     {
-        /** @var Quote $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
         /** @var QuoteAddress $shippingAddress */
         $addressObject = $this->addressFactory->create();
@@ -145,7 +144,7 @@ class Address extends Create
      */
     public function getAddress($type = null)
     {
-        /** @var Quote $session */
+        /** @var QuoteSessionInterface $session */
         $session = $this->getSession();
 
         $quotes = $session->getSubQuotes();

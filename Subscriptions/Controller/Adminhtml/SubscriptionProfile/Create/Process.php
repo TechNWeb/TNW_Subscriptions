@@ -61,18 +61,12 @@ class Process extends Create
     public function execute()
     {
         $this->resetErrors();
-
-        $this->processRequestData();
-
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
             StepPool::STEP_PARAM_TYPE_STORE
         );
-
         $this->processBackActions($currentStep);
-
         $this->processRequestData();
-
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $result = $this->resultRedirectFactory->create();
 

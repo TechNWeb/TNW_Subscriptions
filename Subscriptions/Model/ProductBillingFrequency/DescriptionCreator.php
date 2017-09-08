@@ -12,7 +12,7 @@ use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Create description for billing frequency.
@@ -91,22 +91,28 @@ class DescriptionCreator
      */
     public function getDescription(ModelQuote $quote, array $subscriptionData)
     {
-        $isTrial = $subscriptionData[Create::UNIQUE]['is_trial'];
+        $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
         $formattedPrice = $this->formatPrice($quote->getBaseGrandTotal());
-        $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[Create::UNIQUE]['billing_frequency']);
-        $subscriptionPeriod = $subscriptionData[Create::UNIQUE]['period'];
+        $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']);
+        $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
-        $startDate = $this->formatStartDate($subscriptionData[Create::UNIQUE]['start_on']);
-        $total = $formattedPrice;
+        $startDate = $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']);
         $trialPart = '';
+        $noTrialPart = '';
+
         if ($isTrial) {
             $trialTotal = $formattedPrice;
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
-                $subscriptionData[Create::UNIQUE]['trial_period'],
-                $subscriptionData[Create::UNIQUE]['trial_unit_id']);
+                $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
+                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
-            $total = $this->formatPrice($subscriptionData[Create::NON_UNIQUE]['price']);
+        } else {
+            if ($subscriptionData[CreateProfile::NON_UNIQUE]['initial_fee']) {
+                $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
+            }
         }
+
+        $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
 
         $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
@@ -117,7 +123,8 @@ class DescriptionCreator
             $frequencyUnit,
             $startDate
         );
-        return $trialPart . $priceWithUnit . $shippingInformation;
+
+        return $trialPart . $noTrialPart . $priceWithUnit . $shippingInformation;
     }
 
     /**
@@ -176,8 +183,7 @@ class DescriptionCreator
         } else {
             $startDate = $this->context->getLocaleDate()->formatDate(
                 $startDate,
-                \IntlDateFormatter::LONG,
-                false
+                \IntlDateFormatter::LONG
             );
         }
         return $startDate;

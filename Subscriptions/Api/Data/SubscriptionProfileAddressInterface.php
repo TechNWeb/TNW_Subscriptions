@@ -309,4 +309,11 @@ interface SubscriptionProfileAddressInterface
      * @return $this
      */
     public function setTelephone($telephone);
+
+    /**
+     * Exports customer address
+     *
+     * @return \Magento\Customer\Api\Data\AddressInterface
+     */
+    public function exportCustomerAddress();
 }

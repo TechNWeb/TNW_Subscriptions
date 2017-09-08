@@ -33,7 +33,7 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="billing_frequency">
+    <fieldset name="general">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
@@ -41,7 +41,7 @@
                 <item name="sortOrder" xsi:type="number">10</item>
             </item>
         </argument>
-        <field name="billing_frequency_id">
+        <field name="billing_frequency">
             <argument name="data" xsi:type="array">
                 <item name="multiple" xsi:type="boolean">false</item>
                 <item name="config" xsi:type="array">
@@ -49,7 +49,7 @@
                     <item name="dataType" xsi:type="string">boolean</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">radioset</item>
-                    <item name="dataScope" xsi:type="string">billing_frequency_id</item>
+                    <item name="dataScope" xsi:type="string">billing_frequency</item>
                     <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend
                         admin__field-wide</item>
                     <item name="validation" xsi:type="array">
@@ -122,10 +122,24 @@
                 </item>
             </argument>
         </field>
+        <field name="initial_fee">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Initial Fee</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/add-product-form-initial-fee</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="changeValue" xsi:type="string">index = billing_frequency:value</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
         <field name="price">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Post trial price:</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">input</item>

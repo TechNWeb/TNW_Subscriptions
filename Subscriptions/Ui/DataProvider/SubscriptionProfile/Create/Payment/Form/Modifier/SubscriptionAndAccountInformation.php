@@ -6,10 +6,9 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Customer\Model\Group;
 use Magento\Customer\Model\GroupRegistry;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use TNW\Subscriptions\Model\Backend\Session\Quote as QuoteSession;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
@@ -21,7 +20,7 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     /**
      * Admin session.
      *
-     * @var QuoteSession
+     * @var QuoteSessionInterface
      */
     private $session;
 
@@ -39,16 +38,16 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private $groupRegistry;
 
+
     /**
-     * Modifier constructor.
+     * SubscriptionAndAccountInformation constructor.
      *
-     * @param QuoteSession $session
-     * @param Group $group
+     * @param QuoteSessionInterface $session
      * @param ProfileStatus $profileStatus
      * @param GroupRegistry $groupRegistry
      */
     public function __construct(
-        QuoteSession $session,
+        QuoteSessionInterface $session,
         ProfileStatus $profileStatus,
         GroupRegistry $groupRegistry
     ) {

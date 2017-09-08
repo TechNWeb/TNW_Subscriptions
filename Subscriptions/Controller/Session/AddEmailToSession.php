@@ -1,0 +1,130 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Controller\Session;
+
+use Magento\Customer\Model\ResourceModel\CustomerRepository;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\JsonFactory;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Framework\UrlInterface;
+
+/**
+ * Add customer email to session.
+ */
+class AddEmailToSession extends Action
+{
+    /**
+     * Customer session.
+     *
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+     * Json factory.
+     *
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    /**
+     * Customer repository.
+     *
+     * @var CustomerRepository
+     */
+    private $customerRepository;
+
+    /**
+     * @var UrlInterface
+     */
+    private $url;
+
+    /**
+     * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param CustomerRepository $customerRepository
+     * @param JsonFactory $jsonFactory
+     * @param UrlInterface $url
+     */
+    public function __construct(
+        Context $context,
+        QuoteSessionInterface $session,
+        CustomerRepository $customerRepository,
+        JsonFactory $jsonFactory,
+        UrlInterface $url
+    ) {
+        parent::__construct($context);
+
+        $this->customerRepository = $customerRepository;
+        $this->session = $session;
+        $this->resultJsonFactory = $jsonFactory;
+        $this->url = $url;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute()
+    {
+        $response = new \Magento\Framework\DataObject();
+        $response->setData('error', false);
+
+        try {
+            $email = $this->_request->getParam('customer_email');
+
+            $customer = $this->tryToGetCustomer($email);
+
+            if ($customer && $customer->getId()) {
+                $this->addErrorToMessageManager();
+
+                $response->setData('error', true);
+            } else {
+                $this->session->setCustomerEmail($email);
+            }
+        } catch (\Exception $e) {
+            $response->setData('error', true);
+        }
+
+        return $this->resultJsonFactory->create()->setJsonData($response->toJson());
+    }
+
+    /**
+     * Add error to message manager.
+     */
+    private function addErrorToMessageManager()
+    {
+        $url = $this->url->getUrl('customer/account/forgotpassword');
+
+        // @codingStandardsIgnoreStart
+        $message = __(
+            'There is already an account with this email address. If you are sure that it is your email address, <a href="%1">click here</a> to get your password and access your account.',
+            $url
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->messageManager->addError($message);
+    }
+
+    /**
+     * Try to get customer by email.
+     *
+     * @param string $email
+     *
+     * @return \Magento\Customer\Api\Data\CustomerInterface|null
+     */
+    private function tryToGetCustomer($email)
+    {
+        $customer = null;
+        try {
+            $customer = $this->customerRepository->get($email);
+        } catch (\Exception $e) {
+        }
+
+        return $customer;
+    }
+}

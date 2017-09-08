@@ -36,6 +36,16 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
+     * Edit state code
+     */
+    const STATE_EDIT = 'edit';
+
+    /**
+     * Create state code
+     */
+    const STATE_CREATE = 'create';
+
+    /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface

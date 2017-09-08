@@ -7,6 +7,8 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface" type="TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote"/>
+    <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Backend\Session\Quote" />
     <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool"
                  type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
@@ -22,16 +24,32 @@
             </argument>
         </arguments>
     </virtualType>
-    <virtualType name="SubscriptionProfilePreviewBillingAddress"
+    <virtualType name="SubscriptionProfileCreatePreviewBillingAddress"
                  type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
         <arguments>
             <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING</argument>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_CREATE</argument>
         </arguments>
     </virtualType>
-    <virtualType name="SubscriptionProfilePreviewShippingAddress"
+    <virtualType name="SubscriptionProfileCreatePreviewShippingAddress"
                  type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
         <arguments>
             <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING</argument>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_CREATE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SubscriptionProfileEditPreviewBillingAddress"
+                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
+        <arguments>
+            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING</argument>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SubscriptionProfileEditPreviewShippingAddress"
+                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
+        <arguments>
+            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING</argument>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
         </arguments>
     </virtualType>
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\RecurringOptions">
@@ -81,18 +99,6 @@
         </arguments>
     </virtualType>
 
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Create">
-        <arguments>
-            <argument name="session" xsi:type="object">TNW\Subscriptions\Model\Backend\Session\Quote</argument>
-        </arguments>
-    </type>
-
-    <type name="TNW\Subscriptions\Model\Source\CurrencySelect">
-        <arguments>
-            <argument name="session" xsi:type="object">TNW\Subscriptions\Model\Backend\Session\Quote</argument>
-        </arguments>
-    </type>
-
     <!--Add modifier for Subscription profile creation on shipping address page-->
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account">
         <arguments>
@@ -120,6 +126,48 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit"
+                 type="TNW\Subscriptions\Model\Source\CustomerAddress">
+        <arguments>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileCreate"
+                 type="TNW\Subscriptions\Model\Source\CustomerAddress">
+        <arguments>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_CREATE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="isShipping" xsi:type="string">1</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="isShipping" xsi:type="string">0</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\ShippingInformationForm"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm">
+        <arguments>
+            <argument name="isShipping" xsi:type="string">1</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\BillingInformationForm"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm">
+        <arguments>
+            <argument name="isShipping" xsi:type="string">0</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
@@ -138,6 +186,14 @@
                 <item name="dashboard" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Dashboard</item>
                     <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="shipping_info" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                </item>
+                <item name="billing_info" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
                 </item>
             </argument>
         </arguments>

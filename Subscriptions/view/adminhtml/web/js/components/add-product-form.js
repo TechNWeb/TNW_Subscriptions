@@ -14,7 +14,7 @@ define(
                 ajaxSave: true,
                 configurableModal: null,
                 imports: {
-                    refreshProductQty: 'index = billing_frequency_id:value'
+                    refreshProductQty: 'index = billing_frequency:value'
                 },
                 listens: {
                     responseStatus: 'processResponseStatus'
@@ -102,7 +102,6 @@ define(
              * @return {void}
              */
             setProductId: function (action, id) {
-
                 this.getModalForm().configurableData = {
                     product_id: id
                 };
