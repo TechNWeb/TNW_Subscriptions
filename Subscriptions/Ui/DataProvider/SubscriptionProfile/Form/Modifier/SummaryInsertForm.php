@@ -18,6 +18,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddres
  */
 class SummaryInsertForm implements ModifierInterface
 {
+    const INSERT_FORM_HANDLE = 'handle';
+    const INSERT_FORM_NAMESPACE = 'namespace';
+    const INSERT_FORM_SORT_ORDER = 'sort_order';
     /**
      * Summary fieldset name
      */
@@ -29,23 +32,47 @@ class SummaryInsertForm implements ModifierInterface
     const FORM_DATA_KEY = 'subscription_profile_id';
 
     /**
-     * Address's insert form names
+     * Insert form names
      */
     const SHIPPING_INFORMATION_INSERT_FORM = 'shipping_information_insert_form';
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
+    const SHIPPING_METHODS_INSERT_FORM = 'shipping_method_insert_form';
+    const PAYMENT_METHODS_INSERT_FORM = 'payment_method_insert_form';
 
     /**
-     * Address's form handles
+     * Configuration for insert form
+     *
+     * @var array
      */
-    const SHIPPING_INFORMATION_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_summary_shipping_address';
-    const BILLING_INFORMATION_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_summary_billing_address';
+    private static $insertFormData = [
+        self::SHIPPING_INFORMATION_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_shipping_address',
+            self::INSERT_FORM_NAMESPACE => SummaryAddressForm::DATA_SCOPE_SUMMARY_SHIPPING_ADDRESS_FORM,
+            self::INSERT_FORM_SORT_ORDER => 10,
+        ],
+        self::BILLING_INFORMATION_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_billing_address',
+            self::INSERT_FORM_NAMESPACE => SummaryAddressForm::DATA_SCOPE_SUMMARY_BILLING_ADDRESS_FORM,
+            self::INSERT_FORM_SORT_ORDER => 30,
+        ],
+        self::SHIPPING_METHODS_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_shipping_method',
+            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_SORT_ORDER => 20,
+        ],
+        self::PAYMENT_METHODS_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_payment_method',
+            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_SORT_ORDER => 40,
+        ],
+    ];
 
     /**
-     * Flag that indicates that this is a shipping address form.
+     * Indicates form type.
      *
      * @var bool
      */
-    private $isShipping;
+    private $formType;
 
     /**
      * Registry
@@ -66,16 +93,16 @@ class SummaryInsertForm implements ModifierInterface
      *
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
-     * @param $isShipping
+     * @param $formType
      */
     public function __construct(
         Registry $registry,
         UrlInterface $urlBuilder,
-        $isShipping
+        $formType
     ) {
         $this->registry = $registry;
         $this->urlBuilder = $urlBuilder;
-        $this->isShipping = $isShipping;
+        $this->formType = $formType;
     }
 
     /**
@@ -83,14 +110,12 @@ class SummaryInsertForm implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        $addressInfoInsertFormName = $this->getAddressInfoInsertFormName();
-
         $meta = array_merge_recursive(
             $meta,
             [
                 static::SUMMARY_FIELDSET => [
                     'children' => [
-                         $addressInfoInsertFormName => $this->getInsertFormModifier()
+                         $this->formType => $this->getInsertFormModifier()
                     ],
                 ],
             ]
@@ -151,53 +176,27 @@ class SummaryInsertForm implements ModifierInterface
      */
     private function getSortOrder()
     {
-        return $this->isShippingFieldSet() ? 10 : 30;
+        return self::$insertFormData[$this->formType][self::INSERT_FORM_SORT_ORDER];
     }
 
     /**
-     * Returns namespace name depends on "isShipping" param
+     * Returns namespace name depends on "formType" param
      *
      * @return string
      */
     private function getNamespace()
     {
-        return $this->isShippingFieldSet()
-            ? SummaryAddressForm::DATA_SCOPE_SUMMARY_SHIPPING_ADDRESS_FORM
-            : SummaryAddressForm::DATA_SCOPE_SUMMARY_BILLING_ADDRESS_FORM;
+        return self::$insertFormData[$this->formType][self::INSERT_FORM_NAMESPACE];
     }
 
     /**
-     * Returns address info insert form name depends on "isShipping" param
-     *
-     * @return string
-     */
-    private function getAddressInfoInsertFormName()
-    {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_INFORMATION_INSERT_FORM
-            : self::BILLING_INFORMATION_INSERT_FORM;
-    }
-
-    /**
-     * Returns handle depends on "isShipping" param
+     * Returns handle depends on "formType" param
      *
      * @return string
      */
     private function getHandle()
     {
-        return $this->isShippingFieldSet()
-            ? self::SHIPPING_INFORMATION_FORM_HANDLE
-            : self::BILLING_INFORMATION_FORM_HANDLE;
-    }
-
-    /**
-     * Checks if it is shipping address form.
-     *
-     * @return bool
-     */
-    private function isShippingFieldSet()
-    {
-        return $this->isShipping;
+        return self::$insertFormData[$this->formType][self::INSERT_FORM_HANDLE];
     }
 
     /**

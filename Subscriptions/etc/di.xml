@@ -130,6 +130,21 @@
                         <item name="recurring_options_updater" xsi:type="string">TNW\Subscriptions\Model\ProductBillingFrequency\SaveHandler</item>
                     </item>
                 </item>
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
+                    <!-- Save/load subscription profile addresses/products -->
+                    <item name="read" xsi:type="array">
+                        <item name="profile_address_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\ReadHandler</item>
+                        <item name="profile_product_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\ReadHandler</item>
+                    </item>
+                    <item name="create" xsi:type="array">
+                        <item name="profile_address_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="profile_address_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                </item>
             </argument>
         </arguments>
     </type>
@@ -156,27 +171,6 @@
         <arguments>
             <argument name="entities" xsi:type="array">
                 <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="string">TNW\Subscriptions\Api\Data\SubscriptionProfileInterface</item>
-            </argument>
-        </arguments>
-    </type>
-    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
-        <arguments>
-            <argument name="extensionActions" xsi:type="array">
-                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
-                    <!-- Save/load subscription profile addresses/products -->
-                    <item name="read" xsi:type="array">
-                        <item name="profile_address_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\ReadHandler</item>
-                        <item name="profile_product_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\ReadHandler</item>
-                    </item>
-                    <item name="create" xsi:type="array">
-                        <item name="profile_address_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
-                        <item name="profile_product_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
-                    </item>
-                    <item name="update" xsi:type="array">
-                        <item name="profile_address_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
-                        <item name="profile_product_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
-                    </item>
-                </item>
             </argument>
         </arguments>
     </type>
