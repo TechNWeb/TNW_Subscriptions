@@ -189,6 +189,7 @@
 
 .data-total-container{
   background: #e4e4e4;
+  overflow: auto;
 }
 
 #anchor-content .admin__control-label-up label{
