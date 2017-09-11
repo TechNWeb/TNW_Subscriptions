@@ -238,4 +238,10 @@
     <type name="TNW\Subscriptions\Controller\Subscription\History">
         <plugin name="authentication" type="\Magento\Sales\Controller\Order\Plugin\Authentication"/>
     </type>
+
+    <type name="Magento\Sales\Cron\CleanExpiredQuotes">
+        <plugin name="tnw_clean_expired_quotes"
+                type="TNW\Subscriptions\Plugin\Sales\Cron\CleanExpiredQuotes"
+                sortOrder="1000"/>
+    </type>
 </config>
