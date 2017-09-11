@@ -1,64 +1,89 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: ivan
- * Date: 31.08.17
- * Time: 18:11
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Backend\Block\Template;
-use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as SubscriptionProfileResource;
 
+/**
+ * Block for view subscription profile information
+ */
 class AccountInformation extends Template
 {
+    /**
+     * label for not found date
+     */
     const DATE_NOT_FOUND = 'N/A';
 
     /**
+     * Subscription profile
+     *
      * @var SubscriptionProfileInterface
      */
     private $subscriptionProfile;
+
     /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-    /**
+     * Customer group
+     *
      * @var GroupRepositoryInterface
      */
     private $groupRepository;
+
     /**
+     * Profile status
+     *
      * @var ProfileStatus
      */
     private $profileStatus;
+
     /**
+     * Subscription profile resource
+     *
      * @var SubscriptionProfileResource
      */
     private $subscriptionProfileResource;
 
     /**
+     * Registry
+     *
+     * @var Registry
+     */
+    private $registry;
+
+    /**
+     * Timezone interface
+     *
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
      * AccountInformation constructor.
+     * @param TimezoneInterface $timezone
      * @param SubscriptionProfileResource $subscriptionProfileResource
      * @param ProfileStatus $profileStatus
      * @param GroupRepositoryInterface $groupRepository
-     * @param CustomerRepositoryInterface $customerRepository
      * @param Registry $registry
      * @param Template\Context $context
      * @param array $data
      * @internal param SubscriptionProfileResource $subscriptionProfile
      */
     public function __construct(
+        TimezoneInterface $timezone,
         SubscriptionProfileResource $subscriptionProfileResource,
         ProfileStatus $profileStatus,
         GroupRepositoryInterface $groupRepository,
-        CustomerRepositoryInterface $customerRepository,
         Registry $registry,
         Template\Context $context,
         array $data = []
@@ -67,14 +92,11 @@ class AccountInformation extends Template
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/account_information.phtml');
         parent::__construct($context, $data);
 
-        if ($this->subscriptionProfile === null) {
-            $this->subscriptionProfile = $registry->registry('tnw_subscription_profile');
-        }
-
-        $this->customerRepository = $customerRepository;
+        $this->registry = $registry;
         $this->groupRepository = $groupRepository;
         $this->profileStatus = $profileStatus;
         $this->subscriptionProfileResource = $subscriptionProfileResource;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -84,7 +106,7 @@ class AccountInformation extends Template
      */
     public function getStatus()
     {
-        $status = $this->subscriptionProfile->getStatus();
+        $status = $this->getSubscriptionProfile()->getStatus();
         return $this->profileStatus->getLabelByValue($status);
     }
 
@@ -95,7 +117,7 @@ class AccountInformation extends Template
      */
     public function getCreatedOn()
     {
-        return $this->normalizeDateFormat($this->subscriptionProfile->getCreatedAt());
+        return $this->normalizeDateFormat($this->getSubscriptionProfile()->getCreatedAt());
     }
 
     /**
@@ -107,8 +129,8 @@ class AccountInformation extends Template
     {
         $date = '';
         $lastOrderData = $this->subscriptionProfileResource
-            ->getLastOrderData($this->subscriptionProfile, true);
-        if ($lastOrderData) {
+            ->getLastOrderData($this->getSubscriptionProfile(), true);
+        if (!empty($lastOrderData)) {
             $date = $lastOrderData['scheduled_at'];
         }
         return $this->normalizeDateFormat($date);
@@ -122,8 +144,8 @@ class AccountInformation extends Template
     public function getTrialEndsOn()
     {
         $date = '';
-        if ($this->subscriptionProfile->getTrialStartDate()) {
-            $date = $this->subscriptionProfile->getStartDate();
+        if ($this->getSubscriptionProfile()->getTrialStartDate()) {
+            $date = $this->getSubscriptionProfile()->getStartDate();
         }
         return $this->normalizeDateFormat($date);
     }
@@ -137,19 +159,18 @@ class AccountInformation extends Template
     public function getSubscriptionEndsOn()
     {
         $result = self::DATE_NOT_FOUND;
-        $term = $this->subscriptionProfile->getTerm();
+        $term = $this->getSubscriptionProfile()->getTerm();
         switch ($term) {
             case 0:
                 $date = '';
                 $lastOrderData = $this->subscriptionProfileResource
-                    ->getLastOrderData($this->subscriptionProfile, false);
-                if ($lastOrderData) {
+                    ->getLastOrderData($this->getSubscriptionProfile(), false);
+                if (!empty($lastOrderData)) {
                     $date = $lastOrderData['scheduled_at'];
                 }
                 $result = $this->normalizeDateFormat($date);
                 break;
             case 1:
-                break;
             default:
                 break;
         }
@@ -219,7 +240,7 @@ class AccountInformation extends Template
      */
     public function getCurrency()
     {
-        return $this->subscriptionProfile->getProfileCurrencyCode();
+        return $this->getSubscriptionProfile()->getProfileCurrencyCode();
     }
 
 
@@ -230,7 +251,7 @@ class AccountInformation extends Template
      */
     public function getWebsite()
     {
-        return $this->subscriptionProfile->getWebsite()->getName();
+        return $this->getSubscriptionProfile()->getWebsite()->getName();
     }
 
     /**
@@ -241,8 +262,7 @@ class AccountInformation extends Template
      */
     private function getCustomer()
     {
-        $customerId = $this->subscriptionProfile->getCustomerId();
-        return $this->customerRepository->getById($customerId);
+        return $this->getSubscriptionProfile()->getCustomer();
     }
 
     /**
@@ -256,10 +276,24 @@ class AccountInformation extends Template
         $result = self::DATE_NOT_FOUND;
         if ($date) {
             $dateTime = new DateTime();
-            $result = date('F dS, Y', $dateTime->strToTime($date));
+            $result = $this->timezone->date($dateTime->strToTime($date))->format('F dS, Y');
         }
         return $result;
     }
 
+
+    /**
+     * Return subscription profile from registry
+     *
+     * @return mixed|SubscriptionProfileInterface
+     */
+    public function getSubscriptionProfile()
+    {
+        if ($this->subscriptionProfile === null) {
+            $this->subscriptionProfile = $this->registry->registry('tnw_subscription_profile');
+        }
+
+        return $this->subscriptionProfile;
+    }
 
 }

@@ -82,11 +82,11 @@ class SubscriptionProfile extends AbstractEntity
      *
      * @param \Magento\Framework\Model\AbstractModel $object
      * @param $quoteSubmit bool
-     * @return array|false
+     * @return array
      */
     public function getLastOrderData(\Magento\Framework\Model\AbstractModel $object, $quoteSubmit)
     {
-        $result = false;
+        $result = [];
         $id = $object->getId();
 
         if ($id) {
@@ -106,6 +106,6 @@ class SubscriptionProfile extends AbstractEntity
             $result = $this->getConnection()->query($select)->fetch();
         }
 
-        return $result;
+        return $result ? : [];
     }
 }
