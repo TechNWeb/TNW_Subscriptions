@@ -26,7 +26,7 @@ define([
          * @param value
          */
         changeValue: function (value) {
-            var frequencyPrices = this.source.data.product_frequencies;
+            var frequencyPrices = this.getFrequencyPrices();
             var priceFormat = this.getPriceFormat();
             var priceNumber = 0;
             var priceValue = 0;
@@ -43,6 +43,33 @@ define([
 
             priceValue = formatPrice.formatPrice(priceNumber, priceFormat);
             this.value(priceValue);
+        },
+
+        /**
+         * Returns current product frequencies prices.
+         *
+         * @returns {}
+         */
+        getFrequencyPrices: function() {
+            var frequencyPrices = this.source.data.product_frequencies;
+            var currentItemData;
+
+            if (this.modifySubscription) {
+                currentItemData = this.source.data['item_' + this.item_id];
+
+                if (currentItemData.initial_values
+                    && currentItemData.initial_values.billing_frequency
+                    && currentItemData.initial_values.price
+                    && currentItemData.frequency_data
+                    && currentItemData.frequency_data.product_frequencies
+                ) {
+                    frequencyPrices = currentItemData.frequency_data.product_frequencies;
+                    frequencyPrices[currentItemData.initial_values.billing_frequency].price =
+                        currentItemData.initial_values.price;
+                }
+            }
+
+            return frequencyPrices;
         },
 
         /**
@@ -66,6 +93,26 @@ define([
          */
         getPreviewLabel: function () {
             return this.previewLabelVisible ? this.completePreviewLabel() : false;
+        },
+
+        /**
+         * Sets initial value of the element and subscribes to it's changes.
+         */
+        setInitialValue: function () {
+            var priceFormat = this.getPriceFormat();
+            var priceNumber = this.value();
+            var priceValue;
+
+            if (typeof this.value() == 'string') {
+                priceNumber = formatPrice.formatToNumber(this.value(), priceFormat);
+            }
+
+            priceValue = formatPrice.formatPrice(priceNumber, priceFormat);
+            this._super();
+            this.value(priceValue);
+            this.setCompletePreviewLabel(priceValue);
+
+            return this;
         }
     });
 });

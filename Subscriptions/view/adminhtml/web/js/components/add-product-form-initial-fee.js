@@ -15,12 +15,15 @@ define([
          * @param value
          */
         changeValue: function (value) {
-            var frequencyPrices = this.source.data.product_frequencies;
-            var initialFeeValue = 0;
+            var frequenciesData = this.source.data.product_frequencies;
             var visible = true;
 
-            if (frequencyPrices && value && frequencyPrices[value]){
-                this.value(frequencyPrices[value].initial_fee);
+            if (this.modifySubscription) {
+                frequenciesData = this.source.data['item_' + this.item_id].frequency_data.product_frequencies;
+            }
+
+            if (frequenciesData && value && frequenciesData[value]){
+                this.value(frequenciesData[value].initial_fee);
             }
 
             if (this.value() == 0) {

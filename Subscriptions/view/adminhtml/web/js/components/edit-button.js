@@ -92,6 +92,27 @@ define([
          */
         getTitle: function () {
             return this.active() && this.activeTitle() ? this.activeTitle() : this.title();
+        },
+
+        /**
+         * Checks if Update qty button should be visible and sets its visibility.
+         *
+         * @param previewMode
+         */
+        setUpdateQtyButtonVisibility: function (previewMode) {
+            var currentItemData = this.source.data['item_' + this.item_id];
+            var unlockPresetQty = currentItemData.unlock_preset_qty;
+            var visible = false;
+
+            if (!unlockPresetQty) {
+                visible = true;
+                if (!previewMode) {
+                    visible = false;
+                }
+            }
+
+            this.visible(visible);
+
         }
     });
 });

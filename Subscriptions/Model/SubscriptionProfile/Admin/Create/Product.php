@@ -163,6 +163,7 @@ class Product extends Create
                         'start_on' => $this->getStartOnDate($productData['start_on']),
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
+                        'unlock_preset_qty' => (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
                     ],
                     static::NON_UNIQUE => [
                         'price' => $this->localeFormat->getNumber($productData['price']),

@@ -129,7 +129,8 @@ class ModifyForm extends Form
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $itemKey = 'item_' . $item->getId();
-                $product = $this->productRepository->getById($this->getProductFromItem($item)->getId());
+                $productId = $this->getProductFromItem($item)->getId();
+                $product = $this->productRepository->getById($productId);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
                 $data[self::FORM_DATA_VALUE][$itemKey] = array_merge(
                     $subBuyRequest[Create::UNIQUE],
@@ -139,6 +140,12 @@ class ModifyForm extends Form
                 $data[self::FORM_DATA_VALUE][$itemKey]['name'] = $product->getName();
                 $data[self::FORM_DATA_VALUE][$itemKey]['description'] = $product->getData('short_description');
                 $data[self::FORM_DATA_VALUE][$itemKey]['qty'] = $item->getQty();
+                $data[self::FORM_DATA_VALUE][$itemKey]['product_price'] = $product->getPrice();
+                $data[self::FORM_DATA_VALUE][$itemKey]['frequency_data'] = $this->getFrequenciesData(false, $productId);
+                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['billing_frequency'] =
+                    $data[self::FORM_DATA_VALUE][$itemKey]['billing_frequency'];
+                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['price'] =
+                    $data[self::FORM_DATA_VALUE][$itemKey]['price'];
             }
         }
 
@@ -207,7 +214,7 @@ class ModifyForm extends Form
             $orderIterator++;
             $result[self::CONTAINER_ITEM_PREFIX . $itemId] = [
                 'children' => [
-                    'form' => $this->getForm($objectId, $itemId)
+                    'form' => $this->getForm($objectId, $item)
                 ],
                 'arguments' => [
                     'data' => [
@@ -231,10 +238,10 @@ class ModifyForm extends Form
      * Return item edit form definition.
      *
      * @param string|int $objectId
-     * @param string|int $itemId
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
      * @return array
      */
-    protected function getForm($objectId, $itemId)
+    protected function getForm($objectId, $item)
     {
         return [
             'arguments' => [
@@ -244,7 +251,7 @@ class ModifyForm extends Form
                         'componentType' => UiForm::NAME,
                         'component' => 'TNW_Subscriptions/js/components/modify-subscriptions-form',
                         'objectId' => $objectId,
-                        'objectItemId' => $itemId,
+                        'objectItemId' => $item->getId(),
                         'editButtons' => [
                             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
                             'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
@@ -254,8 +261,8 @@ class ModifyForm extends Form
                 ]
             ],
             'children' => [
-                'description_fieldset' => $this->getDescriptionFieldset(),
-                'edit_fieldset' => $this->getEditFieldsetDefinition()
+                'description_fieldset' => $this->getDescriptionFieldset($item->getId()),
+                'edit_fieldset' => $this->getEditFieldsetDefinition($item)
             ]
         ];
     }
@@ -278,9 +285,10 @@ class ModifyForm extends Form
     /**
      * Return description fieldset definition.
      *
+     * @param string|int $itemId
      * @return array
      */
-    protected function getDescriptionFieldset()
+    protected function getDescriptionFieldset($itemId)
     {
         return [
             'arguments' => [
@@ -296,7 +304,7 @@ class ModifyForm extends Form
             ],
             'children' => [
                 'left_container' => $this->getLeftContainerDefinition(),
-                'middle_container' => $this->getMiddleContainerDefinition()
+                'middle_container' => $this->getMiddleContainerDefinition($itemId)
             ]
         ];
     }
@@ -304,9 +312,10 @@ class ModifyForm extends Form
     /**
      * Returns edit fieldset definition.
      *
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
      * @return array
      */
-    protected function getEditFieldsetDefinition()
+    protected function getEditFieldsetDefinition($item)
     {
         return [
             'arguments' => [
@@ -322,12 +331,13 @@ class ModifyForm extends Form
             ],
             'children' => [
                 'edit_button' => $this->getEditButton(),
-                'billing_frequency' => $this->getBillingFrequencyDefinition(),
+                'billing_frequency' => $this->getBillingFrequencyDefinition($item->getId()),
                 'term' => $this->getTermDefinition(),
                 'period' => $this->getPeriodDefenition(),
                 'start_on' => $this->getStartOnDefinition(),
-                'price' => $this->getPriceDefinition(),
-                'trial_period' => $this->getTrialPeriodDefenition()
+                'price' => $this->getPriceDefinition($item),
+                'trial_period' => $this->getTrialPeriodDefenition($item),
+                'initial_fee' => $this->getInitialFeeDefinition($item),
             ]
         ];
     }
@@ -335,9 +345,10 @@ class ModifyForm extends Form
     /**
      * Returns middle container definition from description fieldset.
      *
+     * @param string|int $itemId
      * @return array
      */
-    protected function getMiddleContainerDefinition()
+    protected function getMiddleContainerDefinition($itemId)
     {
         return [
             'arguments' => [
@@ -353,7 +364,7 @@ class ModifyForm extends Form
             'children' => [
                 'name' => $this->getTextFieldDefenition('name'),
                 'description' => $this->getTextFieldDefenition('description'),
-                'qty_container' => $this->getQtyContainerDefinition(),
+                'qty_container' => $this->getQtyContainerDefinition($itemId),
                 'update_button' => $this->getUpdateButton()
             ]
         ];
@@ -362,9 +373,10 @@ class ModifyForm extends Form
     /**
      * Returns qty fields container definition from description fieldset.
      *
+     * @param string|int $itemId
      * @return array
      */
-    protected function getQtyContainerDefinition()
+    protected function getQtyContainerDefinition($itemId)
     {
         return [
             'arguments' => [
@@ -379,8 +391,8 @@ class ModifyForm extends Form
                 ]
             ],
             'children' => [
-                'qty' => $this->getQtyDefinition(),
-                'qty_edit_button' => $this->getQtyEditButton()
+                'qty' => $this->getQtyDefinition($itemId),
+                'qty_edit_button' => $this->getQtyEditButton($itemId)
             ]
         ];
     }
@@ -560,9 +572,10 @@ class ModifyForm extends Form
     /**
      * Returns billing frequency field definition.
      *
+     * @param string|int $itemId
      * @return array
      */
-    protected function getBillingFrequencyDefinition()
+    protected function getBillingFrequencyDefinition($itemId)
     {
         return [
             'arguments' => [
@@ -583,8 +596,15 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-set',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'onPriceUpdate'=> '${ $.parentName}.price:value'
+                        ],
+                        'optionsForLabel' => $this->getProductBillingFrequenciesAsOptionArray(
+                            $this->currentProduct->getId()
+                        ),
+                        'item_id' => $itemId,
+                        'priceFormat' => $this->getPriceFormatData(),
+                        'addbefore' => $this->getCurrentCurrencySymbol(),
                     ]
                 ]
             ]
@@ -702,15 +722,20 @@ class ModifyForm extends Form
     /**
      * Returns price field definition.
      *
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
      * @return array
      */
-    protected function getPriceDefinition()
+    protected function getPriceDefinition($item)
     {
+        $currentProduct = $this->getProductFromItem($item);
+
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Price:'),
+//                        'label' => __('Price:'),
+                        'label' => $this->getTrialPeriod($currentProduct->getId()) ?
+                            __('Post trial price:') : __('Price') . ':',
                         'dataType' => 'text',
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
@@ -720,14 +745,18 @@ class ModifyForm extends Form
                             'validate-zero-or-greater' => true,
                             'required-entry' => true
                         ],
-                        'addSymbol' => $this->getCurrentCurrencySymbol(),
+                        'addSymbol' => false,
                         'addbefore' => $this->getCurrentCurrencySymbol(),
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'previewLabel' => '%s',
+                        'previewLabel' =>  $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'changeValue' => '${ $.parentName}.billing_frequency:value',
+                        ],
+                        'priceFormat' => $this->getPriceFormatData(),
+                        'modifySubscription' => true,
+                        'item_id' => $item->getId(),
                     ]
                 ]
             ]
@@ -737,10 +766,13 @@ class ModifyForm extends Form
     /**
      * Returns trial period field definition.
      *
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
      * @return array
      */
-    protected function getTrialPeriodDefenition()
+    protected function getTrialPeriodDefenition($item)
     {
+        $currentProduct = $this->getProductFromItem($item);
+
         return [
             'arguments' => [
                 'data' => [
@@ -752,12 +784,11 @@ class ModifyForm extends Form
                         'dataScope' => 'trial_period',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                         'additionalClasses' => 'admin__field-wide',
-                        'visible' => false,
+                        'visible' => $this->getTrialPeriod($currentProduct->getId()) ? true : false,
                         'previewLabel' => '%s',
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'imports' => [
-                            'visible' => $this->currentFormName . ':previewMode',
                             'showPreview' => $this->currentFormName . ':previewMode'
                         ]
                     ]
@@ -767,11 +798,48 @@ class ModifyForm extends Form
     }
 
     /**
-     * Returns qty field definition.
+     * Returns initial fee field definition.
      *
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
      * @return array
      */
-    protected function getQtyDefinition()
+    protected function getInitialFeeDefinition($item)
+    {
+        $currentProduct = $this->getProductFromItem($item);
+
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Initial Fee'),
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Input::NAME,
+                        'componentType' => UiForm\Element\Input::NAME,
+                        'dataScope' => 'initial_fee',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                        'additionalClasses' => 'admin__field-wide',
+                        'visible' => $this->getTrialPeriod($currentProduct->getId()) ? true : false,
+                        'previewLabel' => '%s',
+                        'component' => 'TNW_Subscriptions/js/components/add-product-form-initial-fee',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'imports' => [
+                            'changeValue' => '${ $.parentName}.billing_frequency:value',
+                        ],
+                        'modifySubscription' => true,
+                        'item_id' => $item->getId(),
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Returns qty field definition.
+     *
+     * @param string|int $itemId
+     * @return array
+     */
+    protected function getQtyDefinition($itemId)
     {
         return [
             'arguments' => [
@@ -787,13 +855,13 @@ class ModifyForm extends Form
                             'validate-zero-or-greater' => true,
                             'required-entry' => true
                         ],
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-
-                        ]
+                            'canShowEdit' => $this->currentFormName . ':previewMode'
+                        ],
+                        'item_id' => $itemId
                     ]
                 ]
             ]
@@ -803,9 +871,10 @@ class ModifyForm extends Form
     /**
      * Returns qty edit button definition.
      *
+     * @param string|int $itemId
      * @return array
      */
-    protected function getQtyEditButton()
+    protected function getQtyEditButton($itemId)
     {
         $qtyContainerName = $this->currentFormName . '.description_fieldset.middle_container.qty_container';
 
@@ -833,11 +902,12 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'visible' => $this->currentFormName . ':previewMode'
+                            'setUpdateQtyButtonVisibility' => $this->currentFormName . ':previewMode'
                         ],
                         'exports' => [
                             'active' => '!' . $qtyContainerName . '.qty:showPreview'
-                        ]
+                        ],
+                        'item_id' => $itemId
                     ]
                 ]
             ]
