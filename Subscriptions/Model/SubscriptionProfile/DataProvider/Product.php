@@ -313,6 +313,7 @@ class Product extends AbstractDataProvider
 
         $meta = array_merge_recursive(
             $meta,
+            $this->getProductColumnsData(),
             $this->getMetaData()
         );
 
@@ -334,28 +335,13 @@ class Product extends AbstractDataProvider
      */
     private function getMetaData()
     {
-        $result = [
-            self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [
-                'children' => [
-                    'shipping_method' => [
-                        'arguments' => [
-                            'data' => [
-                                'config' => [
-                                    'dependsCodes' => $this->shippingMethods->getDontCostDependedMethodsCodes(),
-                                    'attentionMessage' => $this->shippingMethods->getShippingAttentionMessage()
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $result = [];
 
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
             $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
 
-            $tempResult = [
+            $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
                     'children' => [
                         'currency_id' => [
@@ -469,7 +455,6 @@ class Product extends AbstractDataProvider
                     ]
                 ]
             ];
-            $result = array_merge($tempResult, $result);
         }
 
         return $result;
@@ -758,5 +743,30 @@ class Product extends AbstractDataProvider
         $data['render_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         $data['update_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         return $data;
+    }
+
+    /**
+     * Returns meta data for product columns.
+     *
+     * @return array
+     */
+    private function getProductColumnsData()
+    {
+        return [
+            self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [
+                'children' => [
+                    'shipping_method' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'dependsCodes' => $this->shippingMethods->getDontCostDependedMethodsCodes(),
+                                    'attentionMessage' => $this->shippingMethods->getShippingAttentionMessage()
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

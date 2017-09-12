@@ -80,14 +80,11 @@ define([
         onValueChange: function (value) {
             $j(".subscription-shipping-attention").hide();
             if (value) {
-                var currentShippingMethod = shippingMethod.split('_');
+                var currentShippingMethod = value.split('_');
 
-                this.dependsCodes.forEach(function(item, i) {
-                    if (item === currentShippingMethod[0]) {
-                        $j(".subscription-shipping-attention").show();
-                        return false;
-                    }
-                });
+                if (this.dependsCodes.indexOf(currentShippingMethod[0]) === -1) {
+                    $j(".subscription-shipping-attention").show();
+                }
             }
         }
     });
