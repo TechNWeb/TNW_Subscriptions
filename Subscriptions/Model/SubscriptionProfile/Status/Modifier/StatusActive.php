@@ -63,7 +63,8 @@ class StatusActive extends Base implements ModifierInterface
         return [
             ProfileStatus::STATUS_COMPLETE,
             ProfileStatus::STATUS_HOLDED,
-            ProfileStatus::STATUS_CANCELED
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_SUSPENDED
         ];
     }
 
