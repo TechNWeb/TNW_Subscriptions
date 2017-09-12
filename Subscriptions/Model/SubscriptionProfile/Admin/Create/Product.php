@@ -157,7 +157,7 @@ class Product extends Create
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
-                        'term' => isset($productData['term']) ?: 0,
+                        'term' => !empty($productData['term']) ?: 0,
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
