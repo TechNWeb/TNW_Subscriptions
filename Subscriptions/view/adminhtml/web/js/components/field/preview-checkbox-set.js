@@ -7,9 +7,10 @@ define([
     'TNW_Subscriptions/js/formatPrice',
     'underscore',
     'jquery',
+    'uiRegistry',
     'mage/translate',
     'jquery/ui'
-], function (Abstract, formatPrice, _, $) {
+], function (Abstract, formatPrice, _, $, registry) {
     'use strict';
 
     return Abstract.extend({
@@ -18,12 +19,16 @@ define([
             previewElementTmpl: 'TNW_Subscriptions/form/element/template/preview-label',
             listens: {
                 showPreview: 'onShowPreviewChanged'
-            }
+            },
+            parentForm: null,
+            currencySymbol: '',
+            optionsForLabel: {}
         },
 
         initialize: function () {
-            this._super()
-                .setDiscountLabel('all');
+            this._super();
+            this.getOptionsForLabel();
+            this.setDiscountLabel('all');
 
             return this;
         },
@@ -53,16 +58,28 @@ define([
             this.setDiscountLabel(priceValue);
         },
 
+        getOptionsForLabel: function() {
+            var options = this.options(),
+                optionsForLabel = {};
+
+            options.forEach(function(option, index, arr) {
+                optionsForLabel[option.value] = option.label;
+            });
+
+            this.optionsForLabel = optionsForLabel;
+
+            return this.optionsForLabel;
+        },
+
         /**
          * Returns preview label.
          *
          * @returns {string}
          */
         getPreviewLabel: function () {
-            var optionIndex = _.findIndex(this.optionsForLabel, {value: this.value()});
-            var option = this.optionsForLabel[optionIndex];
+            var label = this.optionsForLabel[this.value()];
 
-            return option ? option.label : '';
+            return label ? label: '';
         },
 
         /**
@@ -138,15 +155,16 @@ define([
          * @returns {*}
          */
         changeOptionLabel: function(option, optionIndex, changeType) {
-            var frequencyLabel = this.optionsForLabel[optionIndex].label;
-            var optionValue = option.value;
-            var frequencyData = this.getFrequencyData();
-            var discount = 0;
-            var productPrice = this.getProductPrice();
-            var priceFormat = this.getPriceFormat();
+            var optionValue = option.value,
+                frequencyLabel = this.optionsForLabel[optionValue],
+                frequencyData = this.getFrequencyData(),
+                discount = 0,
+                productPrice = this.getProductPrice(),
+                priceFormat = this.getPriceFormat(),
+                currentFrequencyPrice;
 
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
-                var currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
+                    currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
                 if (changeType != 'all') {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
@@ -154,7 +172,7 @@ define([
                 discount = productPrice - currentFrequencyPrice;
 
                 if (discount > 0) {
-                    discount = this.addbefore + formatPrice.formatPrice(discount, priceFormat);
+                    discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
                     frequencyLabel += '  ' + $.mage.__('(SAVE %s)').replace('%s', discount);
                 }
 
@@ -168,9 +186,14 @@ define([
          * @returns {*}
          */
         getFrequencyData: function() {
-            var currentItemData = this.getCurrentItemData();
+            var result,
+                currentItemData = this.getCurrentItemData();
 
-            return currentItemData.frequency_data.product_frequencies;
+            if (currentItemData) {
+                result = currentItemData.frequency_data.product_frequencies;
+            }
+
+            return result;
         },
 
         /**
@@ -179,9 +202,14 @@ define([
          * @returns {*}
          */
         getProductPrice: function() {
-            var currentItemData = this.getCurrentItemData();
+            var result,
+            currentItemData = this.getCurrentItemData();
 
-            return currentItemData.product_price;
+            if (currentItemData) {
+                result = currentItemData.product_price;
+            }
+
+            return result;
         },
 
         /**
@@ -192,8 +220,8 @@ define([
          * @returns bool|number
          */
         issetFrequencyPrice: function(frequencyData, optionValue) {
-            var currentItemData = this.getCurrentItemData();
-            var issetFrequencyPrice;
+            var currentItemData = this.getCurrentItemData(),
+                issetFrequencyPrice;
 
             if (this.frequencyIsInitial(optionValue, currentItemData)) {
                 issetFrequencyPrice = currentItemData.price;
@@ -211,8 +239,8 @@ define([
          * @returns number|string
          */
         getCurrentFrequencyPrice: function(frequencyData, optionValue) {
-            var price;
-            var currentItemData = this.getCurrentItemData();
+            var price,
+                currentItemData = this.getCurrentItemData();
 
             if (this.frequencyIsInitial(optionValue, currentItemData)) {
                 price = currentItemData.price;
@@ -242,7 +270,15 @@ define([
          * @returns {}
          */
         getCurrentItemData: function() {
-            return this.source.data['item_' + this.item_id];
+            var result = Array;
+            if (this.parentForm) {
+                var parent = registry.get(this.parentForm);
+                if (parent) {
+                    result = parent.source.data['item_' + parent.objectItemId];
+                }
+            }
+
+            return result;
         },
 
         /**

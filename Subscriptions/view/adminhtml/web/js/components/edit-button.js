@@ -4,15 +4,17 @@
  */
 define([
     'underscore',
-    'Magento_Ui/js/form/components/button'
-], function (_, Button) {
+    'Magento_Ui/js/form/components/button',
+    'uiRegistry'
+], function (_, Button, registry) {
     'use strict';
 
     return Button.extend({
         defaults: {
             elementTmpl: 'TNW_Subscriptions/form/element/edit-button',
             activeTitle: '',
-            active: false
+            active: false,
+            parentForm: null
         },
 
         /** @inheritdoc */
@@ -100,9 +102,15 @@ define([
          * @param previewMode
          */
         setUpdateQtyButtonVisibility: function (previewMode) {
-            var currentItemData = this.source.data['item_' + this.item_id];
-            var unlockPresetQty = currentItemData.unlock_preset_qty;
-            var visible = false;
+            var parent = this.getParentForm(),
+                currentItemData = {},
+                unlockPresetQty = 0,
+                visible = false;
+
+            if (parent) {
+                currentItemData = parent.source.data['item_' + parent.objectItemId];
+                unlockPresetQty = currentItemData.unlock_preset_qty;
+            }
 
             if (!unlockPresetQty) {
                 visible = true;
@@ -112,7 +120,15 @@ define([
             }
 
             this.visible(visible);
+        },
 
+        getParentForm: function() {
+            var parent = null;
+            if (this.parentForm) {
+                parent = registry.get(this.parentForm);
+            }
+
+            return parent;
         }
     });
 });

@@ -264,7 +264,6 @@ class Form extends AbstractDataProvider
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
                                 'config' => [
                                     'priceFormat' => $this->getPriceFormatData(),
-                                    'optionsForLabel' => $this->getProductBillingFrequenciesAsOptionArray(),
                                     'addbefore' => $this->getCurrentCurrencySymbol(),
                                     'template' => 'TNW_Subscriptions/form/subscription-profile/checkbox-set',
                                 ],
@@ -643,10 +642,14 @@ class Form extends AbstractDataProvider
      */
     private function getProductPrice($productId = null)
     {
+        $productPrice = null;
         $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
-        $product = $this->productRepository->getById($productId);
+        if ($productId) {
+            $product = $this->productRepository->getById($productId);
+            $productPrice = $product->getPrice();
+        }
 
-        return $product->getPrice();
+        return $productPrice;
     }
 
     /**
@@ -670,8 +673,6 @@ class Form extends AbstractDataProvider
                     $data['price'] = $billingFrequencyUnitPrice;
                     $data['preset_qty'] = $billingFrequencyPresetQty;
                 }
-                $data['trial_period'] = $this->getTrialPeriod($productId);
-                $data['product_price'] = $this->getProductPrice($productId);
             }
             $data['product_frequencies'][$billingFrequencyId]['price'] =
                 $billingFrequencyUnitPrice;
@@ -681,7 +682,11 @@ class Form extends AbstractDataProvider
                 $this->getInitialFee($billingFrequencyId, $productId);
         }
 
-        $data['period'] = self::DEFAULT_PERIOD_VALUE;
+        if ($needProductValues) {
+            $data['trial_period'] = $this->getTrialPeriod($productId);
+            $data['product_price'] = $this->getProductPrice($productId);
+            $data['period'] = self::DEFAULT_PERIOD_VALUE;
+        }
 
         return $data;
     }
