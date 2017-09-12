@@ -87,6 +87,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\Pool" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -237,5 +239,31 @@
         <plugin name="tnw_clean_expired_quotes"
                 type="TNW\Subscriptions\Plugin\Sales\Cron\CleanExpiredQuotes"
                 sortOrder="1000"/>
+    </type>
+
+
+    <!--Subscription profile status modifiers after profile queue processing-->
+    <type name="TNW\Subscriptions\Cron\ProfileProcessor">
+        <arguments>
+            <argument name="statusModifiersPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="canceled" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusComplete</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="suspended" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusSuspended</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="past_due" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusPastDue</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+            </argument>
+        </arguments>
     </type>
 </config>

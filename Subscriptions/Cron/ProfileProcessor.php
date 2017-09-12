@@ -10,6 +10,7 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface;
 
 /**
  * Class ProfileProcessor
@@ -38,17 +39,29 @@ class ProfileProcessor
     private $registry;
 
     /**
+     * Poll of subscription profile status modifiers.
+     *
+     * @var PoolInterface
+     */
+    private $statusModifiersPool;
+
+    /**
+     * ProfileProcessor constructor.
      * @param Context $context
      * @param Manager $queueManager
+     * @param Registry $registry
+     * @param PoolInterface $statusModifiersPool
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
-        Registry $registry
+        Registry $registry,
+        PoolInterface $statusModifiersPool
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
         $this->registry = $registry;
+        $this->statusModifiersPool = $statusModifiersPool;
     }
 
     /**
@@ -59,12 +72,15 @@ class ProfileProcessor
      */
     public function process($websiteId)
     {
+        $profileIds = [];
         $successIds = [];
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
-        $this->queueManager->makeRunning(array_keys($itemsCollection->getItems()));
+        $allIds = array_keys($itemsCollection->getItems());
+        $this->queueManager->makeRunning($allIds);
         $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
         foreach ($itemsCollection as $item) {
             try {
+                $profileIds[] = $item->getSubscriptionProfileId();
                 $this->queueManager->processItem($item);
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
@@ -75,6 +91,24 @@ class ProfileProcessor
             }
         }
         $this->queueManager->makeCompleted($successIds);
-        $this->queueManager->updateProfilesStatuses();
+        if (!empty($profileIds)){
+            $this->updateProfilesStatuses($profileIds);
+        }
+    }
+
+    /**
+     * Updates profile statuses after queue processing.
+     *
+     * @param array $allIds
+     */
+    private function updateProfilesStatuses(array $allIds)
+    {
+        try {
+            foreach ($this->statusModifiersPool->getModifiersInstances() as $modifier) {
+                $modifier->modify($allIds);
+            }
+        } catch (\Exception $e) {
+            $this->context->log(__('Error on updating profile statuses - ') . $e->getMessage());
+        }
     }
 }
