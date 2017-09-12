@@ -91,9 +91,9 @@ class ProfileProcessor
             }
         }
         $this->queueManager->makeCompleted($successIds);
-        //if (!empty($profileIds)){
+        if (!empty($profileIds)){
             $this->updateProfilesStatuses($profileIds);
-        //}
+        }
     }
 
     /**
