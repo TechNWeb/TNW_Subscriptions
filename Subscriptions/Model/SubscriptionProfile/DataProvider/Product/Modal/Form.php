@@ -103,7 +103,7 @@ class Form extends AbstractDataProvider
      *
      * @var array
      */
-    private $trialPeriod;
+    protected $trialPeriod;
 
     /**
      * Help calculate product price for billing frequency.
@@ -195,6 +195,7 @@ class Form extends AbstractDataProvider
         $this->sessionQuote = $sessionQuote;
         $this->currencyFactory = $currencyFactory;
         $this->context = $context;
+        $this->trialPeriod = [];
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -205,28 +206,8 @@ class Form extends AbstractDataProvider
     public function getData()
     {
         $data = [];
+        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true);
 
-        /** @var ProductBillingFrequencyInterface $frequency */
-        foreach ($this->getProductBillingFrequencies() as $frequency) {
-
-            $billingFrequencyId = $frequency->getBillingFrequencyId();
-            $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId);
-            $billingFrequencyPresetQty = $frequency->getPresetQty();
-            if ($frequency->getDefaultBillingFrequency()) {
-                $data[self::FORM_DATA_VALUE]['billing_frequency'] = $frequency->getBillingFrequencyId();
-                $data[self::FORM_DATA_VALUE]['price'] = $billingFrequencyUnitPrice;
-                $data[self::FORM_DATA_VALUE]['preset_qty'] = $billingFrequencyPresetQty;
-            }
-            $data[self::FORM_DATA_VALUE]['trial_period'] = $this->getTrialPeriod();
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['price'] =
-                $billingFrequencyUnitPrice;
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['preset_qty'] =
-                $billingFrequencyPresetQty;
-            $data[self::FORM_DATA_VALUE]['product_frequencies'][$billingFrequencyId]['initial_fee'] =
-                $this->getInitialFee($billingFrequencyId);
-        }
-
-        $data[self::FORM_DATA_VALUE]['period'] = self::DEFAULT_PERIOD_VALUE;
 
         return $data;
     }
@@ -281,6 +262,11 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'options' => $this->getProductBillingFrequenciesAsOptionArray(),
+                                'config' => [
+                                    'priceFormat' => $this->getPriceFormatData(),
+                                    'addbefore' => $this->getCurrentCurrencySymbol(),
+                                    'template' => 'TNW_Subscriptions/form/subscription-profile/checkbox-set',
+                                ],
                             ],
                         ],
                     ],
@@ -447,7 +433,7 @@ class Form extends AbstractDataProvider
      * @param null|int $productId
      * @return array|ProductBillingFrequencyInterface[]
      */
-    private function getProductBillingFrequencies($productId = null)
+    protected function getProductBillingFrequencies($productId = null)
     {
         if ($this->productBillingFrequencies === null) {
             $productId = $productId ?: $this->request->getParam('product_id');
@@ -475,20 +461,10 @@ class Form extends AbstractDataProvider
         $result = [];
         $productId = $productId ?: $this->request->getParam('product_id');
         try {
-            $product = $this->productRepository->getById($productId);
-            $productPrice = (int)$product->getPrice();
             /** @var ProductBillingFrequencyInterface $productFrequency */
             foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
                 $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
                 $label = $frequency->getLabel();
-                if ($productId) {
-                    $frequencyPrice = (int)$productFrequency->getPrice();
-                    if ($productPrice > $frequencyPrice) {
-                        $savings = $this->formatPrice($productPrice - $frequencyPrice);
-                        $label .= '  '. sprintf(__('(SAVE %s)'), $savings) ;
-                    }
-
-                }
                 $result[] = [
                     'label' => $label,
                     'value' => $productFrequency->getBillingFrequencyId(),
@@ -510,7 +486,7 @@ class Form extends AbstractDataProvider
     protected function getTrialPeriod($productId = null)
     {
         $productId = $productId ?: $this->request->getParam('product_id');
-        if ($productId && $this->trialPeriod[$productId] === null) {
+        if ($productId && !isset($this->trialPeriod[$productId])) {
             $this->trialPeriod[$productId] = '';
             try {
                 /** @var MagentoProduct $product */
@@ -538,7 +514,7 @@ class Form extends AbstractDataProvider
                     );
                     $formattedPrice = $this->formatPrice($trialPrice);
                     $formattedTrialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
-                    $trialPriceLabel = $formattedPrice . $this->getCurrentCurrencySymbol() . ' ' . __('for') . ' ';
+                    $trialPriceLabel = $formattedPrice . ' ' . __('for') . ' ';
                     if ($trialLength && $trialUnit) {
                         $this->trialPeriod[$productId] = $trialPriceLabel . $trialLength . ' ' . $formattedTrialUnit;
                     }
@@ -548,7 +524,9 @@ class Form extends AbstractDataProvider
             }
         }
 
-        return $this->trialPeriod[$productId];
+        $return = isset($this->trialPeriod[$productId]) ? $this->trialPeriod[$productId] : null;
+
+        return $return;
     }
 
     /**
@@ -573,11 +551,12 @@ class Form extends AbstractDataProvider
      * Get calculated product price for billing frequency.
      *
      * @param string $billingFrequencyId
+     * @param string|null $productId
      * @return string
      */
-    private function getBillingFrequencyUnitPrice($billingFrequencyId)
+    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productId = null)
     {
-        $productId = (int)$this->request->getParam('product_id', 0);
+        $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
 
         return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId, null, false, false);
     }
@@ -633,7 +612,7 @@ class Form extends AbstractDataProvider
      *
      * @return string
      */
-    private function getPriceFormatData()
+    protected function getPriceFormatData()
     {
         $currencyCode = $this->getCurrentCurrency()->getCurrencyCode();
 
@@ -644,13 +623,71 @@ class Form extends AbstractDataProvider
      * Returns initial fee for billing frequency and product.
      *
      * @param string $billingFrequencyId
+     * @param string|null $productId
      * @return float|int
      */
-    private function getInitialFee($billingFrequencyId)
+    protected function getInitialFee($billingFrequencyId, $productId)
     {
-        $productId = (int)$this->request->getParam('product_id', 0);
+        $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
         $initialFee = $this->priceCalculator->getInitialFee($billingFrequencyId, $productId, true);
 
         return $initialFee ? $this->formatPrice($initialFee) : 0;
+    }
+
+    /**
+     * Returns price for current product.
+     *
+     * @param string|null $productId
+     * @return string
+     */
+    private function getProductPrice($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
+        if ($productId) {
+            $product = $this->productRepository->getById($productId);
+            $productPrice = $product->getPrice();
+        }
+
+        return $productPrice;
+    }
+
+    /**
+     * Returns frequencies data for product.
+     *
+     * @param bool $needProductValues
+     * @param string|null $productId
+     * @return []
+     */
+    protected function getFrequenciesData($needProductValues, $productId = null)
+    {
+        /** @var ProductBillingFrequencyInterface $frequency */
+        foreach ($this->getProductBillingFrequencies($productId) as $frequency) {
+
+            $billingFrequencyId = $frequency->getBillingFrequencyId();
+            $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productId);
+            $billingFrequencyPresetQty = $frequency->getPresetQty();
+            if ($needProductValues) {
+                if ($frequency->getDefaultBillingFrequency()) {
+                    $data['billing_frequency'] = $frequency->getBillingFrequencyId();
+                    $data['price'] = $billingFrequencyUnitPrice;
+                    $data['preset_qty'] = $billingFrequencyPresetQty;
+                }
+            }
+            $data['product_frequencies'][$billingFrequencyId]['price'] =
+                $billingFrequencyUnitPrice;
+            $data['product_frequencies'][$billingFrequencyId]['preset_qty'] =
+                $billingFrequencyPresetQty;
+            $data['product_frequencies'][$billingFrequencyId]['initial_fee'] =
+                $this->getInitialFee($billingFrequencyId, $productId);
+        }
+
+        if ($needProductValues) {
+            $data['trial_period'] = $this->getTrialPeriod($productId);
+            $data['product_price'] = $this->getProductPrice($productId);
+            $data['period'] = self::DEFAULT_PERIOD_VALUE;
+        }
+
+        return $data;
     }
 }
