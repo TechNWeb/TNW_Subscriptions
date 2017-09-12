@@ -66,13 +66,6 @@
                 </item>
             </item>
         </argument>
-        <selectionsColumn name="ids">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">id</item>
-                </item>
-            </argument>
-        </selectionsColumn>
         <column name="entity_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -83,14 +76,16 @@
                 </item>
             </argument>
         </column>
-        <column name="label">
+        <actionsColumn name="label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Label">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">1</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Label</item>
+                    <item name="fieldClass" xsi:type="string"></item>
                 </item>
             </argument>
-        </column>
+        </actionsColumn>
         <column name="customer_name">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -165,6 +160,14 @@
                     <item name="dataType" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Next billing cycle date</item>
                     <item name="dateFormat" xsi:type="string">MMMM dd, YYYY</item>
+                </item>
+            </argument>
+        </column>
+        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Total</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </column>
