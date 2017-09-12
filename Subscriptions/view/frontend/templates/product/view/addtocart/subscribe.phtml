@@ -43,36 +43,36 @@
         </div>
     </div>
     <div class="fieldset">
-        <div class="field until-cancelled required">
+        <div class="field term required">
             <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
                 <input type="checkbox"
                        class="checkbox admin__control-checkbox"
-                       name="until_cancelled"
-                       id="until_cancelled"
+                       name="term"
+                       id="term"
                        value="1"
                     <?php if ($block->getDefaultUntilCancelled()): ?>
                        checked="checked"
                     <?php endif ?>
                 />
-                <label class="label admin__field-label" for="until_cancelled">
+                <label class="label admin__field-label" for="term">
                     <span><?php echo __('Until canceled') ?></span>
                 </label>
             </div>
         </div>
-        <div class="field required term" id="term-field"
+        <div class="field required period" id="period-field"
              <?php if ($block->getDefaultUntilCancelled()): ?>style="display:none"<?php endif ?>
         >
             <div class="control">
-                <label for="term"><span><?php echo __('& bill') ?></span></label>
+                <label for="period"><span><?php echo __('& bill') ?></span></label>
                 <input type="number"
-                       name="term"
-                       id="term"
+                       name="period"
+                       id="period"
                        class="input-text qty"
                        data-validate='{"required-number":true}'
                        value="<?php echo $block->getDefaultPeriod() ?>"
                 >
-                <label for="term" class="after-input"><span><?php echo __('times') ?></span></label>
+                <label for="period" class="after-input"><span><?php echo __('times') ?></span></label>
             </div>
         </div>
     </div>
