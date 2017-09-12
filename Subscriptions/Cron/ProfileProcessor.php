@@ -72,6 +72,7 @@ class ProfileProcessor
      */
     public function process($websiteId)
     {
+        $profileIds = [];
         $successIds = [];
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
         $allIds = array_keys($itemsCollection->getItems());
@@ -79,6 +80,7 @@ class ProfileProcessor
         $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
         foreach ($itemsCollection as $item) {
             try {
+                $profileIds[] = $item->getSubscriptionProfileId();
                 $this->queueManager->processItem($item);
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
@@ -89,7 +91,9 @@ class ProfileProcessor
             }
         }
         $this->queueManager->makeCompleted($successIds);
-        $this->updateProfilesStatuses($allIds);
+        //if (!empty($profileIds)){
+            $this->updateProfilesStatuses($profileIds);
+        //}
     }
 
     /**

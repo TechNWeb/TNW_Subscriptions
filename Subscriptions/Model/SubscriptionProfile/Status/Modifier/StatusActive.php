@@ -35,7 +35,7 @@ class StatusActive extends Base implements ModifierInterface
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status IN (?)', $this->getRecoverableStatuses()
+            'profile.status IN (?)', $this->getIgnoredStatuses()
         )->where(
             'main_table.status IN (?)', $this->getQueueStatuses()
         )->where(
@@ -52,19 +52,18 @@ class StatusActive extends Base implements ModifierInterface
      */
     protected function getNewStatus()
     {
-        return ProfileStatus::STATUS_COMPLETE;
+        return ProfileStatus::STATUS_ACTIVE;
     }
 
     /**
-     * Returns list of statuses that can be processed to "Active".
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    private function getRecoverableStatuses()
+    protected function getIgnoredStatuses()
     {
         return [
-            ProfileStatus::STATUS_PAST_DUE,
-            ProfileStatus::STATUS_SUSPENDED
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_HOLDED,
+            ProfileStatus::STATUS_CANCELED
         ];
     }
 

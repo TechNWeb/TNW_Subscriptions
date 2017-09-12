@@ -263,6 +263,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusPastDue</item>
                     <item name="sortOrder" xsi:type="number">30</item>
                 </item>
+                <item name="past_due" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusActive</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
             </argument>
         </arguments>
     </type>

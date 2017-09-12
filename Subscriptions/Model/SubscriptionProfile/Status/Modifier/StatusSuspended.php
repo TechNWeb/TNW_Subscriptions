@@ -35,12 +35,12 @@ class StatusSuspended extends Base implements ModifierInterface
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status != ?', ProfileStatus::STATUS_SUSPENDED
+            'profile.status NOT IN (?)',  $this->getIgnoredStatuses()
         )->where(
             'relation.magento_order_id IS NULL'
         )->where(
             "relation.scheduled_at <= '{$this->getSuspendDate()}' 
-            OR main_table.attempt_count > '{$this->config->getAttemptCount()}'"
+            OR main_table.attempt_count >= '{$this->config->getAttemptCount()}'"
         )->where(
             'profile.entity_id IN (?)', $allIds
         )->group(
@@ -70,5 +70,19 @@ class StatusSuspended extends Base implements ModifierInterface
         $condition = 'P' . $this->config->getGracePeriod() . 'D';
         $date->sub(new \DateInterval($condition));
         return $date->format(DateTime::DATETIME_PHP_FORMAT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getIgnoredStatuses()
+    {
+        return [
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_HOLDED,
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_PAST_DUE
+        ];
     }
 }

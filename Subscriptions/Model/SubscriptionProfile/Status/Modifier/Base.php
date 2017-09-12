@@ -13,6 +13,8 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Base class for status modifiers.
@@ -53,21 +55,46 @@ abstract class Base
      * @var SubscriptionProfileRepository
      */
     private $profileRepository;
+    /**
+     * Profile status data source
+     *
+     * @var ProfileStatus
+     */
+    private $statusSource;
 
+    /**
+     * Message history logger
+     *
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
 
+    /**
+     * Base constructor.
+     * @param Config $config
+     * @param Context $context
+     * @param ResourceConnection $resource
+     * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param ProfileStatus $profileStatus
+     * @param MessageHistoryLogger $messageHistoryLogger
+     */
     public function __construct(
         Config $config,
         Context $context,
         ResourceConnection $resource,
         SearchCriteriaBuilder $criteriaBuilder,
-        SubscriptionProfileRepository $profileRepository
+        SubscriptionProfileRepository $profileRepository,
+        ProfileStatus $profileStatus,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->config = $config;
         $this->context = $context;
         $this->resource = $resource;
         $this->criteriaBuilder = $criteriaBuilder;
         $this->profileRepository = $profileRepository;
-
+        $this->statusSource = $profileStatus;
+        $this->messageHistoryLogger = $messageHistoryLogger;
     }
 
     /**
@@ -88,8 +115,18 @@ abstract class Base
         $profiles = $this->profileRepository->getList($searchCriteria)->getItems();
         /** @var SubscriptionProfileInterface $profile */
         foreach ($profiles as $profile) {
-            $profile->setStatus($this->getNewStatus());
-            $this->profileRepository->save($profile);
+            if ((int)$this->getNewStatus() !== (int)$profile->getStatus()){
+                $oldStatus = $profile->getStatus();
+                //change profile status
+                $profile->setStatus($this->getNewStatus());
+                $profile = $this->profileRepository->save($profile);
+                //add comment about status change
+                $this->addChangeStatusToHistory(
+                    $profile->getId(),
+                    (int)$oldStatus,
+                    (int)$profile->getStatus()
+                );
+            }
         }
     }
 
@@ -107,4 +144,36 @@ abstract class Base
      * @return int
      */
     abstract protected function getNewStatus();
+
+    /**
+     * Returns list of ignored statuses.
+     *
+     * @return array
+     */
+    abstract protected function getIgnoredStatuses();
+
+    /**
+     * Adds comment about profile status change.
+     *
+     * @param int|string $profileId
+     * @param int $oldStatus
+     * @param int $newStatus
+     * @return void
+     */
+    protected function addChangeStatusToHistory($profileId, $oldStatus, $newStatus)
+    {
+        $message = sprintf(
+            $this->messageHistoryLogger->getMessage(
+                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED),
+            $this->statusSource->getLabelByValue($oldStatus),
+            $this->statusSource->getLabelByValue($newStatus)
+        );
+        $this->messageHistoryLogger->log(
+            $message,
+            $profileId,
+            false,
+            false,
+            true
+        );
+    }
 }

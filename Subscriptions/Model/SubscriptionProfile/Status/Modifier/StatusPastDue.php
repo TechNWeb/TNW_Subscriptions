@@ -34,11 +34,11 @@ class StatusPastDue extends Base implements ModifierInterface
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status != ?', ProfileStatus::STATUS_PAST_DUE
+            'profile.status NOT IN (?)', $this->getIgnoredStatuses()
         )->where(
             'relation.magento_order_id IS NULL'
         )->where(
-            "main_table.attempt_count <= '{$this->config->getAttemptCount()}'"
+            "main_table.attempt_count < '{$this->config->getAttemptCount()}'"
         )->where(
             'main_table.attempt_count > 0'
         )->where(
@@ -56,5 +56,19 @@ class StatusPastDue extends Base implements ModifierInterface
     protected function getNewStatus()
     {
         return ProfileStatus::STATUS_PAST_DUE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getIgnoredStatuses()
+    {
+        return [
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_HOLDED,
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_PAST_DUE
+        ];
     }
 }

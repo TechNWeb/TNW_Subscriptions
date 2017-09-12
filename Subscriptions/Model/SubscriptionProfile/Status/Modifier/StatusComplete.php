@@ -31,7 +31,7 @@ class StatusComplete extends Base implements ModifierInterface
         )->where(
             'profile.term = ?', 0
         )->where(
-            'profile.status != ?', ProfileStatus::STATUS_COMPLETE
+            'profile.status NOT IN (?)', $this->getIgnoredStatuses()
         )->where(
             'profile.entity_id IN (?)', $allIds
         )->where(
@@ -51,5 +51,19 @@ class StatusComplete extends Base implements ModifierInterface
     protected function getNewStatus()
     {
         return ProfileStatus::STATUS_COMPLETE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getIgnoredStatuses()
+    {
+        return [
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_HOLDED,
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_PAST_DUE
+        ];
     }
 }
