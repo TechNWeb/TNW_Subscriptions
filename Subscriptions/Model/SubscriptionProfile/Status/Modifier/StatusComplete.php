@@ -62,8 +62,7 @@ class StatusComplete extends Base implements ModifierInterface
             ProfileStatus::STATUS_COMPLETE,
             ProfileStatus::STATUS_HOLDED,
             ProfileStatus::STATUS_CANCELED,
-            ProfileStatus::STATUS_SUSPENDED,
-            ProfileStatus::STATUS_PAST_DUE
+            ProfileStatus::STATUS_SUSPENDED
         ];
     }
 }

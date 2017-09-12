@@ -35,7 +35,7 @@ class StatusActive extends Base implements ModifierInterface
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status IN (?)', $this->getIgnoredStatuses()
+            'profile.status NOT IN (?)', $this->getIgnoredStatuses()
         )->where(
             'main_table.status IN (?)', $this->getQueueStatuses()
         )->where(
