@@ -151,7 +151,8 @@ class Total extends Column
                 )
                 ->join(
                     ['mage_order' => $this->orderResource->getMainTable()],
-                    "profile_order.{$profileIdField} = mage_order." . OrderInterface::ENTITY_ID,
+                    "profile_order." . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID .
+                        " = mage_order." . OrderInterface::ENTITY_ID,
                     [OrderInterface::GRAND_TOTAL]
                 )
                 ->where('profile.' . SubscriptionProfileInterface::ID . ' IN (?)', $profileIds);
