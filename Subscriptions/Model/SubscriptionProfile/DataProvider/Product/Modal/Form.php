@@ -662,6 +662,7 @@ class Form extends AbstractDataProvider
      */
     protected function getFrequenciesData($needProductValues, $productId = null)
     {
+        $addedDefault = false;
         /** @var ProductBillingFrequencyInterface $frequency */
         foreach ($this->getProductBillingFrequencies($productId) as $frequency) {
 
@@ -669,10 +670,11 @@ class Form extends AbstractDataProvider
             $billingFrequencyUnitPrice = $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productId);
             $billingFrequencyPresetQty = $frequency->getPresetQty();
             if ($needProductValues) {
-                if ($frequency->getDefaultBillingFrequency()) {
+                if ($frequency->getDefaultBillingFrequency() || !$addedDefault) {
                     $data['billing_frequency'] = $frequency->getBillingFrequencyId();
                     $data['price'] = $billingFrequencyUnitPrice;
                     $data['preset_qty'] = $billingFrequencyPresetQty;
+                    $addedDefault = true;
                 }
             }
             $data['product_frequencies'][$billingFrequencyId]['price'] =
