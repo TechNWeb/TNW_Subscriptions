@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container as UiContainer;
@@ -17,10 +18,10 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use Magento\Framework\DataObject;
 
 /**
  * Class ModifyForm
@@ -129,7 +130,8 @@ class ModifyForm extends Form
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $itemKey = 'item_' . $item->getId();
-                $product = $this->productRepository->getById($this->getProductFromItem($item)->getId());
+                $productId = $this->getProductFromItem($item)->getId();
+                $product = $this->productRepository->getById($productId);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
                 $data[self::FORM_DATA_VALUE][$itemKey] = array_merge(
                     $subBuyRequest[Create::UNIQUE],
@@ -139,6 +141,14 @@ class ModifyForm extends Form
                 $data[self::FORM_DATA_VALUE][$itemKey]['name'] = $product->getName();
                 $data[self::FORM_DATA_VALUE][$itemKey]['description'] = $product->getData('short_description');
                 $data[self::FORM_DATA_VALUE][$itemKey]['qty'] = $item->getQty();
+                $data[self::FORM_DATA_VALUE][$itemKey]['product_price'] = $product->getPrice();
+                $data[self::FORM_DATA_VALUE][$itemKey]['unlock_preset_qty'] =
+                    (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                $data[self::FORM_DATA_VALUE][$itemKey]['frequency_data'] = $this->getFrequenciesData(false, $productId);
+                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['billing_frequency'] =
+                    $data[self::FORM_DATA_VALUE][$itemKey]['billing_frequency'];
+                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['price'] =
+                    $data[self::FORM_DATA_VALUE][$itemKey]['price'];
             }
         }
 
@@ -327,7 +337,8 @@ class ModifyForm extends Form
                 'period' => $this->getPeriodDefenition(),
                 'start_on' => $this->getStartOnDefinition(),
                 'price' => $this->getPriceDefinition(),
-                'trial_period' => $this->getTrialPeriodDefenition()
+                'trial_period' => $this->getTrialPeriodDefenition(),
+                'initial_fee' => $this->getInitialFeeDefinition(),
             ]
         ];
     }
@@ -583,8 +594,12 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-set',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'onPriceUpdate'=> '${ $.parentName}.price:value'
+                        ],
+                        'parentForm' => $this->currentFormName,
+                        'priceFormat' => $this->getPriceFormatData(),
+                        'currencySymbol' => $this->getCurrentCurrencySymbol(),
                     ]
                 ]
             ]
@@ -710,7 +725,8 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Price:'),
+                        'label' => $this->getTrialPeriod($this->currentProduct->getId()) ?
+                            __('Post trial price:') : __('Price') . ':',
                         'dataType' => 'text',
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
@@ -720,15 +736,18 @@ class ModifyForm extends Form
                             'validate-zero-or-greater' => true,
                             'required-entry' => true
                         ],
-                        'addSymbol' => $this->getCurrentCurrencySymbol(),
+                        'addSymbol' => false,
                         'addbefore' => $this->getCurrentCurrencySymbol(),
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'previewLabel' => '%s',
+                        'previewLabel' =>  $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
-                    ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'changeValue' => '${ $.parentName}.billing_frequency:value',
+                        ],
+                        'priceFormat' => $this->getPriceFormatData(),
+                        'modifySubscription' => true,
+                        'parentForm' => $this->currentFormName,                    ]
                 ]
             ]
         ];
@@ -752,14 +771,46 @@ class ModifyForm extends Form
                         'dataScope' => 'trial_period',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                         'additionalClasses' => 'admin__field-wide',
-                        'visible' => false,
+                        'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
                         'previewLabel' => '%s',
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'imports' => [
-                            'visible' => $this->currentFormName . ':previewMode',
                             'showPreview' => $this->currentFormName . ':previewMode'
                         ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Returns initial fee field definition.
+     *
+     * @return array
+     */
+    protected function getInitialFeeDefinition()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Initial Fee'),
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Input::NAME,
+                        'componentType' => UiForm\Element\Input::NAME,
+                        'dataScope' => 'initial_fee',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                        'additionalClasses' => 'admin__field-wide',
+                        'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
+                        'previewLabel' => '%s',
+                        'component' => 'TNW_Subscriptions/js/components/add-product-form-initial-fee',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'imports' => [
+                            'changeValue' => '${ $.parentName}.billing_frequency:value',
+                        ],
+                        'modifySubscription' => true,
+                        'parentForm' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -787,13 +838,13 @@ class ModifyForm extends Form
                             'validate-zero-or-greater' => true,
                             'required-entry' => true
                         ],
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-
-                        ]
+                            'canShowEdit' => $this->currentFormName . ':previewMode'
+                        ],
+                        'parentForm' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -833,11 +884,12 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'visible' => $this->currentFormName . ':previewMode'
+                            'setUpdateQtyButtonVisibility' => $this->currentFormName . ':previewMode'
                         ],
                         'exports' => [
                             'active' => '!' . $qtyContainerName . '.qty:showPreview'
-                        ]
+                        ],
+                        'parentForm' => $this->currentFormName,
                     ]
                 ]
             ]

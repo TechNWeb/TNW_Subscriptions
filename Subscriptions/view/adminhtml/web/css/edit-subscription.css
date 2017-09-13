@@ -28,3 +28,15 @@ button.profile__cancel-edit_button:before{
     display: inline-block;
     vertical-align: top;
 }
+
+.subscription-summary {
+    width: 49%;
+    display: inline-block;
+    float: left;
+}
+
+.summary-account-information {
+    width: 49%;
+    display: inline-block;
+    float: right;
+}

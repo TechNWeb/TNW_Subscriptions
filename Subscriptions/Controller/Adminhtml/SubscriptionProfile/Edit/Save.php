@@ -105,9 +105,8 @@ class Save extends Action
     private function initProfile()
     {
         $result = false;
-        $profileId = $this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY);
         /** @var SubscriptionProfile $model */
-        $model = $this->profileManager->loadProfile($profileId);
+        $model = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
         if ($model) {
             $result = true;
             $this->coreRegistry->register('tnw_subscription_profile', $model, true);

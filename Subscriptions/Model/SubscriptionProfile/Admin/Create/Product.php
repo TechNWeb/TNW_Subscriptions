@@ -120,7 +120,7 @@ class Product extends Create
         $price = $this->priceCalculator->getUnitPrice(
             $product->getId(),
             $productData['billing_frequency'],
-            $this->localeFormat->getNumber($productData['price']),
+            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
             true
         );
         $product->setPrice($price);
@@ -157,7 +157,7 @@ class Product extends Create
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
-                        'term' => $productData['term'],
+                        'term' => !empty($productData['term']) ?: 0,
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
                         'start_on' => $this->getStartOnDate($productData['start_on']),
@@ -165,7 +165,13 @@ class Product extends Create
                         'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
-                        'price' => $this->localeFormat->getNumber($productData['price']),
+                        'price' => $this->priceCalculator->getUnitPrice(
+                            $product->getId(),
+                            $productData['billing_frequency'],
+                            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
+                            false,
+                            false
+                        ),
                         'initial_fee' => $initialFee
                     ],
                 ],

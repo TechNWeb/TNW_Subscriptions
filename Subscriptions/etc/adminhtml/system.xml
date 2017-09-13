@@ -21,15 +21,23 @@
                        showInStore="0">
                     <label>Extension Version</label>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Version</frontend_model>
+                    <comment>The version of the Magento extension.</comment>
                 </field>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1">
                     <label>Enable Subscriptions</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\Enabledisable</source_model>
+                    <comment>Enable or disable recurring subscription capabilites in Magento.</comment>
                 </field>
             </group>
 
-            <group id="debug" translate="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
-                <label>Debug and Logging</label>
+            <group id="advanced" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Advanced</label>
+                <field id="generated_quotes_count" translate="label" type="text" sortOrder="1" showInDefault="1"
+                       showInWebsite="0">
+                    <label>Number of Quotes</label>
+                    <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
+                    <comment>The number of future quotes to generate at a time for the new subscription profile.</comment>
+                </field>
                 <field id="log_status" translate="label" type="select" sortOrder="1" showInDefault="1"
                        showInWebsite="1">
                     <label>Enable Log</label>
@@ -38,41 +46,40 @@
                 </field>
             </group>
 
+        </section>
+
+        <section id="tnw_subscriptions_profile_options" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
+                 showInStore="0">
+            <class>separator-top</class>
+            <label>Profile Options</label>
+            <tab>tnw_subscriptions</tab>
+
+            <resource>TNW_Subscriptions::config_profile_options</resource>
+
             <group id="past_due_profile_options" translate="label" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>Past due profile options</label>
+                <label>Past Due</label>
                 <field id="attempt_count" translate="label" type="text" sortOrder="1" showInDefault="1"
                        showInWebsite="0">
-                    <label>Attempt count</label>
+                    <label>Attempt Count</label>
                     <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
-                    <comment>Number of payment attempts before status change to "Suspended"</comment>
+                    <comment>The number of payment attempts prior to changing the status of the profile to "Suspended".</comment>
                 </field>
                 <field id="attempt_interval" translate="label" type="text" sortOrder="2" showInDefault="1"
                        showInWebsite="0">
-                    <label>Attempt interval</label>
+                    <label>Attempt Interval</label>
                     <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
-                    <comment>Time interval between payment attempts in "Days"</comment>
+                    <comment>The number of days between retrying a failed payment.</comment>
                 </field>
                 <field id="grace_period" translate="label" type="text" sortOrder="3" showInDefault="1"
                        showInWebsite="0">
-                    <label>Grace period</label>
+                    <label>Grace Period</label>
                     <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
-                    <comment>The total period before changing the status to "Suspended" in "Days"</comment>
+                    <comment>The number of days before suspending a profile due to a failed payment.</comment>
                 </field>
             </group>
-
-            <group id="advanced" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>Advanced</label>
-                <field id="generated_quotes_count" translate="label" type="text" sortOrder="1" showInDefault="1"
-                       showInWebsite="0">
-                    <label>Count of generated quotes</label>
-                    <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
-                    <comment>Count of of generated quotes for one crown run for each profile</comment>
-                </field>
-            </group>
-
         </section>
 
-        <section id="tnw_subscriptions_product" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
+        <section id="tnw_subscriptions_product" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1"
                  showInStore="0">
             <label>Product</label>
             <tab>tnw_subscriptions</tab>
@@ -81,24 +88,28 @@
 
             <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>General</label>
+                <comment>Default catalog setting for all products.</comment>
                 <field id="purchase_type" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="0">
-                    <label>Purchase Type</label>
+                    <label>Available For</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\PurchaseType</source_model>
+                    <comment>Default catalog setting for the product to determine if the product to be sold on recurring basis, as a stand alone or both.</comment>
                 </field>
                 <field id="start_date_type" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1">
                     <label>Start Date</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
+                    <comment>Default catalog setting for the product to determine when the subscription should start.</comment>
                 </field>
                 <field id="lock_product_price_status" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
                     <label>Lock Product Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Default catalog setting for the product to determine if the recurring price will always match the product price.</comment>
                 </field>
                 <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
-                    <label>Unlock preset qantity</label>
+                    <label>Unlock Preset Quiantity</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product quantity is preset for the customer and cannot be changed.</comment>
                 </field>
@@ -106,6 +117,7 @@
 
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Discount</label>
+                <comment>Default catalog setting for the product to determine if products purchased as pasrt fo a subscription should be offered with a flat discount.</comment>
                 <field id="offer_flat_discount_status" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
                     <label>Offer Flat Discount</label>
@@ -132,6 +144,7 @@
 
             <group id="trial" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Trial</label>
+                <comment>Default catalog setting for the product to determine if products in the catalog should all have a trial.</comment>
                 <field id="trial_status" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
                     <label>Is Trial Offered</label>
@@ -175,11 +188,12 @@
                 <label>Term</label>
                 <field id="until_canceled" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
-                    <label>Until canceled</label>
+                    <label>Until Canceled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
         </section>
+
         <section id="tnw_subscriptions_payment_methods" translate="label" type="text" sortOrder="50"
                  showInDefault="1">
             <label>Payment Methods</label>
@@ -188,7 +202,12 @@
             <group id="active_methods" translate="label" type="text" sortOrder="20" showInDefault="1"
                    showInWebsite="0"
                    showInStore="0">
-                <label>Active Methods</label>
+                <label>Available Payment Methods</label>
+                <comment>
+                    <![CDATA[The list below includes all supported Magento payment methods which are activated in your Magento setup.
+                    If you do not see a payment method you were expecting and if that payment method is enabled in your Magento store,
+                    please <a href="https://powersync.biz/contacts" target="_blank">contact us.</a>]]>
+                </comment>
                 <field id="active_methods_list" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="0"
                        showInStore="0">
