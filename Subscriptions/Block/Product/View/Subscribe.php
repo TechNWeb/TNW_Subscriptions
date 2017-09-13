@@ -11,11 +11,13 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
+use TNW\Subscriptions\Model\Context as ContextModel;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -59,6 +61,11 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     private $frequencyRepository;
 
     /**
+     * @var ContextModel
+     */
+    private $contextModel;
+
+    /**
      * @param Context $context
      * @param ProductRepositoryInterface $productRepository
      * @param Config $config
@@ -72,6 +79,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
+        ContextModel $contextModel,
         array $data = []
     ) {
         $this->coreRegistry = $context->getRegistry();
@@ -79,6 +87,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
+        $this->contextModel = $contextModel;
         parent::__construct($context, $data);
     }
 
@@ -128,13 +137,22 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     public function getFrequencyOptions()
     {
         $result = [];
+        $product = $this->getProduct();
+        $productPrice = (int)$product->getPrice();
 
         /** @var ProductBillingFrequencyInterface $productFrequency */
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
+            $label = $frequency->getLabel();
+            $frequencyPrice = (int)$productFrequency->getPrice();
+
+            if ($productPrice > $frequencyPrice) {
+                $savings = $this->formatPrice($productPrice - $frequencyPrice);
+                $label .= '  '. sprintf(__('(SAVE %s)'), $savings) ;
+            }
 
              $data = [
-                'label' => $frequency->getLabel(),
+                'label' => $label,
                 'value' => $productFrequency->getBillingFrequencyId(),
                 'is_default' => $productFrequency->getDefaultBillingFrequency(),
             ];
@@ -240,8 +258,14 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function getDefaultStartOn()
     {
-        return $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
+        $format = preg_replace('/(?<!y)yy(?!y)/', 'Y', $this->getDateFormat());
+        $format = preg_replace('/(?<!M)M/', 'm', $format);
+        $date = $this->_localeDate->date();
+        $result = $date->format($format);
+
+        return $result;
     }
+
     /**
      * Get min value for Start on
      *
@@ -260,5 +284,24 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     public function getDateFormat()
     {
         return $this->_localeDate->getDateFormat(\IntlDateFormatter::SHORT);
+    }
+
+    /**
+     * Format price according to locale settings.
+     *
+     * @param $price
+     * @return float
+     */
+    private function formatPrice($price)
+    {
+        $currentStore = $this->_storeManager->getStore();
+
+        return $this->contextModel->getPriceCurrency()->format(
+            $price,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $currentStore->getId(),
+            $currentStore->getCurrentCurrencyCode()
+        );
     }
 }
