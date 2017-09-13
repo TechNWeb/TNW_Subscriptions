@@ -225,27 +225,23 @@ class QuoteCreator
             $neededDates[] = $date->format('Y-m-d H:i:s');
         }
         //get already generated dates
-        $relations = $this->relationManager->getAllProfileRelations($profile->getId());
-        $existDates = [];
-        foreach ($relations as $relation) {
-            $existDates[] = $relation->getScheduledAt();
-        }
-        $neededDates = array_diff($neededDates, $existDates);
-        $resultDates = [];
-        //generate only future dates
-        $nowDate = new \DateTime();
-        $nowDate = $nowDate->format('Y-m-d H:i:s');
-        foreach ($neededDates as $neededDate) {
-            if ($neededDate > $nowDate){
-                $resultDates[] = $neededDate;
-            }
-        }
-        $resultDates = array_slice(
-            $neededDates,
-            0,
-            $this->config->getGeneratedQuotesCount()
+        $existDates = array_map(
+            function (SubscriptionProfileOrderInterface $relation) {
+                return $relation->getScheduledAt();
+            },
+            $this->relationManager->getAllProfileRelations($profile->getId())
         );
-        $needMore = count($neededDates) > count($resultDates) ? true : false;
+        $neededDates = array_diff($neededDates, $existDates);
+        //generate only future dates
+        $nowDate = (new \DateTime())->format('Y-m-d H:i:s');
+        $resultDates = array_filter(
+            $neededDates,
+            function ($neededDate) use ($nowDate) {
+                return (strtotime($neededDate) > strtotime($nowDate));
+            }
+        );
+        $resultDates = array_slice($resultDates, 0, $this->config->getGeneratedQuotesCount());
+        $needMore = count($neededDates) > count($resultDates);
 
         return [$resultDates, $needMore];
     }
@@ -355,9 +351,15 @@ class QuoteCreator
         $quote->getShippingAddress()->addData(
             $profile->getShippingAddress()->getData()
         );
+        $quote->getShippingAddress()->setCustomerId(
+            $profile->getCustomerId()
+        );
         //Set billing address
         $quote->getBillingAddress()->addData(
             $profile->getBillingAddress()->getData()
+        );
+        $quote->getBillingAddress()->setCustomerId(
+            $profile->getCustomerId()
         );
         //Set shipping method
         $quote->getShippingAddress()
