@@ -356,7 +356,7 @@ class Manager
                 ->setIsVirtual($quote->getIsVirtual())
                 ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
                 ->setTerm($request['term'])
-                ->setTotalBillingCycles(!$startDate ? $request['period'] : 0)
+                ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
                 ->setStartDate($startDate)
                 ->setBillingFrequencyId($frequency->getId())
                 ->setFrequency($frequency->getFrequency())
