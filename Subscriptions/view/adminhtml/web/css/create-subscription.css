@@ -166,6 +166,29 @@
   font-style: italic;
 }
 
+.sub-data-grid .subscription-shipping-attention{
+  margin-top: 1rem;
+}
+
+.sub-data-grid .subscription-shipping-attention::before{
+  color: #eb5202;
+  content: '\e623';
+  background: none;
+  border: 0;
+  font-family: 'Admin Icons';
+  font-size: 1.9rem;
+  font-style: normal;
+  font-weight: 400;
+  height: auto;
+  left: 1.9rem;
+  line-height: inherit;
+  speak: none;
+  text-shadow: none;
+  width: auto;
+  float: left;
+  margin-right: 5px;
+}
+
 .sub-data-grid .sub-product-frequency-description{
   padding-top: 1rem;
 }

@@ -347,6 +347,7 @@ Message,Message
 "Pending","Pending"
 "(SAVE %s)","(SAVE %s)"
 "%s initial charge and then ","%s initial charge and then "
+"the shipping fee is subject to change for each shipment","the shipping fee is subject to change for each shipment"
 "Profile Options","Profile Options"
 "The version of the Magento extension.","The version of the Magento extension."
 "Enable or disable recurring subscription capabilites in Magento.","Enable or disable recurring subscription capabilites in Magento."

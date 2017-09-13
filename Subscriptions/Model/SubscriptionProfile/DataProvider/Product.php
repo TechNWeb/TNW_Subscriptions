@@ -38,6 +38,7 @@ class Product extends AbstractDataProvider
      */
     const GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
     const DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
+    const DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS = 'tnw_subscriptionprofile_product_columns';
     /**#@-*/
 
     /**#@+
@@ -278,19 +279,26 @@ class Product extends AbstractDataProvider
     {
         $shippingMethods = [];
         $label = '';
+        $needShowAttention = false;
         $this->shippingMethods->setQuote($quote);
         if ($this->shippingMethods->canShowShippingMethodLabel()) {
             $label = __('Selected on next step');
             if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT) {
                 $label = $this->shippingMethods->getCurrentMethodLabel();
+                $currentShippingMethod = explode("_", $this->shippingMethods->getCurrentShippingMethod());
+                if (!in_array($currentShippingMethod[0], $this->shippingMethods->getDontCostDependedMethodsCodes())) {
+                    $needShowAttention = true;
+                }
             } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
                 $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
+                $needShowAttention = true;
                 $label = '';
             }
         }
         return [
             'label' => $label,
             'methods' => $shippingMethods,
+            'needShowAttention' => $needShowAttention,
             'sub_quote_id' => $quote->getId(),
             'value' => $quote->getShippingAddress()->getShippingMethod()
         ];
@@ -305,6 +313,7 @@ class Product extends AbstractDataProvider
 
         $meta = array_merge_recursive(
             $meta,
+            $this->getProductColumnsData(),
             $this->getMetaData()
         );
 
@@ -331,6 +340,7 @@ class Product extends AbstractDataProvider
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
             $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.addProductsModal';
             $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
+
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
                     'children' => [
@@ -733,5 +743,30 @@ class Product extends AbstractDataProvider
         $data['render_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         $data['update_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         return $data;
+    }
+
+    /**
+     * Returns meta data for product columns.
+     *
+     * @return array
+     */
+    private function getProductColumnsData()
+    {
+        return [
+            self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [
+                'children' => [
+                    'shipping_method' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'dependsCodes' => $this->shippingMethods->getDontCostDependedMethodsCodes(),
+                                    'attentionMessage' => $this->shippingMethods->getShippingAttentionMessage()
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }
