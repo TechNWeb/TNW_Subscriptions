@@ -353,7 +353,8 @@ class Form extends AbstractDataProvider
                         'config' => [
                             'formElement' => 'container',
                             'componentType' => 'container',
-                            'component' => 'Magento_Ui/js/form/components/button',
+                            'component' => 'TNW_Subscriptions/js/components/primary-button',
+                            'template' => 'TNW_Subscriptions/form/element/primary-button',
                             'title' => 'Add to Subscription',
                             'actions' => [
                                 [
@@ -380,7 +381,7 @@ class Form extends AbstractDataProvider
             'subProductListing' => Product::DATA_SCOPE_SUBSCRIPTION_LISTING,
             'insertForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
             'configurableModal' => 'configurableModal',
-            'mainModal' => 'modal',
+            'mainModal' => 'addProductsModal',
             'insertConfigurableForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM,
             'configurableForm' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
             'modalGrid' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
