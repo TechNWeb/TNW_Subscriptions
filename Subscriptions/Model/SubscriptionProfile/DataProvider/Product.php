@@ -329,7 +329,7 @@ class Product extends AbstractDataProvider
         $result = [];
 
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
-            $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
+            $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.addProductsModal';
             $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
@@ -426,7 +426,7 @@ class Product extends AbstractDataProvider
                             ],
 
                         ],
-                        'modal' => $this->getModal(),
+                        'addProductsModal' => $this->getModal(),
                         'modifyModal' => $this->getModifyModal(),
                         'configurableModal' => $this->getConfigurableModal(),
                     ],
