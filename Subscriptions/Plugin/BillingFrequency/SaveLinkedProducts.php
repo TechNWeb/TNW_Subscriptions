@@ -9,16 +9,17 @@ namespace TNW\Subscriptions\Plugin\BillingFrequency;
 
 use TNW\Subscriptions\Model\BillingFrequency;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\ProductBillingFrequency;
 use TNW\Subscriptions\Model\ProductBillingFrequencyFactory;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
 class SaveLinkedProducts
 {
     /** @var ProductBillingFrequencyRepositoryInterface */
-    protected $productBillingFrequencyRepository;
+    private $productBillingFrequencyRepository;
 
     /** @var ProductBillingFrequencyFactory */
-    protected $productBillingFrequencyFactory;
+    private $productBillingFrequencyFactory;
 
     /**
      * SaveLinkedProducts constructor.
@@ -50,6 +51,7 @@ class SaveLinkedProducts
             $maxOrder = 0;
 
             foreach ($linkedProductData as $data){
+                $data['default_billing_frequency'] = $this->isDefaultBillingFrequency($data, $currentLinkedProducts);
                 $linkedProduct = $this->prepareLinkedProduct($result, $data, $maxOrder++);
                 $this->productBillingFrequencyRepository->save($linkedProduct);
             }
@@ -59,12 +61,31 @@ class SaveLinkedProducts
     }
 
     /**
+     * @param [] $data
+     * @param ProductBillingFrequency $earlierLinkedProducts
+     * @return int
+     */
+    private function isDefaultBillingFrequency($data, $earlierLinkedProducts)
+    {
+        $isDefault = 0;
+
+        foreach ($earlierLinkedProducts as $linkedProduct) {
+            if ($data['id'] == $linkedProduct->getMagentoProductId()) {
+                $isDefault = $linkedProduct->getDefaultBillingFrequency();
+                break;
+            }
+        }
+
+        return $isDefault;
+    }
+
+    /**
      * @param BillingFrequency $result
      * @param [] $data
      * @param int $maxOrder
-     * @return \TNW\Subscriptions\Model\ProductBillingFrequency
+     * @return ProductBillingFrequency
      */
-    protected function prepareLinkedProduct(
+    private function prepareLinkedProduct(
         BillingFrequency $result,
         $data,
         $maxOrder
@@ -91,7 +112,7 @@ class SaveLinkedProducts
      * @param string $field
      * @return string
      */
-    protected function prepareValue($data, $field)
+    private function prepareValue($data, $field)
     {
         $result = !empty($data[$field]) ? $data[$field] : '';
 
