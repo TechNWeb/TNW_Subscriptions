@@ -95,7 +95,8 @@ Day,Day
 Month,Month
 "%s for %s and then ","%s for %s and then "
 every,every
-"Total of %s %s. Products will be shipped every %s starting %s.","Total of %s %s. Products will be shipped every %s starting %s."
+"Products will be shipped every %s starting %s.","Products will be shipped every %s starting %s."
+"Total of %s %s. ","Total of %s %s. "
 today,today
 "ProductSku should be specified","ProductSku should be specified"
 "Could not save the productBillingFrequency: %1","Could not save the productBillingFrequency: %1"

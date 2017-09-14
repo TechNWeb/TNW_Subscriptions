@@ -87,7 +87,7 @@ class Form extends AbstractDataProvider
     /**
      * Product billing frequencies cache.
      *
-     * @var ProductBillingFrequencyInterface[]
+     * @var array
      */
     private $productBillingFrequencies;
 
@@ -196,6 +196,7 @@ class Form extends AbstractDataProvider
         $this->currencyFactory = $currencyFactory;
         $this->context = $context;
         $this->trialPeriod = [];
+        $this->productBillingFrequencies = [];
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -436,19 +437,22 @@ class Form extends AbstractDataProvider
      */
     protected function getProductBillingFrequencies($productId = null)
     {
-        if ($this->productBillingFrequencies === null) {
-            $productId = $productId ?: $this->request->getParam('product_id');
+        $productId = $productId ?: $this->request->getParam('product_id');
+        if ($productId && !isset($this->productBillingFrequencies[$productId])) {
+            $this->productBillingFrequencies[$productId] = [];
             try {
-                $this->productBillingFrequencies = $this->recurringOptionRepository
+                $this->productBillingFrequencies[$productId] = $this->recurringOptionRepository
                     ->getListByProductId($productId)
                     ->getItems();
             } catch (\Exception $e) {
-                $this->productBillingFrequencies = [];
                 $this->context->log($e->getMessage());
             }
         }
+        $return = !empty($this->productBillingFrequencies[$productId])
+            ? $this->productBillingFrequencies[$productId]
+            : [];
 
-        return $this->productBillingFrequencies;
+        return $return;
     }
 
     /**
