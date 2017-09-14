@@ -59,16 +59,24 @@ define([
         },
 
         getOptionsForLabel: function() {
-            var options = this.options(),
-                optionsForLabel = {};
+            if (Object.keys(this.optionsForLabel).length == 0) {
+                var options = this.options(),
+                    optionsForLabel = {};
 
-            options.forEach(function(option, index, arr) {
-                optionsForLabel[option.value] = option.label;
-            });
+                options.forEach(function(option, index, arr) {
+                    optionsForLabel[option.value] = option.label;
+                });
 
-            this.optionsForLabel = optionsForLabel;
+                this.optionsForLabel = optionsForLabel;
+            }
 
             return this.optionsForLabel;
+        },
+
+        getOptionForLabel: function(value) {
+            var labels = this.getOptionsForLabel();
+
+            return labels[value];
         },
 
         /**
@@ -77,7 +85,7 @@ define([
          * @returns {string}
          */
         getPreviewLabel: function () {
-            var label = this.optionsForLabel[this.value()];
+            var label = this.getOptionForLabel(this.value());
 
             return label ? label: '';
         },
@@ -156,7 +164,7 @@ define([
          */
         changeOptionLabel: function(option, optionIndex, changeType) {
             var optionValue = option.value,
-                frequencyLabel = this.optionsForLabel[optionValue],
+                frequencyLabel = this.getOptionForLabel(optionValue),
                 frequencyData = this.getFrequencyData(),
                 discount = 0,
                 productPrice = this.getProductPrice(),
@@ -189,7 +197,7 @@ define([
             var result,
                 currentItemData = this.getCurrentItemData();
 
-            if (currentItemData) {
+            if (currentItemData && currentItemData.frequency_data) {
                 result = currentItemData.frequency_data.product_frequencies;
             }
 
@@ -270,7 +278,7 @@ define([
          * @returns {}
          */
         getCurrentItemData: function() {
-            var result = Array;
+            var result = [];
             if (this.parentForm) {
                 var parent = registry.get(this.parentForm);
                 if (parent) {
