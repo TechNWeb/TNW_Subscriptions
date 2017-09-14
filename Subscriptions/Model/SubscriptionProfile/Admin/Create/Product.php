@@ -148,6 +148,8 @@ class Product extends Create
                 $productData['product_id'],
                 true
             );
+            $startOn = isset($productData['start_on']) ?
+                $productData['start_on'] : $product->getData(Attribute::SUBSCRIPTION_START_DATE);
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
@@ -160,7 +162,7 @@ class Product extends Create
                         'term' => !empty($productData['term']) ?: 0,
                         'period' => $productData['period'],
                         'is_trial' => $isTrial,
-                        'start_on' => $this->getStartOnDate($productData['start_on']),
+                        'start_on' => $this->getStartOnDate($startOn),
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
                     ],
