@@ -140,20 +140,6 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm"
-                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
-        <arguments>
-            <argument name="isShipping" xsi:type="string">1</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm"
-                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
-        <arguments>
-            <argument name="isShipping" xsi:type="string">0</argument>
-        </arguments>
-    </virtualType>
-
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\ShippingInformationForm"
                  type="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm">
         <arguments>
@@ -165,6 +151,31 @@
                  type="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm">
         <arguments>
             <argument name="isShipping" xsi:type="string">0</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::SHIPPING_INFORMATION_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::BILLING_INFORMATION_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::SHIPPING_METHODS_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::PAYMENT_METHODS_INSERT_FORM</argument>
         </arguments>
     </virtualType>
 
@@ -181,20 +192,28 @@
                 </item>
                 <item name="change_history" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ChangeHistory</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
                 </item>
                 <item name="dashboard" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Dashboard</item>
-                    <item name="sortOrder" xsi:type="number">30</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
                 </item>
                 <item name="shipping_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
+                <!--<item name="shipping_method" xsi:type="array">-->
+                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm</item>-->
+                    <!--<item name="sortOrder" xsi:type="number">60</item>-->
+                <!--</item>-->
                 <item name="billing_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm</item>
-                    <item name="sortOrder" xsi:type="number">60</item>
+                    <item name="sortOrder" xsi:type="number">70</item>
                 </item>
+                <!--<item name="payment_method" xsi:type="array">-->
+                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>-->
+                    <!--<item name="sortOrder" xsi:type="number">80</item>-->
+                <!--</item>-->
             </argument>
         </arguments>
     </virtualType>

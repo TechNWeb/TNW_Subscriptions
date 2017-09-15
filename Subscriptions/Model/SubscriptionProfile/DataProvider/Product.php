@@ -38,6 +38,7 @@ class Product extends AbstractDataProvider
      */
     const GROUP_SUBSCRIPTION_PROFILE_ADD_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
     const DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS = 'tnw_subscriptionprofile_create_add_products';
+    const DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS = 'tnw_subscriptionprofile_product_columns';
     /**#@-*/
 
     /**#@+
@@ -182,44 +183,33 @@ class Product extends AbstractDataProvider
     {
         $items = $products = [];
         $estimatedPayment = 0;
-
         $subQuotes = $this->session->getSubQuotes();
-
         $counter = 1;
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
-            $subscriptionData = null;
             $fullSubscriptionData = null;
 
             if (empty($subQuote->getAllItems())) {
                 continue;
             }
-
             /** @var Item $item */
             foreach ($subQuote->getAllItems() as $item) {
-                if (!$subscriptionData) {
-                    $subscriptionData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
-                    );
-                }
+                $nonUniqueData = $item->getBuyRequest()->getDataByPath(
+                    Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
+                );
                 if (!$fullSubscriptionData) {
                     $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
                     );
-                } else {
-                    $nonUniqueData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
-                    );
-                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
-                        isset($nonUniqueData['price']) ? $nonUniqueData['price'] : 0;
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] = 0;
                 }
-
+                $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
+                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $item->getQty(): 0;
 
                 $imageHelper = $this->imageHelper->init(
                     $item->getProduct(),
                     'product_listing_thumbnail'
                 );
-
                 $products[] = [
                     'thumbnail_alt' => $imageHelper->getLabel(),
                     'thumbnail_src' => $imageHelper->getUrl(),
@@ -228,11 +218,8 @@ class Product extends AbstractDataProvider
                     'conf_options' => [], //TODO add here configurable options
                 ];
             }
-
             $subTotal = $subQuote->getGrandTotal();
-
             $estimatedPayment += (double)$subTotal;
-
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
@@ -242,10 +229,8 @@ class Product extends AbstractDataProvider
                 ),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
-
             $products = [];
         }
-
         $estimatedPayment = $this->formatPrice($estimatedPayment);
 
         return [
@@ -278,19 +263,26 @@ class Product extends AbstractDataProvider
     {
         $shippingMethods = [];
         $label = '';
+        $needShowAttention = false;
         $this->shippingMethods->setQuote($quote);
         if ($this->shippingMethods->canShowShippingMethodLabel()) {
             $label = __('Selected on next step');
             if ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_PAYMENT) {
                 $label = $this->shippingMethods->getCurrentMethodLabel();
+                $currentShippingMethod = explode("_", $this->shippingMethods->getCurrentShippingMethod());
+                if (!in_array($currentShippingMethod[0], $this->shippingMethods->getDontCostDependedMethodsCodes())) {
+                    $needShowAttention = true;
+                }
             } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
                 $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
+                $needShowAttention = true;
                 $label = '';
             }
         }
         return [
             'label' => $label,
             'methods' => $shippingMethods,
+            'needShowAttention' => $needShowAttention,
             'sub_quote_id' => $quote->getId(),
             'value' => $quote->getShippingAddress()->getShippingMethod()
         ];
@@ -305,6 +297,7 @@ class Product extends AbstractDataProvider
 
         $meta = array_merge_recursive(
             $meta,
+            $this->getProductColumnsData(),
             $this->getMetaData()
         );
 
@@ -329,8 +322,9 @@ class Product extends AbstractDataProvider
         $result = [];
 
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
-            $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modal';
+            $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.addProductsModal';
             $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
+
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
                     'children' => [
@@ -426,7 +420,7 @@ class Product extends AbstractDataProvider
                             ],
 
                         ],
-                        'modal' => $this->getModal(),
+                        'addProductsModal' => $this->getModal(),
                         'modifyModal' => $this->getModifyModal(),
                         'configurableModal' => $this->getConfigurableModal(),
                     ],
@@ -733,5 +727,30 @@ class Product extends AbstractDataProvider
         $data['render_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         $data['update_url'] = $this->urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile_create_product/changecurrency');
         return $data;
+    }
+
+    /**
+     * Returns meta data for product columns.
+     *
+     * @return array
+     */
+    private function getProductColumnsData()
+    {
+        return [
+            self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [
+                'children' => [
+                    'shipping_method' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'dependsCodes' => $this->shippingMethods->getDontCostDependedMethodsCodes(),
+                                    'attentionMessage' => $this->shippingMethods->getShippingAttentionMessage()
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

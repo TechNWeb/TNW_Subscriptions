@@ -51,6 +51,9 @@ define([
         var fraction = '00';
         precision = precision * (-1);
         var returnNumber = value;
+        if (typeof value == 'number') {
+            value = value.toString();
+        }
         var indexOfDecimalSymbol = value.indexOf(decimalSymbol);
 
         if (indexOfDecimalSymbol >= 0) {

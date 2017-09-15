@@ -1,4 +1,33 @@
 & when (@media-common = true) {
+  .tnw-subscriptions-cart-link__container {
+    display: inline-block;
+    position: relative;
+    float: right;
+    margin: 0 0 0 10px;
+
+    .tnw-subscriptions-cart-link,
+    .tnw-subscriptions-cart-link:visited,
+    .tnw-subscriptions-cart-link:hover,
+    .tnw-subscriptions-cart-link:active {
+      text-decoration: none;
+    }
+
+    .tnw-subscriptions-cart-link > span {
+      background: #ff5501;
+      color: #ffffff;
+      height: 24px;
+      line-height: 24px;
+      border-radius: 2px;
+      display: inline-block;
+      margin: 3px 0 0;
+      min-width: 18px;
+      overflow: hidden;
+      padding: 0 3px;
+      text-align: center;
+      white-space: normal;
+    }
+  }
+
   #step-registration {
     display: inline-flex;
     width: -webkit-fill-available;
@@ -391,11 +420,11 @@
             width: 54px;
           }
 
-          .field.until-cancelled {
+          .field.term {
             margin-bottom: 10px;
           }
 
-          .field.term .control {
+          .field.period .control {
             position: relative;
 
             >label {
@@ -409,13 +438,31 @@
             }
           }
 
-          .field.date .control {
-            position: relative;
+          .field.date {
+            .control {
+              position: relative;
+              width: 57%;
 
-            .ui-datepicker-trigger {
-              position: absolute;
-              top: 7px;
-              right: 0;
+              &:after {
+                font-family: 'luma-icons';
+                font-size: 20px;
+                content: '\e612';
+                right: 2em;
+                position: absolute;
+                z-index: 1;
+              }
+
+              .ui-datepicker-trigger {
+                position: absolute;
+                top: 7px;
+                right: 0;
+              }
+
+              #start_at {
+                z-index: 2;
+                position: relative;
+                background: inherit;
+              }
             }
           }
 
@@ -436,6 +483,20 @@
     #new-customer,
     #existing-customer {
       padding-bottom: 5%;
+    }
+  }
+
+  .catalog-product-view {
+    .addtocart-tabs {
+      .content-container {
+        .tab-content.subscribe-tab {
+          .field.date {
+            .control {
+              width: 67%;
+            }
+          }
+        }
+      }
     }
   }
 }
