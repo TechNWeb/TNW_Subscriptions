@@ -129,26 +129,31 @@ class ModifyForm extends Form
         foreach ($this->getObjects() as $subQuote) {
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
-                $itemKey = 'item_' . $item->getId();
-                $productId = $this->getProductFromItem($item)->getId();
-                $product = $this->productRepository->getById($productId);
+                $product = $this->getProductFromItem($item);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
-                $data[self::FORM_DATA_VALUE][$itemKey] = array_merge(
-                    $subBuyRequest[Create::UNIQUE],
-                    $subBuyRequest[Create::NON_UNIQUE]
-                );
-                $data[self::FORM_DATA_VALUE][$itemKey]['trial_period'] = $this->getTrialPeriod($product->getId());
-                $data[self::FORM_DATA_VALUE][$itemKey]['name'] = $product->getName();
-                $data[self::FORM_DATA_VALUE][$itemKey]['description'] = $product->getData('short_description');
-                $data[self::FORM_DATA_VALUE][$itemKey]['qty'] = $item->getQty();
-                $data[self::FORM_DATA_VALUE][$itemKey]['product_price'] = $product->getPrice();
-                $data[self::FORM_DATA_VALUE][$itemKey]['unlock_preset_qty'] =
-                    (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-                $data[self::FORM_DATA_VALUE][$itemKey]['frequency_data'] = $this->getFrequenciesData(false, $productId);
-                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['billing_frequency'] =
-                    $data[self::FORM_DATA_VALUE][$itemKey]['billing_frequency'];
-                $data[self::FORM_DATA_VALUE][$itemKey]['initial_values']['price'] =
-                    $data[self::FORM_DATA_VALUE][$itemKey]['price'];
+                $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                $itemPrice = $presetQty
+                    ? $subBuyRequest[Create::NON_UNIQUE]['price'] * $item->getQty()
+                    : $subBuyRequest[Create::NON_UNIQUE]['price'];
+                $data[self::FORM_DATA_VALUE]['item_' . $item->getId()] = [
+                    'price' => $itemPrice,
+                    'initial_fee' => $subBuyRequest[Create::NON_UNIQUE]['initial_fee'],
+                    'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
+                    'term' => (string)$subBuyRequest[Create::UNIQUE]['term'],
+                    'period' => $subBuyRequest[Create::UNIQUE]['period'],
+                    'start_on' => $subBuyRequest[Create::UNIQUE]['start_on'],
+                    'trial_period' => $this->getTrialPeriod($product->getId()),
+                    'name' => $product->getName(),
+                    'description' => $product->getData('short_description'),
+                    'qty' => $item->getQty(),
+                    'product_price' => $product->getPrice(),
+                    'unlock_preset_qty' => $presetQty,
+                    'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
+                    'initial_values' => [
+                        'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
+                        'price' => $itemPrice
+                    ]
+                ];
             }
         }
 
@@ -925,6 +930,6 @@ class ModifyForm extends Form
      */
     protected function getProductFromItem(DataObject $item)
     {
-        return $item->getProduct();
+        return $this->productRepository->getById($item->getProduct()->getId());
     }
 }

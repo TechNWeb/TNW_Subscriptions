@@ -115,14 +115,9 @@ class Product extends Create
     public function getPreparedProduct()
     {
         $productData = $this->getData();
+        /** @var MagentoProduct $product */
         $product = $this->productRepository->getById($productData['product_id']);
-
-        $price = $this->priceCalculator->getUnitPrice(
-            $product->getId(),
-            $productData['billing_frequency'],
-            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
-            true
-        );
+        $price = $this->getCalculatedPrice($product, $productData, true);
         $product->setPrice($price);
 
         return $product;
@@ -137,7 +132,6 @@ class Product extends Create
     {
         if (!$this->buyRequest) {
             $productData = $this->getData();
-
             /** @var MagentoProduct $product */
             $product = $this->productRepository->getById($productData['product_id']);
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
@@ -159,21 +153,15 @@ class Product extends Create
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
-                        'term' => !empty($productData['term']) ?: 0,
-                        'period' => $productData['period'],
+                        'term' => !empty($productData['term']) ? 1 : 0,
+                        'period' => !empty($productData['term']) ? 0 : $productData['period'],
                         'is_trial' => $isTrial,
                         'start_on' => $this->getStartOnDate($startOn),
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
                     ],
                     static::NON_UNIQUE => [
-                        'price' => $this->priceCalculator->getUnitPrice(
-                            $product->getId(),
-                            $productData['billing_frequency'],
-                            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
-                            false,
-                            false
-                        ),
+                        'price' => $this->getCalculatedPrice($product, $productData),
                         'initial_fee' => $initialFee
                     ],
                 ],
@@ -208,5 +196,36 @@ class Product extends Create
         }
 
         return $result;
+    }
+
+    /**
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @param bool $full
+     * @return string
+     */
+    private function getCalculatedPrice(MagentoProduct $product, array $productData, $full = false)
+    {
+        $usePresetQty = $product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+
+        //Calculate product Price
+        $price = $this->priceCalculator->getUnitPrice(
+            $product->getId(),
+            $productData['billing_frequency'],
+            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
+            $full,
+            $full
+        );
+
+        if ($usePresetQty){
+            $price = $this->getContext()->getPriceCurrency()->convertAndRound(
+                $price / $productData['qty'],
+                null,
+                null,
+                4
+            );
+        }
+
+        return $price;
     }
 }

@@ -9,7 +9,7 @@ define([
 
     return Abstract.extend({
         defaults: {
-            showPreview: false,
+            showPreview: true,
             previewLabel: '',
             previewElementTmpl: 'TNW_Subscriptions/form/element/template/preview-label',
             listens: {
@@ -23,20 +23,6 @@ define([
         initObservable: function () {
             this._super().
             observe('showPreview');
-
-            return this;
-        },
-
-        /**
-         * @inheritdoc
-         */
-        setInitialValue: function () {
-            if (_.isEmpty(this.valueMap)) {
-                this.on('value', this.onUpdate.bind(this));
-            } else {
-                this._super();
-                this.checked(this.getReverseValueMap(this.value()));
-            }
 
             return this;
         },
