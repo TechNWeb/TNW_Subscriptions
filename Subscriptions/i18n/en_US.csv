@@ -348,3 +348,4 @@ Message,Message
 "Pending","Pending"
 "(SAVE %s)","(SAVE %s)"
 "%s initial charge and then ","%s initial charge and then "
+"Could not save the product billing frequency with same options","Could not save the product billing frequency with same options"

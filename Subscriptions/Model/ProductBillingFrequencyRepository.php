@@ -116,8 +116,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
             $this->resource->save($productBillingFrequency);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
-                'Could not save the productBillingFrequency: %1',
-                $exception->getMessage()
+                'Could not save the product billing frequency with same options'
             ));
         }
         return $productBillingFrequency;

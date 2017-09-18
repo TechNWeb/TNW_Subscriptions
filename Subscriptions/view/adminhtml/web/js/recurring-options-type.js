@@ -19,7 +19,11 @@ define([
             valuesMap: {},
             indexesMap: {},
             filterPlaceholder: 'ns = ${ $.ns }, parentScope = ${ $.parentScope }',
-            periodLabels: {}
+            periodLabels: {},
+            warningMessage: '',
+            validationParams: {
+                currentElement: null
+            }
         },
 
         /**
@@ -64,6 +68,10 @@ define([
          * @returns {*}
          */
         onUpdate: function (currentValue) {
+            this.validationParams.currentElement = this;
+            this.validationParams.allElements = this.retrieveElements(this.index);
+            this.validate('validate-billing-frequency-selected-option', currentValue);
+
             this.updateComponents(currentValue);
             this.updateHeader(currentValue);
 
@@ -128,11 +136,8 @@ define([
          * @param currentValue
          */
         updateHeader:function (currentValue) {
-            var regExp = /.*?(\.\d+)/ig;
-            var containerName = regExp.exec(this.parentName);
-            if (containerName != null) {
-                containerName = containerName[0];
-                var container = registry.get(containerName);
+            var container = this.getContainer();
+            if (container != null) {
                 var message = 'Please select billing frequency';
                 var currentLabel = '';
                 if (typeof this.periodLabels[currentValue] != 'undefined') {
@@ -143,6 +148,33 @@ define([
                 message = $.mage.__(message).replace('%s', currentLabel);
                 container.label(message);
             }
+        },
+
+        /**
+         * Retrieve grid container.
+         *
+         * @returns {*}
+         */
+        getContainer: function () {
+            var container = null;
+            var regExp = /.*?(\.\d+)/ig;
+            var containerName = regExp.exec(this.parentName);
+            if (containerName != null) {
+                containerName = containerName[0];
+                container = registry.get(containerName);
+            }
+
+            return container;
+        },
+
+        /**
+         * Retrieve elements by index.
+         *
+         * @param {String} index
+         * @return {Array}
+         */
+        retrieveElements: function(index) {
+            return registry.filter('index = ' + index + '');
         }
     });
 });

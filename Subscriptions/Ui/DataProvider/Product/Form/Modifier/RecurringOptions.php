@@ -276,6 +276,7 @@ class RecurringOptions extends BaseModifier
      */
     private function getOptionsGridConfig($sortOrder)
     {
+        $billingFrequenciesData = $this->getBillingFrequencies();
         return [
             'arguments' => [
                 'data' => [
@@ -294,6 +295,8 @@ class RecurringOptions extends BaseModifier
                         'sortOrder' => $sortOrder,
                         'dataProvider' => static::RECURRING_OPTIONS_LISTING,
                         'imports' => ['insertData' => '${ $.provider }:${ $.dataProvider }'],
+                        'periodLabels' => $billingFrequenciesData['periodLabels'],
+                        'maxBillingFrequency' => count($billingFrequenciesData['periodLabels']),
                     ],
                 ],
             ],
@@ -470,10 +473,11 @@ class RecurringOptions extends BaseModifier
                             'defaultPlaceholder' => __('-- Please select --'),
                         ],
                         'validation' => [
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'validate-billing-frequency-selected-option' => true
                         ],
                         'notice' => __('Recurring schedule to be picked by the customer'),
-                        'periodLabels' => $billingFrequenciesData['periodLabels'],
+                        'periodLabels' => $billingFrequenciesData['periodLabels']
                     ],
                 ],
             ],
