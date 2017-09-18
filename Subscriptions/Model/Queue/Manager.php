@@ -162,18 +162,23 @@ class Manager
      * Inserts into queue new items.
      *
      * @param array $relationIds - ids from "tnw_subscriptions_subscription_profile_order" table
+     * @param null|bool $makeProcessed
+     * @return array
      */
     public function insertItems(
-        $relationIds
+        $relationIds,
+        $makeProcessed = null
     ) {
         if (!is_array($relationIds)) {
             $relationIds = [$relationIds];
         }
         $fields = [];
+        $itemIds = [];
+        $status = $makeProcessed ? QueueStatus::QUEUE_STATUS_RUNNING : QueueStatus::QUEUE_STATUS_PENDING;
         foreach ($relationIds as $relationId) {
             $fields[] = [
                 Queue::PROFILE_ORDER_ID => $relationId,
-                Queue::STATUS => QueueStatus::QUEUE_STATUS_PENDING,
+                Queue::STATUS => $status,
                 Queue::MESSAGE => '',
                 Queue::CREATED_AT => $this->date->gmtDate(),
                 Queue::UPDATED_AT => $this->date->gmtDate()
@@ -187,7 +192,13 @@ class Manager
                 $fields,
                 [Queue::MESSAGE, Queue::CREATED_AT, Queue::UPDATED_AT]
             );
+            $itemIds = $collection->addFieldToFilter(
+                Queue::PROFILE_ORDER_ID,
+                ['in' => $relationIds]
+            )->getAllIds();
         }
+
+        return $itemIds;
     }
 
     /**

@@ -346,7 +346,7 @@ class Process extends Create
             if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
                 $this->getSubCreateModel()->clearAccountStepData();
             } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
-                $this->getSubCreateModel()->cleaBillingStepData();
+                $this->getSubCreateModel()->clearBillingStepData();
             }
         }
     }
