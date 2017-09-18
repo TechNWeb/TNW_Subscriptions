@@ -87,6 +87,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\Pool" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -130,6 +132,21 @@
                         <item name="recurring_options_updater" xsi:type="string">TNW\Subscriptions\Model\ProductBillingFrequency\SaveHandler</item>
                     </item>
                 </item>
+                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
+                    <!-- Save/load subscription profile addresses/products -->
+                    <item name="read" xsi:type="array">
+                        <item name="profile_address_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\ReadHandler</item>
+                        <item name="profile_product_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\ReadHandler</item>
+                    </item>
+                    <item name="create" xsi:type="array">
+                        <item name="profile_address_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="profile_address_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
+                        <item name="profile_product_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
+                    </item>
+                </item>
             </argument>
         </arguments>
     </type>
@@ -156,27 +173,6 @@
         <arguments>
             <argument name="entities" xsi:type="array">
                 <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="string">TNW\Subscriptions\Api\Data\SubscriptionProfileInterface</item>
-            </argument>
-        </arguments>
-    </type>
-    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
-        <arguments>
-            <argument name="extensionActions" xsi:type="array">
-                <item name="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface" xsi:type="array">
-                    <!-- Save/load subscription profile addresses/products -->
-                    <item name="read" xsi:type="array">
-                        <item name="profile_address_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\ReadHandler</item>
-                        <item name="profile_product_reader" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\ReadHandler</item>
-                    </item>
-                    <item name="create" xsi:type="array">
-                        <item name="profile_address_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
-                        <item name="profile_product_creator" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
-                    </item>
-                    <item name="update" xsi:type="array">
-                        <item name="profile_address_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Address\SaveHandler</item>
-                        <item name="profile_product_updater" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Product\SaveHandler</item>
-                    </item>
-                </item>
             </argument>
         </arguments>
     </type>
@@ -237,5 +233,41 @@
     </type>
     <type name="TNW\Subscriptions\Controller\Subscription\History">
         <plugin name="authentication" type="\Magento\Sales\Controller\Order\Plugin\Authentication"/>
+    </type>
+
+    <type name="Magento\Sales\Cron\CleanExpiredQuotes">
+        <plugin name="tnw_clean_expired_quotes"
+                type="TNW\Subscriptions\Plugin\Sales\Cron\CleanExpiredQuotes"
+                sortOrder="1000"/>
+    </type>
+
+
+    <!--Subscription profile status modifiers after profile queue processing-->
+    <type name="TNW\Subscriptions\Cron\ProfileProcessor">
+        <arguments>
+            <argument name="statusModifiersPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="canceled" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusComplete</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="suspended" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusSuspended</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="past_due" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusPastDue</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="active" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusActive</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+            </argument>
+        </arguments>
     </type>
 </config>

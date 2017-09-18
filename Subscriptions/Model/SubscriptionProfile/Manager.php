@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -85,6 +86,11 @@ class Manager
     private $orderRelationManager;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -94,6 +100,7 @@ class Manager
      * @param AddressFactory $profileAddressFactory
      * @param ProductManager $productManager
      * @param OrderRelationManager $orderRelationManager
+     * @param RequestInterface $request
      */
     public function __construct(
         EnginePool $enginePool,
@@ -103,7 +110,8 @@ class Manager
         DataObjectHelper $dataObjectHelper,
         AddressFactory $profileAddressFactory,
         ProductManager $productManager,
-        OrderRelationManager $orderRelationManager
+        OrderRelationManager $orderRelationManager,
+        RequestInterface $request
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -113,6 +121,7 @@ class Manager
         $this->profileAddressFactory = $profileAddressFactory;
         $this->productManager = $productManager;
         $this->orderRelationManager = $orderRelationManager;
+        $this->request = $request;
     }
 
     /**
@@ -129,6 +138,7 @@ class Manager
 
     /**
      * @param SubscriptionProfileInterface $profile
+     * @return $this
      */
     public function setProfile($profile)
     {
@@ -158,6 +168,18 @@ class Manager
         }
 
         return $model;
+    }
+
+    /**
+     * Load profile from request by name
+     *
+     * @param $requestFieldName
+     * @return null|SubscriptionProfileInterface
+     */
+    public function loadProfileFromRequest($requestFieldName)
+    {
+        $profileId = (int)$this->request->getParam($requestFieldName, 0);
+        return $this->loadProfile($profileId);
     }
 
     /**

@@ -23,7 +23,7 @@ class ProfileStatus implements OptionSourceInterface
     const STATUS_HOLDED = 4;     // Profile does not creates orders.
     const STATUS_SUSPENDED = 5;  // Profile can not create an order and grace period is ended.
     const STATUS_COMPLETE = 6;   // Profile is successfully completed.
-    const STATUS_PAST_DUE = 7;   //
+    const STATUS_PAST_DUE = 7;   // Profile can not create an order and grace period is not ended.
     /**#@-*/
 
     /**
