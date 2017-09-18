@@ -647,10 +647,28 @@ button.action-editor.active:before{
 
 .subscription-item-form .description-fieldset .left-container .sub-product-image{
   margin-bottom: 0;
+  width: 240px;
+  margin-left: 0px;
 }
 
 .subscription-item-form .description-fieldset .left-container .sub-product-image .admin__field-control{
   width: 100%;
   margin-left: 0;
   padding-left: 30px;
+  padding-bottom: 103%;
+}
+.subscription-item-form .description-fieldset .left-container .sub-product-image img{
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.admin__field-control .field-qty .admin__field-label span {
+  margin-left: 1rem;
+}
+.admin__field-control .field-qty .admin__field-label span:after {
+  left: 0;
+  margin-left: 0px;
 }
