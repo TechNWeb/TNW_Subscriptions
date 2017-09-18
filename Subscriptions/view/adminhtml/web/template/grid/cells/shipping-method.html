@@ -17,7 +17,7 @@
         'data-form-part': $col.getForm()
     },
     hasFocus: false,
-    value: value,
+    value: $col.onValueChange($col.getId($row())),
     optgroup: $col.getOptions($row()),
     optionsCaption: false,
     optionsValue: 'value',
@@ -25,4 +25,9 @@
 />
 </div>
 
-<div if="$col.needShowAttention($row())" class="data-grid-cell-content subscription-shipping-attention" html="$col.getAttentionMessage()" />
+<div if="$col.needShowAttention($row())" class="data-grid-cell-content subscription-shipping-attention" data-bind="
+     attr: {
+         id: 'subscription-shipping-attention-' + $col.getId($row()),
+     }"
+     html="$col.getAttentionMessage()"
+/>
