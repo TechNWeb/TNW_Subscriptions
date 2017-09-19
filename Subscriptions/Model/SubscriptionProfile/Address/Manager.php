@@ -171,8 +171,8 @@ class Manager
 
             $profileAddress->setCustomerAddressId($customerAddressId);
             $profileAddress->setStreet(
-                implode('\n', $profileAddress->getStreet())
-            );//TODO fix saving address field street (multiline)
+                trim(implode("\n", $profileAddress->getStreet()))
+            );
         }
     }
 

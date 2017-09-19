@@ -13,6 +13,8 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 interface EngineInterface
 {
+    const PAYMENT_DATA_KEY = 'profile_edit_payment_data';
+
     /**
      * Sets profile to engine model.
      *
@@ -59,4 +61,12 @@ interface EngineInterface
      * @return array
      */
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile);
+
+    /**
+     * Processes profile by request data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processProfileByRequestData($requestData);
 }

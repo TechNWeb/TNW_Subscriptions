@@ -60,6 +60,11 @@ class ReadHandler implements ExtensionInterface
         $searchCriteria = $this->criteriaBuilder->create();
 
         $addresses = $this->addressRepository->getList($searchCriteria)->getItems();
+        foreach ($addresses as $address) {
+            if ($address->getStreet() && !is_array($address->getStreet())) {
+                $address->setStreet(explode("\n", $address->getStreet()));
+            }
+        }
         $entity->setAddresses($addresses);
 
         return $entity;

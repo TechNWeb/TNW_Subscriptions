@@ -6,8 +6,12 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal;
 
+use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\DataObject;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Result\LayoutFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -15,6 +19,10 @@ use Magento\Payment\Block\Transparent\Iframe;
 use Magento\Paypal\Model\Payflow\Service\Response\Transaction;
 use Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator;
 use Magento\Paypal\Model\Payflow\Transparent;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Class Response
@@ -49,6 +57,27 @@ class Response extends \Magento\Framework\App\Action\Action
     private $transparent;
 
     /**
+     * Profile manager
+     *
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
+     * Data persistor (session)
+     *
+     * @var DataPersistorInterface
+     */
+    private $dataPersistor;
+
+    /**
+     * Encryptor
+     *
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -57,6 +86,9 @@ class Response extends \Magento\Framework\App\Action\Action
      * @param ResponseValidator $responseValidator
      * @param LayoutFactory $resultLayoutFactory
      * @param Transparent $transparent
+     * @param ProfileManager $profileManager
+     * @param DataPersistorInterface $dataPersistor
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
@@ -64,7 +96,10 @@ class Response extends \Magento\Framework\App\Action\Action
         Transaction $transaction,
         ResponseValidator $responseValidator,
         LayoutFactory $resultLayoutFactory,
-        Transparent $transparent
+        Transparent $transparent,
+        ProfileManager $profileManager,
+        DataPersistorInterface $dataPersistor,
+        EncryptorInterface $encryptor
     ) {
         parent::__construct($context);
         $this->coreRegistry = $coreRegistry;
@@ -72,6 +107,9 @@ class Response extends \Magento\Framework\App\Action\Action
         $this->responseValidator = $responseValidator;
         $this->resultLayoutFactory = $resultLayoutFactory;
         $this->transparent = $transparent;
+        $this->profileManager = $profileManager;
+        $this->dataPersistor = $dataPersistor;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -80,10 +118,24 @@ class Response extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $parameters = [];
+        if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
+            /** @var SubscriptionProfileInterface $profile */
+            $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+        }
         try {
+            /** @var DataObject $response */
             $response = $this->transaction->getResponseObject($this->getRequest()->getPostValue());
             $this->responseValidator->validate($response, $this->transparent);
-            $this->transaction->savePaymentInQuote($response);
+            if (isset($profile)) {
+                $this->dataPersistor->set(EngineInterface::PAYMENT_DATA_KEY,
+                    [
+                        SubscriptionProfileInterface::ID => $profile->getId(),
+                        SubscriptionProfileInterface::TOKEN_HASH => $this->encryptor->encrypt($response->getPnref()),
+                    ]
+                );
+            } else {
+                $this->transaction->savePaymentInQuote($response);
+            }
         } catch (LocalizedException $exception) {
             $parameters['error'] = true;
             $parameters['error_messages'] = [$exception->getMessage()];
@@ -94,7 +146,12 @@ class Response extends \Magento\Framework\App\Action\Action
         $resultLayout = $this->resultLayoutFactory->create();
         $resultLayout->addDefaultHandle();
         $resultLayout->getLayout()->getUpdate()->load(['paypal_payment_response']);
-
+        /** @var AbstractBlock $iframeBlock */
+        $iframeBlock = $resultLayout->getLayout()->getBlock('transparent_iframe');
+        $index = isset($profile)
+            ? 'tnw_subscriptionprofile_summary_payment_method_form'
+            : 'tnw_subscriptionprofile_create_payment_form';
+        $iframeBlock->setData('index', $index);
         return $resultLayout;
     }
 }

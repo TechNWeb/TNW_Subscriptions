@@ -27,10 +27,7 @@ define([
             '<% _.each(data.inputs, function(val, key){ %>' +
             '<input value="<%= val %>" name="<%= key %>" type="hidden">' +
             '<% }); %>' +
-            '</form>',
-            listens: {
-                checked: 'saveBilling'
-            }
+            '</form>'
         },
 
         /**
@@ -134,6 +131,7 @@ define([
          * @private
          */
         postPaymentToGateway: function (response) {
+            debugger;
             var $iframeSelector =  $j('[data-container="' + this.options.gateway + '-transparent-iframe"]'),
                 data,
                 tmpl,

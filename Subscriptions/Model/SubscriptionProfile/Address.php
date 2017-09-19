@@ -91,9 +91,8 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         }
         $customerAddressData = array_merge($customerAddressData, $customerAddressDataWithRegion);
 
-        //TODO fix saving address field street (multiline)
         if (isset($customerAddressData['street'])) {
-            $customerAddressData['street'] = explode('\n', $customerAddressData['street']);
+            $customerAddressData['street'] = explode("\n", $customerAddressData['street']);
         }
 
         $addressDataObject = $this->addressDataFactory->create();

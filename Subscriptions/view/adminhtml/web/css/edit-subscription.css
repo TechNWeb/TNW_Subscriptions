@@ -23,10 +23,70 @@ button.profile__edit_button:before {
 button.profile__cancel-edit_button:before{
     content: '\e632';
 }
-.fieldset-wrapper.profile__edit_block {
-    width: 48%;
-    display: inline-block;
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form,
+.tnw_subscriptionprofile_form_areas_summary_summary_payment_method_insert_form {
+    width: 49.5%;
     vertical-align: top;
+    float: right;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_information_insert_form,
+.tnw_subscriptionprofile_form_areas_summary_summary_billing_information_insert_form {
+    width: 49.5%;
+    vertical-align: top;
+    float: left;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_billing_information_insert_form {
+    clear: both;
+}
+.admin__profile_summary .admin__page-section-item,
+.admin__profile_summary .inner-block,
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper
+{
+    padding-left: 1em;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset {
+    padding: 0 0 1em 0;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset .admin__field-complex {
+    padding-left: 0;
+}
+.admin__profile_summary .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset {
+    padding-bottom: 0;
+    padding-top: 1em;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset .admin__field {
+    margin-bottom: 0;
+}
+.admin__profile_summary .admin__control-select {
+    width:100%;
+}
+.admin__profile_summary .sub-button-left {
+    margin-top: 1em;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label .admin__field-control{
+    float: left;
+    position: absolute;
+}
+.tnw_subscriptions .right {
+    text-align: right;
+}
+.admin__profile_summary .admin__field legend.admin__field-label {
+    opacity: 1;
+}
+.admin__profile_summary .sub-fieldset .fieldset-wrapper-title {
+    border: none;
+    padding: 0;
+}
+.admin__profile_summary .admin_field_without_legend > div.admin__field {
+    display: inline-block;
+    margin-top: 0;
+}
+.admin__profile_summary .payment-additional-fieldset .payment-cvv input {
+    width: 6rem;
 }
 
 .subscription-summary {

@@ -300,6 +300,20 @@ class Manager
     }
 
     /**
+     * Processes payment method data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processPaymentMethod($requestData)
+    {
+        $engine = $this->getEngineFromRequestData($requestData);
+        $this->getProfile()->setEngineCode($engine);
+        $this->getEngine()->processProfileByRequestData($requestData);
+        return $this;
+    }
+
+    /**
      * Assigns order to profile.
      *
      * @param OrderInterface $order
@@ -520,5 +534,18 @@ class Manager
         $startDate->add(new \DateInterval($expression));
 
         return $startDate->format('Y-m-d H:i:s');
+    }
+
+    private function getEngineFromRequestData($requestData)
+    {
+        $engine = null;
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        foreach ($paymentPostData as $code => $methodData) {
+            if ($methodData['method']) {
+                $engine = $code;
+                break;
+            }
+        }
+        return $engine;
     }
 }
