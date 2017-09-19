@@ -163,7 +163,7 @@
                 </item>
             </argument>
         </column>
-        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
+        <column name="grand_total">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Total</item>
