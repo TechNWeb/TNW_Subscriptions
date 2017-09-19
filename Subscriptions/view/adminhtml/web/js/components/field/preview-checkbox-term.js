@@ -9,7 +9,8 @@ define([
 
     return Abstract.extend({
         defaults: {
-            periodPreviewLabel: ''
+            periodPreviewLabel: '',
+            default: "1"
         },
 
         /**

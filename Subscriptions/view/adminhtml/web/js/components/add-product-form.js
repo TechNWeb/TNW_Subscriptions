@@ -14,7 +14,7 @@ define(
                 ajaxSave: true,
                 configurableModal: null,
                 imports: {
-                    refreshProductQty: 'index = billing_frequency:value'
+                    refreshProductQty: 'ns = ${ $.ns }, index = billing_frequency:value'
                 },
                 listens: {
                     responseStatus: 'processResponseStatus'

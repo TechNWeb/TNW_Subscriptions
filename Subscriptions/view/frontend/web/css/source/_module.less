@@ -438,13 +438,31 @@
             }
           }
 
-          .field.date .control {
-            position: relative;
+          .field.date {
+            .control {
+              position: relative;
+              width: 57%;
 
-            .ui-datepicker-trigger {
-              position: absolute;
-              top: 7px;
-              right: 0;
+              &:after {
+                font-family: 'luma-icons';
+                font-size: 20px;
+                content: '\e612';
+                right: 2em;
+                position: absolute;
+                z-index: 1;
+              }
+
+              .ui-datepicker-trigger {
+                position: absolute;
+                top: 7px;
+                right: 0;
+              }
+
+              #start_at {
+                z-index: 2;
+                position: relative;
+                background: inherit;
+              }
             }
           }
 
@@ -465,6 +483,20 @@
     #new-customer,
     #existing-customer {
       padding-bottom: 5%;
+    }
+  }
+
+  .catalog-product-view {
+    .addtocart-tabs {
+      .content-container {
+        .tab-content.subscribe-tab {
+          .field.date {
+            .control {
+              width: 67%;
+            }
+          }
+        }
+      }
     }
   }
 }

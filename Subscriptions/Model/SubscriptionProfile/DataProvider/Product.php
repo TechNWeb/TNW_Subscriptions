@@ -183,44 +183,33 @@ class Product extends AbstractDataProvider
     {
         $items = $products = [];
         $estimatedPayment = 0;
-
         $subQuotes = $this->session->getSubQuotes();
-
         $counter = 1;
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
-            $subscriptionData = null;
             $fullSubscriptionData = null;
 
             if (empty($subQuote->getAllItems())) {
                 continue;
             }
-
             /** @var Item $item */
             foreach ($subQuote->getAllItems() as $item) {
-                if (!$subscriptionData) {
-                    $subscriptionData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
-                    );
-                }
+                $nonUniqueData = $item->getBuyRequest()->getDataByPath(
+                    Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
+                );
                 if (!$fullSubscriptionData) {
                     $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
                     );
-                } else {
-                    $nonUniqueData = $item->getBuyRequest()->getDataByPath(
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
-                    );
-                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
-                        isset($nonUniqueData['price']) ? $nonUniqueData['price'] : 0;
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] = 0;
                 }
-
+                $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
+                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $item->getQty(): 0;
 
                 $imageHelper = $this->imageHelper->init(
                     $item->getProduct(),
                     'product_listing_thumbnail'
                 );
-
                 $products[] = [
                     'thumbnail_alt' => $imageHelper->getLabel(),
                     'thumbnail_src' => $imageHelper->getUrl(),
@@ -229,11 +218,8 @@ class Product extends AbstractDataProvider
                     'conf_options' => [], //TODO add here configurable options
                 ];
             }
-
             $subTotal = $subQuote->getGrandTotal();
-
             $estimatedPayment += (double)$subTotal;
-
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
@@ -243,10 +229,8 @@ class Product extends AbstractDataProvider
                 ),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
-
             $products = [];
         }
-
         $estimatedPayment = $this->formatPrice($estimatedPayment);
 
         return [
