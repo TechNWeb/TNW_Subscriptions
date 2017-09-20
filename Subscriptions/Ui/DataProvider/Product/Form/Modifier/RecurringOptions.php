@@ -679,7 +679,7 @@ class RecurringOptions extends BaseModifier
                         'label' => __('Preset Qty'),
                         'componentType' => Field::NAME,
                         'formElement' => Input::NAME,
-                        'component' => 'TNW_Subscriptions/js/grid/billing_frequency/preset_qty',
+                        'component' => 'TNW_Subscriptions/js/components/dynamic-rows/preset-qty',
                         'dataScope' => static::FIELD_PRESET_QTY,
                         'dataType' => Number::NAME,
                         'sortOrder' => $sortOrder,
