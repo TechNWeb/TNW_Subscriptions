@@ -7,29 +7,48 @@
 /* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
 ?>
 
-<?php if (!$block->isSubscribeAvailable()): ?>
-    <?php echo $block->getChildHtml('addtocart_orig') ?>
+<?php if ($block->isSubscriptionModuleActive()): ?>
+    <?php if ($block->isOnlySubscriptionAddToCart()): ?>
+        <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
+            <div class="title-container">
+                <div class="tab-title" data-role="collapsible" tabindex="0">
+                    <a href="#subscribe-tab">
+                        <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
+                    </a>
+                </div>
+            </div>
+            <div class="content-container">
+                <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
+                    <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                </div>
+            </div>
+        </div>
+    <?php elseif ($block->isOriginalAndSubscriptionAddToCart()): ?>
+        <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
+            <div class="title-container">
+                <div class="tab-title" data-role="collapsible" tabindex="0">
+                    <a href="#subscribe-tab">
+                        <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
+                    </a>
+                </div>
+                <div class="tab-title" data-role="collapsible" tabindex="1">
+                    <a href="#addtocart-tab">
+                        <?php /* @escapeNotVerified */ echo __('One Time Purchase') ?>
+                    </a>
+                </div>
+            </div>
+            <div class="content-container">
+                <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
+                    <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                </div>
+                <div class="tab-content" id="addtocart-tab" data-role="content" style="display:none">
+                    <?php echo $block->getChildHtml('addtocart_orig') ?>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
+        <?php echo $block->getChildHtml('addtocart_orig') ?>
+    <?php endif ?>
 <?php else: ?>
-    <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
-        <div class="title-container">
-            <div class="tab-title" data-role="collapsible" tabindex="0">
-                <a href="#subscribe-tab">
-                    <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
-                </a>
-            </div>
-            <div class="tab-title" data-role="collapsible" tabindex="1">
-                <a href="#addtocart-tab">
-                    <?php /* @escapeNotVerified */ echo __('One Time Purchase') ?>
-                </a>
-            </div>
-        </div>
-        <div class="content-container">
-            <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
-                <?php echo $block->getChildHtml('addtocart_subscribe') ?>
-            </div>
-            <div class="tab-content" id="addtocart-tab" data-role="content" style="display:none">
-                <?php echo $block->getChildHtml('addtocart_orig') ?>
-            </div>
-        </div>
-    </div>
+    <?php echo $block->getChildHtml('addtocart_orig') ?>
 <?php endif ?>
