@@ -350,7 +350,16 @@ class SummaryAddressForm extends AbstractDataProvider
         /** @var array $childrenData */
         $childrenData = [
             static::INFO_FIELDSET_NAME => [],
-            $this->getAddressFieldsetName() => [],
+            $this->getAddressFieldsetName() => [
+                'address_header' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'content' => $this->getAddressFieldSetLabel(),
+                        ],
+                    ],
+                ]
+            ]],
         ];
         $sortOrder = 2;
         /** @var Attribute $attribute */

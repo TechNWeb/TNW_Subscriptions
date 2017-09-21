@@ -21,9 +21,13 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 class PaymentsPro extends Base
 {
+
+    const SORT_ORDER = 20;
+
     private $paymentPro;
     private $context;
     private $paymentConfig;
@@ -236,6 +240,7 @@ class PaymentsPro extends Base
     {
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
+            'listens'=> $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
             'options' => [
@@ -245,7 +250,7 @@ class PaymentsPro extends Base
                 'orderSaveUrl' => $this->context->getEscaper()->escapeUrl($this->getOrderUrl()),
                 'cgiUrl' => $this->context->getEscaper()->escapeUrl($this->getCgiUrl()),
                 'expireYearLength' => $this->context->getEscaper()->escapeHtml($this->getMethodConfigData('cc_year_length')),
-                'formName' => Payment::DATA_SCOPE_PAYMENT_FORM
+                'formName' => $this->getPaymentFormName(),
             ]
         ];
     }
@@ -386,7 +391,8 @@ class PaymentsPro extends Base
         return $this->urlBuilder->getUrl(
             'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
             [
-                '_secure' => $this->request->isSecure()
+                '_secure' => $this->request->isSecure(),
+                SummaryInsertForm::FORM_DATA_KEY => $this->getProfileId()
             ]
         );
     }

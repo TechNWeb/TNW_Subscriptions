@@ -17,10 +17,45 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
  */
 class Base implements ModifierInterface
 {
+    /**#@+
+     * Name of payment information fieldset.
+     */
+    const PAYMENT_INFORMATION_FIELD_SET_NAME = 'payment_information';
+    const SORT_ORDER = 0;
+    /**#@-*/
+
     /**
      * @var \TNW\Subscriptions\Model\Config
      */
     private $config;
+
+    /**
+     * Payment form name
+     *
+     * @var string
+     */
+    private $paymentFormName;
+
+    /**
+     * Additional namespace
+     *
+     * @var string
+     */
+    private $additionalNamespace;
+
+    /**
+     * Listens
+     *
+     * @var string
+     */
+    private $listens;
+
+    /**
+     * Profile id
+     *
+     * @var integer
+     */
+    private $profileId;
 
     /**
      * @param \TNW\Subscriptions\Model\Config $config
@@ -29,13 +64,11 @@ class Base implements ModifierInterface
         \TNW\Subscriptions\Model\Config $config
     ) {
         $this->config = $config;
+        $this->paymentFormName = Payment::DATA_SCOPE_PAYMENT_FORM;
+        $this->listens = [
+            'checked' => 'saveBilling'
+        ];
     }
-
-    /**#@+
-     * Name of payment information fieldset.
-     */
-    const PAYMENT_INFORMATION_FIELD_SET_NAME = 'payment_information';
-    /**#@-*/
 
     /**
      * {@inheritdoc}
@@ -91,6 +124,26 @@ class Base implements ModifierInterface
     }
 
     /**
+     * @return array
+     */
+    protected function getListens()
+    {
+        return $this->listens;
+    }
+
+    /**
+     * Sets listens
+     *
+     * @param $listens
+     * @return $this
+     */
+    public function setListens($listens)
+    {
+        $this->listens = $listens;
+        return $this;
+    }
+
+    /**
      * Returns metadata for payment method fieldset.
      *
      * @return array
@@ -114,7 +167,8 @@ class Base implements ModifierInterface
                                         'opened' => true,
                                         'dataScope' => $this->getPaymentCode(),
                                         'componentType' => Fieldset::NAME,
-                                        'additionalClasses' => 'fieldset-wrapper-title'
+                                        'additionalClasses' => 'fieldset-wrapper-title',
+                                        'sortOrder' => $this::SORT_ORDER,
                                     ],
                                     $additionalConfig
                                 ),
@@ -213,11 +267,66 @@ class Base implements ModifierInterface
      */
     protected function getFieldsetName()
     {
-        $fieldsetName = Payment::DATA_SCOPE_PAYMENT_FORM .
-            '.' . Payment::DATA_SCOPE_PAYMENT_FORM .
+        $fieldsetName = $this->getPaymentFormName() .
+            '.' . $this->getPaymentFormName() .
+            ($this->additionalNamespace ? '.' . $this->additionalNamespace : '') .
             '.' . static::PAYMENT_INFORMATION_FIELD_SET_NAME
             . '.' . $this->getPaymentCode();
 
         return $fieldsetName;
+    }
+
+    /**
+     * Sets payment form name
+     *
+     * @return string
+     */
+    public function setPaymentFormName($paymentFormName)
+    {
+        $this->paymentFormName = $paymentFormName;
+        return $this;
+    }
+
+    /**
+     * Returns payment form name
+     *
+     * @return string
+     */
+    public function getPaymentFormName()
+    {
+        return $this->paymentFormName;
+    }
+
+    /**
+     * Sets additional namespace
+     *
+     * @return string
+     */
+    public function setAdditionalNamespace($additionalNamespace)
+    {
+        $this->additionalNamespace = $additionalNamespace;
+        return $this;
+    }
+
+    /**
+     * Returns profile id
+     *
+     * @return int
+     */
+    protected function getProfileId()
+    {
+        return $this->profileId;
+    }
+
+    /**
+     * Sets profile id
+     *
+     * @param $profileId
+     * @return $this
+     */
+    public function setProfileId($profileId)
+    {
+        $this->profileId = $profileId;
+        return $this;
     }
 }

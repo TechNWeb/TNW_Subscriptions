@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Registry;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote;
@@ -62,25 +63,35 @@ class Base implements EngineInterface
     private $registry;
 
     /**
+     * Data persistor
+     *
+     * @var DataPersistorInterface
+     */
+    private $persistor;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param MessageHistoryLogger $historyLogger
      * @param Registry $registry
+     * @param DataPersistorInterface $persistor
      */
     public function __construct(
         Config $config,
         Context $context,
         CartManagementInterface $cartManagement,
         MessageHistoryLogger $historyLogger,
-        Registry $registry
+        Registry $registry,
+        DataPersistorInterface $persistor
     ) {
         $this->config = $config;
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->historyLogger = $historyLogger;
         $this->registry = $registry;
+        $this->persistor = $persistor;
     }
 
     /**
@@ -111,6 +122,16 @@ class Base implements EngineInterface
     public function getCartManagement()
     {
         return $this->cartManagement;
+    }
+
+    /**
+     * Returns data persistor
+     *
+     * @return DataPersistorInterface
+     */
+    protected function getPersistor()
+    {
+        return $this->persistor;
     }
 
     /**
@@ -176,6 +197,14 @@ class Base implements EngineInterface
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function processProfileByRequestData($requestData)
+    {
+        return $this;
     }
 
     /**

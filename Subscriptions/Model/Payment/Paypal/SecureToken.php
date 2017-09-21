@@ -12,6 +12,8 @@ use Magento\Framework\DataObject;
 use Magento\Framework\UrlInterface;
 use Magento\Paypal\Model\Payflow\Transparent;
 use Magento\Paypal\Model\Payflowpro;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Class SecureToken
@@ -56,7 +58,7 @@ class SecureToken
      * @return DataObject
      * @throws \Exception
      */
-    public function requestToken(Quote $quote)
+    public function requestToken(DataObject $object)
     {
         $request = $this->transparent->buildBasicRequest();
 
@@ -65,14 +67,23 @@ class SecureToken
         $request->setAmt(0);
         $request->setCreatesecuretoken('Y');
         $request->setSecuretokenid($this->mathRandom->getUniqueHash());
-        $request->setReturnurl($this->url->getUrl('tnw_subscriptions/subscriptionprofile_create_paypal/response'));
-        $request->setErrorurl($this->url->getUrl('tnw_subscriptions/subscriptionprofile_create_paypal/response'));
+        $routePath = 'tnw_subscriptions/subscriptionprofile_create_paypal/response';
+        $url = ($object instanceof SubscriptionProfileInterface)
+            ? $this->url->getUrl(
+                $routePath,
+                [
+                    SummaryInsertForm::FORM_DATA_KEY => $object->getId()
+                ]
+            )
+            : $this->url->getUrl($routePath);
+        $request->setReturnurl($url);
+        $request->setErrorurl($url);
         //TODO WTF? Where is this controller?
         //$request->setCancelurl($this->url->getUrl('paypal/transparent/cancel'));
         $request->setDisablereceipt('TRUE');
         $request->setSilenttran('TRUE');
 
-        $this->transparent->fillCustomerContacts($quote, $request);
+        $this->transparent->fillCustomerContacts($object, $request);
 
         $result = $this->transparent->postRequest($request, $this->transparent->getConfig());
 

@@ -170,9 +170,11 @@ class Manager
             }
 
             $profileAddress->setCustomerAddressId($customerAddressId);
-            $profileAddress->setStreet(
-                implode('\n', $profileAddress->getStreet())
-            );//TODO fix saving address field street (multiline)
+            if (is_array($profileAddress->getStreet())) {
+                $profileAddress->setStreet(
+                    trim(implode("\n", $profileAddress->getStreet()))
+                );
+            }
         }
     }
 
