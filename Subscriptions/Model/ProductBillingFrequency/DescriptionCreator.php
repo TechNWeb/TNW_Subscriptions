@@ -114,17 +114,22 @@ class DescriptionCreator
 
         $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
-
-        $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
+        $shipmentsPart = ' ';
+        if (!$subscriptionData[CreateProfile::UNIQUE]['term']){
+            $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
+            $shipmentsPart = sprintf(
+                __('Total of %s %s. '),
+                $subscriptionPeriod,
+                $shipmentLabel
+            );
+        }
         $shippingInformation = sprintf(
-            __('Total of %s %s. Products will be shipped every %s starting %s.'),
-            $subscriptionPeriod,
-            $shipmentLabel,
+            __('Products will be shipped every %s starting %s.'),
             $frequencyUnit,
             $startDate
         );
 
-        return $trialPart . $noTrialPart . $priceWithUnit . $shippingInformation;
+        return $trialPart . $noTrialPart . $priceWithUnit . $shipmentsPart . $shippingInformation;
     }
 
     /**

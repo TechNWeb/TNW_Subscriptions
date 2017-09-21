@@ -2,8 +2,6 @@
 
 namespace TNW\Subscriptions\Model\Queue;
 
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Quote\Api\CartRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -64,14 +62,6 @@ class Manager
     private $relationManager;
 
     /**
-     * Search criteria builder.
-     *
-     * @var SearchCriteriaBuilder
-     */
-    private $criteriaBuilder;
-
-
-    /**
      * Repository fore saving/retrieving quotes.
      *
      * @var CartRepositoryInterface
@@ -92,7 +82,6 @@ class Manager
      * @param Config $config
      * @param ProfileManager $profileManager
      * @param RelationManager $relationManager
-     * @param SearchCriteriaBuilder $criteriaBuilder
      * @param CartRepositoryInterface $cartRepository
      * @param SubscriptionProfileRepository $profileRepository
      */
@@ -102,7 +91,6 @@ class Manager
         Config $config,
         ProfileManager $profileManager,
         RelationManager $relationManager,
-        SearchCriteriaBuilder $criteriaBuilder,
         CartRepositoryInterface $cartRepository,
         SubscriptionProfileRepository $profileRepository
     ) {
@@ -111,7 +99,6 @@ class Manager
         $this->config = $config;
         $this->profileManager = $profileManager;
         $this->relationManager = $relationManager;
-        $this->criteriaBuilder = $criteriaBuilder;
         $this->cartRepository = $cartRepository;
         $this->profileRepository = $profileRepository;
     }
@@ -152,7 +139,9 @@ class Manager
             'profile.status NOT IN (?)',
             [
                 ProfileStatus::STATUS_CANCELED,
-                ProfileStatus::STATUS_HOLDED
+                ProfileStatus::STATUS_HOLDED,
+                ProfileStatus::STATUS_SUSPENDED,
+                ProfileStatus::STATUS_COMPLETE
             ]
         )->order(
             'relation.scheduled_at ASC'
@@ -170,82 +159,26 @@ class Manager
     }
 
     /**
-     * Returns list of profile ids that should be transferred to status "Suspended".
-     *
-     * @return array
-     */
-    public function getSuspendedProfileIds()
-    {
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getSelect()
-            ->reset(\Zend_Db_Select::COLUMNS)
-            ->join(
-                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-                'main_table.profile_order_id = relation.id',
-                [SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]
-            );
-        $collection->getSelect()
-            ->where(
-                'relation.scheduled_at <= ?', $this->getSuspendDate()
-            )->orWhere(
-                'main_table.attempt_count >= ?', $this->config->getAttemptCount()
-            );
-
-        return $collection->getConnection()->fetchAll(
-            $collection->getSelect()
-        );
-    }
-
-    /**
-     * Returns list of profile ids that should be transferred to status "Canceled".
-     *
-     * @return array
-     */
-    public function getCanceledProfileIds()
-    {
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getSelect()
-            ->reset()
-            ->from(
-                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-                []
-            )->join(
-                ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
-                'relation.subscription_profile_id = profile.entity_id',
-                [SubscriptionProfile::ID, SubscriptionProfile::TOTAL_BILLING_CYCLES]
-            )->where(
-                'profile.term = ?', 0
-            )->where(
-                'relation.magento_order_id IS NOT NULL'
-            )->group(
-                ['relation.subscription_profile_id']
-            )->having(
-                'COUNT(relation.subscription_profile_id) = profile.total_billing_cycles'
-            );
-
-        return $collection->getConnection()->fetchCol(
-            $collection->getSelect()
-        );
-    }
-
-    /**
      * Inserts into queue new items.
      *
      * @param array $relationIds - ids from "tnw_subscriptions_subscription_profile_order" table
+     * @param null|bool $makeProcessed
+     * @return array
      */
     public function insertItems(
-        $relationIds
+        $relationIds,
+        $makeProcessed = null
     ) {
         if (!is_array($relationIds)) {
             $relationIds = [$relationIds];
         }
         $fields = [];
+        $itemIds = [];
+        $status = $makeProcessed ? QueueStatus::QUEUE_STATUS_RUNNING : QueueStatus::QUEUE_STATUS_PENDING;
         foreach ($relationIds as $relationId) {
             $fields[] = [
                 Queue::PROFILE_ORDER_ID => $relationId,
-                Queue::STATUS => QueueStatus::QUEUE_STATUS_PENDING,
+                Queue::STATUS => $status,
                 Queue::MESSAGE => '',
                 Queue::CREATED_AT => $this->date->gmtDate(),
                 Queue::UPDATED_AT => $this->date->gmtDate()
@@ -259,7 +192,13 @@ class Manager
                 $fields,
                 [Queue::MESSAGE, Queue::CREATED_AT, Queue::UPDATED_AT]
             );
+            $itemIds = $collection->addFieldToFilter(
+                Queue::PROFILE_ORDER_ID,
+                ['in' => $relationIds]
+            )->getAllIds();
         }
+
+        return $itemIds;
     }
 
     /**
@@ -370,20 +309,6 @@ class Manager
     }
 
     /**
-     * Returns formatted profile suspend date.
-     *
-     * @return null|string
-     */
-    private function getSuspendDate()
-    {
-        $date = new \DateTime();
-        $condition = 'P' . $this->config->getGracePeriod() . 'D';
-        $date->sub(new \DateInterval($condition));
-        return $date->format(self::DATETIME_FORMAT);
-    }
-
-
-    /**
      * Processes queue item and add order to profile relation.
      *
      * @param Queue $item
@@ -397,33 +322,5 @@ class Manager
         $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
             ->setMagentoOrderId($order->getId());
         $this->relationManager->saveRelation($relation);
-    }
-
-    /**
-     * Updates status in profiles ("Suspended" and "Canceled").
-     */
-    public function updateProfilesStatuses()
-    {
-        $suspendedIds = $this->getSuspendedProfileIds();
-        $canceledIds = $this->getCanceledProfileIds();
-        $this->criteriaBuilder->addFilter(
-            SubscriptionProfile::ID,
-            array_merge($suspendedIds, $canceledIds),
-            'in'
-        );
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteria = $this->criteriaBuilder->create();
-        $profiles = $this->profileRepository->getList($searchCriteria)->getItems();
-        /** @var SubscriptionProfile $profile */
-        foreach ($profiles as $profile) {
-            $this->profileManager->setProfile($profile);
-            //update status in each profile
-            if (in_array($profile->getId(), $suspendedIds)) {
-                $this->profileManager->setSuspendedStatus();
-            } elseif (in_array($profile->getId(), $canceledIds)) {
-                $this->profileManager->setCanceledStatus();
-            }
-            $this->profileManager->saveProfile();
-        }
     }
 }

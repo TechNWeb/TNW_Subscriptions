@@ -28,7 +28,7 @@ class Grid extends DataProvider
 
         if ($field === 'label') {
             $filter->setValue(
-                str_replace(
+                str_ireplace(
                     SubscriptionProfileInterface::LABEL_PREFIX,
                     '',
                     $filter->getValue()

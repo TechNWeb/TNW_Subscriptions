@@ -91,6 +91,11 @@ class Manager
     private $request;
 
     /**
+     * @var SubscriptionProfileFactory
+     */
+    private $subscriptionProfileFactory;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -289,6 +294,24 @@ class Manager
     }
 
     /**
+     * Sets to profile status "Complete".
+     */
+    public function setCompleteStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_COMPLETE);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Past Due".
+     */
+    public function setPastDueStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
+        return $this;
+    }
+
+    /**
      * Engine profile processing.
      *
      * @param Quote $quote
@@ -302,12 +325,28 @@ class Manager
     /**
      * Assigns order to profile.
      *
+     * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $relation
      * @param OrderInterface $order
-     * @param SubscriptionProfileInterface $profile
-     * @param null $date
+     * @return null|\TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
      */
     public function assignOrderToProfile(
-        OrderInterface $order,
+        \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $relation,
+        OrderInterface $order
+    ) {
+        $relation->setMagentoOrderId($order->getId());
+        return $this->orderRelationManager->saveRelation($relation);
+    }
+
+    /**
+     * Assigns quote to profile.
+     *
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     * @param null|string $date
+     * @return null|\TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     */
+    public function assignQuoteToProfile(
+        Quote $quote,
         SubscriptionProfileInterface $profile,
         $date = null
     ) {
@@ -319,12 +358,9 @@ class Manager
         $relation = $this->orderRelationManager
             ->getNewProfileOrderReletion()
             ->setSubscriptionProfileId($profile->getId())
-            ->setMagentoOrderId($order->getId())
-            ->setMagentoQuoteId($order->getQuoteId())
-            ->setScheduledAt(
-                $date
-            );
-        $this->orderRelationManager->saveRelation($relation);
+            ->setMagentoQuoteId($quote->getId())
+            ->setScheduledAt($date);
+        return $this->orderRelationManager->saveRelation($relation);
     }
 
     /**
@@ -356,7 +392,7 @@ class Manager
                 ->setIsVirtual($quote->getIsVirtual())
                 ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
                 ->setTerm($request['term'])
-                ->setTotalBillingCycles(!$startDate ? $request['period'] : 0)
+                ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
                 ->setStartDate($startDate)
                 ->setBillingFrequencyId($frequency->getId())
                 ->setFrequency($frequency->getFrequency())

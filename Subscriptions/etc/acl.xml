@@ -6,8 +6,10 @@
             <resource id="Magento_Backend::admin">
                 <resource id="TNW_Subscriptions::config_general" title="TNW Subscriptions Config General"
                           sortOrder="100"/>
-                <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product"
+                <resource id="TNW_Subscriptions::config_profile_options" title="TNW Subscriptions Config Profile Options"
                           sortOrder="200"/>
+                <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product"
+                          sortOrder="300"/>
                 <resource id="TNW_Subscriptions::config_payment" title="TNW Subscriptions Payment Product"
                           sortOrder="500"/>
                 <resource id="TNW_Subscriptions::BillingFrequency" sortOrder="10" title="BillingFrequency">

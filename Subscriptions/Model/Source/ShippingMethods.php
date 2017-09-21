@@ -6,12 +6,12 @@
 
 namespace TNW\Subscriptions\Model\Source;
 
-use Magento\Quote\Model\Quote as ModelQuote;
-use Magento\Quote\Model\Quote\Item;
-use TNW\Subscriptions\Model\Context;
-use Magento\Quote\Model\Quote\Address\Rate;
-use Magento\Tax\Helper\Data;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
+use Magento\Quote\Model\Quote\Address\Rate;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Tax\Helper\Data;
+use TNW\Subscriptions\Model\Context;
 
 /**
  * Class ShippingMethods
@@ -37,6 +37,16 @@ class ShippingMethods
      * @var Data
      */
     private $taxHelper;
+
+    /**
+     * Available shipping codes when shipping methods don't cost depends on the products.
+     *
+     * @var array
+     */
+    private $dontCostDependedMethodsCodes = [
+        'flatrate',
+        'freeshipping',
+    ];
 
     /**
      * ShippingMethods constructor.
@@ -222,4 +232,35 @@ class ShippingMethods
         }
         return $result;
     }
+
+    /**
+     * Return list of shipping codes when shipping methods don't cost depends on the products.
+     *
+     * @return array
+     */
+    public function getDontCostDependedMethodsCodes()
+    {
+        return $this->dontCostDependedMethodsCodes;
+    }
+
+    /**
+     * Return attention message.
+     *
+     * @return string
+     */
+    public function getShippingAttentionMessage()
+    {
+        return __('the shipping fee is subject to change for each shipment');
+    }
+
+    /**
+     * Return shipping method code.
+     *
+     * @return string
+     */
+    public function getCurrentShippingMethod()
+    {
+        return $this->getQuote()->getShippingAddress()->getShippingMethod();
+    }
+
 }

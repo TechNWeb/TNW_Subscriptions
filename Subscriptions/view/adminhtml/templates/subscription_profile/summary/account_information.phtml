@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation $block */
+?>
+<div class="admin__profile-summary-account-information">
+    <div class="admin__fieldset">
+        <div class="subscription-summary">
+            <table class="admin__table-secondary data-table">
+                <tbody>
+                <tr class="col-0">
+                    <td class="label"><?php echo __("Status") ?></td>
+                    <td><span class="text"><?php echo $block->getStatus() ?></span></td>
+                </tr>
+                <tr class="col-1">
+                    <td class="label"><?php echo __('Created On') ?></td>
+                    <td><span class="date"><?php echo $block->getCreatedOn() ?></span></td>
+                </tr>
+                <tr class="col-2">
+                    <td class="label"><?php echo __('Last Successful Order') ?></td>
+                    <td><span class="date"><?php echo $block->getLastSuccessfulOrder() ?></span></td>
+                </tr>
+                <tr class="col-3">
+                    <td class="label"><?php echo __('Trial Ends On') ?></td>
+                    <td><span class="date"><?php echo $block->getTrialEndsOn() ?></span></td>
+                </tr>
+                <tr class="col-4">
+                    <td class="label"><?php echo __('Subscription Ends On') ?></td>
+                    <td><span class="date"><?php echo $block->getSubscriptionEndsOn() ?></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="summary-account-information">
+            <table class="admin__table-secondary data-table">
+                <tbody>
+                <tr class="col-0">
+                    <td class="label"><?php echo __("Customer Name") ?></td>
+                    <td><span class="text"><?php echo $block->getCustomerName() ?></span></td>
+                </tr>
+                <tr class="col-1">
+                    <td class="label"><?php echo __('Email') ?></td>
+                    <td><span class="text">
+                            <a href="mailto:<?php echo $block->getEmail() ?>"><?php echo $block->getEmail() ?></a>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="col-2">
+                    <td class="label"><?php echo __('Customer Group') ?></td>
+                    <td><span class="text"><?php echo $block->getCustomerGroup() ?></span></td>
+                </tr>
+                <tr class="col-3">
+                    <td class="label"><?php echo __('Currency') ?></td>
+                    <td><span class="text"><?php echo $block->getCurrency() ?></span></td>
+                </tr>
+                <tr class="col-4">
+                    <td class="label"><?php echo __('Website') ?></td>
+                    <td><span class="text"><?php echo $block->getWebsite() ?></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

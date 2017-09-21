@@ -166,6 +166,29 @@
   font-style: italic;
 }
 
+.sub-data-grid .subscription-shipping-attention{
+  margin-top: 1rem;
+}
+
+.sub-data-grid .subscription-shipping-attention::before{
+  color: #eb5202;
+  content: '\e623';
+  background: none;
+  border: 0;
+  font-family: 'Admin Icons';
+  font-size: 1.9rem;
+  font-style: normal;
+  font-weight: 400;
+  height: auto;
+  left: 1.9rem;
+  line-height: inherit;
+  speak: none;
+  text-shadow: none;
+  width: auto;
+  float: left;
+  margin-right: 5px;
+}
+
 .sub-data-grid .sub-product-frequency-description{
   padding-top: 1rem;
 }
@@ -189,6 +212,7 @@
 
 .data-total-container{
   background: #e4e4e4;
+  overflow: auto;
 }
 
 #anchor-content .admin__control-label-up label{
@@ -611,22 +635,39 @@ button.action-editor.active:before{
 
 .subscription-item-form .description-fieldset .middle-container{
   display: inline-block;
-  width: calc( (100%) * .8 - 2rem);
 }
 
 .subscription-item-form .description-fieldset .left-container{
   display: inline-block;
-  width: calc( (100%) * .19);
+  width: 240px;
   text-align: center;
   margin-right: 2rem;
 }
 
 .subscription-item-form .description-fieldset .left-container .sub-product-image{
   margin-bottom: 0;
+  width: 240px;
+  margin-left: 0px;
 }
 
 .subscription-item-form .description-fieldset .left-container .sub-product-image .admin__field-control{
   width: 100%;
   margin-left: 0;
   padding-left: 30px;
+  padding-bottom: 100%;
+}
+.subscription-item-form .description-fieldset .left-container .sub-product-image img{
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.admin__field-control .field-qty .admin__field-label span {
+  margin-left: 1rem;
+}
+.admin__field-control .field-qty .admin__field-label span:after {
+  left: 0;
+  margin-left: 0px;
 }
