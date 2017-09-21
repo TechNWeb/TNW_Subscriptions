@@ -178,7 +178,7 @@ class AccountInformation extends Template
                 break;
             case 1:
                 if (!empty($lastOrderData)) {
-                    $result = self::UNTIL_CANCELED;
+                    $result = __(self::UNTIL_CANCELED);
                 }
                 break;
             default:
