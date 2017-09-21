@@ -23,30 +23,6 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
 class Total extends Column
 {
     /**
-     * @var SubscriptionProfile
-     */
-    private $subscriptionProfileResource;
-    
-    /**
-     * @var SubscriptionProfileOrder
-     */
-    private $subscriptionProfileOrderResource;
-
-    /**
-     * Flat sales order resource
-     *
-     * @var OrderResource
-     */
-    private $orderResource;
-
-    /**
-     * Last order totals for profiles
-     *
-     * @var array
-     */
-    private $profileGrandTotals;
-
-    /**
      * Convert price value helper
      *
      * @var PriceCurrencyInterface
@@ -58,9 +34,6 @@ class Total extends Column
      *
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param SubscriptionProfile $subscriptionProfileResource
-     * @param SubscriptionProfileOrder $subscriptionProfileOrderResource
-     * @param OrderResource $orderResource
      * @param PriceCurrencyInterface $priceFormatter
      * @param array $components
      * @param array $data
@@ -68,16 +41,10 @@ class Total extends Column
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        SubscriptionProfile $subscriptionProfileResource,
-        SubscriptionProfileOrder $subscriptionProfileOrderResource,
-        OrderResource $orderResource,
         PriceCurrencyInterface $priceFormatter,
         array $components = [],
         array $data = []
     ) {
-        $this->subscriptionProfileResource = $subscriptionProfileResource;
-        $this->subscriptionProfileOrderResource = $subscriptionProfileOrderResource;
-        $this->orderResource = $orderResource;
         $this->priceFormatter = $priceFormatter;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
@@ -91,10 +58,8 @@ class Total extends Column
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
-            $totals = $this->getProfileGrandTotals($dataSource['data']['items']);
             foreach ($dataSource['data']['items'] as & $item) {
-                $profileId = $item[SubscriptionProfileInterface::ID];
-                $total = isset($totals[$profileId]) ? $totals[$profileId] : null;
+                $total = isset($item['grand_total']) ? $item['grand_total'] : null;
                 
                 if ($total) {
                     $currencyCode = isset($item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE]) ?
@@ -113,55 +78,5 @@ class Total extends Column
         }
 
         return $dataSource;
-    }
-
-    /**
-     * Retrieve grand total values for subscription profiles
-     *
-     * @param array $dataSourceItems
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function getProfileGrandTotals($dataSourceItems)
-    {
-        if ($this->profileGrandTotals === null) {
-            $this->profileGrandTotals = [];
-
-            $profileIdField = SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID;
-            $innerOrderSelect = $this->subscriptionProfileOrderResource->getConnection()->select()
-                ->from(
-                    ['profile_order_2' => $this->subscriptionProfileOrderResource->getMainTable()],
-                    ['max(profile_order_2.' . SubscriptionProfileOrderInterface::SCHEDULED_AT . ')']
-                )
-                ->where("profile_order_2.{$profileIdField}= profile." . SubscriptionProfileInterface::ID)
-                ->where('profile_order_2.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NOT NULL');
-
-            $profileIds = array_column($dataSourceItems, SubscriptionProfileInterface::ID);
-            $select = $this->subscriptionProfileOrderResource->getConnection()->select()
-                ->from(
-                    ['profile' => $this->subscriptionProfileResource->getEntityTable()],
-                    [SubscriptionProfileInterface::ID]
-                )
-                ->join(
-                    ['profile_order' => $this->subscriptionProfileOrderResource->getMainTable()],
-                    'profile.' . SubscriptionProfileInterface::ID . ' = profile_order.' . $profileIdField
-                        . ' AND profile_order.' . SubscriptionProfileOrderInterface::SCHEDULED_AT
-                        . ' IN (' . $innerOrderSelect . ')',
-                    []
-                )
-                ->join(
-                    ['mage_order' => $this->orderResource->getMainTable()],
-                    "profile_order." . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID .
-                        " = mage_order." . OrderInterface::ENTITY_ID,
-                    [OrderInterface::GRAND_TOTAL]
-                )
-                ->where('profile.' . SubscriptionProfileInterface::ID . ' IN (?)', $profileIds);
-
-            foreach ($this->subscriptionProfileOrderResource->getConnection()->fetchAll($select) as $row) {
-                $this->profileGrandTotals[$row[SubscriptionProfileInterface::ID]] = $row[OrderInterface::GRAND_TOTAL];
-            }
-        }
-
-        return $this->profileGrandTotals;
     }
 }
