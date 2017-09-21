@@ -46,8 +46,7 @@ define([
             dndConfig: {
                 component: 'TNW_Subscriptions/js/components/dynamic-rows/dnd'
             },
-            periodLabels: {},
-            maxBillingFrequency: ''
+            billingFrequenciesCount: ''
         },
 
         /** @inheritdoc */
@@ -158,9 +157,9 @@ define([
          * @return {void}
          */
         checkAddingBillingFrequency: function (rowIndex) {
-            var button = registry.get('index = button_add, name = product_form.product_form.subscription-options.container_header.button_add');
+            var button = registry.get('name = product_form.product_form.subscription-options.container_header.button_add');
             button.set('disabled', false);
-            if (rowIndex === undefined && this._elems.length == this.maxBillingFrequency) {
+            if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
                 button.set('disabled', true);
             }
         }

@@ -296,7 +296,7 @@ class RecurringOptions extends BaseModifier
                         'dataProvider' => static::RECURRING_OPTIONS_LISTING,
                         'imports' => ['insertData' => '${ $.provider }:${ $.dataProvider }'],
                         'periodLabels' => $billingFrequenciesData['periodLabels'],
-                        'maxBillingFrequency' => count($billingFrequenciesData['periodLabels']),
+                        'billingFrequenciesCount' => count($billingFrequenciesData['periodLabels']),
                     ],
                 ],
             ],
