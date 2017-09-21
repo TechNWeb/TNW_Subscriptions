@@ -125,7 +125,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      *
      * @return bool
      */
-    public function isSubscriptionModuleActive()
+    public function isSubscribeAvailable()
     {
         return $this->config->isSubscriptionsActiveCurrent();
     }
@@ -135,9 +135,9 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      * 
      * @return bool
      */
-    public function isOnlySubscriptionAddToCart()
+    public function IsOnlySubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE) ? true : false;
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE);
     }
 
     /**
@@ -145,10 +145,9 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      *
      * @return bool
      */
-    public function isOriginalAndSubscriptionAddToCart()
+    public function IsOneTimeAndSubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
-            ? true : false;
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE);
     }
 
     /**

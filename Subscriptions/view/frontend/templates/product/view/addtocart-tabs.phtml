@@ -7,8 +7,8 @@
 /* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
 ?>
 
-<?php if ($block->isSubscriptionModuleActive()): ?>
-    <?php if ($block->isOnlySubscriptionAddToCart()): ?>
+<?php if ($block->isSubscribeAvailable()): ?>
+    <?php if ($block->IsOnlySubscribePurchase()): ?>
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
             <div class="title-container">
                 <div class="tab-title" data-role="collapsible" tabindex="0">
@@ -23,7 +23,7 @@
                 </div>
             </div>
         </div>
-    <?php elseif ($block->isOriginalAndSubscriptionAddToCart()): ?>
+    <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
             <div class="title-container">
                 <div class="tab-title" data-role="collapsible" tabindex="0">
