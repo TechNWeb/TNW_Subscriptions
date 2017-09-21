@@ -73,9 +73,6 @@
                         <item name="displayAsLink" xsi:type="boolean">false</item>
                         <item name="sortOrder" xsi:type="number">0</item>
                         <item name="additionalClasses" xsi:type="string">profile__edit_button</item>
-                        <item name="imports" xsi:type="array">
-                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = shipping_method:preview</item>
-                        </item>
                         <item name="actions" xsi:type="array">
                             <item name="0" xsi:type="array">
                                 <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_method</item>
@@ -136,18 +133,19 @@
                     </item>
                 </item>
             </argument>
-            <field name="shipping_methods_list">
+            <field name="shipping_method_id">
                 <argument name="data" xsi:type="array">
-                    <item name="options" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</item>
+                    <item name="multiple" xsi:type="boolean">false</item>
                     <item name="config" xsi:type="array">
+                        <item name="additionalClasses" xsi:type="string">shipping-methods-fieldset</item>
                         <item name="dataType" xsi:type="string">text</item>
-                        <item name="label" xsi:type="boolean">false</item>
-                        <item name="formElement" xsi:type="string">select</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
-                        <item name="dataScope" xsi:type="string">customer_shipping_address_id</item>
-                        <item name="additionalClasses" xsi:type="string">wide-select</item>
-                        <item name="component" xsi:type="string">Magento_Ui/js/form/element/checkbox-set</item>
-                        <item name="sortOrder" xsi:type="number">1</item>
+                        <item name="formElement" xsi:type="string">radioset</item>
+                        <item name="template" xsi:type="string">TNW_Subscriptions/form/element/template/checkbox-set-with-tooltip</item>
+                        <item name="dataScope" xsi:type="string">shipping_method_id</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
                     </item>
                 </argument>
             </field>

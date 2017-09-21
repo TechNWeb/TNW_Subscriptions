@@ -7,11 +7,13 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
+use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Message;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\MissedPayments;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\NextPayment;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Status;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
@@ -71,19 +73,35 @@ class Overview extends Template
     private $profileOrderCollection;
 
     /**
+     * Quote
+     *
+     * @var Quote
+     */
+    private $nextQuote;
+
+    /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param ProfileOrderCollection $profileOrderCollection,
+     * @param ProfileOrderCollection $profileOrderCollection ,
+     * @param ProfileManager $profileManager
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         ProfileOrderCollection $profileOrderCollection,
+        ProfileManager $profileManager,
         array $data = []
     ) {
         $this->registry = $registry;
         $this->profileOrderCollection = $profileOrderCollection;
+        $this->profileManager = $profileManager;
+        $this->profileManager->setProfile($this->getSubscriptionProfile());
         parent::__construct($context, $data);
     }
 
@@ -102,24 +120,35 @@ class Overview extends Template
      *
      * @return SubscriptionProfileOrder|false
      */
-    public function getNextSubscriptionProfileOrder()
+    public function getNextProfileRelation()
     {
         if ($this->nextSubscriptionProfileOrder === null) {
             $profile = $this->getSubscriptionProfile();
             if (!$profile || !$profile->getId()) {
                 $this->nextSubscriptionProfileOrder = false;
             } else {
-                $this->profileOrderCollection
-                    ->addFieldToFilter('subscription_profile_id', $profile->getId())
-                    ->addFieldToFilter('magento_quote_id', ['notnull' => true])
-                    ->addFieldToFilter('magento_order_id', ['null' => true])
-                    ->addOrder('scheduled_at', ProfileOrderCollection::SORT_ORDER_ASC)
-                    ->setPageSize(1);
-                $this->nextSubscriptionProfileOrder = $this->profileOrderCollection->getFirstItem();
+                $this->nextSubscriptionProfileOrder = $this->profileManager->getNextProfileRelation();
             }
         }
-
         return $this->nextSubscriptionProfileOrder;
+    }
+
+    /**
+     * Retrieve next Subscription profile order
+     *
+     * @return Quote|false
+     */
+    public function getNextQuote()
+    {
+        if ($this->nextQuote === null) {
+            $profile = $this->getSubscriptionProfile();
+            if (!$profile || !$profile->getId()) {
+                $this->nextQuote = false;
+            } else {
+                $this->nextQuote = $this->profileManager->getNextQuote();
+            }
+        }
+        return $this->nextQuote;
     }
 
     /**
@@ -131,7 +160,8 @@ class Overview extends Template
     protected function initChildBlock(Template $block)
     {
         $block->setData('subscription_profile', $this->getSubscriptionProfile());
-        $block->setData('next_subscription_profile_order', $this->getNextSubscriptionProfileOrder());
+        $block->setData('next_profile_relation', $this->getNextProfileRelation());
+        $block->setData('next_quote', $this->getNextQuote());
         return $block;
     }
 

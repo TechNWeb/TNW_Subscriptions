@@ -11,7 +11,6 @@ define(
         return Component.extend({
 
             beforeSubmit: function () {
-                debugger;
                 var fieldset;
 
                 this.validate();

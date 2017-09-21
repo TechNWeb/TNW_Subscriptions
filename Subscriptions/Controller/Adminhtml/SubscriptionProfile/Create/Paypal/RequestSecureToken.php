@@ -51,6 +51,7 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
      * @var Transparent
      */
     private $transparent;
+
     /**
      * @var ProfileManager
      */
@@ -84,7 +85,9 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
     }
 
-
+    /**
+     * @return $this|Json
+     */
     public function execute()
     {
         if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {

@@ -20,6 +20,8 @@ use Magento\Paypal\Model\Payflow\Service\Response\Transaction;
 use Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator;
 use Magento\Paypal\Model\Payflow\Transparent;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -149,8 +151,8 @@ class Response extends \Magento\Framework\App\Action\Action
         /** @var AbstractBlock $iframeBlock */
         $iframeBlock = $resultLayout->getLayout()->getBlock('transparent_iframe');
         $index = isset($profile)
-            ? 'tnw_subscriptionprofile_summary_payment_method_form'
-            : 'tnw_subscriptionprofile_create_payment_form';
+            ? SummaryPaymentMethodForm::FORM_NAME
+            : Payment::DATA_SCOPE_PAYMENT_FORM;
         $iframeBlock->setData('index', $index);
         return $resultLayout;
     }

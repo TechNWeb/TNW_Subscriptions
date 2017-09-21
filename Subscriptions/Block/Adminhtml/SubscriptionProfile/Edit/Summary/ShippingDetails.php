@@ -61,7 +61,7 @@ class ShippingDetails extends Template
     /**
      * Return subscription profile from registry
      *
-     * @return mixed|SubscriptionProfileInterface
+     * @return null|SubscriptionProfileInterface
      */
     private function getProfile()
     {

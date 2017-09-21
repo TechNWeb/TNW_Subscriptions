@@ -128,7 +128,7 @@ class PaymentDetails extends Template
     /**
      * Returns subscription profile from registry
      *
-     * @return mixed|SubscriptionProfileInterface
+     * @return null|SubscriptionProfileInterface
      */
     private function getProfile()
     {

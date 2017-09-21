@@ -131,7 +131,6 @@ define([
          * @private
          */
         postPaymentToGateway: function (response) {
-            debugger;
             var $iframeSelector =  $j('[data-container="' + this.options.gateway + '-transparent-iframe"]'),
                 data,
                 tmpl,

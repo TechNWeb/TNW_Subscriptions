@@ -103,9 +103,7 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
     public function getMeta()
     {
         $meta = parent::getMeta();
-
         $poolMeta = [];
-
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
             if (method_exists($modifier, 'setPaymentFormName')) {
                 $modifier->setPaymentFormName(self::FORM_NAME);
@@ -121,7 +119,6 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
             }
             $poolMeta = $modifier->modifyMeta($poolMeta);
         }
-
         $meta = array_merge_recursive(
             $meta,
             [
@@ -143,20 +140,16 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
                 ],
             ]
         );
-
-
-
         return $meta;
     }
 
     /**
      * Returns current subscription profile id from registry
      *
-     * @return mixed|null|string
+     * @return null|string
      */
     private function getProfileId()
     {
         return $this->profile ? $this->profile->getId() : null;
     }
-
 }

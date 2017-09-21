@@ -170,9 +170,11 @@ class Manager
             }
 
             $profileAddress->setCustomerAddressId($customerAddressId);
-            $profileAddress->setStreet(
-                trim(implode("\n", $profileAddress->getStreet()))
-            );
+            if (is_array($profileAddress->getStreet())) {
+                $profileAddress->setStreet(
+                    trim(implode("\n", $profileAddress->getStreet()))
+                );
+            }
         }
     }
 

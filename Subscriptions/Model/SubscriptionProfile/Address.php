@@ -91,7 +91,7 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         }
         $customerAddressData = array_merge($customerAddressData, $customerAddressDataWithRegion);
 
-        if (isset($customerAddressData['street'])) {
+        if (isset($customerAddressData['street']) && !is_array($customerAddressData['street'])) {
             $customerAddressData['street'] = explode("\n", $customerAddressData['street']);
         }
 
