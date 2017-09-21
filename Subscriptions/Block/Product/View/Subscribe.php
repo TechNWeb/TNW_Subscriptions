@@ -16,6 +16,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyReposi
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context as ContextModel;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -121,12 +122,32 @@ class Subscribe extends \Magento\Framework\View\Element\Template
 
     /**
      * Get "Enable Subscriptions" config value for current website
-     * 
+     *
      * @return bool
      */
     public function isSubscribeAvailable()
     {
         return $this->config->isSubscriptionsActiveCurrent();
+    }
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" only.
+     * 
+     * @return bool
+     */
+    public function IsOnlySubscribePurchase()
+    {
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE);
+    }
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
+     *
+     * @return bool
+     */
+    public function IsOneTimeAndSubscribePurchase()
+    {
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE);
     }
 
     /**
@@ -303,5 +324,10 @@ class Subscribe extends \Magento\Framework\View\Element\Template
             $currentStore->getId(),
             $currentStore->getCurrentCurrencyCode()
         );
+    }
+
+    private function getProductSubscriptionPurchaseType()
+    {
+        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
     }
 }
