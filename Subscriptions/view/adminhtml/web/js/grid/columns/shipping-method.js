@@ -5,8 +5,9 @@
 
 define([
     'Magento_Ui/js/grid/columns/column',
-    'jquery'
-], function (Column, $j) {
+    'jquery',
+    'underscore'
+], function (Column, $j, _) {
     'use strict';
 
     return Column.extend({
@@ -15,9 +16,9 @@ define([
             value: null,
             dependsCodes: [],
             attentionMessage: '',
-            listens: {
+            /*listens: {
                 'value': 'onValueChange'
-            }
+            }*/
         },
 
         /**
@@ -30,6 +31,7 @@ define([
                 .observe([
                     'value'
                 ]);
+            _.bindAll(this, 'onValueChange');
 
             return this;
         },
@@ -75,15 +77,18 @@ define([
          * Select value change.
          * Hide or show attention message.
          *
-         * @param value
+         * @param id
          */
-        onValueChange: function (value) {
+        onValueChange: function (id) {
             $j(".subscription-shipping-attention").hide();
-            if (value) {
-                var currentShippingMethod = value.split('_');
-
-                if (this.dependsCodes.indexOf(currentShippingMethod[0]) === -1) {
-                    $j(".subscription-shipping-attention").show();
+            var element = $j("select[name='shipping_methods[" + id + "]']").get(0);
+            if (element) {
+                var currentSelectedValue = element.value;
+                if (currentSelectedValue) {
+                    var currentShippingMethod = currentSelectedValue.split('_');
+                    if (this.dependsCodes.indexOf(currentShippingMethod[0]) === -1) {
+                        $j("#subscription-shipping-attention-" + id).show();
+                    }
                 }
             }
         }

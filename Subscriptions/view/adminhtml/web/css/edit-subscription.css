@@ -23,10 +23,111 @@ button.profile__edit_button:before {
 button.profile__cancel-edit_button:before{
     content: '\e632';
 }
-.fieldset-wrapper.profile__edit_block {
-    width: 48%;
-    display: inline-block;
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form,
+.tnw_subscriptionprofile_form_areas_summary_summary_payment_method_insert_form {
+    width: 49.5%;
     vertical-align: top;
+    float: right;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_information_insert_form,
+.tnw_subscriptionprofile_form_areas_summary_summary_billing_information_insert_form {
+    width: 49.5%;
+    vertical-align: top;
+    float: left;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_billing_information_insert_form {
+    clear: both;
+}
+.admin__profile_summary .admin__page-section-item,
+.admin__profile_summary .inner-block,
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper
+{
+    padding-left: 1em;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset {
+    padding: 0 0 1em 0;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset .admin__field-complex {
+    padding-left: 0;
+}
+.admin__profile_summary .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset {
+    padding-bottom: 0;
+    padding-top: 1em;
+}
+.admin__profile_summary .fieldset-wrapper .fieldset-wrapper .admin__fieldset-wrapper-content .admin__fieldset .admin__field {
+    margin-bottom: 0;
+}
+.admin__profile_summary .admin__control-select {
+    width:100%;
+}
+.admin__profile_summary .sub-button-left {
+    margin-top: 1em;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label .admin__field-control{
+    float: left;
+    position: absolute;
+}
+.tnw_subscriptions .right {
+    text-align: right;
+}
+.admin__profile_summary .admin__field legend.admin__field-label {
+    opacity: 1;
+}
+.admin__profile_summary .sub-fieldset .fieldset-wrapper-title {
+    border: none;
+    padding: 0;
+}
+.admin__profile_summary .admin_field_without_legend > div.admin__field {
+    display: inline-block;
+    margin-top: 0;
+}
+.admin__profile_summary .payment-additional-fieldset .payment-cvv input {
+    width: 6rem;
+}
+.admin__fieldset>.shipping-methods-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option {
+    display: block;
+    margin: 0;
+}
+.admin__fieldset>.shipping-methods-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option:before, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option:before {
+    display: none;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention{
+    display: inline-block;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention::before{
+    color: #eb5202;
+    content: '\e623';
+    font-family: 'Admin Icons';
+    font-size: 1.9rem;
+    margin-right: 10px;
+    margin-left: 5px;
+}
+
+.tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention[data-title]:hover:after {
+    content: attr(data-title);
+    background-color: white;
+    color: #000;
+    position: absolute;
+    top: 25px;
+    white-space: normal;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0px 0px 1px #000;
+    -webkit-box-shadow: 0px 0px 1px #000;
+    box-shadow: 0px 0px 1px #000;
+    padding: 5px;
+    width: 150px;
+    text-align: center;
+    z-index: 20;
 }
 
 .subscription-summary {

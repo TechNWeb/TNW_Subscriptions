@@ -208,18 +208,18 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
-                <!--<item name="shipping_method" xsi:type="array">-->
-                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm</item>-->
-                    <!--<item name="sortOrder" xsi:type="number">60</item>-->
-                <!--</item>-->
+                <item name="shipping_method" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
+                </item>
                 <item name="billing_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">70</item>
                 </item>
-                <!--<item name="payment_method" xsi:type="array">-->
-                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>-->
-                    <!--<item name="sortOrder" xsi:type="number">80</item>-->
-                <!--</item>-->
+                <item name="payment_method" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">80</item>
+                </item>
                 <item name="products" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
                     <item name="sortOrder" xsi:type="number">90</item>
@@ -260,4 +260,25 @@
     <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
         <plugin name="tnw_subscriptions_sales_order_grid_collection" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
     </type>
+
+    <!--Add modifier for Subscription profile edit on Summary tab-->
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

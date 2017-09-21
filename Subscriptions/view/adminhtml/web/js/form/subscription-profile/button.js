@@ -21,6 +21,7 @@ define([
             if (addressSelect.visible() || !addressSelect.issetShippingAddress) {
                 visible = false;
             }
+            addressSelect.filter(!addressSelect.visible(), 'empty');
 
             this.visible(visible);
         }

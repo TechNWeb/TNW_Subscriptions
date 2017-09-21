@@ -114,6 +114,10 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
             }
 
             $this->resource->save($productBillingFrequency);
+        } catch (\Zend_Db_Exception $dbException) {
+            throw new \Zend_Db_Exception(__(
+                'Could not save the product billing frequency with same options'
+            ));
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the productBillingFrequency: %1',

@@ -1,0 +1,32 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\PaymentDetails $block */
+?>
+<div class="inner-block tnw_subscriptions">
+    <table class="admin__table-secondary data-table">
+        <tbody>
+            <tr class="col-0">
+                <td class="label"><?php echo __("Payment Type") ?></td>
+                <td class="right"><span class="text"><?php echo $block->getPaymentMethodTitle() ?></span></td>
+            </tr>
+            <?php if ($block->getPaymentAdditionalInfo()) :?>
+                <tr class="col-1">
+                    <td class="label"><?php echo __("Card Type") ?></td>
+                    <td class="right"><span class="text"><?php echo $block->getCreditCardTypeLabel() ?></span></td>
+                </tr>
+                <tr class="col-2">
+                    <td class="label"><?php echo __("Card Number") ?></td>
+                    <td class="right"><span class="text"><?php echo $block->getCreditCardNumber() ?></span></td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+

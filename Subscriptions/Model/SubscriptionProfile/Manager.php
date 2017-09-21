@@ -7,16 +7,20 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
@@ -91,6 +95,29 @@ class Manager
     private $request;
 
     /**
+     * @var SubscriptionProfileFactory
+     */
+    private $subscriptionProfileFactory;
+
+    /**
+     * Quote repository
+     *
+     * @var CartRepositoryInterface
+     */
+    private $quoteRepository;
+
+    /**
+     * Search criteria builder
+     *
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+    /**
+     * @var ShippingMethods
+     */
+    private $shippingMethods;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -101,6 +128,9 @@ class Manager
      * @param ProductManager $productManager
      * @param OrderRelationManager $orderRelationManager
      * @param RequestInterface $request
+     * @param CartRepositoryInterface $quoteRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ShippingMethods $shippingMethods
      */
     public function __construct(
         EnginePool $enginePool,
@@ -111,7 +141,10 @@ class Manager
         AddressFactory $profileAddressFactory,
         ProductManager $productManager,
         OrderRelationManager $orderRelationManager,
-        RequestInterface $request
+        RequestInterface $request,
+        CartRepositoryInterface $quoteRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ShippingMethods $shippingMethods
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -122,6 +155,9 @@ class Manager
         $this->productManager = $productManager;
         $this->orderRelationManager = $orderRelationManager;
         $this->request = $request;
+        $this->quoteRepository = $quoteRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->shippingMethods = $shippingMethods;
     }
 
     /**
@@ -289,6 +325,24 @@ class Manager
     }
 
     /**
+     * Sets to profile status "Complete".
+     */
+    public function setCompleteStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_COMPLETE);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Past Due".
+     */
+    public function setPastDueStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
+        return $this;
+    }
+
+    /**
      * Engine profile processing.
      *
      * @param Quote $quote
@@ -300,14 +354,72 @@ class Manager
     }
 
     /**
+     * Processes payment method data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processPaymentMethod($requestData)
+    {
+        $engine = $this->getEngineFromRequestData($requestData);
+        if ($engine) {
+            $this->getProfile()->setEngineCode($engine);
+            $this->getEngine()->processProfileByRequestData($requestData);
+        }
+        return $this;
+    }
+
+    /**
+     * Processes shipping method data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processShippingMethod($requestData)
+    {
+        $shippingMethod = $this->getShippingMethodFromRequestData($requestData);
+        if ($shippingMethod) {
+            $this->getProfile()->setShippingMethod($shippingMethod);
+            $quote = $this->getNextQuote();
+            $shippingDescription = '';
+            if ($quote) {
+                $shippingMethodOptions = $this->getShippingMethodOptions($quote, false);
+                foreach ($shippingMethodOptions as $shippingMethodOption) {
+                    if ($shippingMethodOption['value'] == $shippingMethod) {
+                        $shippingDescription = $shippingMethodOption['label'];
+                    }
+                }
+            }
+            $this->getProfile()->setShippingDescription($shippingDescription);
+        }
+        return $this;
+    }
+
+    /**
      * Assigns order to profile.
      *
+     * @param SubscriptionProfileOrderInterface $relation
      * @param OrderInterface $order
-     * @param SubscriptionProfileInterface $profile
-     * @param null $date
+     * @return null|SubscriptionProfileOrderInterface
      */
     public function assignOrderToProfile(
-        OrderInterface $order,
+        SubscriptionProfileOrderInterface $relation,
+        OrderInterface $order
+    ) {
+        $relation->setMagentoOrderId($order->getId());
+        return $this->orderRelationManager->saveRelation($relation);
+    }
+
+    /**
+     * Assigns quote to profile.
+     *
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     * @param null|string $date
+     * @return null|SubscriptionProfileOrderInterface
+     */
+    public function assignQuoteToProfile(
+        Quote $quote,
         SubscriptionProfileInterface $profile,
         $date = null
     ) {
@@ -317,14 +429,11 @@ class Manager
         }
 
         $relation = $this->orderRelationManager
-            ->getNewProfileOrderReletion()
+            ->getNewProfileOrderRelation()
             ->setSubscriptionProfileId($profile->getId())
-            ->setMagentoOrderId($order->getId())
-            ->setMagentoQuoteId($order->getQuoteId())
-            ->setScheduledAt(
-                $date
-            );
-        $this->orderRelationManager->saveRelation($relation);
+            ->setMagentoQuoteId($quote->getId())
+            ->setScheduledAt($date);
+        return $this->orderRelationManager->saveRelation($relation);
     }
 
     /**
@@ -399,6 +508,56 @@ class Manager
         }
 
         return $this;
+    }
+
+    /**
+     * Returns next profile relation
+     *
+     * @return null|SubscriptionProfileOrderInterface
+     */
+    public function getNextProfileRelation()
+    {
+        return $this->orderRelationManager->getNextProfileRelation($this->getProfile());
+    }
+
+    /**
+     * Returns next profile relation
+     *
+     * @return null|Quote
+     */
+    public function getNextQuote()
+    {
+        $quote = null;
+        $nextProfileRelation =  $this->getNextProfileRelation();
+        if ($nextProfileRelation) {
+            $quoteId = $nextProfileRelation->getMagentoQuoteId();
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(Quote::KEY_ENTITY_ID, $quoteId)->create();
+            $quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+            if (count($quotes)) {
+                $quote = reset($quotes);
+            }
+        }
+        return $quote;
+    }
+
+    /**
+     * Returns shipping method options
+     *
+     * @param Quote $quote
+     * @param bool $withPrice
+     * @return array
+     */
+    public function getShippingMethodOptions(Quote $quote, $withPrice = true)
+    {
+        $options = [];
+        if ($quote && $quote->getId()) {
+            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
+            $options = $this->shippingMethods
+                ->setQuote($quote)
+                ->getShippingMethodsAsOptionArray($withPrice);
+        }
+        return $options;
     }
 
     /**
@@ -520,5 +679,38 @@ class Manager
         $startDate->add(new \DateInterval($expression));
 
         return $startDate->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Returns engine code form request data
+     *
+     * @param $requestData
+     * @return int|null|string
+     */
+    private function getEngineFromRequestData($requestData)
+    {
+        $engine = null;
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        foreach ($paymentPostData as $code => $methodData) {
+            if ($methodData['method']) {
+                $engine = $code;
+                break;
+            }
+        }
+        return $engine;
+    }
+
+    /**
+     * Returns shipping method code form request data
+     *
+     * @param $requestData
+     * @return int|null|string
+     */
+    private function getShippingMethodFromRequestData($requestData)
+    {
+        $shippingMethodCode= isset($requestData['shipping_method_id'])
+            ? $requestData['shipping_method_id']
+            : null;
+        return $shippingMethodCode;
     }
 }

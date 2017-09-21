@@ -21,4 +21,16 @@ class Checkmo extends Base
             OrderPaymentInterface::METHOD => CheckmoPayment::PAYMENT_METHOD_CHECKMO_CODE
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function processProfileByRequestData($requestData)
+    {
+        $this->getProfile()->setPaymentAdditionalInfo('');
+        $this->getProfile()->setTokenHash('');
+        return $this;
+    }
+
+
 }

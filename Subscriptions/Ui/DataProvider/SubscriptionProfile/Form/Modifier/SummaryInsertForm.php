@@ -12,6 +12,8 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Container;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
@@ -60,12 +62,12 @@ class SummaryInsertForm implements ModifierInterface
         ],
         self::SHIPPING_METHODS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_shipping_method',
-            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_NAMESPACE => SummaryShippingMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 20,
         ],
         self::PAYMENT_METHODS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_payment_method',
-            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_NAMESPACE => SummaryPaymentMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 40,
         ],
         self::PRODUCTS_INSERT_FORM => [

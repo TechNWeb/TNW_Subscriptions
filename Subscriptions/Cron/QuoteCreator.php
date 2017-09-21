@@ -304,7 +304,7 @@ class QuoteCreator
         Quote $quote,
         $date
     ) {
-        $relation = $this->relationManager->getNewProfileOrderReletion()
+        $relation = $this->relationManager->getNewProfileOrderRelation()
             ->setSubscriptionProfileId($profile->getId())
             ->setMagentoQuoteId($quote->getId())
             ->setScheduledAt($date);

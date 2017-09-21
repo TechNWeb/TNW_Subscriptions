@@ -241,7 +241,6 @@
                 sortOrder="1000"/>
     </type>
 
-
     <!--Subscription profile status modifiers after profile queue processing-->
     <type name="TNW\Subscriptions\Cron\ProfileProcessor">
         <arguments>
@@ -268,6 +267,12 @@
                     <item name="sortOrder" xsi:type="number">40</item>
                 </item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
+        <arguments>
+            <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
         </arguments>
     </type>
 </config>
