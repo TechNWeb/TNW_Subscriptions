@@ -364,3 +364,4 @@ The number of future quotes to generate at a time for the new subscription profi
 "Default catalog setting for the product to determine when the subscription should start.","Default catalog setting for the product to determine when the subscription should start."
 "Default catalog setting for the product to determine if the recurring price will always match the product price.","Default catalog setting for the product to determine if the recurring price will always match the product price."
 "Available Payment Methods","Available Payment Methods"
+"Could not save the product billing frequency with same options","Could not save the product billing frequency with same options"

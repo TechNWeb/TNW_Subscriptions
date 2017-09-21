@@ -7,8 +7,10 @@ define([
     'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
     'underscore',
     'uiRegistry',
-    'jquery'
-], function (DynamicRows, _, registry, $) {
+    'jquery',
+    'Magento_Ui/js/lib/validation/validator',
+    'mage/translate'
+], function (DynamicRows, _, registry, $, validator) {
     'use strict';
 
     var maxId = 0,
@@ -43,13 +45,33 @@ define([
             pageSize: 9999,
             dndConfig: {
                 component: 'TNW_Subscriptions/js/components/dynamic-rows/dnd'
-            }
+            },
+            billingFrequenciesCount: ''
         },
 
         /** @inheritdoc */
         initialize: function () {
             this._super();
             initMaxId(this.recordData());
+
+            var current = this;
+            validator.addRule(
+                'validate-billing-frequency-selected-option',
+                function (currentValue, rule, params) {
+                    var flag = true;
+                    _.each(params.allElements, function (element, index) {
+                        if (element.dataScope !== params.currentElement.dataScope &&
+                            element.value() === currentValue
+                        ) {
+                            flag = false;
+                            return false;
+                        }
+                    });
+
+                    return flag;
+                },
+                $.mage.__('The same billing frequency is selected.')
+            );
 
             return this;
         },
@@ -73,6 +95,8 @@ define([
 
         /** @inheritdoc */
         processingAddChild: function (ctx, index, prop) {
+            this.checkAddingBillingFrequency(index);
+
             if (ctx && !_.isNumber(ctx['id'])) {
                 ctx['id'] = ++maxId;
             } else if (!ctx) {
@@ -124,6 +148,7 @@ define([
         deleteRecord: function (index, recordId) {
             this._super();
             this.hidePager();
+            this.checkAddingBillingFrequency(index);
         },
 
         /**
@@ -143,6 +168,21 @@ define([
                         pager[0].hide();
                     }
                 }
+            }
+        },
+
+        /**
+         * Disable/enable button.
+         * If grid elements count more than max.
+         *
+         * @param {String} rowIndex
+         * @return {void}
+         */
+        checkAddingBillingFrequency: function (rowIndex) {
+            var button = registry.get('name = product_form.product_form.subscription-options.container_header.button_add');
+            button.set('disabled', false);
+            if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
+                button.set('disabled', true);
             }
         }
     });
