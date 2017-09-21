@@ -135,10 +135,10 @@ define([
                 pager;
 
             if (childs.length == 0) {
-                grid = document.getElementsByClassName('recurring-options');
+                grid = $('.recurring-options');
 
                 if (grid.length > 0) {
-                    pager = grid[0].getElementsByClassName('admin__control-table-pagination');
+                    pager = grid.find('.admin__control-table-pagination');
                     if (pager.length > 0) {
                         pager[0].hide();
                     }
