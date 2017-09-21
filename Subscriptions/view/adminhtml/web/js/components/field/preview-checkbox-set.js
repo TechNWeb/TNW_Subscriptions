@@ -282,7 +282,7 @@ define([
             if (this.parentForm) {
                 var parent = registry.get(this.parentForm);
                 if (parent) {
-                    result = parent.source.data['item_' + parent.objectItemId];
+                    result = parent.source.data['item_' + parent.additionalData.objectItemId];
                 }
             }
 
