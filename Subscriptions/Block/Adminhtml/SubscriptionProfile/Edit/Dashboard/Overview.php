@@ -101,7 +101,6 @@ class Overview extends Template
         $this->registry = $registry;
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
-        $this->profileManager->setProfile($this->getSubscriptionProfile());
         parent::__construct($context, $data);
     }
 
@@ -159,9 +158,12 @@ class Overview extends Template
      */
     protected function initChildBlock(Template $block)
     {
-        $block->setData('subscription_profile', $this->getSubscriptionProfile());
-        $block->setData('next_profile_relation', $this->getNextProfileRelation());
-        $block->setData('next_quote', $this->getNextQuote());
+        $this->profileManager->setProfile($this->getSubscriptionProfile());
+        $block->addData([
+            'subscription_profile' => $this->getSubscriptionProfile(),
+            'next_profile_relation' => $this->getNextProfileRelation(),
+            'next_quote'=> $this->getNextQuote(),
+        ]);
         return $block;
     }
 
