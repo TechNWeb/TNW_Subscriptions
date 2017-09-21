@@ -27,6 +27,11 @@ class AccountInformation extends Template
     const DATE_NOT_FOUND = 'N/A';
 
     /**
+     * label for subscription with term=1
+     */
+    const UNTIL_CANCELED = 'Until canceled';
+
+    /**
      * Subscription profile
      *
      * @var SubscriptionProfileInterface
@@ -151,8 +156,9 @@ class AccountInformation extends Template
     }
 
     /**
-     * If term equal 1 return 'N/A',
-     * if term equal 0 return last not submit order date
+     * If term equal 1 return 'UNTIL_CANCELED',
+     * if term equal 0 return last not submit order date.
+     * If quites were not generated return 'N/A.'
      *
      * @return string
      */
@@ -160,17 +166,21 @@ class AccountInformation extends Template
     {
         $result = self::DATE_NOT_FOUND;
         $term = $this->getSubscriptionProfile()->getTerm();
+        $lastOrderData = $this->subscriptionProfileResource
+            ->getLastOrderData($this->getSubscriptionProfile(), false);
         switch ($term) {
             case 0:
                 $date = '';
-                $lastOrderData = $this->subscriptionProfileResource
-                    ->getLastOrderData($this->getSubscriptionProfile(), false);
                 if (!empty($lastOrderData)) {
                     $date = $lastOrderData['scheduled_at'];
                 }
                 $result = $this->normalizeDateFormat($date);
                 break;
             case 1:
+                if (!empty($lastOrderData)) {
+                    $result = self::UNTIL_CANCELED;
+                }
+                break;
             default:
                 break;
         }

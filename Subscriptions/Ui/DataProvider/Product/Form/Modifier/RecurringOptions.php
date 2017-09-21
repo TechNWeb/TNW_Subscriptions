@@ -284,7 +284,7 @@ class RecurringOptions extends BaseModifier
                         'componentType' => DynamicRows::NAME,
                         'component' => 'TNW_Subscriptions/js/components/dynamic-rows-import-recurring-options',
                         'template' => 'ui/dynamic-rows/templates/collapsible',
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'admin__field-wide recurring-options',
                         'deleteProperty' => static::FIELD_IS_DELETE,
                         'deleteValue' => '1',
                         'addButton' => false,

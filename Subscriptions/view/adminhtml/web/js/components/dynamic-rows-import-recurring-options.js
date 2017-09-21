@@ -116,6 +116,34 @@ define([
          */
         retrieveElements: function(index) {
             return registry.filter('parentSelections = ' + this.index + ', index = ' + index + '');
+        },
+
+        /**
+         * {inheritdoc}
+         */
+        deleteRecord: function (index, recordId) {
+            this._super();
+            this.hidePager();
+        },
+
+        /**
+         * Hide pager if there are no items in grid.
+         */
+        hidePager: function() {
+            var childs = this.getChildItems(),
+                grid,
+                pager;
+
+            if (childs.length == 0) {
+                grid = document.getElementsByClassName('recurring-options');
+
+                if (grid.length > 0) {
+                    pager = grid[0].getElementsByClassName('admin__control-table-pagination');
+                    if (pager.length > 0) {
+                        pager[0].hide();
+                    }
+                }
+            }
         }
     });
 });
