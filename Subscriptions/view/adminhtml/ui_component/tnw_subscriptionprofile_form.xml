@@ -82,26 +82,6 @@
                 <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails</argument>
             </htmlContent>
         </container>
-        <field name="comment_area">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Comment</item>
-                    <item name="componentType" xsi:type="string">field</item>
-                    <item name="formElement" xsi:type="string">textarea</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                </item>
-            </argument>
-        </field>
-        <field name="submit_comment" class="TNW\Subscriptions\Ui\Component\Field\AddCommentButton">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="title" translate="true" xsi:type="string">Add comment</item>
-                    <item name="formElement" xsi:type="string">button</item>
-                    <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/dashboard/add-comment-button</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
-                </item>
-            </argument>
-        </field>
     </fieldset>
     <fieldset name="summary">
         <argument name="data" xsi:type="array">
@@ -150,5 +130,26 @@
                 <item name="tabLabel" translate="true" xsi:type="string">Change History</item>
             </item>
         </argument>
+        <field name="comment_area">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Comment</item>
+                    <item name="componentType" xsi:type="string">field</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="additionalClasses" xsi:type="string">change-history-field-set</item>
+                </item>
+            </argument>
+        </field>
+        <field name="submit_comment" class="TNW\Subscriptions\Ui\Component\Field\AddCommentButton">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="title" translate="true" xsi:type="string">Add comment</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/change_history/add-comment-button</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                </item>
+            </argument>
+        </field>
     </fieldset>
 </form>

@@ -141,3 +141,48 @@ button.profile__cancel-edit_button:before{
     display: inline-block;
     float: right;
 }
+
+
+.order_change_history .change-history-field-set .admin__field-label {
+    width: 100%;
+    text-align: left;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .data-total-container {
+    display: none;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-grid {
+    margin-top: 30px;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row {
+    padding: 26px 21px 20px 20px;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-message {
+    margin-left: 40px;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row > .comment-type, .comment-message {
+    font-size: 1.8rem;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-author {
+    font-style: italic;
+    width: auto;
+    display: inline-block;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-author .data-grid-cell-content {
+    width: auto;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-date {
+    float: right;
+    width: auto;
+}
