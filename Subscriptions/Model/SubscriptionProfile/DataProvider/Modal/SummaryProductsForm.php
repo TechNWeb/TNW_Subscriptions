@@ -24,12 +24,11 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 
 /**
- * Class ModifyForm
+ * Class SummaryProductsForm
  */
 class SummaryProductsForm extends ModifyForm
 {
@@ -71,13 +70,6 @@ class SummaryProductsForm extends ModifyForm
      * @var
      */
     private $currentProduct;
-
-    /**
-     * Calculator for retrieving product price.
-     *
-     * @var PriceCalculator
-     */
-    private $priceCalculator;
 
     /**
      * SummaryProductsForm constructor.
@@ -124,7 +116,6 @@ class SummaryProductsForm extends ModifyForm
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        $this->priceCalculator = $priceCalculator;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
             $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
@@ -153,7 +144,7 @@ class SummaryProductsForm extends ModifyForm
                     'price' => $itemPrice,
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),
                     'term' => (string)$term,
-                    'start_on' => $this->getStartOnDate($startOn),
+                    'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $product->getName(),
                     'description' => $product->getData('short_description'),
                     'qty' => $item->getQty(),
@@ -443,31 +434,4 @@ class SummaryProductsForm extends ModifyForm
     {
         return $this->profileManager->loadProfileFromRequest('subscription_profile_id');
     }
-
-    /**
-     * Calculates start date for subscription.
-     *
-     * @param $startOn
-     * @return string
-     */
-    private function getStartOnDate($startOn)
-    {
-        switch ($startOn) {
-            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-t');
-                break;
-            case StartDateType::MOMENT_OF_PURCHASE:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-d');
-                break;
-            default:
-                $result = new \DateTime($startOn);
-                $result = $result->format('Y-m-d');
-                break;
-        }
-
-        return $result;
-    }
-
 }
