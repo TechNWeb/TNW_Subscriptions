@@ -63,7 +63,7 @@ define([
             if (this.modifySubscription && this.getParentForm()) {
                 parent = this.getParentForm();
                 if (parent) {
-                    currentItemData = parent.source.data['item_' + parent.objectItemId];
+                    currentItemData = parent.source.data['item_' + parent.additionalData.objectItemId];
                 }
 
                 if (currentItemData.initial_values

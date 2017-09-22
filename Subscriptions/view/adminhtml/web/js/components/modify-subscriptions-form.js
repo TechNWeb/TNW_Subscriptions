@@ -14,8 +14,8 @@ define(
                 previewMode: true,
                 buttonPreviewMode: true,
                 editButtons: {},
-                objectId: null,
-                objectItemId: null,
+                additionalData: {},
+                productsFormName: null,
                 listens: {
                     responseStatus: 'processResponseStatus'
                 }
@@ -45,7 +45,7 @@ define(
                             return;
                         }
                     }
-                    mainForm = registry.get('index = modify_modal_form');
+                    mainForm = registry.get('index = ' + this.productsFormName);
                     if (mainForm) {
                         mainForm.destroyInserted();
                         mainForm.render();
@@ -88,10 +88,7 @@ define(
                 this.validate();
 
                 if (!this.additionalInvalid && !this.source.get('params.invalid')) {
-                    this.setAdditionalData({
-                        objectId: this.objectId,
-                        objectItemId: this.objectItemId
-                    });
+                    this.setAdditionalData(this.additionalData);
                     this.setAdditionalData(data)
                         .submit(redirect);
                 }

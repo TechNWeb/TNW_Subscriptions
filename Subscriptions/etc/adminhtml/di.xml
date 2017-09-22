@@ -178,6 +178,12 @@
             <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::PAYMENT_METHODS_INSERT_FORM</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::PRODUCTS_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
 
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
@@ -213,6 +219,10 @@
                 <item name="payment_method" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>
                     <item name="sortOrder" xsi:type="number">80</item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">90</item>
                 </item>
             </argument>
         </arguments>

@@ -27,7 +27,7 @@ define([
                 parent = this.getParentForm();
                 if (parent) {
                     frequenciesData =
-                        parent.source.data['item_' + parent.objectItemId].frequency_data.product_frequencies;
+                        parent.source.data['item_' + parent.additionalData.objectItemId].frequency_data.product_frequencies;
                 }
             }
 
