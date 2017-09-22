@@ -517,7 +517,7 @@ class Form extends AbstractDataProvider
                         Attribute::SUBSCRIPTION_TRIAL_PRICE,
                         0
                     );
-                    $formattedPrice = $this->formatPrice($trialPrice);
+                    $formattedPrice = $this->formatPrice($this->convertPrice($trialPrice));
                     $formattedTrialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
                     $trialPriceLabel = $formattedPrice . ' ' . __('for') . ' ';
                     if ($trialLength && $trialUnit) {
@@ -563,7 +563,7 @@ class Form extends AbstractDataProvider
     {
         $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
 
-        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId, null, false, false);
+        return $this->priceCalculator->getUnitPrice($productId, $billingFrequencyId, null, false);
     }
 
     /**
@@ -598,7 +598,7 @@ class Form extends AbstractDataProvider
     /**
      * Format price according to locale settings.
      *
-     * @param $price
+     * @param string|float $price
      * @return float
      */
     private function formatPrice($price)
@@ -607,6 +607,21 @@ class Form extends AbstractDataProvider
             $price,
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION,
+            $this->sessionQuote->getStoreId(),
+            $this->getCurrentCurrency()
+        );
+    }
+
+    /**
+     * Returns converted to currecy price.
+     *
+     * @param string|float $price
+     * @return float
+     */
+    protected function convertPrice($price)
+    {
+        return $this->context->getPriceCurrency()->convert(
+            $price,
             $this->sessionQuote->getStoreId(),
             $this->getCurrentCurrency()
         );
@@ -634,7 +649,7 @@ class Form extends AbstractDataProvider
     protected function getInitialFee($billingFrequencyId, $productId)
     {
         $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
-        $initialFee = $this->priceCalculator->getInitialFee($billingFrequencyId, $productId, true);
+        $initialFee = $this->priceCalculator->getInitialFee($billingFrequencyId, $productId);
 
         return $initialFee ? $this->formatPrice($initialFee) : 0;
     }
@@ -651,7 +666,7 @@ class Form extends AbstractDataProvider
         $productId = $productId ?: (int)$this->request->getParam('product_id', 0);
         if ($productId) {
             $product = $this->productRepository->getById($productId);
-            $productPrice = $product->getPrice();
+            $productPrice = $this->convertPrice($product->getPrice());
         }
 
         return $productPrice;

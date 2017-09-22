@@ -258,7 +258,11 @@
         </arguments>
     </virtualType>
     <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
-        <plugin name="tnw_subscriptions_sales_order_grid_collection" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
+        <plugin
+                name="tnw_subscriptions_sales_order_grid_collection"
+                type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"
+                sortOrder="100"
+                disabled="false"/>
     </type>
 
     <!--Add modifier for Subscription profile edit on Summary tab-->
@@ -281,4 +285,18 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer">
+        <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
+                type="TNW\Subscriptions\Plugin\Sales\Block\Order\Items\Column\Renderer\AddInitialFee"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Items">
+        <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
+                type="TNW\Subscriptions\Plugin\Sales\Block\Order\Items\AddInitialFee"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
 </config>
