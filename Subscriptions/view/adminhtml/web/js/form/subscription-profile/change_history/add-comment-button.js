@@ -70,9 +70,8 @@ define([
          * @return void
          */
         reloadOrderHistoryChangeGrid: function () {
-            var grid = 'tnw_subscriptionprofile_edit_change_history_listing.tnw_subscriptionprofile_edit_change_history_listing_data_source';
             var params = [];
-            var target = registry.get(grid);
+            var target = registry.get('index = ' + this.ns + '_data_source');
             if (target && typeof target === 'object') {
                 target.set('params.t ', Date.now());
             }

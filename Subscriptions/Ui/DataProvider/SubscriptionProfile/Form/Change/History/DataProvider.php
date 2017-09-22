@@ -13,7 +13,7 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
 /**
- * @property \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection collection
+ * Class DataProvider
  */
 class DataProvider extends AbstractDataProvider
 {
