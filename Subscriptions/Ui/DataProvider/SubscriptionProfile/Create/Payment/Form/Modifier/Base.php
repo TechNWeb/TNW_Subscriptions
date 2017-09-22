@@ -205,7 +205,7 @@ class Base implements ModifierInterface
                             'false' => '0',
                             'true' => '1',
                         ],
-                        'default' => '1',
+                        'default' => '0',
                     ],
                 ],
             ],
