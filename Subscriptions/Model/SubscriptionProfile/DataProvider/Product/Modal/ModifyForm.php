@@ -22,6 +22,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 
 /**
  * Class ModifyForm
@@ -49,7 +50,11 @@ class ModifyForm extends Form
     const FORM_DATA_VALUE = 'new_subscription';
     /**#@-*/
 
+    /**#@+
+     * Edit button name.
+     */
     const EDIT_BUTTON_NAME = 'edit_button';
+    /**#@-*/
 
     /**
      * Image helper.
@@ -258,8 +263,8 @@ class ModifyForm extends Form
                         'formElement' => UiForm::NAME,
                         'componentType' => UiForm::NAME,
                         'component' => 'TNW_Subscriptions/js/components/modify-subscriptions-form',
-                        'objectId' => $objectId,
-                        'objectItemId' => $itemId,
+                        'additionalData' => $this->getAdditionalData($objectId, $itemId),
+                        'productsFormName' => $this->getProductFormName(),
                         'editButtons' => [
                             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
                             'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
@@ -276,6 +281,21 @@ class ModifyForm extends Form
     }
 
     /**
+     * Retrieve additional data to form.
+     *
+     * @param string $objectId
+     * @param string $objectItemId
+     * @return array
+     */
+    protected function getAdditionalData($objectId, $objectItemId)
+    {
+        return [
+            'objectId' => $objectId ,
+            'objectItemId' => $objectItemId,
+        ];
+    }
+
+    /**
      * Returns full name of edit form.
      *
      * @param string|int $container
@@ -288,6 +308,16 @@ class ModifyForm extends Form
             . '.' . self::CONTAINER_PREFIX . $container
             . '.' . self::CONTAINER_ITEM_PREFIX . $containerItem
             . '.form';
+    }
+
+    /**
+     * Returns name of product form.
+     *
+     * @return string
+     */
+    protected function getProductFormName()
+    {
+        return ProductDataProvider::DATA_SCOPE_ADD_MODIFY_FORM;
     }
 
     /**
@@ -408,15 +438,7 @@ class ModifyForm extends Form
      */
     protected function getLeftContainerDefinition()
     {
-        $imageHelper = $this->imageHelper->init(
-            $this->currentProduct,
-            'category_page_grid',
-            [
-                'type' => 'small_image',
-                'width' => '240',
-                'height' => '240',
-            ]
-        );
+        $imageHelper = $this->getImageHelper();
 
         return [
             'arguments' => [
@@ -448,6 +470,26 @@ class ModifyForm extends Form
 
             ]
         ];
+    }
+
+    /**
+     * Returns left container image from description.
+     *
+     * @return ImageHelper
+     */
+    protected function getImageHelper()
+    {
+        $imageHelper = $this->imageHelper->init(
+            $this->currentProduct,
+            'category_page_grid',
+            [
+                'type' => 'small_image',
+                'width' => '240',
+                'height' => '240',
+            ]
+        );
+
+        return $imageHelper;
     }
 
     /**
@@ -931,5 +973,15 @@ class ModifyForm extends Form
     protected function getProductFromItem(DataObject $item)
     {
         return $this->productRepository->getById($item->getProduct()->getId());
+    }
+
+    /**
+     * Return currentFormName.
+     *
+     * @return string
+     */
+    protected function getCurrentFormName()
+    {
+        return $this->currentFormName;
     }
 }
