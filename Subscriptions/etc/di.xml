@@ -232,14 +232,19 @@
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Controller\Subscription\History">
-        <plugin name="authentication" type="\Magento\Sales\Controller\Order\Plugin\Authentication"/>
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
     </type>
 
     <type name="Magento\Sales\Cron\CleanExpiredQuotes">
         <plugin name="tnw_clean_expired_quotes"
                 type="TNW\Subscriptions\Plugin\Sales\Cron\CleanExpiredQuotes"
-                sortOrder="1000"/>
+                sortOrder="1000"
+                disabled="false"/>
     </type>
+
 
     <!--Subscription profile status modifiers after profile queue processing-->
     <type name="TNW\Subscriptions\Cron\ProfileProcessor">
@@ -274,5 +279,33 @@
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="tnw_subs_quote_item_save"
+                type="TNW\Subscriptions\Plugin\Quote\Item\AfterSave"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
+        <plugin name="tnw_subscriptions_copy_data_to_order"
+                type="TNW\Subscriptions\Plugin\Quote\Item\ToOrderItem"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
+        <plugin name="tnw_subs_order_item_save"
+                type="TNW\Subscriptions\Plugin\Sales\Order\Item\AfterSave"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Api\Data\OrderInterface">
+        <plugin name="tnw_subs_order_item_collection"
+                type="TNW\Subscriptions\Plugin\Sales\Order\ItemCollection"
+                sortOrder="100"
+                disabled="false"/>
     </type>
 </config>

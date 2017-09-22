@@ -137,7 +137,7 @@ class ModifyForm extends Form
                     : $subBuyRequest[Create::NON_UNIQUE]['price'];
                 $data[self::FORM_DATA_VALUE]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
-                    'initial_fee' => $subBuyRequest[Create::NON_UNIQUE]['initial_fee'],
+                    'initial_fee' => $this->getInitialFeeFromItem($item),
                     'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                     'term' => (string)$subBuyRequest[Create::UNIQUE]['term'],
                     'period' => $subBuyRequest[Create::UNIQUE]['period'],
@@ -931,5 +931,24 @@ class ModifyForm extends Form
     protected function getProductFromItem(DataObject $item)
     {
         return $this->productRepository->getById($item->getProduct()->getId());
+    }
+
+    /**
+     * Returns initial fee from item.
+     *
+     * @param DataObject $item
+     * @return int
+     */
+    protected function getInitialFeeFromItem($item)
+    {
+        $initialFee = 0;
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees) {
+            $initialFee = $initialFees->getSubsInitialFee();
+        }
+
+        return $initialFee;
     }
 }

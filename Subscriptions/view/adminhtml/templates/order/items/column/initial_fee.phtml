@@ -1,0 +1,10 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\Items\Price\Renderer $block */?>
+<?php
+$_item = $block->getItem();
+echo $block->displayPrices($block->getItemBaseInitialFee($_item), $block->getItemInitialFee($_item));

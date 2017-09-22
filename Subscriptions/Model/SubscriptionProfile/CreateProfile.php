@@ -171,15 +171,14 @@ class CreateProfile extends BaseCreate
         try {
             $this->productModifier->setData($productData);
             $product = $this->productModifier->getPreparedProduct();
-
             $quote = $this->getSubQuote();
-            $quote->addProduct(
+            $item = $quote->addProduct(
                 $product,
                 $this->productModifier->getPreparedBuyRequest()
             );
+            $this->productModifier->setInitialFeeToItem($item);
             $quote->setTotalsCollectedFlag(false);
             $this->quoteCreator->getCartRepository()->save($quote);
-
             $result['error'] = false;
         } catch (\Exception $e) {
             $this->getContext()->log($e->getMessage());
