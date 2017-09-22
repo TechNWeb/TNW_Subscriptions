@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Plugin\Quote\Item;
 
-use Closure;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Quote\Model\Quote\Item\ToOrderItem as MagentoToOrderItem;
@@ -45,7 +44,7 @@ class ToOrderItem
      */
     public function aroundConvert(
         MagentoToOrderItem $subject,
-        Closure $proceed,
+        \Closure $proceed,
         AbstractItem $item,
         $additional = []
     ) {

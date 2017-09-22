@@ -7,9 +7,30 @@
 namespace TNW\Subscriptions\Plugin\Sales\Block\Order\Items;
 
 use Magento\Sales\Block\Adminhtml\Order\View\Items;
+use TNW\Subscriptions\Model\Context;
 
+/**
+ * Class AddInitialFee
+ */
 class AddInitialFee
 {
+    /**
+     * Context
+     *
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * AddInitialFee constructor.
+     * @param Context $context
+     */
+    public function __construct(
+        Context $context
+    ) {
+        $this->context = $context;
+    }
+
     /**
      * @param Items $subject
      * @param array $result
@@ -17,11 +38,10 @@ class AddInitialFee
      */
     public function afterGetColumns(Items $subject, $result)
     {
-        $pos   = array_search('total', array_keys($result));
-        $result = array_merge(
-            array_slice($result, 0, $pos),
-            ['tnw_subscriptions_initial_fee' => __('Subscription Initial Fee')],
-            array_slice($result, $pos)
+        $result = $this->context->arrayInsertBefore(
+            $result,
+            'total',
+            ['tnw_subscriptions_initial_fee' => __('Subscription Initial Fee')]
         );
 
         return $result;
