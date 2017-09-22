@@ -80,7 +80,12 @@ define([
          * @param id
          */
         onValueChange: function (id) {
-            $j(".subscription-shipping-attention").hide();
+            var messageElem = $j("#subscription-shipping-attention-" + id).get(0);
+            if (messageElem) {
+                $j(messageElem).hide();
+            } else {
+                $j(".subscription-shipping-attention").hide();
+            }
             var element = $j("select[name='shipping_methods[" + id + "]']").get(0);
             if (element) {
                 var currentSelectedValue = element.value;
