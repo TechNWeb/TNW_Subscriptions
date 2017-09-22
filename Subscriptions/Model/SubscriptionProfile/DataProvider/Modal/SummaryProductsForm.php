@@ -280,6 +280,38 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
+     * Returns start on field definition.
+     *
+     * @return array
+     */
+    protected function getStartOnDefinition()
+    {
+        $visibleOnEdit = $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'];
+        $nowDate = new \DateTime();
+
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Start on:'),
+                        'additionalClasses' => 'admin__field-wide admin__field-date',
+                        'dataType' => 'string',
+                        'dataScope' => 'start_on',
+                        'formElement' => UiForm\Element\DataType\Date::NAME,
+                        'componentType' => UiForm\Element\DataType\Date::NAME,
+                        'current_date' => $nowDate->format('m/d/Y'),
+                        'validation' => ['required-entry' => true],
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-date',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'visibleOnEdit' => $visibleOnEdit,
+                        'showPreview' => $this->getCurrentFormName() . ':previewMode'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
      * Returns billing frequency field definition.
      *
      * @return array

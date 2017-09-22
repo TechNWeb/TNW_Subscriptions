@@ -692,6 +692,7 @@ button.action-editor.active:before{
 
 /* Modify item container */
 .subscription-container {
+    clear: both;
     padding-top: 1.5rem;
 }
 
