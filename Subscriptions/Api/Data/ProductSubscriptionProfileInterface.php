@@ -28,6 +28,8 @@ interface ProductSubscriptionProfileInterface
     const DISCOUNT_TYPE = 'discount_type';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const NEED_RECOLLECT = 'need_recollect';
+
     /**#@-*/
 
     /**#@+

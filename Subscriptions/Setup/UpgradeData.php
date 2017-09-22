@@ -458,6 +458,38 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.18", "<")) {
+            //TODO add this attributes to main eav setup
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => 'static',
+                    'label' => 'Need Recollect',
+                    'sort_order' => 250,
+                    'input' => 'select',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => true,
+                ]
+            );
+
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => 'static',
+                    'label' => 'Need Recollect',
+                    'sort_order' => 250,
+                    'input' => 'select',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => true,
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

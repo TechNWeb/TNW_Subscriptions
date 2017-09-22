@@ -38,6 +38,7 @@ interface SubscriptionProfileInterface
     const NEED_GENERATE_QUOTES = 'need_generate_quotes';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const NEED_RECOLLECT = 'need_recollect';
     /**#@-*/
 
     /**#@+
