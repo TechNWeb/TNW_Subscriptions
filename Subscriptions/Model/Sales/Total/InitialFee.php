@@ -18,7 +18,14 @@ use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
 class InitialFee extends AbstractTotal
 {
     /**
-     * @inheritdoc
+     * Subscription initial fee totals collector.
+     * Adds initial fee to grand total amount (without taxes).
+     * Initial fee is quote item extension attribute.
+     *
+     * @param Quote $quote
+     * @param ShippingAssignmentInterface $shippingAssignment
+     * @param Total $total
+     * @return $this
      */
     public function collect(
         Quote $quote,

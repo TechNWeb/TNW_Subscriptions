@@ -48,6 +48,13 @@ class ItemCollection
     }
 
 
+    /**
+     * Add subscription initial fee extension attributes to order items.
+     *
+     * @param OrderInterface $subject
+     * @param Collection $result
+     * @return Collection
+     */
     public function afterGetItemsCollection(OrderInterface $subject, Collection $result)
     {
         $orderItemIds = array_keys($result->getItems());

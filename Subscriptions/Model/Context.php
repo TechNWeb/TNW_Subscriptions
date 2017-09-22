@@ -178,4 +178,24 @@ class Context
 
         return json_encode($priceFormatData);
     }
+
+
+    /**
+     * Inserts element before element in array.
+     *
+     * @param array $result - array to insert.
+     * @param $beforeValue - value of the element before which it will be inserted
+     * @param array $element - element to insert.
+     * @return array
+     */
+    public function arrayInsertBefore(array $result, $beforeValue, $element)
+    {
+        $pos = array_search($beforeValue, array_keys($result));
+        $result = array_merge(
+            array_slice($result, 0, $pos),
+            $element,
+            array_slice($result, $pos)
+        );
+        return $result;
+    }
 }
