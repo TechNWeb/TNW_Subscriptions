@@ -8,9 +8,11 @@
 namespace TNW\Subscriptions\Plugin\BillingFrequency;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencySearchResultsInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\BillingFrequency;
 use TNW\Subscriptions\Model\ProductBillingFrequencyFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Plugin to save links between billing frequency and products.
@@ -32,16 +34,25 @@ class SaveLinkedProducts
     private $productBillingFrequencyFactory;
 
     /**
+     * Search criteria builder.
+     *
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
      * SaveLinkedProducts constructor.
      * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
      * @param ProductBillingFrequencyFactory $productBillingFrequencyFactory
      */
     public function __construct(
         ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
-        ProductBillingFrequencyFactory $productBillingFrequencyFactory
+        ProductBillingFrequencyFactory $productBillingFrequencyFactory,
+        SearchCriteriaBuilder $criteriaBuilder
     ) {
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
         $this->productBillingFrequencyFactory = $productBillingFrequencyFactory;
+        $this->searchCriteriaBuilder = $criteriaBuilder;
     }
 
     /**
@@ -64,9 +75,17 @@ class SaveLinkedProducts
 
         if ($result->getData('links') && $result->getData('links')['linked']) {
             $linkedProductData = $result->getData('links')['linked'];
+            $isDefaultDataNewProducts = $this->getIsDefaultBillingFrequencyForNewProductts(
+                $linkedProductData,
+                $currentLinkedProducts
+            );
             $maxOrder = 0;
             foreach ($linkedProductData as $data) {
-                $data['default_billing_frequency'] = $this->isDefaultBillingFrequency($data, $currentLinkedProducts);
+                $data['default_billing_frequency'] = $this->isDefaultBillingFrequency(
+                    $data,
+                    $currentLinkedProducts,
+                    $isDefaultDataNewProducts
+                );
                 $linkedProduct = $this->prepareLinkedProduct($result, $data, $maxOrder++);
                 $this->productBillingFrequencyRepository->save($linkedProduct);
             }
@@ -76,21 +95,91 @@ class SaveLinkedProducts
     }
 
     /**
+     * Returns an array of products that don't have any billing frequency
+     * to set default_billing_frequency value for these products.
+     *
+     * @param array $newlinkedProductData
+     * @param array $currentLinkedProducts
+     * @return array
+     */
+    private function getIsDefaultBillingFrequencyForNewProductts(
+        array $newlinkedProductData,
+        array $currentLinkedProducts
+    ) {
+        $addedProductsIds = [];
+        $productsWithoutFrequencies = [];
+
+        //Search for added to billing frequency products.
+        foreach ($newlinkedProductData as $newProductData) {
+            $existedProduct = false;
+            foreach ($currentLinkedProducts as $currentLinkedProduct) {
+                if ($currentLinkedProduct->getMagentoProductId() == $newProductData['id']) {
+                    $existedProduct = true;
+                    break;
+                }
+            }
+
+            if (!$existedProduct) {
+                $addedProductsIds[] = $newProductData['id'];
+            }
+        }
+        //Search for products without billing frequencies.
+        if (!empty($addedProductsIds)) {
+            $this->searchCriteriaBuilder->addFilter(
+                ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                $addedProductsIds,
+                'in'
+            );
+
+            /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
+            $searchCriteria = $this->searchCriteriaBuilder->create();
+            /** @var ProductBillingFrequencySearchResultsInterface $foundBillingFrequencies */
+            $foundBillingFrequencies = $this->productBillingFrequencyRepository->getList($searchCriteria);
+
+            foreach ($addedProductsIds as $addedProductId) {
+                $productHasFrequency = false;
+
+                foreach ($foundBillingFrequencies->getItems() as $productBillingFrequency) {
+                    if ($productBillingFrequency->getMagentoProductId() == $addedProductId) {
+                        $productHasFrequency = true;
+                        break;
+                    }
+                }
+
+                if (!$productHasFrequency) {
+                    $productsWithoutFrequencies[$addedProductId] = 1;
+                }
+            }
+        }
+
+        return $productsWithoutFrequencies;
+    }
+
+    /**
+     * Set default_billing_frequency value for product.
+     *
      * @param array $data
-     * @param ProductBillingFrequencyInterface[] $earlierLinkedProducts
+     * @param array $earlierLinkedProducts
+     * @param array $isDefaultDataNewProducts
      * @return int
      */
     private function isDefaultBillingFrequency(
         array $data,
-        $earlierLinkedProducts
+        array $earlierLinkedProducts,
+        array $isDefaultDataNewProducts
     ) {
         $isDefault = 0;
+        $productId = $data['id'];
 
         foreach ($earlierLinkedProducts as $linkedProduct) {
-            if ($data['id'] == $linkedProduct->getMagentoProductId()) {
+            if ($productId == $linkedProduct->getMagentoProductId()) {
                 $isDefault = $linkedProduct->getDefaultBillingFrequency();
                 break;
             }
+        }
+
+        if (isset($isDefaultDataNewProducts[$productId]) && ($isDefaultDataNewProducts[$productId] == 1)) {
+            $isDefault = 1;
         }
 
         return $isDefault;

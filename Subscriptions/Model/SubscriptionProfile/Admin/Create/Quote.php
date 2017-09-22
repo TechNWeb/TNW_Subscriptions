@@ -131,6 +131,9 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if ($session->getStoreId()) {
+            if ($session->getCurrencyId()){
+                $quote->setQuoteCurrencyCode($session->getCurrencyId());
+            }
             $quote->setCustomerGroupId($this->groupManagement->getDefaultGroup()->getId());
             $quote->setIsActive(false);
             $quote->setStoreId($session->getStoreId());

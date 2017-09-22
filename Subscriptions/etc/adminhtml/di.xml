@@ -178,6 +178,12 @@
             <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::PAYMENT_METHODS_INSERT_FORM</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::PRODUCTS_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
 
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
@@ -202,18 +208,22 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
-                <!--<item name="shipping_method" xsi:type="array">-->
-                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm</item>-->
-                    <!--<item name="sortOrder" xsi:type="number">60</item>-->
-                <!--</item>-->
+                <item name="shipping_method" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingMethodInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
+                </item>
                 <item name="billing_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\BillingInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">70</item>
                 </item>
-                <!--<item name="payment_method" xsi:type="array">-->
-                    <!--<item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>-->
-                    <!--<item name="sortOrder" xsi:type="number">80</item>-->
-                <!--</item>-->
+                <item name="payment_method" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">80</item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">90</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -248,6 +258,45 @@
         </arguments>
     </virtualType>
     <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
-        <plugin name="tnw_subscriptions_sales_order_grid_collection" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
+        <plugin
+                name="tnw_subscriptions_sales_order_grid_collection"
+                type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <!--Add modifier for Subscription profile edit on Summary tab-->
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer">
+        <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
+                type="TNW\Subscriptions\Plugin\Sales\Block\Order\Items\Column\Renderer\AddInitialFee"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Items">
+        <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
+                type="TNW\Subscriptions\Plugin\Sales\Block\Order\Items\AddInitialFee"
+                sortOrder="100"
+                disabled="false"/>
     </type>
 </config>

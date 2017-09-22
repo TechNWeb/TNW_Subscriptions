@@ -70,34 +70,36 @@ class ShippingMethods
     }
 
     /**
+     * Sets quote to source
+     *
      * @param ModelQuote $quote
+     * @return $this
      */
     public function setQuote(ModelQuote $quote)
     {
         $this->quote = $quote;
+        return $this;
     }
 
     /**
      * Returns list of shipping methods for quote as array.
      *
+     * @param bool $withPrice
      * @return array
      */
-    public function getShippingMethodsAsOptionArray()
+    public function getShippingMethodsAsOptionArray($withPrice = true)
     {
         $result = [];
-
         $methods = $this->getCurrentRates();
-
         foreach ($methods as $code => $rates) {
             /** @var Rate $rate */
             foreach ($rates as $rate) {
                 $result[] = [
                     'value' => $rate->getCode(),
-                    'label' => $this->getMethodLabel($code, $rate)
+                    'label' => $this->getMethodLabel($code, $rate, $withPrice)
                 ];
             }
         }
-
         return $result;
     }
 
@@ -116,22 +118,19 @@ class ShippingMethods
      *
      * @return string
      */
-    public function getCurrentMethodLabel()
+    public function getCurrentMethodLabel($withPrice = true)
     {
         $result = '';
-
         $shippingMethod = $this->getQuote()->getShippingAddress()->getShippingMethod();
-
         foreach ($this->getCurrentRates() as $code => $group) {
             /** @var Rate $rate */
             foreach ($group as $rate) {
                 if ($rate->getCode() === $shippingMethod) {
-                    $result = $this->getMethodLabel($code, $rate);
+                    $result = $this->getMethodLabel($code, $rate, $withPrice);
                     break;
                 }
             }
         }
-
         return $result;
     }
 
@@ -142,23 +141,22 @@ class ShippingMethods
      * @param Rate $rate
      * @return string
      */
-    private function getMethodLabel($code, $rate)
+    private function getMethodLabel($code, $rate, $withPrice = true)
     {
         $result = '';
-
         $result .= $this->getCarrierTitle($code);
-
-        $result .= ' (' . $this->getMethodTitle($rate) . ')';
-
-        $cost = $this->getShippingPrice($rate->getPrice(), $this->taxHelper->displayShippingPriceIncludingTax());
-        $costInclTax = $this->getShippingPrice($rate->getPrice(), true);
-
-        $result .= ' - ' . $cost;
-
-        if ($costInclTax !== $cost && $this->taxHelper->displayShippingBothPrices()) {
-            $result .= ' (' . __('Incl. Tax') . $costInclTax . ')';
+        $methodTitle = $this->getMethodTitle($rate);
+        if ($methodTitle) {
+            $result .= ' (' . $this->getMethodTitle($rate) . ')';
         }
-
+        if ($withPrice) {
+            $cost = $this->getShippingPrice($rate->getPrice(), $this->taxHelper->displayShippingPriceIncludingTax());
+            $costInclTax = $this->getShippingPrice($rate->getPrice(), true);
+            $result .= ' - ' . $cost;
+            if ($costInclTax !== $cost && $this->taxHelper->displayShippingBothPrices()) {
+                $result .= ' (' . __('Incl. Tax') . $costInclTax . ')';
+            }
+        }
         return $result;
     }
 

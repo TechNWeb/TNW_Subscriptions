@@ -276,6 +276,7 @@ class RecurringOptions extends BaseModifier
      */
     private function getOptionsGridConfig($sortOrder)
     {
+        $billingFrequenciesData = $this->getBillingFrequencies();
         return [
             'arguments' => [
                 'data' => [
@@ -284,7 +285,7 @@ class RecurringOptions extends BaseModifier
                         'componentType' => DynamicRows::NAME,
                         'component' => 'TNW_Subscriptions/js/components/dynamic-rows-import-recurring-options',
                         'template' => 'ui/dynamic-rows/templates/collapsible',
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'admin__field-wide recurring-options',
                         'deleteProperty' => static::FIELD_IS_DELETE,
                         'deleteValue' => '1',
                         'addButton' => false,
@@ -294,6 +295,8 @@ class RecurringOptions extends BaseModifier
                         'sortOrder' => $sortOrder,
                         'dataProvider' => static::RECURRING_OPTIONS_LISTING,
                         'imports' => ['insertData' => '${ $.provider }:${ $.dataProvider }'],
+                        'periodLabels' => $billingFrequenciesData['periodLabels'],
+                        'billingFrequenciesCount' => count($billingFrequenciesData['periodLabels']),
                     ],
                 ],
             ],
@@ -470,10 +473,11 @@ class RecurringOptions extends BaseModifier
                             'defaultPlaceholder' => __('-- Please select --'),
                         ],
                         'validation' => [
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'validate-billing-frequency-selected-option' => true
                         ],
                         'notice' => __('Recurring schedule to be picked by the customer'),
-                        'periodLabels' => $billingFrequenciesData['periodLabels'],
+                        'periodLabels' => $billingFrequenciesData['periodLabels']
                     ],
                 ],
             ],
@@ -679,7 +683,7 @@ class RecurringOptions extends BaseModifier
                         'label' => __('Preset Qty'),
                         'componentType' => Field::NAME,
                         'formElement' => Input::NAME,
-                        'component' => 'TNW_Subscriptions/js/grid/billing_frequency/preset_qty',
+                        'component' => 'TNW_Subscriptions/js/components/dynamic-rows/preset-qty',
                         'dataScope' => static::FIELD_PRESET_QTY,
                         'dataType' => Number::NAME,
                         'sortOrder' => $sortOrder,

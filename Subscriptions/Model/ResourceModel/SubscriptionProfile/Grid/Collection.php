@@ -74,7 +74,8 @@ class Collection extends SearchResult
             'status' => 'main_table.status',
             'trial_start_date' => 'main_table.trial_start_date',
             'start_date' => 'main_table.start_date',
-            'next_billing_cycle_date' => 'relation.scheduled_at'
+            'next_billing_cycle_date' => 'relation.scheduled_at',
+            'grand_total' => 'quotes.grand_total'
         ];
         $this->getSelect()->join(
             ['frequency' => BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE],
@@ -82,6 +83,9 @@ class Collection extends SearchResult
         )->joinLeft(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
             'relation.id = (' . (string)$this->getRelationJoinSelect(). ')'
+        )->joinLeft(
+            ['quotes' => 'quote'],
+            'quotes.entity_id = relation.magento_quote_id'
         )->join(
             ['customer' => $connection->getTableName('customer_entity')],
             'customer.entity_id = main_table.customer_id'

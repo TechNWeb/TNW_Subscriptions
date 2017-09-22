@@ -86,13 +86,14 @@ class DescriptionCreator
      *
      * @param ModelQuote $quote
      * @param array $subscriptionData
+     * @param null|int|string $initialFee
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getDescription(ModelQuote $quote, array $subscriptionData)
+    public function getDescription(ModelQuote $quote, array $subscriptionData, $initialFee = null)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = $this->formatPrice($quote->getBaseGrandTotal());
+        $formattedPrice = $this->formatPrice($quote->getSubtotal() + $initialFee);
         $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']);
         $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
@@ -107,7 +108,7 @@ class DescriptionCreator
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
         } else {
-            if ($subscriptionData[CreateProfile::NON_UNIQUE]['initial_fee']) {
+            if ($initialFee) {
                 $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
             }
         }

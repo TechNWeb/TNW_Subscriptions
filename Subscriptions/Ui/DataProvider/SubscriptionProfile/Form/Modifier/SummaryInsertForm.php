@@ -12,6 +12,9 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Container;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
  * Class SummaryInsertForm
@@ -21,6 +24,7 @@ class SummaryInsertForm implements ModifierInterface
     const INSERT_FORM_HANDLE = 'handle';
     const INSERT_FORM_NAMESPACE = 'namespace';
     const INSERT_FORM_SORT_ORDER = 'sort_order';
+
     /**
      * Summary fieldset name
      */
@@ -38,6 +42,7 @@ class SummaryInsertForm implements ModifierInterface
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
     const SHIPPING_METHODS_INSERT_FORM = 'shipping_method_insert_form';
     const PAYMENT_METHODS_INSERT_FORM = 'payment_method_insert_form';
+    const PRODUCTS_INSERT_FORM = 'products_insert_form';
 
     /**
      * Configuration for insert form
@@ -57,13 +62,18 @@ class SummaryInsertForm implements ModifierInterface
         ],
         self::SHIPPING_METHODS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_shipping_method',
-            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_NAMESPACE => SummaryShippingMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 20,
         ],
         self::PAYMENT_METHODS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_payment_method',
-            self::INSERT_FORM_NAMESPACE => '',
+            self::INSERT_FORM_NAMESPACE => SummaryPaymentMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 40,
+        ],
+        self::PRODUCTS_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_products',
+            self::INSERT_FORM_NAMESPACE => SummaryProductsForm::DATA_SCOPE_SUMMARY_PRODUCTS_FORM,
+            self::INSERT_FORM_SORT_ORDER => 50,
         ],
     ];
 

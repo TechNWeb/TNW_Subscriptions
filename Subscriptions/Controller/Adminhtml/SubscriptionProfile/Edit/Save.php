@@ -15,6 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Address\Manager as ProfileAddressManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as SubscriptionProductManager;
 
 /**
  * Class Save
@@ -51,24 +52,34 @@ class Save extends Action
     private $profileAddressManager;
 
     /**
+     * Subscription profile product manager.
+     *
+     * @var SubscriptionProductManager
+     */
+    private $subscriptionProductManager;
+
+    /**
      * Save constructor.
      * @param Context $context
      * @param Registry $coreRegistry
      * @param JsonFactory $jsonFactory
      * @param ProfileManager $profileManager
      * @param ProfileAddressManager $profileAddressManager
+     * @param SubscriptionProductManager $subscriptionProductManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         JsonFactory $jsonFactory,
         ProfileManager $profileManager,
-        ProfileAddressManager $profileAddressManager
+        ProfileAddressManager $profileAddressManager,
+        SubscriptionProductManager $subscriptionProductManager
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->jsonFactory = $jsonFactory;
         $this->profileManager = $profileManager;
         $this->profileAddressManager = $profileAddressManager;
+        $this->subscriptionProductManager = $subscriptionProductManager;
 
         parent::__construct($context);
     }
@@ -123,5 +134,8 @@ class Save extends Action
 
         $this->profileAddressManager->processShippingAddress($requestData);
         $this->profileAddressManager->processBillingAddress($requestData);
+        $this->profileManager->processPaymentMethod($requestData);
+        $this->profileManager->processShippingMethod($requestData);
+        $this->subscriptionProductManager->processProfileProducts($requestData);
     }
 }

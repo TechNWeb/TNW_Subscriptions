@@ -8,17 +8,23 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Payp
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\DataObject;
 use Magento\Framework\Session\Generic;
 use TNW\Subscriptions\Model\Payment\Paypal\SecureToken;
 use Magento\Paypal\Model\Payflow\Transparent;
 use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Class RequestSecureToken
  */
 class RequestSecureToken extends \Magento\Framework\App\Action\Action
 {
+    const STATE_EDIT = 'edit';
+    const STATE_NAME = 'state';
+
     /**
      * @var JsonFactory
      */
@@ -47,11 +53,19 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
     private $transparent;
 
     /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
      * RequestSecureToken constructor.
      * @param Context $context
+     * @param JsonFactory $resultJsonFactory
      * @param QuoteSessionInterface $session
      * @param Generic $sessionTransparent
      * @param Transparent $transparent
+     * @param SecureToken $secureTokenService
+     * @param ProfileManager $profileManager
      */
     public function __construct(
         Context $context,
@@ -59,29 +73,38 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
         QuoteSessionInterface $session,
         Generic $sessionTransparent,
         Transparent $transparent,
-        SecureToken $secureTokenService
+        SecureToken $secureTokenService,
+        ProfileManager $profileManager
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->session = $session;
         $this->sessionTransparent = $sessionTransparent;
         $this->transparent = $transparent;
         $this->secureTokenService = $secureTokenService;
+        $this->profileManager = $profileManager;
         parent::__construct($context);
     }
 
-
+    /**
+     * @return $this|Json
+     */
     public function execute()
     {
-        /** @var Quote $quote */
-        $quote = $this->session->getFirstQuote();
+        if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
+            $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+            $object = $profile;
+        } else {
+            /** @var DataObject $object */
+            $object = $this->session->getFirstQuote();
 
-        if (!$quote || !$quote instanceof Quote) {
-            return $this->getErrorResponse();
+            if (!$object || !$object instanceof Quote) {
+                return $this->getErrorResponse();
+            }
+            $this->sessionTransparent->setQuoteId($object->getId());
         }
 
-        $this->sessionTransparent->setQuoteId($quote->getId());
         try {
-            $token = $this->secureTokenService->requestToken($quote);
+            $token = $this->secureTokenService->requestToken($object);
             if (!$token->getData('securetoken')) {
                 throw new \LogicException();
             }

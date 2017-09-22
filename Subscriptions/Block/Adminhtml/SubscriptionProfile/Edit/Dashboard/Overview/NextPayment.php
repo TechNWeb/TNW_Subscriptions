@@ -10,6 +10,7 @@ use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Framework\Stdlib\DateTime\Timezone;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ResourceModel\Quote\Collection as QuoteCollection;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
@@ -18,7 +19,8 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
  * Subscription Overview Next Payment block
  * 
  * @method SubscriptionProfile getSubscriptionProfile()
- * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
+ * @method SubscriptionProfileOrder getNextProfileRelation()
+ * @method Quote getNextQuote()
  */
 class NextPayment extends Template
 {
@@ -74,7 +76,7 @@ class NextPayment extends Template
      */
     public function getNextPaymentDate()
     {
-        $nextPayment = $this->getNextSubscriptionProfileOrder();
+        $nextPayment = $this->getNextProfileRelation();
         if (!$nextPayment) {
             return false;
         }
@@ -89,18 +91,11 @@ class NextPayment extends Template
     public function getCost()
     {
         if ($this->grandTotal === null) {
-            $nextPayment = $this->getNextSubscriptionProfileOrder();
-            if (!$nextPayment || !$nextPayment->getMagentoQuoteId()) {
+            $quote = $this->getNextQuote();
+            if (!$quote || !$quote->getId()) {
                 $this->grandTotal = false;
             } else {
-                $select = $this->quoteCollection->getSelect()
-                    ->reset(\Zend_Db_Select::COLUMNS)
-                    ->columns(['grand_total'])
-                    ->where(
-                        $this->quoteCollection->getResource()->getIdFieldName() . ' = ?',
-                        $nextPayment->getMagentoQuoteId()
-                    );
-                $this->grandTotal = floatval($this->quoteCollection->getConnection()->fetchOne($select));
+                $this->grandTotal = (float)$quote->getGrandTotal();
             }
         }
         return $this->grandTotal;

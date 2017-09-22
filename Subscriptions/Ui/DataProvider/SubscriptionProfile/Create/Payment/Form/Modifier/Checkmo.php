@@ -20,6 +20,7 @@ class Checkmo extends Base
      */
     const ADDITIONAL_FIELD_MAILING_ADDRESS = 'mailing_address';
     const ADDITIONAL_FIELD_PAYABLE_TO = 'payable_to';
+    const SORT_ORDER = 10;
     /**#@-*/
 
     /**
@@ -121,9 +122,10 @@ class Checkmo extends Base
     {
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
+            'listens'=> $this->getListens(),
             'options' => [
                 'gateway' => $this->getPaymentCode(),
-                'formName' => Payment::DATA_SCOPE_PAYMENT_FORM
+                'formName' => $this->getPaymentFormName()
             ]
         ];
     }

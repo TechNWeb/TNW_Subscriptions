@@ -45,6 +45,9 @@ class SaveHandler implements ExtensionInterface
         if (!empty($addresses)){
             foreach ($addresses as $address) {
                 $address->setProfileId($entity->getId());
+                if ($address->getStreet() && is_array($address->getStreet())) {
+                    $address->setStreet(trim(implode("\n", $address->getStreet())));
+                }
                 $this->addressRepository->save($address);
             }
         }

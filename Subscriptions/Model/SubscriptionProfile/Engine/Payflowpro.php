@@ -56,4 +56,31 @@ class Payflowpro extends Base
             PaypalPayflow::PNREF => $profile->getPaymentToken()
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function processProfileByRequestData($requestData)
+    {
+        $additionalData = [];
+        $tokenHash = '';
+        $paymentData = $this->getPersistor()->get(self::PAYMENT_DATA_KEY);
+        if (isset($paymentData[SubscriptionProfileInterface::ID],
+            $paymentData[SubscriptionProfileInterface::TOKEN_HASH])) {
+            if ((int)$paymentData[SubscriptionProfileInterface::ID] === (int)$this->getProfile()->getId()) {
+                $tokenHash = $paymentData[SubscriptionProfileInterface::TOKEN_HASH];
+            }
+        }
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        foreach ($paymentPostData as $code => $methodData) {
+            if ($methodData['method']) {
+                $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
+
+                break;
+            }
+        }
+        $this->getProfile()->setTokenHash($tokenHash);
+        $this->getProfile()->setEncodedPaymentAdditionalInfo($additionalData);
+        return $this;
+    }
 }

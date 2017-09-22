@@ -6,15 +6,16 @@
 
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use Magento\Catalog\Model\Product;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
 /**
  * Class Manager
@@ -43,6 +44,13 @@ class Manager
     private $profileProduct;
 
     /**
+     * Core registry
+     *
+     * @var Registry
+     */
+    protected $coreRegistry;
+
+    /**
      * Mapper between subscription product and magentp product attrbites.
      *
      * @var array
@@ -61,13 +69,16 @@ class Manager
      * Manager constructor.
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param ProductRepository $productRepository
+     * @param Registry $coreRegistry
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        Registry $coreRegistry
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->productRepository = $productRepository;
+        $this->coreRegistry = $coreRegistry;
     }
 
 
@@ -186,5 +197,35 @@ class Manager
         }
 
         return $initialFee;
+    }
+
+    /**
+     * Process products data from request.
+     *
+     * @param $data
+     */
+    public function processProfileProducts($data)
+    {
+        /** @var \TNW\Subscriptions\Model\SubscriptionProfile $profileModel */
+        $profileModel = $this->coreRegistry->registry('tnw_subscription_profile');
+        if ($profileModel) {
+            $profileProducts = $profileModel->getProducts();
+            $objectItemId = isset($data['objectItemId']) ? $data['objectItemId'] : false;
+            if ($objectItemId) {
+                /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
+                foreach ($profileProducts as &$product) {
+                    if ($product->getId() == $objectItemId) {
+                        $remove = isset($data['remove']);
+                        $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : false;
+                        if ($remove) {
+                            $product->delete();
+                        } else {
+                            $product->setPrice($requestData['price']);
+                            $product->setQty($requestData['qty']);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

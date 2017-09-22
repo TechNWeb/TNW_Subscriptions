@@ -26,7 +26,7 @@ define([
                 showPreview = true;
 
             if (parent) {
-                currentItemData = parent.source.data['item_' + parent.objectItemId];
+                currentItemData = parent.source.data['item_' + parent.additionalData.objectItemId];
                 unlockPresetQty = currentItemData.unlock_preset_qty;
             }
 

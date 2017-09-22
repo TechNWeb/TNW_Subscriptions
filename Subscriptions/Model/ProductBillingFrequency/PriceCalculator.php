@@ -14,6 +14,8 @@ use TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Calculate unit price for billing frequency.
@@ -35,17 +37,36 @@ class PriceCalculator
     private $collectionFactory;
 
     /**
-     * PriceCalculator constructor.
+     * Context.
      *
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * Current session.
+     *
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+
+    /**
+     * PriceCalculator constructor.
      * @param ProductRepository $productRepository
      * @param CollectionFactory $productBillingFrequencyCollectionFactory
+     * @param Context $context
      */
     public function __construct(
         ProductRepository $productRepository,
-        CollectionFactory $productBillingFrequencyCollectionFactory
+        CollectionFactory $productBillingFrequencyCollectionFactory,
+        Context $context,
+        QuoteSessionInterface $session
     ) {
         $this->productRepository = $productRepository;
         $this->collectionFactory = $productBillingFrequencyCollectionFactory;
+        $this->context = $context;
+        $this->session = $session;
     }
 
     /**
@@ -53,7 +74,7 @@ class PriceCalculator
      *
      * Return calculated product price based on conditions:
      * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" > 0 then:
-     *     price = "Trial price"(product) + "Initial fee"(billing frequency).
+     *     price = "Trial price"(product).
      *     (if "initial fee" should be calculated on current step")
      * If product "Is trial offered" is "Yes" and $useTrial is true and "Trial price" = 0 then:
      *     price = 0.
@@ -61,11 +82,10 @@ class PriceCalculator
      * If product "Is trial offered" is "No" then:
      *     If "Lock product price"(product) = "No" then:
      *         If isset $productPrice then price = $productPrice
-     *         else price = "Price"(billing frequency) + "Initial fee"(billing frequency).
+     *         else price = "Price"(billing frequency).
      *     If "Lock product price"(product) = "Yes" then:
-     *         price = "Price"(product) + "Initial fee"(billing frequency) - "Discount amount"(product)
+     *         price = "Price"(product) - "Discount amount"(product)
      *         (if "Offer flat discount" = On).
-     *(if "initial fee" should be calculated on current step")
      *
      * "Discount amount" calculated based on conditions:
      *    If "Discount amount type" = "Flat fee" then:
@@ -77,7 +97,6 @@ class PriceCalculator
      * @param int $billingFrequencyId
      * @param float|string $productPrice
      * @param bool $useTrial
-     * @param bool $useInitialFee
      * @throws NoSuchEntityException when requested product doesn't exists in Db.
      * @return string
      */
@@ -85,28 +104,25 @@ class PriceCalculator
         $productId,
         $billingFrequencyId,
         $productPrice = null,
-        $useTrial = false,
-        $useInitialFee = true
+        $useTrial = false
     ) {
         $price = 0;
         if ($productId && $billingFrequencyId) {
             /** @var Product $product */
             $product = $this->productRepository->getById($productId);
             $trialOffered = $this->getTrialOfferedStatus($product);
-            $initialFee = $this->getInitialFee($billingFrequencyId, $productId, $useInitialFee);
             $lockProductPrice = $this->getProductLockPriceSatus($product);
             if ($trialOffered && $useTrial) {
                 $trialPrice = $this->getTrialPrice($product);
-                $price = $trialPrice ? $trialPrice + $initialFee : 0;
+                $price = $trialPrice ?: 0;
             } else {
                 if ($lockProductPrice) {
                     $discountAmount = $this->getDiscountAmount($product);
-                    $lockPrice = isset($productPrice) ? $productPrice : $product->getOrigData('price') - $discountAmount;
-                    $price = $lockPrice + $initialFee;
+                    $origPrice = $this->convertToCurrency($product->getOrigData('price'));
+                    $price= isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
                 } else {
                     $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
-                    $billingFrequencyPrice = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
-                    $price = $billingFrequencyPrice + $initialFee;
+                    $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
                 }
             }
         }
@@ -132,18 +148,15 @@ class PriceCalculator
      *
      * @param int $billingFrequencyId
      * @param int $productId
-     * @param bool $useInitialFee
+     * @param bool $convert
      * @return float
      */
-    public function getInitialFee($billingFrequencyId, $productId, $useInitialFee)
+    public function getInitialFee($billingFrequencyId, $productId, $convert = true)
     {
-        $initialFee = 0;
-        if ($useInitialFee) {
-            $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
-            $initialFee = (float)$productBillingFrequency->getInitialFee() ?: 0;
-        }
+        $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+        $initialFee = (float)$productBillingFrequency->getInitialFee() ?: 0;
 
-        return $initialFee;
+        return $convert ? $this->convertToCurrency($initialFee) : $initialFee;
     }
 
     /**
@@ -154,9 +167,11 @@ class PriceCalculator
      */
     private function getTrialPrice(Product $product)
     {
-        return $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)
+        $price = $product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)
             ? (float)$product->getCustomAttribute(Attribute::SUBSCRIPTION_TRIAL_PRICE)->getValue()
             : 0;
+
+        return $this->convertToCurrency($price);
     }
 
     /**
@@ -208,7 +223,7 @@ class PriceCalculator
             }
         }
 
-        return $discountAmount;
+        return $this->convertToCurrency($discountAmount);
     }
 
     /**
@@ -221,8 +236,9 @@ class PriceCalculator
     private function getBillingFrequencyPrice($billingFrequencyId, $productId)
     {
         $productBillingFrequency = $this->getProductBillingFrequency($billingFrequencyId, $productId);
+        $price = (float)$productBillingFrequency->getPrice() ?: 0;
 
-        return (float)$productBillingFrequency->getPrice() ?: 0;
+        return $this->convertToCurrency($price);
     }
 
     /**
@@ -242,5 +258,20 @@ class PriceCalculator
         $collection->addFieldToFilter(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID, $productId);
 
         return $collection->getFirstItem();
+    }
+
+    /**
+     * Converts price to currency.
+     *
+     * @param string|float value
+     * @return float
+     */
+    private function convertToCurrency($value)
+    {
+        return $this->context->getPriceCurrency()->convert(
+            $value,
+            $this->session->getStoreId(),
+            $this->session->getCurrencyId()
+        );
     }
 }

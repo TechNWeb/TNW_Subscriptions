@@ -27,10 +27,7 @@ define([
             '<% _.each(data.inputs, function(val, key){ %>' +
             '<input value="<%= val %>" name="<%= key %>" type="hidden">' +
             '<% }); %>' +
-            '</form>',
-            listens: {
-                checked: 'saveBilling'
-            }
+            '</form>'
         },
 
         /**

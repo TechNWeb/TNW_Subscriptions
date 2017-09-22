@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Api\SortOrderBuilder;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface as RelationRepository;
 use TNW\Subscriptions\Model\SubscriptionProfileOrderFactory;
@@ -44,21 +47,28 @@ class Manager
      * @var SearchCriteriaBuilder
      */
     private $criteriaBuilder;
+    /**
+     * @var SortOrderBuilder
+     */
+    private $sortOrderBuilder;
 
     /**
      * Manager constructor.
      * @param SubscriptionProfileOrderFactory $profileFactory
      * @param RelationRepository $profileOrderRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param SortOrderBuilder $sortOrderBuilder
      */
     public function __construct(
         SubscriptionProfileOrderFactory $profileFactory,
         RelationRepository $profileOrderRepository,
-        SearchCriteriaBuilder $criteriaBuilder
+        SearchCriteriaBuilder $criteriaBuilder,
+        SortOrderBuilder $sortOrderBuilder
     ) {
         $this->profileOrderFactory = $profileFactory;
         $this->profileOrderRepository = $profileOrderRepository;
         $this->criteriaBuilder = $criteriaBuilder;
+        $this->sortOrderBuilder = $sortOrderBuilder;
     }
 
 
@@ -76,7 +86,7 @@ class Manager
     public function getProfileOrderRelation()
     {
         if (!$this->profileOrderRelation) {
-            $this->profileOrderRelation = $this->getNewProfileOrderReletion();
+            $this->profileOrderRelation = $this->getNewProfileOrderRelation();
         }
 
         return $this->profileOrderRelation;
@@ -98,7 +108,7 @@ class Manager
      *
      * @return SubscriptionProfileOrderInterface
      */
-    public function getNewProfileOrderReletion()
+    public function getNewProfileOrderRelation()
     {
         return $this->profileOrderFactory->create();
     }
@@ -146,5 +156,35 @@ class Manager
     public function getRelationById($id)
     {
         return $this->profileOrderRepository->getById($id);
+    }
+
+    /**
+     * Retrieve next Subscription profile order
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @return false|SubscriptionProfileOrderInterface
+     */
+    public function getNextProfileRelation($profile)
+    {
+        $result = null;
+        /** @var \Magento\Framework\Api\SortOrder $sortOrder */
+        $sortOrder = $this->sortOrderBuilder
+            ->setField(SubscriptionProfileOrderInterface::SCHEDULED_AT)
+            ->setDirection(SortOrder::SORT_ASC)
+            ->create();
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder
+            ->addFilter(SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profile->getId())
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, null, 'null' )
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID, null, 'notnull' )
+            ->setSortOrders([$sortOrder])
+            ->setPageSize(1)
+            ->create();
+        $results =  $this->profileOrderRepository->getList($searchCriteria)->getItems();
+        if (count($results)) {
+            $result = reset($results);
+        }
+
+        return $result;
     }
 }
