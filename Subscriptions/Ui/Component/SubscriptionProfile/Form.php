@@ -28,6 +28,16 @@ class Form extends BaseForm
             ]
         );
 
+        $this->getContext()->addComponentDefinition(
+            'tab',
+            [
+                'component' => 'TNW_Subscriptions/js/form/element/sub-edit-area',
+                'config' => [
+                    'template' => 'TNW_Subscriptions/form/subscription-profile/edit/area-with-message_container'
+                ]
+            ]
+        );
+
         return parent::prepareDataSource($dataSource);
     }
 }
