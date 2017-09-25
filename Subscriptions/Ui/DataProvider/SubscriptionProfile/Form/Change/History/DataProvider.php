@@ -88,8 +88,10 @@ class DataProvider extends AbstractDataProvider
     {
         $convertedData = [];
         $convertedData['entity_id'] = $messageHistoryData['entity_id'];
+        $convertedData['is_message_comment'] = $messageHistoryData['is_comment'] ? 1 : 0;
         $convertedData['comment_type'] = $messageHistoryData['is_comment'] ? __('Comment') : '';
-        $convertedData['message'] = sprintf('"%s"', $messageHistoryData['message']);
+        $convertedData['message'] = $messageHistoryData['is_comment']
+            ? sprintf('"%s"', $messageHistoryData['message']) : $messageHistoryData['message'];
         $convertedData['author'] = $messageHistoryData['lastname'] ?
             sprintf('By %s %s (%s)', $messageHistoryData['firstname'], $messageHistoryData['lastname'], $messageHistoryData['email'])
             : __('By automated process');

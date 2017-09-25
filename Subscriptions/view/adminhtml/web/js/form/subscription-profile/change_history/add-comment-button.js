@@ -13,7 +13,8 @@ define([
     return Button.extend({
 
         defaults: {
-            displayPrimary: true
+            displayPrimary: true,
+            changeHistoryGridIndex: null
         },
 
         /** @inheritdoc */
@@ -70,10 +71,12 @@ define([
          * @return void
          */
         reloadOrderHistoryChangeGrid: function () {
-            var params = [];
-            var target = registry.get('index = ' + this.ns + '_data_source');
-            if (target && typeof target === 'object') {
-                target.set('params.t ', Date.now());
+            if (this.changeHistoryGridIndex) {
+                var params = [];
+                var target = registry.get(this.changeHistoryGridIndex);
+                if (target && typeof target === 'object') {
+                    target.set('params.t ', Date.now());
+                }
             }
         }
     });

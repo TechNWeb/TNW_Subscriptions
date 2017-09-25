@@ -148,6 +148,7 @@
                     <item name="formElement" xsi:type="string">button</item>
                     <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/change_history/add-comment-button</item>
                     <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="changeHistoryGridIndex" xsi:type="string">tnw_subscriptionprofile_edit_change_history_listing.tnw_subscriptionprofile_edit_change_history_listing_data_source</item>
                 </item>
             </argument>
         </field>

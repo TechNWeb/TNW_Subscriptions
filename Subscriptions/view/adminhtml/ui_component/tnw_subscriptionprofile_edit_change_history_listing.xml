@@ -36,7 +36,7 @@
     <columns name="tnw_subscriptionprofile_change_history_columns">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/subscription-listing</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/subscription-order-change-history</item>
                 <item name="fieldClass" xsi:type="string">change-history-grid</item>
             </item>
         </argument>
