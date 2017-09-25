@@ -195,12 +195,12 @@
         </section>
 
         <section id="tnw_subscriptions_payment_methods" translate="label" type="text" sortOrder="50"
-                 showInDefault="1">
+                 showInDefault="1" showInWebsite="1">
             <label>Payment Methods</label>
             <tab>tnw_subscriptions</tab>
             <resource>TNW_Subscriptions::config_payment</resource>
             <group id="active_methods" translate="label" type="text" sortOrder="20" showInDefault="1"
-                   showInWebsite="0"
+                   showInWebsite="1"
                    showInStore="0">
                 <label>Available Payment Methods</label>
                 <comment>
@@ -208,11 +208,7 @@
                     If you do not see a payment method you were expecting and if that payment method is enabled in your Magento store,
                     please <a href="https://powersync.biz/contacts" target="_blank">contact us.</a>]]>
                 </comment>
-                <field id="active_methods_list" translate="label" type="select" sortOrder="20" showInDefault="1"
-                       showInWebsite="0"
-                       showInStore="0">
-                    <frontend_model>TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods</frontend_model>
-                </field>
+                <frontend_model>TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods</frontend_model>
             </group>
         </section>
     </system>
