@@ -13,7 +13,7 @@ use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
-use TNW\Subscriptions\Model\Config as SubsConfig;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
@@ -62,7 +62,7 @@ class PaymentsPro extends Base
 
     /**
      * PaymentsPro constructor.
-     * @param SubsConfig $config
+     * @param SubscriptionConfig $config
      * @param QuoteSessionInterface $session
      * @param Context $context
      * @param Transparent $paymentPro
@@ -72,7 +72,7 @@ class PaymentsPro extends Base
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
-        SubsConfig $config,
+        SubscriptionConfig $config,
         QuoteSessionInterface $session,
         Context $context,
         Transparent $paymentPro,
