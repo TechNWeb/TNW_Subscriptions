@@ -10,6 +10,7 @@
     <body>
         <referenceContainer name="content">
             <uiComponent name="tnw_subscriptionprofile_form"/>
+            <uiComponent name="tnw_subscriptionprofile_cancel_button"/>
         </referenceContainer>
     </body>
 </page>

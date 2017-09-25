@@ -490,6 +490,24 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.19", "<")) {
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
+                [
+                    'type' => 'static',
+                    'label' => 'Cancel before next billing cycle',
+                    'sort_order' => 260,
+                    'input' => 'bool',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => false,
+                    'default' => 0,
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

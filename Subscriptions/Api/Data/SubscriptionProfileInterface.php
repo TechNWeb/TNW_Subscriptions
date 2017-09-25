@@ -39,6 +39,7 @@ interface SubscriptionProfileInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
+    const CANCEL_BEFORE_NEXT_CYCLE = 'cancel_before_next_cycle';
     /**#@-*/
 
     /**#@+

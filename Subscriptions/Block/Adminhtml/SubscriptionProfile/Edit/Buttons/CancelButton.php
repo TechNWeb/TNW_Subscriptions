@@ -28,9 +28,19 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
         return [
             'label' => __('Cancel'),
             'class' => 'cancel red-text',
-            'on_click' => 'deleteConfirm(\'' . __(
-                    'Are you sure you want to cancel the profile?'
-                ) . '\', \'' . $this->getUpdateUrl() . '\')',
+            'data_attribute' => [
+                'mage-init' => [
+                    'Magento_Ui/js/form/button-adapter' => [
+                        'actions' => [
+                            [
+                                'targetName' => 'tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button_popup.cancelModal',
+                                'actionName' => 'toggleModal',
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'on_click' => '',
             'sort_order' => 20,
         ];
     }
