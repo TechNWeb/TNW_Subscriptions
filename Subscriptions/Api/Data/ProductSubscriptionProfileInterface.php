@@ -269,4 +269,19 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setUpdatedAt($date);
+
+    /**
+     * Gets need recollect
+     *
+     * @return []|null
+     */
+    public function getNeedRecollect();
+
+    /**
+     * Sets need recollect
+     *
+     * @param bool $needRecollect
+     * @return $this
+     */
+    public function setNeedRecollect($needRecollect);
 }
