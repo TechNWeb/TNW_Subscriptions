@@ -332,4 +332,20 @@ class ProductSubscriptionProfile extends AbstractModel
     {
         return $this->setData(self::UPDATED_AT, $date);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNeedRecollect()
+    {
+        return $this->getData(self::NEED_RECOLLECT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNeedRecollect($needRecollect)
+    {
+        return $this->setData(self::NEED_RECOLLECT);
+    }
 }

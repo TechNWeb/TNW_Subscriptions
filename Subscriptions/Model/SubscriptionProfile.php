@@ -642,6 +642,22 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getNeedRecollect()
+    {
+        return $this->getData(self::NEED_RECOLLECT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNeedRecollect($needRecollect)
+    {
+        return $this->setData(self::NEED_RECOLLECT);
+    }
+
+    /**
      * Get sum of all order's grand totals for current subscription profile.
      *
      * @return string
