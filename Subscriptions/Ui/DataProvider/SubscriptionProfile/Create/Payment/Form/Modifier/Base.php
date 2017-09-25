@@ -96,11 +96,7 @@ class Base implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        $isPaymentAvailable = $this->config->isPaymentMethodAvailableForSubscription(
-            $this->getPaymentCode(),
-            $this->session->getStoreId()
-        );
-        if ($isPaymentAvailable) {
+        if ($this->isPaymentMethodAvailable()) {
             $meta = array_replace_recursive(
                 $meta,
                 $this->getPaymentFields()
@@ -345,5 +341,18 @@ class Base implements ModifierInterface
     {
         $this->profileId = $profileId;
         return $this;
+    }
+
+    /**
+     * Returns payment method availability.
+     *
+     * @return bool
+     */
+    protected function isPaymentMethodAvailable()
+    {
+        return $this->config->isPaymentMethodAvailableForSubscription(
+            $this->getPaymentCode(),
+            $this->session->getStoreId()
+        );
     }
 }

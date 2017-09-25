@@ -16,7 +16,7 @@ use Magento\Framework\View\Helper\Js;
 use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Paypal\Model\Config;
-use TNW\Subscriptions\Model\Config as SubsConfig;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 
 /**
  * Class ActiveMethods
@@ -40,7 +40,7 @@ class ActiveMethods extends Fieldset
     /**
      * Subscriptions config.
      *
-     * @var SubsConfig
+     * @var SubscriptionConfig
      */
     private $config;
 
@@ -60,7 +60,7 @@ class ActiveMethods extends Fieldset
      * @param Session $authSession
      * @param Js $jsHelper
      * @param Yesno $yesNo
-     * @param SubsConfig $config
+     * @param SubscriptionConfig $config
      * @param array $data
      */
     public function __construct(
@@ -68,7 +68,7 @@ class ActiveMethods extends Fieldset
         Session $authSession,
         Js $jsHelper,
         Yesno $yesNo,
-        SubsConfig $config,
+        SubscriptionConfig $config,
         array $data = []
     ) {
         $this->yesNo = $yesNo;
@@ -133,22 +133,7 @@ class ActiveMethods extends Fieldset
             $element->addField(
                 $method['code'],
                 'select',
-                [
-                    'name' => 'groups[' . self::GROUP_ID . '][fields]['
-                        . $method['code'] . '][value]',
-                    'label' => $method['title'],
-                    'comment' => '',
-                    'value' => $data,
-                    'values' => $this->yesNo->toOptionArray(),
-                    'inherit' => $inherit,
-                    'scope' => $this->getForm()->getScope(),
-                    'scope_id' => $this->getForm()->getScopeId(),
-                    'scope_label' => __('[WEBSITE]'),
-                    'can_use_default_value' => $this->getForm()
-                        ->canUseDefaultValue(1),
-                    'can_use_website_value' => $this->getForm()
-                        ->canUseWebsiteValue(1)
-                ]
+                $this->getFieldConfig($method, $data, $inherit)
             )->setRenderer(
                 $this->getFieldRenderer()
             );
@@ -199,5 +184,33 @@ class ActiveMethods extends Fieldset
         }
 
         return $result;
+    }
+
+    /**
+     * Returns field config.
+     *
+     * @param $method
+     * @param $data
+     * @param $inherit
+     * @return array
+     */
+    private function getFieldConfig($method, $data, $inherit)
+    {
+        return [
+            'name' => 'groups[' . self::GROUP_ID . '][fields]['
+                . $method['code'] . '][value]',
+            'label' => $method['title'],
+            'comment' => '',
+            'value' => $data,
+            'values' => $this->yesNo->toOptionArray(),
+            'inherit' => $inherit,
+            'scope' => $this->getForm()->getScope(),
+            'scope_id' => $this->getForm()->getScopeId(),
+            'scope_label' => __('[WEBSITE]'),
+            'can_use_default_value' => $this->getForm()
+                ->canUseDefaultValue(1),
+            'can_use_website_value' => $this->getForm()
+                ->canUseWebsiteValue(1)
+        ];
     }
 }
