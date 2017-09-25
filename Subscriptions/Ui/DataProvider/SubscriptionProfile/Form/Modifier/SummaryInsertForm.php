@@ -8,9 +8,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Container;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
@@ -19,7 +17,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProduc
 /**
  * Class SummaryInsertForm
  */
-class SummaryInsertForm implements ModifierInterface
+class SummaryInsertForm extends BaseFormModifier
 {
     const INSERT_FORM_HANDLE = 'handle';
     const INSERT_FORM_NAMESPACE = 'namespace';
@@ -85,20 +83,6 @@ class SummaryInsertForm implements ModifierInterface
     private $formType;
 
     /**
-     * Registry
-     *
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * Url builder
-     *
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
-    /**
      * AddressModifier constructor.
      *
      * @param Registry $registry
@@ -110,9 +94,8 @@ class SummaryInsertForm implements ModifierInterface
         UrlInterface $urlBuilder,
         $formType
     ) {
-        $this->registry = $registry;
-        $this->urlBuilder = $urlBuilder;
         $this->formType = $formType;
+        parent::__construct($urlBuilder, $registry);
     }
 
     /**
@@ -160,8 +143,8 @@ class SummaryInsertForm implements ModifierInterface
                         'label' => false,
                         'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
-                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
-                        'render_url' => $this->urlBuilder->getUrl(
+                        'update_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
+                        'render_url' => $this->getUrlBuilder()->getUrl(
                             'mui/index/render_handle',
                             [
                                 'handle' => $this->getHandle(),
@@ -207,16 +190,6 @@ class SummaryInsertForm implements ModifierInterface
     private function getHandle()
     {
         return self::$insertFormData[$this->formType][self::INSERT_FORM_HANDLE];
-    }
-
-    /**
-     * Returns current subscription profile from registry
-     *
-     * @return SubscriptionProfile|null
-     */
-    private function getProfile()
-    {
-        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**

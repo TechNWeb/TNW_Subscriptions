@@ -10,32 +10,17 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
 /**
  * Data provider for change history.
  */
-class ChangeHistory implements ModifierInterface
+class ChangeHistory extends BaseFormModifier
 {
     /**
      * Group name.
      */
     const GROUP_CHANGE_HISTORY = 'change_history';
-
-    /**
-     * Registry.
-     *
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * Url interface.
-     *
-     * @var UrlInterface
-     */
-    private $urlBuilder;
 
     /**
      * Collection Factory.
@@ -45,19 +30,21 @@ class ChangeHistory implements ModifierInterface
     private $collectionFactory;
 
     /**
+     * ChangeHistory constructor.
+     *
+     * @param UrlInterface $urlBuilder
      * @param Registry $registry
-     * @param UrlInterface $url
      * @param CollectionFactory $collectionFactory
      */
     public function __construct(
+        UrlInterface $urlBuilder,
         Registry $registry,
-        UrlInterface $url,
         CollectionFactory $collectionFactory
     ) {
-        $this->registry = $registry;
-        $this->urlBuilder = $url;
         $this->collectionFactory = $collectionFactory;
+        parent::__construct($urlBuilder, $registry);
     }
+
 
     /**
      * {@inheritdoc}
@@ -106,7 +93,7 @@ class ChangeHistory implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $profile = $this->registry->registry('tnw_subscription_profile');
+        $profile = $this->getProfile();
 
         if ($profile && $profile->getId()) {
             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
@@ -122,7 +109,7 @@ class ChangeHistory implements ModifierInterface
      */
     private function getConvertedMessageHistoryData()
     {
-        $profile = $this->registry->registry('tnw_subscription_profile');
+        $profile = $this->getProfile();
 
         $collection = $this->collectionFactory->create();
         $data = $collection->getDataForChangeHistory($profile->getId());
