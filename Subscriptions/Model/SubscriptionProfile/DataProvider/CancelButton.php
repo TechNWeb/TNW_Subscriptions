@@ -80,7 +80,7 @@ class CancelButton extends AbstractDataProvider
         $meta = array_merge_recursive(
             $meta,
             [
-                'tnw_subscriptionprofile_cancel_button_popup' => [
+                'tnw_subscriptionprofile_cancel_button' => [
                     'children' => [
                         'cancelModal' => $this->getCancelModal(),
                     ],
@@ -149,7 +149,8 @@ class CancelButton extends AbstractDataProvider
                         ),
                         'autoRender' => true,
                         'ns' => CancelButtonPopup::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM,
-                        'externalProvider' => CancelButtonPopup::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM . '.' . CancelButtonPopup::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM
+                        'externalProvider' => CancelButtonPopup::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM . '.'
+                            . CancelButtonPopup::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM
                             . '_data_source',
                     ],
                 ],

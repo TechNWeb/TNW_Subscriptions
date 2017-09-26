@@ -802,3 +802,15 @@ button.action-editor.active:before{
     padding-left: 30px;
 }
 
+.cancel-popup-float-right {
+    float: right;
+}
+
+.cancel-popup-underlined {
+    text-decoration: underline;
+}
+
+.cancel-popup-spaces {
+    padding-right: 2%;
+    padding-top: 0.5%;
+}

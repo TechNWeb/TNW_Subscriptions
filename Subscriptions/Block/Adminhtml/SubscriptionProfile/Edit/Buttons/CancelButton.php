@@ -33,7 +33,7 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => 'tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button_popup.cancelModal',
+                                'targetName' => 'tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.cancelModal',
                                 'actionName' => 'toggleModal',
                             ],
                         ]
