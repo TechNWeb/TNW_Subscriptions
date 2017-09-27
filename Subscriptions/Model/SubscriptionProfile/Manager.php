@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
@@ -21,12 +22,14 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Framework\Api\SimpleDataObjectConverter;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
 
 /**
  * Class Manager
@@ -558,6 +561,35 @@ class Manager
                 ->getShippingMethodsAsOptionArray($withPrice);
         }
         return $options;
+    }
+
+    /**
+     * Handles messages for subscription edit form
+     *
+     * @return array
+     */
+    public function handleMessages()
+    {
+        $messages = [];
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        if ($profile->getNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
+            $messages[] = [
+                'index' => 'index = subscription_details_message',
+                'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
+            ];
+        }
+        if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'index = profit_message',
+                'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        return $messages;
     }
 
     /**

@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Product;
 
 use Magento\Framework\EntityManager\Operation\ExtensionInterface;
+use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 

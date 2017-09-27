@@ -346,6 +346,6 @@ class ProductSubscriptionProfile extends AbstractModel
      */
     public function setNeedRecollect($needRecollect)
     {
-        return $this->setData(self::NEED_RECOLLECT);
+        return $this->setData(self::NEED_RECOLLECT, $needRecollect);
     }
 }

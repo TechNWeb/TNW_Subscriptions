@@ -215,14 +215,20 @@ class Manager
                 /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
                 foreach ($profileProducts as &$product) {
                     if ($product->getId() == $objectItemId) {
+                        $productDataChanges = $product->hasDataChanges();
+                        $product->setDataChanges(false);
                         $remove = isset($data['remove']);
                         $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : false;
                         if ($remove) {
                             $product->delete();
                         } else {
-                            $product->setPrice($requestData['price']);
-                            $product->setQty($requestData['qty']);
+                            $product->setPrice(number_format($requestData['price'], 4));
+                            $product->setQty(number_format($requestData['qty'], 4));
                         }
+                        if ($product->hasDataChanges()) {
+                            $product->setNeedRecollect('1');
+                        }
+                        $product->setDataChanges($productDataChanges || $product->hasDataChanges());
                     }
                 }
             }

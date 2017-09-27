@@ -95,6 +95,9 @@ class UpcomingOrders extends BaseFormModifier
         if ($profile && $profile->getNeedGenerateQuotes() == 1) {
             $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
         }
+        if ($profile && $profile->getNeedRecollect()) {
+            $messages[] = $profile->getShippingBillingChangesMadeMessageForUpcomingOrders();
+        }
 
         return $messages;
     }
