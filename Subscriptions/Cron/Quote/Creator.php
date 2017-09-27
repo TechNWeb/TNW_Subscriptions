@@ -102,7 +102,7 @@ class Creator extends Base
                         );
                     }
                     $needGenerate = $profile->getTerm() ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
-                        : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATE;
+                        : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED;
                     $needGenerate = $needMore ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE : $needGenerate;
                     $this->updateGenerateQuotesState($profile, $needGenerate);
                 } catch (\Exception $e) {
