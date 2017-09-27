@@ -509,6 +509,11 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.20", "<")) {
+            //TODO add this attributes to main eav setup
+            $this->updateApplyToForProductAttributes($eavSetup);
+        }
+
         $setup->endSetup();
     }
 
@@ -541,6 +546,85 @@ class UpgradeData implements UpgradeDataInterface
             'tnw_subscr_discount_amount',
             'backend_model',
             'TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount'
+        );
+    }
+
+    /**
+     * @param EavSetup $eavSetup
+     */
+    private function updateApplyToForProductAttributes($eavSetup)
+    {
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_STATUS,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_PRICE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_START_DATE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_START_DATE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+            'apply_to',
+            'simple,virtual,downloadable'
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            'apply_to',
+            'simple,virtual,downloadable'
         );
     }
 }
