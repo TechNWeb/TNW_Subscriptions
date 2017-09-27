@@ -237,112 +237,6 @@ button.profile__cancel-edit_button:before{
     padding-left: 0;
 }
 
-.sub-data-grid {
-    color: #666;
-    padding: 0 2rem;
-    background: #f8f8f8;
-    border: 1px solid #e3e3e3;
-}
-
-.sub-data-grid .sub-data-product-container{
-    padding-top: 1.5rem;
-}
-
-.sub-data-grid .sub-product-title{
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.sub-data-grid .sub-data-thumbnail{
-    display: inline-block;
-    width: 20%;
-}
-
-.sub-data-grid .sub-data-thumbnail img{
-    display: block;
-    width: 5rem;
-}
-
-.sub-data-grid .dotted-border:after {
-    content: '.................';
-    font-size: 3rem;
-    width: 85%;
-    line-height: 1rem;
-    letter-spacing: 1rem;
-    display: block;
-    margin: 0 auto;
-    padding-bottom: 15px;
-    color: #ccc;
-}
-
-
-.sub-data-grid .border {
-    border-bottom: 2px solid #e3e3e3;
-}
-
-.sub-data-grid .sub-data-row {
-    padding: 1rem 0 0 0;
-}
-
-.sub-data-grid .sub-data-product{
-    display: inline-block;
-    width: 75%;
-    vertical-align: top;
-}
-
-.sub-data-grid .sub-data-product-name{
-    font-size: 16px;
-}
-
-.sub-data-grid .sub-data-product-qty{
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.sub-data-grid .sub-product-shipping-method{
-    padding: 0 0 2rem 0;
-}
-
-.sub-data-grid .subscription-shipping-title{
-    font-weight: bold;
-    padding: 0.5rem 0;
-}
-
-.sub-data-grid .subscription-shipping-method{
-    font-style: italic;
-}
-
-.sub-data-grid .subscription-shipping-attention{
-    margin-top: 1rem;
-}
-
-.sub-data-grid .subscription-shipping-attention::before{
-    color: #eb5202;
-    content: '\e623';
-    background: none;
-    border: 0;
-    font-family: 'Admin Icons';
-    font-size: 1.9rem;
-    font-style: normal;
-    font-weight: 400;
-    height: auto;
-    left: 1.9rem;
-    line-height: inherit;
-    speak: none;
-    text-shadow: none;
-    width: auto;
-    float: left;
-    margin-right: 5px;
-}
-
-.sub-data-grid .sub-product-frequency-description{
-    padding-top: 1rem;
-}
-
-.sub-data-grid .sub-product-frequency-description .data-grid-cell-content span{
-    font-weight: bold;
-}
-
 .data-total-container .total-title{
     padding: 1.5rem 0 1.5rem 2rem;
     font-size: 2.25rem;
@@ -872,6 +766,7 @@ button.action-editor.active:before{
 
 .order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-author .data-grid-cell-content {
     width: auto;
+    padding-right: 5px;
 }
 
 .order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-date {

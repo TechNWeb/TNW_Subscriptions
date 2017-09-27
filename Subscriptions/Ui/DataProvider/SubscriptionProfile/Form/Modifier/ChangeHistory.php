@@ -62,7 +62,7 @@ class ChangeHistory extends BaseFormModifier
                                 'externalProvider' => self::CHANGE_HISTORY_LISTING . '.' . self::CHANGE_HISTORY_LISTING . '_data_source',
                                 'selectionsProvider' => self::CHANGE_HISTORY_LISTING . '.'.self::CHANGE_HISTORY_LISTING . 'tnw_subscriptionprofile_change_history_columns.entity_id',
                                 'ns' => self::CHANGE_HISTORY_LISTING,
-                                'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                                'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                                 'realTimeLink' => false,
                                 'behaviourType' => 'simple',
                                 'externalFilterMode' => true,
