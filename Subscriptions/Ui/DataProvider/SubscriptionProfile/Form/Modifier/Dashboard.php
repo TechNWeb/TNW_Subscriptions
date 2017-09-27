@@ -11,24 +11,16 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 
 /**
  * Dashboard for Subscription Profile.
  */
-class Dashboard implements ModifierInterface
+class Dashboard extends BaseFormModifier
 {
     /**
      * Group name.
      */
     const GROUP_DASHBOARD = 'dashboard';
-
-    /**
-     * Url Interface.
-     *
-     * @var UrlInterface
-     */
-    private $urlBuilder;
 
     /**
      * Data Persistor.
@@ -38,23 +30,19 @@ class Dashboard implements ModifierInterface
     private $dataPersistor;
 
     /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @param UrlInterface $url
-     * @param DataPersistorInterface $dataPersistor
+     * Dashboard constructor.
+     *
+     * @param UrlInterface $urlBuilder
      * @param Registry $registry
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
-        UrlInterface $url,
-        DataPersistorInterface $dataPersistor,
-        Registry $registry
+        UrlInterface $urlBuilder,
+        Registry $registry,
+        DataPersistorInterface $dataPersistor
     ) {
-        $this->urlBuilder = $url;
         $this->dataPersistor = $dataPersistor;
-        $this->registry = $registry;
+        parent::__construct($urlBuilder, $registry);
     }
 
     /**
@@ -84,6 +72,7 @@ class Dashboard implements ModifierInterface
                         'opened' => true,
                         'componentType' => Form\Fieldset::NAME,
                         'sortOrder' => 10,
+                        'tabMessages' => $this->getTabMessages(),
                     ],
                 ],
             ],
@@ -97,12 +86,29 @@ class Dashboard implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $profile = $this->registry->registry('tnw_subscription_profile');
+        $profile = $this->getProfile();
 
         if ($profile) {
             $this->dataPersistor->set('subscription_id', $profile->getId());
         }
 
         return $data;
+    }
+
+    /**
+     * Retrieve attention messages for tab.
+     *
+     * @return array
+     */
+    protected function getTabMessages()
+    {
+        $messages = [];
+
+        $profile = $this->getProfile();
+        if ($profile && $profile->getNeedGenerateQuotes() == 1) {
+            $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
+        }
+
+        return $messages;
     }
 }

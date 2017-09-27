@@ -10,7 +10,9 @@ use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Base form modifier to display payment method.
@@ -25,7 +27,7 @@ class Base implements ModifierInterface
     /**#@-*/
 
     /**
-     * @var \TNW\Subscriptions\Model\Config
+     * @var Config
      */
     private $config;
 
@@ -58,12 +60,23 @@ class Base implements ModifierInterface
     private $profileId;
 
     /**
-     * @param \TNW\Subscriptions\Model\Config $config
+     * Session
+     *
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+     * Base constructor.
+     * @param Config $config
+     * @param QuoteSessionInterface $session
      */
     public function __construct(
-        \TNW\Subscriptions\Model\Config $config
+        Config $config,
+        QuoteSessionInterface $session
     ) {
         $this->config = $config;
+        $this->session = $session;
         $this->paymentFormName = Payment::DATA_SCOPE_PAYMENT_FORM;
         $this->listens = [
             'checked' => 'saveBilling'
@@ -83,7 +96,7 @@ class Base implements ModifierInterface
      */
     public function modifyMeta(array $meta)
     {
-        if ($this->config->isPaymentMethodAvailableForSubscription($this->getPaymentCode())) {
+        if ($this->isPaymentMethodAvailable()) {
             $meta = array_replace_recursive(
                 $meta,
                 $this->getPaymentFields()
@@ -328,5 +341,18 @@ class Base implements ModifierInterface
     {
         $this->profileId = $profileId;
         return $this;
+    }
+
+    /**
+     * Returns payment method availability.
+     *
+     * @return bool
+     */
+    protected function isPaymentMethodAvailable()
+    {
+        return $this->config->isPaymentMethodAvailableForSubscription(
+            $this->getPaymentCode(),
+            $this->session->getStoreId()
+        );
     }
 }

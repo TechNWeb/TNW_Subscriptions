@@ -28,6 +28,8 @@ interface ProductSubscriptionProfileInterface
     const DISCOUNT_TYPE = 'discount_type';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const NEED_RECOLLECT = 'need_recollect';
+
     /**#@-*/
 
     /**#@+
@@ -267,4 +269,19 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setUpdatedAt($date);
+
+    /**
+     * Gets need recollect
+     *
+     * @return []|null
+     */
+    public function getNeedRecollect();
+
+    /**
+     * Sets need recollect
+     *
+     * @param bool $needRecollect
+     * @return $this
+     */
+    public function setNeedRecollect($needRecollect);
 }

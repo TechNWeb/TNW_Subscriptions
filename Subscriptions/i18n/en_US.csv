@@ -366,6 +366,7 @@ The number of future quotes to generate at a time for the new subscription profi
 "Available Payment Methods","Available Payment Methods"
 "Could not save the product billing frequency with same options","Could not save the product billing frequency with same options"
 "Save Changes","Save Changes"
+"We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.","We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile."
 "Subscription #","Subscription #"
 "Next Payment On","Next Payment On"
 "Action","Action"

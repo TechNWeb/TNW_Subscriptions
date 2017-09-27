@@ -145,13 +145,22 @@ class QuoteCreator
                         $cycleDate
                     );
                 }
-                if (!$profile->getTerm() || !$needMore) {
-                    $profile->setNeedGenerateQuotes(false);
+
+                if ($profile->getTerm()) {
+                    $profile->setNeedGenerateQuotes(2);
+                    if ($needMore) {
+                        $profile->setNeedGenerateQuotes(1);
+                    }
+                } else {
+                    $profile->setNeedGenerateQuotes(0);
+                    if ($needMore) {
+                        $profile->setNeedGenerateQuotes(1);
+                    }
                 }
             } catch (\Exception $e) {
                 $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
                 $this->context->log($e->getMessage());
-                $profile->setNeedGenerateQuotes(true);
+                $profile->setNeedGenerateQuotes(1);
             }
             $this->profileRepository->save($profile);
         }

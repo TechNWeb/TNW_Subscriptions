@@ -780,6 +780,34 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addQuoteAndOrderItemExtentionAttributeTables($setup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.18", "<")) {
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need Recollect',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need Recollect',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

@@ -6,13 +6,15 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
-use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Magento\Framework\Api\Filter;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\Pool;
 
+/**
+ * Payment step form data provider.
+ */
 class Payment extends AbstractDataProvider
 {
     /**#@+
@@ -34,11 +36,6 @@ class Payment extends AbstractDataProvider
     private $urlBuilder;
 
     /**
-     * @var StepPool
-     */
-    private $stepPool;
-
-    /**
      * Modifiers pool.
      *
      * @var Pool
@@ -46,12 +43,12 @@ class Payment extends AbstractDataProvider
     private $modifiersPool;
 
     /**
-     * DataProvider constructor.
+     * Payment constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
-     * @param StepPool $stepPool
+     * @param PoolInterface $modifiersPool
      * @param array $meta
      * @param array $data
      */
@@ -60,13 +57,11 @@ class Payment extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         UrlInterface $urlBuilder,
-        StepPool $stepPool,
         PoolInterface $modifiersPool,
         array $meta = [],
         array $data = []
     ) {
         $this->urlBuilder = $urlBuilder;
-        $this->stepPool = $stepPool;
         $this->modifiersPool = $modifiersPool;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
@@ -115,7 +110,7 @@ class Payment extends AbstractDataProvider
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMeta()
     {
