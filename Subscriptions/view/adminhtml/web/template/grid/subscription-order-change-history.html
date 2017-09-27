@@ -1,0 +1,13 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div if="hasData()" class="sub-data-grid" data-role="grid-wrapper">
+    <div data-bind="attr: {class: isMessageComment($row()) ? 'sub-data-row comment ' : 'sub-data-row change-status '}"
+         repeat="foreach: rows, item: '$row'">
+        <div outerfasteach="data: getVisible(), as: '$col'"
+             css="getFieldClass($row())" click="getFieldHandler($row())" template="getBody()"/>
+    </div>
+</div>
