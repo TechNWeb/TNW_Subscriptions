@@ -101,13 +101,14 @@ class Creator extends Base
                             $cycleDate
                         );
                     }
-                    $needGenerate = $profile->getTerm() ? 2 : 0;
-                    $needGenerate = $needMore ? 1 : $needGenerate;
+                    $needGenerate = $profile->getTerm() ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+                        : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATE;
+                    $needGenerate = $needMore ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE : $needGenerate;
                     $this->updateGenerateQuotesState($profile, $needGenerate);
                 } catch (\Exception $e) {
                     $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
                     $this->context->log($e->getMessage());
-                    $this->updateGenerateQuotesState($profile, SubscriptionProfileInterface::GENERATE_QUOTES_STATE_ACTIVE);
+                    $this->updateGenerateQuotesState($profile, SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE);
                 }
                 $this->profileRepository->save($profile);
             }
@@ -122,7 +123,15 @@ class Creator extends Base
     public function getProfilesIdsToProcess($websiteId)
     {
         $collection = $this->getBaseCollection()
-            ->addFieldToFilter(SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [1, 2]])
+            ->addFieldToFilter(
+                SubscriptionProfileInterface::GENERATE_QUOTES_STATE,
+                [
+                    'in' => [
+                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
+                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+                    ]
+                ]
+            )
             ->addFieldToFilter(SubscriptionProfileInterface::WEBSITE_ID, $websiteId)
             ->addFieldToFilter(SubscriptionProfileInterface::NEED_RECOLLECT, 0)
             ->addFieldToFilter('products_need_recollect', 0);

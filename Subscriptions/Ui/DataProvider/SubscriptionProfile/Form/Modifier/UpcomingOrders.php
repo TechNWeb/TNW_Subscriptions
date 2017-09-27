@@ -93,7 +93,7 @@ class UpcomingOrders extends BaseFormModifier
         $messages = [];
 
         $profile = $this->getProfile();
-        if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_ACTIVE) {
+        if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE) {
             $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
         }
 

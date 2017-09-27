@@ -67,8 +67,8 @@ interface SubscriptionProfileInterface
     /**#@+
      * Generate quotes states.
      */
-    const GENERATE_QUOTES_STATE_NEED_GENERATE = 0;
-    const GENERATE_QUOTES_STATE_ACTIVE = 1;
+    const GENERATE_QUOTES_STATE_GENERATE = 0;
+    const GENERATE_QUOTES_STATE_NEED_GENERATE = 1;
     const GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR = 2;
     /**#@-*/
 

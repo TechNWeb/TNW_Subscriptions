@@ -475,7 +475,7 @@ class Manager
                 ->setTrialStartDate(null)
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
-                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_ACTIVE);
+                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
 
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
