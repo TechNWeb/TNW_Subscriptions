@@ -6,43 +6,18 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Form;
-use Magento\Framework\UrlInterface;
-use Magento\Framework\Registry;
 
 /**
  * Prepare upcoming orders ui layout.
  */
-class UpcomingOrders implements ModifierInterface
+class UpcomingOrders extends BaseFormModifier
 {
     /**#@+
      * Upcoming Orders group name.
      */
     const GROUP_UPCOMING_ORDERS = 'upcoming_orders';
     /**#@-*/
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @param UrlInterface $urlBuilder
-     * @param Registry $registry
-     */
-    public function __construct(
-        UrlInterface $urlBuilder,
-        Registry $registry
-    ) {
-        $this->urlBuilder = $urlBuilder;
-        $this->registry = $registry;
-    }
 
     /**
      * {@inheritdoc}
@@ -61,7 +36,7 @@ class UpcomingOrders implements ModifierInterface
                                 'externalProvider' => 'tnw_subscriptionprofile_edit_upcoming_orders_listing.tnw_subscriptionprofile_edit_upcoming_orders_listing_data_source',
                                 'selectionsProvider' => 'tnw_subscriptionprofile_edit_upcoming_orders_listing.tnw_subscriptionprofile_edit_upcoming_orders_listing.tnw_subscriptionprofile_upcoming_orders_columns.ids',
                                 'ns' => 'tnw_subscriptionprofile_edit_upcoming_orders_listing',
-                                'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                                'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                                 'realTimeLink' => false,
                                 'behaviourType' => 'simple',
                                 'externalFilterMode' => true,
@@ -83,7 +58,8 @@ class UpcomingOrders implements ModifierInterface
                         'collapsible' => false,
                         'opened' => false,
                         'componentType' => Form\Fieldset::NAME,
-                        'sortOrder' => 10
+                        'sortOrder' => 10,
+                        'tabMessages' => $this->getTabMessages(),
                     ],
                 ],
             ],
@@ -97,7 +73,7 @@ class UpcomingOrders implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $profile =  $this->registry->registry('tnw_subscription_profile');
+        $profile =  $this->getProfile();
 
          if ($profile && $profile->getId()){
              $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
@@ -106,4 +82,20 @@ class UpcomingOrders implements ModifierInterface
         return $data;
     }
 
+    /**
+     * Retrieve attention messages for tab.
+     *
+     * @return array
+     */
+    protected function getTabMessages()
+    {
+        $messages = [];
+
+        $profile = $this->getProfile();
+        if ($profile && $profile->getNeedGenerateQuotes() == 1) {
+            $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
+        }
+
+        return $messages;
+    }
 }

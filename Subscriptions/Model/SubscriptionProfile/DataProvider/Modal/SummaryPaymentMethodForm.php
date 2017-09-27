@@ -85,6 +85,8 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
 
         $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
 
+        $data['payment'][$this->profileManager->getProfile()->getEngineCode()]['method'] = "1";
+
         return [
             $this->getProfileId() => $data
         ];

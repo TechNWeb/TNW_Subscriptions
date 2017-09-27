@@ -143,6 +143,698 @@ button.profile__cancel-edit_button:before{
 }
 
 
+/** Summary products */
+.subscription-profile-products-container .admin__field-complex-elements{
+    max-width: 100%;
+}
+
+.subscription-profile-products-container .sub-button-left,
+.fieldset-wrapper .admin__fieldset .sub-button-left,
+.subscription-profile-products-container .sub-button-right,
+.fieldset-wrapper .admin__fieldset .sub-button-right {
+    padding-top: .6875em;
+    padding-bottom: .6875em;
+    font-size: 16px;
+}
+.fieldset-wrapper .admin__fieldset .sub-button-left { float: left; }
+.subscription-profile-products-container .sub-button-left {
+    display: inline-block;
+    float: none !important;
+    margin-bottom: 1.3rem;
+    margin-right: 1.3rem;
+}
+.fieldset-wrapper .admin__fieldset .sub-button-right { float:right; }
+.subscription-profile-products-container .sub-button-right {
+    display: inline-block;
+    float: none !important;
+}
+
+.subscription-profile-products-container .admin__fieldset{
+    padding-top: 0;
+}
+
+.admin__data-grid-header-row .header-grid-dext{
+    font-size: 2.1rem;
+    float: left;
+}
+
+.subscriptions-add-product-modal-form-container{
+    float: left;
+    width: 17%;
+    margin-left: 2rem;
+    padding-top: 0;
+}
+
+.subscriptions-add-product-modal-form-container .action-secondary{
+    background-color: #eb5202;
+    border-color: #eb5202;
+    color: #fff;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+    width: 100%;
+}
+
+.subscriptions-add-product-modal-form-container .admin__fieldset{
+    padding-top: 1.4rem;
+}
+
+.subscriptions-add-product-modal-form-container .form-inline .fieldset-wrapper{
+    padding:0 3rem;
+}
+
+/*Bug Magento, legend is nor displayed */
+.subscription-item-form .sub-legend legend{
+    opacity: 1;
+}
+.subscriptions-modify-modal-form-container .sub-legend legend {
+    opacity: 1;
+}
+
+.sub-period-input{
+    margin: 0 !important;
+}
+
+.sub-period-input input{
+    width: 4rem !important;
+    margin: 0 0.5rem;
+}
+
+.sub-period-input .admin__field-control{
+    margin: 0 !important;
+}
+
+.subscriptions-add-product-modal-grid-container{
+    float: left;
+    width: 80%;
+}
+
+.subscriptions-add-product-modal .modal-title{
+    font-size: 2.8rem;
+}
+.subscriptions-add-product-modal .modal-header{
+    border-bottom: 1px solid #ccc;
+    margin-left: 2.6rem;
+    margin-right: 2.6rem;
+    padding-left: 0;
+}
+
+.sub-data-grid {
+    color: #666;
+    padding: 0 2rem;
+    background: #f8f8f8;
+    border: 1px solid #e3e3e3;
+}
+
+.sub-data-grid .sub-data-product-container{
+    padding-top: 1.5rem;
+}
+
+.sub-data-grid .sub-product-title{
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.sub-data-grid .sub-data-thumbnail{
+    display: inline-block;
+    width: 20%;
+}
+
+.sub-data-grid .sub-data-thumbnail img{
+    display: block;
+    width: 5rem;
+}
+
+.sub-data-grid .dotted-border:after {
+    content: '.................';
+    font-size: 3rem;
+    width: 85%;
+    line-height: 1rem;
+    letter-spacing: 1rem;
+    display: block;
+    margin: 0 auto;
+    padding-bottom: 15px;
+    color: #ccc;
+}
+
+
+.sub-data-grid .border {
+    border-bottom: 2px solid #e3e3e3;
+}
+
+.sub-data-grid .sub-data-row {
+    padding: 1rem 0 0 0;
+}
+
+.sub-data-grid .sub-data-product{
+    display: inline-block;
+    width: 75%;
+    vertical-align: top;
+}
+
+.sub-data-grid .sub-data-product-name{
+    font-size: 16px;
+}
+
+.sub-data-grid .sub-data-product-qty{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.sub-data-grid .sub-product-shipping-method{
+    padding: 0 0 2rem 0;
+}
+
+.sub-data-grid .subscription-shipping-title{
+    font-weight: bold;
+    padding: 0.5rem 0;
+}
+
+.sub-data-grid .subscription-shipping-method{
+    font-style: italic;
+}
+
+.sub-data-grid .subscription-shipping-attention{
+    margin-top: 1rem;
+}
+
+.sub-data-grid .subscription-shipping-attention::before{
+    color: #eb5202;
+    content: '\e623';
+    background: none;
+    border: 0;
+    font-family: 'Admin Icons';
+    font-size: 1.9rem;
+    font-style: normal;
+    font-weight: 400;
+    height: auto;
+    left: 1.9rem;
+    line-height: inherit;
+    speak: none;
+    text-shadow: none;
+    width: auto;
+    float: left;
+    margin-right: 5px;
+}
+
+.sub-data-grid .sub-product-frequency-description{
+    padding-top: 1rem;
+}
+
+.sub-data-grid .sub-product-frequency-description .data-grid-cell-content span{
+    font-weight: bold;
+}
+
+.data-total-container .total-title{
+    padding: 1.5rem 0 1.5rem 2rem;
+    font-size: 2.25rem;
+    display: inline-block;
+}
+
+.data-total-container .total-value{
+    padding: 1.5rem 2rem 1.5rem 0;
+    font-size: 2.25rem;
+    display: inline-block;
+    float: right;
+}
+
+.data-total-container{
+    background: #e4e4e4;
+    overflow: auto;
+}
+
+#anchor-content .admin__control-label-up label{
+    width: auto;
+    position: relative;
+    margin-left: 0;
+    float: none;
+
+}
+#anchor-content .admin__control-label-up{
+    position: relative;
+}
+[data-index = "account_info"] legend {
+    display: none;
+}
+.admin_field_without_legend > div.admin__field{
+    display: inline-block;
+    margin-top: 0px;
+}
+
+.payment-additional-fieldset legend{
+    opacity: 1 !important;
+}
+
+.payment-additional-fieldset._show{
+    margin-top: 0 !important;
+}
+
+.payment-additional-fieldset .payment-cvv input{
+    width: 6rem;
+}
+
+#anchor-content .admin_field_without_legend{
+    width: calc( (100%) * .7 - 30px);
+}
+.admin__control-label-up.select {
+    width: 20%;
+    min-width: 11rem;
+}
+.admin__control-label-up.input {
+    width: 74%;
+}
+.admin__address-information-preview {
+    width: 47%;
+    margin: 1%;
+    float: left;
+}
+.admin__address-information-buttons{
+    display: block;
+    float:left;
+    margin: 0;
+    padding: 0;
+}
+
+.admin__address-information-buttons fieldset{
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.admin__shipping-information-preview {
+    margin-right: 50%
+}
+.admin__payment-details-preview {
+    width: 47%;
+    float: right;
+    margin: 1%;
+}
+.admin__payment-details-preview .fieldset-wrapper-title {
+    border-bottom: 1px solid #ffffff;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control {
+    float: none;
+    margin: 0 auto;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option {
+    display: block;
+    margin: 0;
+}
+.admin__fieldset>.subscription-store-fieldset>.admin__field-control>.admin__field-option:nth-child(1):nth-last-child(2)+
+.admin__field-option:before, .admin__field-control>.admin__field-option:nth-child(2):nth-last-child(1)+
+.admin__field-option:before {
+    display: none;
+}
+
+.sub-fieldset .admin__fieldset{
+    padding: 0;
+}
+
+.sub-fieldset .payment-checkbox{
+    margin-bottom: 0;
+}
+
+.sub-fieldset .payment-additional-fieldset{
+    margin-top: 3rem;
+    margin-left: 2.6rem;
+}
+.wide-select select{
+    width:100%;
+}
+.subscr-container-title {
+    font-size: 2rem;
+    font-weight: 400;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label .admin__field-control{
+    float: left;
+    position: absolute;
+}
+.subscription-profile-currency {
+    background: #f1f1f1;
+    border: 1px solid #e3e3e3;
+    margin-bottom: 15px;
+}
+.subscription-profile-currency .admin__fieldset {
+    color: #666;
+    padding: 3rem 2rem;
+}
+.subscription-profile-currency .admin__fieldset>.admin__field {
+    padding: 0 20px;
+}
+.subscription-profile-currency .admin__fieldset .admin__field-label {
+    display: block;
+    margin: 0 0 1rem;
+    text-align: left;
+}
+.subscription-profile-currency .admin__fieldset .admin__control-select{
+    width: 100%;
+}
+.in-stock span {
+    display: none;
+}
+/*warning not in stock tooltip*/
+.warning-not-in-stock .admin__grid-tooltip {
+    display: none;
+}
+.warning-not-in-stock {
+    display: inline-block;
+    position: absolute;
+}
+.admin_grid_col_with_tooltip {
+    display: inline-block;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip {
+    display: block;
+    background: #f1f1f1;
+    border: 1px solid #f1f1f1;
+    border-radius: 1px;
+    box-shadow: 0 3px 9px 0 rgba(0,0,0,0.3);
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.36;
+    padding: 1.5rem;
+    position: absolute;
+    text-transform: none;
+    width: 27rem;
+    word-break: normal;
+    z-index: 2;
+    left: -2.2rem;
+    bottom: 1.8rem;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:before {
+    border: 15px solid transparent;
+    height: 0;
+    width: 0;
+    content: '';
+    display: block;
+    left: 2rem;
+    position: absolute;
+    top: 100%;
+    z-index: 3;
+    border-top-color: #bfbfbf;
+    margin-top: 1px;
+}
+.warning-not-in-stock:hover .admin__grid-tooltip:after {
+    border: 15px solid transparent;
+    height: 0;
+    width: 0;
+    content: '';
+    display: block;
+    left: 2rem;
+    position: absolute;
+    top: 100%;
+    border-top-color: #f1f1f1;
+    margin-top: -1px;
+    z-index: 4;
+}
+.qty-warning:after {
+    color: #eb5202;
+    content: '\e623';
+    font-family: 'Admin Icons';
+    font-size: 1.7rem;
+    position: absolute;
+    top: -0.5rem;
+    left: 0.5rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field {
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+    width: calc((100%) * .50 );
+    text-align: left;
+    margin-left: 0;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-control {
+    text-align: right;
+    line-height: 3.2rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field:nth-child(odd)/*>.admin__field-label*/ {
+    background-color: #f1f1f1;
+}
+.admin__payment-details-preview .admin__fieldset>.admin__field>.admin__field-label {
+    padding: 0.5rem 0 0.5rem 1rem;
+}
+.admin__payment-details-preview>.admin__fieldset-wrapper-content>fieldset {
+    padding-top: 1rem;
+}
+
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2),
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+    display: block;
+}
+
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option:before,
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option:before {
+    display: none;
+}
+
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2) + .admin__field-option,
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
+    display: block;
+    margin-left: 0;
+}
+
+.radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
+    margin-top: .9rem;
+}
+
+.customer_exists_popup .admin__fieldset-wrapper-content .admin__fieldset {
+    padding-bottom: 0;
+}
+
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container {
+    float: left;
+    width: calc( (100%) * .49 );
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container:first-child {
+    margin-right: 1%;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field {
+    padding: 1% 1% 1% 2%;
+    line-height: 3.2rem;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field + .admin__field {
+    margin-top: 0;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-label {
+    float: left;
+    text-align: left;
+}
+.admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
+    text-align: right;
+}
+
+/* "action-editor" button */
+button.action-editor:before {
+    font-size: 2.5rem;
+    font-family: 'Admin Icons';
+    content: '\e631';
+}
+
+button.action-editor {
+    background: none;
+    border: none;
+    padding: 1rem;
+    margin: 0
+}
+
+/* "action-remove" button */
+button.remove-button-icon:before {
+    font-size: 2.5rem;
+    font-family: 'Admin Icons';
+    content: '\e630';
+}
+button.remove-button-icon {
+    background: none;
+    border: none;
+    padding: 1rem;
+    margin: 0
+}
+
+button.action-editor.active:before{
+    content: '\e632';
+}
+
+/* Modify modal */
+.modify-subscriptions-modal .modal-inner-wrap{
+    padding-right: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .action-close{
+    padding: 2.6rem 2.6rem 2.1rem 0;
+    right: inherit;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-header{
+    border-bottom: 1px solid #ccc;
+    line-height: 1.2;
+    padding-left: 0;
+    margin-left: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-header .modal-title{
+    padding-left: 4.8rem;
+    font-size: 2.6rem;
+}
+
+.modify-subscriptions-modal .modal-inner-wrap .modal-content {
+    padding-right: 0;
+}
+
+/* Modify item container */
+.subscription-container {
+    clear: both;
+    padding-top: 1.5rem;
+}
+
+.subscription-container .fieldset-wrapper-title {
+    margin-bottom: 20px;
+}
+
+.subscription-container > .admin__fieldset-wrapper-content{
+    border: 1px solid #ccc;
+    padding: 0 2rem;
+}
+
+.subscription-container .fieldset-wrapper-title .title{
+    font-size: 2.5rem;
+    font-weight: 400;
+}
+
+.subscriptions-modify-modal-form-container .admin__fieldset {
+    padding: 0;
+}
+
+.subscription-container .admin__fieldset {
+    padding: 0;
+}
+
+.subscription-container .subscription-item-form:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+}
+
+/* Modify item form */
+.subscription-item-form .description-fieldset{
+    display: inline-block;
+    width: 80%;
+    margin: 2rem 0 !important;
+}
+
+.subscription-item-form .description-fieldset .admin__field-label{
+    width: 3rem !important;
+}
+
+.subscription-item-form .description-fieldset .field-name{
+    font-size: 2.6rem;
+    margin-bottom: 0;
+}
+
+.subscription-item-form .description-fieldset .field-description{
+    margin-top: 0.5rem;
+}
+
+.subscription-item-form .description-fieldset .qty-container{
+    width: inherit;
+}
+
+.subscription-item-form .description-fieldset .qty-container .field-qty{
+    margin-right: 30px;
+}
+
+.subscription-item-form .description-fieldset .qty-container .admin__control-preview {
+    padding: 0.625rem;
+}
+
+.subscription-item-form .description-fieldset .qty-edit-button{
+    padding: 0.625rem;
+}
+
+
+.subscription-item-form .edit-fieldset{
+    display: inline-block;
+    width: 18%;
+    border-left: 1px solid #ccc;
+    padding-left: 2rem;
+    padding-right: 3rem;
+    margin: 2rem 0 !important;
+    position: relative;
+}
+
+.subscription-item-form .edit-fieldset .action-editor{
+    position: absolute;
+    right: -40px;
+    top: -20px;
+    padding: 2rem;
+}
+
+.subscription-item-form div{
+    vertical-align: top;
+}
+
+.subscription-item-form .description-fieldset .middle-container{
+    display: inline-block;
+    width: calc( (100%) * .8 - 2rem);
+}
+
+.subscription-item-form .description-fieldset .left-container{
+    display: inline-block;
+    width: calc( (100%) * .19);
+    text-align: center;
+    margin-right: 2rem;
+}
+
+.subscription-item-form .description-fieldset .left-container .sub-product-image{
+    margin-bottom: 0;
+}
+
+.subscription-item-form .description-fieldset .left-container .sub-product-image .admin__field-control{
+    width: 100%;
+    margin-left: 0;
+    padding-left: 30px;
+}
+
+.sub-area-messages ul li {
+    list-style: none;
+    background: #fffbbb;
+    border: none;
+    border-radius: 0;
+    color: #333;
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem;
+    padding: 1.8rem 4rem 1.8rem 5.5rem;
+    position: relative;
+    text-shadow: none;
+}
+
+.sub-area-messages ul li:before {
+    background: none;
+    border: 0;
+    color: #eb5202;
+    content: '\e623';
+    font-family: 'Admin Icons';
+    font-size: 1.9rem;
+    font-style: normal;
+    font-weight: 400;
+    height: auto;
+    left: 1.9rem;
+    line-height: inherit;
+    margin-top: -1.3rem;
+    position: absolute;
+    speak: none;
+    text-shadow: none;
+    top: 50%;
+    width: auto;
+}
+
 .order_change_history .change-history-field-set .admin__field-label {
     width: 100%;
     text-align: left;

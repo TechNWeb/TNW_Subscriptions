@@ -116,7 +116,7 @@ class Message extends Template
      */
     private function getDaysPastDue()
     {
-        $profileOrder = $this->getNextSubscriptionProfileOrder();
+        $profileOrder = $this->getNextProfileRelation();
         if (!$profileOrder) {
             return 0;
         }
@@ -137,7 +137,7 @@ class Message extends Template
      */
     private function getDaysUntilSuspended()
     {
-        $profileOrder = $this->getNextSubscriptionProfileOrder();
+        $profileOrder = $this->getNextProfileRelation();
         if (!$profileOrder) {
             return 0;
         }
@@ -147,11 +147,8 @@ class Message extends Template
             intval($this->config->getAttemptCount()) * intval($this->config->getAttemptInterval()),
         ]);
         $beginPeriod = new \DateTime($profileOrder->getScheduledAt() . " +$period days");
-        $dateNow = new \DateTime();
-        if ($beginPeriod > $dateNow ) {
-            return 0;
-        }
+        $dayDateDiff = $beginPeriod->diff(new \DateTime())->days;
 
-        return $beginPeriod->diff(new \DateTime())->days;
+        return ($dayDateDiff > 0) ? $dayDateDiff : 0;
     }
 }

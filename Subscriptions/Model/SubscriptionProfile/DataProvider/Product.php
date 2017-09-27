@@ -188,10 +188,12 @@ class Product extends AbstractDataProvider
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $fullSubscriptionData = null;
+            $initialFee = 0;
 
             if (empty($subQuote->getAllItems())) {
                 continue;
             }
+
             /** @var Item $item */
             foreach ($subQuote->getAllItems() as $item) {
                 $nonUniqueData = $item->getBuyRequest()->getDataByPath(
@@ -217,6 +219,8 @@ class Product extends AbstractDataProvider
                     'name' => $item->getName(),
                     'conf_options' => [], //TODO add here configurable options
                 ];
+
+                $initialFee += $this->getItemInitialFee($item);
             }
             $subTotal = $subQuote->getGrandTotal();
             $estimatedPayment += (double)$subTotal;
@@ -225,7 +229,8 @@ class Product extends AbstractDataProvider
                 'products' => $products,
                 'frequency_description' => $this->frequencyDescriptionCreator->getDescription(
                     $subQuote,
-                    $fullSubscriptionData
+                    $fullSubscriptionData,
+                    $initialFee
                 ),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
@@ -752,5 +757,24 @@ class Product extends AbstractDataProvider
                 ],
             ],
         ];
+    }
+
+    /**
+     * Returns quote item initial fee.
+     *
+     * @param Item $item
+     * @return float
+     */
+    private function getItemInitialFee(Item $item)
+    {
+        $result = 0;
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees){
+            $result = $initialFees->getSubsInitialFee();
+        }
+
+        return $result;
     }
 }

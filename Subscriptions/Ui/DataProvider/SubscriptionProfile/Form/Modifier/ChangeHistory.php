@@ -6,49 +6,43 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
-use Magento\Framework\UrlInterface;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
-use Magento\Ui\Component\Form;
 use Magento\Framework\Registry;
-use TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface as MessageRepository;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
 /**
- * Class ChangeHistory
+ * Data provider for change history.
  */
-class ChangeHistory implements ModifierInterface
+class ChangeHistory extends BaseFormModifier
 {
+    /**
+     * Group name.
+     */
     const GROUP_CHANGE_HISTORY = 'change_history';
     const CHANGE_HISTORY_LISTING = 'tnw_subscriptionprofile_edit_change_history_listing';
 
     /**
-     * @var MessageRepository
+     * Collection Factory.
+     *
+     * @var CollectionFactory
      */
-    private $messageHistoryRepository;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
+    private $collectionFactory;
 
     /**
      * ChangeHistory constructor.
-     * @param Registry $registry
-     * @param MessageRepository $messageHistoryRepository
+     *
      * @param UrlInterface $urlBuilder
+     * @param Registry $registry
+     * @param CollectionFactory $collectionFactory
      */
     public function __construct(
+        UrlInterface $urlBuilder,
         Registry $registry,
-        MessageRepository $messageHistoryRepository,
-        UrlInterface $urlBuilder
+        CollectionFactory $collectionFactory
     ) {
-        $this->registry = $registry;
-        $this->messageHistoryRepository = $messageHistoryRepository;
-        $this->urlBuilder = $urlBuilder;
+        $this->collectionFactory = $collectionFactory;
+        parent::__construct($urlBuilder, $registry);
     }
 
     /**
@@ -105,7 +99,8 @@ class ChangeHistory implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $profile = $this->registry->registry('tnw_subscription_profile');
+        $profile = $this->getProfile();
+
         if ($profile && $profile->getId()) {
             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
         }

@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
+use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -771,10 +772,42 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
         }
 
-
         if (version_compare($context->getVersion(), "2.0.14", "<")) {
             $this->addSubscriptionProfileMessageHistoryTable($setup);
         }
+
+        if (version_compare($context->getVersion(), "2.0.17", "<")) {
+            $this->addQuoteAndOrderItemExtentionAttributeTables($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.18", "<")) {
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need Recollect',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+
+            //TODO add this attributes to main eav setup
+            $setup->getConnection()->addColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfile::NEED_RECOLLECT,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need Recollect',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 
@@ -1898,5 +1931,85 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * Create table 'tnw_subscriptions_subscription_profile_message_history'.
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addQuoteAndOrderItemExtentionAttributeTables(SchemaSetupInterface $setup)
+    {
+        if (!$setup->tableExists(SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE)) {
+            $table = $setup->getConnection()->newTable(
+                SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE
+            )->addColumn(
+                SalesExtensionAttributesInterface::MAGENTO_ITEM_ID, Table::TYPE_INTEGER,
+                null,
+                [
+                    'identity' => true,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'primary' => true
+                ],
+                'Magento quote item ID'
+            )->addColumn(
+                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE,
+                Table::TYPE_DECIMAL,
+                '12,4',
+                [
+                    'nullable' => false,
+                    'default' => '0.0000'
+                ],
+                'Initial fee'
+            )->addColumn(
+                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE,
+                Table::TYPE_DECIMAL,
+                '12,4',
+                [
+                    'nullable' => false,
+                    'default' => '0.0000'
+                ],
+                'Base initial fee'
+            );
+
+            $setup->getConnection()->createTable($table);
+        }
+
+        if (!$setup->tableExists(SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE)) {
+            $table = $setup->getConnection()->newTable(
+                SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE
+            )->addColumn(
+                SalesExtensionAttributesInterface::MAGENTO_ITEM_ID, Table::TYPE_INTEGER,
+                null,
+                [
+                    'identity' => true,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'primary' => true
+                ],
+                'Magento order item ID'
+            )->addColumn(
+                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE,
+                Table::TYPE_DECIMAL,
+                '12,4',
+                [
+                    'nullable' => false,
+                    'default' => '0.0000'
+                ],
+                'Initial fee'
+            )->addColumn(
+                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE,
+                Table::TYPE_DECIMAL,
+                '12,4',
+                [
+                    'nullable' => false,
+                    'default' => '0.0000'
+                ],
+                'Base initial fee'
+            );
+
+            $setup->getConnection()->createTable($table);
+        }
     }
 }

@@ -15,7 +15,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TNW\Subscriptions\Cron\QuoteCreator;
+use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 use TNW\Subscriptions\Model\Config;
 
 /**
@@ -31,9 +31,9 @@ class GenerateCommand extends Base
     /**
      * Quote creator
      *
-     * @var QuoteCreator.
+     * @var PoolInterface.
      */
-    private $quoteCreator;
+    private $quoteProcessorsPool;
 
     /**
      * GenerateCommand constructor.
@@ -43,7 +43,7 @@ class GenerateCommand extends Base
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
-     * @param QuoteCreator $quoteCreator
+     * @param PoolInterface $quoteProcessorsPool
      */
     public function __construct(
         Filesystem $filesystem,
@@ -52,9 +52,9 @@ class GenerateCommand extends Base
         Config $config,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
-        QuoteCreator $quoteCreator
+        PoolInterface $quoteProcessorsPool
     ) {
-        $this->quoteCreator = $quoteCreator;
+        $this->quoteProcessorsPool = $quoteProcessorsPool;
         parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager);
     }
 
@@ -91,10 +91,9 @@ class GenerateCommand extends Base
 
         try {
             $this->setAreaCode();
-            foreach ($this->getStoreManager()->getWebsites() as $website){
-                if ($this->getConfig()->isSubscriptionsActive($website->getId())){
-                    $this->quoteCreator->process($website->getId());
-                }
+            $websiteIds = array_keys($this->getStoreManager()->getWebsites());
+            foreach ($this->quoteProcessorsPool->getProcessorsInstances() as $instance) {
+                $instance->process($websiteIds);
             }
             $this->unlockProcess($fileStream);
         } catch (\Exception $e) {

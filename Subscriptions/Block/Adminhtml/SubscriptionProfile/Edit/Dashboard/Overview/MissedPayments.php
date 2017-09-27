@@ -60,7 +60,7 @@ class MissedPayments extends Template
     public function getCountOfMissedPayments()
     {
         if ($this->countOfMissedPayments === null) {
-            $nextOrder = $this->getNextSubscriptionProfileOrder();
+            $nextOrder = $this->getNextProfileRelation();
             if (!$nextOrder || !$nextOrder->getId()) {
                 $this->countOfMissedPayments = 0;
             } else {

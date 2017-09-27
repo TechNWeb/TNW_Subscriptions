@@ -145,7 +145,10 @@ class ShippingMethods
     {
         $result = '';
         $result .= $this->getCarrierTitle($code);
-        $result .= ' (' . $this->getMethodTitle($rate) . ')';
+        $methodTitle = $this->getMethodTitle($rate);
+        if ($methodTitle) {
+            $result .= ' (' . $this->getMethodTitle($rate) . ')';
+        }
         if ($withPrice) {
             $cost = $this->getShippingPrice($rate->getPrice(), $this->taxHelper->displayShippingPriceIncludingTax());
             $costInclTax = $this->getShippingPrice($rate->getPrice(), true);

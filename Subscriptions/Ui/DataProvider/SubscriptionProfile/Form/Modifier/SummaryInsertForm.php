@@ -8,21 +8,21 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Container;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
  * Class SummaryInsertForm
  */
-class SummaryInsertForm implements ModifierInterface
+class SummaryInsertForm extends BaseFormModifier
 {
     const INSERT_FORM_HANDLE = 'handle';
     const INSERT_FORM_NAMESPACE = 'namespace';
     const INSERT_FORM_SORT_ORDER = 'sort_order';
+
     /**
      * Summary fieldset name
      */
@@ -40,6 +40,7 @@ class SummaryInsertForm implements ModifierInterface
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
     const SHIPPING_METHODS_INSERT_FORM = 'shipping_method_insert_form';
     const PAYMENT_METHODS_INSERT_FORM = 'payment_method_insert_form';
+    const PRODUCTS_INSERT_FORM = 'products_insert_form';
 
     /**
      * Configuration for insert form
@@ -67,6 +68,11 @@ class SummaryInsertForm implements ModifierInterface
             self::INSERT_FORM_NAMESPACE => SummaryPaymentMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 40,
         ],
+        self::PRODUCTS_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_products',
+            self::INSERT_FORM_NAMESPACE => SummaryProductsForm::DATA_SCOPE_SUMMARY_PRODUCTS_FORM,
+            self::INSERT_FORM_SORT_ORDER => 50,
+        ],
     ];
 
     /**
@@ -75,20 +81,6 @@ class SummaryInsertForm implements ModifierInterface
      * @var bool
      */
     private $formType;
-
-    /**
-     * Registry
-     *
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * Url builder
-     *
-     * @var UrlInterface
-     */
-    private $urlBuilder;
 
     /**
      * AddressModifier constructor.
@@ -102,9 +94,8 @@ class SummaryInsertForm implements ModifierInterface
         UrlInterface $urlBuilder,
         $formType
     ) {
-        $this->registry = $registry;
-        $this->urlBuilder = $urlBuilder;
         $this->formType = $formType;
+        parent::__construct($urlBuilder, $registry);
     }
 
     /**
@@ -152,8 +143,8 @@ class SummaryInsertForm implements ModifierInterface
                         'label' => false,
                         'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
-                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
-                        'render_url' => $this->urlBuilder->getUrl(
+                        'update_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
+                        'render_url' => $this->getUrlBuilder()->getUrl(
                             'mui/index/render_handle',
                             [
                                 'handle' => $this->getHandle(),
@@ -199,16 +190,6 @@ class SummaryInsertForm implements ModifierInterface
     private function getHandle()
     {
         return self::$insertFormData[$this->formType][self::INSERT_FORM_HANDLE];
-    }
-
-    /**
-     * Returns current subscription profile from registry
-     *
-     * @return SubscriptionProfile|null
-     */
-    private function getProfile()
-    {
-        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**
