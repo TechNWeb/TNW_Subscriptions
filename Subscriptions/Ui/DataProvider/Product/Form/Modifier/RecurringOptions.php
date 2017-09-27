@@ -110,6 +110,14 @@ class RecurringOptions extends BaseModifier
     private $searchCriteriaBuilder;
 
     /**
+     * @var array
+     */
+    private $forbiddenProductTypes = [
+        \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
+        \Magento\Bundle\Model\Product\Type::TYPE_CODE,
+    ];
+
+    /**
      * RecurringOptions constructor.
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
@@ -138,27 +146,30 @@ class RecurringOptions extends BaseModifier
      */
     public function modifyData(array $data)
     {
-        $options = [];
-        $productOptions = $this->locator->getProduct()->getRecurringOptions() ?: [];
 
-        $productId = $this->locator->getProduct()->getId();
+        if ($this->isSubscriptionAttributesShown()) {
+            $options = [];
+            $productOptions = $this->locator->getProduct()->getRecurringOptions() ?: [];
 
-        /** @var ProductBillingFrequencyInterface $option */
-        foreach ($productOptions as $option) {
-            $options[] = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $option->getData());
-        }
+            $productId = $this->locator->getProduct()->getId();
 
-        $data =  array_replace_recursive(
-            $data,
-            [
-                $productId => [
-                    static::DATA_SOURCE_DEFAULT => [
-                        static::FIELD_ENABLE => 1,
-                        static::GRID_OPTIONS_NAME => $options
+            /** @var ProductBillingFrequencyInterface $option */
+            foreach ($productOptions as $option) {
+                $options[] = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $option->getData());
+            }
+
+            $data =  array_replace_recursive(
+                $data,
+                [
+                    $productId => [
+                        static::DATA_SOURCE_DEFAULT => [
+                            static::FIELD_ENABLE => 1,
+                            static::GRID_OPTIONS_NAME => $options
+                        ]
                     ]
                 ]
-            ]
-        );
+            );
+        }
 
         return $data;
     }
@@ -188,7 +199,9 @@ class RecurringOptions extends BaseModifier
     {
         $this->meta = $meta;
 
-        $this->createRecurringOptionsPanel();
+        if ($this->isSubscriptionAttributesShown()) {
+            $this->createRecurringOptionsPanel();
+        }
 
         return $this->meta;
     }
@@ -694,5 +707,23 @@ class RecurringOptions extends BaseModifier
                 ],
             ],
         ];
+    }
+
+    /**
+     * Check if it is necessary to show recurring options grid (depends on product type).
+     *
+     * @return bool
+     */
+    private function isSubscriptionAttributesShown()
+    {
+        $productType = \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE;
+        $product = $this->locator->getProduct();
+
+        if ($product) {
+            $productType = $product->getTypeId();
+        }
+
+        return (!in_array($productType, $this->forbiddenProductTypes));
+
     }
 }
