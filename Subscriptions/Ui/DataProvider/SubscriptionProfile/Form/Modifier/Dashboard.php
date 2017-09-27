@@ -11,6 +11,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Dashboard for Subscription Profile.
@@ -105,7 +106,7 @@ class Dashboard extends BaseFormModifier
         $messages = [];
 
         $profile = $this->getProfile();
-        if ($profile && $profile->getNeedGenerateQuotes() == 1) {
+        if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE) {
             $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
         }
 

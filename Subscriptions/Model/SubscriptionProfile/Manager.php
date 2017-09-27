@@ -21,6 +21,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
@@ -474,7 +475,7 @@ class Manager
                 ->setTrialStartDate(null)
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
-                ->setNeedGenerateQuotes(true);
+                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
 
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
