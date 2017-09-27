@@ -853,7 +853,7 @@ button.action-editor.active:before{
 }
 
 .order_change_history .admin__data-grid-outer-wrap .sub-data-row {
-    padding: 26px 21px 20px 20px;
+    padding: 7px 13px 8px 16px;
 }
 
 .order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-message {
@@ -877,4 +877,24 @@ button.action-editor.active:before{
 .order_change_history .admin__data-grid-outer-wrap .sub-data-row .comment-date {
     float: right;
     width: auto;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .change-status {
+    padding-bottom: 11px;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .comment .comment-type {
+    line-height: 1.15;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .comment .comment-message {
+    margin-bottom: 12px;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .change-status .comment-type {
+    display: none;
+}
+
+.order_change_history .admin__data-grid-outer-wrap .change-status .comment-message {
+    margin-left: 0;
 }
