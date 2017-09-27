@@ -162,9 +162,10 @@ class Manager
      * Retrieve next Subscription profile order
      *
      * @param SubscriptionProfileInterface $profile
-     * @return false|SubscriptionProfileOrderInterface
+     * @param null|bool $all
+     * @return false|SubscriptionProfileOrderInterface|SubscriptionProfileOrderInterface[]
      */
-    public function getNextProfileRelation($profile)
+    public function getNextProfileRelation($profile, $all = null)
     {
         $result = null;
         /** @var \Magento\Framework\Api\SortOrder $sortOrder */
@@ -172,17 +173,20 @@ class Manager
             ->setField(SubscriptionProfileOrderInterface::SCHEDULED_AT)
             ->setDirection(SortOrder::SORT_ASC)
             ->create();
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteria = $this->criteriaBuilder
+        $this->criteriaBuilder
             ->addFilter(SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profile->getId())
-            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, null, 'null' )
-            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID, null, 'notnull' )
-            ->setSortOrders([$sortOrder])
-            ->setPageSize(1)
-            ->create();
-        $results =  $this->profileOrderRepository->getList($searchCriteria)->getItems();
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, null, 'null')
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID, null, 'notnull')
+            ->setSortOrders([$sortOrder]);
+        if (!$all){
+            $this->criteriaBuilder->setPageSize(1);
+        }
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder->create();
+
+        $results = $this->profileOrderRepository->getList($searchCriteria)->getItems();
         if (count($results)) {
-            $result = reset($results);
+            $result = $all ? $results : reset($results);
         }
 
         return $result;

@@ -25,11 +25,6 @@ class ProductSubscriptionProfile extends AbstractModel
      */
     const ENTITY = 'tnw_product_subscription_profile';
 
-    /**
-     * Entity table.
-     */
-    const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
-
     /*
      * Default group code for custom attributes.
      */

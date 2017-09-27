@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\ObjectManagerInterface;
@@ -17,12 +17,12 @@ class Pool implements PoolInterface
     /**
      * @var array
      */
-    protected $modifiers = [];
+    protected $processors = [];
 
     /**
      * @var array
      */
-    protected $modifiersInstances = [];
+    protected $processorsInstances = [];
 
     /**
      * Object manager.
@@ -34,31 +34,31 @@ class Pool implements PoolInterface
     /**
      * Pool constructor.
      * @param ObjectManagerInterface $objectManager
-     * @param array $modifiers
+     * @param array $processors
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        array $modifiers
+        array $processors
     ) {
         $this->objectManager = $objectManager;
-        $this->modifiers = $modifiers;
+        $this->processors = $processors;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getModifiers()
+    public function getProcessors()
     {
-        return $this->modifiers;
+        return $this->processors;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getModifiersInstances()
+    public function getProcessorsInstances()
     {
-        if (!$this->modifiersInstances) {
-            foreach ($this->modifiers as $modifier) {
+        if (!$this->processorsInstances) {
+            foreach ($this->processors as $modifier) {
                 if (empty($modifier['class'])) {
                     throw new LocalizedException(__('Parameter "class" must be present.'));
                 }
@@ -68,15 +68,15 @@ class Pool implements PoolInterface
                 }
 
                 $modifierObject = $this->objectManager->create($modifier['class']);
-                if (!$modifierObject instanceof ModifierInterface) {
+                if (!$modifierObject instanceof ProcessInterface) {
                     throw new \InvalidArgumentException(
-                        'Type "' . $modifier['class'] . '" is not instance on ' . ModifierInterface::class
+                        'Type "' . $modifier['class'] . '" is not instance on ' . ProcessInterface::class
                     );
                 }
-                $this->modifiersInstances[$modifier['class']] = $modifierObject;
+                $this->processorsInstances[$modifier['class']] = $modifierObject;
             }
         }
 
-        return $this->modifiersInstances;
+        return $this->processorsInstances;
     }
 }
