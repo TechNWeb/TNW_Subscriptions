@@ -237,6 +237,12 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Edit">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
 
     <type name="Magento\Sales\Cron\CleanExpiredQuotes">
         <plugin name="tnw_clean_expired_quotes"

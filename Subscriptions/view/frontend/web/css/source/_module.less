@@ -1,4 +1,14 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+@import '_variables.less';
+
 & when (@media-common = true) {
+
   .tnw-subscriptions-cart-link__container {
     display: inline-block;
     position: relative;
@@ -544,4 +554,83 @@
       }
     }
   }
+}
+
+#my-subscriptions-table {
+  .sub-icons-container {
+    .lib-tooltip(bottom);
+    @media (max-width: 639px) {
+      &:before {
+        content: normal;
+      }
+      .sub-message {
+        display: inline-block;
+        background: none;
+        max-width: none;
+        max-height: none;
+        padding: 0;
+        border: none;
+        margin-top: 0;
+        position: inherit;
+      }
+      .sub-message:before {
+        content: normal;
+      }
+      .sub-message:after {
+        content: normal;
+      }
+      .sub-icon {
+        float: left;
+        margin-right: 0.5rem;
+        width: 2rem;
+        height: 2px;
+      }
+    }
+  }
+  td {
+    .sub-icon {
+      position: relative;
+    }
+    .sub-icon:before {
+      background: none;
+      border: 0;
+      font-family: @icons-subscription__font-name;
+      font-size: 1.9rem;
+      font-style: normal;
+      font-weight: 400;
+      height: auto;
+      left: 0rem;
+      line-height: inherit;
+      margin-top: -0.5rem;
+      position: absolute;
+      speak: none;
+      text-shadow: none;
+      top: 50%;
+      width: auto;
+    }
+    .sub-icon-warning-orange:before {
+      color: #ff5501;
+      content: @icon-warning-subscription__content;
+    }
+    .sub-icon-warning-red:before {
+      color: #CF2A27;
+      content: @icon-warning-subscription__content;
+    }
+    .sub-icon-active-green:before {
+      color: #009e0f;
+      content: @icon-active-subscription__content;
+    }
+  }
+  .status.green {
+    color: #009e0f;
+  }
+  .status.orange {
+    color: #ff5501;
+  }
+  .status.red {
+    color: #CF2A27
+  }
+}
+.subscriptions-products-toolbar {
+  position: relative;
 }

@@ -14,6 +14,8 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface as RelationRepository;
 use TNW\Subscriptions\Model\SubscriptionProfileOrderFactory;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class Manager
@@ -47,10 +49,18 @@ class Manager
      * @var SearchCriteriaBuilder
      */
     private $criteriaBuilder;
+
     /**
      * @var SortOrderBuilder
      */
     private $sortOrderBuilder;
+
+    /**
+     * Subscription config.
+     *
+     * @var Config
+     */
+    private $config;
 
     /**
      * Manager constructor.
@@ -58,17 +68,20 @@ class Manager
      * @param RelationRepository $profileOrderRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param SortOrderBuilder $sortOrderBuilder
+     * @param Config $config
      */
     public function __construct(
         SubscriptionProfileOrderFactory $profileFactory,
         RelationRepository $profileOrderRepository,
         SearchCriteriaBuilder $criteriaBuilder,
-        SortOrderBuilder $sortOrderBuilder
+        SortOrderBuilder $sortOrderBuilder,
+        Config $config
     ) {
         $this->profileOrderFactory = $profileFactory;
         $this->profileOrderRepository = $profileOrderRepository;
         $this->criteriaBuilder = $criteriaBuilder;
         $this->sortOrderBuilder = $sortOrderBuilder;
+        $this->config = $config;
     }
 
 
@@ -164,7 +177,7 @@ class Manager
      * @param SubscriptionProfileInterface $profile
      * @return false|SubscriptionProfileOrderInterface
      */
-    public function getNextProfileRelation($profile)
+    public function getNextProfileRelation(SubscriptionProfileInterface $profile)
     {
         $result = null;
         /** @var \Magento\Framework\Api\SortOrder $sortOrder */
@@ -186,5 +199,94 @@ class Manager
         }
 
         return $result;
+    }
+
+    /**
+     * Retrieve status message.
+     *
+     * @param int|string $status
+     * @param string$scheduledAt
+     * @return string
+     */
+    public function getStatusMessage($status, $scheduledAt)
+    {
+        $result = '';
+        switch ($status) {
+            case ProfileStatus::STATUS_ACTIVE:
+                $result =  __('Subscription is current');
+                break;
+            case ProfileStatus::STATUS_HOLDED:
+                $result = __('Subscription is inactive');
+                break;
+            case ProfileStatus::STATUS_TRIAL:
+                $result = __('In trial period');
+                break;
+            case ProfileStatus::STATUS_PENDING:
+                $result = __('Awaiting payment');
+                break;
+            case ProfileStatus::STATUS_COMPLETE:
+                $result = __('Subscription successfully completed');
+                break;
+            case ProfileStatus::STATUS_SUSPENDED:
+                $days = $this->getDaysPastDue($scheduledAt);
+                $result = __('%1 day%2 past due!', $days, $days !== 1 ? 's' : '');
+                break;
+            case ProfileStatus::STATUS_CANCELED:
+                $result = __('Subscription is canceled');
+                break;
+            case ProfileStatus::STATUS_PAST_DUE:
+                $days = $this->getDaysUntilSuspended($scheduledAt);
+                $result = __(
+                    '%1 day%2 until suspended',
+                    $days,
+                    $days !== 1 ? 's' : ''
+                );
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieve the number of days from the last successful payment.
+     *
+     * @param string $scheduledAt
+     * @return int
+     */
+    private function getDaysPastDue($scheduledAt)
+    {
+        if (!$scheduledAt) {
+            return 0;
+        }
+
+        $dateFrom = new \DateTime($scheduledAt);
+        $dateTo = new \DateTime();
+        if ($dateFrom > $dateTo) {
+            return 0;
+        }
+
+        return $dateFrom->diff($dateTo)->days;
+    }
+
+    /**
+     * Retrieve count of days from when the payment was due until today.
+     *
+     * @param string $scheduledAt
+     * @return int
+     */
+    private function getDaysUntilSuspended($scheduledAt)
+    {
+        if (!$scheduledAt) {
+            return 0;
+        }
+
+        $period = min([
+            intval($this->config->getGracePeriod()),
+            intval($this->config->getAttemptCount()) * intval($this->config->getAttemptInterval()),
+        ]);
+        $beginPeriod = new \DateTime($scheduledAt . " +$period days");
+        $dayDateDiff = $beginPeriod->diff(new \DateTime())->days;
+
+        return ($dayDateDiff > 0) ? $dayDateDiff : 0;
     }
 }

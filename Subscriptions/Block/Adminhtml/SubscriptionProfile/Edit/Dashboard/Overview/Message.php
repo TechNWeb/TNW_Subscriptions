@@ -8,16 +8,14 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\O
 
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
-use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 
 /**
  * Subscription Overview Message block
  *
  * @method SubscriptionProfile getSubscriptionProfile()
- * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
  */
 class Message extends Template
 {
@@ -27,21 +25,21 @@ class Message extends Template
     protected $_template = 'TNW_Subscriptions::subscription_profile/dashboard/overview/message.phtml';
 
     /**
-     * @var Config
+     * @var Manager
      */
-    private $config;
+    private $profileManager;
 
     /**
      * @param Context $context
-     * @param Config $config
+     * @param Manager $profileManager
      * @param array $data
      */
     public function __construct(
         Context $context,
-        Config $config,
+        Manager $profileManager,
         array $data = []
     ) {
-        $this->config = $config;
+        $this->profileManager = $profileManager;
         parent::__construct($context, $data);
     }
 
@@ -52,35 +50,19 @@ class Message extends Template
      */
     public function getMessage()
     {
+        $message = '';
         $profile = $this->getSubscriptionProfile();
         if ($profile) {
-            switch ($profile->getStatus()) {
-                case ProfileStatus::STATUS_ACTIVE:
-                    return __('Subscription is current');
-                case ProfileStatus::STATUS_HOLDED:
-                    return __('Subscription is inactive');
-                case ProfileStatus::STATUS_TRIAL:
-                    return __('In trial period');
-                case ProfileStatus::STATUS_PENDING:
-                    return __('Awaiting payment');
-                case ProfileStatus::STATUS_COMPLETE:
-                    return __('Subscription successfully completed');
-                case ProfileStatus::STATUS_SUSPENDED:
-                    $days = $this->getDaysPastDue();
-                    return __('%1 day%2 past due!', $days, $days !== 1 ? 's' : '');
-                case ProfileStatus::STATUS_CANCELED:
-                    return __('Subscription is canceled');
-                case ProfileStatus::STATUS_PAST_DUE:
-                    $days = $this->getDaysUntilSuspended();
-                    return __(
-                        '%1 day%2 until suspended',
-                        $days,
-                        $days !== 1 ? 's' : ''
-                    );
+            $profileOrder = $this->getNextProfileRelation();
+            $scheduledAt = null;
+            if ($profileOrder) {
+                $this->profileManager->setProfileOrderRelation($profileOrder);
+                $scheduledAt = $profileOrder->getScheduledAt();
             }
+            $message = $this->profileManager->getStatusMessage($profile->getStatus(), $scheduledAt);
         }
 
-        return '';
+        return $message;
     }
 
     /**
@@ -107,48 +89,5 @@ class Message extends Template
         }
 
         return '';
-    }
-
-    /**
-     * Retrieve the number of days from the last successful payment.
-     *
-     * @return int
-     */
-    private function getDaysPastDue()
-    {
-        $profileOrder = $this->getNextProfileRelation();
-        if (!$profileOrder) {
-            return 0;
-        }
-        
-        $dateFrom = new \DateTime($profileOrder->getScheduledAt());
-        $dateTo = new \DateTime();
-        if ($dateFrom > $dateTo) {
-            return 0;
-        }
-        
-        return $dateFrom->diff($dateTo)->days;
-    }
-
-    /**
-     * Retrieve count of days from when the payment was due until today.
-     *
-     * @return int
-     */
-    private function getDaysUntilSuspended()
-    {
-        $profileOrder = $this->getNextProfileRelation();
-        if (!$profileOrder) {
-            return 0;
-        }
-
-        $period = min([
-            intval($this->config->getGracePeriod()),
-            intval($this->config->getAttemptCount()) * intval($this->config->getAttemptInterval()),
-        ]);
-        $beginPeriod = new \DateTime($profileOrder->getScheduledAt() . " +$period days");
-        $dayDateDiff = $beginPeriod->diff(new \DateTime())->days;
-
-        return ($dayDateDiff > 0) ? $dayDateDiff : 0;
     }
 }
