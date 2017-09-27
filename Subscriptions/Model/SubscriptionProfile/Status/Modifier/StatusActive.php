@@ -15,7 +15,7 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 /**
  * Modifier to set "Active" status
  */
-class StatusActive extends Base implements ModifierInterface
+class StatusActive extends Base
 {
     /**
      * {@inheritdoc}

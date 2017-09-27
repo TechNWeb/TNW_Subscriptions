@@ -132,7 +132,9 @@ class MessageHistoryLogger
         if (!$isAutomatedProcess) {
             $authSession = $this->authSessionFactory->create();
             $user = $authSession->getUser();
-            $messageHistory->setUserId($user->getId());
+            if ($user) {
+                $messageHistory->setUserId($user->getId());
+            }
         }
 
         $this->messageHistoryRepository->save($messageHistory);

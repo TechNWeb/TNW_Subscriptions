@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 /**
  * Interface PoolInterface
@@ -16,14 +16,14 @@ interface PoolInterface
      *
      * @return array
      */
-    public function getModifiers();
+    public function getProcessors();
 
     /**
      * Retrieves modifiers instantiated
      *
-     * @return ModifierInterface[]
+     * @return ProcessInterface[]
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \InvalidArgumentException
      */
-    public function getModifiersInstances();
+    public function getProcessorsInstances();
 }

@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
@@ -21,6 +20,7 @@ class ChangeHistory extends BaseFormModifier
      * Group name.
      */
     const GROUP_CHANGE_HISTORY = 'change_history';
+    const CHANGE_HISTORY_LISTING = 'tnw_subscriptionprofile_edit_change_history_listing';
 
     /**
      * Collection Factory.
@@ -45,28 +45,33 @@ class ChangeHistory extends BaseFormModifier
         parent::__construct($urlBuilder, $registry);
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function modifyMeta(array $meta)
     {
-        $data = $this->getConvertedMessageHistoryData();
-
         $meta[static::GROUP_CHANGE_HISTORY] = [
             'children' => [
-                static::GROUP_CHANGE_HISTORY . '_listing' => [
+                'change_history_listing' => [
                     'arguments' => [
                         'data' => [
                             'config' => [
                                 'autoRender' => true,
-                                'componentType' => Container::NAME,
-                                'template' => 'TNW_Subscriptions/form/subscription-profile/message-history',
-                                'component' => 'TNW_Subscriptions/js/form/subscription-profile/message-history',
-                                'imports' =>
-                                    [
-                                        'messageHistoryData' => $data
-                                    ]
+                                'componentType' => 'insertListing',
+                                'dataScope' => 'change_history_listing',
+                                'externalProvider' => self::CHANGE_HISTORY_LISTING . '.' . self::CHANGE_HISTORY_LISTING . '_data_source',
+                                'selectionsProvider' => self::CHANGE_HISTORY_LISTING . '.'.self::CHANGE_HISTORY_LISTING . 'tnw_subscriptionprofile_change_history_columns.entity_id',
+                                'ns' => self::CHANGE_HISTORY_LISTING,
+                                'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
+                                'realTimeLink' => false,
+                                'behaviourType' => 'simple',
+                                'externalFilterMode' => true,
+                                'imports' => [
+                                    'profileId' => '${ $.provider }:data.subscription_profile_id'
+                                ],
+                                'exports' => [
+                                    'profileId' => '${ $.externalProvider }:params.subscription_profile_id'
+                                ],
                             ],
                         ],
                     ],
@@ -75,11 +80,12 @@ class ChangeHistory extends BaseFormModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Subscription Change History'),
+                        'label' => __('Product Reviews'),
                         'collapsible' => true,
-                        'opened' => true,
+                        'opened' => false,
                         'componentType' => Form\Fieldset::NAME,
                         'sortOrder' => 10,
+                        'additionalClasses' => 'order_change_history'
                     ],
                 ],
             ],
@@ -100,34 +106,5 @@ class ChangeHistory extends BaseFormModifier
         }
 
         return $data;
-    }
-
-    /**
-     * Get message history for subscription profile from registry.
-     *
-     * @return array
-     */
-    private function getConvertedMessageHistoryData()
-    {
-        $profile = $this->getProfile();
-
-        $collection = $this->collectionFactory->create();
-        $data = $collection->getDataForChangeHistory($profile->getId());
-
-        $convertedData = [];
-        foreach ($data as $key => $item) {
-            $convertedData[$key]['author_name'] = $item['lastname']
-                ? 'by ' . $item['firstname'] . ' ' . $item['lastname']
-                : __('by automated process');
-            $convertedData[$key]['author_email'] = $item['email'];
-            $convertedData[$key]['message'] = $item['message'];
-            $convertedData[$key]['is_comment'] = $item['is_comment'];
-            $convertedData[$key]['comment_label'] = $item['is_comment'] ? __('Comment') : '';
-
-            // date format like "August 23rd, 2017   2:04:15 PM"
-            $convertedData[$key]['date'] = date('F dS, Y   g:i:s A', strtotime($item['created_at']));
-        }
-
-        return $convertedData;
     }
 }

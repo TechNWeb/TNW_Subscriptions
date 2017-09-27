@@ -34,9 +34,9 @@ class Config
     /**#@+
      * Config xml path for past due profile options section
      */
-    private $xmlAttemptCount = 'tnw_subscriptions_general/past_due_profile_options/attempt_count';
-    private $xmlAttemptInterval = 'tnw_subscriptions_general/past_due_profile_options/attempt_interval';
-    private $xmlGracePeriod = 'tnw_subscriptions_general/past_due_profile_options/grace_period';
+    private $xmlAttemptCount = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_count';
+    private $xmlAttemptInterval = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval';
+    private $xmlGracePeriod = 'tnw_subscriptions_profile_options/past_due_profile_options/grace_period';
     /**#@-*/
 
     /**#@+
