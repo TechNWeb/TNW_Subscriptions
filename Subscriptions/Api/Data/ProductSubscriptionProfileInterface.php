@@ -10,6 +10,11 @@ use Magento\Catalog\Model\Product;
 
 interface ProductSubscriptionProfileInterface
 {
+    /**
+     * Entity table.
+     */
+    const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
+
     /**#@+
      * Constants for field names
      */
@@ -29,7 +34,6 @@ interface ProductSubscriptionProfileInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
-
     /**#@-*/
 
     /**#@+

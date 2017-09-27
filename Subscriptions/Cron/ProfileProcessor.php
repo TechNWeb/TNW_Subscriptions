@@ -10,7 +10,7 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 
 /**
  * Class ProfileProcessor
@@ -43,25 +43,25 @@ class ProfileProcessor
      *
      * @var PoolInterface
      */
-    private $statusModifiersPool;
+    private $statusProcessorsPool;
 
     /**
      * ProfileProcessor constructor.
      * @param Context $context
      * @param Manager $queueManager
      * @param Registry $registry
-     * @param PoolInterface $statusModifiersPool
+     * @param PoolInterface $statusProcessorsPool
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
         Registry $registry,
-        PoolInterface $statusModifiersPool
+        PoolInterface $statusProcessorsPool
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
         $this->registry = $registry;
-        $this->statusModifiersPool = $statusModifiersPool;
+        $this->statusProcessorsPool = $statusProcessorsPool;
     }
 
     /**
@@ -104,8 +104,8 @@ class ProfileProcessor
     private function updateProfilesStatuses(array $allIds)
     {
         try {
-            foreach ($this->statusModifiersPool->getModifiersInstances() as $modifier) {
-                $modifier->modify($allIds);
+            foreach ($this->statusProcessorsPool->getProcessorsInstances() as $modifier) {
+                $modifier->process($allIds);
             }
         } catch (\Exception $e) {
             $this->context->log(__('Error on updating profile statuses - ') . $e->getMessage());

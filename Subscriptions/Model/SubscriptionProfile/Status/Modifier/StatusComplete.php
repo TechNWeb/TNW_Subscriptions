@@ -13,7 +13,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 /**
  * Modifier to set "Complete" status
  */
-class StatusComplete extends Base implements ModifierInterface
+class StatusComplete extends Base
 {
     /**
      * {@inheritdoc}
