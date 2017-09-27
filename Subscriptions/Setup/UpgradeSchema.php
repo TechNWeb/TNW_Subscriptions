@@ -808,6 +808,19 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.19", "<")) {
+            //TODO add this column to main subscription profile setup
+            $setup->getConnection()->changeColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::NEED_GENERATE_QUOTES,
+                SubscriptionProfile::GENERATE_QUOTES_STATE,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'comment' => 'Generate quotes state'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

@@ -147,20 +147,21 @@ class QuoteCreator
                 }
 
                 if ($profile->getTerm()) {
-                    $profile->setNeedGenerateQuotes(2);
+                    $tempState = SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR;
                     if ($needMore) {
-                        $profile->setNeedGenerateQuotes(1);
+                        $tempState = SubscriptionProfileInterface::GENERATE_QUOTES_STATE_ACTIVE;
                     }
                 } else {
-                    $profile->setNeedGenerateQuotes(0);
+                    $tempState = SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE;
                     if ($needMore) {
-                        $profile->setNeedGenerateQuotes(1);
+                        $tempState = SubscriptionProfileInterface::GENERATE_QUOTES_STATE_ACTIVE;
                     }
                 }
+                $this->updateGenerateQuotesState($profile, $tempState);
             } catch (\Exception $e) {
                 $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
                 $this->context->log($e->getMessage());
-                $profile->setNeedGenerateQuotes(1);
+                $this->updateGenerateQuotesState($profile, SubscriptionProfileInterface::GENERATE_QUOTES_STATE_ACTIVE);
             }
             $this->profileRepository->save($profile);
         }
@@ -177,7 +178,7 @@ class QuoteCreator
     private function getProfiles($websiteId)
     {
         $this->criteriaBuilder->addFilter(
-            SubscriptionProfileInterface::NEED_GENERATE_QUOTES,
+            SubscriptionProfileInterface::GENERATE_QUOTES_STATE,
             true
             )->addFilter(
                 SubscriptionProfileInterface::WEBSITE_ID,
@@ -404,5 +405,16 @@ class QuoteCreator
             false,
             true
         );
+    }
+
+    /**
+     * Setting current state to subscription profile attribute.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param int $state
+     */
+    private function updateGenerateQuotesState(SubscriptionProfileInterface $profile, $state)
+    {
+        $profile->setGenerateQuotesState($state);
     }
 }
