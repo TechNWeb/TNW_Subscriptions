@@ -596,17 +596,17 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     /**
      * {@inheritdoc}
      */
-    public function getNeedGenerateQuotes()
+    public function getGenerateQuotesState()
     {
-        return $this->getData(self::NEED_GENERATE_QUOTES);
+        return $this->getData(self::GENERATE_QUOTES_STATE);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setNeedGenerateQuotes($flag)
+    public function setGenerateQuotesState($state)
     {
-        return $this->setData(self::NEED_GENERATE_QUOTES, $flag);
+        return $this->setData(self::GENERATE_QUOTES_STATE, $state);
     }
 
     /**

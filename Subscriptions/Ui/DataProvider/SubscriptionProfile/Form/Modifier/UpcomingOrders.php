@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Prepare upcoming orders ui layout.
@@ -92,7 +93,7 @@ class UpcomingOrders extends BaseFormModifier
         $messages = [];
 
         $profile = $this->getProfile();
-        if ($profile && $profile->getNeedGenerateQuotes() == 1) {
+        if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE) {
             $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
         }
         if ($profile && $profile->getNeedRecollect()) {
