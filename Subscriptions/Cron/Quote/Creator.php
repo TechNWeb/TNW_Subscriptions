@@ -4,79 +4,35 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Cron;
+namespace TNW\Subscriptions\Cron\Quote;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\DataObject;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteFactory;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class QuoteCreator
+ * Class Creator
  */
-class QuoteCreator
+class Creator extends Base
 {
-    /**
-     * Repository for retrieving subscription profiles.
-     *
-     * @var SubscriptionProfileRepository
-     */
-    private $profileRepository;
-
-    /**
-     * Search criteria builder.
-     *
-     * @var SearchCriteriaBuilder
-     */
-    private $criteriaBuilder;
-
-    /**
-     * Subscriptions context.
-     *
-     * @var Context
-     */
-    private $context;
-
-    /**
-     * Subscriptions config.
-     *
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * Repository fore saving/retrieving quotes.
-     *
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
     /**
      * Factory for creating quotes.
      *
      * @var QuoteFactory
      */
     private $quoteFactory;
-
-    /**
-     * Profile relation manager.
-     *
-     * @var RelationManager
-     */
-    private $relationManager;
 
     /**
      * Profile process queue manager.
@@ -93,13 +49,14 @@ class QuoteCreator
     private $messageHistoryLogger;
 
     /**
-     * QuoteCreator constructor.
+     * Creator constructor.
      * @param SubscriptionProfileRepository $profileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param Context $context
      * @param Config $config
      * @param CartRepositoryInterface $cartRepository
      * @param QuoteFactory $quoteFactory
+     * @param CollectionFactory $collectionFactory
      * @param RelationManager $relationManager
      * @param Manager $queueManager
      * @param MessageHistoryLogger $messageHistoryLogger
@@ -111,82 +68,75 @@ class QuoteCreator
         Config $config,
         CartRepositoryInterface $cartRepository,
         QuoteFactory $quoteFactory,
+        CollectionFactory $collectionFactory,
         RelationManager $relationManager,
         Manager $queueManager,
         MessageHistoryLogger $messageHistoryLogger
     ) {
-        $this->profileRepository = $profileRepository;
-        $this->criteriaBuilder = $criteriaBuilder;
-        $this->context = $context;
-        $this->config = $config;
-        $this->cartRepository = $cartRepository;
         $this->quoteFactory = $quoteFactory;
-        $this->relationManager = $relationManager;
         $this->queueManager = $queueManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
+        parent::__construct($profileRepository, $criteriaBuilder, $context, $config, $cartRepository,
+            $collectionFactory, $relationManager
+        );
     }
 
     /**
      * Generates future quotes for profile and adds them to queue.
      *
-     * @param int $websiteId
+     * @param array $websiteIds
      */
-    public function process($websiteId)
+    public function process(array $websiteIds)
     {
-        $relations = [];
-        foreach ($this->getProfiles($websiteId) as $profile) {
-            try {
-                list($cycles, $needMore) = $this->getBillingCycles($profile);
-                foreach ($cycles as $cycleDate) {
-                    $quote = $this->generateQuote($profile);
-                    $relations[] = $this->assignQuoteToProfile(
-                        $profile,
-                        $quote,
-                        $cycleDate
-                    );
-                }
-
-                if ($profile->getTerm()) {
-                    $profile->setNeedGenerateQuotes(2);
-                    if ($needMore) {
-                        $profile->setNeedGenerateQuotes(1);
+        foreach ($websiteIds as $websiteId) {
+            $relations = [];
+            foreach ($this->getProfiles($websiteId) as $profile) {
+                try {
+                    list($cycles, $needMore) = $this->getBillingCycles($profile);
+                    foreach ($cycles as $cycleDate) {
+                        $quote = $this->processQuote($profile, $this->getEmptyQuote());
+                        $relations[] = $this->assignQuoteToProfile(
+                            $profile,
+                            $quote,
+                            $cycleDate
+                        );
                     }
-                } else {
-                    $profile->setNeedGenerateQuotes(0);
-                    if ($needMore) {
-                        $profile->setNeedGenerateQuotes(1);
-                    }
+                    $needGenerate = $profile->getTerm() ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+                        : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED;
+                    $needGenerate = $needMore ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE : $needGenerate;
+                    $this->updateGenerateQuotesState($profile, $needGenerate);
+                } catch (\Exception $e) {
+                    $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
+                    $this->context->log($e->getMessage());
+                    $this->updateGenerateQuotesState($profile, SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE);
                 }
-            } catch (\Exception $e) {
-                $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
-                $this->context->log($e->getMessage());
-                $profile->setNeedGenerateQuotes(1);
+                $this->profileRepository->save($profile);
             }
-            $this->profileRepository->save($profile);
+            //Add created relations to profile process queue
+            $this->queueManager->insertItems($relations);
         }
-        //Add created relations to profile process queue
-        $this->queueManager->insertItems($relations);
     }
 
     /**
-     * Returns list of profiles with no quotes.
-     *
-     * @param int $websiteId
-     * @return SubscriptionProfileInterface[]
+     * @inheritdoc
      */
-    private function getProfiles($websiteId)
+    public function getProfilesIdsToProcess($websiteId)
     {
-        $this->criteriaBuilder->addFilter(
-            SubscriptionProfileInterface::NEED_GENERATE_QUOTES,
-            true
-            )->addFilter(
-                SubscriptionProfileInterface::WEBSITE_ID,
-                $websiteId
-            );
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteria = $this->criteriaBuilder->create();
+        $collection = $this->getBaseCollection()
+            ->addFieldToFilter(
+                SubscriptionProfileInterface::GENERATE_QUOTES_STATE,
+                [
+                    'in' => [
+                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
+                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+                    ]
+                ]
+            )
+            ->addFieldToFilter(SubscriptionProfileInterface::WEBSITE_ID, $websiteId)
+            ->addFieldToFilter(SubscriptionProfileInterface::NEED_RECOLLECT, 0)
+            ->addFieldToFilter('products_need_recollect', 0);
 
-        return $this->profileRepository->getList($searchCriteria)->getItems();
+        return $collection->getAllIds();
     }
 
     /**
@@ -284,23 +234,6 @@ class QuoteCreator
     }
 
     /**
-     * Returns request for adding product to subscription quote.
-     *
-     * @param ProductSubscriptionProfileInterface $profileProduct
-     * @return DataObject
-     */
-    private function getProductAddRequest(
-        ProductSubscriptionProfileInterface $profileProduct
-    ) {
-        $data = [
-            'custom_price' => $profileProduct->getPrice(),
-            'qty' => $profileProduct->getQty()
-        ];
-
-        return new DataObject($data);
-    }
-
-    /**
      * Creates relation between profile and scheduled quote.
      *
      * @param SubscriptionProfileInterface $profile
@@ -322,63 +255,6 @@ class QuoteCreator
         $this->logToMessageHistory($relation, $profile->getId());
 
         return $id;
-    }
-
-    /**
-     * Creates quote for profile.
-     *
-     * @param SubscriptionProfileInterface $profile
-     * @return mixed
-     */
-    private function generateQuote(SubscriptionProfileInterface $profile)
-    {
-        /** @var Quote $quote */
-        $quote = $this->quoteFactory->create();
-        //Deactivate quote
-        $quote->setIsActive(false);
-        $quote->setData('ignore_old_qty', true);
-        $quote->setData('is_super_mode', true);
-        //Set store
-        $quote->setStore(
-            $profile->getWebsite()->getDefaultStore()
-        );
-        //Set currency
-        $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
-        //Set customer
-        $quote->assignCustomer($profile->getCustomer());
-        //Add products
-        foreach ($profile->getProducts() as $profileProduct) {
-            $addRequest = $this->getProductAddRequest(
-                $profileProduct
-            );
-            $quote->addProduct(
-                $profileProduct->getMagentoProduct(),
-                $addRequest
-            );
-        }
-        //Set shipping address
-        $quote->getShippingAddress()->addData(
-            $profile->getShippingAddress()->getData()
-        );
-        $quote->getShippingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
-        //Set billing address
-        $quote->getBillingAddress()->addData(
-            $profile->getBillingAddress()->getData()
-        );
-        $quote->getBillingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
-        //Set shipping method
-        $quote->getShippingAddress()
-            ->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod($profile->getShippingMethod());
-        $quote->setTotalsCollectedFlag(false);
-        $this->cartRepository->save($quote);
-
-        return $quote;
     }
 
     /**
@@ -404,5 +280,26 @@ class QuoteCreator
             false,
             true
         );
+    }
+
+    /**
+     * Returns empty quote object.
+     *
+     * @return Quote
+     */
+    private function getEmptyQuote()
+    {
+        return $this->quoteFactory->create();
+    }
+
+    /**
+     * Setting current state to subscription profile attribute.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param int $state
+     */
+    private function updateGenerateQuotesState(SubscriptionProfileInterface $profile, $state)
+    {
+        $profile->setGenerateQuotesState($state);
     }
 }

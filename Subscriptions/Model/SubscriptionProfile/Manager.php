@@ -21,12 +21,14 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Framework\Api\SimpleDataObjectConverter;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
 
 /**
  * Class Manager
@@ -474,7 +476,7 @@ class Manager
                 ->setTrialStartDate(null)
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
-                ->setNeedGenerateQuotes(true);
+                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
 
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
@@ -558,6 +560,35 @@ class Manager
                 ->getShippingMethodsAsOptionArray($withPrice);
         }
         return $options;
+    }
+
+    /**
+     * Handles messages for subscription edit form
+     *
+     * @return array
+     */
+    public function handleMessages()
+    {
+        $messages = [];
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        if ($profile->getNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
+            $messages[] = [
+                'index' => 'index = subscription_details_message',
+                'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
+            ];
+        }
+        if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'index = profit_message',
+                'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        return $messages;
     }
 
     /**

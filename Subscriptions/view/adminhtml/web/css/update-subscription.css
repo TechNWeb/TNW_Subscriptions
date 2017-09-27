@@ -78,6 +78,18 @@
     float: right;
     margin-bottom: 9%;
 }
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title {
+    border: none;
+    padding-bottom: 0;
+}
+.admin__profile-dashboard-profit .fieldset-wrapper-title {
+    padding-bottom: 0;
+}
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title strong.title,
+.admin__profile-dashboard-profit .fieldset-wrapper-title strong.title {
+    font-size: 2rem;
+    font-weight: normal;
+}
 
 .profile-dashboard-subscription-details-title-wrapper {
     border-bottom: 1px solid #ffffff;

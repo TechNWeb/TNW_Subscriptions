@@ -12,14 +12,15 @@ use Magento\Framework\App\ResourceConnection;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Base class for status modifiers.
  */
-abstract class Base
+abstract class Base implements ProcessInterface
 {
     /**
      * Config model.
@@ -102,7 +103,7 @@ abstract class Base
      *
      * @param array $allIds
      */
-    public function modify(array $allIds)
+    public function process(array $allIds)
     {
         $ids = $this->getIdsToModify($allIds);
         $this->criteriaBuilder->addFilter(
@@ -115,7 +116,7 @@ abstract class Base
         $profiles = $this->profileRepository->getList($searchCriteria)->getItems();
         /** @var SubscriptionProfileInterface $profile */
         foreach ($profiles as $profile) {
-            if ((int)$this->getNewStatus() !== (int)$profile->getStatus()){
+            if ((int)$this->getNewStatus() !== (int)$profile->getStatus()) {
                 $oldStatus = $profile->getStatus();
                 //change profile status
                 $profile->setStatus($this->getNewStatus());

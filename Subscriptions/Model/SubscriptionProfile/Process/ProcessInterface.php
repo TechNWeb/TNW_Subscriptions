@@ -4,18 +4,18 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 /**
  * Interface ModifierInterface
  */
-interface ModifierInterface
+interface ProcessInterface
 {
     /**
-     * Modifies subscription profile statuses.
+     * Processes subscription profile statuses.
      *
      * @param array $ids
      * @return void
      */
-    public function modify(array $ids);
+    public function process(array $ids);
 }
