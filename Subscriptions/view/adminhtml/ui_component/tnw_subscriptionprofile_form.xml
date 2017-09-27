@@ -60,28 +60,63 @@
                 <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview</argument>
             </htmlContent>
         </container>
-        <container name="profit">
+        <fieldset name="profit_fieldset">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">5</item>
-                    <item name="additionalClasses" xsi:type="string">admin__profile_dashboard_profit</item>
+                    <item name="collapsible" xsi:type="boolean">false</item>
+                    <item name="additionalClasses" xsi:type="string">admin__profile-dashboard-profit</item>
                 </item>
             </argument>
-            <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Profit</argument>
-            </htmlContent>
-        </container>
-        <container name="subscription_details">
+            <container name="profit">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="sortOrder" xsi:type="number">5</item>
+                    </item>
+                </argument>
+                <container name="profit_message">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="sortOrder" xsi:type="number">10</item>
+                            <item name="additionalClasses" xsi:type="string">message message-warning warning</item>
+                            <item name="label" xsi:type="boolean">false</item>
+                            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/container-with-message</item>
+                        </item>
+                    </argument>
+                </container>
+                <htmlContent name="html_content">
+                    <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Profit</argument>
+                </htmlContent>
+            </container>
+        </fieldset>
+        <fieldset name="subscription_details_fieldset">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">10</item>
-                    <item name="additionalClasses" xsi:type="string">admin__profile_dashboard_subscription_details</item>
+                    <item name="collapsible" xsi:type="boolean">false</item>
+                    <item name="label" translate="true" xsi:type="string">Subscription Details</item>
+                    <item name="additionalClasses" xsi:type="string">admin__profile-dashboard-subscription-details</item>
                 </item>
             </argument>
-            <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails</argument>
-            </htmlContent>
-        </container>
+            <container name="subscription_details">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="sortOrder" xsi:type="number">10</item>
+                    </item>
+                </argument>
+                <container name="subscription_details_message">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="sortOrder" xsi:type="number">10</item>
+                            <item name="additionalClasses" xsi:type="string">message message-warning warning</item>
+                            <item name="label" xsi:type="boolean">false</item>
+                            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/container-with-message</item>
+                        </item>
+                    </argument>
+                </container>
+                <htmlContent name="html_content">
+                    <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails</argument>
+                </htmlContent>
+            </container>
+        </fieldset>
     </fieldset>
     <fieldset name="summary">
         <argument name="data" xsi:type="array">

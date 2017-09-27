@@ -1,0 +1,12 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+<div class="admin__field-complex" css="$data.additionalClasses" attr="'data-index': index" if="canShowMessage()">
+    <div each="data: getMessageData(), as: 'message'">
+        <span html="message"></span>
+    </div>
+</div>

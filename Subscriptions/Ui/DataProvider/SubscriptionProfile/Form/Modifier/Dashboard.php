@@ -11,6 +11,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
@@ -31,18 +32,28 @@ class Dashboard extends BaseFormModifier
     private $dataPersistor;
 
     /**
+     * Profit calculator
+     *
+     * @var ProfitCalculator
+     */
+    private $profitCalculator;
+
+    /**
      * Dashboard constructor.
      *
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param DataPersistorInterface $dataPersistor
+     * @param ProfitCalculator $profitCalculator
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Registry $registry,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        ProfitCalculator $profitCalculator
     ) {
         $this->dataPersistor = $dataPersistor;
+        $this->profitCalculator = $profitCalculator;
         parent::__construct($urlBuilder, $registry);
     }
 
@@ -64,6 +75,8 @@ class Dashboard extends BaseFormModifier
                         ],
                     ],
                 ],
+                'subscription_details_fieldset' => $this->getSubscriptionDetailsFieldsetMeta(),
+                'profit_fieldset' => $this->getProfitFieldsetMeta(),
             ],
             'arguments' => [
                 'data' => [
@@ -111,5 +124,105 @@ class Dashboard extends BaseFormModifier
         }
 
         return $messages;
+    }
+
+    /**
+     * Returns warning messages for subscription details area.
+     *
+     * @return array
+     */
+    private function getSubscriptionDetailsMessage()
+    {
+        $messages = [];
+        $profile = $this->getProfile();
+        if ($profile && $profile->getNeedRecollect()) {
+            $messages[] = $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails();
+        }
+        return $messages;
+    }
+
+    /**
+     * Returns subscription details fieldset meta information
+     *
+     * @return array
+     */
+    private function getSubscriptionDetailsFieldsetMeta()
+    {
+        return [
+            'children' => [
+                'subscription_details' => [
+                    'children' => [
+                        'subscription_details_message' => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'messages' => $this->getSubscriptionDetailsMessage()
+                                    ]
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Returns warning messages for profit area.
+     *
+     * @return array
+     */
+    private function getProfitMessage()
+    {
+        $messages = [];
+        $profile = $this->getProfile();
+        if ($profile && $profile->getProductNeedRecollect()) {
+            $messages[] = $profile->getProductChangesMadeMessageForProfit();
+        }
+        return $messages;
+    }
+
+    /**
+     * Returns label for profit block
+     *
+     * @return string
+     */
+    private function getProfitLabel()
+    {
+        $profit = $this->profitCalculator->getRenderedTotalProfit($this->getProfile(), false);
+        return __('Profit (Total: %1)', $profit);
+    }
+
+    /**
+     * Returns profit fieldset meta information
+     *
+     * @return array
+     */
+    private function getProfitFieldsetMeta()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => $this->getProfitLabel()
+                    ],
+                ],
+            ],
+            'children' => [
+                'profit' => [
+                    'children' => [
+                        'profit_message' => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'messages' => $this->getProfitMessage()
+                                    ]
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

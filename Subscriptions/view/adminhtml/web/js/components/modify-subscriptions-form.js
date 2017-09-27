@@ -50,6 +50,23 @@ define(
                         mainForm.destroyInserted();
                         mainForm.render();
                     }
+                    this.setMessageFromResponse();
+                }
+            },
+
+            /**
+             * Sets messages from response to components by name
+             */
+            setMessageFromResponse: function () {
+                var result = this.responseData();
+                if (result.result) {
+                    var messages = result.messages;
+                    if (messages) {
+                        messages.forEach(function (message) {
+                            var tab = registry.get(message.index);
+                            tab.setMessagesData(message.message);
+                        });
+                    }
                 }
             },
 

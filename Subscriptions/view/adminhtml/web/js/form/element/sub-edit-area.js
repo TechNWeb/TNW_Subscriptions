@@ -12,6 +12,14 @@ define([
             messagesData: [],
         },
 
+        /** @inheritdoc */
+        initObservable: function () {
+            return this._super()
+                .observe([
+                    'messagesData'
+                ]);
+        },
+
         /**
          * Check if need show messages block.
          *
@@ -55,7 +63,10 @@ define([
          * @param message
          */
         setMessagesData: function (message) {
-            this.messagesData.push(message);
+            var currentMessages = this.getMessageData();
+            if (currentMessages.indexOf(message) < 0) {
+                this.messagesData.push(message);
+            }
         },
 
         /**
