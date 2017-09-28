@@ -77,7 +77,7 @@ class ProfileProcessor
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
         $allIds = array_keys($itemsCollection->getItems());
         $this->queueManager->makeRunning($allIds);
-        $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
+        $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED, true);
         foreach ($itemsCollection as $item) {
             try {
                 $profileIds[] = $item->getSubscriptionProfileId();

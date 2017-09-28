@@ -299,4 +299,17 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+
+    <virtualType name="TNW\Subscriptions\Model\Payflow\Service\Response\Transaction"
+                 type="Magento\Paypal\Model\Payflow\Service\Response\Transaction">
+        <arguments>
+            <argument name="paymentManagement" xsi:type="object">TNW\Subscriptions\Model\Payment\PaymentMethodManagement</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal\Response">
+        <arguments>
+            <argument name="transaction" xsi:type="object">TNW\Subscriptions\Model\Payflow\Service\Response\Transaction</argument>
+        </arguments>
+    </type>
 </config>

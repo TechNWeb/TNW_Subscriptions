@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Registry;
+use Magento\Payment\Model\Checks\ZeroTotal;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
@@ -16,6 +17,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use Magento\Payment\Model\Method\Free;
 
 /**
  * Class Base
@@ -70,6 +72,13 @@ class Base implements EngineInterface
     private $persistor;
 
     /**
+     * Zero total quote validator.
+     *
+     * @var ZeroTotal
+     */
+    private $zeroTotalValidator;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param Context $context
@@ -84,7 +93,8 @@ class Base implements EngineInterface
         CartManagementInterface $cartManagement,
         MessageHistoryLogger $historyLogger,
         Registry $registry,
-        DataPersistorInterface $persistor
+        DataPersistorInterface $persistor,
+        ZeroTotal $zeroTotalValidator
     ) {
         $this->config = $config;
         $this->context = $context;
@@ -92,6 +102,7 @@ class Base implements EngineInterface
         $this->historyLogger = $historyLogger;
         $this->registry = $registry;
         $this->persistor = $persistor;
+        $this->zeroTotalValidator = $zeroTotalValidator;
     }
 
     /**
@@ -174,12 +185,7 @@ class Base implements EngineInterface
     public function processProfile(Quote $quote)
     {
         try {
-            $quote->getPayment()->importData(
-                $this->getPaymentInfo($this->getProfile())
-            );
-            $quote->getPayment()->setAdditionalInformation(
-                $this->getPaymentAdditionalInfo($this->getProfile())
-            );
+            $this->validatePayment($quote);
             $order = $this->getCartManagement()->submit($quote);
             $this->logToMessageHistory($this->getProfile(), $quote, $order);
 
@@ -233,5 +239,26 @@ class Base implements EngineInterface
             false,
             $this->registry->registry('profile_process_type')
         );
+    }
+
+    /**
+     * Validates zero total and sets free payment method to quote if validation failed.
+     *
+     * @param Quote $quote
+     */
+    private function validatePayment(Quote $quote)
+    {
+        /** @var Payment $payment */
+        $payment = $quote->getPayment();
+        //if quote payment is not initialised set profile payment method as default.
+        if (!$payment->getMethod()){
+            $payment->importData($this->getPaymentInfo($this->getProfile()));
+            $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
+        }
+        // check quote total
+        if (!$this->zeroTotalValidator->isApplicable($payment->getMethodInstance(), $quote)) {
+            $payment->importData(['method' => Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        }
     }
 }

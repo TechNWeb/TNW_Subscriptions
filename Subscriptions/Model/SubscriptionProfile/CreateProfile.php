@@ -703,7 +703,7 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Cleares extra data on account step (ex. customer_address_id from quote address if it is exist).
+     * Clears extra data on account step (ex. customer_address_id from quote address if it is exist).
      *
      * @return void
      */
