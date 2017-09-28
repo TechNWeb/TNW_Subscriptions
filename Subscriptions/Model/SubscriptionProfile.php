@@ -36,6 +36,11 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     const ENTITY = 'subscription_profile';
 
     /**
+     * Default group code for custom attributes.
+     */
+    const DEFAULT_GROUP_CODE = 'additional-information';
+
+    /**
      * Edit state code
      */
     const STATE_EDIT = 'edit';

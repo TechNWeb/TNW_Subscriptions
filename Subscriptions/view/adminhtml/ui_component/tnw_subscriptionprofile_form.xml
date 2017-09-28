@@ -139,6 +139,15 @@
             </htmlContent>
         </container>
     </fieldset>
+    <fieldset name="additional_attributes">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" translate="true" xsi:type="string">Additional Information</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Additional Attributes</item>
+            </item>
+        </argument>
+    </fieldset>
     <fieldset name="upcoming_orders">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">

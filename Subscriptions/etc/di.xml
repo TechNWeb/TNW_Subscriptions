@@ -202,9 +202,9 @@
     </type>
 
     <!-- Eav attribute plugin to setup default attribute set and attribute group -->
-    <type name="Magento\Eav\Model\Attribute">
+    <type name="Magento\Eav\Model\ResourceModel\Entity\Attribute">
         <plugin name="subscriptions_subscription_profile_attribute"
-                type="TNW\Subscriptions\Plugin\Eav\Attribute"
+                type="TNW\Subscriptions\Plugin\Eav\Model\ResourceModel\Entity\Attribute"
                 sortOrder="10"
                 disabled="false"/>
     </type>

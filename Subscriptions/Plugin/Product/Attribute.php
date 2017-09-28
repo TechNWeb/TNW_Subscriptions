@@ -81,27 +81,6 @@ class Attribute
     }
 
     /**
-     * Set default group and attribute set for ProductSubscriptionProfile attributes on save.
-     *
-     * @param \Magento\Catalog\Model\ResourceModel\Eav\Attribute $subject
-     * @return void
-     */
-    public function beforeSave(\Magento\Catalog\Model\ResourceModel\Eav\Attribute $subject)
-    {
-        if ($subject->getEntityType()->getEntityTypeCode() === ProductSubscriptionProfile::ENTITY) {
-            $this->eavEntityType->loadByCode(ProductSubscriptionProfile::ENTITY);
-            $groupCollection = $this->groupCollectionFactory->create()
-                ->setAttributeSetFilter($this->eavEntityType->getDefaultAttributeSetId())
-                ->addFieldToFilter('attribute_group_code', ProductSubscriptionProfile::DEFAULT_GROUP_CODE)
-                ->setPageSize(1)
-                ->load();
-            $group = $groupCollection->getFirstItem();
-            $subject->setAttributeSetId($this->eavEntityType->getDefaultAttributeSetId());
-            $subject->setAttributeGroupId($group->getId());
-        }
-    }
-
-    /**
      * Get default values for subscription product attributes.
      * This method implement cache for this default values.
      *

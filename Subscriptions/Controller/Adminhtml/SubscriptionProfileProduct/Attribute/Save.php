@@ -161,6 +161,10 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                 $data['backend_model'] = $this->productHelper->getAttributeBackendModelByInputType(
                     $data['frontend_input']
                 );
+
+                if (strcasecmp($data['frontend_input'], 'multiselect') === 0) {
+                    $data['source_model'] = 'Magento\Eav\Model\Entity\Attribute\Source\Table';
+                }
             }
 
             if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
