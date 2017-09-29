@@ -78,6 +78,30 @@
     float: right;
     margin-bottom: 9%;
 }
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title {
+    border: none;
+    padding-bottom: 1rem;
+}
+
+.admin__profile-dashboard-subscription-details .admin__fieldset {
+    padding-top: 0rem;
+}
+
+.admin__profile-dashboard-profit  .admin__fieldset {
+    padding-top: 1rem;
+}
+.admin__profile-dashboard-subscription-details .message-warning {
+    margin-bottom: 1rem;
+}
+
+.admin__profile-dashboard-profit .fieldset-wrapper-title {
+    padding-bottom: 1rem;
+}
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title strong.title,
+.admin__profile-dashboard-profit .fieldset-wrapper-title strong.title {
+    font-size: 2rem;
+    font-weight: normal;
+}
 
 .profile-dashboard-subscription-details-title-wrapper {
     border-bottom: 1px solid #ffffff;

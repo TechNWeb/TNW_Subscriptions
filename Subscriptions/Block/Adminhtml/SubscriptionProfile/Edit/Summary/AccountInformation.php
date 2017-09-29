@@ -164,6 +164,7 @@ class AccountInformation extends Template
      */
     public function getSubscriptionEndsOn()
     {
+        $class = 'ends-on';
         $result = self::DATE_NOT_FOUND;
         $term = $this->getSubscriptionProfile()->getTerm();
         $lastOrderData = $this->subscriptionProfileResource
@@ -179,13 +180,14 @@ class AccountInformation extends Template
             case 1:
                 if (!empty($lastOrderData)) {
                     $result = __(self::UNTIL_CANCELED);
+                    $class = 'until-canceled';
                 }
                 break;
             default:
                 break;
         }
 
-        return $result;
+        return '<span class="' . $class . '">' . $result . '</span>';
     }
 
     /**

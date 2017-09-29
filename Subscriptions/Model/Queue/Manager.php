@@ -127,14 +127,19 @@ class Manager
             'relation.subscription_profile_id = profile.entity_id',
             []
         );
-        $pendingStatus = QueueStatus::QUEUE_STATUS_PENDING;
-        $errorStatus = QueueStatus::QUEUE_STATUS_ERROR;
+        $connection = $collection->getConnection();
+        $pendingCondition = implode(' AND ', [
+            $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
+            $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_PENDING)
+        ]);
+        $errorCondition = implode(' AND ', [
+            $connection->quoteInto("main_table.updated_at <= ?", $this->getAttemptDate()),
+            $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_ERROR),
+            $connection->quoteInto("main_table.attempt_count <= ?", $this->config->getAttemptCount())
+        ]);
+
         $collection->getSelect()->where(
-            "relation.scheduled_at <= '{$this->getCurrentDate()}' AND main_table.status = '{$pendingStatus}'"
-        )->orWhere(
-            "main_table.updated_at <= '{$this->getAttemptDate()}' 
-            AND main_table.status = '{$errorStatus}' 
-            AND main_table.attempt_count <= {$this->config->getAttemptCount()}"
+            '(' . $pendingCondition . ') OR (' . $errorCondition . ')'
         )->where(
             'profile.status NOT IN (?)',
             [
@@ -149,7 +154,7 @@ class Manager
             ['main_table.profile_order_id']
         );
 
-        if ($websiteId){
+        if ($websiteId) {
             $collection->getSelect()->where(
                 'profile.website_id = ?', $websiteId
             );

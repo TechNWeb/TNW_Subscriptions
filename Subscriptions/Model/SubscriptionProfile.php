@@ -596,17 +596,17 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     /**
      * {@inheritdoc}
      */
-    public function getNeedGenerateQuotes()
+    public function getGenerateQuotesState()
     {
-        return $this->getData(self::NEED_GENERATE_QUOTES);
+        return $this->getData(self::GENERATE_QUOTES_STATE);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setNeedGenerateQuotes($flag)
+    public function setGenerateQuotesState($state)
     {
-        return $this->setData(self::NEED_GENERATE_QUOTES, $flag);
+        return $this->setData(self::GENERATE_QUOTES_STATE, $state);
     }
 
     /**
@@ -642,6 +642,22 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getNeedRecollect()
+    {
+        return $this->getData(self::NEED_RECOLLECT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNeedRecollect($needRecollect)
+    {
+        return $this->setData(self::NEED_RECOLLECT, $needRecollect);
+    }
+
+    /**
      * Get sum of all order's grand totals for current subscription profile.
      *
      * @return string
@@ -659,5 +675,47 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function getTotalValue()
     {
         return $this->getResource()->getTotalValue($this);
+    }
+
+    /**
+     * Checks whether products need recollect
+     *
+     * @return bool
+     */
+    public function getProductNeedRecollect()
+    {
+        $result = false;
+        /** @var ProductSubscriptionProfile $product */
+        foreach ($this->getProducts() as $product) {
+            if ($product->getNeedRecollect()) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getShippingBillingChangesMadeMessageForUpcomingOrders()
+    {
+        return __('Subscription changes made. Shipping Details and Grand Total may not reflect correct information until recalculation is complete.');
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getShippingBillingChangesMadeMessageForSubscriptionDetails()
+    {
+        return __('Subscription changes made. Current, Annual and Total values may not reflect correct information until recalculation is complete.');
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getProductChangesMadeMessageForProfit()
+    {
+        return __('Subscription products have changed. The graph may not show correct information until recalculation is complete.');
     }
 }

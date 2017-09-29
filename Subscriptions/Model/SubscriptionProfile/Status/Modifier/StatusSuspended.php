@@ -15,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 /**
  * Modifier to set "Suspended" status
  */
-class StatusSuspended extends Base implements ModifierInterface
+class StatusSuspended extends Base
 {
     /**
      * {@inheritdoc}

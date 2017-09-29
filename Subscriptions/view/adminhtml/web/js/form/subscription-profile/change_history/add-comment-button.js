@@ -5,13 +5,16 @@
 
 define([
     'Magento_Ui/js/form/components/button',
-    'jquery'
-], function (Button, $) {
+    'jquery',
+    'uiRegistry'
+], function (Button, $, registry) {
     'use strict';
 
     return Button.extend({
+
         defaults: {
-            displayPrimary: true
+            displayPrimary: true,
+            changeHistoryGridIndex: null
         },
 
         /** @inheritdoc */
@@ -29,8 +32,8 @@ define([
          * @inheritdoc
          */
         action: function () {
-            var url = typeof this.imports.url == "undefined" ? '' : this.imports.url,
-                comment = $("textarea[name='dashboard[comment_area]']").val();
+            var url = typeof this.imports.url === "undefined" ? '' : this.imports.url,
+                comment = $("textarea[name='change_history[comment_area]']").val();
 
             this.sendAjaxAddComment(url, comment)
         },
@@ -44,6 +47,7 @@ define([
          * @return void
          */
         sendAjaxAddComment: function (url, comment) {
+            var _self = this;
             $.ajax({
                 showLoader: true,
                 url: url,
@@ -55,9 +59,25 @@ define([
                 dataType: 'json'
             }).done(function (data) {
                 if (data.result) {
-                    $("textarea[name='dashboard[comment_area]']").val('');
+                    $("textarea[name='change_history[comment_area]").val('');
+                    _self.reloadOrderHistoryChangeGrid();
                 }
             })
+        },
+
+        /**
+         * Update order change history grid.
+         *
+         * @return void
+         */
+        reloadOrderHistoryChangeGrid: function () {
+            if (this.changeHistoryGridIndex) {
+                var params = [];
+                var target = registry.get(this.changeHistoryGridIndex);
+                if (target && typeof target === 'object') {
+                    target.set('params.t ', Date.now());
+                }
+            }
         }
     });
 });

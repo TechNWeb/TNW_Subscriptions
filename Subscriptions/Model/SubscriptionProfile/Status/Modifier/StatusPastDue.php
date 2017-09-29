@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 /**
  * Modifier to set "Past Due" status
  */
-class StatusPastDue extends Base implements ModifierInterface
+class StatusPastDue extends Base
 {
     /**
      * {@inheritdoc}

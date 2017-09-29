@@ -25,11 +25,6 @@ class ProductSubscriptionProfile extends AbstractModel
      */
     const ENTITY = 'tnw_product_subscription_profile';
 
-    /**
-     * Entity table.
-     */
-    const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
-
     /*
      * Default group code for custom attributes.
      */
@@ -331,5 +326,21 @@ class ProductSubscriptionProfile extends AbstractModel
     public function setUpdatedAt($date)
     {
         return $this->setData(self::UPDATED_AT, $date);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNeedRecollect()
+    {
+        return $this->getData(self::NEED_RECOLLECT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNeedRecollect($needRecollect)
+    {
+        return $this->setData(self::NEED_RECOLLECT, $needRecollect);
     }
 }
