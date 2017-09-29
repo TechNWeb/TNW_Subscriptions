@@ -53,7 +53,7 @@ class Collection extends AbstractCollection
     {
         $this->addFilter(SubscriptionProfileMessageHistoryInterface::PARENT_ID, $parentId);
         $this->addUserDataToSelect();
-        $this->setOrder(SubscriptionProfileMessageHistoryInterface::CREATED_AT);
+        $this->setOrder(SubscriptionProfileMessageHistoryInterface::ENTITY_ID);
 
         return $this;
     }
