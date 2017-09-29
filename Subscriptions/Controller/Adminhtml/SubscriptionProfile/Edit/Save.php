@@ -139,6 +139,7 @@ class Save extends Action
         $this->profileAddressManager->processBillingAddress($requestData);
         $this->profileManager->processPaymentMethod($requestData);
         $this->profileManager->processShippingMethod($requestData);
+        $this->profileManager->processAttribute($requestData);
         $this->subscriptionProductManager->processProfileProducts($requestData);
     }
 

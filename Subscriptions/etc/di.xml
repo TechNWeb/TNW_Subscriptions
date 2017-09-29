@@ -63,6 +63,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfileRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile"/>
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\AttributeRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface"

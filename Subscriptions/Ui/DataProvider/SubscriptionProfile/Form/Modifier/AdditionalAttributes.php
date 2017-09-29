@@ -131,6 +131,7 @@ class AdditionalAttributes extends BaseFormModifier
             }
         }
 
+        $data[$profileId]['additional_attributes']['subscription_profile_id'] = $profileId;
         return $data;
     }
 
@@ -196,6 +197,14 @@ class AdditionalAttributes extends BaseFormModifier
             $meta = $this->arrayManager->merge('arguments/data/config', $meta, [
                 'options' => $attribute->getSource()->getAllOptions(),
             ]);
+        }
+
+        if ($attribute->getFrontendInput() === 'boolean') {
+            $meta['arguments']['data']['config']['prefer'] = 'toggle';
+            $meta['arguments']['data']['config']['valueMap'] = [
+                'true' => '1',
+                'false' => '0',
+            ];
         }
 
         return $meta;
