@@ -93,7 +93,9 @@ class DescriptionCreator
     public function getDescription(ModelQuote $quote, array $subscriptionData, $initialFee = null)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = $this->formatPrice($quote->getSubtotal() + $initialFee);
+        $formattedPrice = ($quote->getSubtotal() + $initialFee)
+            ? $this->formatPrice($quote->getSubtotal() + $initialFee)
+            : __('Free');
         $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']);
         $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
@@ -102,11 +104,10 @@ class DescriptionCreator
         $noTrialPart = '';
 
         if ($isTrial) {
-            $trialTotal = $formattedPrice;
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
-            $trialPart = sprintf(__('%s for %s and then '), $trialTotal, $frequencyTrialPeriod);
+            $trialPart = sprintf(__('%s for %s and then '), $formattedPrice, $frequencyTrialPeriod);
         } else {
             if ($initialFee) {
                 $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);

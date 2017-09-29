@@ -52,6 +52,7 @@ class ActiveMethods extends Fieldset
     private $availableMethodsCodes = [
         Checkmo::PAYMENT_METHOD_CHECKMO_CODE,
         Config::METHOD_PAYFLOWPRO,
+        Config::METHOD_PAYMENT_PRO
     ];
 
     /**
@@ -171,7 +172,7 @@ class ActiveMethods extends Fieldset
         foreach ($paymentMethods as $code => $data) {
             $active = isset($data['active']) ? (bool)($data['active']) : false;
             if (in_array($code, $this->availableMethodsCodes) && $active) {
-                if ($code === Config::METHOD_PAYFLOWPRO) {
+                if (in_array($code, [Config::METHOD_PAYFLOWPRO, Config::METHOD_PAYMENT_PRO])) {
                     $title = $this->config->getTitleForPaypal();
                 } else {
                     $title = isset($data['title']) ? $data['title'] : '';
