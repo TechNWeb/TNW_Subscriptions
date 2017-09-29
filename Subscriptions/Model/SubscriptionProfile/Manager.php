@@ -114,6 +114,7 @@ class Manager
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
     /**
      * @var ShippingMethods
      */
@@ -385,7 +386,7 @@ class Manager
             $quote = $this->getNextQuote();
             $shippingDescription = '';
             if ($quote) {
-                $shippingMethodOptions = $this->getShippingMethodOptions($quote, false);
+                $shippingMethodOptions = $this->shippingMethods->getShippingMethodOptions($quote, false);
                 foreach ($shippingMethodOptions as $shippingMethodOption) {
                     if ($shippingMethodOption['value'] == $shippingMethod) {
                         $shippingDescription = $shippingMethodOption['label'];
@@ -541,25 +542,6 @@ class Manager
             }
         }
         return $quote;
-    }
-
-    /**
-     * Returns shipping method options
-     *
-     * @param Quote $quote
-     * @param bool $withPrice
-     * @return array
-     */
-    public function getShippingMethodOptions(Quote $quote, $withPrice = true)
-    {
-        $options = [];
-        if ($quote && $quote->getId()) {
-            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
-            $options = $this->shippingMethods
-                ->setQuote($quote)
-                ->getShippingMethodsAsOptionArray($withPrice);
-        }
-        return $options;
     }
 
     /**
