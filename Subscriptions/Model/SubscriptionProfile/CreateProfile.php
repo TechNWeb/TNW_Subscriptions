@@ -20,6 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
+use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 
 /**
  * Class for creating subscription profile.
@@ -90,6 +91,13 @@ class CreateProfile extends BaseCreate
     private $queueManager;
 
     /**
+     * Profile future orders generator.
+     *
+     * @var QuoteGenerator
+     */
+    private $quoteGenerator;
+
+    /**
      * CreateProfile constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -101,6 +109,7 @@ class CreateProfile extends BaseCreate
      * @param ManagerInterface $eventManager
      * @param MessageHistoryLogger $messageHistoryLogger
      * @param QueueManager $queueManager
+     * @param QuoteGenerator $quoteGenerator
      */
     public function __construct(
         Context $context,
@@ -112,7 +121,8 @@ class CreateProfile extends BaseCreate
         Manager $profileManager,
         ManagerInterface $eventManager,
         MessageHistoryLogger $messageHistoryLogger,
-        QueueManager $queueManager
+        QueueManager $queueManager,
+        QuoteGenerator $quoteGenerator
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -122,6 +132,7 @@ class CreateProfile extends BaseCreate
         $this->eventManager = $eventManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->queueManager = $queueManager;
+        $this->quoteGenerator = $quoteGenerator;
 
         parent::__construct($context, $session);
     }
@@ -129,7 +140,7 @@ class CreateProfile extends BaseCreate
     /**
      * @return bool
      */
-    public function isNeedCollect()
+    protected function isNeedCollect()
     {
         return $this->needCollect;
     }
@@ -280,7 +291,7 @@ class CreateProfile extends BaseCreate
      *
      * @return ModelQuote
      */
-    public function createSubCart()
+    protected function createSubCart()
     {
         return $this->quoteCreator->createSubCart();
     }
@@ -481,22 +492,10 @@ class CreateProfile extends BaseCreate
             $basicPayment = $session->getFirstQuote()->getPayment();
             /** @var ModelQuote $subQuote */
             foreach ($subQuotes as $subQuote) {
-                $subQuote->setCustomer($customer);
-                $this->quoteCreator->fillCustomerData($customer);
-                $errors = $this->quoteCreator->validate($subQuote);
-
-                if (!empty($errors)) {
-                    foreach ($errors as $error) {
-                        $this->getContext()->log($error);
-                        $this->getContext()->getMessageManager()->addError($error);
-                    }
-                    //Maybe we need to delete customer in this case.
-                    throw new \Exception(__('Quote validation is failed.'));
-                }
+                $this->quoteCreator->fillCustomerData($customer, $subQuote);
+                $this->quoteCreator->validate($subQuote);
                 //Create new profile
                 $profile = $this->createProfile($subQuote, $basicPayment);
-                //Add comment about profile creating
-                $this->logToMessageCreateSubscription($profile);
                 //Assign quote to new profile
                 $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile);
                 //Add new relation to profile processing queue in "running" state.
@@ -511,23 +510,18 @@ class CreateProfile extends BaseCreate
                         __('Unable to process order for profile ') . $profile->getId()
                     );
                     $this->getContext()->log($e->getMessage());
-                    $this->profileManager->setPastDueStatus()->saveProfile();
                     $this->queueManager->makeError($queueItemIds, $e->getMessage());
                 }
                 if (isset($order)) {
                     $this->profileManager->assignOrderToProfile($relation, $order);
-                    $this->logMessageOrderCreated(
-                        $profile->getId(),
-                        $order->getId(),
-                        $subQuote->getId()
-                    );
-                    $this->profileManager->setActiveStatus()->saveProfile();
                     $this->queueManager->makeCompleted($queueItemIds);
                     $this->eventManager->dispatch(
                         'checkout_submit_all_after',
                         ['order' => $order, 'quote' => $subQuote]
                     );
                 }
+                //Generate quote for next payment.
+                $this->quoteGenerator->generateProfileQuotes($profile, 1);
                 $profiles[] = $profile;
                 //TODO add here email sending
             }
@@ -554,6 +548,8 @@ class CreateProfile extends BaseCreate
             ->populateProfileData($subQuote)
             ->populatePaymentData($payment)
             ->saveProfile();
+        //Add comment about profile creating
+        $this->logToMessageCreateSubscription($profile);
 
         return $profile;
     }
@@ -582,27 +578,6 @@ class CreateProfile extends BaseCreate
         if ($needRecollect) {
             $this->setNeedCollect(true);
         }
-    }
-
-    /**
-     * Returns SubQuotes grand total.
-     *
-     * @return int
-     */
-    public function getSubQuotesGrandTotal()
-    {
-        $grandTotal = 0;
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $quotes = $session->getSubQuotes();
-
-        if (!empty($quotes)) {
-            foreach ($quotes as $quote) {
-                $grandTotal += $quote->getGrandTotal() * 1;
-            }
-        }
-
-        return $grandTotal;
     }
 
     /**
@@ -703,7 +678,7 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Cleares extra data on account step (ex. customer_address_id from quote address if it is exist).
+     * Clears extra data on account step (ex. customer_address_id from quote address if it is exist).
      *
      * @return void
      */
@@ -722,7 +697,7 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Cleares extra data on payment and billing step
+     * Clears extra data on payment and billing step
      * (ex. customer_address_id, shipping method).
      *
      * @return void
@@ -773,29 +748,6 @@ class CreateProfile extends BaseCreate
         $this->messageHistoryLogger->log(
             $message,
             $profile->getId()
-        );
-    }
-
-    /**
-     * Log message for Subscription Profile order creating from quote.
-     *
-     * @param int $profileId
-     * @param int $orderId
-     * @param int $quoteId
-     *
-     * @return void
-     */
-    private function logMessageOrderCreated($profileId, $orderId, $quoteId)
-    {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
-            $this->messageHistoryLogger->getOrderIncrementIdById($orderId),
-            $this->messageHistoryLogger->getConvertedQuoteId($quoteId)
-        );
-
-        $this->messageHistoryLogger->log(
-            $message,
-            $profileId
         );
     }
 }
