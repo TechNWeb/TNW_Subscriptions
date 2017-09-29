@@ -16,6 +16,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class Base
@@ -182,9 +183,11 @@ class Base implements EngineInterface
             );
             $order = $this->getCartManagement()->submit($quote);
             $this->logToMessageHistory($this->getProfile(), $quote, $order);
+            $this->updateProfileStatus();
 
             return $order;
         } catch (\Exception $e) {
+            $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
             $quote->setReservedOrderId(null);
             $quote->save();
             throw new \Exception($e->getMessage());
@@ -233,5 +236,23 @@ class Base implements EngineInterface
             false,
             $this->registry->registry('profile_process_type')
         );
+    }
+
+    /**
+     * Updates profile status after order processing
+     */
+    private function updateProfileStatus()
+    {
+        $status = ProfileStatus::STATUS_ACTIVE;
+        $trialStartDate = $this->getProfile()->getTrialStartDate();
+        $startDate = $this->getProfile()->getStartDate();
+        if ($trialStartDate) {
+            $date = (new \DateTime())->getTimestamp();
+            $startDate = (new \DateTime($startDate))->getTimestamp();
+            if ($date < $startDate) {
+                $status = ProfileStatus::STATUS_TRIAL;
+            }
+        }
+        $this->getProfile()->setStatus($status);
     }
 }
