@@ -462,6 +462,10 @@
   padding-bottom: 0;
 }
 
+.admin__subscription-account-information {
+  padding-top: 3rem;
+}
+
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container {
   float: left;
   width: calc( (100%) * .49 );
@@ -635,6 +639,7 @@ button.action-editor.active:before{
 
 .subscription-item-form .description-fieldset .middle-container{
   display: inline-block;
+  width: calc(100% - 280px);
 }
 
 .subscription-item-form .description-fieldset .left-container{
