@@ -77,7 +77,7 @@ class ProfileProcessor
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
         $allIds = array_keys($itemsCollection->getItems());
         $this->queueManager->makeRunning($allIds);
-        $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED, true);
+        $this->setProcessTypeParam();
         foreach ($itemsCollection as $item) {
             try {
                 $profileIds[] = $item->getSubscriptionProfileId();
@@ -110,5 +110,14 @@ class ProfileProcessor
         } catch (\Exception $e) {
             $this->context->log(__('Error on updating profile statuses - ') . $e->getMessage());
         }
+    }
+
+    /**
+     * Sets process type param to registry.
+     */
+    private function setProcessTypeParam()
+    {
+        $this->registry->unregister('profile_process_type');
+        $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
     }
 }
