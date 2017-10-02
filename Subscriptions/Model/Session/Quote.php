@@ -64,6 +64,19 @@ class Quote extends QuoteSession
     }
 
     /**
+     * @return int|float
+     */
+    public function getSubQuoteItemsCount()
+    {
+        $qty = 0;
+        foreach ($this->getSubQuotes() as $quote) {
+            $qty += $quote->getItemsQty();
+        }
+
+        return $qty;
+    }
+
+    /**
      * @return Session
      */
     private function getCustomerSession()

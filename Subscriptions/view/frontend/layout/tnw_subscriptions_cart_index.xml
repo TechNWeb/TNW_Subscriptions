@@ -78,12 +78,12 @@
                                             <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps</item>
                                         </item>
                                         <item name="children" xsi:type="array">
-                                            <item name="products" xsi:type="array">
+                                            <item name="plans" xsi:type="array">
                                                 <item name="sortOrder" xsi:type="string">0</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">products</item>
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/plans</item>
+                                                <item name="displayArea" xsi:type="string">plans</item>
                                                 <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/products</item>
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/plans</item>
                                                 </item>
                                             </item>
                                             <item name="registration" xsi:type="array">

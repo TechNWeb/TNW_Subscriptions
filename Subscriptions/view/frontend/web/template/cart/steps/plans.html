@@ -1,0 +1,64 @@
+<div class="tnw-subscriptions-cart_subscription-plans__container" style="width: 100%">
+    <div class="content">
+        <div class="tnw-subscriptions-cart_subscription-plan-items" data-bind="foreach: items">
+            <div class="title">
+                <h2 data-bind="i18n: plan_title"></h2>
+            </div>
+
+            <div class="products" data-bind="foreach: products">
+                <form class="plan-item" data-bind="id: id">
+                    <div class="item-content__container">
+                        <div class="">
+                            <img class="product-image" data-bind="attr: {src: image}"/>
+                        </div>
+                        <div class="title product-name">
+                            <h2 data-bind="text: name"></h2>
+                        </div>
+                        <div class="block-description">
+                            <span data-bind="html: description"></span>
+                        </div>
+                        <div class="block-qty">
+                            <label data-bind="i18n: 'Qty: '"></label>
+                            <input type="text" data-bind="value: qty"/>
+                        </div>
+                        <div class="price-box">
+                            <span data-bind="html: price"></span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="action primary">
+                        <span data-bind="i18n: 'Update'"></span>
+                    </button>
+
+                    <div class="billing-frequency-wrapper">
+                        <span data-bind="i18n: 'Billing Frequency: '"></span>
+                        <div class="term">
+                            <span data-bind="i18n: 'Term: '"></span>
+                            <label data-bind="i18n: 'Until cancelled'"></label>
+                            <input type="checkbox" name="until-canceled" data-bind="checked: term">
+                            <div class="term-input" data-bind="visible: term">
+                                <span data-bind="i18n: '& bill '"></span>
+                                <input type="text" data-bind="value: period"/>
+                                <span data-bind="i18n: 'times'"></span>
+                            </div>
+                        </div>
+
+                        <div class="billing-frequencies" data-bind="foreach: billing_frequencies">
+                            <div class="billing-frequency-item">
+                                <input type="radio" name='frequency' data-bind="value: value, checked: checked">
+                                <label data-bind="text: label"></label>
+                            </div>
+                        </div>
+
+                        <div class="start-on">
+                            <label data-bind="i18n: 'Start On: '"></label>
+                            <input type="date" data-bind="value: start_on">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
