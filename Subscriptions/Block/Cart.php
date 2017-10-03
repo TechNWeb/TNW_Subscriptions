@@ -28,6 +28,7 @@ class Cart extends \Magento\Framework\View\Element\Template
     /**
      * @param Context $context
      * @param CompositeConfigProvider $configProvider
+     * @param Sidebar $sidebar
      * @param array $data
      */
     public function __construct(
