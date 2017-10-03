@@ -285,11 +285,7 @@ class History extends \Magento\Framework\View\Element\Template
      */
     public function canHoldSubscription()
     {
-        if ($this->config->getCanHoldProfile($this->getWebsiteId())) {
-            return true;
-        }
-
-        return false;
+        return $this->config->getCanHoldProfile($this->getWebsiteId());
     }
 
     /**
@@ -299,11 +295,7 @@ class History extends \Magento\Framework\View\Element\Template
      */
     public function canCancelSubscription()
     {
-        if ($this->config->getCanCancelProfile($this->getWebsiteId())) {
-            return true;
-        }
-
-        return false;
+        return $this->config->getCanCancelProfile($this->getWebsiteId());
     }
 
     /**

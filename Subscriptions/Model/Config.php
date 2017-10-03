@@ -547,8 +547,7 @@ class Config
      */
     public function getCanHoldProfile($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlCanHoldProfile, $websiteId);
-        return $value ? true : false;
+        return (bool)$this->getStoreConfig($this->xmlCanHoldProfile, $websiteId);
     }
 
     /**
@@ -559,7 +558,6 @@ class Config
      */
     public function getCanCancelProfile($websiteId = null)
     {
-        $value = $this->getStoreConfig($this->xmlCanCancelProfile, $websiteId);
-        return $value ? true : false;
+        return (bool)$this->getStoreConfig($this->xmlCanCancelProfile, $websiteId);
     }
 }
