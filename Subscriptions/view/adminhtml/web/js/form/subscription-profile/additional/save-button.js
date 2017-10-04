@@ -38,9 +38,15 @@ define([
                     + "&form_key=" + window.FORM_KEY
                     + "&subscription_profile_id=" + $('.additional-attributes-field-set input[name="additional_attributes[subscription_profile_id]"]').val(),
                 type: "POST",
-                dataType: 'json'
-            }).done(function (data) {
+                dataType: 'json',
+                success: function (response) {
+                    if (response.error) {
+                        response.error_messages;
+                    }
+                },
+                complete: function () {
 
+                }
             })
         }
     });

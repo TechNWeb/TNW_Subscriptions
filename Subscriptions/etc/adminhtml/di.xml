@@ -224,10 +224,6 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
                     <item name="sortOrder" xsi:type="number">90</item>
                 </item>
-                <item name="additional_attributes" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\AdditionalAttributes</item>
-                    <item name="sortOrder" xsi:type="number">100</item>
-                </item>
             </argument>
         </arguments>
     </virtualType>

@@ -146,27 +146,32 @@
                 <item name="label" translate="true" xsi:type="string">Additional Information</item>
                 <item name="tabLabel" translate="true" xsi:type="string">Additional Attributes</item>
                 <item name="additionalClasses" xsi:type="string">additional-attributes-field-set</item>
+                <item name="toolbarSection" xsi:type="string">.additional-attributes-field-set</item>
             </item>
         </argument>
-        <field name="subscription_profile_id">
+        <insertForm class="Magento\Ui\Component\Container">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="formElement" xsi:type="string">hidden</item>
-                    <item name="additionalClasses" xsi:type="string">additional-attributes-field-entity-id</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="render_url" xsi:type="url" path="mui/index/render_handle">
+                        <param name="handle">tnw_subscriptions_subscriptionprofile_additional_edit</param>
+                        <param name="buttons">1</param>
+                    </item>
+                    <item name="autoRender" xsi:type="boolean">true</item>
+                    <item name="ns" xsi:type="string">tnw_subscriptionprofile_edit_additional_form</item>
+                    <item name="externalProvider" xsi:type="string">${ $.ns }.tnw_subscriptionprofile_edit_additional_form_data_source</item>
+                    <item name="toolbarContainer" xsi:type="string">${ $.parentName }</item>
+                    <item name="formSubmitType" xsi:type="string">ajax</item>
+                    <item name="realTimeLink" xsi:type="boolean">false</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="profileId" xsi:type="string">${ $.provider }:data.subscription_profile_id</item>
+                    </item>
+                    <item name="exports" xsi:type="array">
+                        <item name="profileId" xsi:type="string">${ $.externalProvider }:params.subscription_profile_id</item>
+                    </item>
                 </item>
             </argument>
-        </field>
-        <field name="save_attributes">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="title" translate="true" xsi:type="string">Save</item>
-                    <item name="formElement" xsi:type="string">button</item>
-                    <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/additional-attributes/save-button</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
-                    <item name="saveUrl" xsi:type="url" path="*/subscriptionprofile_edit/save" />
-                </item>
-            </argument>
-        </field>
+        </insertForm>
     </fieldset>
     <fieldset name="upcoming_orders">
         <argument name="data" xsi:type="array">
