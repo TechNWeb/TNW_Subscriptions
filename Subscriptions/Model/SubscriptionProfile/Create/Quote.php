@@ -11,7 +11,9 @@ use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\QuoteFactory;
+use TNW\Subscriptions\Api\CustomerQuoteRepositoryInterface;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\CustomerQuote\Manager as CustomerQuoteManager;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -43,9 +45,18 @@ class Quote extends Create implements QuoteCreateInterface
     private $cartRepository;
 
     /**
+     * Customer Repository
+     *
      * @var CustomerRepositoryInterface
      */
     private $customerRepository;
+
+    /**
+     * Customer Quote Repository
+     *
+     * @var CustomerQuoteRepositoryInterface
+     */
+    private $customerQuoteRepository;
 
     /**
      * Quote constructor.
@@ -57,6 +68,7 @@ class Quote extends Create implements QuoteCreateInterface
      * @param Address $addressCreator
      * @param CartRepositoryInterface $cartRepository
      * @param CustomerRepositoryInterface $customerRepository
+     * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
      */
     public function __construct(
         Context $context,
@@ -65,7 +77,8 @@ class Quote extends Create implements QuoteCreateInterface
         GroupManagementInterface $groupManagement,
         Address $addressCreator,
         CartRepositoryInterface $cartRepository,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        CustomerQuoteRepositoryInterface $customerQuoteRepository
     ) {
         parent::__construct($context, $session);
         $this->quoteFactory = $quoteFactory;
@@ -73,6 +86,17 @@ class Quote extends Create implements QuoteCreateInterface
         $this->addressCreator = $addressCreator;
         $this->cartRepository = $cartRepository;
         $this->customerRepository = $customerRepository;
+        $this->customerQuoteRepository = $customerQuoteRepository;
+    }
+
+    /**
+     * Returns repository for retrieving quotes.
+     *
+     * @return CartRepositoryInterface
+     */
+    public function getCartRepository()
+    {
+        return $this->cartRepository;
     }
 
     /**
@@ -117,6 +141,9 @@ class Quote extends Create implements QuoteCreateInterface
             $quote->assignCustomer($customer);
             $quote->setTotalsCollectedFlag(true);
             $this->cartRepository->save($quote);
+        }
+        if ($session->getCustomerId()) {
+            $this->customerQuoteRepository->saveCustomerQuote($session->getCustomerId(), $quote->getId());
         }
 
         return $quote;

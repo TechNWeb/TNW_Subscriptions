@@ -83,6 +83,12 @@
                 type="TNW\Subscriptions\Model\Queue"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileQueueSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\CustomerQuoteRepositoryInterface"
+                type="TNW\Subscriptions\Model\CustomerQuoteRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\CustomerQuoteInterface"
+                type="TNW\Subscriptions\Model\CustomerQuote"/>
+    <preference for="TNW\Subscriptions\Api\Data\CustomerQuoteSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface"

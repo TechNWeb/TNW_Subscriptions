@@ -17,7 +17,6 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
@@ -102,7 +101,7 @@ class CreateProfile extends BaseCreate
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Address $addressCreator
-     * @param Quote $quoteCreator
+     * @param QuoteCreateInterface $quoteCreator
      * @param Product $productModifier
      * @param Customer $customerCreator
      * @param Manager $profileManager
@@ -115,7 +114,7 @@ class CreateProfile extends BaseCreate
         Context $context,
         QuoteSessionInterface $session,
         Address $addressCreator,
-        Quote $quoteCreator,
+        QuoteCreateInterface $quoteCreator,
         Product $productModifier,
         Customer $customerCreator,
         Manager $profileManager,
@@ -189,6 +188,7 @@ class CreateProfile extends BaseCreate
             );
             $this->productModifier->setInitialFeeToItem($item);
             $quote->setTotalsCollectedFlag(false);
+            $quote->setIsModified(true);
             $this->quoteCreator->getCartRepository()->save($quote);
             $result['error'] = false;
         } catch (\Exception $e) {
@@ -200,6 +200,21 @@ class CreateProfile extends BaseCreate
         }
 
         return $result;
+    }
+
+    /**
+     * Recollects unmodified quotes
+     */
+    public function recollectUnmodifiedQuotes()
+    {
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        foreach ($session->getSubQuotes() as $subQuote) {
+            if (!$subQuote->getIsModified()) {
+                $subQuote->setTotalsCollectedFlag(false);
+                $this->quoteCreator->getCartRepository()->save($subQuote);
+            }
+        }
     }
 
     /**
