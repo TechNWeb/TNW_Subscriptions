@@ -70,19 +70,38 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->attributeRepository = $attributeRepository;
         $this->sortOrderBuilder = $sortOrderBuilder;
-        $this->collection = $collectionFactory->create();
+        $this->collection = $collectionFactory->create()
+            ->addAttributeToSelect('*');
         $this->formElementMapper = $formElementMapper;
         $this->arrayManager = $arrayManager;
         $this->eavConfig = $eavConfig;
+    }
 
+    /**
+     * @return array
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
         foreach ($this->getGroups() as $groupCode => $group) {
             if (strcasecmp($groupCode, 'additional-information') !== 0) {
                 continue;
             }
 
             $attributes = !empty($this->getAttributes()[$groupCode]) ? $this->getAttributes()[$groupCode] : [];
-            $this->meta['additional']['children'] = $this->getAttributesMeta($attributes, $group);
+            $meta['additional']['children'] = $this->getAttributesMeta($attributes, $group);
         }
+
+        return $meta;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        $data = parent::getData();
+        return $data;
     }
 
     /**

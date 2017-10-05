@@ -143,15 +143,17 @@
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" translate="true" xsi:type="string">Additional Information</item>
+                <item name="label" xsi:type="boolean">false</item>
                 <item name="tabLabel" translate="true" xsi:type="string">Additional Attributes</item>
                 <item name="additionalClasses" xsi:type="string">additional-attributes-field-set</item>
-                <item name="toolbarSection" xsi:type="string">.additional-attributes-field-set</item>
+                <item name="toolbarSection" xsi:type="string">.additional-attributes-field-set header</item>
+                <item name="messagesClass" xsi:type="string">messageasd</item>
             </item>
         </argument>
         <insertForm class="Magento\Ui\Component\Container">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/additional</item>
                     <item name="update_url" xsi:type="url" path="mui/index/render"/>
                     <item name="render_url" xsi:type="url" path="mui/index/render_handle">
                         <param name="handle">tnw_subscriptions_subscriptionprofile_additional_edit</param>
@@ -164,10 +166,7 @@
                     <item name="formSubmitType" xsi:type="string">ajax</item>
                     <item name="realTimeLink" xsi:type="boolean">false</item>
                     <item name="imports" xsi:type="array">
-                        <item name="profileId" xsi:type="string">${ $.provider }:data.subscription_profile_id</item>
-                    </item>
-                    <item name="exports" xsi:type="array">
-                        <item name="profileId" xsi:type="string">${ $.externalProvider }:params.subscription_profile_id</item>
+                        <item name="params.profileId" xsi:type="string">${ $.provider }:data.subscription_profile_id</item>
                     </item>
                 </item>
             </argument>
