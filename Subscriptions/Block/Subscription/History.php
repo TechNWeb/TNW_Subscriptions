@@ -8,12 +8,14 @@
 namespace TNW\Subscriptions\Block\Subscription;
 
 use Magento\Customer\Model\Session;
-use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as SubscriptionProfileManager;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 
 /**
  * Subscriptions history block instance.
@@ -60,6 +62,23 @@ class History extends \Magento\Framework\View\Element\Template
     private $subscriptionProfileManager;
 
     /**
+     * Subscriptions config.
+     *
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var int
+     */
+    private $websiteId;
+
+    /**
      * History constructor.
      *
      * @param Session $customerSession
@@ -69,6 +88,8 @@ class History extends \Magento\Framework\View\Element\Template
      * @param Context $context
      * @param SubscriptionProfileManager $subscriptionProfileManager
      * @param CollectionFactory $collectionFactory
+     * @param Config $config
+     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
@@ -79,6 +100,8 @@ class History extends \Magento\Framework\View\Element\Template
         Context $context,
         SubscriptionProfileManager $subscriptionProfileManager,
         CollectionFactory $collectionFactory,
+        Config $config,
+        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -87,6 +110,8 @@ class History extends \Magento\Framework\View\Element\Template
         $this->profileOrderManager = $profileOrderManager;
         $this->subscriptionProfileManager = $subscriptionProfileManager;
         $this->subscriptionCollectionFactory = $collectionFactory;
+        $this->config = $config;
+        $this->storeManager = $storeManager;
         parent::__construct($context, $data);
     }
 
@@ -244,6 +269,15 @@ class History extends \Magento\Framework\View\Element\Template
         return $this->profileOrderManager->getStatusMessage($status, $scheduledAt);
     }
 
+    /** Check if Action Column can be shown. Depends on actions than can be shown.
+     *
+     * @return bool
+     */
+    public function canShowActionColumn()
+    {
+        return $this->canHoldSubscription() || $this->canCancelSubscription();
+    }
+
     /**
      * Check if we can hold subscription.
      *
@@ -251,8 +285,7 @@ class History extends \Magento\Framework\View\Element\Template
      */
     public function canHoldSubscription()
     {
-        //todo add check logic to hold subscription
-        return true;
+        return $this->config->getCanHoldProfile($this->getWebsiteId());
     }
 
     /**
@@ -262,8 +295,21 @@ class History extends \Magento\Framework\View\Element\Template
      */
     public function canCancelSubscription()
     {
-        //todo add check logic to cancel subscription
-        return true;
+        return $this->config->getCanCancelProfile($this->getWebsiteId());
+    }
+
+    /**
+     * Return current website id.
+     *
+     * @return int
+     */
+    private function getWebsiteId()
+    {
+        if (!$this->websiteId) {
+            $this->websiteId = $this->storeManager->getWebsite()->getId();
+        }
+
+        return $this->websiteId;
     }
 
     /**

@@ -63,6 +63,13 @@ class Config
     private $xmlDiscountType = 'tnw_subscriptions_product/discount/discount_type';
     /**#@-*/
 
+    /**#@+
+     * Config xml path for Customer section
+     */
+    private $xmlCanHoldProfile = 'tnw_subscriptions_customer/profile_actions/can_hold';
+    private $xmlCanCancelProfile = 'tnw_subscriptions_customer/profile_actions/can_cancel';
+    /**#@-*/
+
     private $xmlUntilCanceled = 'tnw_subscriptions_product/term/until_canceled';
 
     /**
@@ -530,5 +537,27 @@ class Config
     public function getWebsite($websiteId)
     {
         return $this->storeManager->getWebsite($websiteId);
+    }
+
+    /**
+     * Get "Can hold profile" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return bool
+     */
+    public function getCanHoldProfile($websiteId = null)
+    {
+        return (bool)$this->getStoreConfig($this->xmlCanHoldProfile, $websiteId);
+    }
+
+    /**
+     * Get "Can cancel profile" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return bool
+     */
+    public function getCanCancelProfile($websiteId = null)
+    {
+        return (bool)$this->getStoreConfig($this->xmlCanCancelProfile, $websiteId);
     }
 }
