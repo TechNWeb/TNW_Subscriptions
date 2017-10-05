@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
@@ -15,7 +16,6 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
-use Magento\Framework\Controller\Result\JsonFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
 /**
@@ -88,11 +88,7 @@ class Process extends Create
             ];
 
             $redirectParams = array_merge($redirectParams, $this->getAdditionalParams($currentStep));
-
-            $result->setPath(
-                'tnw_subscriptions/subscriptionprofile/create',
-                $redirectParams
-            );
+            $result->setPath('tnw_subscriptions/subscriptionprofile/create', $redirectParams);
         }
 
         return $result;
@@ -342,7 +338,7 @@ class Process extends Create
     {
         $back = $this->getRequest()->getParam('back', 0);
 
-        if ($back) {
+        if (1 == $back) {
             if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
                 $this->getSubCreateModel()->clearAccountStepData();
             } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
