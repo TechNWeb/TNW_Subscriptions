@@ -187,11 +187,18 @@ class CreateProfile extends BaseCreate
                 $product,
                 $this->productModifier->getPreparedBuyRequest()
             );
-            $this->productModifier->setInitialFeeToItem($item);
-            $quote->setTotalsCollectedFlag(false);
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-            $this->quoteCreator->getCartRepository()->save($quote);
-            $result['error'] = false;
+            if ($item instanceof Item) {
+                $this->productModifier->setInitialFeeToItem($item);
+                $quote->setTotalsCollectedFlag(false);
+                $quote->getShippingAddress()->setCollectShippingRates(true);
+                $this->quoteCreator->getCartRepository()->save($quote);
+                $result['error'] = false;
+            } else {
+                $result = [
+                    'error' => true,
+                    'message' => $item
+                ];
+            }
         } catch (\Exception $e) {
             $this->getContext()->log($e->getMessage());
             $result = [
