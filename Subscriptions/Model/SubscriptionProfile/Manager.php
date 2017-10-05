@@ -114,6 +114,7 @@ class Manager
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
     /**
      * @var ShippingMethods
      */
@@ -385,7 +386,7 @@ class Manager
             $quote = $this->getNextQuote();
             $shippingDescription = '';
             if ($quote) {
-                $shippingMethodOptions = $this->getShippingMethodOptions($quote, false);
+                $shippingMethodOptions = $this->shippingMethods->getShippingMethodOptions($quote, false);
                 foreach ($shippingMethodOptions as $shippingMethodOption) {
                     if ($shippingMethodOption['value'] == $shippingMethod) {
                         $shippingDescription = $shippingMethodOption['label'];
@@ -563,25 +564,6 @@ class Manager
     }
 
     /**
-     * Returns shipping method options
-     *
-     * @param Quote $quote
-     * @param bool $withPrice
-     * @return array
-     */
-    public function getShippingMethodOptions(Quote $quote, $withPrice = true)
-    {
-        $options = [];
-        if ($quote && $quote->getId()) {
-            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
-            $options = $this->shippingMethods
-                ->setQuote($quote)
-                ->getShippingMethodsAsOptionArray($withPrice);
-        }
-        return $options;
-    }
-
-    /**
      * Handles messages for subscription edit form
      *
      * @return array
@@ -593,15 +575,15 @@ class Manager
         $profile = $this->getProfile();
         if ($profile->getNeedRecollect()) {
             $messages[] = [
-                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
-                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
-            ];
-            $messages[] = [
                 'index' => 'index = subscription_details_message',
                 'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
             ];
         }
         if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
             $messages[] = [
                 'index' => 'index = profit_message',
                 'message' => $profile->getProductChangesMadeMessageForProfit()

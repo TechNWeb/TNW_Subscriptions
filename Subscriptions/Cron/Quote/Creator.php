@@ -82,39 +82,54 @@ class Creator extends Base
     }
 
     /**
-     * Generates future quotes for profile and adds them to queue.
+     * Generates future quotes for profiles and adds them to queue.
      *
      * @param array $websiteIds
      */
     public function process(array $websiteIds)
     {
         foreach ($websiteIds as $websiteId) {
-            $relations = [];
             foreach ($this->getProfiles($websiteId) as $profile) {
-                try {
-                    list($cycles, $needMore) = $this->getBillingCycles($profile);
-                    foreach ($cycles as $cycleDate) {
-                        $quote = $this->processQuote($profile, $this->getEmptyQuote());
-                        $relations[] = $this->assignQuoteToProfile(
-                            $profile,
-                            $quote,
-                            $cycleDate
-                        );
-                    }
-                    $needGenerate = $profile->getTerm() ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
-                        : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED;
-                    $needGenerate = $needMore ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE : $needGenerate;
-                    $this->updateGenerateQuotesState($profile, $needGenerate);
-                } catch (\Exception $e) {
-                    $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
-                    $this->context->log($e->getMessage());
-                    $this->updateGenerateQuotesState($profile, SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE);
-                }
-                $this->profileRepository->save($profile);
+                $this->generateProfileQuotes($profile);
             }
+        }
+    }
+
+    /**
+     * Generates future quotes for profile.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param null|int $quotesCount
+     */
+    public function generateProfileQuotes(SubscriptionProfileInterface $profile, $quotesCount = null)
+    {
+        $relations = [];
+        try {
+            $count = $quotesCount ?: $this->config->getGeneratedQuotesCount();
+            list($cycles, $needMore) = $this->getBillingCycles($profile, $count);
+            foreach ($cycles as $cycleDate) {
+                $quote = $this->processQuote($profile, $this->getEmptyQuote());
+                $relations[] = $this->assignQuoteToProfile(
+                    $profile,
+                    $quote,
+                    $cycleDate
+                );
+            }
+            $this->updateGenerateQuotesState(
+                $profile,
+                $this->getNeedGenerateState($profile, $needMore)
+            );
             //Add created relations to profile process queue
             $this->queueManager->insertItems($relations);
+        } catch (\Exception $e) {
+            $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
+            $this->context->log($e->getMessage());
+            $this->updateGenerateQuotesState(
+                $profile,
+                SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE
+            );
         }
+        $this->profileRepository->save($profile);
     }
 
     /**
@@ -143,10 +158,11 @@ class Creator extends Base
      * Returns list of billing cycle dates and flag to generate more quotes.
      *
      * @param SubscriptionProfileInterface $profile
+     * @param int $count
      * @return array
      * @throws \Exception
      */
-    private function getBillingCycles(SubscriptionProfileInterface $profile)
+    private function getBillingCycles(SubscriptionProfileInterface $profile, $count)
     {
         $neededDates = [];
         $date = new \DateTime($profile->getStartDate());
@@ -199,7 +215,7 @@ class Creator extends Base
                 return (strtotime($neededDate) > strtotime($nowDate));
             }
         );
-        $resultDates = array_slice($resultDates, 0, $this->config->getGeneratedQuotesCount());
+        $resultDates = array_slice($resultDates, 0, $count);
         $needMore = count($neededDates) > count($resultDates);
 
         return [$resultDates, $needMore];
@@ -301,5 +317,24 @@ class Creator extends Base
     private function updateGenerateQuotesState(SubscriptionProfileInterface $profile, $state)
     {
         $profile->setGenerateQuotesState($state);
+    }
+
+    /**
+     * Returns need generate state for profile.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param $needMore
+     * @return int
+     */
+    private function getNeedGenerateState(SubscriptionProfileInterface $profile, $needMore)
+    {
+        $needGenerate = $profile->getTerm()
+            ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+            : SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED;
+        $needGenerate = $needMore
+            ? SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE
+            : $needGenerate;
+
+        return $needGenerate;
     }
 }

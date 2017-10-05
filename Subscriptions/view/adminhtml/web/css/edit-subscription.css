@@ -135,6 +135,9 @@ button.profile__cancel-edit_button:before{
     display: inline-block;
     float: left;
 }
+.subscription-summary .until-canceled{
+    font-style: italic;
+}
 
 .summary-account-information {
     width: 49%;

@@ -9,6 +9,6 @@
     <update handle="customer_account"/>
     <referenceContainer name="content">
         <block class="TNW\Subscriptions\Block\Subscription\History" name="subscription_order_history"
-               template="subscription/sub-history.phtml"/>
+               template="subscription/sub-history.phtml" cacheable="false"/>
     </referenceContainer>
 </page>

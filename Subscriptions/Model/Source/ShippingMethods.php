@@ -104,6 +104,23 @@ class ShippingMethods
     }
 
     /**
+     * Returns shipping method options
+     *
+     * @param ModelQuote $quote
+     * @param bool $withPrice
+     * @return array
+     */
+    public function getShippingMethodOptions(ModelQuote $quote, $withPrice = true)
+    {
+        $options = [];
+        if ($quote && $quote->getId()) {
+            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
+            $options = $this->setQuote($quote)->getShippingMethodsAsOptionArray($withPrice);
+        }
+        return $options;
+    }
+
+    /**
      * Returns rates list for shipping method.
      *
      * @return array
