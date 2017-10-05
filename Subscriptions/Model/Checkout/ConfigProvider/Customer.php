@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Model\Checkout\ConfigProvider;
 
 use Magento\Customer\Model\Context as CustomerContext;
-use Magento\Customer\Model\Url as CustomerUrl;
 use Magento\Framework\App\Http\Context as HttpContext;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\Checkout\ConfigProviderInterface;
@@ -17,13 +16,6 @@ use TNW\Subscriptions\Model\Checkout\ConfigProviderInterface;
  */
 class Customer implements ConfigProviderInterface
 {
-    /**
-     * Customer url.
-     *
-     * @var CustomerUrl
-     */
-    private $customerUrl;
-
     /**
      * Http context.
      *
@@ -39,16 +31,13 @@ class Customer implements ConfigProviderInterface
     private $url;
 
     /**
-     * @param CustomerUrl $customerUrl
      * @param HttpContext $httpContext
      * @param UrlInterface $url
      */
     public function __construct(
-        CustomerUrl $customerUrl,
         HttpContext $httpContext,
         UrlInterface $url
     ) {
-        $this->customerUrl = $customerUrl;
         $this->httpContext = $httpContext;
         $this->url = $url;
     }
@@ -60,11 +49,7 @@ class Customer implements ConfigProviderInterface
     {
         return [
             'isCustomerLoggedIn' => $this->isCustomerLoggedIn(),
-            'registerUrl' => $this->customerUrl->getRegisterUrl(),
-            'forgotPasswordUrl' => $this->customerUrl->getForgotPasswordUrl(),
             'changeAfterLoginUrl' => $this->url->getUrl('tnw_subscriptions/session/ChangeBeforeAuthUrl'),
-            'loginPostUrl' => $this->customerUrl->getLoginPostUrl(),
-            'urlAddEmailToSession' => $this->url->getUrl('tnw_subscriptions/session/AddEmailToSession'),
         ];
     }
 

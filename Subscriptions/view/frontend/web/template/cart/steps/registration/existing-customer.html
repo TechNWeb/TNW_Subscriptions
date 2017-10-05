@@ -1,34 +1,37 @@
-<form data-mage-init='{"validation": {}}' class="form form-login" method="post" novalidate="novalidate"
-      data-bind="attr: {action: loginPostUrl}, submit: validateForm" id="existing-customer" data-role="email-for-login"
->
+<div class="existing-customer">
+    <form data-mage-init='{"validation": {}}' class="form form-login" method="post" novalidate="novalidate"
+          data-bind="attr: {action: loginPostUrl}, submit: validateForm" id="existing-customer"
+          data-role="email-for-login"
+    >
 
-    <h2 class="control-spaces">
-        Existing customer
-    </h2>
+        <h2 class="control-spaces">
+            Existing customer
+        </h2>
 
-    <input name="login[username]" class="email control-spaces" type="email"
-           data-validate="{required:true, 'validate-email':true}"
-           data-bind="
+        <input name="login[username]" class="email control-spaces" type="email"
+               data-validate="{required:true, 'validate-email':true}"
+               data-bind="
                attr: { placeholder: placeholderEmail },
                textInput: email,
                hasFocus: emailFocused"
-    />
+        />
 
-    <input name="login[password]" class="password control-spaces" type="password"
-           data-bind="attr: {placeholder: placeholderPassword}"
-           data-validate="{required:true}"
-    />
+        <input name="login[password]" class="password control-spaces" type="password"
+               data-bind="attr: {placeholder: placeholderPassword}"
+               data-validate="{required:true}"
+        />
 
-    <div class="secondary forgot-password">
-        <a class="action remind" data-bind="attr: {href: forgotPasswordUrl}">
-            <span data-bind="i18n: 'Forgot Password?'"></span>
-        </a>
-    </div>
-
-    <button type="submit"
-            class="action primary"
-            attr="'data-index': index">
-        <span data-bind="i18n: 'Log In'"></span>
-    </button>
-
-</form>
+        <div class="secondary forgot-password">
+            <a class="action remind" data-bind="attr: {href: forgotPasswordUrl}">
+                <span data-bind="i18n: 'Forgot Password?'"></span>
+            </a>
+        </div>
+        <div class="button-container">
+            <button type="submit"
+                    class="action primary"
+                    attr="'data-index': index">
+                <span data-bind="i18n: 'Log In'"></span>
+            </button>
+        </div>
+    </form>
+</div>

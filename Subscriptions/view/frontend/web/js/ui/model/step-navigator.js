@@ -53,6 +53,9 @@ define(
                 steps.push({
                     code: code,
                     alias: alias != null ? alias : code,
+                    blockNamespace: step.blockNamespace,
+                    requestFieldName: step.requestFieldName,
+                    requestFieldValue: step.requestFieldValue,
                     title : $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,

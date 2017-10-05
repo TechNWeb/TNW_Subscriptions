@@ -5,20 +5,21 @@
 
 define([
     'uiComponent',
-    'jquery'
-], function (uiComponent, $) {
+    'jquery',
+    'uiRegistry'
+], function (uiComponent, $, registry) {
     'use strict';
 
     return uiComponent.extend({
         defaults: {
-            forgotPasswordUrl: window.tnwSubscriptionsCheckoutConfig.forgotPasswordUrl,
-            loginPostUrl: window.tnwSubscriptionsCheckoutConfig.loginPostUrl,
+            forgotPasswordUrl: '',
+            loginPostUrl: '',
             placeholderPassword: $.mage.__('Password'),
             placeholderEmail: $.mage.__('Email Address'),
             emailFocused: false,
             email: '',
             listens: {
-                emailFocused: 'validateEmail',
+                emailFocused: 'validateEmail'
             }
         },
 

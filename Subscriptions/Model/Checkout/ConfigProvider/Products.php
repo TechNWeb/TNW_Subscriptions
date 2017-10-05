@@ -6,9 +6,8 @@
 
 namespace TNW\Subscriptions\Model\Checkout\ConfigProvider;
 
+use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\Checkout\ConfigProviderInterface;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\Product as CatalogProduct;
 
 /**
  * Products config for Cart.
@@ -16,25 +15,29 @@ use Magento\Catalog\Model\Product as CatalogProduct;
 class Products implements ConfigProviderInterface
 {
     /**
-     * @var ProductRepositoryInterface
+     * Url Builder.
+     *
+     * @var UrlInterface
      */
-    private $productRepository;
+    private $url;
 
     /**
-     * @param ProductRepositoryInterface $productRepository
+     * Products constructor.
+     * @param UrlInterface $url
      */
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        UrlInterface $url
     ) {
-        $this->productRepository = $productRepository;
+        $this->url = $url;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getConfig()
     {
-        //todo config for product
-        return [];
+        return [
+            'render_url' => $this->url->getUrl('tnw_subscriptions/ui_render/handle'),
+        ];
     }
 }
