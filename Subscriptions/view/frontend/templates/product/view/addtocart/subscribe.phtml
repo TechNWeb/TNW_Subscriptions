@@ -9,7 +9,8 @@
 <div class="subscribe-container"
      data-mage-init='{"tnwSubscribeContainer":{
         "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
-        "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>
+        "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
+        "canShowSubscribePriceBlock" : "true"
     }}'
 >
     <div class="fieldset">
@@ -18,9 +19,9 @@
             <div class="control">
                 <div class="options-list nested">
                 <?php foreach ($block->getFrequencyOptions() as $option): ?>
-                    <div class="field choice admin__field admin__field-option required">
+                    <div class="field choice required">
                         <input type="radio"
-                               class="radio admin__control-radio required"
+                               class="radio required"
                                name="billing_frequency"
                                id="billing_frequency_<?php echo $option['value'] ?>"
                                value="<?php echo $option['value'] ?>"
@@ -32,7 +33,7 @@
                                 data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
                             <?php endif ?>
                         />
-                        <label class="label admin__field-label"
+                        <label class="label"
                                for="billing_frequency_<?php echo $option['value'] ?>">
                             <span><?php echo $option['label'] ?></span>
                         </label>
@@ -47,7 +48,7 @@
             <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
                 <input type="checkbox"
-                       class="checkbox admin__control-checkbox"
+                       class="checkbox"
                        name="term"
                        id="term"
                        value="1"
@@ -55,7 +56,7 @@
                        checked="checked"
                     <?php endif ?>
                 />
-                <label class="label admin__field-label" for="term">
+                <label class="label" for="term">
                     <span><?php echo __('Until canceled') ?></span>
                 </label>
             </div>

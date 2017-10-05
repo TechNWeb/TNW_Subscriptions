@@ -27,14 +27,51 @@ define([
             buttonDisabledClass: 'disabled',
             buttonTextWhileAdding: '',
             buttonTextAdded: '',
-            buttonTextDefault: ''
+            buttonTextDefault: '',
+            subscribeTabSelector: '#subscribe-tab-head',
+            subscribePriceBlockSelector: 'div.price-subscription_price',
+            addToCartTabSelector: '#addtocart-tab-head',
+            addToCartPriceBlockSelector: 'div.price-final_price',
+            canShowSubscribePriceBlock: false
+        },
+
+        containers: {
+            subscriptionTab: null,
+            subscriptionPriceBox: null,
+            addToCartTab: null,
+            addToCartPriceBox: null
         },
 
         /**
          * Initialize widget
          */
         _create: function () {
+            this._prepareContainers();
+            this._initialize();
             this._bind();
+        },
+
+        /**
+         * First initialization.
+         */
+        _initialize: function () {
+            this.containers.addToCartPriceBox.show();
+            this.containers.subscriptionPriceBox.hide();
+
+            if (this.options.canShowSubscribePriceBlock) {
+                this.containers.addToCartPriceBox.hide();
+                this.containers.subscriptionPriceBox.show();
+            }
+        },
+
+        /**
+         * Get html elements.
+         */
+        _prepareContainers: function () {
+            this.containers.subscriptionTab = $(this.options.subscribeTabSelector);
+            this.containers.subscriptionPriceBox = $(this.options.subscribePriceBlockSelector);
+            this.containers.addToCartTab = $(this.options.addToCartTabSelector);
+            this.containers.addToCartPriceBox = $(this.options.addToCartPriceBlockSelector);
         },
 
         /**
@@ -59,6 +96,16 @@ define([
                     widget._updateQtyFromFrequency();
                 }, this));
             }
+
+            this.containers.subscriptionTab.on('click', $.proxy(function() {
+                widget.containers.subscriptionPriceBox.show();
+                widget.containers.addToCartPriceBox.hide();
+            }, this));
+
+            this.containers.addToCartTab.on('click', $.proxy(function() {
+                widget.containers.subscriptionPriceBox.hide();
+                widget.containers.addToCartPriceBox.show();
+            }, this));
         },
 
         /**
