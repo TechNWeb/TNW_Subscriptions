@@ -49,6 +49,7 @@ define([
         defaults: {
             configurableData: {},
             externalFormName: '${ $.ns }.${ $.ns }',
+            template: 'TNW_Subscriptions/form/insert',
             pageActionsClass: 'page-actions',
             actionsContainerClass: 'page-main-actions',
             exports: {

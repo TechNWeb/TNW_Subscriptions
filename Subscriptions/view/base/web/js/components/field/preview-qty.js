@@ -47,6 +47,15 @@ define([
             }
 
             return parent;
+        },
+
+        /**
+         * Checks if element has addons
+         *
+         * @returns {Boolean}
+         */
+        hasAddons: function () {
+            return this.addbefore || this.addafter;
         }
     });
 });

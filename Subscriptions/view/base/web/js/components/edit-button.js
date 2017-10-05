@@ -129,6 +129,14 @@ define([
             }
 
             return parent;
+        },
+
+        hasAddons: function () {
+            return false;
+        },
+
+        hasService: function () {
+            return false;
         }
     });
 });
