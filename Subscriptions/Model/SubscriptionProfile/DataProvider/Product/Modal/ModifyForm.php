@@ -760,10 +760,13 @@ class ModifyForm extends Form
                         'visibleOnEdit' => $visibleOnEdit,
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                        'options' => [
+                            'minDate' => 'new Date()',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 

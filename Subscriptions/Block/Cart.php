@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Block;
 
+use Magento\Checkout\Block\Cart\Sidebar;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Model\Checkout\CompositeConfigProvider;
@@ -22,6 +23,11 @@ class Cart extends Template
     private $configProvider;
 
     /**
+     * @var Sidebar
+     */
+    private $sidebar;
+
+    /**
      * @var QuoteSessionInterface
      */
     private $quoteSession;
@@ -32,12 +38,14 @@ class Cart extends Template
      * @param QuoteSessionInterface $quoteSession
      * @param Context $context
      * @param CompositeConfigProvider $configProvider
+     * @param Sidebar $sidebar
      * @param array $data
      */
     public function __construct(
         QuoteSessionInterface $quoteSession,
         Context $context,
         CompositeConfigProvider $configProvider,
+        Sidebar $sidebar,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -46,6 +54,7 @@ class Cart extends Template
         $this->jsLayout = isset($data['jsLayout']) && is_array($data['jsLayout'])
             ? $data['jsLayout']
             : [];
+        $this->sidebar = $sidebar;
     }
 
     /**
@@ -89,5 +98,15 @@ class Cart extends Template
     public function getContinueShoppingUrl()
     {
         return $this->_urlBuilder->getUrl();
+    }
+
+    /**
+     * Get config from sidebar block for checkout data.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->sidebar->getConfig();
     }
 }

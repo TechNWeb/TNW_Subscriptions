@@ -107,7 +107,7 @@ class History extends \Magento\Framework\View\Element\Template
                 'main_table.customer_id',
                 ['eq' => $customerId]
             )->setOrder(
-                'next_billing_cycle_date',
+                'created_at',
                 'desc'
             );
         }

@@ -34,3 +34,6 @@
                 $block->escapeUrl($block->getContinueShoppingUrl())) ?></p>
     </div>
 <?php endif; ?>
+<script>
+    window.checkout = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getConfig()); ?>;
+</script>
