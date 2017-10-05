@@ -36,7 +36,7 @@
     }
   }
 
-  #step-registration {
+  .registration-fieldset .fieldset{
     display: inline-flex;
     width: -webkit-fill-available;
     margin-bottom: 5%;
@@ -45,14 +45,14 @@
       width: 6%
     }
 
-    #new-customer,
-    #existing-customer {
+    .new-customer,
+    .existing-customer {
       position: relative;
       width: 35%;
-      padding-bottom: 3%;
+      padding-bottom: 70px;
       padding-right: 5%;
       border: 1px solid #ccc;
-      height: 100%;
+      margin-right: 6%;
 
       .control-spaces {
         margin-top: 5%;
@@ -69,7 +69,7 @@
         width: 50%;
         height: 45px;
         position: absolute;
-        bottom: 6%;
+        bottom: 15px;
       }
 
       .forgot-password {
@@ -88,170 +88,12 @@
       display: -webkit-flex;
     }
 
-    .next-step,
-    .block-sidebar {
+    .next-step {
       -webkit-flex: 1 0 auto;
       -ms-flex: 1 0 auto;
       flex: 1 0 auto;
       max-width: 300px;
       margin-left: 15px;
-    }
-
-    .block-sidebar {
-      background-color: #f0f0f0;
-      padding: 20px;
-      font-size: 1.4rem;
-
-      > div {
-        margin: 0 0 20px 0;
-      }
-
-      .cart-items .list {
-        list-style: none none;
-        padding: 4px 0 0 0;
-      }
-
-      .cart-items .list._expanded {
-        border-bottom: 1px solid #cccccc;
-        border-top: 1px solid #cccccc;
-      }
-
-      .cart-items .list._expanded li {
-        clear: both;
-      }
-
-      .cart-items .product-item-details {
-        display: -webkit-box;
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-flex-direction: row;
-        -ms-flex-direction: row;
-        flex-direction: row;
-        -webkit-justify-content: space-between;
-        justify-content: space-between;
-      }
-
-      .cart-items .block-product-actions .action.delete:before {
-        -webkit-font-smoothing: antialiased;
-        font-size: 18px;
-        line-height: 20px;
-        color: #8f8f8f;
-        content: @icon-trash;
-        font-family: @icons__font-name;
-        vertical-align: middle;
-        display: inline-block;
-        font-weight: normal;
-        overflow: hidden;
-        text-align: center;
-      }
-
-      .cart-items .block-product-actions .action.delete._disabled::before {
-        color: #e4e4e4;
-      }
-
-      .cart-items .block-product-actions .action.delete > span {
-        border: 0;
-        clip: rect(0, 0, 0, 0);
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        padding: 0;
-        position: absolute;
-        width: 1px;
-      }
-
-      .cart-items .product-item-name {
-        font-weight: 600;
-      }
-
-      .cart-items .product-item-options,
-      .plan-summary .plan-summary-info {
-        font-size: 1.3rem;
-        padding: 10px 0 0 0;
-      }
-
-      .content {
-        margin: 20px 0 0 0;
-
-        dt.label {
-          float: left;
-          width: 70%;
-          font-weight: 500;
-        }
-
-        dd.value {
-          margin-left: 70%;
-          text-align: right;
-        }
-
-        dt.label.qty {
-          width: 50%;
-          padding: 4px 0 0 0;
-        }
-
-        dd.value.qty {
-          margin-left: 50%;
-        }
-
-        dt.label.start {
-          width: 50%;
-        }
-
-        dd.value.start {
-          margin-left: 50%;
-        }
-
-        dd.value.start .calendar:after {
-          margin: 0 0 0 -25px;
-          font-family: @icons__font-name;
-          font-size: 16px;
-          content: @icon-calendar;
-        }
-
-        dd.value.start .calendar input {
-          margin: -4px 0 0 0;
-          width: calc(~'100% - 25px');
-        }
-
-        dt.label.repeat {
-          width: 50%;
-        }
-
-        dd.value.repeat {
-          margin-left: 50%;
-        }
-      }
-
-      .cart-items .product-item-options .value.qty > input {
-        text-align: center;
-        width: 40px;
-      }
-
-      .subtotal {
-        font-size: 2.2rem;
-        font-weight: 600;
-        text-align: right;
-      }
-
-      .actions .action.primary.checkout {
-        line-height: 2.2rem;
-        padding: 14px 17px;
-        font-size: 1.8rem;
-        width: 100%;
-        display: block;
-      }
-
-      .notice {
-        font-size: 1.3rem;
-        color: #9c221e;
-      }
-
-      .title {
-        font-weight: 500;
-        font-size: 1.5rem;
-        color: #333333;
-      }
     }
 
     .select-action.next-step {
@@ -263,8 +105,7 @@
       }
     }
 
-    .tnw-subscriptions-cart__progress-bar,
-    .tnw-subscriptions-cart_subscription-plans__container {
+    .tnw-subscriptions-cart__progress-bar {
       display: -webkit-box;
       display: -webkit-flex;
       display: -ms-flexbox;
@@ -487,12 +328,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
-  #step-registration {
-    #new-customer,
-    #existing-customer {
-      padding-bottom: 5%;
-    }
-  }
 
   .catalog-product-view {
     .addtocart-tabs {
@@ -509,26 +344,26 @@
   }
 }
 
-@media (min-width: 414px) and (max-width: 768px) {
-  #step-registration {
-    #new-customer,
-    #existing-customer {
-      padding-bottom: 8%;
+@media (max-width: 414px) {
+  .tnw-subscriptions-cart__container {
+    .tnw-subscriptions-cart__progress-bar {
+      .progress-bar_item > span {
+        font-size: 1.1rem;
+      }
     }
   }
 }
 
-@media (max-width: 414px) {
-  #step-registration {
-    display: inline-block;
-    height: 650px;
+@media (max-width: 490px) {
+  .registration-fieldset .fieldset{
+    display: block;
 
-    #new-customer,
-    #existing-customer {
+    .new-customer,
+    .existing-customer {
       width: 95%;
       margin-bottom: 5%;
       padding-right: 4%;
-      height: 45%;
+      padding-bottom: 100px;
 
       .email,
       .password {
@@ -537,18 +372,6 @@
 
       .forgot-password {
         padding-right: 5%;
-      }
-
-      .action.primary {
-        bottom: 4%;
-      }
-    }
-  }
-
-  .tnw-subscriptions-cart__container {
-    .tnw-subscriptions-cart__progress-bar {
-      .progress-bar_item > span {
-        font-size: 1.1rem;
       }
     }
   }

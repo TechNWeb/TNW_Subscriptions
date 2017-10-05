@@ -6,13 +6,16 @@
 
 namespace TNW\Subscriptions\Block;
 
-use TNW\Subscriptions\Model\Checkout\CompositeConfigProvider;
+use Magento\Checkout\Block\Cart\Sidebar;
+use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use TNW\Subscriptions\Model\Checkout\CompositeConfigProvider;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Cart block.
  */
-class Cart extends \Magento\Framework\View\Element\Template
+class Cart extends Template
 {
     /**
      * @var CompositeConfigProvider
@@ -20,20 +23,38 @@ class Cart extends \Magento\Framework\View\Element\Template
     private $configProvider;
 
     /**
+     * @var Sidebar
+     */
+    private $sidebar;
+
+    /**
+     * @var QuoteSessionInterface
+     */
+    private $quoteSession;
+
+    /**
+     * Cart constructor.
+     *
+     * @param QuoteSessionInterface $quoteSession
      * @param Context $context
      * @param CompositeConfigProvider $configProvider
+     * @param Sidebar $sidebar
      * @param array $data
      */
     public function __construct(
+        QuoteSessionInterface $quoteSession,
         Context $context,
         CompositeConfigProvider $configProvider,
+        Sidebar $sidebar,
         array $data = []
     ) {
         parent::__construct($context, $data);
+        $this->quoteSession = $quoteSession;
         $this->configProvider = $configProvider;
         $this->jsLayout = isset($data['jsLayout']) && is_array($data['jsLayout'])
             ? $data['jsLayout']
             : [];
+        $this->sidebar = $sidebar;
     }
 
     /**
@@ -43,6 +64,9 @@ class Cart extends \Magento\Framework\View\Element\Template
      */
     public function getJsLayout()
     {
+        //set config data
+        $this->jsLayout['components']['subscriptionsProvider'] = $this->getCheckoutConfig();
+
         return \Zend_Json::encode($this->jsLayout);
     }
 
@@ -57,14 +81,13 @@ class Cart extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Get cart items count
+     * Get cart items count.
      *
-     * @return int
+     * @return int|float
      */
     public function getCartItemsCount()
     {
-        //todo qty of cart items
-        return 1;
+        return $this->quoteSession->getSubQuoteItemsCount();
     }
 
     /**
@@ -75,5 +98,15 @@ class Cart extends \Magento\Framework\View\Element\Template
     public function getContinueShoppingUrl()
     {
         return $this->_urlBuilder->getUrl();
+    }
+
+    /**
+     * Get config from sidebar block for checkout data.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->sidebar->getConfig();
     }
 }

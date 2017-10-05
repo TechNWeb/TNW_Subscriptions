@@ -6,8 +6,9 @@
 define([
     'Magento_Ui/js/form/element/abstract',
     'TNW_Subscriptions/js/ui/model/step-navigator',
-    'jquery'
-], function (Abstract, stepNavigator, $) {
+    'jquery',
+    'uiRegistry'
+], function (Abstract, stepNavigator, $, registry) {
     'use strict';
 
     return Abstract.extend({
@@ -53,7 +54,8 @@ define([
          * Not need registration if customer is log in.
          */
         missRegistrationIfLogin: function () {
-            if (window.tnwSubscriptionsCheckoutConfig.isCustomerLoggedIn) {
+            var isLoggedIn = registry.get('subscriptionsProvider').isCustomerLoggedIn;
+            if (isLoggedIn) {
                 stepNavigator.navigateNext();
             }
         },
@@ -73,9 +75,10 @@ define([
          * Send ajax to change redirect url after login.
          */
         sendAjaxToChangeUrl: function (routePath, hash) {
+            var url = registry.get('subscriptionsProvider').changeAfterLoginUrl;
             $.ajax({
                 showLoader: true,
-                url: window.tnwSubscriptionsCheckoutConfig.changeAfterLoginUrl,
+                url: url,
                 data: {
                     form_key: window.FORM_KEY,
                     'route_path': routePath,

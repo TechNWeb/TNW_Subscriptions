@@ -45,6 +45,12 @@ class DataProvider extends AbstractDataProvider
     {
         /** @var Collection $collection */
         $collection = $this->getCollection();
+
+        /* hide all such records if they are more than 2 months */
+        $collection->addFilterToMap('updated_at', 'main_table.updated_at');
+        $minDate = date('Y-m-d H:i:s', strtotime("-2 months"));
+        $collection->addFieldToFilter('updated_at', ['gteq' => $minDate]);
+
         $collection->addFilterToMap('id', 'main_table.id');
         $collection->getSelect()->join(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
