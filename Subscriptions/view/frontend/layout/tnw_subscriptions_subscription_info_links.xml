@@ -11,7 +11,7 @@
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Html\Links" as="links" name="subscription.info.links" before="-">
                 <arguments>
-                    <argument name="css_class" xsi:type="string">items order-links</argument>
+                    <argument name="css_class" xsi:type="string">sub-items items order-links</argument>
                 </arguments>
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.summaty">
                     <arguments>
