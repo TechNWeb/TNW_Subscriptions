@@ -127,6 +127,10 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         self::IS_VIRTUAL,
         self::TOKEN_HASH,
         self::PAYMENT_ADDITIONAL_INFO,
+        self::CREATED_AT,
+        self::UPDATED_AT,
+        self::GENERATE_QUOTES_STATE,
+        self::NEED_RECOLLECT,
     ];
 
     /**

@@ -4,11 +4,12 @@
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">tnw_subscriptionprofile_edit_additional_form.tnw_subscriptionprofile_edit_additional_form_data_source</item>
             <item name="deps" xsi:type="string">tnw_subscriptionprofile_edit_additional_form.tnw_subscriptionprofile_edit_additional_form_data_source</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_edit_additional_form</item>
         </item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
-            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_edit_additional_form</item>
             <item name="ajaxSave" xsi:type="boolean">true</item>
+            <item name="ajaxSaveType" xsi:type="string">simple</item>
         </item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
         <item name="buttons" xsi:type="array">
@@ -37,6 +38,15 @@
             </item>
         </argument>
     </dataSource>
+    <container name="messages">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string"/>
+                <item name="component" xsi:type="string">Magento_Catalog/js/components/messages</item>
+                <item name="additionalClasses" xsi:type="string">messages</item>
+            </item>
+        </argument>
+    </container>
     <fieldset name="additional">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">

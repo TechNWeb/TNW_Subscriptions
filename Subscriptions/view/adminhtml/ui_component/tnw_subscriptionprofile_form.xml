@@ -147,7 +147,7 @@
                 <item name="tabLabel" translate="true" xsi:type="string">Additional Attributes</item>
                 <item name="additionalClasses" xsi:type="string">additional-attributes-field-set</item>
                 <item name="toolbarSection" xsi:type="string">.additional-attributes-field-set header</item>
-                <item name="messagesClass" xsi:type="string">messageasd</item>
+                <item name="messagesClass" xsi:type="string">messages</item>
             </item>
         </argument>
         <insertForm class="Magento\Ui\Component\Container">
