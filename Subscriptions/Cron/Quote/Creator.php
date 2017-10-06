@@ -166,10 +166,8 @@ class Creator extends Base
     {
         $neededDates = [];
         $date = new \DateTime($profile->getStartDate());
-        // If profile has a trial period then add to list start date.
-        if ($profile->getStatus() === ProfileStatus::STATUS_TRIAL) {
-            $neededDates[] = $date->format('Y-m-d H:i:s');
-        }
+        //Add to list start date.
+        $neededDates[] = $date->format('Y-m-d H:i:s');
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
             //End date of current year
@@ -188,7 +186,7 @@ class Creator extends Base
             }
         } else {
             // Profile has a finite count of cycles
-            $cyclesCount = (int)$profile->getTotalBillingCycles();
+            $cyclesCount = (int)$profile->getTotalBillingCycles() - 1;
         }
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
