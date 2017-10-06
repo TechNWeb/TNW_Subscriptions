@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
 use Magento\Framework\Registry;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -69,5 +70,16 @@ class Profit extends Template
     public function getRemainingProfit()
     {
         return $this->profitCalculator->getRenderedRemainingProfit($this->subscriptionProfile);
+    }
+
+    /**
+     * Get can hide Remaining profit row
+     * 
+     * @return bool
+     */
+    public function getHideRemainingProfit()
+    {
+        return $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
+            && floatval($this->profitCalculator->getRemainingProfit($this->subscriptionProfile)) === 0.0;
     }
 }

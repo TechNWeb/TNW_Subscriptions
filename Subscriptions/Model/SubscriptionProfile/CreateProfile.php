@@ -17,7 +17,6 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
@@ -102,7 +101,7 @@ class CreateProfile extends BaseCreate
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Address $addressCreator
-     * @param Quote $quoteCreator
+     * @param QuoteCreateInterface $quoteCreator
      * @param Product $productModifier
      * @param Customer $customerCreator
      * @param Manager $profileManager
@@ -115,7 +114,7 @@ class CreateProfile extends BaseCreate
         Context $context,
         QuoteSessionInterface $session,
         Address $addressCreator,
-        Quote $quoteCreator,
+        QuoteCreateInterface $quoteCreator,
         Product $productModifier,
         Customer $customerCreator,
         Manager $profileManager,
@@ -187,10 +186,18 @@ class CreateProfile extends BaseCreate
                 $product,
                 $this->productModifier->getPreparedBuyRequest()
             );
-            $this->productModifier->setInitialFeeToItem($item);
-            $quote->setTotalsCollectedFlag(false);
-            $this->quoteCreator->getCartRepository()->save($quote);
-            $result['error'] = false;
+            if ($item instanceof Item) {
+                $this->productModifier->setInitialFeeToItem($item);
+                $quote->setTotalsCollectedFlag(false);
+                $quote->getShippingAddress()->setCollectShippingRates(true);
+                $this->quoteCreator->getCartRepository()->save($quote);
+                $result['error'] = false;
+            } else {
+                $result = [
+                    'error' => true,
+                    'message' => $item
+                ];
+            }
         } catch (\Exception $e) {
             $this->getContext()->log($e->getMessage());
             $result = [
@@ -200,6 +207,21 @@ class CreateProfile extends BaseCreate
         }
 
         return $result;
+    }
+
+    /**
+     * Recollects unmodified quotes
+     */
+    public function recollectUnmodifiedQuotes()
+    {
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        foreach ($session->getSubQuotes() as $subQuote) {
+            if (!$subQuote->getIsModified()) {
+                $subQuote->setTotalsCollectedFlag(false);
+                $this->quoteCreator->getCartRepository()->save($subQuote);
+            }
+        }
     }
 
     /**
@@ -214,20 +236,18 @@ class CreateProfile extends BaseCreate
     {
         /** @var ModelQuote $quote */
         $quote = $this->quoteCreator->getCartRepository()->get($quoteId);
-        /** @var Item $item */
-        foreach ($quote->getAllItems() as $item) {
-            if ($item->getId() === $quoteItemId) {
-                $request['product_id'] = $item->getProduct()->getId();
-                $item->isDeleted(true);
-                $this->quoteCreator->getCartRepository()->save($quote);
-                if (!$quote->getAllItems()) {
-                    $this->quoteCreator->getCartRepository()->delete($quote);
-                    /** @var QuoteSessionInterface $session */
-                    $session = $this->getSession();
-                    $session->removeSubQuote($quote);
-                }
-                break;
-            }
+        $item = $quote->getItemById($quoteItemId);
+        $request['product_id'] = $item->getProduct()->getId();
+        $item->isDeleted(true);
+
+        if (!$quote->getAllItems()) {
+            $this->quoteCreator->getCartRepository()->delete($quote);
+            /** @var QuoteSessionInterface $session */
+            $session = $this->getSession();
+            $session->removeSubQuote($quote);
+        } else {
+            $quote->getShippingAddress()->setCollectShippingRates(true);
+            $this->quoteCreator->getCartRepository()->save($quote);
         }
 
         return $request;

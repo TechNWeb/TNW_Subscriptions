@@ -22,6 +22,12 @@ interface QuoteSessionInterface extends \Magento\Framework\Session\SessionManage
     public function getSubQuotes();
 
     /**
+     * @param $subQuoteIds
+     * @return $this
+     */
+    public function setSubQuoteIds($subQuoteIds);
+
+    /**
      * @return bool|\Magento\Quote\Model\Quote
      */
     public function getFirstQuote();

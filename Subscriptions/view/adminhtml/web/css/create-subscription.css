@@ -1,3 +1,28 @@
+.admin__fieldset>.admin__field.field-wide[class]:not(.admin__field-option)>.admin__field-label {
+  display: block;
+  line-height: 1.4rem;
+  margin-bottom: .86rem;
+  margin-top: -0.14rem;
+  text-align: left;
+  width: auto;
+}
+
+.admin__fieldset>.admin__field.field-wide[class]:not(.admin__field-option)._required>.admin__field-label span {
+  padding-left: 1.5rem;
+}
+
+.admin__fieldset>.admin__field.field-wide[class]:not(.admin__field-option)._required>.admin__field-label span:after {
+  left: 0;
+  margin-left: 30px;
+}
+
+.admin__fieldset>.admin__field.field-wide[class]>.admin__field-control {
+  clear: left;
+  float: none;
+  text-align: left;
+  width: auto;
+}
+
 .subscription-profile-products-container .admin__field-complex-elements{
   max-width: 100%;
 }

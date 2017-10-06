@@ -6,12 +6,14 @@
 define([
     'uiComponent',
     'jquery',
-    'TNW_Subscriptions/js/ui/model/step-navigator'
-], function (uiComponent, $, stepNavigator) {
+    'TNW_Subscriptions/js/ui/model/step-navigator',
+    'uiRegistry'
+], function (uiComponent, $, stepNavigator, registry) {
     'use strict';
 
     return uiComponent.extend({
         defaults: {
+            urlAddEmailToSession: '',
             placeholderEmail: $.mage.__('Email Address'),
             emailFocused: false,
             email: '',
@@ -76,9 +78,10 @@ define([
          * Send ajax to add Customer email to session.
          */
         sendAjaxAddEmailToSession: function (email) {
+            var url = this.urlAddEmailToSession;
             $.ajax({
                 showLoader: true,
-                url: window.tnwSubscriptionsCheckoutConfig.urlAddEmailToSession,
+                url: url,
                 data: {
                     form_key: window.FORM_KEY,
                     'customer_email': email
