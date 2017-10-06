@@ -399,25 +399,6 @@ class Manager
     }
 
     /**
-     * Processes additional data
-     *
-     * @param $requestData
-     * @return $this
-     */
-    public function processAttribute($requestData)
-    {
-        if (empty($requestData['additional_attributes'])) {
-            return $this;
-        }
-
-        foreach ($requestData['additional_attributes'] as $attributeCode => $attributeValue) {
-            $this->getProfile()->setCustomAttribute($attributeCode, $attributeValue);
-        }
-
-        return $this;
-    }
-
-    /**
      * Assigns order to profile.
      *
      * @param SubscriptionProfileOrderInterface $relation
