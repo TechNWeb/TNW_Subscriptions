@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!--<update handle="customer_account"/>-->
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Html\Links" as="links" name="subscription.info.links" before="-">
+                <arguments>
+                    <argument name="css_class" xsi:type="string">sub-items items order-links</argument>
+                </arguments>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.summaty">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/edit</argument>
+                        <argument name="label" xsi:type="string" translate="true">Summary</argument>
+                    </arguments>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.shipping">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/shipment</argument>
+                        <argument name="label" xsi:type="string" translate="true">Shipping information</argument>
+                    </arguments>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.billing">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/billing</argument>
+                        <argument name="label" xsi:type="string" translate="true">Billing information</argument>
+                    </arguments>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.items">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/items</argument>
+                        <argument name="label" xsi:type="string" translate="true">Products &amp; Services</argument>
+                    </arguments>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.order.history">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/orderhistory</argument>
+                        <argument name="label" xsi:type="string" translate="true">Order History</argument>
+                    </arguments>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.change.history">
+                    <arguments>
+                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/changehistory</argument>
+                        <argument name="label" xsi:type="string" translate="true">Change History</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

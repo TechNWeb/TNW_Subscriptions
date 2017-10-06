@@ -27,7 +27,11 @@ class StatusComplete extends Base
         )->join(
             ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
             'relation.subscription_profile_id = profile.entity_id',
-            [SubscriptionProfile::ID, SubscriptionProfile::TOTAL_BILLING_CYCLES]
+            [
+                SubscriptionProfile::ID,
+                SubscriptionProfile::TOTAL_BILLING_CYCLES,
+                'trial_cycle_count' => new \Zend_Db_Expr('IF(profile.trial_start_date, 1, 0)')
+            ]
         )->where(
             'profile.term = ?', 0
         )->where(
@@ -39,7 +43,7 @@ class StatusComplete extends Base
         )->group(
             ['relation.subscription_profile_id']
         )->having(
-            'COUNT(relation.subscription_profile_id) = profile.total_billing_cycles'
+            'COUNT(relation.subscription_profile_id) = profile.total_billing_cycles + trial_cycle_count'
         );
 
         return $this->resource->getConnection()->fetchCol($select);

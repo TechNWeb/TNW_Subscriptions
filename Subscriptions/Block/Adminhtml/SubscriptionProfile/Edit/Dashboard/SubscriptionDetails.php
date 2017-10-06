@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 use Magento\Backend\Block\Template;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Registry;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -90,5 +91,16 @@ class SubscriptionDetails extends Template
     public function getValueType()
     {
         return $this->subscriptionProfile->getTerm() ? self::ANNUAL :self::TOTAL;
+    }
+
+    /**
+     * Can hide sum of all generated non-paid(has no orders) quotes
+     *
+     * @return bool
+     */
+    public function getHideValue()
+    {
+        return $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE 
+            && floatval($this->subscriptionProfile->getTotalValue()) === 0.0;
     }
 }

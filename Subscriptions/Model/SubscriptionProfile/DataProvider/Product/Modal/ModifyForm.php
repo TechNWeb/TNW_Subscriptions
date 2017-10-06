@@ -198,6 +198,7 @@ class ModifyForm extends Form
                             'collapsible' => false,
                             'componentType' => UiForm\Fieldset::NAME,
                             'additionalClasses' => 'subscription-container',
+                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                             'dataScope' => '',
                             'sortOrder' => $iterator
                         ]
@@ -237,6 +238,7 @@ class ModifyForm extends Form
                             'componentType' => UiForm\Fieldset::NAME,
                             'dataScope' => 'item_' . $itemId,
                             'additionalClasses' => 'subscription-item-form',
+                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                             'sortOrder' => $orderIterator
                         ],
                     ],
@@ -335,6 +337,7 @@ class ModifyForm extends Form
                         'collapsible' => false,
                         'componentType' => UiForm\Fieldset::NAME,
                         'additionalClasses' => 'description-fieldset',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'dataScope' => ''
                     ],
                 ],
@@ -361,6 +364,7 @@ class ModifyForm extends Form
                         'collapsible' => false,
                         'componentType' => UiForm\Fieldset::NAME,
                         'additionalClasses' => 'edit-fieldset',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'dataScope' => ''
                     ],
                 ],
@@ -393,6 +397,7 @@ class ModifyForm extends Form
                         'collapsible' => false,
                         'componentType' => UiForm\Fieldset::NAME,
                         'additionalClasses' => 'middle-container',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                     ],
                 ],
             ],
@@ -447,7 +452,8 @@ class ModifyForm extends Form
                         'label' => false,
                         'collapsible' => false,
                         'componentType' => UiForm\Fieldset::NAME,
-                        'additionalClasses' => 'left-container'
+                        'additionalClasses' => 'left-container',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                     ]
                 ]
             ],
@@ -506,7 +512,7 @@ class ModifyForm extends Form
                     'config' => [
                         'label' => false,
                         'dataType' => 'text',
-                        'additionalClasses' => 'admin__field-wide field-' . $name,
+                        'additionalClasses' => 'field-' . $name,
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
@@ -632,7 +638,7 @@ class ModifyForm extends Form
                         'formElement' => UiForm\Element\RadioSet::NAME,
                         'componentType' => UiForm\Element\RadioSet::NAME,
                         'dataScope' => 'billing_frequency',
-                        'additionalClasses' => 'radio-options-one-column sub-legend admin__field-wide',
+                        'additionalClasses' => 'radio-options-one-column sub-legend field-wide',
                         'additionalForGroup' => false,
                         'validation' => ['required-entry' => true],
                         'options' => $this->getProductBillingFrequenciesAsOptionArray(
@@ -673,7 +679,7 @@ class ModifyForm extends Form
                         'label' => __('Term:'),
                         'dataScope' => 'term',
                         'required' => true,
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'field-wide',
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -698,7 +704,7 @@ class ModifyForm extends Form
                 'data' => [
                     'config' => [
                         'label' => false,
-                        'additionalClasses' => 'admin__field-wide sub-period-input',
+                        'additionalClasses' => 'field-wide sub-period-input',
                         'dataType' => 'string',
                         'dataScope' => 'period',
                         'formElement' => UiForm\Element\Input::NAME,
@@ -742,7 +748,7 @@ class ModifyForm extends Form
                 'data' => [
                     'config' => [
                         'label' => __('Start on:'),
-                        'additionalClasses' => 'admin__field-wide admin__field-date',
+                        'additionalClasses' => 'field-wide',
                         'dataType' => 'string',
                         'dataScope' => 'start_on',
                         'formElement' => UiForm\Element\DataType\Date::NAME,
@@ -754,10 +760,13 @@ class ModifyForm extends Form
                         'visibleOnEdit' => $visibleOnEdit,
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                        'options' => [
+                            'minDate' => 'new Date()',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -778,7 +787,7 @@ class ModifyForm extends Form
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'price',
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'field-wide',
                         'validation' => [
                             'validate-zero-or-greater' => true,
                             'required-entry' => true
@@ -817,7 +826,7 @@ class ModifyForm extends Form
                         'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'trial_period',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'field-wide',
                         'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
                         'previewLabel' => '%s',
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
@@ -848,7 +857,7 @@ class ModifyForm extends Form
                         'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'initial_fee',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
-                        'additionalClasses' => 'admin__field-wide',
+                        'additionalClasses' => 'field-wide',
                         'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
                         'previewLabel' => '%s',
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-initial-fee',

@@ -8,7 +8,7 @@
 
 // @codingStandardsIgnoreFile
 ?>
-
+<?php echo $block->getChildHtml('tnw_subscriptions.cart.provider');?>
 <?php if ($block->getCartItemsCount()): ?>
     <div id="tnw-subscriptions-cart" data-role="loader-container" data-bind="scope:'cart'" class="tnw-subscriptions-cart-container">
         <div id="tnw-subscriptions-loader" data-role="cart-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
@@ -26,10 +26,6 @@
                 }
             }
         </script>
-        <script>
-            window.tnwSubscriptionsCheckoutConfig = <?php /* @noEscape */ echo \Zend_Json::encode
-            ($block->getCheckoutConfig()); ?>;
-        </script>
     </div>
 <?php else: ?>
     <div class="cart-empty">
@@ -38,3 +34,6 @@
                 $block->escapeUrl($block->getContinueShoppingUrl())) ?></p>
     </div>
 <?php endif; ?>
+<script>
+    window.checkout = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getConfig()); ?>;
+</script>

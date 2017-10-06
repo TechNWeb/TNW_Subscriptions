@@ -12,6 +12,8 @@
                           sortOrder="300"/>
                 <resource id="TNW_Subscriptions::config_payment" title="TNW Subscriptions Payment Product"
                           sortOrder="500"/>
+                <resource id="TNW_Subscriptions::config_customer" title="TNW Subscriptions Customer"
+                          sortOrder="600"/>
                 <resource id="TNW_Subscriptions::BillingFrequency" sortOrder="10" title="BillingFrequency">
                     <resource id="TNW_Subscriptions::BillingFrequency_edit" sortOrder="20"
                               title="Edit BillingFrequency"/>

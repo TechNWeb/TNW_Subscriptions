@@ -50,6 +50,9 @@
 .overview-content .subscription-message {
     font-size: 3rem;
 }
+.overview-content .block-subscription-message {
+    padding: 20px 0;
+}
 .overview-content .missed-payments {
     vertical-align: top;
 }

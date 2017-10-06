@@ -44,5 +44,11 @@
                 <until_canceled>1</until_canceled>
             </term>
         </tnw_subscriptions_product>
+        <tnw_subscriptions_customer>
+            <profile_actions>
+                <can_hold>1</can_hold>
+                <can_cancel>1</can_cancel>
+            </profile_actions>
+        </tnw_subscriptions_customer>
     </default>
 </config>
