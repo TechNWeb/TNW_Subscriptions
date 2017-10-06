@@ -23,7 +23,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
  */
 class Manager
 {
-
     /**
      * Repository fore saving/retrieving quotes.
      *
@@ -51,7 +50,10 @@ class Manager
      * @var CustomerQuoteFactory
      */
     private $customerQuoteFactory;
+
     /**
+     * Profile creator
+     *
      * @var CreateProfile
      */
     private $createProfile;
@@ -80,6 +82,7 @@ class Manager
 
     /**
      * Returns customer quotes
+     *
      * @return CartInterface[]
      */
     public function getQuotesByCustomer($customerId)
@@ -105,8 +108,9 @@ class Manager
 
     /**
      * Save customer quote by customer id and quote id
-     * @param $customerId
-     * @param $quoteId
+     *
+     * @param string $customerId
+     * @param string $quoteId
      */
     public function saveCustomerQuote($customerId, $quoteId)
     {
@@ -207,9 +211,9 @@ class Manager
      */
     private function getProductData(Item $item)
     {
-        $buyRequest = $item->getBuyRequest()->getDataByPath($this->createProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
-        $uniqueData = $buyRequest[$this->createProfile::UNIQUE];
-        $nonUniqueData = $buyRequest[$this->createProfile::NON_UNIQUE];
+        $buyRequest = $item->getBuyRequest()->getDataByPath(CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+        $uniqueData = $buyRequest[CreateProfile::UNIQUE];
+        $nonUniqueData = $buyRequest[CreateProfile::NON_UNIQUE];
         $result = [
             'billing_frequency' => $uniqueData['billing_frequency'],
             'period' => $uniqueData['period'],

@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\Session\Quote as QuoteSession;
 
 /**
  * Class LoadCustomerSubQuoteObserver
- * @package TNW\Subscriptions\Observer
  */
 class LoadCustomerSubQuoteObserver implements ObserverInterface
 {

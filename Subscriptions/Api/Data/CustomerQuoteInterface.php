@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Api\Data;
 
 /**
  * Interface CustomerQuoteInterface
- * @package TNW\Subscriptions\Api\Data
  */
 interface CustomerQuoteInterface
 {

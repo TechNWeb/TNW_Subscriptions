@@ -159,15 +159,14 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     /**
      * Sets sub quote ids
      *
-     * @param $subQuoteIds
-     * @return mixed
+     * @param array $subQuoteIds
+     * @return $this
      */
     public function setSubQuoteIds($subQuoteIds)
     {
         $this->storage->setSubQuoteIds($subQuoteIds);
         $this->removeAllSubQuotes();
         return $this;
-
     }
 
     /**

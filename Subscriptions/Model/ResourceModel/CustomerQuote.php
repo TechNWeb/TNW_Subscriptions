@@ -10,7 +10,6 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
  * Class CustomerQuote
- * @package TNW\Subscriptions\Model\ResourceModel
  */
 class CustomerQuote extends AbstractDb
 {

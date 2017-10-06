@@ -60,11 +60,11 @@ class CustomerQuoteRepository implements CustomerQuoteRepositoryInterface
      * @var CustomerQuoteInterfaceFactory
      */
     private $dataCustomerQuoteFactory;
+
     /**
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
-
 
     /**
      * CustomerQuoteRepository constructor.

@@ -14,7 +14,6 @@ use TNW\Subscriptions\Api\Data\CustomerQuoteInterface;
 
 /**
  * Interface CustomerQuoteRepositoryInterface
- * @package TNW\Subscriptions\Api
  */
 interface CustomerQuoteRepositoryInterface
 {
@@ -72,14 +71,15 @@ interface CustomerQuoteRepositoryInterface
 
     /**
      * Save customer quote by customer id and quote id
-     * @param $customerId
-     * @param $quoteId
+     *
+     * @param string $customerId
+     * @param string $quoteId
      */
     public function saveCustomerQuote($customerId, $quoteId);
 
     /**
      * Returns customer quotes by customer id
-     * @param $customerId
+     * @param string $customerId
      * @return CustomerQuoteInterface[]
      */
     public function getCustomerQuotes($customerId);
