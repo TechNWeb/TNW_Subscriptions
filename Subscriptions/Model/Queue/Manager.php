@@ -130,7 +130,10 @@ class Manager
         $connection = $collection->getConnection();
         $pendingCondition = implode(' AND ', [
             $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
-            $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_PENDING)
+            $connection->quoteInto(
+                "main_table.status in (?)",
+                [QueueStatus::QUEUE_STATUS_PENDING, QueueStatus::QUEUE_STATUS_RUNNING]
+            )
         ]);
         $errorCondition = implode(' AND ', [
             $connection->quoteInto("main_table.updated_at <= ?", $this->getAttemptDate()),
