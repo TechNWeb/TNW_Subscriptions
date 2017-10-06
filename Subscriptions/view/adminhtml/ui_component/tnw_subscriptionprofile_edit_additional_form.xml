@@ -52,6 +52,7 @@
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" translate="true" xsi:type="string">Additional Information</item>
+                <item name="additionalClasses" xsi:type="string">additional-form-field-set</item>
             </item>
         </argument>
         <field name="entity_id">
