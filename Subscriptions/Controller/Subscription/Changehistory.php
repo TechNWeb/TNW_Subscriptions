@@ -6,8 +6,9 @@
 namespace TNW\Subscriptions\Controller\Subscription;
 
 /**
- * Controller for subscription history at customer account dashboard.
+ * Subscription change history controller at customer account dashboard.
  */
-class Edit extends \TNW\Subscriptions\Controller\Subscription\AbstractView
+class Changehistory extends \TNW\Subscriptions\Controller\Subscription\AbstractView
 {
+
 }

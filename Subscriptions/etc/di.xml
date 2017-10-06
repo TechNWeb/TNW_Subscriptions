@@ -249,6 +249,36 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Shipment">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Billing">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Items">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Orderhistory">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Subscription\Changehistory">
+        <plugin name="authentication"
+                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
 
     <type name="Magento\Sales\Cron\CleanExpiredQuotes">
         <plugin name="tnw_clean_expired_quotes"
