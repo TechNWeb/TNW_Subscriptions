@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <add id="TNW_Subscriptions::top_level" module="TNW_Subscriptions" resource="Magento_Backend::content"
-             sortOrder="79" title="Subscription" translate="title"/>
+             sortOrder="49" title="Subscription" translate="title"/>
 
         <!-- Subscription -> Operations -->
         <add id="TNW_Subscriptions::tnw_subscriptions_operations" title="Operations" translate="title"
@@ -42,7 +42,7 @@
 
         <!-- Sales -> Operations -> Subscriptions - Subscription profile grid -->
         <add id="TNW_Subscriptions::tnw_subscriptions_operations_subscription_profile" title="Subscriptions"
-             translate="title" module="TNW_Subscriptions" sortOrder="100" parent="Magento_Sales::sales_operation"
+             translate="title" module="TNW_Subscriptions" sortOrder="5" parent="Magento_Sales::sales_operation"
              action="tnw_subscriptions/subscriptionprofile/index" resource="TNW_Subscriptions::SubscriptionProfile"/>
 
         <!-- Sales -> Recurring -->
