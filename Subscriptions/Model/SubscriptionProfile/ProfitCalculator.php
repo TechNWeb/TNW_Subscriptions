@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Directory\Model\Currency;
 use Magento\Reports\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
@@ -49,19 +50,26 @@ class ProfitCalculator
      * @var float|int
      */
     private $asOfTodayProfit;
+    /**
+     * @var Currency
+     */
+    private $currency;
 
     /**
      * ProfitCalculator constructor.
      *
      * @param ProductCollectionFactory $productCollectionFactory
      * @param QuoteItemCollectionFactory $quoteItemCollectionFactory
+     * @param Currency $currency
      */
     public function __construct(
         ProductCollectionFactory $productCollectionFactory,
-        QuoteItemCollectionFactory $quoteItemCollectionFactory
+        QuoteItemCollectionFactory $quoteItemCollectionFactory,
+        Currency $currency
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
+        $this->currency = $currency;
     }
 
     /**
@@ -74,6 +82,19 @@ class ProfitCalculator
     public function getTotalProfit(SubscriptionProfile $subscriptionProfile)
     {
         return $this->getAsOfTodayProfit($subscriptionProfile) + $this->getRemainingProfit($subscriptionProfile);
+    }
+
+    /**
+     * Get rendered total profit for given subscription profile.
+     *
+     * @param SubscriptionProfile $subscriptionProfile
+     * @param bool $addContainer
+     * @return string
+     */
+    public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
+    {
+        $profit = $this->getTotalProfit($subscriptionProfile);
+        return $this->renderPrice($profit, $subscriptionProfile, $addContainer);
     }
 
     /**
@@ -93,6 +114,18 @@ class ProfitCalculator
     }
 
     /**
+     * Get rendered actual profit for today for given subscription profile.
+     *
+     * @param SubscriptionProfile $subscriptionProfile
+     * @return string
+     */
+    public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
+    {
+        $profit = $this->getAsOfTodayProfit($subscriptionProfile);
+        return $this->renderPrice($profit, $subscriptionProfile);
+    }
+
+    /**
      * Get potential profit for given subscription profile.
      * Remaining profit equals (product price - product cost) * product amount from all non paid quotes(has no order).
      *
@@ -106,6 +139,18 @@ class ProfitCalculator
         }
 
         return $this->remainingProfit;
+    }
+
+    /**
+     * Get rendered potential profit for given subscription profile.
+     *
+     * @param SubscriptionProfile $subscriptionProfile
+     * @return float|int
+     */
+    public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile)
+    {
+        $profit = $this->getRemainingProfit($subscriptionProfile);
+        return $this->renderPrice($profit, $subscriptionProfile);
     }
 
     /**
@@ -221,5 +266,20 @@ class ProfitCalculator
         }
 
         return $resource->getConnection()->fetchCol($sql);
+    }
+
+    /**
+     * Render price.
+     *
+     * @param string $value
+     * @param SubscriptionProfile $subscriptionProfile
+     * @param bool $addContainer
+     * @return string
+     */
+    private function renderPrice($value, SubscriptionProfile $subscriptionProfile, $addContainer = true)
+    {
+        $profileCurrencyCode = $subscriptionProfile->getProfileCurrencyCode();
+        $this->currency->setCurrencyCode($profileCurrencyCode);
+        return $this->currency->format($value, [], $addContainer);
     }
 }

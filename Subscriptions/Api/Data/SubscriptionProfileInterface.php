@@ -6,10 +6,12 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+use Magento\Framework\Api\CustomAttributesDataInterface;
+
 /**
  * Interface SubscriptionProfileInterface
  */
-interface SubscriptionProfileInterface
+interface SubscriptionProfileInterface extends CustomAttributesDataInterface
 {
     /**#@+
      * Constants for field names
@@ -35,7 +37,11 @@ interface SubscriptionProfileInterface
     const IS_VIRTUAL = 'is_virtual';
     const TOKEN_HASH = 'token_hash';
     const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
+    /**
+     * @deprecated use GENERATE_QUOTES_STATE
+     */
     const NEED_GENERATE_QUOTES = 'need_generate_quotes';
+    const GENERATE_QUOTES_STATE = 'generate_quotes_state';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
@@ -60,6 +66,14 @@ interface SubscriptionProfileInterface
      * Label prefix
      */
     const LABEL_PREFIX = '#S-';
+
+    /**#@+
+     * Generate quotes states.
+     */
+    const GENERATE_QUOTES_STATE_GENERATED = 0;
+    const GENERATE_QUOTES_STATE_NEED_GENERATE = 1;
+    const GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR = 2;
+    /**#@-*/
 
     /**
      * Gets id.
@@ -459,19 +473,19 @@ interface SubscriptionProfileInterface
     public function setPaymentAdditionalInfo($info);
 
     /**
-     * Gets quotes generation flag.
+     * Gets quotes generation state.
      *
      * @return []|null
      */
-    public function getNeedGenerateQuotes();
+    public function getGenerateQuotesState();
 
     /**
-     * Sets quotes generation flag.
+     * Sets quotes generation state.
      *
-     * @param bool $flag
+     * @param int $state
      * @return $this
      */
-    public function setNeedGenerateQuotes($flag);
+    public function setGenerateQuotesState($state);
 
     /**
      * Gets created at date.

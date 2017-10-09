@@ -6,39 +6,18 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\Component\Form;
-use Magento\Framework\UrlInterface;
-use Magento\Framework\Registry;
 
 /**
  * Prepare orders history ui layout.
  */
-class OrdersHistory implements ModifierInterface
+class OrdersHistory extends BaseFormModifier
 {
+    /**#@+
+     * Group name order history.
+     */
     const GROUP_ORDER_HISTORY = 'order_history';
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @param UrlInterface $urlBuilder
-     * @param Registry $registry
-     */
-    public function __construct(
-        UrlInterface $urlBuilder,
-        Registry $registry
-    ) {
-        $this->urlBuilder = $urlBuilder;
-        $this->registry = $registry;
-    }
+    /**#@-*/
 
     /**
      * {@inheritdoc}
@@ -57,7 +36,7 @@ class OrdersHistory implements ModifierInterface
                                 'externalProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_edit_order_history_listing_data_source',
                                 'selectionsProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_order_history_columns.ids',
                                 'ns' => 'tnw_subscriptionprofile_edit_order_history_listing',
-                                'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                                'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                                 'realTimeLink' => false,
                                 'behaviourType' => 'simple',
                                 'externalFilterMode' => true,
@@ -93,7 +72,7 @@ class OrdersHistory implements ModifierInterface
      */
     public function modifyData(array $data)
     {
-        $profile =  $this->registry->registry('tnw_subscription_profile');
+        $profile =  $this->getProfile();
 
          if ($profile && $profile->getId()){
              $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();

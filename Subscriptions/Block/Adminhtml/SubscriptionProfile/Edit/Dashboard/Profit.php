@@ -7,8 +7,8 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
-use Magento\Directory\Model\Currency;
 use Magento\Framework\Registry;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -22,13 +22,6 @@ class Profit extends Template
     private $subscriptionProfile;
 
     /**
-     * Help render profit prices.
-     *
-     * @var Currency
-     */
-    private $currency;
-
-    /**
      * Calculate different profit values for given subscription profile.
      *
      * @var SubscriptionProfile\ProfitCalculator
@@ -40,14 +33,12 @@ class Profit extends Template
      *
      * @param Template\Context $context
      * @param Registry $registry
-     * @param Currency $currency
      * @param SubscriptionProfile\ProfitCalculator $profitCalculator
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         Registry $registry,
-        Currency $currency,
         SubscriptionProfile\ProfitCalculator $profitCalculator,
         array $data = []
     ) {
@@ -55,20 +46,8 @@ class Profit extends Template
         if ($this->subscriptionProfile === null) {
             $this->subscriptionProfile = $registry->registry('tnw_subscription_profile');
         }
-        $this->currency = $currency;
         $this->profitCalculator = $profitCalculator;
         parent::__construct($context, $data);
-    }
-
-    /**
-     * Get total profit for given subscription profile.
-     * Total profit equals "as of today" profit + "remaining" profit.
-     *
-     * @return string
-     */
-    public function getTotalProfit()
-    {
-        return $this->renderPrice($this->profitCalculator->getTotalProfit($this->subscriptionProfile));
     }
 
     /**
@@ -79,7 +58,7 @@ class Profit extends Template
      */
     public function getAsOfTodayProfit()
     {
-        return $this->renderPrice($this->profitCalculator->getAsOfTodayProfit($this->subscriptionProfile));
+        return $this->profitCalculator->getRenderedAsOfTodayProfit($this->subscriptionProfile);
     }
 
     /**
@@ -90,20 +69,17 @@ class Profit extends Template
      */
     public function getRemainingProfit()
     {
-        return $this->renderPrice($this->profitCalculator->getRemainingProfit($this->subscriptionProfile));
+        return $this->profitCalculator->getRenderedRemainingProfit($this->subscriptionProfile);
     }
 
     /**
-     * Render price.
-     *
-     * @param string $value
-     * @return string
+     * Get can hide Remaining profit row
+     * 
+     * @return bool
      */
-    private function renderPrice($value)
+    public function getHideRemainingProfit()
     {
-        $profileCurrencyCode = $this->subscriptionProfile->getProfileCurrencyCode();
-        $this->currency->setCurrencyCode($profileCurrencyCode);
-
-        return $this->currency->format($value);
+        return $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
+            && floatval($this->profitCalculator->getRemainingProfit($this->subscriptionProfile)) === 0.0;
     }
 }

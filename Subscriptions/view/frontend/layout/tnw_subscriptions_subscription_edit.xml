@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <update handle="tnw_subscriptions_subscription_info_links"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="TNW\Subscriptions\Block\Subscription\Info\View" name="subscription.info.view" after="subscription.info.links"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -50,6 +50,9 @@
 .overview-content .subscription-message {
     font-size: 3rem;
 }
+.overview-content .block-subscription-message {
+    padding: 20px 0;
+}
 .overview-content .missed-payments {
     vertical-align: top;
 }
@@ -77,6 +80,30 @@
     width: 47%;
     float: right;
     margin-bottom: 9%;
+}
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title {
+    border: none;
+    padding-bottom: 1rem;
+}
+
+.admin__profile-dashboard-subscription-details .admin__fieldset {
+    padding-top: 0rem;
+}
+
+.admin__profile-dashboard-profit  .admin__fieldset {
+    padding-top: 1rem;
+}
+.admin__profile-dashboard-subscription-details .message-warning {
+    margin-bottom: 1rem;
+}
+
+.admin__profile-dashboard-profit .fieldset-wrapper-title {
+    padding-bottom: 1rem;
+}
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title strong.title,
+.admin__profile-dashboard-profit .fieldset-wrapper-title strong.title {
+    font-size: 2rem;
+    font-weight: normal;
 }
 
 .profile-dashboard-subscription-details-title-wrapper {
@@ -162,4 +189,9 @@
 }
 .float-left {
     float: left;
+}
+.additional-form-field-set .fieldset-wrapper-title .title,
+.additional-form-field-set .admin__fieldset-wrapper-title .title {
+    font-size: 2rem;
+    font-weight: 400;
 }

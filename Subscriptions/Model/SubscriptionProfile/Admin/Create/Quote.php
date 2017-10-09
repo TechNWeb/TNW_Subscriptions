@@ -196,29 +196,25 @@ class Quote extends Create implements QuoteCreateInterface
      * Sets into quote customer data.
      *
      * @param CustomerInterface $customer
+     * @param ModelQuote $quote
      */
-    public function fillCustomerData(CustomerInterface $customer)
+    public function fillCustomerData(CustomerInterface $customer, ModelQuote $quote)
     {
         $quoteData = [];
         $origAddresses = $customer->getAddresses(); // save original addresses
         $customer->setAddresses([]);
         $data = $this->customerMapper->toFlatArray($customer);
         $customer->setAddresses($origAddresses); // restore original addresses
-
         foreach ($this->getCustomerForm($customer)->getUserAttributes() as $attribute) {
             if (isset($data[$attribute->getAttributeCode()])) {
                 $quoteCode = sprintf('customer_%s', $attribute->getAttributeCode());
                 $quoteData[$quoteCode] = $data[$attribute->getAttributeCode()];
             }
         }
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-
-        foreach ($session->getSubQuotes() as $subQuote) {
-            foreach ($quoteData as $code => $value) {
-                $subQuote->setData($code, $value);
-            }
+        foreach ($quoteData as $code => $value) {
+            $quote->setData($code, $value);
         }
+        $quote->setCustomer($customer);
     }
 
     /**
@@ -243,7 +239,6 @@ class Quote extends Create implements QuoteCreateInterface
 
     /**
      * @param ModelQuote $quote
-     * @return array
      * @throws \Exception
      */
     public function validate(ModelQuote $quote)
@@ -290,6 +285,13 @@ class Quote extends Create implements QuoteCreateInterface
             }
         }
 
-        return $errors;
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
+                $this->getContext()->log($error);
+                $this->getContext()->getMessageManager()->addError($error);
+            }
+            //Maybe we need to delete customer in this case.
+            throw new \Exception(__('Quote validation is failed.'));
+        };
     }
 }

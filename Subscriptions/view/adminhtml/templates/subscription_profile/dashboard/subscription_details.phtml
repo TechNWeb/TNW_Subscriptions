@@ -8,29 +8,27 @@
 
 /** @var TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails $block */
 ?>
-<div class="admin__profile-dashboard-subscription-details">
-    <div class="fieldset-wrapper-title profile-dashboard-subscription-details-title-wrapper">
-        <strong class="title" style="font-size:2rem; font-weight:400">
-            <span data-bind="i18n: label"><?php echo __('Subscription Details') ?></span>
-        </strong>
-    </div>
-    <div class="admin__fieldset">
-        <div class="subscription-details">
-            <table class="admin__table-secondary data-table">
-                <tbody>
-                <tr class="col-0">
-                    <td class="label"><?php echo __("Current Value") ?></td>
-                    <td><span class="price"><?php echo $block->getCurrentValue() ?></span></td>
-                </tr>
-                <tr class="col-1">
-                    <td class="label"><?php echo __($block->getValueType()) . '*' ?></td>
-                    <td><span class="price"><?php echo $block->getValue() ?></span></td>
-                </tr>
-                </tbody>
-            </table>
-            <div class="admin__fieldset">
-                <span class="admin__field-note"><?php echo __('* Estimated amount and it may change as the subscription goes through its lifecycle') ?></span>
-            </div>
+<div class="admin__fieldset">
+    <div class="subscription-details">
+        <table class="admin__table-secondary data-table">
+            <tbody>
+            <tr class="col-0">
+                <td class="label"><?php echo __("Current Value") ?></td>
+                <td><span class="price"><?php echo $block->getCurrentValue() ?></span></td>
+            </tr>
+            <?php if (!$block->getHideValue()):?>
+            <tr class="col-1">
+                <td class="label"><?php echo __($block->getValueType()) . '*' ?></td>
+                <td><span class="price"><?php echo $block->getValue() ?></span></td>
+            </tr>
+            <?php endif ?>
+            </tbody>
+        </table>
+        <?php if (!$block->getHideValue()):?>
+        <div class="admin__fieldset">
+            <span class="admin__field-note"><?php echo __('* Estimated amount and it may change as the subscription goes through its lifecycle') ?></span>
         </div>
+        <?php endif ?>
     </div>
 </div>
+

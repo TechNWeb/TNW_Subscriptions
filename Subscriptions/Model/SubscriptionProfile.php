@@ -7,15 +7,18 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\Api\AttributeValueFactory;
+use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
-use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Json\Helper\Data;
@@ -23,7 +26,7 @@ use Magento\Framework\Json\Helper\Data;
 /**
  * Subscription Profile model.
  */
-class SubscriptionProfile extends AbstractModel implements SubscriptionProfileInterface
+class SubscriptionProfile extends AbstractExtensibleModel implements SubscriptionProfileInterface
 {
     /**
      * Entity for subscription profile.
@@ -34,6 +37,11 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      * Entity code.
      */
     const ENTITY = 'subscription_profile';
+
+    /**
+     * Default group code for custom attributes.
+     */
+    const DEFAULT_GROUP_CODE = 'additional-information';
 
     /**
      * Edit state code
@@ -88,11 +96,53 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     private $jsonHelper;
 
     /**
+     * @var SubscriptionProfileAttributeRepositoryInterface
+     */
+    private $metadataService;
+
+    /**
+     * Attributes are that part of interface
+     *
+     * @var array
+     */
+    protected $interfaceAttributes = [
+        self::WEBSITE_ID,
+        self::UNIT,
+        self::CUSTOMER_ID,
+        self::STATUS,
+        self::FREQUENCY,
+        self::ID,
+        self::LABEL,
+        self::BILLING_FREQUENCY_ID,
+        self::ENGINE_CODE,
+        self::START_DATE,
+        self::TRIAL_START_DATE,
+        self::TERM,
+        self::TOTAL_BILLING_CYCLES,
+        self::SHIPPING_METHOD,
+        self::SHIPPING_DESCRIPTION,
+        self::PROFILE_CURRENCY_CODE,
+        self::TRIAL_LENGTH,
+        self::TRIAL_LENGTH_UNIT,
+        self::IS_VIRTUAL,
+        self::TOKEN_HASH,
+        self::PAYMENT_ADDITIONAL_INFO,
+        self::CREATED_AT,
+        self::UPDATED_AT,
+        self::GENERATE_QUOTES_STATE,
+        self::NEED_RECOLLECT,
+    ];
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
      * @param CustomerRepositoryInterface $customerRepository
+     * @param WebsiteRepositoryInterface $websiteRepository
      * @param EncryptorInterface $encryptor
+     * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param Data $jsonHelper
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
@@ -101,9 +151,12 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function __construct(
         ModelContext $context,
         Registry $registry,
+        ExtensionAttributesFactory $extensionFactory,
+        AttributeValueFactory $customAttributeFactory,
         CustomerRepositoryInterface $customerRepository,
         WebsiteRepositoryInterface $websiteRepository,
         EncryptorInterface $encryptor,
+        SubscriptionProfileAttributeRepositoryInterface $metadataService,
         Data $jsonHelper,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -113,7 +166,9 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
         $this->websiteRepository = $websiteRepository;
         $this->encryptor = $encryptor;
         $this->jsonHelper = $jsonHelper;
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->metadataService = $metadataService;
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory,
+            $resource, $resourceCollection, $data);
     }
 
 
@@ -123,6 +178,18 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     protected function _construct()
     {
         $this->_init(Resource::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCustomAttributesCodes()
+    {
+        if ($this->customAttributesCodes === null) {
+            $this->customAttributesCodes = $this->getEavAttributesCodes($this->metadataService);
+            $this->customAttributesCodes = array_diff($this->customAttributesCodes, $this->interfaceAttributes);
+        }
+        return $this->customAttributesCodes;
     }
 
     /**
@@ -596,17 +663,17 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     /**
      * {@inheritdoc}
      */
-    public function getNeedGenerateQuotes()
+    public function getGenerateQuotesState()
     {
-        return $this->getData(self::NEED_GENERATE_QUOTES);
+        return $this->getData(self::GENERATE_QUOTES_STATE);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setNeedGenerateQuotes($flag)
+    public function setGenerateQuotesState($state)
     {
-        return $this->setData(self::NEED_GENERATE_QUOTES, $flag);
+        return $this->setData(self::GENERATE_QUOTES_STATE, $state);
     }
 
     /**
@@ -654,7 +721,7 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
      */
     public function setNeedRecollect($needRecollect)
     {
-        return $this->setData(self::NEED_RECOLLECT);
+        return $this->setData(self::NEED_RECOLLECT, $needRecollect);
     }
 
     /**
@@ -675,5 +742,47 @@ class SubscriptionProfile extends AbstractModel implements SubscriptionProfileIn
     public function getTotalValue()
     {
         return $this->getResource()->getTotalValue($this);
+    }
+
+    /**
+     * Checks whether products need recollect
+     *
+     * @return bool
+     */
+    public function getProductNeedRecollect()
+    {
+        $result = false;
+        /** @var ProductSubscriptionProfile $product */
+        foreach ($this->getProducts() as $product) {
+            if ($product->getNeedRecollect()) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getShippingBillingChangesMadeMessageForUpcomingOrders()
+    {
+        return __('Subscription changes made. Shipping Details and Grand Total may not reflect correct information until recalculation is complete.');
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getShippingBillingChangesMadeMessageForSubscriptionDetails()
+    {
+        return __('Subscription changes made. Current, Annual and Total values may not reflect correct information until recalculation is complete.');
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getProductChangesMadeMessageForProfit()
+    {
+        return __('Subscription products have changed. The graph may not show correct information until recalculation is complete.');
     }
 }

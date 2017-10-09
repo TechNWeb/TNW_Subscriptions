@@ -2,7 +2,9 @@
 <div class="overview-content">
     <table class="overview-table" style="width:100%">
         <tr style="height:25%;">
+            <?php if ($block->getCanShowNextPayment()): ?>
             <td rowspan="2" class="next-payment"><?php echo $block->getNextPaymentHtml() ?></td>
+            <?php endif ?>
             <td colspan="2" class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>"><?php echo $block->getMessageHtml() ?></td>
         </tr>
         <tr>

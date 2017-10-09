@@ -7,8 +7,9 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\OfflinePayments\Model\Checkmo as CheckmoPayment;
+use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Form modifier to display payment method Checkmo.
@@ -34,19 +35,22 @@ class Checkmo extends Base
     private $checkmoPayment;
 
     /**
-     * @param \TNW\Subscriptions\Model\Config $config
+     * Checkmo constructor.
+     * @param Config $config
+     * @param QuoteSessionInterface $session
      * @param Context $context
      * @param CheckmoPayment $checkmoPayment
      */
     public function __construct(
-        \TNW\Subscriptions\Model\Config $config,
+        Config $config,
+        QuoteSessionInterface $session,
         Context $context,
         CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
 
-        parent::__construct($config);
+        parent::__construct($config, $session);
     }
 
 

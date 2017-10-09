@@ -44,18 +44,17 @@ class Collection extends AbstractCollection
     }
 
     /**
-     * Get sorted and filtered data for change history in admin panel.
+     * Get sorted and filtered collection for change history in admin panel.
      *
      * @param int $parentId
-     *
-     * @return array
+     * @return $this
      */
-    public function getDataForChangeHistory($parentId)
+    public function getChangeHistoryCollection($parentId)
     {
         $this->addFilter(SubscriptionProfileMessageHistoryInterface::PARENT_ID, $parentId);
         $this->addUserDataToSelect();
-        $this->setOrder(SubscriptionProfileMessageHistoryInterface::CREATED_AT);
+        $this->setOrder(SubscriptionProfileMessageHistoryInterface::ENTITY_ID);
 
-        return $this->getData();
+        return $this;
     }
 }

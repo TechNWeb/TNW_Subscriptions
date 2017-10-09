@@ -157,6 +157,19 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Sets sub quote ids
+     *
+     * @param array $subQuoteIds
+     * @return $this
+     */
+    public function setSubQuoteIds($subQuoteIds)
+    {
+        $this->storage->setSubQuoteIds($subQuoteIds);
+        $this->removeAllSubQuotes();
+        return $this;
+    }
+
+    /**
      * Adds quote id to session storage.
      *
      * @param int|string $subQuoteId
@@ -216,6 +229,17 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * Removes all sub quotes
+     *
+     * @return $this
+     */
+    private function removeAllSubQuotes()
+    {
+        $this->quotes = null;
+        return $this;
+    }
+
+    /**
      * Removes quote id from session storage.
      *
      * @param int $quoteId
@@ -257,7 +281,15 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
             $quote = $this->quoteRepository->get($quote);
         }
         $this->addSubQuoteId($quote->getId());
-        $this->quotes[] = $quote;
+        $needAddQuote = true;
+        foreach ($this->quotes as $oldQuote) {
+            if ($oldQuote->getId() == $quote->getId()) {
+                $needAddQuote = false;
+            }
+        }
+        if ($needAddQuote) {
+            $this->quotes[] = $quote;
+        }
 
         return $this;
     }

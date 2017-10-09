@@ -34,9 +34,9 @@ class Config
     /**#@+
      * Config xml path for past due profile options section
      */
-    private $xmlAttemptCount = 'tnw_subscriptions_general/past_due_profile_options/attempt_count';
-    private $xmlAttemptInterval = 'tnw_subscriptions_general/past_due_profile_options/attempt_interval';
-    private $xmlGracePeriod = 'tnw_subscriptions_general/past_due_profile_options/grace_period';
+    private $xmlAttemptCount = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_count';
+    private $xmlAttemptInterval = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval';
+    private $xmlGracePeriod = 'tnw_subscriptions_profile_options/past_due_profile_options/grace_period';
     /**#@-*/
 
     /**#@+
@@ -61,6 +61,13 @@ class Config
     private $xmlOfferFlatDiscountStatus = 'tnw_subscriptions_product/discount/offer_flat_discount_status';
     private $xmlDiscountAmount = 'tnw_subscriptions_product/discount/discount_amount';
     private $xmlDiscountType = 'tnw_subscriptions_product/discount/discount_type';
+    /**#@-*/
+
+    /**#@+
+     * Config xml path for Customer section
+     */
+    private $xmlCanHoldProfile = 'tnw_subscriptions_customer/profile_actions/can_hold';
+    private $xmlCanCancelProfile = 'tnw_subscriptions_customer/profile_actions/can_cancel';
     /**#@-*/
 
     private $xmlUntilCanceled = 'tnw_subscriptions_product/term/until_canceled';
@@ -122,7 +129,7 @@ class Config
             $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
         } else {
             if ($this->isSubscriptionsActive === null) {
-                $this->isIntegrationActive = false;
+                $this->isSubscriptionsActive = false;
                 foreach ($this->storeManager->getWebsites() as $website) {
                     if ($this->getStoreConfig($this->xmlIsActive, $website->getId())
                     && !empty($this->getAvailablePaymentsList($websiteId))) {
@@ -131,7 +138,7 @@ class Config
                     }
                 }
             } else {
-                return $this->isIntegrationActive;
+                return $this->isSubscriptionsActive;
             }
         }
 
@@ -344,11 +351,11 @@ class Config
                 $storeId = 0;
             }
             if (!is_array($storeId)) {
-                $store = $this->storeManager->getStore($storeId);
+                $store = $this->getStore($storeId);
             }
         }
         if (!$store) {
-            $store = $this->storeManager->getStore(0);
+            $store = $this->getStore(0);
         }
 
         return (int)$store->getId();
@@ -365,11 +372,11 @@ class Config
         $websiteId = $this->request->getParam('website');
         if ($websiteId) {
             if (!is_array($websiteId)) {
-                $website = $this->storeManager->getWebsite($websiteId);
+                $website = $this->getWebsite($websiteId);
             }
         }
         if (!$website) {
-            $website = $this->storeManager->getWebsite(0);
+            $website = $this->getWebsite(0);
         }
 
         return (int)$website->getId();
@@ -398,13 +405,13 @@ class Config
             $result = $this->scopeConfig->getValue(
                 $path,
                 ScopeInterface::SCOPE_STORE,
-                $this->storeManager->getStore($storeId)->getCode()
+                $this->getStore($storeId)->getCode()
             );
         } else if ($websiteId) {
             $result = $this->scopeConfig->getValue(
                 $path,
                 ScopeInterface::SCOPE_WEBSITE,
-                $this->storeManager->getWebsite($websiteId)->getCode()
+                $this->getWebsite($websiteId)->getCode()
             );
         } else {
             $result = $this->scopeConfig->getValue($path);
@@ -458,13 +465,13 @@ class Config
      */
     public function getTitleForPaypal($websiteId = null)
     {
-        $title = 'Payments Pro';
+        $title = __('Payments Pro');
 
         if ($this->getStoreConfig(
             'payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active',
             $websiteId
         )) {
-            $title = 'Payflow Pro';
+            $title = __('Payflow Pro');
         }
 
         return $title;
@@ -474,16 +481,25 @@ class Config
      * Check if payment method is available for subscription and it is on for Magento.
      *
      * @param $paymentCode
-     * @param null|int $websiteId
+     * @param null|int $storeId
      * @return bool
      */
-    public function isPaymentMethodAvailableForSubscription($paymentCode, $websiteId = null)
+    public function isPaymentMethodAvailableForSubscription($paymentCode, $storeId = null)
     {
+        $websiteId = null;
         $isAvailable = false;
-
-        $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode)
-            || (bool)$this->getStoreConfig('payment/' . $paymentCode . '/active', $websiteId);
-
+        if ($storeId){
+            $websiteId = $this->getStore($storeId)->getWebsiteId();
+            $this->paypalConfig->setStoreId($storeId);
+        }
+        if ($paymentCode === PaypalConfig::METHOD_PAYFLOWPRO || $paymentCode === PaypalConfig::METHOD_PAYMENT_PRO) {
+            $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode);
+        } else {
+            $isAvailableInMagento = (bool)$this->getStoreConfig(
+                'payment/' . $paymentCode . '/active',
+                $websiteId
+            );
+        }
         if ($isAvailableInMagento && $this->isPaymentAvailable($paymentCode, $websiteId)) {
             $isAvailable = true;
         }
@@ -499,5 +515,49 @@ class Config
     public function isUntilCanceledChecked()
     {
         return $this->getStoreConfig($this->xmlUntilCanceled);
+    }
+
+    /**
+     * Returns store by id.
+     *
+     * @param int|string $storeId
+     * @return StoreInterface
+     */
+    public function getStore($storeId)
+    {
+        return $this->storeManager->getStore($storeId);
+    }
+
+    /**
+     * Returns website by id.
+     *
+     * @param int|string $websiteId
+     * @return WebsiteInterface
+     */
+    public function getWebsite($websiteId)
+    {
+        return $this->storeManager->getWebsite($websiteId);
+    }
+
+    /**
+     * Get "Can hold profile" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return bool
+     */
+    public function getCanHoldProfile($websiteId = null)
+    {
+        return (bool)$this->getStoreConfig($this->xmlCanHoldProfile, $websiteId);
+    }
+
+    /**
+     * Get "Can cancel profile" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return bool
+     */
+    public function getCanCancelProfile($websiteId = null)
+    {
+        return (bool)$this->getStoreConfig($this->xmlCanCancelProfile, $websiteId);
     }
 }

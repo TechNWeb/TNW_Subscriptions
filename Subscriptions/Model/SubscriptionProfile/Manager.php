@@ -21,12 +21,14 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Framework\Api\SimpleDataObjectConverter;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
 
 /**
  * Class Manager
@@ -112,6 +114,7 @@ class Manager
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
     /**
      * @var ShippingMethods
      */
@@ -383,7 +386,7 @@ class Manager
             $quote = $this->getNextQuote();
             $shippingDescription = '';
             if ($quote) {
-                $shippingMethodOptions = $this->getShippingMethodOptions($quote, false);
+                $shippingMethodOptions = $this->shippingMethods->getShippingMethodOptions($quote, false);
                 foreach ($shippingMethodOptions as $shippingMethodOption) {
                     if ($shippingMethodOption['value'] == $shippingMethod) {
                         $shippingDescription = $shippingMethodOption['label'];
@@ -474,7 +477,7 @@ class Manager
                 ->setTrialStartDate(null)
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
-                ->setNeedGenerateQuotes(true);
+                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
 
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
@@ -542,22 +545,32 @@ class Manager
     }
 
     /**
-     * Returns shipping method options
+     * Handles messages for subscription edit form
      *
-     * @param Quote $quote
-     * @param bool $withPrice
      * @return array
      */
-    public function getShippingMethodOptions(Quote $quote, $withPrice = true)
+    public function handleMessages()
     {
-        $options = [];
-        if ($quote && $quote->getId()) {
-            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
-            $options = $this->shippingMethods
-                ->setQuote($quote)
-                ->getShippingMethodsAsOptionArray($withPrice);
+        $messages = [];
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        if ($profile->getNeedRecollect()) {
+            $messages[] = [
+                'index' => 'index = subscription_details_message',
+                'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
+            ];
         }
-        return $options;
+        if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
+            $messages[] = [
+                'index' => 'index = profit_message',
+                'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        return $messages;
     }
 
     /**

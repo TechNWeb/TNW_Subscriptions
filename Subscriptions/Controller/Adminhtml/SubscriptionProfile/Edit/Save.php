@@ -92,19 +92,23 @@ class Save extends Action
     public function execute()
     {
         $result = $this->initProfile();
-
         if ($result) {
             try {
+                /** @var SubscriptionProfile $profile */
+                $profile = $this->profileManager->getProfile();
+                $profileDataChanges = $profile->hasDataChanges();
+                $profile->setDataChanges(false);
                 $this->processRequestData();
+                if ($profile->hasDataChanges()) {
+                    $profile->setNeedRecollect('1');
+                }
+                $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
             } catch (\Exception $e) {
                 $result = false;
             }
         }
-
-        $response = new DataObject();
-        $response->setData('result', $result);
-
+        $response = $this->createResponse($result);
         return $this->jsonFactory->create()->setJsonData($response->toJson());
     }
 
@@ -131,11 +135,29 @@ class Save extends Action
     private function processRequestData()
     {
         $requestData = $this->getRequest()->getParams();
-
         $this->profileAddressManager->processShippingAddress($requestData);
         $this->profileAddressManager->processBillingAddress($requestData);
         $this->profileManager->processPaymentMethod($requestData);
         $this->profileManager->processShippingMethod($requestData);
         $this->subscriptionProductManager->processProfileProducts($requestData);
+    }
+
+    /**
+     * Creates response object
+     *
+     * @param $result
+     * @return DataObject
+     */
+    private function createResponse($result)
+    {
+        $messages = $this->profileManager->handleMessages();
+        $response = new DataObject();
+        $response->setData(
+            [
+                'result' => $result,
+                'messages' => $messages,
+            ]
+        );
+        return $response;
     }
 }

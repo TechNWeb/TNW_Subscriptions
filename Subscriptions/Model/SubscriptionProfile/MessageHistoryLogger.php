@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Customer\Model\Session;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileMessageHistoryRepositoryInterface;
@@ -70,6 +71,11 @@ class MessageHistoryLogger
     private $orderRepository;
 
     /**
+     * @var Session
+     */
+    private $customerSession;
+
+    /**
      * Messages to log.
      *
      * @var array
@@ -93,13 +99,15 @@ class MessageHistoryLogger
         SubscriptionProfileMessageHistoryRepositoryInterface $messageHistoryRepository,
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
         \Magento\Backend\Model\Auth\SessionFactory $authSessionFactory,
-        \Magento\Sales\Model\OrderRepository $orderRepository
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        Session $customerSession
     ) {
         $this->messageHistoryFactory = $messageHistoryFactory;
         $this->messageHistoryRepository = $messageHistoryRepository;
         $this->date = $date;
         $this->authSessionFactory = $authSessionFactory;
         $this->orderRepository = $orderRepository;
+        $this->customerSession = $customerSession;
     }
 
     /***
@@ -115,7 +123,7 @@ class MessageHistoryLogger
         $message,
         $subscriptionId,
         $isComment = false,
-        $isVisibleOnFront = false,
+        $isVisibleOnFront = true,
         $isAutomatedProcess = false
     ) {
         $createdAt = $this->date->gmtTimestamp();
@@ -132,7 +140,15 @@ class MessageHistoryLogger
         if (!$isAutomatedProcess) {
             $authSession = $this->authSessionFactory->create();
             $user = $authSession->getUser();
-            $messageHistory->setUserId($user->getId());
+            if ($user) {
+                $messageHistory->setUserId($user->getId());
+            }
+
+            $customerId = $this->customerSession->getCustomerId();
+
+            if ($customerId) {
+                $messageHistory->setCustomerId($customerId);
+            }
         }
 
         $this->messageHistoryRepository->save($messageHistory);

@@ -152,7 +152,12 @@ class Manager
                 $address = $this->formatMultiLineAttributes($address);
             }
 
+            $addressDataChanges = $profileAddress->hasDataChanges();
+            $profileAddress->setDataChanges(false);
+
             if ($address) {
+                $address = $this->normalizeAddressData($address);
+                $address = array_intersect_key($profileAddress->getData(), $address);
                 $this->dataObjectHelper->populateWithArray(
                     $profileAddress,
                     $address,
@@ -169,19 +174,18 @@ class Manager
                 $customerAddressId = $customerAddress->getId();
             }
 
-            $profileAddress->setCustomerAddressId($customerAddressId);
-            if (is_array($profileAddress->getStreet())) {
-                $profileAddress->setStreet(
-                    trim(implode("\n", $profileAddress->getStreet()))
-                );
+            $profileAddress->setCustomerAddressId((string)$customerAddressId);
+            if ($profileAddress->hasDataChanges()) {
+                $this->profileManager->getProfile()->setNeedRecollect('1');
             }
+            $profileAddress->setDataChanges($addressDataChanges || $profileAddress->hasDataChanges());
         }
     }
 
     /**
      * Returns profile's Shipping address
      *
-     * @return mixed|null|SubscriptionProfileAddressInterface
+     * @return SubscriptionProfileAddressInterface
      */
     private function getProfileAddress($type)
     {
@@ -263,5 +267,24 @@ class Manager
         $customer = $this->profileManager->getProfile()->getCustomer();
         $addresses = (array)$customer->getAddresses();
         return [$customer, $addresses];
+    }
+
+    /**
+     * Normalizes address data. Replaces empty strings with null. Converts int to string. As they holds in object.
+     *
+     * @param $address
+     * @return mixed
+     */
+    private function normalizeAddressData($address)
+    {
+        foreach ($address as $key => $item) {
+            if ($item === '') {
+                $address[$key] = null;
+            }
+            if (is_int($item)) {
+                $address[$key] = (string)$item;
+            }
+        }
+        return $address;
     }
 }

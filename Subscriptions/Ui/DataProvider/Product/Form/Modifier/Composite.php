@@ -16,7 +16,6 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
  */
 class Composite extends AbstractModifier
 {
-
     /**
      * @var array
      */

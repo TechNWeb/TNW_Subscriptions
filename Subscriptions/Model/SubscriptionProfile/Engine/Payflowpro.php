@@ -75,7 +75,6 @@ class Payflowpro extends Base
         foreach ($paymentPostData as $code => $methodData) {
             if ($methodData['method']) {
                 $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
-
                 break;
             }
         }

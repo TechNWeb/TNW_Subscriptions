@@ -1,0 +1,246 @@
+<?php
+/**
+ *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ *  See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Pricing\Render;
+
+use Magento\Framework\Pricing\Amount\AmountInterface;
+use Magento\Framework\Pricing\Price\PriceInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Pricing\Render\PriceBox as BasePriceBox;
+use Magento\Framework\Pricing\Render\RendererPool;
+use Magento\Framework\Pricing\SaleableInterface;
+use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+
+/**
+ * Class for subscription_price rendering
+ *
+ */
+class SubscriptionPriceBox extends BasePriceBox
+{
+    /**
+     * PriceCalculator
+     *
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+    /**
+     * Billing frequency repository.
+     *
+     * @var FrequencyOptionRepository
+     */
+    private $frequencyOptionRepository;
+
+    /**
+     * @var TrialLengthUnitType
+     */
+    private $trialLengthUnitType;
+
+    /**
+     * @var PriceCurrencyInterface
+     */
+    protected $priceCurrency;
+
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
+    protected $jsonHelper;
+
+    /**
+     * SubscriptionPriceBox constructor.
+     *
+     * @param Template\Context $context
+     * @param SaleableInterface $saleableItem
+     * @param PriceInterface $price
+     * @param RendererPool $rendererPool
+     * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param PriceCalculator $priceCalculator
+     * @param TrialLengthUnitType $trialLengthUnitType
+     * @param PriceCurrencyInterface $priceCurrency
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+     * @param array $data
+     */
+    public function __construct(
+        Template\Context $context,
+        SaleableInterface $saleableItem,
+        PriceInterface $price,
+        RendererPool $rendererPool,
+        FrequencyOptionRepository $frequencyOptionRepository,
+        PriceCalculator $priceCalculator,
+        TrialLengthUnitType $trialLengthUnitType,
+        PriceCurrencyInterface $priceCurrency,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
+        array $data = []
+    ) {
+        parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
+
+        $this->frequencyOptionRepository = $frequencyOptionRepository;
+        $this->priceCalculator = $priceCalculator;
+        $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->priceCurrency = $priceCurrency;
+        $this->jsonHelper = $jsonHelper;
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function _toHtml()
+    {
+        // Check catalog permissions
+        if ($this->getSaleableItem()->getCanShowPrice() === false) {
+            return '';
+        }
+
+        $result = parent::_toHtml();
+
+        return $this->wrapResult($result);
+    }
+
+    /**
+     * Wrap with standard required container.
+     *
+     * @param string $html
+     * @return string
+     */
+    protected function wrapResult($html)
+    {
+        return '<div class="price-box ' . $this->getData('css_classes') . '" ' .
+            'data-role="priceBox" ' .
+            'data-product-id="' . $this->getSaleableItem()->getId() . '"' .
+            '>' . $html . '</div>';
+    }
+
+    /**
+     * Get Key for caching block content.
+     *
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        return parent::getCacheKey() . ($this->getData('list_category_page') ? '-list-category-page': '');
+    }
+
+    /**
+     * Returns list of product billing frequencies.
+     *
+     * @return array
+     */
+    public function getProductBillingFrequencies()
+    {
+        $result = [];
+
+        $product = $this->getProduct();
+        if ($product) {
+
+            $trialPriceStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+
+            $productBillingFrequencies = $this->frequencyOptionRepository
+                ->getListByProductId($product->getId())
+                ->getItems();
+
+            foreach ($productBillingFrequencies as $billingFrequency) {
+                $billingFrequencyId = $billingFrequency->getBillingFrequencyId();
+
+                $price = $this->priceCalculator->getUnitPrice($product->getId(), $billingFrequencyId);
+
+                $topMessage = '';
+                $bottomMessage = '';
+
+                $isDefault = $billingFrequency->getDefaultBillingFrequency();
+                $initialFee = (float)$billingFrequency->getInitialFee() ?: 0;
+                if ($trialPriceStatus) {
+                    $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
+                    $trialPeriod = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH);
+                    $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
+
+                    $topMessage = sprintf(__('Try for %s'), $this->getFrequencyTrialWithUnit($trialPeriod,$trialUnitId));
+                    $bottomMessage = sprintf('then %s', $this->formatCurrency($price, false));
+                    $price = $trialPrice + $initialFee;
+                } else {
+                    if ($initialFee) {
+                        $customPrice = $this->formatCurrency($price, false);
+                        $topMessage = __('Initial charge');
+                        $price = (float)$price + $initialFee;
+                        $bottomMessage = sprintf('then %s', $customPrice);
+                    }
+                }
+
+                $result[$billingFrequencyId] = [
+                    'default' => $isDefault,
+                    'billing_frequency_id' => $billingFrequencyId,
+                    'price' => $price,
+                    'top_message' => $topMessage,
+                    'bottom_message' => $bottomMessage
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieve current product model
+     *
+     * @return SaleableInterface
+     */
+    public function getProduct()
+    {
+        return $this->getSaleableItem();
+    }
+
+    /**
+     * Return Billing Frequency Trial with unit (e.g. "6 months")
+     *
+     * @param $period
+     * @param $unitId
+     * @return string
+     */
+    private function getFrequencyTrialWithUnit($period, $unitId)
+    {
+        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength((int)$unitId, $period);
+
+        return strtolower($period . ' ' . $unitLabel);
+    }
+
+    /**
+     * Format price value
+     *
+     * @param float $amount
+     * @param bool $includeContainer
+     * @param int $precision
+     * @return float
+     */
+    public function formatCurrency(
+        $amount,
+        $includeContainer = true,
+        $precision = PriceCurrencyInterface::DEFAULT_PRECISION
+    ) {
+        return $this->priceCurrency->format($amount, $includeContainer, $precision);
+    }
+
+    /**
+     * Render subscription price amount blocks.
+     *
+     * @param AmountInterface $amount
+     * @param array $arguments
+     * @return string
+     */
+    public function renderSubscriptionAmounts(AmountInterface $amount, array $arguments = [])
+    {
+        $result = [];
+        foreach ($this->getProductBillingFrequencies() as $key => $billingFrequencyData) {
+            $currentArguments['billing_frequency'] = array_replace($billingFrequencyData, $arguments);
+            $result[$key] = parent::renderAmount($amount, $currentArguments);
+        }
+
+        return $this->jsonHelper->jsonEncode($result);
+    }
+}

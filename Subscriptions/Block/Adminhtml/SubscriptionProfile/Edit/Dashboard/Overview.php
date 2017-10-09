@@ -13,6 +13,7 @@ use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overvie
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\NextPayment;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Status;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
@@ -273,5 +274,15 @@ class Overview extends Template
     public function getStatusHtml()
     {
         return $this->getBlockStatus()->toHtml();
+    }
+
+    /**
+     * Can show Next payment block
+     * 
+     * @return bool
+     */
+    public function getCanShowNextPayment()
+    {
+        return $this->getSubscriptionProfile()->getStatus() != ProfileStatus::STATUS_COMPLETE;
     }
 }

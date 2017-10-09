@@ -4,7 +4,6 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal;
 
 use Magento\Payment\Model\Config;
@@ -14,29 +13,57 @@ use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
 use Magento\Framework\UrlInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
+/**
+ * PayPal payment methods form modifier.
+ */
 class PaymentsPro extends Base
 {
-
     const SORT_ORDER = 20;
 
+    /**
+     * @var Transparent
+     */
     private $paymentPro;
+
+    /**
+     * @var Context
+     */
     private $context;
+
+    /**
+     * @var Config
+     */
     private $paymentConfig;
+
+    /**
+     * @var Repository
+     */
     private $assetRepository;
+
+    /**
+     * @var RequestInterface
+     */
     private $request;
+
+    /**
+     * @var UrlInterface
+     */
     private $urlBuilder;
 
     /**
-     * @param \TNW\Subscriptions\Model\Config $config
+     * PaymentsPro constructor.
+     * @param SubscriptionConfig $config
+     * @param QuoteSessionInterface $session
      * @param Context $context
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
@@ -45,7 +72,8 @@ class PaymentsPro extends Base
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
-        \TNW\Subscriptions\Model\Config $config,
+        SubscriptionConfig $config,
+        QuoteSessionInterface $session,
         Context $context,
         Transparent $paymentPro,
         Config $paymentConfig,
@@ -60,9 +88,9 @@ class PaymentsPro extends Base
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
 
-        parent::__construct($config);
-
+        parent::__construct($config, $session);
     }
+
 
     /**
      * {@inheritdoc}

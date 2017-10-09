@@ -8,7 +8,6 @@
 
 // @codingStandardsIgnoreFile
 ?>
-
 <?php if ($block->getCartItemsCount()): ?>
     <div id="tnw-subscriptions-cart" data-role="loader-container" data-bind="scope:'cart'" class="tnw-subscriptions-cart-container">
         <div id="tnw-subscriptions-loader" data-role="cart-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
@@ -26,10 +25,6 @@
                 }
             }
         </script>
-        <script>
-            window.tnwSubscriptionsCheckoutConfig = <?php /* @noEscape */ echo \Zend_Json::encode
-            ($block->getCheckoutConfig()); ?>;
-        </script>
     </div>
 <?php else: ?>
     <div class="cart-empty">
@@ -38,3 +33,11 @@
                 $block->escapeUrl($block->getContinueShoppingUrl())) ?></p>
     </div>
 <?php endif; ?>
+<script>
+    window.customerData = [];
+    require([
+        'Magento_Ui/js/block-loader'
+    ], function(blockLoader) {
+        blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+    })
+</script>
