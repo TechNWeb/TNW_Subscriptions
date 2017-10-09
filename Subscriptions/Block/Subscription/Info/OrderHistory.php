@@ -105,4 +105,27 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
     {
         return $this->getUrl('sales/order/view', ['order_id' => $order->getId()]);
     }
+
+    /**
+     * @param $status
+     * @return string
+     */
+    public function getIconSubClass($status)
+    {
+        $result = '';
+
+        switch ($status) {
+            case \Magento\Sales\Model\Order::STATE_NEW:
+                $result = 'sub-icon-active-green';
+                break;
+            case \Magento\Sales\Model\Order::STATE_COMPLETE:
+                $result = 'sub-icon-warning-orange';
+                break;
+            case \Magento\Sales\Model\Order::STATE_CLOSED:
+                $result = 'sub-icon-warning-red';
+                break;
+        }
+
+        return $result;
+    }
 }

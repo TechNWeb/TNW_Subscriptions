@@ -13,31 +13,36 @@
             <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Order History') ?></caption>
             <thead>
             <tr>
+                <th scope="col" class="col icon"></th>
                 <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Order #') ?></th>
+                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Created On') ?></th>
+                <th scope="col" class="col tax-fee"><?php /* @escapeNotVerified */ echo __('Tax Fee') ?></th>
+                <th scope="col" class="col shipping-fee"><?php /* @escapeNotVerified */ echo __('Shipping Fee') ?></th>
+                <th scope="col" class="col total"><?php /* @escapeNotVerified */ echo __('Grand Total') ?></th>
                 <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
-                <th scope="col" class="col bill-name"><?php /* @escapeNotVerified */ echo __('Bill To Name') ?></th>
-                <th scope="col" class="col ship-name"><?php /* @escapeNotVerified */ echo __('Ship To Name') ?></th>
-                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Purchase Date') ?></th>
-                <th scope="col" class="col shipping-details"><?php /* @escapeNotVerified */ echo __('Shipping Details') ?></th>
-                <th scope="col" class="col total"><?php /* @escapeNotVerified */ echo __('Order Total') ?></th>
-                <th scope="col" class="col actions">&nbsp;</th>
             </tr>
             </thead>
             <tbody>
             <?php /** @var \Magento\Sales\Model\Order $_order */ foreach ($_orderHistory as $_order): ?>
                 <tr>
-                    <td data-th="<?php echo $block->escapeHtml(__('Order #')) ?>" class="col id"><?php /* @escapeNotVerified */ echo $_order->getRealOrderId() ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getStatusLabel() ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Bill To Name')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getBillingAddress() ? $block->escapeHtml($_order->getBillingAddress()->getName()) : '&nbsp;' ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Ship To Name')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getShippingAddress() ? $block->escapeHtml($_order->getShippingAddress()->getName()) : '&nbsp;' ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Purchase Date')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->formatDate($_order->getCreatedAt()) ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Details')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getShippingDescription(), ' - ', $_order->formatPrice($_order->getShippingAmount()); ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Order Total')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getGrandTotal()) ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                    <td class="sub-icons-container">
+                        <?php $class = $block->getIconSubClass($_order->getStatus()); if (!empty($class)): ?>
+                            <div class="sub-icon tooltip-toggle <?php echo $class ?>"></div>
+                        <?php endif; ?>
+                        <div class="sub-message tooltip-content">
+                            <?php echo $_order->getStatusLabel() ?>
+                        </div>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Order #')) ?>" class="col id">
                         <a href="<?php /* @escapeNotVerified */ echo $block->getViewUrl($_order) ?>" class="action view">
-                            <span><?php /* @escapeNotVerified */ echo __('View Order') ?></span>
+                            <span><?php /* @escapeNotVerified */ echo $_order->getRealOrderId() ?></span>
                         </a>
                     </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Created On')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->formatDate($_order->getCreatedAt()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Tax Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getTaxAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getShippingAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Grand Total')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getGrandTotal()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getStatusLabel() ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
