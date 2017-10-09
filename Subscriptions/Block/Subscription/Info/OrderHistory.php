@@ -79,7 +79,7 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
         parent::_prepareLayout();
         if ($this->getOrderHistory()) {
             $pager = $this->getLayout()
-                ->createBlock('Magento\Theme\Block\Html\Pager', 'subscription.info.order.history.pager')
+                ->createBlock(\Magento\Theme\Block\Html\Pager::class, 'subscription.info.order.history.pager')
                 ->setCollection($this->getOrderHistory());
 
             $this->setChild('pager', $pager);
