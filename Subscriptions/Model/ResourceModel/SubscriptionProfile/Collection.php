@@ -21,8 +21,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            'TNW\Subscriptions\Model\SubscriptionProfile',
-            'TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile'
+            \TNW\Subscriptions\Model\SubscriptionProfile::class,
+            \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile::class
         );
     }
 }

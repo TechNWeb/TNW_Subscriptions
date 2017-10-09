@@ -4,6 +4,10 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\ResponseInterface;
 
+/**
+ * Additional save action
+ * @package TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
+ */
 class AdditionalSave extends \Magento\Backend\App\Action
 {
 
@@ -17,6 +21,12 @@ class AdditionalSave extends \Magento\Backend\App\Action
      */
     private $subscriptionProfileRepository;
 
+    /**
+     * AdditionalSave constructor.
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
+     * @param \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\LayoutFactory $layoutFactory,

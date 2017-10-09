@@ -21,6 +21,12 @@ class SubscriptionProfile extends AbstractEntity
      */
     private $entityManager;
 
+    /**
+     * SubscriptionProfile constructor.
+     * @param \Magento\Eav\Model\Entity\Context $context
+     * @param \Magento\Framework\EntityManager\EntityManager $entityManager
+     * @param array $data
+     */
     public function __construct(
         \Magento\Eav\Model\Entity\Context $context,
         \Magento\Framework\EntityManager\EntityManager $entityManager,

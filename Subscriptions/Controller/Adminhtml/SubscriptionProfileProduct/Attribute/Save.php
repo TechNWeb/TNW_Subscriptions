@@ -163,7 +163,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                 );
 
                 if (strcasecmp($data['frontend_input'], 'multiselect') === 0) {
-                    $data['source_model'] = 'Magento\Eav\Model\Entity\Attribute\Source\Table';
+                    $data['source_model'] = \Magento\Eav\Model\Entity\Attribute\Source\Table::class;
                 }
             }
 

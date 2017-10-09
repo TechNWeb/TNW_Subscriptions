@@ -3,6 +3,10 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Ui\Component\Form;
 
+/**
+ * Additional form data provider
+ * @package TNW\Subscriptions\Model\SubscriptionProfile
+ */
 class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
     /**
@@ -50,6 +54,22 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
      */
     private $attributeRepository;
 
+    /**
+     * AdditionalDataProvider constructor.
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory $collectionFactory
+     * @param \Magento\Eav\Api\AttributeGroupRepositoryInterface $attributeGroupRepository
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Eav\Api\AttributeRepositoryInterface $attributeRepository
+     * @param \Magento\Ui\DataProvider\Mapper\FormElement $formElementMapper
+     * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
+     * @param \Magento\Framework\Stdlib\ArrayManager $arrayManager
+     * @param \Magento\Eav\Model\Config $eavConfig
+     * @param array $meta
+     * @param array $data
+     */
     public function __construct(
         $name,
         $primaryFieldName,
@@ -93,15 +113,6 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
         }
 
         return $meta;
-    }
-
-    /**
-     * @return array
-     */
-    public function getData()
-    {
-        $data = parent::getData();
-        return $data;
     }
 
     /**
@@ -243,7 +254,7 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
      * @param \Magento\Eav\Api\Data\AttributeGroupInterface $group
      * @return \Magento\Eav\Api\Data\AttributeInterface[]
      */
-    private function loadAttributes($group)
+    private function loadAttributes(\Magento\Eav\Api\Data\AttributeGroupInterface $group)
     {
         $sortOrder = $this->sortOrderBuilder
             ->setField('sort_order')
