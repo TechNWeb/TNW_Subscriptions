@@ -373,3 +373,5 @@ The number of future quotes to generate at a time for the new subscription profi
 "You have placed no subscriptions.","You have placed no subscriptions."
 "by %s","by %s"
 "There are no messages about current subscription history","There are no messages about current subscription history"
+"merchant","merchant"
+"customer","customer"

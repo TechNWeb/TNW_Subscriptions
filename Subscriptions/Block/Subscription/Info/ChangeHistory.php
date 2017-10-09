@@ -75,7 +75,7 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
         parent::_prepareLayout();
         if ($this->getChangeHistoryCollection()) {
             $pager = $this->getLayout()->createBlock(
-                'Magento\Theme\Block\Html\Pager',
+                \Magento\Theme\Block\Html\Pager::class,
                 'subscription.change.history.pager'
             )->setCollection(
                 $this->getChangeHistoryCollection()
@@ -117,9 +117,9 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
      */
     public function getMessageSource($messageItem)
     {
-        $source = 'merchant';
+        $source = __('merchant');
         if ($messageItem->getCustomerId()) {
-            $source = 'customer';
+            $source = __('customer');
         }
 
         return $source;
