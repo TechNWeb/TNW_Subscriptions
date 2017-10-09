@@ -131,6 +131,9 @@ class Manager
         if (!$customerId) {
             return false;
         }
+        if (!$quoteIds) {
+            $quoteIds = [];
+        }
         if (!is_array($quoteIds)) {
             $quoteIds = [$quoteIds];
         }
