@@ -13,7 +13,6 @@
             <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Order History') ?></caption>
             <thead>
             <tr>
-                <th scope="col" class="col icon"></th>
                 <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Order #') ?></th>
                 <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Created On') ?></th>
                 <th scope="col" class="col tax-fee"><?php /* @escapeNotVerified */ echo __('Tax Fee') ?></th>
@@ -25,14 +24,6 @@
             <tbody>
             <?php /** @var \Magento\Sales\Model\Order $_order */ foreach ($_orderHistory as $_order): ?>
                 <tr>
-                    <td class="sub-icons-container">
-                        <?php $class = $block->getIconSubClass($_order->getStatus()); if (!empty($class)): ?>
-                            <div class="sub-icon tooltip-toggle <?php echo $class ?>"></div>
-                        <?php endif; ?>
-                        <div class="sub-message tooltip-content">
-                            <?php echo $_order->getStatusLabel() ?>
-                        </div>
-                    </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Order #')) ?>" class="col id">
                         <a href="<?php /* @escapeNotVerified */ echo $block->getViewUrl($_order) ?>" class="action view">
                             <span><?php /* @escapeNotVerified */ echo $_order->getRealOrderId() ?></span>
