@@ -4,6 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Sales order link
@@ -32,9 +33,9 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
     }
 
     /**
-     * Retrieve current order model instance
+     * Retrieve current subscription model instance
      *
-     * @return \Magento\Sales\Model\Order
+     * @return SubscriptionProfile
      */
     private function getSubscription()
     {

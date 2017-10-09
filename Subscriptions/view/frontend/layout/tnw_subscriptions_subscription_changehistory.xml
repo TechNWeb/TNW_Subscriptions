@@ -11,6 +11,7 @@
     <body>
         <referenceContainer name="content">
             <block class="TNW\Subscriptions\Block\Subscription\Info\ChangeHistory"
+                   template="subscription/change-history.phtml"
                    name="subscription.info.change.history"
                    after="subscription.info.links"
             />

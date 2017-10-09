@@ -827,6 +827,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerQuote($setup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.23", "<")) {
+            //TODO add this column to addSubscriptionProfileMessageHistoryTable()
+            $this->addCustomerToMessageHistory($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -2095,5 +2100,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $setup->getConnection()->createTable($table);
         }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addCustomerToMessageHistory(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->addColumn(
+            $setup->getTable('tnw_subscriptions_subscription_profile_message_history'),
+            'customer_id',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Customer id whose message it is'
+            ]
+        );
     }
 }
