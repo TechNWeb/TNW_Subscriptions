@@ -1,7 +1,7 @@
 define(
     [
         'jquery',
-        'Magento_Ui/js/form/form',
+        'TNW_Subscriptions/js/components/subscriptions-form',
         'uiRegistry',
         'underscore'
     ],

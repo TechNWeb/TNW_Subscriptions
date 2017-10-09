@@ -65,7 +65,7 @@ class Cart extends Template
     public function getJsLayout()
     {
         //set config data
-        $this->jsLayout['components']['subscriptionsProvider'] = $this->getCheckoutConfig();
+        $this->jsLayout['components']['cart']['checkoutConfig'] = $this->getCheckoutConfig();
 
         return \Zend_Json::encode($this->jsLayout);
     }
