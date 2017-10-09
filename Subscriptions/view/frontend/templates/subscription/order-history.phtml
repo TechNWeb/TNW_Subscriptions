@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Subscription\Info\OrderHistory */
+?>
+<?php $_orderHistory = $block->getOrderHistory(); ?>
+<?php if ($_orderHistory && count($_orderHistory)): ?>
+    <div class="table-wrapper orders-history">
+        <table class="data table table-order-items history" id="my-orders-table">
+            <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Order History') ?></caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Order #') ?></th>
+                <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
+                <th scope="col" class="col bill-name"><?php /* @escapeNotVerified */ echo __('Bill To Name') ?></th>
+                <th scope="col" class="col ship-name"><?php /* @escapeNotVerified */ echo __('Ship To Name') ?></th>
+                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Purchase Date') ?></th>
+                <th scope="col" class="col shipping-details"><?php /* @escapeNotVerified */ echo __('Shipping Details') ?></th>
+                <th scope="col" class="col total"><?php /* @escapeNotVerified */ echo __('Order Total') ?></th>
+                <th scope="col" class="col actions">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php /** @var \Magento\Sales\Model\Order $_order */ foreach ($_orderHistory as $_order): ?>
+                <tr>
+                    <td data-th="<?php echo $block->escapeHtml(__('Order #')) ?>" class="col id"><?php /* @escapeNotVerified */ echo $_order->getRealOrderId() ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getStatusLabel() ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Bill To Name')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getBillingAddress() ? $block->escapeHtml($_order->getBillingAddress()->getName()) : '&nbsp;' ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Ship To Name')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getShippingAddress() ? $block->escapeHtml($_order->getShippingAddress()->getName()) : '&nbsp;' ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Purchase Date')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->formatDate($_order->getCreatedAt()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Details')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getShippingDescription(), ' - ', $_order->formatPrice($_order->getShippingAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Order Total')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getGrandTotal()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                        <a href="<?php /* @escapeNotVerified */ echo $block->getViewUrl($_order) ?>" class="action view">
+                            <span><?php /* @escapeNotVerified */ echo __('View Order') ?></span>
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php if ($block->getPagerHtml()): ?>
+        <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+    <?php endif ?>
+<?php else: ?>
+    <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('You have placed no orders.'); ?></span></div>
+<?php endif ?>
