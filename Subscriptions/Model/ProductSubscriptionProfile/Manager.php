@@ -51,7 +51,7 @@ class Manager
     protected $coreRegistry;
 
     /**
-     * Mapper between subscription product and magentp product attrbites.
+     * Mapper between subscription product and magento product attributes.
      *
      * @var array
      */
@@ -63,6 +63,9 @@ class Manager
         ProductSubscriptionProfile::OFFER_FLAT_DISCOUNT_STATUS => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
         ProductSubscriptionProfile::DISCOUNT_AMOUNT => Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
         ProductSubscriptionProfile::DISCOUNT_TYPE => Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+        ProductSubscriptionProfile::SKU => 'sku',
+        ProductSubscriptionProfile::NAME => 'name',
+        ProductSubscriptionProfile::TNW_SUBSCR_UNLOCK_PRESET_QTY => Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
     ];
 
     /**

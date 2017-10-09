@@ -18,6 +18,7 @@ use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -819,6 +820,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Generate quotes state'
                 ]
             );
+        }
+
+        if (version_compare($context->getVersion(), '2.0.25', '<')) {
+            $this->updateProductSubscriptionProfileTable($setup);
         }
 
         $setup->endSetup();
@@ -2024,5 +2029,59 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $setup->getConnection()->createTable($table);
         }
+    }
+
+
+    /**
+     * Remove foreign key and add column name and sku
+     *
+     * @param SchemaSetupInterface $setup
+     * @return void
+     */
+    private function updateProductSubscriptionProfileTable(SchemaSetupInterface $setup)
+    {
+        $tableName = $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE);
+        $setup->getConnection()->dropForeignKey(
+            $tableName,
+            $setup->getConnection()->getForeignKeyName(
+                $tableName,
+                'magento_product_id',
+                'catalog_product_entity',
+                'entity_id'
+            )
+        );
+        $setup->getConnection()->addColumn(
+            $tableName,
+            ProductSubscriptionProfileInterface::NAME,
+            [
+                'type' => Table::TYPE_TEXT,
+                'nullable'  => true,
+                'comment'   => 'Product name',
+                'length'    => 255,
+                'after'     => ProductSubscriptionProfileInterface::MAGENTO_PRODUCT_ID
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $tableName,
+            ProductSubscriptionProfileInterface::SKU,
+            [
+                'type' => Table::TYPE_TEXT,
+                'nullable'  => true,
+                'comment'   => 'Product sku',
+                'length'    => 64,
+                'after'     => ProductSubscriptionProfileInterface::NAME
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $tableName,
+            ProductSubscriptionProfileInterface::TNW_SUBSCR_UNLOCK_PRESET_QTY,
+            [
+                'type' => Table::TYPE_INTEGER,
+                'nullable'  => true,
+                'comment'   => 'Product sku',
+                'length'    => 11,
+                'after'     => ProductSubscriptionProfileInterface::SKU
+            ]
+        );
     }
 }

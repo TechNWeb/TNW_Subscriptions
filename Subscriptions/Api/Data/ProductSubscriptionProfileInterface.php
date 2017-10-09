@@ -34,6 +34,9 @@ interface ProductSubscriptionProfileInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
+    const NAME = 'name';
+    const SKU = 'sku';
+    const TNW_SUBSCR_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
     /**#@-*/
 
     /**#@+
@@ -288,4 +291,49 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setNeedRecollect($needRecollect);
+
+    /**
+     * Get product name
+     *
+     * @return string|null
+     */
+    public function getName();
+
+    /**
+     * Set product name
+     *
+     * @param string $productName
+     * @return $this
+     */
+    public function setName($productName);
+
+    /**
+     * Get product sku
+     *
+     * @return string|null
+     */
+    public function getSku();
+
+    /**
+     * Set product sku
+     *
+     * @param string $productSku
+     * @return $this
+     */
+    public function setSku($productSku);
+
+    /**
+     * Get product tnw_subscr_unlock_preset_qty
+     *
+     * @return int|null
+     */
+    public function getTnwSubscrUnlockPresetQty();
+
+    /**
+     * Set product tnw_subscr_unlock_preset_qty
+     *
+     * @param int $subscrUnlockPresetQty
+     * @return $this
+     */
+    public function setTnwSubscrUnlockPresetQty($subscrUnlockPresetQty);
 }
