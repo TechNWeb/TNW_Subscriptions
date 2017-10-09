@@ -4,6 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
+
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**

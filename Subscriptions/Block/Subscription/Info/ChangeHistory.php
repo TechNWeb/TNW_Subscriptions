@@ -81,7 +81,6 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
                 $this->getChangeHistoryCollection()
             );
             $this->setChild('pager', $pager);
-            $this->getChangeHistoryCollection()->load();
         }
 
         return $this;
@@ -115,7 +114,7 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
      * @param MessageHistory $messageItem
      * @return string
      */
-    public function getMessageSource($messageItem)
+    public function getMessageSource(MessageHistory $messageItem)
     {
         $source = __('merchant');
         if ($messageItem->getCustomerId()) {
