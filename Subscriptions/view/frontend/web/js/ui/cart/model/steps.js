@@ -14,7 +14,8 @@ define([
         return Component.extend({
             defaults: {
                 handle: '',
-                render_url: ''
+                render_url: '',
+                isLoading: true
             },
 
             /**
@@ -35,6 +36,12 @@ define([
                 return this;
             },
 
+            /** @inheritdoc */
+            initObservable: function () {
+                return this._super()
+                    .observe(['isLoading']);
+            },
+
             /**
              * Renders current step.
              */
@@ -42,12 +49,13 @@ define([
                 var stepIndex = stepNavigator._getActiveItemIndex();
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
-                    var provider = registry.get('subscriptionsProvider');
+                    var config = registry.get('cart').checkoutConfig;
                     var insertForm = registry.get(this.name + '.' + 'insert_form');
-                    insertForm.render_url = provider.render_url + '?' + this.getRenderParams(step);
+                    insertForm.render_url = config.render_url + '?' + this.getRenderParams(step);
+                    insertForm.renderSettings.url = insertForm.render_url;
                     insertForm.ns = step.blockNamespace;
                     insertForm.params.namespace = step.blockNamespace;
-                    insertForm.renderSettings.url = insertForm.render_url;
+                    this.isLoading(true);
                     insertForm.destroyInserted();
                     insertForm.render();
                 }
@@ -65,7 +73,6 @@ define([
                     result[step.requestFieldName] = step.requestFieldValue;
                 }
                 result['handle'] = this.handle + '_' + step.code;
-                result['form_key'] = window.FORM_KEY;
 
                 return $.param(result);
             }

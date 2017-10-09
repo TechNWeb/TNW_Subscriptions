@@ -3,21 +3,23 @@
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">tnw_subscriptionprofile_create_registration_form.tnw_subscriptionprofile_create_registration_form_data_source</item>
-            <item name="deps" xsi:type="string">tnw_subscriptionprofile_create_registration_form.tnw_subscriptionprofile_create_registration_form_data_source</item>
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form.tnw_subscriptionprofile_checkout_registration_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form.tnw_subscriptionprofile_checkout_registration_form_data_source</item>
         </item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
             <item name="ajaxSaveType" xsi:type="string">simple</item>
-            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/modify-subscriptions-form</item>
-            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_create_registration_form</item>
+            <item name="useParentLoader" xsi:type="boolean">true</item>
+            <item name="parentForLoader" xsi:type="string">cart.steps</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/subscriptions-form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
         </item>
-        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
-    <dataSource name="tnw_subscriptionprofile_create_registration_form_data_source">
+    <dataSource name="tnw_subscriptionprofile_checkout_registration_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Registration</argument>
-            <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_registration_form_data_source</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">modify_form_data</argument>
             <argument name="requestFieldName" xsi:type="string">modify_form_data</argument>
         </argument>
@@ -52,7 +54,7 @@
                     <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration/existing-customer</item>
                     <item name="sortOrder" xsi:type="number">0</item>
                     <item name="label" xsi:type="boolean">false</item>
-                    <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/existing-customer</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/authentication</item>
                 </item>
             </argument>
         </container>

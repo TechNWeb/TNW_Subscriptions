@@ -10,6 +10,7 @@ use Magento\Customer\Model\Url as CustomerUrl;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Data provider for registration step.
@@ -19,7 +20,7 @@ class Registration extends AbstractDataProvider
     /**#@+
      * Form data scope
      */
-    const DATA_SCOPE_REGISTRATION_FORM = 'tnw_subscriptionprofile_create_registration_form';
+    const DATA_SCOPE_REGISTRATION_FORM = 'tnw_subscriptionprofile_checkout_registration_form';
     /**#@-*/
 
     /**
@@ -37,12 +38,20 @@ class Registration extends AbstractDataProvider
     private $url;
 
     /**
+     * Store manager.
+     *
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * Registration constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CustomerUrl $customerUrl
      * @param UrlInterface $url
+     * @param StoreManagerInterface $storeManager
      * @param array $meta
      * @param array $data
      */
@@ -52,11 +61,13 @@ class Registration extends AbstractDataProvider
         $requestFieldName,
         CustomerUrl $customerUrl,
         UrlInterface $url,
+        StoreManagerInterface $storeManager,
         array $meta = [],
         array $data = []
     ) {
         $this->customerUrl = $customerUrl;
         $this->url = $url;
+        $this->storeManager = $storeManager;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -127,7 +138,9 @@ class Registration extends AbstractDataProvider
     {
         return [
             'forgotPasswordUrl' => $this->customerUrl->getForgotPasswordUrl(),
-            'loginPostUrl' => $this->customerUrl->getLoginPostUrl(),
+            'nextStepUrl' =>$this->url->getUrl('tnw_subscriptions/cart/index/') . '#address',
+            'registerUrl' => $this->customerUrl->getRegisterUrl(),
+            'baseUrl' =>  $this->storeManager->getStore()->getBaseUrl()
         ];
     }
 }

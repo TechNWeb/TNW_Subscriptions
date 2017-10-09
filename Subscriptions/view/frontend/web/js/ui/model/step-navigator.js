@@ -9,7 +9,7 @@ define(
         'ko',
         'mage/translate'
     ],
-    function($, ko, $t) {
+    function ($, ko, $t) {
         'use strict';
 
         var steps = ko.observableArray();
@@ -33,17 +33,17 @@ define(
              *
              * @param {Object} step
              */
-            registerStep: function(step) {
+            registerStep: function (step) {
                 var code = step.code,
-                    alias = (typeof step.alias == 'undefined' ? null : step.alias),
+                    alias = (typeof step.alias === 'undefined' ? null : step.alias),
                     isActive = ko.observable(step.isActive),
-                    scrollTo = (typeof step.scrollTo == 'undefined' ? null : step.scrollTo);
+                    scrollTo = (typeof step.scrollTo === 'undefined' ? null : step.scrollTo);
 
-                if (-1 != $.inArray(code, this.validCodes)) {
+                if (-1 !== $.inArray(code, this.validCodes)) {
                     throw new DOMException('Step code [' + code + '] already registered in step navigator');
                 }
-                if (alias != null) {
-                    if (-1 != $.inArray(alias, this.validCodes)) {
+                if (alias !== null) {
+                    if (-1 !== $.inArray(alias, this.validCodes)) {
                         throw new DOMException('Step code [' + alias + '] already registered in step navigator');
                     }
                     this.validCodes.push(alias);
@@ -52,11 +52,11 @@ define(
                 this.validCodes.push(code);
                 steps.push({
                     code: code,
-                    alias: alias != null ? alias : code,
+                    alias: alias !== null ? alias : code,
                     blockNamespace: step.blockNamespace,
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
-                    title : $t(step.title),
+                    title: $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,
                     scrollTo: scrollTo
@@ -64,7 +64,7 @@ define(
                 this.stepCodes.push(code);
 
                 var hash = window.location.hash.replace('#', '');
-                if (hash != '' && hash != code) {
+                if (hash !== '' && hash !== code) {
                     isActive(false);
                 }
             },
@@ -76,7 +76,7 @@ define(
              * @param {Object} itemTwo
              * @returns {number}
              */
-            sortItems: function(itemOne, itemTwo) {
+            sortItems: function (itemOne, itemTwo) {
                 return itemOne.sortOrder > itemTwo.sortOrder ? 1 : -1
             },
 
@@ -86,13 +86,13 @@ define(
              * @param {String} code
              * @returns {boolean}
              */
-            isProcessed: function(code) {
+            isProcessed: function (code) {
                 var activeItemIndex = this._getActiveItemIndex(),
                     sortedItems = steps.sort(this.sortItems),
                     requestedItemIndex = -1;
 
-                sortedItems.forEach(function(element, index) {
-                    if (element.code == code) {
+                sortedItems.forEach(function (element, index) {
+                    if (element.code === code) {
                         requestedItemIndex = index;
                     }
                 });
@@ -105,13 +105,13 @@ define(
              *
              * @param {String} code
              */
-            navigateBackTo: function(code) {
+            navigateBackTo: function (code) {
                 var self = this,
                     sortedItems = steps.sort(this.sortItems);
 
                 if (this.isProcessed(code)) {
-                    sortedItems.forEach(function(element) {
-                        if (element.code == code) {
+                    sortedItems.forEach(function (element) {
+                        if (element.code === code) {
                             element.isActive(true);
                             self._applyHash(code);
                         } else {
@@ -122,14 +122,33 @@ define(
             },
 
             /**
+             * Navigate to step
+             *
+             * @param {String} code
+             */
+            navigateTo: function (code) {
+                var self = this,
+                    sortedItems = steps.sort(this.sortItems);
+
+                sortedItems.forEach(function (element) {
+                    if (element.code === code) {
+                        element.isActive(true);
+                        self._applyHash(code);
+                    } else {
+                        element.isActive(false);
+                    }
+                });
+            },
+
+            /**
              * Navigate to the next step
              */
-            navigateNext: function() {
+            navigateNext: function () {
                 var activeIndex = 0,
                     body = $.browser.safari || $.browser.chrome ? $('body') : $('html'),
-                    screenHeight = $.browser.opera? window.innerHeight : $(window).height();
+                    screenHeight = $.browser.opera ? window.innerHeight : $(window).height();
 
-                steps.sort(this.sortItems).forEach(function(element, index) {
+                steps.sort(this.sortItems).forEach(function (element, index) {
                     if (element.isActive()) {
                         element.isActive(false);
                         activeIndex = index;
@@ -153,16 +172,33 @@ define(
              * @returns {number}
              * @private
              */
-            _getActiveItemIndex: function() {
+            _getActiveItemIndex: function () {
                 var activeIndex = 0;
 
-                steps.sort(this.sortItems).forEach(function(element, index) {
+                steps.sort(this.sortItems).forEach(function (element, index) {
                     if (element.isActive()) {
                         activeIndex = index;
                     }
                 });
 
                 return activeIndex;
+            },
+
+            /**
+             *
+             * Get active item code
+             *
+             * @returns {String}
+             */
+            getActiveItemCode: function () {
+                var code = '';
+                steps.sort(this.sortItems).forEach(function (element, index) {
+                    if (element.isActive()) {
+                        code = element.code;
+                    }
+                });
+
+                return code;
             },
 
             /**

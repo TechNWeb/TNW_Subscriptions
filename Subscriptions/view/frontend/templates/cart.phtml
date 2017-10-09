@@ -8,7 +8,6 @@
 
 // @codingStandardsIgnoreFile
 ?>
-<?php echo $block->getChildHtml('tnw_subscriptions.cart.provider');?>
 <?php if ($block->getCartItemsCount()): ?>
     <div id="tnw-subscriptions-cart" data-role="loader-container" data-bind="scope:'cart'" class="tnw-subscriptions-cart-container">
         <div id="tnw-subscriptions-loader" data-role="cart-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
@@ -35,5 +34,10 @@
     </div>
 <?php endif; ?>
 <script>
-    window.checkout = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getConfig()); ?>;
+    window.customerData = [];
+    require([
+        'Magento_Ui/js/block-loader'
+    ], function(blockLoader) {
+        blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+    })
 </script>
