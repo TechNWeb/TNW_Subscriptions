@@ -71,10 +71,11 @@ class SummaryProductsForm extends ModifyForm
      * @var
      */
     private $currentProduct;
+
     /**
      * @var BillingFrequencyRepository
      */
-    private $frequencyRepository;
+    protected $frequencyRepository;
 
     /**
      * SummaryProductsForm constructor.
@@ -148,9 +149,9 @@ class SummaryProductsForm extends ModifyForm
                 $startOn = isset($trialStartDate) ?
                     $trialStartDate : $subQuote->getStartDate();
                 try {
-                    $billingFrequencyLabel = $this->getFrequencyRepository()->getById($subQuote->getBillingFrequencyId())->getLabel();
+                    $billingFrequencyLabel = $this->frequencyRepository->getById($subQuote->getBillingFrequencyId())->getLabel();
                 } catch (NoSuchEntityException $e) {
-                    $billingFrequencyLabel = 'Product was deleted';
+                    $billingFrequencyLabel = __('Product was deleted');
                 }
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
@@ -158,7 +159,8 @@ class SummaryProductsForm extends ModifyForm
                     'term' => (string)$term,
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
-                    'description' => $isProductDeleted ? __('Product deleted') : $product->getData('short_description'),
+                    'description' => $isProductDeleted ? __('Product deleted')
+                        : $product->getData('short_description'),
                     'qty' => $item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
                 ];
@@ -166,16 +168,6 @@ class SummaryProductsForm extends ModifyForm
         }
 
         return $data;
-    }
-
-    /**
-     * Return frequency repository
-     *
-     * @return BillingFrequencyRepository
-     */
-    public function getFrequencyRepository()
-    {
-        return $this->frequencyRepository;
     }
 
     /**

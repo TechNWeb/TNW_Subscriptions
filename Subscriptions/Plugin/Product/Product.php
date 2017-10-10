@@ -30,7 +30,6 @@ class Product
     private $profileStatus;
 
     /**
-     * Product constructor.
      * @param ResourceProductSubscriptionProfile $productSubscriptionProfile
      * @param ProfileStatus $profileStatus
      */
@@ -38,7 +37,6 @@ class Product
         ResourceProductSubscriptionProfile $productSubscriptionProfile,
         ProfileStatus $profileStatus
     ) {
-
         $this->resourceProductSubscriptionProfile = $productSubscriptionProfile;
         $this->profileStatus = $profileStatus;
     }
@@ -53,7 +51,6 @@ class Product
      */
     public function beforeSave(ProductInterface $product)
     {
-
         /**
          * $this->getCanSaveRecurringOptions() - set either in controller when "Recurring Options" ajax tab is loaded,
          * or in type instance as well
@@ -93,12 +90,13 @@ class Product
         ];
         foreach ($profileIds as $productProfileData) {
             if (!in_array($productProfileData['profile_status'], $availableToDeleteProfileStatus)) {
-                throw new \Exception(sprintf(
-                    'Product with ID %s can\'t delete, this product attached to profile with ID %s. Profile have status %s',
-                    $productProfileData['product_id'],
-                    $productProfileData['profile_id'],
-                    $this->profileStatus->getLabelByValue($productProfileData['profile_status'])
-                ));
+                throw new \Magento\Framework\Exception\CouldNotDeleteException(
+                    __('Product with ID %1 can\'t delete, this product attached to profile with ID %2. Profile have status %3',
+                        $productProfileData['product_id'],
+                        $productProfileData['profile_id'],
+                        $this->profileStatus->getLabelByValue($productProfileData['profile_status'])
+                    )
+                );
             }
         }
     }

@@ -7,12 +7,17 @@
 
 namespace TNW\Subscriptions\Plugin\Product;
 
-
 use Magento\Catalog\Controller\Adminhtml\Product\MassDelete as ControllerMassDelete;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Message\Manager;
 
+/**
+ * Plugin for mass delete product
+ *
+ * Class MassDelete
+ * @package TNW\Subscriptions\Plugin\Product
+ */
 class MassDelete
 {
     /**
@@ -23,17 +28,23 @@ class MassDelete
     private $resultFactory;
 
     /**
-     * MassDelete constructor.
+     * Object manager
      *
+     * @var ObjectManager
+     */
+    private $objectManager;
+
+    /**
      * @param ResultFactory $resultFactory
+     * @param ObjectManager $objectManager
      */
     public function __construct(
-        ResultFactory $resultFactory
+        ResultFactory $resultFactory,
+        ObjectManager $objectManager
     ) {
-
         $this->resultFactory = $resultFactory;
+        $this->objectManager = $objectManager;
     }
-
 
     /**
      * Add error message if mass delete product have error
@@ -48,7 +59,7 @@ class MassDelete
             // call the core observed function
             $returnValue = $proceed();
         } catch (\Exception $e) {
-            $messageManager = ObjectManager::getInstance()->get(Manager::class);
+            $messageManager = $this->objectManager->getInstance()->get(Manager::class);
             $messageManager->addErrorMessage($e->getMessage());
             $returnValue = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('catalog/*/index');
         }

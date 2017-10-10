@@ -31,7 +31,7 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
      * @param array $productIds
      * @return array [product_id(int), profile_id(int), profile_status(int)]
      */
-    public function getProfileStatusByProductIds($productIds = [])
+    public function getProfileStatusByProductIds(array $productIds = [])
     {
         $result = [];
 
@@ -53,7 +53,7 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
                     ProductSubscriptionProfileInterface::SUBSCRIPTION_PROFILE_ID,
                     ProductSubscriptionProfileInterface::ID
                 ),
-                ['profile.status AS profile_status']
+                ['profile.status' => 'profile_status']
             );
             $select->where(
                 sprintf(
