@@ -18,7 +18,9 @@
                 <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Next Payment On') ?></th>
                 <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
                 <th scope="col" class="col next-payment"><?php /* @escapeNotVerified */ echo __('Next Payment') ?></th>
-                <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Action') ?></th>
+                <?php if ($block->canShowActionColumn()): ?>
+                    <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Action') ?></th>
+                <?php endif;?>
             </tr>
             </thead>
             <tbody>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
@@ -30,12 +30,16 @@
                                                 <item name="0" xsi:type="array">
                                                     <item name="code" xsi:type="string">products</item>
                                                     <item name="alias" xsi:type="string"/>
+                                                    <item name="blockNamespace" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
+                                                    <item name="requestFieldName" xsi:type="string">modify_form_data</item>
+                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
                                                     <item name="title" xsi:type="string" translate="true">Products</item>
                                                     <item name="sortOrder" xsi:type="string">0</item>
                                                     <item name="isActive" xsi:type="boolean">true</item>
                                                 </item>
                                                 <item name="1" xsi:type="array">
                                                     <item name="code" xsi:type="string">registration</item>
+                                                    <item name="blockNamespace" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
                                                     <item name="title" xsi:type="string" translate="true">Registration</item>
                                                     <item name="sortOrder" xsi:type="string">1</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
@@ -71,116 +75,27 @@
                                         </item>
                                     </item>
                                     <item name="steps" xsi:type="array">
-                                        <item name="sortOrder" xsi:type="string">30</item>
-                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps</item>
-                                        <item name="displayArea" xsi:type="string">steps</item>
                                         <item name="config" xsi:type="array">
                                             <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps</item>
                                         </item>
+                                        <item name="displayArea" xsi:type="string">steps</item>
+                                        <item name="sortOrder" xsi:type="string">30</item>
+                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps</item>
+                                        <item name="provider" xsi:type="string">cart.data_source</item>
+                                        <item name="deps" xsi:type="string">cart.data_source</item>
+                                        <item name="handle" xsi:type="string">tnw_subscriptions_subscriptionprofile_create</item>
                                         <item name="children" xsi:type="array">
-                                            <item name="products" xsi:type="array">
-                                                <item name="sortOrder" xsi:type="string">0</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">products</item>
-                                                <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/products</item>
-                                                </item>
-                                            </item>
-                                            <item name="registration" xsi:type="array">
-                                                <item name="sortOrder" xsi:type="string">10</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">registration</item>
-                                                <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration</item>
-                                                </item>
-                                                <item name="children" xsi:type="array">
-                                                    <item name="existing_customer" xsi:type="array">
-                                                        <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/existing-customer</item>
-                                                        <item name="displayArea" xsi:type="string">existing_customer</item>
-                                                        <item name="config" xsi:type="array">
-                                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration/existing-customer</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="new_customer" xsi:type="array">
-                                                        <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps/registration/new-customer</item>
-                                                        <item name="displayArea" xsi:type="string">new_customer</item>
-                                                        <item name="config" xsi:type="array">
-                                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/registration/new-customer</item>
-                                                        </item>
-                                                    </item>
-                                                </item>
-                                            </item>
-                                            <item name="address" xsi:type="array">
-                                                <item name="sortOrder" xsi:type="string">20</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">address</item>
-                                                <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/address</item>
-                                                </item>
-                                                <item name="children" xsi:type="array">
-                                                    <item name="shipping_address" xsi:type="array">
-                                                        <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">uiComponent</item>
-                                                        <item name="displayArea" xsi:type="string">shipping_address</item>
-                                                        <item name="config" xsi:type="array">
-                                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/address/shipping-address</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="shipping_information" xsi:type="array">
-                                                        <item name="sortOrder" xsi:type="string">10</item>
-                                                        <item name="component" xsi:type="string">uiComponent</item>
-                                                        <item name="displayArea" xsi:type="string">shipping_information</item>
-                                                        <item name="config" xsi:type="array">
-                                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/address/shipping-information</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="sidebar" xsi:type="array">
-                                                        <item name="sortOrder" xsi:type="string">50</item>
-                                                        <item name="component" xsi:type="string">uiComponent</item>
-                                                        <item name="displayArea" xsi:type="string">sidebar</item>
-                                                        <item name="config" xsi:type="array">
-                                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/sidebar</item>
-                                                        </item>
-                                                        <item name="children" xsi:type="array">
-                                                            <item name="cartItems" xsi:type="array">
-                                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/cart-items</item>
-                                                                <item name="displayArea" xsi:type="string">cartItems</item>
-                                                                <item name="sortOrder" xsi:type="string">0</item>
-                                                                <item name="config" xsi:type="array">
-                                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/cart-items</item>
-                                                                </item>
-                                                            </item>
-                                                            <item name="planSummary" xsi:type="array">
-                                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/view/subscription-plan-summary</item>
-                                                                <item name="displayArea" xsi:type="string">planSummary</item>
-                                                                <item name="sortOrder" xsi:type="string">10</item>
-                                                                <item name="config" xsi:type="array">
-                                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/subscription-plan-summary</item>
-                                                                </item>
-                                                            </item>
-                                                        </item>
-                                                    </item>
-                                                </item>
-                                            </item>
-                                            <item name="payment" xsi:type="array">
-                                                <item name="sortOrder" xsi:type="string">30</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">payment</item>
-                                                <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/payment</item>
-                                                </item>
-                                            </item>
-                                            <item name="thank_you" xsi:type="array">
-                                                <item name="sortOrder" xsi:type="string">40</item>
-                                                <item name="component" xsi:type="string">uiComponent</item>
-                                                <item name="displayArea" xsi:type="string">thank_you</item>
-                                                <item name="config" xsi:type="array">
-                                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps/thank-you</item>
-                                                </item>
+                                            <item name="insert_form" xsi:type="array">
+                                                <item name="displayArea" xsi:type="string">insert_form</item>
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
+                                                <item name="autoRender" xsi:type="boolean">false</item>
+                                                <item name="formSubmitType" xsi:type="string">ajax</item>
                                             </item>
                                         </item>
+                                    </item>
+                                    <item name="data_source" xsi:type="array">
+                                        <item name="displayArea" xsi:type="string">data_source</item>
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
                                     </item>
                                 </item>
                             </item>
@@ -189,5 +104,8 @@
                 </arguments>
             </block>
         </referenceContainer>
+        <referenceContainer name="page.messages" remove="true"/>
+        <referenceContainer name="authentication-popup" remove="true"/>
+        <move element="logo" destination="checkout.header.wrapper"/>
     </body>
 </page>

@@ -517,7 +517,9 @@ class Form extends AbstractDataProvider
                         Attribute::SUBSCRIPTION_TRIAL_PRICE,
                         0
                     );
-                    $formattedPrice = $this->formatPrice($this->convertPrice($trialPrice));
+                    $formattedPrice = $trialPrice
+                        ? $this->formatPrice($this->convertPrice($trialPrice))
+                        : __('Free');
                     $formattedTrialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
                     $trialPriceLabel = $formattedPrice . ' ' . __('for') . ' ';
                     if ($trialLength && $trialUnit) {

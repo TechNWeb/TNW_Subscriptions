@@ -1,3 +1,9 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <ul class="tnw-subscriptions-cart__progress-bar">
     <!-- ko foreach: { data: getSteps().sort(sortItems), as: 'item' } -->
     <li class="progress-bar_item" data-bind="css: item.isActive() ? '_active' : ($parent.isProcessed(item) ? '_complete' : '')">

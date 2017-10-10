@@ -10,9 +10,10 @@ define(
         'ko',
         'uiComponent',
         'TNW_Subscriptions/js/ui/model/step-navigator',
+        'uiRegistry',
         'jquery/jquery.hashchange'
     ],
-    function ($, _, ko, Component, stepNavigator) {
+    function ($, _, ko, Component, stepNavigator, registry) {
         'use strict';
 
         return Component.extend({
@@ -53,8 +54,12 @@ define(
              */
             navigateAccordingToUrl: function () {
                 var step = window.location.hash.substr(1);
-
                 if (step) {
+                    var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
+                    if (step === 'registration' && isLoggedIn) {
+                        step = 'address';
+                    }
+
                     $.each(this.steps, function () {
                         this.code === step ? this.isActive = true : this.isActive = false;
                     });

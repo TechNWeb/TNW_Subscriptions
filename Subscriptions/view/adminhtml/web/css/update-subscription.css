@@ -50,6 +50,9 @@
 .overview-content .subscription-message {
     font-size: 3rem;
 }
+.overview-content .block-subscription-message {
+    padding: 20px 0;
+}
 .overview-content .missed-payments {
     vertical-align: top;
 }
@@ -186,4 +189,9 @@
 }
 .float-left {
     float: left;
+}
+.additional-form-field-set .fieldset-wrapper-title .title,
+.additional-form-field-set .admin__fieldset-wrapper-title .title {
+    font-size: 2rem;
+    font-weight: 400;
 }

@@ -75,7 +75,8 @@ class Collection extends SearchResult
             'trial_start_date' => 'main_table.trial_start_date',
             'start_date' => 'main_table.start_date',
             'next_billing_cycle_date' => 'relation.scheduled_at',
-            'grand_total' => 'quotes.grand_total'
+            'grand_total' => 'quotes.grand_total',
+            'created_at' => 'main_table.created_at'
         ];
         $this->getSelect()->join(
             ['frequency' => BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE],

@@ -26,12 +26,12 @@
     <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
             <div class="title-container">
-                <div class="tab-title" data-role="collapsible" tabindex="0">
+                <div class="tab-title" id="subscribe-tab-head" data-role="collapsible" tabindex="0">
                     <a href="#subscribe-tab">
                         <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
                     </a>
                 </div>
-                <div class="tab-title" data-role="collapsible" tabindex="1">
+                <div class="tab-title" id="addtocart-tab-head" data-role="collapsible" tabindex="1">
                     <a href="#addtocart-tab">
                         <?php /* @escapeNotVerified */ echo __('One Time Purchase') ?>
                     </a>

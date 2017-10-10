@@ -556,15 +556,15 @@ class Manager
         $profile = $this->getProfile();
         if ($profile->getNeedRecollect()) {
             $messages[] = [
-                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
-                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
-            ];
-            $messages[] = [
                 'index' => 'index = subscription_details_message',
                 'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
             ];
         }
         if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
             $messages[] = [
                 'index' => 'index = profit_message',
                 'message' => $profile->getProductChangesMadeMessageForProfit()

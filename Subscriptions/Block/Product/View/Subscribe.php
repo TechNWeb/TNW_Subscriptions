@@ -127,7 +127,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function isSubscribeAvailable()
     {
-        return $this->config->isSubscriptionsActiveCurrent();
+        return $this->config->isSubscriptionsActiveCurrent() && count($this->getProductBillingFrequencies());
     }
 
     /**

@@ -51,7 +51,7 @@
         <section id="tnw_subscriptions_profile_options" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
                  showInStore="0">
             <class>separator-top</class>
-            <label>Profile Options</label>
+            <label>Subscription Profiles</label>
             <tab>tnw_subscriptions</tab>
 
             <resource>TNW_Subscriptions::config_profile_options</resource>
@@ -81,7 +81,7 @@
 
         <section id="tnw_subscriptions_product" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1"
                  showInStore="0">
-            <label>Product</label>
+            <label>Products</label>
             <tab>tnw_subscriptions</tab>
 
             <resource>TNW_Subscriptions::config_product</resource>
@@ -189,6 +189,7 @@
                 <field id="until_canceled" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
                     <label>Until Canceled</label>
+                    <comment>Customers will be able to create an infinite subscription, those subscription profile will run until cancelled.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
@@ -209,6 +210,30 @@
                     please <a href="https://powersync.biz/contacts" target="_blank">contact us.</a>]]>
                 </comment>
                 <frontend_model>TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods</frontend_model>
+            </group>
+        </section>
+        <section id="tnw_subscriptions_customer" translate="label" type="text" sortOrder="60"
+                 showInDefault="1" showInWebsite="1">
+            <label>Customer Settings</label>
+            <tab>tnw_subscriptions</tab>
+            <resource>TNW_Subscriptions::config_customer</resource>
+            <group id="profile_actions" translate="label" type="text" sortOrder="20" showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="0">
+                <label>Subscription Profile Settings</label>
+                <comment>Available customer actions with subscription profile.</comment>
+                <field id="can_hold" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Can Place On Hold</label>
+                    <comment>Customer can place their subscription profiles on hold without merchants assistance.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="can_cancel" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Can Cancel</label>
+                    <comment>Customer can cancel their subscription profile at any point without merchants assistance.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>

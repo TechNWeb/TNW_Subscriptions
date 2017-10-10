@@ -1,31 +1,11 @@
-<div class="block-step">
-    <!-- ko if: getActiveIndex() == productsStepIndex -->
-        <!-- ko foreach: getRegion('products') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-    <!--/ko-->
-
-    <!-- ko if: getActiveIndex() == registrationStepIndex -->
-        <!-- ko foreach: getRegion('registration') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-    <!--/ko-->
-
-    <!-- ko if: getActiveIndex() == addressStepIndex-->
-        <!-- ko foreach: getRegion('address') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-    <!--/ko-->
-
-    <!-- ko if: getActiveIndex() == paymentStepIndex -->
-        <!-- ko foreach: getRegion('payment') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-    <!--/ko-->
-
-    <!-- ko if: getActiveIndex() == thankYouStepIndex -->
-        <!-- ko foreach: getRegion('thank_you') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-    <!--/ko-->
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div data-bind="blockLoader: isLoading()">
+    <each args="data: elems, as: 'element'">
+        <render if="hasTemplate()"/>
+    </each>
 </div>

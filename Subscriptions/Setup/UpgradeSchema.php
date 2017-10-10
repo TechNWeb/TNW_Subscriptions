@@ -13,6 +13,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\CustomerQuote;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -820,6 +821,16 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Generate quotes state'
                 ]
             );
+        }
+
+
+        if (version_compare($context->getVersion(), "2.0.22", "<")) {
+            $this->addCustomerQuote($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.23", "<")) {
+            //TODO add this column to addSubscriptionProfileMessageHistoryTable()
+            $this->addCustomerToMessageHistory($setup);
         }
 
         if (version_compare($context->getVersion(), '2.0.25', '<')) {
@@ -2081,6 +2092,88 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'comment'   => 'Product sku',
                 'length'    => 11,
                 'after'     => ProductSubscriptionProfileInterface::SKU
+            ]
+        );
+    }
+
+
+    /**
+     * Create table 'tnw_subscriptions_customer_quote'.
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addCustomerQuote(SchemaSetupInterface $setup)
+    {
+        if (!$setup->tableExists($setup->getTable(CustomerQuote::CUSTOMER_QUOTE_TABLE))) {
+            $table = $setup->getConnection()
+                ->newTable($setup->getTable(CustomerQuote::CUSTOMER_QUOTE_TABLE))
+                ->addColumn(
+                    CustomerQuote::ID,
+                    Table::TYPE_INTEGER,
+                    null,
+                    [
+                        'identity' => true,
+                        'unsigned' => true,
+                        'primary' => true,
+                        'nullable' => false
+                    ]
+                )->addColumn(
+                    CustomerQuote::CUSTOMER_ID,
+                    Table::TYPE_INTEGER,
+                    null,
+                    [
+                        'unsigned' => true,
+                        'nullable' => false
+                    ]
+                )->addColumn(
+                    CustomerQuote::QUOTE_ID,
+                    Table::TYPE_INTEGER,
+                    null,
+                    [
+                        'unsigned' => true,
+                        'nullable' => false
+                    ]
+                )->addForeignKey(
+                    $setup->getConnection()->getForeignKeyName(
+                        $setup->getTable(CustomerQuote::CUSTOMER_QUOTE_TABLE),
+                        CustomerQuote::QUOTE_ID,
+                        $setup->getTable('quote'),
+                        'entity_id'
+                    ),
+                    CustomerQuote::QUOTE_ID,
+                    $setup->getTable('quote'),
+                    'entity_id',
+                    AdapterInterface::FK_ACTION_CASCADE
+                )->addForeignKey(
+                    $setup->getConnection()->getForeignKeyName(
+                        $setup->getTable(CustomerQuote::CUSTOMER_QUOTE_TABLE),
+                        CustomerQuote::CUSTOMER_ID,
+                        $setup->getTable('customer_entity'),
+                        'entity_id'
+                    ),
+                    CustomerQuote::CUSTOMER_ID,
+                    $setup->getTable('customer_entity'),
+                    'entity_id',
+                    AdapterInterface::FK_ACTION_CASCADE
+                );
+
+            $setup->getConnection()->createTable($table);
+        }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addCustomerToMessageHistory(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->addColumn(
+            $setup->getTable('tnw_subscriptions_subscription_profile_message_history'),
+            'customer_id',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Customer id whose message it is'
             ]
         );
     }

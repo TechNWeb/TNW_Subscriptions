@@ -16,15 +16,19 @@
                 <td class="label"><?php echo __("Current Value") ?></td>
                 <td><span class="price"><?php echo $block->getCurrentValue() ?></span></td>
             </tr>
+            <?php if (!$block->getHideValue()):?>
             <tr class="col-1">
                 <td class="label"><?php echo __($block->getValueType()) . '*' ?></td>
                 <td><span class="price"><?php echo $block->getValue() ?></span></td>
             </tr>
+            <?php endif ?>
             </tbody>
         </table>
+        <?php if (!$block->getHideValue()):?>
         <div class="admin__fieldset">
             <span class="admin__field-note"><?php echo __('* Estimated amount and it may change as the subscription goes through its lifecycle') ?></span>
         </div>
+        <?php endif ?>
     </div>
 </div>
 

@@ -6,10 +6,12 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+use Magento\Framework\Api\CustomAttributesDataInterface;
+
 /**
  * Interface SubscriptionProfileInterface
  */
-interface SubscriptionProfileInterface
+interface SubscriptionProfileInterface extends CustomAttributesDataInterface
 {
     /**#@+
      * Constants for field names
