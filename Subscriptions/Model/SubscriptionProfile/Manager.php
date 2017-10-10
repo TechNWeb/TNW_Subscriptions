@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -121,6 +122,16 @@ class Manager
     private $shippingMethods;
 
     /**
+     * @var MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -134,6 +145,8 @@ class Manager
      * @param CartRepositoryInterface $quoteRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ShippingMethods $shippingMethods
+     * @param MessageHistoryLogger $historyLogger
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         EnginePool $enginePool,
@@ -147,7 +160,9 @@ class Manager
         RequestInterface $request,
         CartRepositoryInterface $quoteRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ShippingMethods $shippingMethods
+        ShippingMethods $shippingMethods,
+        MessageHistoryLogger $historyLogger,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -161,6 +176,8 @@ class Manager
         $this->quoteRepository = $quoteRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->shippingMethods = $shippingMethods;
+        $this->historyLogger = $historyLogger;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -366,10 +383,57 @@ class Manager
     {
         $engine = $this->getEngineFromRequestData($requestData);
         if ($engine) {
+            $additionalInfoOld = $this->getProfile()->getPaymentAdditionalInfo();
+            $oldEngine = $this->getProfile()->getEngineCode();
             $this->getProfile()->setEngineCode($engine);
             $this->getEngine()->processProfileByRequestData($requestData);
+            $additionalInfo = $this->getProfile()->getPaymentAdditionalInfo();
+
+            if (strcasecmp($oldEngine, $engine) !== 0) {
+                $message = __('Payment method changed from %1 to %2',
+                    $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
+                    $this->scopeConfig->getValue("payment/{$engine}/title"));
+
+                $this->historyLogger->log($message, $this->getProfile()->getId());
+            } else {
+                $ccNumber = $this->propertyAdditionalInfo($additionalInfo, 'cc_last_4');
+                $ccNumberOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_last_4');
+                if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
+                    $message = __('Payment method changed. Card number changed from %1 to %2',
+                        sprintf('XXXX%s', $ccNumberOld),
+                        sprintf('XXXX%s', $ccNumber));
+
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+
+                $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
+                $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
+                if (strcasecmp($ccExpOld, $ccExp) !== 0) {
+                    $message = __('Payment method changed. Expiration date changed from %1 to %2', $ccExp, $ccExpOld);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+            }
         }
         return $this;
+    }
+
+    /**
+     * @param $additionalInfo
+     * @param $property
+     * @return mixed|null
+     */
+    private function propertyAdditionalInfo($additionalInfo, $property)
+    {
+        if (empty($additionalInfo)) {
+            return null;
+        }
+
+        $additionalInfo = (array)json_decode($additionalInfo);
+        if (empty($additionalInfo[$property])) {
+            return null;
+        }
+
+        return $additionalInfo[$property];
     }
 
     /**
@@ -393,7 +457,14 @@ class Manager
                     }
                 }
             }
+
+            $oldShippingDescription = $this->getProfile()->getShippingDescription();
             $this->getProfile()->setShippingDescription($shippingDescription);
+
+            if(strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
+                $message = __('Shipping method changed from %1 to %2', $oldShippingDescription, $shippingDescription);
+                $this->historyLogger->log($message, $this->getProfile()->getId());
+            }
         }
         return $this;
     }

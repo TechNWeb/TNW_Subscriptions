@@ -15,6 +15,7 @@ use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Framework\Api\DataObjectHelper;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class Manager
@@ -64,6 +65,11 @@ class Manager
     private $addressMapper;
 
     /**
+     * @var MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
      * Manager constructor.
      * @param DataObjectHelper $dataObjectHelper
      * @param CustomerRepositoryInterface $customerRepository
@@ -71,6 +77,7 @@ class Manager
      * @param FormFactory $customerForm
      * @param ProfileManager $profileManager
      * @param AddressMapper $addressMapper
+     * @param MessageHistoryLogger $historyLogger
      */
     public function __construct(
         DataObjectHelper $dataObjectHelper,
@@ -78,7 +85,8 @@ class Manager
         AddressInterfaceFactory $addressDataFactory,
         FormFactory $customerForm,
         ProfileManager $profileManager,
-        AddressMapper $addressMapper
+        AddressMapper $addressMapper,
+        MessageHistoryLogger $historyLogger
     ) {
         $this->dataObjectHelper = $dataObjectHelper;
         $this->customerRepository = $customerRepository;
@@ -86,6 +94,7 @@ class Manager
         $this->customerForm = $customerForm;
         $this->profileManager = $profileManager;
         $this->addressMapper = $addressMapper;
+        $this->historyLogger = $historyLogger;
     }
 
     /**
@@ -177,6 +186,13 @@ class Manager
             $profileAddress->setCustomerAddressId((string)$customerAddressId);
             if ($profileAddress->hasDataChanges()) {
                 $this->profileManager->getProfile()->setNeedRecollect('1');
+
+                if (null !== $this->profileManager->getProfile()->getId()) {
+                    $message = $type === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING
+                        ? __('Shipping Address updated.') : __('Billing Address updated.');
+
+                    $this->historyLogger->log($message, $this->profileManager->getProfile()->getId());
+                }
             }
             $profileAddress->setDataChanges($addressDataChanges || $profileAddress->hasDataChanges());
         }
