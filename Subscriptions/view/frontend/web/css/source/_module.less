@@ -462,7 +462,7 @@
   }
 }
 
-.subscription-data-history-wrapper {
+.subscription-data-wrapper {
   margin-top: -1px;
   padding: 25px;
   border: 1px solid #cccccc;
@@ -518,8 +518,48 @@
   margin: 25px 0 0 0;
 }
 
-@media (min-width: 768px) {
-  .mess-history-wrapper {
+.overview-content {
+  width: 100%;
 
+  &:after {
+    content: '';
+    clear: both;
+    display: block;
+  }
+}
+
+.next-payment {
+  width: 30%;
+  height: 100%;
+  float: left;
+}
+.status-message {
+  float: left;
+  //width: 67%;
+}
+
+.subscription-ship-info, .subscription-bill-info {
+  float: left;
+  width: 50%;
+}
+
+.subscription-ship-details, .subscription-payment-details {
+  float: right;
+  width: 50%;
+
+  &:after {
+    content: '';
+    clear: both;
+    display: block;
+  }
+}
+
+.subscription-products {
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .summary-item {
+    width: 100%;
   }
 }
