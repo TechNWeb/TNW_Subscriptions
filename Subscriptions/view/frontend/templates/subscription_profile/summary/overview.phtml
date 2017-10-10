@@ -5,10 +5,10 @@
             <div class="summary-item next-payment"><?php echo $block->getNextPaymentHtml() ?></div>
         <?php endif ?>
         <div class="summary-item status-message">
-            <div class="subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>">
+            <div class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>">
                 <?php echo $block->getMessageHtml() ?>
             </div>
-            <div class="subscription-status <?php echo $block->getBlockStatus()->getStatusClass() ?>">
+            <div class="bordered subscription-status <?php echo $block->getBlockStatus()->getStatusClass() ?>">
                 <?php echo $block->getStatusHtml() ?>
             </div>
         </div>
