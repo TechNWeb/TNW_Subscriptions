@@ -809,3 +809,7 @@ button.action-editor.active:before{
     padding-right: 2%;
     padding-top: 0.5%;
 }
+
+.tnw_subscriptionprofile_cancel_button_popup .admin__fieldset-wrapper-content .admin__fieldset {
+    padding-bottom: 0;
+}

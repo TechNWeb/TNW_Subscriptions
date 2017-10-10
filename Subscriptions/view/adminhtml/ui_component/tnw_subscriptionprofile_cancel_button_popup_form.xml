@@ -25,10 +25,11 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="general">
+    <fieldset name="general" class="TNW\Subscriptions\Ui\Component\Fieldset\SubscriptionCancelButtonPopup">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" translate="true" xsi:type="string">Are you sure you want to cancel Subscription ?</item>
+                <item name="label" translate="true" xsi:type="string">Are you sure you want to cancel Subscription</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/element/cancel-popup-label</item>
             </item>
         </argument>
         <field name="cancel_button_popup_title">

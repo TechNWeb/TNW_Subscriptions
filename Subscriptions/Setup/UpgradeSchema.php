@@ -832,6 +832,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerToMessageHistory($setup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.24", "<")) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
+                [
+                    'type' => Table::TYPE_SMALLINT,
+                    'nullable' => false,
+                    'comment' => 'Need Recollect',
+                    'length' => 1,
+                    'default' => '0'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

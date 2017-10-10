@@ -46,10 +46,8 @@ define([
                     },
                 type: "POST",
                 dataType: 'json'
-            }).done(function (data) {
-                if (data.result == true) {
-                    location.reload();
-                }
+            }).done(function () {
+                location.reload();
             });
         }
     });

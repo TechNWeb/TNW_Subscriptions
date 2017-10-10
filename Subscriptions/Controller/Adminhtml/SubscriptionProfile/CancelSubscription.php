@@ -10,7 +10,8 @@ use Magento\Backend\App\Action;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
-use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
  * Reassign subscription to customer.
@@ -32,25 +33,27 @@ class CancelSubscription extends Action
     private $dataPersistor;
 
     /**
-     * @var CreateProfile
+     * Model for update status.
+     *
+     * @var UpdateStatusModel
      */
-    private $createSubscriptionProfile;
+    private $updateStatusModel;
 
     /**
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
      * @param DataPersistorInterface $dataPersistor
-     * @param CreateProfile $createSubscriptionProfile
+     * @param UpdateStatusModel $updateStatusModel
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
         DataPersistorInterface $dataPersistor,
-        CreateProfile $createSubscriptionProfile
+        UpdateStatusModel $updateStatusModel
     ) {
         $this->resultJsonFactory = $jsonFactory;
         $this->dataPersistor = $dataPersistor;
-        $this->createSubscriptionProfile = $createSubscriptionProfile;
+        $this->updateStatusModel = $updateStatusModel;
 
         parent::__construct($context);
     }
@@ -64,10 +67,14 @@ class CancelSubscription extends Action
         $response->setData('result', false);
 
         $value = $this->getRequest()->getParam('value');
+        $subscriptionId = $this->dataPersistor->get('subscription_id');
+
         try {
             if ($value == 'next') {
+                $this->updateStatusModel->updateStatusBeforeNextBillingCycle($subscriptionId);
                 $response->setData('result', true);
             } elseif ($value == 'now') {
+                $this->updateStatusModel->updateStatus($subscriptionId, ProfileStatus::STATUS_CANCELED);
                 $response->setData('result', true);
             }
         } catch (\Exception $e) {
