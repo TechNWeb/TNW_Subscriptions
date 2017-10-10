@@ -97,10 +97,10 @@ class ViewAction extends Column
      * @param array $item
      * @return bool
      */
-    private function isNeedShowActions($item)
+    private function isNeedShowActions(array $item)
     {
         $needToShow = false;
-        $scheduledAt = $item['scheduled_at'];
+        $scheduledAt = $this->timezone->date($item['scheduled_at'])->format('Y-m-d H:i:s');
         $dateTime = new DateTime();
         $dateNow = $dateTime->strToTime($this->timezone->date()->format('Y-m-d H:i:s'));
 
