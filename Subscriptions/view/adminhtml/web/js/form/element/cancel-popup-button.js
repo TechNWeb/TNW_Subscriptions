@@ -17,12 +17,12 @@ define([
          * @inheritdoc
          */
         action: function () {
-            var options = uiRegistry.get('index=cancel_button_popup_options');
-            var valid = options.validate();
+            var options = uiRegistry.get('index=cancel_button_popup_options'),
+            valid = options.validate(),
+            url;
 
             if (valid.valid) {
-                var url = typeof this.imports.url == "undefined"
-                    ? '' : this.imports.url;
+                url = typeof this.imports.url == "undefined" ? '' : this.imports.url;
 
                 if (url) {
                     this.sendAjax(url, options.value());

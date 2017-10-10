@@ -119,6 +119,8 @@ class UpdateStatus
     }
 
     /**
+     * Set cancel_before_next_cycle to 1 for subscription profile.
+     *
      * @param int $profileId
      */
     public function updateStatusBeforeNextBillingCycle($profileId)
@@ -129,5 +131,9 @@ class UpdateStatus
         $model->setData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE, 1);
 
         $this->profileRepository->save($model);
+
+        $this->messageManager->addSuccessMessage(__(
+            'Status will be changed before next billing cycle.'
+        ));
     }
 }

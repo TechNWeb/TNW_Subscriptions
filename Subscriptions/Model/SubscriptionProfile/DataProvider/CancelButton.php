@@ -14,6 +14,9 @@ use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonPopup;
 
+/**
+ * Cancel button data provider.
+ */
 class CancelButton extends AbstractDataProvider
 {
     const CANCEL_BUTTON_HANDLER = 'tnw_subscriptionprofile_cancel_button_popup';
