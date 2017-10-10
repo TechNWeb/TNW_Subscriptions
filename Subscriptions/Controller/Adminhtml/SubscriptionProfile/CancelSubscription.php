@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
- * Reassign subscription to customer.
+ * Cancel subscription.
  */
 class CancelSubscription extends Action
 {
