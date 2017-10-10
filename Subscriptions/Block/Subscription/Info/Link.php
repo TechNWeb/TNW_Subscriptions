@@ -40,7 +40,7 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
      */
     private function getSubscription()
     {
-        return $this->_registry->registry('current_subscription');
+        return $this->_registry->registry('tnw_subscription_profile');
     }
 
     /**

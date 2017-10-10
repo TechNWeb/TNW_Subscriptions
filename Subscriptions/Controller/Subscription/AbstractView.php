@@ -106,7 +106,7 @@ abstract class AbstractView extends Action\Action
             return false;
         }
 
-        $this->registry->register('current_subscription', $subscription);
+        $this->registry->register('tnw_subscription_profile', $subscription);
 
         return $subscription->getId();
     }
