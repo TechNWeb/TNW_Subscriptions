@@ -9,8 +9,7 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 use Magento\Framework\View\Element\Template;
 
 /**
- * Class Details
- * @package TNW\Subscriptions\Block\Subscription\Summary\Overview
+ * Class Payment Details
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
