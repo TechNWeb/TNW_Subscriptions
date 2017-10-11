@@ -11,13 +11,11 @@ use Magento\Customer\Model\Address\Config as AddressConfig;
 
 /**
  * Class Address
- * @package TNW\Subscriptions\Block\Subscription\Summary
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class Address extends Template
 {
-
     /**
      * @var AddressConfig
      */
@@ -28,6 +26,12 @@ class Address extends Template
      */
     private $addressType;
 
+    /**
+     * Address constructor.
+     * @param Template\Context $context
+     * @param AddressConfig $addressConfig
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         AddressConfig $addressConfig,
