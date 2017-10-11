@@ -206,6 +206,31 @@ class Manager
     }
 
     /**
+     * Retrieve Subscription profile ID by Order ID
+     *
+     * @param int $orderId
+     * @return int|false
+     */
+    public function getSubscriptionProfileIdByOrder($orderId)
+    {
+        $this->criteriaBuilder
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, $orderId)
+            ->setPageSize(1);
+
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder->create();
+        $results = $this->profileOrderRepository->getList($searchCriteria)->getItems();
+        
+        if (count($results)) {
+            /* @var SubscriptionProfileOrderInterface $item */
+            $item = $results[0];
+            return intval($item->getSubscriptionProfileId());
+        }
+        
+        return false;
+    }
+
+    /**
      * Retrieve status message.
      *
      * @param int|string $status

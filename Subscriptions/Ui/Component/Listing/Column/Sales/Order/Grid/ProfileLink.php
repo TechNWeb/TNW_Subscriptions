@@ -6,15 +6,40 @@
 
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Ui\Component\Listing\Columns\Column;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Api\UrlBuilderInterface;
 
 /**
  * Order id column modifier.
  */
 class ProfileLink extends Column
 {
+    /**
+     * @var UrlBuilderInterface
+     */
+    private $profileUrlBuilder;
+
+    /**
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param UrlBuilderInterface $profileUrlBuilder
+     * @param array $components
+     * @param array $data
+     */
+    public function __construct(
+        ContextInterface $context, 
+        UiComponentFactory $uiComponentFactory,
+        UrlBuilderInterface $profileUrlBuilder,
+        array $components, 
+        array $data
+    ) {
+        parent::__construct($context, $uiComponentFactory, $components, $data);
+        $this->profileUrlBuilder = $profileUrlBuilder;
+    }
+
     /**
      * Add link to subscriptions profile page.
      *
@@ -25,20 +50,10 @@ class ProfileLink extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-
-                if (isset($item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID])) {
-                    $url = $this->context->getUrl(
-                        'tnw_subscriptions/subscriptionprofile/edit/',
-                        ['entity_id' => $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]]
-                    );
-                    $gridLabel = SubscriptionProfileInterface::LABEL_PREFIX
-                        . $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID];
-                    $html = sprintf(
-                        "<a target=\"_blank\" href ='%s'\">%s</a>",
-                        $url,
-                        $gridLabel
-                    );
-                    $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID] = $html;
+                $profileId = $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID];
+                if ($profileId) {
+                    $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID] =
+                        $this->profileUrlBuilder->getEditHtmlLink($profileId, true);
                 }
             }
         }

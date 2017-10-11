@@ -97,6 +97,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
     <preference for="TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool" />
+    <preference for="TNW\Subscriptions\Api\UrlBuilderInterface"
+                type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -116,6 +118,11 @@
         <plugin name="subscriptions_product_initialization"
                 type="TNW\Subscriptions\Plugin\Product\Initialization"
                 sortOrder="50"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Info">
+        <plugin name="subscriptions_order_view"
+                type="TNW\Subscriptions\Plugin\Block\Order\Info"
                 disabled="false"/>
     </type>
 
