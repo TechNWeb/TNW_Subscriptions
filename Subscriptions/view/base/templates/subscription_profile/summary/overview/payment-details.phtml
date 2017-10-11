@@ -8,12 +8,26 @@
         <table class="table-secondary data-table">
             <tbody>
             <tr class="col-0">
-                <td class="label"><?php echo __("Shipping Method") ?></td>
-                <td class="right"><?php echo '' ?></td>
+                <td class="label"><?php echo __('Payment Type') ?></td>
+                <td class="right"><?php echo $block->getPaymentMethodTitle() ?></td>
             </tr>
-            <tr class="col-0">
-                <td class="label"><?php echo __("Shipping Method") ?></td>
-                <td class="right"><?php echo '' ?></td>
+            <?php if ($block->getPaymentAdditionalInfo()) :?>
+                <tr class="col-1">
+                    <td class="label"><?php echo __('Card Type') ?></td>
+                    <td class="right"><span class="text"><?php echo $block->getCreditCardTypeLabel() ?></span></td>
+                </tr>
+                <tr class="col-2">
+                    <td class="label"><?php echo __('Card Number') ?></td>
+                    <td class="right"><span class="text"><?php echo $block->getCreditCardNumber() ?></span></td>
+                </tr>
+                <tr class="col-3">
+                    <td class="label"><?php echo __('Exp. Date') ?></td>
+                    <td class="right"><span class="text"><?php echo $block->getCreditCardExpDate() ?></span></td>
+                </tr>
+            <?php endif; ?>
+            <tr class="col-4">
+                <td class="label"><?php echo __('Currency') ?></td>
+                <td class="right"><span class="text"><?php echo $block->getSubscriptionProfile()->getProfileCurrencyCode() ?></span></td>
             </tr>
             </tbody>
         </table>
