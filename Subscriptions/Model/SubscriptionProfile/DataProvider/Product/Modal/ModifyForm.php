@@ -602,7 +602,6 @@ class ModifyForm extends Form
      */
     protected function getRemoveButton()
     {
-        $buttonVisibility = isset($this->currentProduct) ? '' : '!';
         return [
             'arguments' => [
                 'data' => [
@@ -620,7 +619,6 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'visible' => $buttonVisibility . $this->currentFormName . ':previewMode',
                             'isRemoveButtonVisible' => $this->currentFormName . ':previewMode',
                         ],
                         'buttonVisibility' => $this->getRemoveButtonVisibility(),

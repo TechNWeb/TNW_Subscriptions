@@ -58,7 +58,7 @@ class MassDelete
         try {
             // call the core observed function
             $returnValue = $proceed();
-        } catch (CouldNotDeleteException $e) {
+        } catch (\Exception $e) {
             $this->manager->addErrorMessage($e->getMessage());
             $returnValue = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('catalog/*/index');
         }
