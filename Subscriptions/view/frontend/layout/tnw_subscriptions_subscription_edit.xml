@@ -19,7 +19,7 @@
                         <argument name="type" xsi:type="string">shipping</argument>
                     </action>
                 </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Shipment\Details"
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details"
                        name="subscription.info.view.shipping.details"
                        template="TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml"
                        as="shipping-details" />
