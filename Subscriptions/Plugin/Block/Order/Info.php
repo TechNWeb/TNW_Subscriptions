@@ -6,9 +6,8 @@
 
 namespace TNW\Subscriptions\Plugin\Block\Order;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\UrlBuilderInterface as UrlBuilderInterface;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as SubscriptionProfileOrderResource;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 
 /**
  * Plugin for \Magento\Sales\Block\Adminhtml\Order\View\Info
@@ -21,19 +20,20 @@ class Info
     private $profileUrlBuilder;
 
     /**
-     * @var SubscriptionProfileOrderResource
+     * @var Manager
      */
-    private $subscriptionProfileOrderResource;
+    private $manager;
 
     /**
      * @param UrlBuilderInterface $profileUrlBuilder
+     * @param Manager $manager
      */
     public function __construct(
         UrlBuilderInterface $profileUrlBuilder,
-        SubscriptionProfileOrderResource $subscriptionProfileOrderResource
+        Manager $manager
     ) {
         $this->profileUrlBuilder = $profileUrlBuilder;
-        $this->subscriptionProfileOrderResource = $subscriptionProfileOrderResource;
+        $this->manager = $manager;
     }
 
     /**
@@ -49,7 +49,7 @@ class Info
     ) {
         $orderId = $block->getOrder()->getId();
         if ($orderId) {
-            $profile_id = $this->subscriptionProfileOrderResource->getSubscriptionProfileIdByOrder($orderId);
+            $profile_id = $this->manager->getSubscriptionProfileIdByOrder($orderId);
             if ($profile_id) {
                 $result[] = [
                     'label' => __('Subscription Profile'),

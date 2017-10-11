@@ -40,7 +40,7 @@ class UrlBuilder implements UrlBuilderInterface
     /**
      * Get subscription edit URL
      * 
-     * @param $id
+     * @param int $id
      * @return string
      */
     public function getEditUrl($id)
@@ -51,7 +51,7 @@ class UrlBuilder implements UrlBuilderInterface
     /**
      * Get subscription edit URL link
      * 
-     * @param $id
+     * @param int $id
      * @param bool $targetBlank
      * @return string
      */
