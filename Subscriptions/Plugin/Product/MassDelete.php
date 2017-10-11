@@ -9,8 +9,8 @@ namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Catalog\Controller\Adminhtml\Product\MassDelete as ControllerMassDelete;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Message\Manager;
+use Magento\Framework\Exception\CouldNotDeleteException;
 
 /**
  * Plugin for mass delete product
@@ -28,22 +28,22 @@ class MassDelete
     private $resultFactory;
 
     /**
-     * Object manager
      *
-     * @var ObjectManager
+     *
+     * @var Manager
      */
-    private $objectManager;
+    private $manager;
 
     /**
      * @param ResultFactory $resultFactory
-     * @param ObjectManager $objectManager
+     * @param Manager $messageManager
      */
     public function __construct(
         ResultFactory $resultFactory,
-        ObjectManager $objectManager
+        Manager $messageManager
     ) {
         $this->resultFactory = $resultFactory;
-        $this->objectManager = $objectManager;
+        $this->manager = $messageManager;
     }
 
     /**
@@ -58,9 +58,8 @@ class MassDelete
         try {
             // call the core observed function
             $returnValue = $proceed();
-        } catch (\Exception $e) {
-            $messageManager = $this->objectManager->getInstance()->get(Manager::class);
-            $messageManager->addErrorMessage($e->getMessage());
+        } catch (CouldNotDeleteException $e) {
+            $this->manager->addErrorMessage($e->getMessage());
             $returnValue = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('catalog/*/index');
         }
 

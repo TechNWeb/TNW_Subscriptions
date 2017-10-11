@@ -53,7 +53,7 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
                     ProductSubscriptionProfileInterface::SUBSCRIPTION_PROFILE_ID,
                     ProductSubscriptionProfileInterface::ID
                 ),
-                ['profile.status' => 'profile_status']
+                ['profile_status' => 'profile.status']
             );
             $select->where(
                 sprintf(

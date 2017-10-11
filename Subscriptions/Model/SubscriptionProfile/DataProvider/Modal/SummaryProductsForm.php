@@ -73,11 +73,6 @@ class SummaryProductsForm extends ModifyForm
     private $currentProduct;
 
     /**
-     * @var BillingFrequencyRepository
-     */
-    protected $frequencyRepository;
-
-    /**
      * SummaryProductsForm constructor.
      *
      * @param string $name
@@ -122,7 +117,6 @@ class SummaryProductsForm extends ModifyForm
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        $this->frequencyRepository = $frequencyRepository;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
             $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
             $currencyFactory, $context, $imageHelper, $scope, $meta, $data);
