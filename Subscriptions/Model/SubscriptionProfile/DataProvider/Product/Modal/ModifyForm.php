@@ -620,12 +620,24 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'visible' => $buttonVisibility . $this->currentFormName . ':previewMode'
-                        ]
+                            'visible' => $buttonVisibility . $this->currentFormName . ':previewMode',
+                            'isRemoveButtonVisible' => $this->currentFormName . ':previewMode',
+                        ],
+                        'buttonVisibility' => $this->getRemoveButtonVisibility(),
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * Returns 'Remove' button visibility in subscription product list.
+     *
+     * @return bool
+     */
+    protected function getRemoveButtonVisibility()
+    {
+        return true;
     }
 
     /**
@@ -934,7 +946,7 @@ class ModifyForm extends Form
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-advanced qty-edit-button',
+                        'additionalClasses' => 'action-advanced qty-edit-button action-additional',
                         'additionalForGroup' => true,
                         'displayAsLink' => true,
                         'title' => '[' . __('Modify') . ']',

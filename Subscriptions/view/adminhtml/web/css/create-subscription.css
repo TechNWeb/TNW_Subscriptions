@@ -615,6 +615,10 @@ button.action-editor.active:before{
   width: 3rem !important;
 }
 
+.subscription-item-form .description-fieldset .admin__field-label span{
+  white-space: nowrap;
+}
+
 .subscription-item-form .description-fieldset .field-name{
   font-size: 2.6rem;
   margin-bottom: 0;

@@ -151,6 +151,7 @@ class SummaryProductsForm extends ModifyForm
                     'price' => $itemPrice,
                     'billing_frequency' => $billingFrequencyLabel,
                     'term' => (string)$term,
+                    'period' => $subQuote->getTotalBillingCycles(),
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
                     'description' => $isProductDeleted ? __('Product deleted')
@@ -251,6 +252,7 @@ class SummaryProductsForm extends ModifyForm
                 'edit_button' => $this->getEditButton(),
                 'billing_frequency' => $this->getBillingFrequencyDefinition(),
                 'term' => $this->getTermDefinition(),
+                'period' => $this->getPeriodDefenition(),
                 'start_on' => $this->getStartOnDefinition(),
                 'price' => $this->getPriceDefinition(),
             ]
@@ -280,6 +282,47 @@ class SummaryProductsForm extends ModifyForm
                         'additionalClasses' => 'admin__field-wide',
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'showPreview' => $this->getCurrentFormName() . ':previewMode'
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Returns period field definition.
+     *
+     * @return array
+     */
+    protected function getPeriodDefenition()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => false,
+                        'additionalClasses' => 'field-wide sub-period-input',
+                        'dataType' => 'string',
+                        'dataScope' => 'period',
+                        'formElement' => UiForm\Element\Input::NAME,
+                        'componentType' => UiForm\Element\Input::NAME,
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/period-input',
+                        'first_phrase' => __('& bill'),
+                        'last_phrase' => __('times'),
+                        'validation' => [
+                            'validate-greater-than-zero' => true,
+                            'required-entry' => true
+                        ],
+                        'imports' => [
+                            'visible' => '!' . $this->getCurrentFormName() . '.edit_fieldset.term' . ':checked',
+                        ],
+                        'exports' => [
+                            'completePreviewLabel' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':periodPreviewLabel'
+                        ],
+                        'previewLabelVisible' => false,
+                        'previewLabel' => __('Bill %s times'),
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'showPreview' => $this->getCurrentFormName() . ':previewMode'
                     ]
@@ -478,5 +521,26 @@ class SummaryProductsForm extends ModifyForm
     private function getCurrentProfile()
     {
         return $this->profileManager->loadProfileFromRequest('subscription_profile_id');
+    }
+
+    /**
+     * Returns 'Remove' button visibility on subscription products list.
+     * Depends on products qty in subscription.
+     * Qty == 1 => button isn't shown.
+     * Qty > 1 => button is shown.
+     *
+     * @return bool
+     */
+    protected function getRemoveButtonVisibility()
+    {
+        $result = false;
+        /** @var \TNW\Subscriptions\Model\SubscriptionProfile $currentProfile */
+        $currentProfile = $this->getCurrentProfile();
+
+        if ($currentProfile && count($currentProfile->getProfileProducts()) > 1) {
+            $result = true;
+        }
+
+        return $result;
     }
 }

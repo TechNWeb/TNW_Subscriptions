@@ -10,7 +10,7 @@
     <update handle="tnw_subscriptions_subscription_info_links"/>
     <body>
         <referenceContainer name="content">
-            <block class="TNW\Subscriptions\Block\Subscription\Info\View" name="subscription.info.view" after="subscription.info.links"/>
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview" name="subscription.info.view" after="subscription.info.links"/>
         </referenceContainer>
     </body>
 </page>

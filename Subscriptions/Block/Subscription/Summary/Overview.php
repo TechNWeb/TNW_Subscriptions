@@ -4,14 +4,14 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
+namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Backend\Block\Template;
 use Magento\Quote\Model\Quote;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Message;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\MissedPayments;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\NextPayment;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Status;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\MissedPayments;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\Status;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -26,7 +26,7 @@ class Overview extends Template
     /**
      * @inheritdoc
      */
-    protected $_template = 'TNW_Subscriptions::subscription_profile/dashboard/overview.phtml';
+    protected $_template = 'TNW_Subscriptions::subscription_profile/summary/overview.phtml';
 
     /**
      * Registry model
@@ -284,5 +284,35 @@ class Overview extends Template
     public function getCanShowNextPayment()
     {
         return $this->getSubscriptionProfile()->getStatus() != ProfileStatus::STATUS_COMPLETE;
+    }
+
+    public function getShippingInfoHtml()
+    {
+        return 'shipping information';
+    }
+
+    public function getShippingDetailsHtml()
+    {
+        return 'shiiping details';
+    }
+
+    public function getBillingInfoHtml()
+    {
+        return 'billing information';
+    }
+
+    public function getPaymentDetailsHtml()
+    {
+        return 'payment details';
+    }
+
+    public function getProductsHtml()
+    {
+        return 'products grid';
+    }
+
+    public function getDangerZoneHtml()
+    {
+        return 'DangerZone block';
     }
 }

@@ -103,7 +103,7 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
      */
     private function getSubscription()
     {
-        return $this->registry->registry('current_subscription');
+        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**
