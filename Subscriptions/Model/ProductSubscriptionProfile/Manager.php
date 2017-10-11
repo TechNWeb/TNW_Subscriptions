@@ -240,22 +240,26 @@ class Manager
                         }
                         if ($product->hasDataChanges()) {
                             $product->setNeedRecollect('1');
-
-                            $message[] = __('Updated product %1.', $product->getMagentoProduct()->getName());
-                            if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::PRICE)) {
-                                $message[] = __('Price changed from %1 to %2.',
-                                    $product->getOrigData(ProductSubscriptionProfileInterface::PRICE),
-                                    $product->getData(ProductSubscriptionProfileInterface::PRICE));
-                            }
-
-                            if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::QTY)) {
-                                $message[] = __('Qty changed from %1 to %2.',
-                                    $product->getOrigData(ProductSubscriptionProfileInterface::QTY),
-                                    $product->getData(ProductSubscriptionProfileInterface::QTY));
-                            }
-
-                            $this->historyLogger->log(implode(' ', $message), $profileModel->getId());
                         }
+
+                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::PRICE)) {
+                            $message = __('Updated product %1. Price changed from %2 to %3.',
+                                $product->getMagentoProduct()->getName(),
+                                $product->getOrigData(ProductSubscriptionProfileInterface::PRICE),
+                                $product->getData(ProductSubscriptionProfileInterface::PRICE));
+
+                            $this->historyLogger->log($message, $profileModel->getId());
+                        }
+
+                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::QTY)) {
+                            $message = __('Updated product %1. Qty changed from %2 to %3.',
+                                $product->getMagentoProduct()->getName(),
+                                $product->getOrigData(ProductSubscriptionProfileInterface::QTY),
+                                $product->getData(ProductSubscriptionProfileInterface::QTY));
+
+                            $this->historyLogger->log($message, $profileModel->getId());
+                        }
+
                         $product->setDataChanges($productDataChanges || $product->hasDataChanges());
                     }
                 }
