@@ -1,12 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: serhii
- * Date: 10.10.17
- * Time: 17:52
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Api;
 
+namespace TNW\Subscriptions\Api;
 
 /**
  * Class to retrieve subscription url
