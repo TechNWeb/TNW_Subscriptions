@@ -9,8 +9,7 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Shipping;
 use Magento\Framework\View\Element\Template;
 
 /**
- * Class Shipment
- * @package TNW\Subscriptions\Block\Subscription\Summary\Overview
+ * Class Shipment Details
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
