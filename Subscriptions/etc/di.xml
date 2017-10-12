@@ -301,6 +301,11 @@
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 
     <type name="Magento\Quote\Model\Quote\Item">
         <plugin name="tnw_subs_quote_item_save"
