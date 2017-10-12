@@ -8,9 +8,6 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review;
 
 use Magento\Backend\Block\Template;
 use Magento\Customer\Model\Address\Config;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
@@ -55,18 +52,12 @@ class Address extends Template
     private $profileRepository;
 
     /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
      * Address constructor.
      *
      * @param Template\Context $context
      * @param CreateProfile $create
      * @param Config $addressConfig
      * @param SubscriptionProfileRepositoryInterface $profileRepository
-     * @param RequestInterface $request
      * @param string $addressType
      * @param $profileState
      * @param array $data
@@ -77,7 +68,6 @@ class Address extends Template
         CreateProfile $create,
         Config $addressConfig,
         SubscriptionProfileRepositoryInterface $profileRepository,
-        RequestInterface $request,
         $addressType = QuoteAddress::ADDRESS_TYPE_SHIPPING,
         $profileState,
         array $data = []
@@ -88,7 +78,6 @@ class Address extends Template
         $this->addressConfig = $addressConfig;
         $this->profileState = $profileState;
         $this->profileRepository = $profileRepository;
-        $this->request = $request;
 
         parent::__construct($context, $data);
     }
@@ -128,7 +117,7 @@ class Address extends Template
      */
     private function getProfile()
     {
-        $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
+        $profileId = (int)$this->_request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
         try {
             /** @var SubscriptionProfile $profile */
             $profile = $this->profileRepository->getById($profileId);

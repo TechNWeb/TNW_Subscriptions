@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview;
+namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
@@ -27,7 +27,7 @@ class NextPayment extends Template
     /**
      * @inheritdoc
      */
-    protected $_template = 'TNW_Subscriptions::subscription_profile/dashboard/overview/next-payment.phtml';
+    protected $_template = 'TNW_Subscriptions::subscription_profile/summary/overview/next-payment.phtml';
 
     /**
      * @var QuoteCollection

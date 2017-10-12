@@ -1,0 +1,47 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Subscription\Info\OrderHistory */
+?>
+<?php $_orderHistory = $block->getOrderHistory(); ?>
+<?php if ($_orderHistory && count($_orderHistory)): ?>
+    <div class="table-wrapper orders-history">
+        <table class="data table table-order-items history" id="my-orders-table">
+            <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Order History') ?></caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Order #') ?></th>
+                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Created On') ?></th>
+                <th scope="col" class="col tax-fee"><?php /* @escapeNotVerified */ echo __('Tax Fee') ?></th>
+                <th scope="col" class="col shipping-fee"><?php /* @escapeNotVerified */ echo __('Shipping Fee') ?></th>
+                <th scope="col" class="col total"><?php /* @escapeNotVerified */ echo __('Grand Total') ?></th>
+                <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php /** @var \Magento\Sales\Model\Order $_order */ foreach ($_orderHistory as $_order): ?>
+                <tr>
+                    <td data-th="<?php echo $block->escapeHtml(__('Order #')) ?>" class="col id">
+                        <a href="<?php /* @escapeNotVerified */ echo $block->getViewUrl($_order) ?>" class="action view">
+                            <span><?php /* @escapeNotVerified */ echo $_order->getRealOrderId() ?></span>
+                        </a>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Created On')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->formatDate($_order->getCreatedAt()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Tax Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getTaxAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getShippingAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Grand Total')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getGrandTotal()) ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getStatusLabel() ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php if ($block->getPagerHtml()): ?>
+        <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+    <?php endif ?>
+<?php else: ?>
+    <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('You have placed no orders.'); ?></span></div>
+<?php endif ?>

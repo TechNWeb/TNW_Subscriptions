@@ -466,7 +466,8 @@ class ModifyForm extends Form
                                 'formElement' => UiForm\Element\Input::NAME,
                                 'elementTmpl' => 'TNW_Subscriptions/form/element/image',
                                 'additionalClasses' => 'sub-product-image',
-                                'src' => $imageHelper->getUrl()
+                                'src' => isset($this->currentProduct) ? $imageHelper->getUrl()
+                                    : $imageHelper->getDefaultPlaceholderUrl('small_image')
                             ]
                         ]
                     ]
@@ -485,15 +486,19 @@ class ModifyForm extends Form
      */
     protected function getImageHelper()
     {
-        $imageHelper = $this->imageHelper->init(
-            $this->currentProduct,
-            'category_page_grid',
-            [
-                'type' => 'small_image',
-                'width' => '240',
-                'height' => '240',
-            ]
-        );
+        $imageHelper = $this->imageHelper;
+
+        if (isset($this->currentProduct)) {
+            $imageHelper = $imageHelper->init(
+                $this->currentProduct,
+                'category_page_grid',
+                [
+                    'type' => 'small_image',
+                    'width' => '240',
+                    'height' => '240',
+                ]
+            );
+        }
 
         return $imageHelper;
     }
@@ -567,6 +572,7 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'visible' => isset($this->currentProduct),
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
@@ -613,12 +619,23 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'visible' => $this->currentFormName . ':previewMode'
-                        ]
+                            'isRemoveButtonVisible' => $this->currentFormName . ':previewMode',
+                        ],
+                        'buttonVisibility' => $this->getRemoveButtonVisibility(),
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * Returns 'Remove' button visibility in subscription product list.
+     *
+     * @return bool
+     */
+    protected function getRemoveButtonVisibility()
+    {
+        return true;
     }
 
     /**
@@ -777,12 +794,16 @@ class ModifyForm extends Form
      */
     protected function getPriceDefinition()
     {
+        $label = __('Price') . ':';
+        if (isset($this->currentProduct)
+            && $this->getTrialPeriod($this->currentProduct->getId())) {
+            $label = __('Post trial price:');
+        }
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => $this->getTrialPeriod($this->currentProduct->getId()) ?
-                            __('Post trial price:') : __('Price') . ':',
+                        'label' => $label,
                         'dataType' => 'text',
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
@@ -915,7 +936,7 @@ class ModifyForm extends Form
     protected function getQtyEditButton()
     {
         $qtyContainerName = $this->currentFormName . '.description_fieldset.middle_container.qty_container';
-
+        $buttonVisibility = isset($this->currentProduct) ? '' : '!';
         return [
             'arguments' => [
                 'data' => [
@@ -923,7 +944,7 @@ class ModifyForm extends Form
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-advanced qty-edit-button',
+                        'additionalClasses' => 'action-advanced qty-edit-button action-additional',
                         'additionalForGroup' => true,
                         'displayAsLink' => true,
                         'title' => '[' . __('Modify') . ']',
@@ -940,7 +961,7 @@ class ModifyForm extends Form
                         ],
                         'provider' => null,
                         'imports' => [
-                            'setUpdateQtyButtonVisibility' => $this->currentFormName . ':previewMode'
+                            'setUpdateQtyButtonVisibility' => $buttonVisibility . $this->currentFormName . ':previewMode'
                         ],
                         'exports' => [
                             'active' => '!' . $qtyContainerName . '.qty:showPreview'

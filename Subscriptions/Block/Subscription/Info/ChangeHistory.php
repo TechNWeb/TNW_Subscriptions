@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection as MessagesCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
@@ -28,26 +27,21 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
     /** @var Registry  */
     private $registry;
 
-    /** @var TimezoneInterface */
-    private $timezone;
-
     /**
      * @param Context $context
      * @param CollectionFactory $collectionFactory
      * @param Registry $registry
-     * @param TimezoneInterface $timezone
      * @param array $data
      */
     public function __construct(
         Context $context,
         CollectionFactory $collectionFactory,
         Registry $registry,
-        TimezoneInterface $timezone,
         array $data = []
     ) {
         $this->messageHistoryCollectionFactory = $collectionFactory;
         $this->registry = $registry;
-        $this->timezone = $timezone;
+
         parent::__construct($context, $data);
     }
 
@@ -103,7 +97,7 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
      */
     private function getSubscription()
     {
-        return $this->registry->registry('current_subscription');
+        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**
@@ -134,7 +128,7 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
     {
         $dateTime = new DateTime();
 
-        $date = $this->timezone->date(
+        $date = $this->_localeDate->date(
             $dateTime->strToTime($date)
         )->format('F dS, Y   g:i:s A');
 

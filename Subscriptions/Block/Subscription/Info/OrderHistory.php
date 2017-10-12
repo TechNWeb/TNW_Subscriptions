@@ -5,14 +5,97 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+
 /**
  * Subscription order history block at customer account dashboard.
  */
 class OrderHistory extends \Magento\Framework\View\Element\Template
 {
-    protected function _toHtml()
+    /**
+     * @var string
+     */
+    protected $_template = 'subscription/order-history.phtml';
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory
+     */
+    private $orderCollectionFactory;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\Collection
+     */
+    private $orders;
+
+    /**
+     * OrderHistory constructor.
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+        $this->orderCollectionFactory = $orderCollectionFactory;
+    }
+
+    /**
+     * @return bool|\Magento\Sales\Model\ResourceModel\Order\Collection
+     */
+    public function getOrderHistory()
     {
-        //toDo: Subscription order history block
-        return 'Here is current subscription order history block';
+        if (!($profileId = $this->_request->getParam('entity_id'))) {
+            return false;
+        }
+
+        if (!$this->orders) {
+            $this->orders = $this->orderCollectionFactory->create()
+                ->join(
+                    ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                    'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                    []
+                )
+                ->addFieldToFilter('relation.subscription_profile_id', $profileId);
+        }
+
+        return $this->orders;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function _prepareLayout()
+    {
+        parent::_prepareLayout();
+        if ($this->getOrderHistory()) {
+            $pager = $this->getLayout()
+                ->createBlock(\Magento\Theme\Block\Html\Pager::class, 'subscription.info.order.history.pager')
+                ->setCollection($this->getOrderHistory());
+
+            $this->setChild('pager', $pager);
+            $this->getOrderHistory()->load();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPagerHtml()
+    {
+        return $this->getChildHtml('pager');
+    }
+
+    /**
+     * @param object $order
+     * @return string
+     */
+    public function getViewUrl($order)
+    {
+        return $this->getUrl('sales/order/view', ['order_id' => $order->getId()]);
     }
 }

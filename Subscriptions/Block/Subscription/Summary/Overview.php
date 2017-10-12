@@ -4,14 +4,14 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
+namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Backend\Block\Template;
 use Magento\Quote\Model\Quote;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Message;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\MissedPayments;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\NextPayment;
-use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview\Status;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\MissedPayments;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview\Status;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -26,7 +26,7 @@ class Overview extends Template
     /**
      * @inheritdoc
      */
-    protected $_template = 'TNW_Subscriptions::subscription_profile/dashboard/overview.phtml';
+    protected $_template = 'TNW_Subscriptions::subscription_profile/summary/overview.phtml';
 
     /**
      * Registry model
@@ -154,10 +154,10 @@ class Overview extends Template
     /**
      * Init child block
      *
-     * @param Template $block
-     * @return Template
+     * @param \Magento\Framework\View\Element\AbstractBlock $block
+     * @return \Magento\Framework\View\Element\AbstractBlock
      */
-    protected function initChildBlock(Template $block)
+    protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
     {
         $this->profileManager->setProfile($this->getSubscriptionProfile());
         $block->addData([
@@ -166,6 +166,18 @@ class Overview extends Template
             'next_quote'=> $this->getNextQuote(),
         ]);
         return $block;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _prepareLayout()
+    {
+        foreach ($this->getChildNames() as $names) {
+            $this->initChildBlock($this->getLayout()->getBlock($names));
+        }
+
+        return parent::_prepareLayout();
     }
 
     /**
@@ -284,5 +296,44 @@ class Overview extends Template
     public function getCanShowNextPayment()
     {
         return $this->getSubscriptionProfile()->getStatus() != ProfileStatus::STATUS_COMPLETE;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShippingInfoHtml()
+    {
+        return $this->getChildHtml('shipping-information');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShippingDetailsHtml()
+    {
+        return $this->getChildHtml('shipping-details');
+    }
+
+    /**
+     * @return string
+     */
+    public function getBillingInfoHtml()
+    {
+        return $this->getChildHtml('billing-information');
+    }
+
+    public function getPaymentDetailsHtml()
+    {
+        return $this->getChildHtml('payment-details');
+    }
+
+    public function getProductsHtml()
+    {
+        return 'products grid';
+    }
+
+    public function getDangerZoneHtml()
+    {
+        return 'DangerZone block';
     }
 }

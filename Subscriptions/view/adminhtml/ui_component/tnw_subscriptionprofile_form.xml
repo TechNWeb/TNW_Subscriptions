@@ -57,7 +57,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview</argument>
+                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Overview</argument>
             </htmlContent>
         </container>
         <fieldset name="profit_fieldset">

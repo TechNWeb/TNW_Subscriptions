@@ -70,7 +70,7 @@ class Config
     private $xmlCanCancelProfile = 'tnw_subscriptions_customer/profile_actions/can_cancel';
     /**#@-*/
 
-    private $xmlUntilCanceled = 'tnw_subscriptions_product/term/until_canceled';
+    private $xmlUntilCanceled = 'tnw_subscriptions_customer/profile_actions/until_canceled';
 
     /**
      * @var ScopeConfigInterface

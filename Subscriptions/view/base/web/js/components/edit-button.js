@@ -14,7 +14,8 @@ define([
             elementTmpl: 'TNW_Subscriptions/form/element/edit-button',
             activeTitle: '',
             active: false,
-            parentForm: null
+            parentForm: null,
+            buttonVisibility: true
         },
 
         /** @inheritdoc */
@@ -137,6 +138,15 @@ define([
 
         hasService: function () {
             return false;
+        },
+
+        /**
+         * Check if 'Remove' button can be shown.
+         *
+         * @param formPreviewMode
+         */
+        isRemoveButtonVisible: function(formPreviewMode) {
+            this.visible(formPreviewMode && this.buttonVisibility);
         }
     });
 });

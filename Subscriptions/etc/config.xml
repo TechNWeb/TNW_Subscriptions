@@ -40,14 +40,12 @@
                 <discount_amount>10</discount_amount> <!--10%-->
                 <discount_type>2</discount_type> <!--percents-->
             </discount>
-            <term>
-                <until_canceled>1</until_canceled>
-            </term>
         </tnw_subscriptions_product>
         <tnw_subscriptions_customer>
             <profile_actions>
                 <can_hold>1</can_hold>
                 <can_cancel>1</can_cancel>
+                <until_canceled>1</until_canceled>
             </profile_actions>
         </tnw_subscriptions_customer>
     </default>

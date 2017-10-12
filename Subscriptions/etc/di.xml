@@ -97,6 +97,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryRepository"/>
     <preference for="TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool" />
+    <preference for="TNW\Subscriptions\Api\UrlBuilderInterface"
+                type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -116,6 +118,18 @@
         <plugin name="subscriptions_product_initialization"
                 type="TNW\Subscriptions\Plugin\Product\Initialization"
                 sortOrder="50"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Info">
+        <plugin name="subscriptions_order_view"
+                type="TNW\Subscriptions\Plugin\Block\Order\Info"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\MassDelete">
+        <plugin name="subscriptions_product_mass_delete"
+                type="TNW\Subscriptions\Plugin\Product\MassDelete"
+                sortOrder="60"
                 disabled="false"/>
     </type>
 
@@ -292,6 +306,11 @@
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 

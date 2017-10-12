@@ -462,7 +462,7 @@
   }
 }
 
-.subscription-data-history-wrapper {
+.subscription-data-wrapper {
   margin-top: -1px;
   padding: 25px;
   border: 1px solid #cccccc;
@@ -518,8 +518,183 @@
   margin: 25px 0 0 0;
 }
 
-@media (min-width: 768px) {
-  .mess-history-wrapper {
+.overview-content {
+  width: 100%;
+  font-size: 2rem;
+  text-align: center;
 
+  &:after {
+    content: '';
+    clear: both;
+    display: block;
+  }
+
+  .title {
+    padding: 10px 0;
+  }
+
+  .next-payment {
+    width: 30%;
+    height: 100%;
+    float: left;
+    margin-bottom: 15px;
+
+    .date.day {
+      padding-top: 10px;
+      font-size: 9rem;
+      line-height: 9rem;
+    }
+
+    .date.month {
+      font-size: 3rem;
+      padding: 4px 0;
+    }
+
+   .cost {
+      margin-top: 30px;
+      padding: 5px 0 10px;
+      font-size: 4rem;
+      background-color: #eee;
+      border-top: 1px solid #999;
+    }
+  }
+
+  .status-message {
+    width: 67%;
+    float: right;
+  }
+
+  .bordered {
+    border: 1px solid #999;
+  }
+
+  .subscription-message {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+
+  .light-green {
+    background: #b6d7a8;
+  }
+
+  .green {
+    background: #009e0f;
+  }
+
+  .red {
+    background: #CF2A27;
+  }
+
+  .orange {
+    background: #FFD966;
+  }
+
+  .block-subscription-message {
+    padding: 29px 0;
+  }
+
+  .subscription-status {
+    vertical-align: top;
+    color: white;
+
+    .title {
+      font-size: 3rem;
+    }
+
+    .value {
+      font-size: 6rem;
+      line-height: 15rem;
+    }
+  }
+}
+
+.subscription-ship-info, .subscription-bill-info {
+  float: left;
+  width: 49%;
+}
+
+.subscription-ship-details, .subscription-payment-details {
+  float: right;
+  width: 49%;
+
+  .table-secondary {
+    tbody tr td {
+      padding: 1rem 1rem;
+      text-align: left;
+    }
+
+    tbody tr td.right {
+      text-align: right;
+    }
+
+    tbody tr:nth-child(2n+1) td {
+      background-color: #f1f1f1;
+    }
+  }
+}
+
+.subscription-data-wrapper {
+
+  .clear {
+    clear: both;
+  }
+
+  .block .block-title {
+    &:after {
+      content: '';
+      clear: both;
+      display: block;
+    }
+
+    strong {
+      float: left;
+    }
+
+    .profile__edit_button {
+      float: left;
+      margin-left: 1rem;
+      text-decoration: none;
+
+      &:before {
+        content: '\e601';
+        font-size: 2.4rem;
+        color: #333333;
+        .lib-css(font-family, @icons__font-name);
+      }
+    }
+  }
+}
+
+.subscription-products {
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .summary-item {
+    width: 100%;
+  }
+
+  .overview-content {
+    .next-payment {
+      width: 100%;
+    }
+    .status-message {
+      width:100%;
+    }
+
+    .block-subscription-message {
+      padding: 5px 0;
+    }
+
+    .subscription-status {
+      .title {
+        padding: 0;
+        font-size: 2rem;
+      }
+
+      .value {
+        line-height: 6rem;
+      }
+    }
   }
 }
