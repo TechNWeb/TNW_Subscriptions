@@ -28,11 +28,6 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
     private $orders;
 
     /**
-     * @var \Magento\Framework\App\RequestInterface
-     */
-    private $request;
-
-    /**
      * OrderHistory constructor.
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
@@ -41,12 +36,10 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
-        \Magento\Framework\App\RequestInterface $request,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->orderCollectionFactory = $orderCollectionFactory;
-        $this->request = $request;
     }
 
     /**
@@ -54,7 +47,7 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
      */
     public function getOrderHistory()
     {
-        if (!($profileId = $this->request->getParam('entity_id'))) {
+        if (!($profileId = $this->_request->getParam('entity_id'))) {
             return false;
         }
 
