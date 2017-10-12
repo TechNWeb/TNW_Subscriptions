@@ -8,8 +8,6 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action;
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
@@ -18,13 +16,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateSta
  */
 class CancelSubscription extends Action
 {
-    /**
-     * Result json factory.
-     *
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-
     /**
      * Data Persistor.
      *
@@ -41,17 +32,14 @@ class CancelSubscription extends Action
 
     /**
      * @param Action\Context $context
-     * @param JsonFactory $jsonFactory
      * @param DataPersistorInterface $dataPersistor
      * @param UpdateStatusModel $updateStatusModel
      */
     public function __construct(
         Action\Context $context,
-        JsonFactory $jsonFactory,
         DataPersistorInterface $dataPersistor,
         UpdateStatusModel $updateStatusModel
     ) {
-        $this->resultJsonFactory = $jsonFactory;
         $this->dataPersistor = $dataPersistor;
         $this->updateStatusModel = $updateStatusModel;
 
@@ -63,24 +51,24 @@ class CancelSubscription extends Action
      */
     public function execute()
     {
-        $response = new DataObject();
-        $response->setData('result', false);
+        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        $resultRedirect = $this->resultRedirectFactory->create();
 
-        $value = $this->getRequest()->getParam('value');
+        $option = $this->getRequest()->getPost()->get('cancel_button_popup_options');
         $subscriptionId = $this->dataPersistor->get('subscription_id');
 
         try {
-            if ($value == 'next') {
+            if ($option == 'next') {
                 $this->updateStatusModel->updateStatusBeforeNextBillingCycle($subscriptionId);
-                $response->setData('result', true);
-            } elseif ($value == 'now') {
+            } elseif ($option == 'now') {
                 $this->updateStatusModel->updateStatus($subscriptionId, ProfileStatus::STATUS_CANCELED);
-                $response->setData('result', true);
             }
         } catch (\Exception $e) {
-            $response->setData('result', false);
+            $this->messageManager->addErrorMessage($e->getMessage());
         }
 
-        return $this->resultJsonFactory->create()->setJsonData($response->toJson());
+        $resultRedirect->setPath('tnw_subscriptions/subscriptionprofile/edit', ['entity_id' => $subscriptionId]);
+
+        return $resultRedirect;
     }
 }

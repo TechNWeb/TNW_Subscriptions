@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
 
@@ -15,9 +16,29 @@ use Magento\Framework\Api\Filter;
 class CancelButtonPopup extends AbstractDataProvider
 {
     /**
+     * Url Builder.
+     *
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
      * Form data scope.
      */
     const DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM = 'tnw_subscriptionprofile_cancel_button_popup_form';
+
+    public function __construct(
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
+        UrlInterface $urlBuilder,
+        array $meta = [],
+        array $data = []
+    ) {
+        $this->urlBuilder = $urlBuilder;
+
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
+    }
 
     /**
      * {@inheritdoc}
@@ -32,5 +53,19 @@ class CancelButtonPopup extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getConfigData()
+    {
+        $configData = parent::getConfigData();
+
+        $configData['submit_url'] = $this->urlBuilder->getUrl(
+            'tnw_subscriptions/subscriptionprofile/cancelsubscription'
+        );
+
+        return $configData;
     }
 }

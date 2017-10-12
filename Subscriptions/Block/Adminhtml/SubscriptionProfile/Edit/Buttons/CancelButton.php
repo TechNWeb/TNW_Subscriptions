@@ -16,7 +16,7 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
 {
     /**
      * Retrieve button-specified settings
-     * 
+     *
      * @return array
      */
     public function getButtonData()
@@ -33,7 +33,7 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => 'tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.tnw_subscriptionprofile_cancel_button.cancelModal',
+                                'targetName' => 'index = cancelModal',
                                 'actionName' => 'toggleModal',
                             ],
                         ]
