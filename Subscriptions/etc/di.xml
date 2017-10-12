@@ -126,6 +126,13 @@
                 disabled="false"/>
     </type>
 
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\MassDelete">
+        <plugin name="subscriptions_product_mass_delete"
+                type="TNW\Subscriptions\Plugin\Product\MassDelete"
+                sortOrder="60"
+                disabled="false"/>
+    </type>
+
     <type name="TNW\Subscriptions\Model\BillingFrequency">
         <plugin name="subscriptions_frequency_save_linked_products"
                 type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"

@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container as UiContainer;
@@ -116,7 +117,6 @@ class SummaryProductsForm extends ModifyForm
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-
         parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
             $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
             $currencyFactory, $context, $imageHelper, $scope, $meta, $data);
@@ -132,7 +132,9 @@ class SummaryProductsForm extends ModifyForm
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
-                $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                $isProductDeleted = !isset($product);
+                $presetQty = $isProductDeleted ? (int)$item->getTnwSubscrUnlockPresetQty()
+                    : (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $presetQty
                     ? $item->getPrice() * $item->getQty()
                     : $item->getPrice();
@@ -140,15 +142,22 @@ class SummaryProductsForm extends ModifyForm
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ?
                     $trialStartDate : $subQuote->getStartDate();
+                try {
+                    $billingFrequencyLabel = $this->frequencyRepository->getById($subQuote->getBillingFrequencyId())->getLabel();
+                } catch (NoSuchEntityException $e) {
+                    $billingFrequencyLabel = __('Product was deleted');
+                }
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
-                    'billing_frequency' => $subQuote->getBillingFrequencyId(),
+                    'billing_frequency' => $billingFrequencyLabel,
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
-                    'name' => $product->getName(),
-                    'description' => $product->getData('short_description'),
+                    'name' => $isProductDeleted ? $item->getName() : $product->getName(),
+                    'description' => $isProductDeleted ? __('Product deleted')
+                        : $product->getData('short_description'),
                     'qty' => $item->getQty(),
+                    'is_product_deleted' => $isProductDeleted,
                 ];
             }
         }
@@ -329,7 +338,8 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getStartOnDefinition()
     {
-        $visibleOnEdit = $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'];
+        $visibleOnEdit = isset($this->currentProduct)
+            ? $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'] : false;
         $nowDate = new \DateTime();
 
         return [
@@ -367,18 +377,15 @@ class SummaryProductsForm extends ModifyForm
                     'multiple' => false,
                     'config' => [
                         'label' => __('Billing Frequency:'),
-                        'dataType' => 'boolean',
-                        'formElement' => UiForm\Element\RadioSet::NAME,
-                        'componentType' => UiForm\Element\RadioSet::NAME,
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Input::NAME,
+                        'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'billing_frequency',
-                        'additionalClasses' => 'radio-options-one-column sub-legend admin__field-wide',
+                        'additionalClasses' => 'admin__field-wide',
                         'additionalForGroup' => false,
                         'validation' => ['required-entry' => true],
-                        'options' => $this->getProductBillingFrequenciesAsOptionArray(
-                            $this->currentProduct->getId()
-                        ),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-set',
-                        'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'showPreview' => $this->getCurrentFormName() . ':previewMode',
                         'imports' => [
                             'onPriceUpdate'=> '${ $.parentName}.price:value'
@@ -475,13 +482,19 @@ class SummaryProductsForm extends ModifyForm
 
     /**
      * Returns product from object item.
+     * If magento product delete return null
      *
      * @param DataObject $item
      * @return mixed
      */
     protected function getProductFromItem(DataObject $item)
     {
-        $this->currentProduct = $item->getMagentoProduct();
+        try {
+            $this->currentProduct = $item->getMagentoProduct();
+        } catch (NoSuchEntityException $e) {
+            $this->currentProduct = null;
+        }
+
         return $this->currentProduct;
     }
 
