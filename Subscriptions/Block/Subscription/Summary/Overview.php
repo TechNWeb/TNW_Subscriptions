@@ -327,9 +327,12 @@ class Overview extends Template
         return 'payment details';
     }
 
+    /**
+     * @return string
+     */
     public function getProductsHtml()
     {
-        return 'products grid';
+        return $this->getChildHtml('products');
     }
 
     public function getDangerZoneHtml()
