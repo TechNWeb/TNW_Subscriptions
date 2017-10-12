@@ -1,10 +1,21 @@
-<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */ ?>
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block */ ?>
 <div class="block">
     <div class="block-title">
         <strong><?php echo __('Products') ?></strong>
         <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
     </div>
     <div class="block-content">
-
+        <ol class="product-items">
+            <?php foreach ($block->getProducts() as $product): ?>
+            <li class="product-item">
+                <div class="product-item-photo">
+                    <?php echo $block->getImage($product, 'side_column_widget_product_thumbnail')->toHtml(); ?>
+                </div>
+                <div class="product-item-details">
+                    <strong class="product-item-name"></strong>
+                </div>
+            </li>
+            <?php endforeach; ?>
+        </ol>
     </div>
 </div>
