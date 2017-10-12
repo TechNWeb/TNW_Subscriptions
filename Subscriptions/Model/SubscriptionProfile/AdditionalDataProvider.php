@@ -109,7 +109,17 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
             }
 
             $attributes = !empty($this->getAttributes()[$groupCode]) ? $this->getAttributes()[$groupCode] : [];
-            $meta['additional']['children'] = $this->getAttributesMeta($attributes, $group);
+            if (empty($attributes)) {
+                $meta['additional']['children']['empty'] = $this->arrayManager->set('arguments/data/config', [], [
+                    'formElement' => 'container',
+                    'componentType' => 'container',
+                    'component' => 'Magento_Ui/js/form/components/html',
+                    'template' => 'TNW_Subscriptions/form/subscription-profile/additional/empty',
+                    'attributesNotFound' => __('No custom attributes found')
+                ]);
+            } else {
+                $meta['additional']['children'] = $this->getAttributesMeta($attributes, $group);
+            }
         }
 
         return $meta;
