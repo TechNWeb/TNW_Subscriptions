@@ -74,7 +74,7 @@ define(
              * Hide and show edit and remove buttons on products form.
              *
              * @param {Object} current
-             * @param {bool} previewMode
+             * @param {boolean} previewMode
              */
             hideEditButtons: function (current, previewMode) {
                 _.each(registry.filter('index = form'), function (form) {
@@ -115,6 +115,7 @@ define(
              */
             toggleButtonPreviewMode: function () {
                 this.buttonPreviewMode(!this.buttonPreviewMode());
+                this.hideEditButtons(this, !this.buttonPreviewMode());
             },
 
             /**
