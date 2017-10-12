@@ -610,17 +610,58 @@
 
 .subscription-ship-info, .subscription-bill-info {
   float: left;
-  width: 50%;
+  width: 49%;
 }
 
 .subscription-ship-details, .subscription-payment-details {
   float: right;
-  width: 50%;
+  width: 49%;
 
-  &:after {
-    content: '';
+  .table-secondary {
+    tbody tr td {
+      padding: 1rem 1rem;
+      text-align: left;
+    }
+
+    tbody tr td.right {
+      text-align: right;
+    }
+
+    tbody tr:nth-child(2n+1) td {
+      background-color: #f1f1f1;
+    }
+  }
+}
+
+.subscription-data-wrapper {
+
+  .clear {
     clear: both;
-    display: block;
+  }
+
+  .block .block-title {
+    &:after {
+      content: '';
+      clear: both;
+      display: block;
+    }
+
+    strong {
+      float: left;
+    }
+
+    .profile__edit_button {
+      float: left;
+      margin-left: 1rem;
+      text-decoration: none;
+
+      &:before {
+        content: '\e601';
+        font-size: 2.4rem;
+        color: #333333;
+        .lib-css(font-family, @icons__font-name);
+      }
+    }
   }
 }
 

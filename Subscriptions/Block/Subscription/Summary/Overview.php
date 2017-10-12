@@ -154,10 +154,10 @@ class Overview extends Template
     /**
      * Init child block
      *
-     * @param Template $block
-     * @return Template
+     * @param \Magento\Framework\View\Element\AbstractBlock $block
+     * @return \Magento\Framework\View\Element\AbstractBlock
      */
-    protected function initChildBlock(Template $block)
+    protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
     {
         $this->profileManager->setProfile($this->getSubscriptionProfile());
         $block->addData([
@@ -166,6 +166,18 @@ class Overview extends Template
             'next_quote'=> $this->getNextQuote(),
         ]);
         return $block;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _prepareLayout()
+    {
+        foreach ($this->getChildNames() as $names) {
+            $this->initChildBlock($this->getLayout()->getBlock($names));
+        }
+
+        return parent::_prepareLayout();
     }
 
     /**
@@ -286,19 +298,28 @@ class Overview extends Template
         return $this->getSubscriptionProfile()->getStatus() != ProfileStatus::STATUS_COMPLETE;
     }
 
+    /**
+     * @return string
+     */
     public function getShippingInfoHtml()
     {
-        return 'shipping information';
+        return $this->getChildHtml('shipping-information');
     }
 
+    /**
+     * @return string
+     */
     public function getShippingDetailsHtml()
     {
-        return 'shiiping details';
+        return $this->getChildHtml('shipping-details');
     }
 
+    /**
+     * @return string
+     */
     public function getBillingInfoHtml()
     {
-        return 'billing information';
+        return $this->getChildHtml('billing-information');
     }
 
     public function getPaymentDetailsHtml()

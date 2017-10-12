@@ -1,0 +1,17 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipment\Details $block */ ?>
+<div class="block">
+    <div class="block-title">
+        <strong><?php echo __("Shipping Details") ?></strong>
+        <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/shipment', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+    </div>
+    <div class="block-content">
+        <table class="table-secondary data-table">
+            <tbody>
+            <tr class="col-0">
+                <td class="label"><?php echo __("Shipping Method") ?></td>
+                <td class="right"><?php echo $block->getShippingDescription() ?></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
