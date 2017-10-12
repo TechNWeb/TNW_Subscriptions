@@ -324,7 +324,7 @@ class Overview extends Template
 
     public function getPaymentDetailsHtml()
     {
-        return 'payment details';
+        return $this->getChildHtml('payment-details');
     }
 
     /**

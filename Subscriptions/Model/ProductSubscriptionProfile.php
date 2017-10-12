@@ -343,4 +343,70 @@ class ProductSubscriptionProfile extends AbstractModel
     {
         return $this->setData(self::NEED_RECOLLECT, $needRecollect);
     }
+
+    /**
+     * Get product name
+     *
+     * @return string|null
+     */
+    public function getName()
+    {
+        return $this->getData(self::NAME);
+    }
+
+    /**
+     * Set product name
+     *
+     * @param string $productName
+     * @return $this
+     */
+    public function setName($productName)
+    {
+        $this->setData(self::NAME, $productName);
+        return $this;
+    }
+
+    /**
+     * Get product sku
+     *
+     * @return string|null
+     */
+    public function getSku()
+    {
+        return $this->getData(self::SKU);
+    }
+
+    /**
+     * Set product sku
+     *
+     * @param string $productSku
+     * @return $this
+     */
+    public function setSku($productSku)
+    {
+        $this->setData(self::SKU, $productSku);
+        return $this;
+    }
+
+    /**
+     * Get product tnw_subscr_unlock_preset_qty
+     *
+     * @return int|null
+     */
+    public function getTnwSubscrUnlockPresetQty()
+    {
+        return $this->getData(self::TNW_SUBSCR_UNLOCK_PRESET_QTY);
+    }
+
+    /**
+     * Set product tnw_subscr_unlock_preset_qty
+     *
+     * @param int $subscrUnlockPresetQty
+     * @return $this
+     */
+    public function setTnwSubscrUnlockPresetQty($subscrUnlockPresetQty)
+    {
+        $this->setData(self::TNW_SUBSCR_UNLOCK_PRESET_QTY, $subscrUnlockPresetQty);
+        return $this;
+    }
 }

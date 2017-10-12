@@ -11,7 +11,6 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use Magento\Framework\UrlInterface;
 
 /**
  * Add customer email to session.
@@ -40,30 +39,22 @@ class AddEmailToSession extends Action
     private $customerRepository;
 
     /**
-     * @var UrlInterface
-     */
-    private $url;
-
-    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param CustomerRepository $customerRepository
      * @param JsonFactory $jsonFactory
-     * @param UrlInterface $url
      */
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
         CustomerRepository $customerRepository,
-        JsonFactory $jsonFactory,
-        UrlInterface $url
+        JsonFactory $jsonFactory
     ) {
         parent::__construct($context);
 
         $this->customerRepository = $customerRepository;
         $this->session = $session;
         $this->resultJsonFactory = $jsonFactory;
-        $this->url = $url;
     }
 
     /**
@@ -98,7 +89,7 @@ class AddEmailToSession extends Action
      */
     private function addErrorToMessageManager()
     {
-        $url = $this->url->getUrl('customer/account/forgotpassword');
+        $url = $this->_url->getUrl('customer/account/forgotpassword');
 
         // @codingStandardsIgnoreStart
         $message = __(

@@ -30,6 +30,10 @@
                         <argument name="type" xsi:type="string">billing</argument>
                     </action>
                 </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details"
+                       name="subscription.info.view.payment.details"
+                       template="TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml"
+                       as="payment-details" />
                 <block class="TNW\Subscriptions\Block\Subscription\Summary\Products"
                        name="subscription.info.view.products" as="products"
                        template="TNW_Subscriptions::subscription_profile/summary/products.phtml" />

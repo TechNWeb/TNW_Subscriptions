@@ -514,6 +514,47 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateApplyToForProductAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), '2.0.25', '<')) {
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::NAME,
+                [
+                    'type' => 'static',
+                    'label' => 'Magento Product Name',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 260,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::SKU,
+                [
+                    'type' => 'static',
+                    'label' => 'Magento Product SKU',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 270,
+                ]
+            );
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::TNW_SUBSCR_UNLOCK_PRESET_QTY,
+                [
+                    'type' => 'static',
+                    'label' => 'Magento Product subscr unlock preset qty',
+                    'input' => 'int',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 280,
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

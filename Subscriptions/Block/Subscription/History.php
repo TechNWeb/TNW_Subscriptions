@@ -10,7 +10,6 @@ namespace TNW\Subscriptions\Block\Subscription;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
@@ -69,11 +68,6 @@ class History extends \Magento\Framework\View\Element\Template
     private $config;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @var int
      */
     private $websiteId;
@@ -89,7 +83,6 @@ class History extends \Magento\Framework\View\Element\Template
      * @param SubscriptionProfileManager $subscriptionProfileManager
      * @param CollectionFactory $collectionFactory
      * @param Config $config
-     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
@@ -101,7 +94,6 @@ class History extends \Magento\Framework\View\Element\Template
         SubscriptionProfileManager $subscriptionProfileManager,
         CollectionFactory $collectionFactory,
         Config $config,
-        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -111,7 +103,6 @@ class History extends \Magento\Framework\View\Element\Template
         $this->subscriptionProfileManager = $subscriptionProfileManager;
         $this->subscriptionCollectionFactory = $collectionFactory;
         $this->config = $config;
-        $this->storeManager = $storeManager;
         parent::__construct($context, $data);
     }
 
@@ -306,7 +297,7 @@ class History extends \Magento\Framework\View\Element\Template
     private function getWebsiteId()
     {
         if (!$this->websiteId) {
-            $this->websiteId = $this->storeManager->getWebsite()->getId();
+            $this->websiteId = $this->_storeManager->getWebsite()->getId();
         }
 
         return $this->websiteId;
