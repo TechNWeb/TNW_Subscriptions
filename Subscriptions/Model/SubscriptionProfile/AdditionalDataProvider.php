@@ -115,6 +115,7 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
                     'componentType' => 'container',
                     'component' => 'Magento_Ui/js/form/components/html',
                     'template' => 'TNW_Subscriptions/form/subscription-profile/additional/empty',
+                    'attributesNotFound' => __('No custom attributes found')
                 ]);
             } else {
                 $meta['additional']['children'] = $this->getAttributesMeta($attributes, $group);
