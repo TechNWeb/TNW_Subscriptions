@@ -1,21 +1,75 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block */ ?>
-<div class="block">
+<div class="block products">
     <div class="block-title">
         <strong><?php echo __('Products') ?></strong>
         <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
     </div>
     <div class="block-content">
-        <ol class="product-items">
+        <ol class="items">
             <?php foreach ($block->getProducts() as $product): ?>
-            <li class="product-item">
+            <li class="item">
                 <div class="product-item-photo">
-                    <?php echo $block->getImage($product, 'side_column_widget_product_thumbnail')->toHtml(); ?>
+                    <?php echo $block->getImage($product, 'product_thumbnail_image', ['class' => 'photo image'])->toHtml(); ?>
                 </div>
                 <div class="product-item-details">
-                    <strong class="product-item-name"></strong>
+                    <strong class="product-item-name"><?php echo $product->getMagentoProduct()->getName() ?></strong>
+                    <span class="product-item-description"><?php echo 'asd' ?></span>
+                    <dl class="item-options">
+                        <dt>Color</dt>
+                        <dd>Green</dd>
+                        <dt>Size</dt>
+                        <dd>28</dd>
+                    </dl>
                 </div>
+                <div class="additional">
+                    <dl>
+                        <dt>Color</dt>
+                        <dd>Green</dd>
+                        <dt>Size</dt>
+                        <dd>28</dd>
+                    </dl>
+                </div>
+                <div style="clear: both"></div>
             </li>
             <?php endforeach; ?>
         </ol>
     </div>
 </div>
+<style type="text/css">
+    .products .block-content {
+        border: 1px solid #ccc;
+    }
+
+    .products .product-item-photo {
+        float: left;
+        width: 100px;
+    }
+
+    .products .product-item-details {
+        float: left;
+    }
+
+    .products dt:after {
+        content: ':';
+    }
+
+    .products .additional {
+        width: 150px;
+        float: right;
+        border-left: 1px solid #ccc;
+        margin: 5px;
+        padding: 5px;
+    }
+
+    .products .items {
+        padding: 0 2rem;
+    }
+
+    .products .item {
+        border-bottom: 1px solid #ccc;
+    }
+
+    .products .item:last-child {
+        border-bottom-width: 0;
+    }
+</style>
