@@ -236,7 +236,7 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Retrieve icon class for appearance.
      *
-     * @param SubscriptionProfile|\Magento\Framework\DataObject $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return string
      */
     public function getIconSubClass($subscription)
