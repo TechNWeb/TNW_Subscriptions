@@ -20,16 +20,19 @@ define(
 
                 var current = this;
                 _.each(this.source.data.payment, function (fields, code) {
+                    fieldset = registry.get('index = ' + code);
+                    fieldset.resetErrors();
                     if (fields.method === "1"){
                         switch (code) {
                             case 'payflowpro':
-                                fieldset = registry.get('index = ' + code);
                                 fieldset.beforeSubmit();
                                 break;
                             case 'checkmo':
                             default:
                                 current.save();
                         }
+                    } else {
+                        fieldset.set('payment_errors', ['Please select payment.']);
                     }
                 });
             },
