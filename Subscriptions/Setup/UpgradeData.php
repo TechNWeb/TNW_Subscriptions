@@ -514,25 +514,7 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateApplyToForProductAttributes($eavSetup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.24", "<")) {
-            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
-            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
-            $subscriptionSetup->addAttribute(
-                $profileEntityTypeId,
-                SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
-                [
-                    'type' => 'static',
-                    'label' => 'Cancel before next billing cycle',
-                    'sort_order' => 260,
-                    'input' => 'bool',
-                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
-                    'required' => false,
-                    'default' => 0,
-                ]
-            );
-        }
-
-        if (version_compare($context->getVersion(), '2.0.26', '<')) {
+        if (version_compare($context->getVersion(), '2.0.25', '<')) {
             $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
             $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
             $subscriptionSetup->addAttribute(
@@ -569,6 +551,24 @@ class UpgradeData implements UpgradeDataInterface
                     'required' => false,
                     'visible' => false,
                     'sort_order' => 280,
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.26", "<")) {
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileEntityTypeId = $subscriptionSetup->getEntityTypeId(SubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileEntityTypeId,
+                SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
+                [
+                    'type' => 'static',
+                    'label' => 'Cancel before next billing cycle',
+                    'sort_order' => 260,
+                    'input' => 'bool',
+                    'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                    'required' => false,
+                    'default' => 0,
                 ]
             );
         }

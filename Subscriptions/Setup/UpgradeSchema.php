@@ -833,7 +833,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerToMessageHistory($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.24", "<")) {
+        if (version_compare($context->getVersion(), '2.0.25', '<')) {
+            $this->updateProductSubscriptionProfileTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.26", "<")) {
             $setup->getConnection()->addColumn(
                 $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
                 SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
@@ -845,10 +849,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'default' => '0'
                 ]
             );
-        }
-
-        if (version_compare($context->getVersion(), '2.0.26', '<')) {
-            $this->updateProductSubscriptionProfileTable($setup);
         }
 
         $setup->endSetup();
