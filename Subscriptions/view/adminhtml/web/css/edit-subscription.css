@@ -831,3 +831,7 @@ button.action-editor.active:before{
 .tnw_subscriptionprofile_cancel_button_popup .admin__fieldset-wrapper-content .admin__fieldset {
     padding-bottom: 0;
 }
+
+.tnw_subscriptionprofile_cancel_button_popup .modal-header {
+    display: none;
+}

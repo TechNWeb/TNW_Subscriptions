@@ -532,7 +532,7 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
-        if (version_compare($context->getVersion(), '2.0.25', '<')) {
+        if (version_compare($context->getVersion(), '2.0.26', '<')) {
             $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
             $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
             $subscriptionSetup->addAttribute(

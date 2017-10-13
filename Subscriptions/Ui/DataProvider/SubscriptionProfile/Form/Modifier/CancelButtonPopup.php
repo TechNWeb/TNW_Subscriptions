@@ -16,6 +16,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonP
  */
 class CancelButtonPopup extends BaseFormModifier
 {
+    /**
+     * Handler for cancel popup.
+     */
     const CANCEL_BUTTON_HANDLER = 'tnw_subscriptionprofile_cancel_button_popup';
 
     /**
@@ -63,7 +66,6 @@ class CancelButtonPopup extends BaseFormModifier
                 'data' => [
                     'config' => [
                         'componentType' => Modal::NAME,
-                        'component' => 'TNW_Subscriptions/js/modal/modal-component-cancel-button-popup',
                         'options' => [
                             'modalClass' => 'modal-popup tnw_subscriptionprofile_cancel_button_popup',
                         ],

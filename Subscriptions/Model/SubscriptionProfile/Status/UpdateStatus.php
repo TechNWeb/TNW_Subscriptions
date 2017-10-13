@@ -13,6 +13,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
+/**
+ * Update status for subscription profile model.
+ */
 class UpdateStatus
 {
     /**

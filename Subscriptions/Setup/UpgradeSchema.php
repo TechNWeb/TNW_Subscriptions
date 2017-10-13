@@ -847,7 +847,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        if (version_compare($context->getVersion(), '2.0.25', '<')) {
+        if (version_compare($context->getVersion(), '2.0.26', '<')) {
             $this->updateProductSubscriptionProfileTable($setup);
         }
 

@@ -531,4 +531,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setNeedRecollect($needRecollect);
+
+    /**
+     * Gets cancel before next cycle.
+     *
+     * @return bool
+     */
+    public function getCancelBeforeNextCycle();
+
+    /**
+     * Sets cancel before next cycle.
+     *
+     * @param bool $cancelBeforeNextCycle
+     * @return $this
+     */
+    public function setCancelBeforeNextCycle($cancelBeforeNextCycle);
 }

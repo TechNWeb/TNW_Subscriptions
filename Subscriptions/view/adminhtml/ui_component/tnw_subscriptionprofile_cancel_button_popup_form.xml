@@ -24,6 +24,11 @@
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_cancel_button_popup_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">cancel_button_popup</argument>
             <argument name="requestFieldName" xsi:type="string">cancel_button_popup</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" path="tnw_subscriptions/subscriptionprofile/cancelsubscription" xsi:type="url"/>
+                </item>
+            </argument>
         </argument>
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
@@ -36,13 +41,7 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="general" class="TNW\Subscriptions\Ui\Component\Fieldset\SubscriptionCancelButtonPopup">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="label" translate="true" xsi:type="string">Are you sure you want to cancel Subscription</item>
-                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/element/cancel-popup-label</item>
-            </item>
-        </argument>
+    <fieldset name="general">
         <field name="cancel_button_popup_title">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -74,7 +73,8 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="title" translate="true" xsi:type="string">Confirm</item>
                     <item name="formElement" xsi:type="string">button</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/cancel-popup-button</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                    <item name="additionalClasses" xsi:type="string">cancel-popup-float-right action-primary</item>
                     <item name="actions" xsi:type="array">
                         <item name="0" xsi:type="array">
                             <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_cancel_button_popup_form</item>
@@ -91,7 +91,8 @@
                     <item name="title" translate="true" xsi:type="string">I changed my mind</item>
                     <item name="formElement" xsi:type="string">button</item>
                     <item name="displayAsLink" xsi:type="string">true</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/link</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                    <item name="additionalClasses" xsi:type="string">cancel-popup-float-right cancel-popup-spaces cancel-popup-underlined action-advanced</item>
                     <item name="actions" xsi:type="array">
                         <item name="0" xsi:type="array">
                             <item name="targetName" xsi:type="string">index = cancelModal</item>
