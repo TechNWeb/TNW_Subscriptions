@@ -54,11 +54,6 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
      */
     protected function _beforeToHtml()
     {
-        /*if ($this instanceof Items) {
-            $this->messagePool->addMessage('warning', 'WARNING TEST');
-            $this->messagePool->addMessage('error', 'ERROR TEST');
-            $this->messagePool->addMessage('success', 'SUCCESS TEST');
-        }*/
         ObjectManager::getInstance()->get(
             \TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningProcessor::class
         )->process($this);
