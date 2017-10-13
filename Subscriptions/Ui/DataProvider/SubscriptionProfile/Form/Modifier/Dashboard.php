@@ -11,7 +11,10 @@ use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Model\ProfileCcUtils;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
@@ -39,21 +42,37 @@ class Dashboard extends BaseFormModifier
     private $profitCalculator;
 
     /**
+     * @var ProfileCcUtils
+     */
+    private $utils;
+
+    /**
+     * @var ProfileOrderManager
+     */
+    private $profileOrderManager;
+
+    /**
      * Dashboard constructor.
      *
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param DataPersistorInterface $dataPersistor
      * @param ProfitCalculator $profitCalculator
+     * @param ProfileOrderManager $profileOrderManager
+     * @param ProfileCcUtils      $utils
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Registry $registry,
         DataPersistorInterface $dataPersistor,
-        ProfitCalculator $profitCalculator
+        ProfitCalculator $profitCalculator,
+        ProfileOrderManager $profileOrderManager,
+        ProfileCcUtils $utils
     ) {
         $this->dataPersistor = $dataPersistor;
         $this->profitCalculator = $profitCalculator;
+        $this->profileOrderManager = $profileOrderManager;
+        $this->utils = $utils;
         parent::__construct($urlBuilder, $registry);
     }
 
@@ -121,6 +140,16 @@ class Dashboard extends BaseFormModifier
         $profile = $this->getProfile();
         if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE) {
             $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
+        }
+
+        if ($profile && $this->utils->isCcPayment($profile)) {
+            $relation = $this->getNextProfileRelation($profile);
+            if (
+                false !== $relation &&
+                $this->utils->isCcExpireBy($profile, $relation->getScheduledAt())
+            ) {
+                $messages[] = __('Credit Card will expire before next billing cycle.');
+            }
         }
 
         return $messages;
@@ -224,5 +253,16 @@ class Dashboard extends BaseFormModifier
                 ],
             ],
         ];
+    }
+
+    /**
+     * Returns next profile relation instance.
+     *
+     * @param SubscriptionProfile $profile
+     * @return false|\TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     */
+    private function getNextProfileRelation(SubscriptionProfile $profile)
+    {
+        return $this->profileOrderManager->getNextProfileRelation($profile, false);
     }
 }
