@@ -14,6 +14,12 @@ use Magento\Framework\Api\CustomAttributesDataInterface;
 interface SubscriptionProfileInterface extends CustomAttributesDataInterface
 {
     /**#@+
+     * Main table name.
+     */
+    const MAIN_TABLE = 'tnw_subscriptions_subscription_profile';
+    /**#@-*/
+    
+    /**#@+
      * Constants for field names
      */
     const WEBSITE_ID = 'website_id';
