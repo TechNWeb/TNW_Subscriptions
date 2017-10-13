@@ -8,10 +8,13 @@ namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Backend\Block\Template;
 use Magento\Quote\Model\Quote;
+use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
+use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\MissedPayments;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\Status;
+use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -20,20 +23,15 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview block
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Overview extends Template
+class Overview extends ContentAbstract implements ExpireWarningSupportInterface
 {
     /**
      * @inheritdoc
      */
     protected $_template = 'TNW_Subscriptions::subscription_profile/summary/overview.phtml';
-
-    /**
-     * Registry model
-     *
-     * @var \Magento\Framework\Registry
-     */
-    private $registry;
 
     /**
      * Next Payment block
@@ -88,6 +86,7 @@ class Overview extends Template
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
+     * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param ProfileOrderCollection $profileOrderCollection ,
      * @param ProfileManager $profileManager
      * @param array $data
@@ -95,24 +94,14 @@ class Overview extends Template
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
+        \TNW\Subscriptions\Model\MessagePool $messagePool,
         ProfileOrderCollection $profileOrderCollection,
         ProfileManager $profileManager,
         array $data = []
     ) {
-        $this->registry = $registry;
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
-        parent::__construct($context, $data);
-    }
-
-    /**
-     * Get current Subscription Profile model
-     *
-     * @return SubscriptionProfile|null
-     */
-    public function getSubscriptionProfile()
-    {
-        return $this->registry->registry('tnw_subscription_profile');
+        parent::__construct($context, $registry, $messagePool, $data);
     }
 
     /**
@@ -322,18 +311,43 @@ class Overview extends Template
         return $this->getChildHtml('billing-information');
     }
 
+    /**
+     * @return string
+     */
     public function getPaymentDetailsHtml()
     {
         return $this->getChildHtml('payment-details');
     }
 
+    /**
+     * @return string
+     */
     public function getProductsHtml()
     {
         return 'products grid';
     }
 
+    /**
+     * @return string
+     */
     public function getDangerZoneHtml()
     {
         return 'DangerZone block';
+    }
+
+    /**
+     * @return MessagePool
+     */
+    public function getMessagePool()
+    {
+        return $this->messagePool;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        return $this->_appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND;
     }
 }

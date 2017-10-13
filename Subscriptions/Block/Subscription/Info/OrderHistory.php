@@ -10,7 +10,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 /**
  * Subscription order history block at customer account dashboard.
  */
-class OrderHistory extends \Magento\Framework\View\Element\Template
+class OrderHistory extends ContentAbstract
 {
     /**
      * @var string
@@ -28,17 +28,20 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
     private $orders;
 
     /**
-     * OrderHistory constructor.
      * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Framework\Registry $registry,
+        \TNW\Subscriptions\Model\MessagePool $messagePool,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         array $data = []
     ) {
-        parent::__construct($context, $data);
+        parent::__construct($context, $registry, $messagePool, $data);
         $this->orderCollectionFactory = $orderCollectionFactory;
     }
 
@@ -76,7 +79,6 @@ class OrderHistory extends \Magento\Framework\View\Element\Template
                 ->setCollection($this->getOrderHistory());
 
             $this->setChild('pager', $pager);
-            $this->getOrderHistory()->load();
         }
 
         return $this;
