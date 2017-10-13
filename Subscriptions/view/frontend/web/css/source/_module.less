@@ -49,7 +49,7 @@
     .existing-customer {
       position: relative;
       width: 35%;
-      padding-bottom: 70px;
+      padding-bottom: 75px;
       padding-right: 5%;
       border: 1px solid #ccc;
       margin-right: 6%;
@@ -459,5 +459,244 @@
 @media (min-width: 768px) {
   .sub-items.order-links li.item a {
     padding: 1px 2rem;
+  }
+}
+
+.subscription-data-wrapper {
+  margin-top: -1px;
+  padding: 25px;
+  border: 1px solid #cccccc;
+}
+
+.mess-history-header {
+  border-bottom: 1px solid #cccccc;
+  font-size: 2rem;
+  padding-bottom: 8px;
+}
+
+.mess-history-list-wrapper {
+  padding-top: 15px;
+}
+
+.mess-history-list-wrapper ul{
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0px;
+}
+
+.history-row {
+  margin: 5px 0px;
+  padding: 5px 15px 10px 15px;
+}
+
+.message-text {
+  width: 100%;
+  padding-bottom: 8px;
+}
+
+.message-source {
+  font-size: 1rem;
+  font-style: italic;
+  float: left;
+}
+
+.message-date {
+  float: right;
+  font-size: 1.2rem;
+}
+.message-clear {
+  clear: both;
+}
+
+.history-row {
+  &:nth-child(odd) {
+    background-color: #f1f1f1;
+  }
+}
+
+.mess-history-toolbar {
+  margin: 25px 0 0 0;
+}
+
+.overview-content {
+  width: 100%;
+  font-size: 2rem;
+  text-align: center;
+
+  &:after {
+    content: '';
+    clear: both;
+    display: block;
+  }
+
+  .title {
+    padding: 10px 0;
+  }
+
+  .next-payment {
+    width: 30%;
+    height: 100%;
+    float: left;
+    margin-bottom: 15px;
+
+    .date.day {
+      padding-top: 10px;
+      font-size: 9rem;
+      line-height: 9rem;
+    }
+
+    .date.month {
+      font-size: 3rem;
+      padding: 4px 0;
+    }
+
+   .cost {
+      margin-top: 30px;
+      padding: 5px 0 10px;
+      font-size: 4rem;
+      background-color: #eee;
+      border-top: 1px solid #999;
+    }
+  }
+
+  .status-message {
+    width: 67%;
+    float: right;
+  }
+
+  .bordered {
+    border: 1px solid #999;
+  }
+
+  .subscription-message {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+
+  .light-green {
+    background: #b6d7a8;
+  }
+
+  .green {
+    background: #009e0f;
+  }
+
+  .red {
+    background: #CF2A27;
+  }
+
+  .orange {
+    background: #FFD966;
+  }
+
+  .block-subscription-message {
+    padding: 29px 0;
+  }
+
+  .subscription-status {
+    vertical-align: top;
+    color: white;
+
+    .title {
+      font-size: 3rem;
+    }
+
+    .value {
+      font-size: 6rem;
+      line-height: 15rem;
+    }
+  }
+}
+
+.subscription-ship-info, .subscription-bill-info {
+  float: left;
+  width: 49%;
+}
+
+.subscription-ship-details, .subscription-payment-details {
+  float: right;
+  width: 49%;
+
+  .table-secondary {
+    tbody tr td {
+      padding: 1rem 1rem;
+      text-align: left;
+    }
+
+    tbody tr td.right {
+      text-align: right;
+    }
+
+    tbody tr:nth-child(2n+1) td {
+      background-color: #f1f1f1;
+    }
+  }
+}
+
+.subscription-data-wrapper {
+
+  .clear {
+    clear: both;
+  }
+
+  .block .block-title {
+    &:after {
+      content: '';
+      clear: both;
+      display: block;
+    }
+
+    strong {
+      float: left;
+    }
+
+    .profile__edit_button {
+      float: left;
+      margin-left: 1rem;
+      text-decoration: none;
+
+      &:before {
+        content: '\e601';
+        font-size: 2.4rem;
+        color: #333333;
+        .lib-css(font-family, @icons__font-name);
+      }
+    }
+  }
+}
+
+.subscription-products {
+  display: inline-block;
+}
+
+.account .subscription-messages { padding: 0; }
+
+@media (max-width: 768px) {
+  .summary-item {
+    width: 100%;
+  }
+
+  .overview-content {
+    .next-payment {
+      width: 100%;
+    }
+    .status-message {
+      width:100%;
+    }
+
+    .block-subscription-message {
+      padding: 5px 0;
+    }
+
+    .subscription-status {
+      .title {
+        padding: 0;
+        font-size: 2rem;
+      }
+
+      .value {
+        line-height: 6rem;
+      }
+    }
   }
 }

@@ -23,6 +23,20 @@ button.profile__edit_button:before {
 button.profile__cancel-edit_button:before{
     content: '\e632';
 }
+.admin__fieldset>.admin__field.field-wide[class]>.admin__field-control {
+    clear: left;
+    float: none;
+    text-align: left;
+    width: auto;
+}
+.admin__fieldset>.admin__field.field-wide[class]:not(.admin__field-option)>.admin__field-label {
+    display: block;
+    line-height: 1.4rem;
+    margin-bottom: .86rem;
+    margin-top: -0.14rem;
+    text-align: left;
+    width: auto;
+}
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form,
 .tnw_subscriptionprofile_form_areas_summary_summary_payment_method_insert_form {
     width: 49.5%;
@@ -594,7 +608,7 @@ button.action-editor.active:before{
 }
 
 .subscription-container .fieldset-wrapper-title {
-    margin-bottom: 20px;
+    border: none;
 }
 
 .subscription-container > .admin__fieldset-wrapper-content{
@@ -628,6 +642,10 @@ button.action-editor.active:before{
 
 .subscription-item-form .description-fieldset .admin__field-label{
     width: 3rem !important;
+}
+
+.subscription-item-form .description-fieldset .admin__field-label span{
+    white-space: nowrap;
 }
 
 .subscription-item-form .description-fieldset .field-name{
@@ -795,4 +813,25 @@ button.action-editor.active:before{
 
 .order_change_history .admin__data-grid-outer-wrap .change-status .comment-message {
     margin-left: 0;
+}
+
+.cancel-popup-float-right {
+    float: right;
+}
+
+.cancel-popup-underlined {
+    text-decoration: underline;
+}
+
+.cancel-popup-spaces {
+    padding-right: 2%;
+    padding-top: 0.5%;
+}
+
+.tnw_subscriptionprofile_cancel_button_popup .admin__fieldset-wrapper-content .admin__fieldset {
+    padding-bottom: 0;
+}
+
+.tnw_subscriptionprofile_cancel_button_popup .modal-header {
+    display: none;
 }

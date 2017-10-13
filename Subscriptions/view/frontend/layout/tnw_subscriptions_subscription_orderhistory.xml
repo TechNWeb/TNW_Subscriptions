@@ -12,7 +12,7 @@
         <referenceContainer name="content">
             <block class="TNW\Subscriptions\Block\Subscription\Info\OrderHistory"
                    name="subscription.info.order.history"
-                   after="subscription.info.links"
+                   after="subscription.info.links" cacheable="false"
             />
         </referenceContainer>
     </body>

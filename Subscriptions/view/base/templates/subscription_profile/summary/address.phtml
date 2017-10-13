@@ -1,0 +1,12 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */ ?>
+<div class="block">
+    <div class="block-title">
+        <strong><?php echo $block->getAddressTitle() ?></strong>
+        <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button"></a>
+    </div>
+    <div class="block-content subscription-profile-<?php echo $this->getAddressType() ?>-address">
+        <address>
+            <?php echo $block->getAddressHtml() ?>
+        </address>
+    </div>
+</div>

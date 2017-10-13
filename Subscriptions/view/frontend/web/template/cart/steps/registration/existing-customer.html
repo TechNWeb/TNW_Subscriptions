@@ -1,37 +1,65 @@
-<div class="existing-customer">
-    <form data-mage-init='{"validation": {}}' class="form form-login" method="post" novalidate="novalidate"
-          data-bind="attr: {action: loginPostUrl}, submit: validateForm" id="existing-customer"
-          data-role="email-for-login"
-    >
-
-        <h2 class="control-spaces">
-            Existing customer
-        </h2>
-
-        <input name="login[username]" class="email control-spaces" type="email"
-               data-validate="{required:true, 'validate-email':true}"
-               data-bind="
-               attr: { placeholder: placeholderEmail },
-               textInput: email,
-               hasFocus: emailFocused"
-        />
-
-        <input name="login[password]" class="password control-spaces" type="password"
-               data-bind="attr: {placeholder: placeholderPassword}"
-               data-validate="{required:true}"
-        />
-
-        <div class="secondary forgot-password">
-            <a class="action remind" data-bind="attr: {href: forgotPasswordUrl}">
-                <span data-bind="i18n: 'Forgot Password?'"></span>
-            </a>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="existing-customer" data-block="authentication">
+    <!-- ko foreach: getRegion('before') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+    <div class="block block-customer-login"
+         data-bind="attr: {'data-label': $t('or')}">
+        <div class="block-title">
+            <h2 class="control-spaces"
+                id="block-customer-login-heading"
+                data-bind="i18n: 'Existing customer'">
+            </h2>
         </div>
-        <div class="button-container">
-            <button type="submit"
-                    class="action primary"
-                    attr="'data-index': index">
-                <span data-bind="i18n: 'Log In'"></span>
-            </button>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="block-content">
+            <form data-role="login"
+                  data-bind="submit:login"
+                  method="post"
+            >
+                    <div class="field email required">
+                        <div class="control">
+                            <input type="email"
+                                   class="input-text email control-spaces"
+                                   id="login-email"
+                                   name="username"
+                                   data-bind="attr: {autocomplete: autocomplete, placeholder: placeholderEmail }"
+                            />
+                        </div>
+                    </div>
+                    <div class="field password required">
+                        <div class="control">
+                            <input type="password"
+                                   class="input-text password control-spaces"
+                                   id="login-password"
+                                   name="password"
+                                   data-bind="attr: {autocomplete: autocomplete, placeholder: placeholderPassword}"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <!-- ko foreach: getRegion('additional-login-form-fields') -->
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!-- /ko -->
+                <div class="secondary forgot-password">
+                    <a class="action remind" data-bind="attr: { href: forgotPasswordUrl }">
+                        <span data-bind="i18n: 'Forgot Password?'"></span>
+                    </a>
+                </div>
+                <div class="actions-toolbar">
+                    <input name="context" type="hidden" value="checkout"/>
+                    <div class="primary">
+                        <button type="submit" class="action primary action-login"><span
+                                data-bind="i18n: 'Login'"></span></button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

@@ -5,14 +5,32 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
+use TNW\Subscriptions\Model\MessagePool;
+
 /**
  * Subscription shipment block at customer account dashboard.
  */
-class Shipment extends \Magento\Framework\View\Element\Template
+class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
 {
-    protected function _toHtml()
+    /**
+     * @var string
+     */
+    protected $_template = 'subscription/shipment.phtml';
+
+    /**
+     * @return MessagePool
+     */
+    public function getMessagePool()
     {
-        //toDo: Subscription shipment block
-        return 'Here is current subscription shipment info';
+        return $this->messagePool;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        return true;
     }
 }

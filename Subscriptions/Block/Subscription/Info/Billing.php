@@ -5,14 +5,32 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
+use TNW\Subscriptions\Model\MessagePool;
+
 /**
  * Subscription billing block on customer account dashboard.
  */
-class Billing extends \Magento\Framework\View\Element\Template
+class Billing extends ContentAbstract implements ExpireWarningSupportInterface
 {
-    protected function _toHtml()
+    /**
+     * @var string
+     */
+    protected $_template = 'subscription/billing.phtml';
+
+    /**
+     * @return MessagePool
+     */
+    public function getMessagePool()
     {
-        //toDo: Subscription billing block
-        return 'Here is current subscription billing info';
+        return $this->messagePool;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        return true;
     }
 }

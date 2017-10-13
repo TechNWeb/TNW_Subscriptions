@@ -15,6 +15,27 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
  */
 class SubscriptionProfile extends AbstractEntity
 {
+
+    /**
+     * @var \Magento\Framework\EntityManager\EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * SubscriptionProfile constructor.
+     * @param \Magento\Eav\Model\Entity\Context $context
+     * @param \Magento\Framework\EntityManager\EntityManager $entityManager
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Eav\Model\Entity\Context $context,
+        \Magento\Framework\EntityManager\EntityManager $entityManager,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -107,5 +128,33 @@ class SubscriptionProfile extends AbstractEntity
         }
 
         return $result ? : [];
+    }
+
+    /**
+     * Reset firstly loaded attributes
+     *
+     * @param \Magento\Framework\Model\AbstractModel $object
+     * @param integer $entityId
+     * @param array|null $attributes
+     * @return $this
+     */
+    public function load($object, $entityId, $attributes = [])
+    {
+        $this->loadAttributesMetadata($attributes);
+        $this->entityManager->load($object, $entityId);
+        return $this;
+    }
+
+    /**
+     * Save entity's attributes into the object's resource
+     *
+     * @param  \Magento\Framework\Model\AbstractModel $object
+     * @return $this
+     * @throws \Exception
+     */
+    public function save(\Magento\Framework\Model\AbstractModel $object)
+    {
+        $this->entityManager->save($object);
+        return $this;
     }
 }

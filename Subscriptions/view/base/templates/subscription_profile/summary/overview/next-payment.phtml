@@ -1,0 +1,9 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment $block */ ?>
+<div class="bordered block-next-payment">
+    <div class="title"><?php echo __('Next Payment') ?></div>
+    <?php $date = $block->getNextPaymentDate() ?>
+    <div class="date day"><?php echo $date ? $date->format('j') : '--' ?></div>
+    <div class="date month"><?php echo $date ? $date->format('F') : '--' ?></div>
+    <div class="date year"><?php echo $date ? $date->format('Y') : '--' ?></div>
+    <div class="cost"><?php echo $block->getCostFormatting() ?></div>
+</div>

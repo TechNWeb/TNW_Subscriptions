@@ -57,7 +57,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Overview</argument>
+                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Overview</argument>
             </htmlContent>
         </container>
         <fieldset name="profit_fieldset">
@@ -138,6 +138,39 @@
                 <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation</argument>
             </htmlContent>
         </container>
+    </fieldset>
+    <fieldset name="additional_attributes">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="boolean">false</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Additional Attributes</item>
+                <item name="additionalClasses" xsi:type="string">additional-attributes-field-set</item>
+                <item name="toolbarSection" xsi:type="string">.additional-attributes-field-set header</item>
+                <item name="messagesClass" xsi:type="string">messages</item>
+            </item>
+        </argument>
+        <insertForm class="Magento\Ui\Component\Container">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/subscription-profile/additional</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="render_url" xsi:type="url" path="mui/index/render_handle">
+                        <param name="handle">tnw_subscriptions_subscriptionprofile_additional_edit</param>
+                        <param name="buttons">1</param>
+                    </item>
+                    <item name="autoRender" xsi:type="boolean">true</item>
+                    <item name="ns" xsi:type="string">tnw_subscriptionprofile_edit_additional_form</item>
+                    <item name="externalProvider" xsi:type="string">${ $.ns }.tnw_subscriptionprofile_edit_additional_form_data_source</item>
+                    <item name="toolbarContainer" xsi:type="string">${ $.parentName }</item>
+                    <item name="formSubmitType" xsi:type="string">ajax</item>
+                    <item name="realTimeLink" xsi:type="boolean">false</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="params.profileId" xsi:type="string">${ $.provider }:data.subscription_profile_id</item>
+                    </item>
+                </item>
+            </argument>
+        </insertForm>
     </fieldset>
     <fieldset name="upcoming_orders">
         <argument name="data" xsi:type="array">

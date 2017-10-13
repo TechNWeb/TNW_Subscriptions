@@ -1,9 +1,11 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <div class="tnw-subscriptions-cart__container">
     <div class="block-main">
-        <!-- ko foreach: getRegion('messages') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-
         <!-- ko foreach: getRegion('progressBar') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -12,7 +14,11 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
     </div>
-    <div class="block-steps">
+    <div class="block-steps" id="checkout">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
         <!-- ko foreach: getRegion('steps') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->

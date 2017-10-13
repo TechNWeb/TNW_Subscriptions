@@ -1,0 +1,25 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview $block */ ?>
+<div class="subscription-data-wrapper ">
+    <?= $block->getTabMessagesHtml()  ?>
+    <div class="overview-content">
+        <?php if ($block->getCanShowNextPayment()): ?>
+            <div class="summary-item next-payment"><?php echo $block->getNextPaymentHtml() ?></div>
+        <?php endif ?>
+        <div class="summary-item status-message">
+            <div class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>">
+                <?php echo $block->getMessageHtml() ?>
+            </div>
+            <div class="bordered subscription-status <?php echo $block->getBlockStatus()->getStatusClass() ?>">
+                <?php echo $block->getStatusHtml() ?>
+            </div>
+        </div>
+    </div>
+    <div class="summary-item subscription-ship-info"><?php echo $block->getShippingInfoHtml() ?></div>
+    <div class="summary-item subscription-ship-details"><?php echo $block->getShippingDetailsHtml() ?></div>
+    <div class="clear"></div>
+    <div class="summary-item subscription-bill-info"><?php echo $block->getBillingInfoHtml() ?></div>
+    <div class="summary-item subscription-payment-details"><?php echo $block->getPaymentDetailsHtml() ?></div>
+    <div class="clear"></div>
+    <div class="subscription-products"><?php echo $block->getProductsHtml() ?></div>
+    <div class="subscription-danger-zone"><?php echo $block->getDangerZoneHtml() ?></div>
+</div>

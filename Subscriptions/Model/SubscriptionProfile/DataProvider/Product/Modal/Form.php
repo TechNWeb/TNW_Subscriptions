@@ -82,7 +82,7 @@ class Form extends AbstractDataProvider
      *
      * @var BillingFrequencyRepository
      */
-    private $frequencyRepository;
+    protected $frequencyRepository;
 
     /**
      * Product billing frequencies cache.

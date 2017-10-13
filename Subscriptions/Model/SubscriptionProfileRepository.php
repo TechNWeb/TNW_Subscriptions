@@ -168,7 +168,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     public function getById($subscriptionProfileId)
     {
         $subscriptionProfile = $this->subscriptionProfileFactory->create();
-        $this->entityManager->load($subscriptionProfile, $subscriptionProfileId);
+        $this->resource->load($subscriptionProfile, $subscriptionProfileId);
         if (!$subscriptionProfile->getId()) {
             throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.',
                 $subscriptionProfileId));

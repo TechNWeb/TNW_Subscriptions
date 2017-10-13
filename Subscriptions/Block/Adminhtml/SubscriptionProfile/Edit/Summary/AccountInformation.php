@@ -11,7 +11,6 @@ use Magento\Backend\Block\Template;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as SubscriptionProfileResource;
@@ -67,15 +66,7 @@ class AccountInformation extends Template
     private $registry;
 
     /**
-     * Timezone interface
-     *
-     * @var TimezoneInterface
-     */
-    private $timezone;
-
-    /**
      * AccountInformation constructor.
-     * @param TimezoneInterface $timezone
      * @param SubscriptionProfileResource $subscriptionProfileResource
      * @param ProfileStatus $profileStatus
      * @param GroupRepositoryInterface $groupRepository
@@ -85,7 +76,6 @@ class AccountInformation extends Template
      * @internal param SubscriptionProfileResource $subscriptionProfile
      */
     public function __construct(
-        TimezoneInterface $timezone,
         SubscriptionProfileResource $subscriptionProfileResource,
         ProfileStatus $profileStatus,
         GroupRepositoryInterface $groupRepository,
@@ -101,7 +91,6 @@ class AccountInformation extends Template
         $this->groupRepository = $groupRepository;
         $this->profileStatus = $profileStatus;
         $this->subscriptionProfileResource = $subscriptionProfileResource;
-        $this->timezone = $timezone;
     }
 
     /**
@@ -288,7 +277,7 @@ class AccountInformation extends Template
         $result = self::DATE_NOT_FOUND;
         if ($date) {
             $dateTime = new DateTime();
-            $result = $this->timezone->date($dateTime->strToTime($date))->format('F dS, Y');
+            $result = $this->_localeDate->date($dateTime->strToTime($date))->format('F dS, Y');
         }
         return $result;
     }
