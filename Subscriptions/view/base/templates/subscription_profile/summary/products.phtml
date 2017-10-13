@@ -6,34 +6,33 @@
     </div>
     <div class="block-content">
         <ol class="items">
-            <?php foreach ($block->getProducts() as $product): ?>
+            <?php foreach ($block->getItems() as $item): ?>
             <li class="item">
                 <div class="product-item-photo">
-                    <?php echo $block->getImage($product, 'product_thumbnail_image', ['class' => 'photo image'])->toHtml(); ?>
+                    <img class="photo image" src="<?php echo $block->getImageUrl($item); ?>" />
                 </div>
                 <div class="product-item-details">
-                    <strong class="product-item-name"><?php echo $product->getMagentoProduct()->getName() ?></strong>
-                    <span class="product-item-description"><?php echo 'asd' ?></span>
+                    <strong class="product-item-name"><?php echo $block->getName($item) ?></strong>
+                    <span class="product-item-qty">(x<?php echo (int)$item->getQty() ?>)</span>
+                    <div class="product-item-description"><?php echo $block->getDescription($item) ?></div>
                     <dl class="item-options">
-                        <dt>Color</dt>
-                        <dd>Green</dd>
-                        <dt>Size</dt>
-                        <dd>28</dd>
+                        <dt class="qty"><?php echo __('Qty') ?></dt>
+                        <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
                 </div>
                 <div class="additional">
                     <dl>
-                        <dt>Billing Frequency</dt>
-                        <dd></dd>
-                        <dt>Term</dt>
-                        <dd></dd>
-                        <dt>Start on</dt>
-                        <dd></dd>
-                        <dt>Price</dt>
-                        <dd></dd>
+                        <dt><?php echo __('Billing Frequency') ?></dt>
+                        <dd><?php echo $block->getBillingFrequencyLabel() ?></dd>
+                        <dt><?php echo __('Term') ?></dt>
+                        <dd><?php echo $block->getTerm() ?></dd>
+                        <dt><?php echo __('Start on') ?></dt>
+                        <dd><?php echo $block->getStartOn()->format('m/d/Y') ?></dd>
+                        <dt><?php echo __('Price') ?></dt>
+                        <dd><?php echo $block->formatPrice($item->getPrice()) ?></dd>
                     </dl>
                 </div>
-                <div style="clear: both"></div>
+                <div class="product-item-frequency-description"><?php echo $block->getFrequencyDescription($item) ?></div>
             </li>
             <?php endforeach; ?>
         </ol>
@@ -45,12 +44,26 @@
     }
 
     .products .product-item-photo {
-        float: left;
-        width: 100px;
+        display: inline-block;
+        width: 18%;
+        text-align: center;
     }
 
     .products .product-item-details {
-        float: left;
+        display: inline-block;
+        width: 54%;
+        padding-left: 1rem;
+    }
+
+    .products .product-item-name {
+        font-size: 2rem;
+        margin: 0;
+        display: inline-block;
+    }
+
+    .products .product-item-qty {
+        display: none;
+        font-weight: bold;
     }
 
     .products dt:after {
@@ -58,11 +71,21 @@
     }
 
     .products .additional {
-        width: 150px;
-        float: right;
+        display: inline-block;
+        width: 18%;
         border-left: 1px solid #ccc;
         margin: 5px;
-        padding: 5px;
+        padding: 5px 5px 5px 1rem;
+    }
+
+    .products .additional:after {
+        content: '';
+        clear: both;
+        display: block;
+    }
+
+    .products .product-item-frequency-description {
+        display: none;
     }
 
     .products .items {
@@ -71,9 +94,63 @@
 
     .products .item {
         border-bottom: 1px solid #ccc;
+        margin: 0;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .products .item > div {
+        vertical-align: top;
     }
 
     .products .item:last-child {
         border-bottom-width: 0;
+    }
+
+    .products .item-options dt {
+        float: left;
+    }
+
+    .products .item-options dd {
+        padding-left: 4rem;
+    }
+
+    .products .item-options dd:after {
+        content: '';
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .products .additional {
+            display: none;
+        }
+
+        .products .product-item-name {
+            font-size: 1.6rem;
+        }
+
+        .products .product-item-photo {
+            width: 10%;
+        }
+
+        .products .product-item-details {
+            width: 80%;
+        }
+
+        .products .product-item-description {
+            display: none;
+        }
+
+        .products .product-item-qty {
+            display: inline-block;
+        }
+
+        .products .item-options .qty, .products .item-options .qty + dd {
+            display: none;
+        }
+
+        .products .product-item-frequency-description {
+            display: block;
+        }
     }
 </style>
