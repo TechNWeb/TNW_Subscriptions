@@ -183,16 +183,9 @@ class Products extends Template
      */
     public function getTerm()
     {
-        switch ($this->getSubscriptionProfile()->getTerm()) {
-            case 0:
-                return __('Bill %1 times', $this->getSubscriptionProfile()->getTotalBillingCycles());
-
-            case 1:
-                return __('Until canceled');
-
-            default:
-                return '';
-        }
+        return !$this->getSubscriptionProfile()->getTerm()
+            ? __('Bill %1 times', $this->getSubscriptionProfile()->getTotalBillingCycles())
+            : __('Until canceled');
     }
 
     /**
