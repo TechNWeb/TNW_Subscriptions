@@ -662,6 +662,12 @@
         .lib-css(font-family, @icons__font-name);
       }
     }
+
+    @media (max-width: 768px) {
+      .profile__edit_button {
+        float: right;
+      }
+    }
   }
 }
 
@@ -696,6 +702,128 @@
 
       .value {
         line-height: 6rem;
+      }
+    }
+  }
+}
+
+.subscription-data-wrapper .subscription-products {
+  .products {
+    .block-content {
+      border: 1px solid #ccc;
+      padding: 0 2rem;
+    }
+
+    .product-item-photo {
+      display: inline-block;
+      width: 18%;
+      text-align: center;
+    }
+
+    .product-item-details {
+      display: inline-block;
+      width: 54%;
+      padding-left: 1rem;
+    }
+
+    .product-item-name {
+      font-size: 2rem;
+      margin: 0;
+      display: inline-block;
+    }
+
+    .product-item-qty {
+      display: none;
+      font-weight: bold;
+    }
+
+    .additional {
+      display: inline-block;
+      width: 18%;
+      border-left: 1px solid #ccc;
+      margin: 5px;
+      padding: 5px 5px 5px 1rem;
+
+      &:after {
+        content: '';
+        clear: both;
+        display: block;
+      }
+    }
+
+    .product-frequency-description {
+      display: none;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    dt:after {
+      content: ':';
+    }
+
+    .item-options {
+      dt {
+        float: left;
+      }
+
+      dd {
+        padding-left: 4rem;
+
+        &:after {
+          content: '';
+          display: block;
+        }
+      }
+    }
+
+    .items {
+      .item {
+        border-bottom: 1px solid #ccc;
+        margin: 0;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+
+        &:last-child {
+          border-bottom-width: 0;
+        }
+      }
+
+      .item > div {
+        vertical-align: top;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .additional {
+        display: none;
+      }
+
+      .product-item-name {
+        font-size: 1.6rem;
+      }
+
+      .product-item-photo {
+        width: 10%;
+      }
+
+      .product-item-details {
+        width: 80%;
+      }
+
+      .product-item-description {
+        display: none;
+      }
+
+      .product-item-qty {
+        display: inline-block;
+      }
+
+      .item-options .qty, .item-options .qty + dd {
+        display: none;
+      }
+
+      .product-frequency-description {
+        display: block;
       }
     }
   }

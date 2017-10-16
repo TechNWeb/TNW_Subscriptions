@@ -41,6 +41,11 @@ class Products extends Template
      */
     private $resourceSubscriptionProfile;
 
+    /**
+     * @var \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType
+     */
+    private $trialLengthUnitType;
+
     public function __construct(
         Template\Context $context,
         \Magento\Catalog\Helper\ImageFactory $imageFactory,
@@ -48,6 +53,7 @@ class Products extends Template
         \Magento\Framework\Locale\CurrencyInterface $currency,
         \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType $frequencyUnitType,
         \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile $resourceSubscriptionProfile,
+        \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType $trialLengthUnitType,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -56,6 +62,7 @@ class Products extends Template
         $this->currency = $currency;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->resourceSubscriptionProfile = $resourceSubscriptionProfile;
+        $this->trialLengthUnitType = $trialLengthUnitType;
     }
 
     /**
@@ -169,45 +176,86 @@ class Products extends Template
      */
     public function getTerm()
     {
-        $result = '';
-        $term = $this->getSubscriptionProfile()->getTerm();
-        $lastOrderData = $this->resourceSubscriptionProfile
-            ->getLastOrderData($this->getSubscriptionProfile(), false);
-
-        switch ($term) {
+        switch ($this->getSubscriptionProfile()->getTerm()) {
             case 0:
-                $date = '';
-                if (!empty($lastOrderData)) {
-                    $date = $lastOrderData['scheduled_at'];
-                }
+                return __('Bill %1 times', $this->getSubscriptionProfile()->getTotalBillingCycles());
 
-                $this->getSubscriptionProfile()->getTotalBillingCycles();
-                $result = $this->_localeDate->date($date)->format('F dS, Y');
-                break;
             case 1:
-                if (!empty($lastOrderData)) {
-                    $result = __('Until canceled');
-                }
-                break;
-            default:
-                break;
-        }
+                return __('Until canceled');
 
-        return $result;
+            default:
+                return '';
+        }
     }
 
     /**
-     * @param ProductSubscriptionProfileInterface $item
      * @return string
      */
-    public function getFrequencyDescription(ProductSubscriptionProfileInterface $item)
+    public function getFrequencyDescription()
     {
-        $frequencyUnit = $this->getFrequencyWithUnit($this->getSubscriptionProfile()->getBillingFrequencyId());
-        return __('<b>%1/%2</b>. Shipped every %2 for %3 starting on %4',
-            $this->formatPrice($this->getPrice($item)),
-            $frequencyUnit,
-            '2 years',
-            $this->getStartOn()->format('F jS Y'));
+        $profile = $this->getSubscriptionProfile();
+
+        $initialFee = $price = 0;
+        foreach ($this->getItems() as $item) {
+            $initialFee += $item->getInitialFee();
+            $price += $this->getPrice($item);
+        }
+
+        $initialFee += (float)$profile->getTotalValue();
+
+        $formattedPrice = !empty($initialFee)
+            ? $this->formatPrice($initialFee) : __('Free');
+
+        if ($profile->getTrialLength()) {
+            $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
+                $profile->getTrialLength(), $profile->getTrialLengthUnit());
+            $description[] = __('%1 for %2 and then', $formattedPrice, $frequencyTrialPeriod);
+        } else if ($initialFee) {
+            $description[] = __('%1 initial charge and then', $formattedPrice);
+        }
+
+        $frequencyUnit = $this->getFrequencyWithUnit($profile->getBillingFrequencyId());
+        $description[] = __('%1 / every %2.', $this->formatPrice($price), $frequencyUnit);
+
+        if (!$profile->getTerm()) {
+            $subscriptionPeriod = $profile->getTotalBillingCycles();
+            $description[] = __('Total of %1 %2.',
+                $subscriptionPeriod, $this->getShipmentLabel($subscriptionPeriod));
+        }
+
+        $description[] = __('Products will be shipped every %1 starting %2.',
+            $frequencyUnit, $this->getStartOn()->format('F jS Y'));
+
+        return implode(' ', $description);
+    }
+
+    /**
+     * Return Billing Frequency Trial with unit (e.g. "6 months")
+     *
+     * @param $period
+     * @param $unitId
+     * @return string
+     */
+    private function getFrequencyTrialWithUnit($period, $unitId)
+    {
+        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength($unitId, $period);
+        return strtolower($period . ' ' . $unitLabel);
+    }
+
+    /**
+     * Get shipment label depends on subscription period.
+     *
+     * @param int $subscriptionPeriod
+     * @return \Magento\Framework\Phrase
+     */
+    private function getShipmentLabel($subscriptionPeriod)
+    {
+        $label = 'shipment';
+        if ($subscriptionPeriod != 1) {
+            $label .= "s";
+        }
+
+        return __($label);
     }
 
     /**
