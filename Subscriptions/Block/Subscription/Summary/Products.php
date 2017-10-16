@@ -201,8 +201,6 @@ class Products extends Template
             $price += $this->getPrice($item);
         }
 
-        $initialFee += (float)$profile->getTotalValue();
-
         $formattedPrice = !empty($initialFee)
             ? $this->formatPrice($initialFee) : __('Free');
 
