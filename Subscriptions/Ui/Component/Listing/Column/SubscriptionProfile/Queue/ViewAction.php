@@ -12,6 +12,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use TNW\Subscriptions\Model\Source\Queue\Status;
 
 class ViewAction extends Column
 {
@@ -61,7 +62,7 @@ class ViewAction extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (isset($item['id']) && $this->isNeedShowActions($item['scheduled_at'])) {
+                if (isset($item['id']) && $this->isNeedShowActions($item)) {
                     $item[$this->getData('name')] = [
                         'process' => [
                             'href' => $this->urlBuilder->getUrl(
@@ -90,15 +91,26 @@ class ViewAction extends Column
     }
 
     /**
-     * If scheduled date greater than date now try show actions.
+     * If scheduled date greater than date now
+     * and status != 'complete' try to show actions.
      *
-     * @param $scheduledAt string date in format 'Y-m-d H:i:s'.
+     * @param array $item
      * @return bool
      */
-    private function isNeedShowActions($scheduledAt)
+    private function isNeedShowActions(array $item)
     {
+        $needToShow = false;
+        $scheduledAt = $this->timezone->date($item['scheduled_at'])->format('Y-m-d H:i:s');
         $dateTime = new DateTime();
         $dateNow = $dateTime->strToTime($this->timezone->date()->format('Y-m-d H:i:s'));
-        return $dateNow > $dateTime->strToTime($scheduledAt);
+
+        if (
+            ($dateNow > $dateTime->strToTime($scheduledAt))
+            && ($item['status'] !== Status::QUEUE_STATUS_COMPLETE)
+        ) {
+            $needToShow = true;
+        }
+
+        return $needToShow;
     }
 }

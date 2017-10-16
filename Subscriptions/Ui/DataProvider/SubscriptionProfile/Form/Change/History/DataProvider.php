@@ -27,7 +27,6 @@ class DataProvider extends AbstractDataProvider
      */
     private $timezone;
 
-
     /**
      * DataProvider constructor.
      * @param TimezoneInterface $timezone

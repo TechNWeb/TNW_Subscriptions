@@ -10,7 +10,31 @@
     <update handle="tnw_subscriptions_subscription_info_links"/>
     <body>
         <referenceContainer name="content">
-            <block class="TNW\Subscriptions\Block\Subscription\Info\View" name="subscription.info.view" after="subscription.info.links"/>
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview"
+                   name="subscription.info.view" after="subscription.info.links">
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
+                       name="subscription.info.view.shipping.information" as="shipping-information"
+                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
+                    <action method="setAddressType">
+                        <argument name="type" xsi:type="string">shipping</argument>
+                    </action>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details"
+                       name="subscription.info.view.shipping.details"
+                       template="TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml"
+                       as="shipping-details" />
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
+                       name="subscription.info.view.billing.information" as="billing-information"
+                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
+                    <action method="setAddressType">
+                        <argument name="type" xsi:type="string">billing</argument>
+                    </action>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details"
+                       name="subscription.info.view.payment.details"
+                       template="TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml"
+                       as="payment-details" />
+            </block>
         </referenceContainer>
     </body>
 </page>

@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Class Manager
@@ -51,7 +52,12 @@ class Manager
     protected $coreRegistry;
 
     /**
-     * Mapper between subscription product and magentp product attrbites.
+     * @var MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
+     * Mapper between subscription product and magento product attributes.
      *
      * @var array
      */
@@ -63,6 +69,9 @@ class Manager
         ProductSubscriptionProfile::OFFER_FLAT_DISCOUNT_STATUS => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
         ProductSubscriptionProfile::DISCOUNT_AMOUNT => Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
         ProductSubscriptionProfile::DISCOUNT_TYPE => Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+        ProductSubscriptionProfile::SKU => 'sku',
+        ProductSubscriptionProfile::NAME => 'name',
+        ProductSubscriptionProfile::TNW_SUBSCR_UNLOCK_PRESET_QTY => Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
     ];
 
     /**
@@ -74,11 +83,13 @@ class Manager
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         ProductRepository $productRepository,
-        Registry $coreRegistry
+        Registry $coreRegistry,
+        MessageHistoryLogger $historyLogger
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->productRepository = $productRepository;
         $this->coreRegistry = $coreRegistry;
+        $this->historyLogger = $historyLogger;
     }
 
 
@@ -213,7 +224,11 @@ class Manager
             $objectItemId = isset($data['objectItemId']) ? $data['objectItemId'] : false;
             if ($objectItemId) {
                 /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
-                foreach ($profileProducts as &$product) {
+                foreach ($profileProducts as $product) {
+
+                    // Restore original data
+                    $product->setOrigData();
+
                     if ($product->getId() == $objectItemId) {
                         $productDataChanges = $product->hasDataChanges();
                         $product->setDataChanges(false);
@@ -221,6 +236,7 @@ class Manager
                         $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : false;
                         if ($remove) {
                             $product->delete();
+                            $this->historyLogger->log(__('Deleted product %1.', $product->getMagentoProduct()->getName()), $profileModel->getId());
                         } else {
                             $product->setPrice(number_format($requestData['price'], 4));
                             $product->setQty(number_format($requestData['qty'], 4));
@@ -228,6 +244,25 @@ class Manager
                         if ($product->hasDataChanges()) {
                             $product->setNeedRecollect('1');
                         }
+
+                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::PRICE)) {
+                            $message = __('Updated product %1. Price changed from %2 to %3.',
+                                $product->getMagentoProduct()->getName(),
+                                $product->getOrigData(ProductSubscriptionProfileInterface::PRICE),
+                                $product->getData(ProductSubscriptionProfileInterface::PRICE));
+
+                            $this->historyLogger->log($message, $profileModel->getId());
+                        }
+
+                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::QTY)) {
+                            $message = __('Updated product %1. Qty changed from %2 to %3.',
+                                $product->getMagentoProduct()->getName(),
+                                $product->getOrigData(ProductSubscriptionProfileInterface::QTY),
+                                $product->getData(ProductSubscriptionProfileInterface::QTY));
+
+                            $this->historyLogger->log($message, $profileModel->getId());
+                        }
+
                         $product->setDataChanges($productDataChanges || $product->hasDataChanges());
                     }
                 }

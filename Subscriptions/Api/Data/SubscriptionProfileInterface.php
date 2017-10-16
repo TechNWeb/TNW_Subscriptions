@@ -45,6 +45,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
+    const CANCEL_BEFORE_NEXT_CYCLE = 'cancel_before_next_cycle';
     /**#@-*/
 
     /**#@+
@@ -530,4 +531,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setNeedRecollect($needRecollect);
+
+    /**
+     * Gets cancel before next cycle.
+     *
+     * @return bool
+     */
+    public function getCancelBeforeNextCycle();
+
+    /**
+     * Sets cancel before next cycle.
+     *
+     * @param bool $cancelBeforeNextCycle
+     * @return $this
+     */
+    public function setCancelBeforeNextCycle($cancelBeforeNextCycle);
 }

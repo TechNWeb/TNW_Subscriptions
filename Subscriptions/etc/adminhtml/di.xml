@@ -225,6 +225,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
                     <item name="sortOrder" xsi:type="number">90</item>
                 </item>
+                <item name="cancel_button_popup" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\CancelButtonPopup</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>

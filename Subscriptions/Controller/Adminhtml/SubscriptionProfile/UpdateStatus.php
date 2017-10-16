@@ -9,11 +9,8 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
  * Action To update status in Subscription Profile
@@ -21,56 +18,38 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 class UpdateStatus extends Action
 {
     /**
-     * Repository profile
+     * Model for update status.
      *
-     * @var SubscriptionProfileRepository
+     * @var UpdateStatusModel
      */
-    private $profileRepository;
+    private $updateStatusModel;
 
     /**
-     * The Manager that define logic of status change on Subscription Profile
-     *
-     * @var StatusManager
-     */
-    private $statusManager;
-
-    /**
-     * Profile status data source
-     *
-     * @var ProfileStatus
-     */
-    private $statusSource;
-
-    /**
-     * Message history logger
+     * Message history logger.
      *
      * @var MessageHistoryLogger
      */
     private $messageHistoryLogger;
-    
+
+
     /**
      * @param Context $context
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param StatusManager $statusManager
-     * @param ProfileStatus $statusSource
+     * @param UpdateStatusModel $updateStatusModel
      * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         Context $context,
-        SubscriptionProfileRepository $profileRepository,
-        StatusManager $statusManager,
-        ProfileStatus $statusSource,
+        UpdateStatusModel $updateStatusModel,
         MessageHistoryLogger $messageHistoryLogger
     ) {
-        $this->profileRepository = $profileRepository;
-        $this->statusManager = $statusManager;
-        $this->statusSource = $statusSource;
+        $this->updateStatusModel = $updateStatusModel;
         $this->messageHistoryLogger = $messageHistoryLogger;
+
         parent::__construct($context);
     }
 
     /**
-     * Update status in Subscription Profile
+     * Update status in Subscription Profile.
      *
      * @return Redirect
      */
@@ -80,36 +59,16 @@ class UpdateStatus extends Action
         $newStatus = $this->getRequest()->getParam('status');
 
         try {
-            /* @var SubscriptionProfile $model */
-            $model = $this->profileRepository->getById($profileId);
-
-            if (!$this->statusManager->canChangeStatus($model, $newStatus)) {
-                $this->messageManager->addErrorMessage(
-                    __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
-                );
-                return $this->getRedirect();
-            }
-
-            $oldStatus = $model->getStatus();
-            $model->setStatus($newStatus);
-            $this->profileRepository->save($model);
-            $this->logChangeStatus($model, $oldStatus);
-
-            $this->messageManager->addSuccessMessage(__(
-                'Status successfully changed to "%1"',
-                $this->statusSource->getLabelByValue($newStatus)
-            ));
-
+            $this->updateStatusModel->updateStatus($profileId, $newStatus);
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
-            return $this->getRedirect();
         }
 
         return $this->getRedirect();
     }
 
     /**
-     * Acl check for admin
+     * Acl check for admin.
      *
      * @return bool
      */
@@ -121,7 +80,7 @@ class UpdateStatus extends Action
     }
 
     /**
-     * Retrieve redirect model
+     * Retrieve redirect model.
      *
      * @return Redirect
      */
@@ -129,24 +88,7 @@ class UpdateStatus extends Action
     {
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
+
         return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
-    }
-
-    /**
-     * Log change status in to Subscription Profile history
-     *
-     * @param SubscriptionProfile $model
-     * @param int $oldStatus
-     * @return void
-     */
-    private function logChangeStatus(SubscriptionProfile $model, $oldStatus)
-    {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED),
-            $this->statusSource->getLabelByValue($oldStatus),
-            $this->statusSource->getLabelByValue($model->getStatus())
-        );
-
-        $this->messageHistoryLogger->log($message, $model->getId());
     }
 }

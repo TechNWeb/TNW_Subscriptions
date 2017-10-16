@@ -71,6 +71,26 @@ define(
             },
 
             /**
+             * Hide and show edit and remove buttons on products form.
+             *
+             * @param {Object} current
+             * @param {boolean} previewMode
+             */
+            hideEditButtons: function (current, previewMode) {
+                _.each(registry.filter('index = form'), function (form) {
+                    if (form !== current) {
+                        _.each(form.editButtons, function (item) {
+                                _.each(registry.filter('index = remove_button'), function (removeButton) {
+                                    removeButton.visible(!previewMode)
+                                });
+                                registry.get(item).visible(!previewMode);
+                            }
+                        );
+                    }
+                });
+            },
+
+            /**
              * Toggles "previewMode" property.
              */
             togglePreviewMode: function () {
@@ -78,9 +98,11 @@ define(
                 var previewMode = this.previewMode();
                 _.each(this.editButtons, function (item) {
                     if (!previewMode) {
+                        current.hideEditButtons(current, previewMode);
                         current.buttonPreviewMode(false);
                         registry.get(item).deactivate();
                     } else {
+                        current.hideEditButtons(current, previewMode);
                         current.buttonPreviewMode(true);
                         registry.get(item).activate();
                     }
@@ -93,6 +115,7 @@ define(
              */
             toggleButtonPreviewMode: function () {
                 this.buttonPreviewMode(!this.buttonPreviewMode());
+                this.hideEditButtons(this, !this.buttonPreviewMode());
             },
 
             /**

@@ -39,9 +39,35 @@ class Collection extends SearchResult
         $mainTable = SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
         $resourceModel = Resource::class
     ) {
-        parent::__construct($entityFactory, $logger, $fetchStrategy,
-            $eventManager, $mainTable, $resourceModel
+        parent::__construct(
+            $entityFactory,
+            $logger,
+            $fetchStrategy,
+            $eventManager,
+            $mainTable,
+            $resourceModel
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _initInitialFieldsToSelect()
+    {
+        parent::_initInitialFieldsToSelect();
+
+        $this->_initialFieldsToSelect = array_merge(
+            $this->_initialFieldsToSelect,
+            [
+                'website_id',
+                'status',
+                'trial_start_date',
+                'start_date',
+                'created_at',
+            ]
+        );
+
+        return $this;
     }
 
     /**
@@ -53,47 +79,43 @@ class Collection extends SearchResult
     {
         parent::_initSelect();
         $connection = $this->getConnection();
-        $columns = [
-            'entity_id' => 'main_table.entity_id',
-            'label' => $connection->getConcatSql(
-                [
-                    $connection->quote(SubscriptionProfileInterface::LABEL_PREFIX),
-                    'main_table.entity_id'
-                ]
-            ),
-            'customer_name' => $connection->getConcatSql(
-                [
-                    'customer.firstname',
-                    'customer.lastname'
-                ],
-                ' '
-            ),
-            'customer_email' => 'customer.email',
-            'frequency_label' => 'frequency.label',
-            'website_id' => 'main_table.website_id',
-            'status' => 'main_table.status',
-            'trial_start_date' => 'main_table.trial_start_date',
-            'start_date' => 'main_table.start_date',
-            'next_billing_cycle_date' => 'relation.scheduled_at',
-            'grand_total' => 'quotes.grand_total',
-            'created_at' => 'main_table.created_at'
-        ];
+
+        $this->addFieldToSelect(
+            [
+                'label' => $connection->getConcatSql(
+                    [
+                        $connection->quote(SubscriptionProfileInterface::LABEL_PREFIX),
+                        'main_table.entity_id',
+                    ]
+                ),
+            ]
+        );
+
         $this->getSelect()->join(
             ['frequency' => BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE],
-            'main_table.billing_frequency_id = frequency.id'
+            'main_table.billing_frequency_id = frequency.id',
+            ['frequency_label' => 'frequency.label']
         )->joinLeft(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-            'relation.id = (' . (string)$this->getRelationJoinSelect(). ')'
+            'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
+            ['next_billing_cycle_date' => 'relation.scheduled_at']
         )->joinLeft(
             ['quotes' => 'quote'],
-            'quotes.entity_id = relation.magento_quote_id'
+            'quotes.entity_id = relation.magento_quote_id',
+            ['grand_total' => 'quotes.grand_total']
         )->join(
             ['customer' => $connection->getTableName('customer_entity')],
-            'customer.entity_id = main_table.customer_id'
-        )->reset(
-            \Zend_Db_Select::COLUMNS
-        )->columns(
-            $columns
+            'customer.entity_id = main_table.customer_id',
+            [
+                'customer_name' => $connection->getConcatSql(
+                    [
+                        'customer.firstname',
+                        'customer.lastname',
+                    ],
+                    ' '
+                ),
+                'customer_email' => 'customer.email',
+            ]
         );
 
         return $this;

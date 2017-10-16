@@ -1,0 +1,43 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Subscription\Info\ChangeHistory */
+?>
+<?php $messagesCollection = $block->getChangeHistoryCollection(); ?>
+<?php if ($messagesCollection && count($messagesCollection)): ?>
+    <div class="subscription-data-wrapper ">
+        <div class="mess-history-header"><?php /* @escapeNotVerified */ echo __('Subscription Change History') ?></div>
+        <div class="mess-history-list-wrapper">
+            <ul>
+                <?php foreach ($messagesCollection as $messageItem): ?>
+                    <li class="history-row">
+                        <div class="message-text">
+                            <?php echo $messageItem->getMessage();?>
+                        </div>
+                        <div class="message-source">
+                            <?php echo sprintf(__('by %s'), $block->getMessageSource($messageItem)); ?>
+                        </div>
+                        <div class="message-date">
+                            <?php echo $block->getFormattedDate($messageItem->getCreatedAt()); ?>
+                        </div>
+                        <div class="message-clear"/>
+                    </li>
+                <?php endforeach;?>
+            </ul>
+        </div>
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="subscriptions-products-toolbar toolbar bottom mess-history-toolbar">
+                <?php echo $block->getPagerHtml(); ?>
+            </div>
+        <?php endif ?>
+    </div>
+<?php else: ?>
+    <div class="message info empty">
+        <span>
+            <?php /* @escapeNotVerified */ echo __('There are no messages about current subscription history'); ?>
+        </span>
+    </div>
+<?php endif;?>
