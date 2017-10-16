@@ -46,6 +46,11 @@ class Products extends Template
      */
     private $trialLengthUnitType;
 
+    /**
+     * @var \Magento\Sales\Model\OrderRepository
+     */
+    private $orderRepository;
+
     public function __construct(
         Template\Context $context,
         \Magento\Catalog\Helper\ImageFactory $imageFactory,
@@ -54,6 +59,7 @@ class Products extends Template
         \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType $frequencyUnitType,
         \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile $resourceSubscriptionProfile,
         \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType $trialLengthUnitType,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -63,6 +69,7 @@ class Products extends Template
         $this->frequencyUnitType = $frequencyUnitType;
         $this->resourceSubscriptionProfile = $resourceSubscriptionProfile;
         $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -195,11 +202,16 @@ class Products extends Template
     {
         $profile = $this->getSubscriptionProfile();
 
-        $initialFee = $price = 0;
+        $price = 0;
         foreach ($this->getItems() as $item) {
-            $initialFee += $item->getInitialFee();
             $price += $this->getPrice($item);
         }
+
+        $orderData = $this->getSubscriptionProfile()->getResource()
+            ->getFirstOrderData($profile);
+
+        $initialFee = $this->orderRepository->get($orderData['magento_order_id'])
+            ->getGrandTotal();
 
         $formattedPrice = !empty($initialFee)
             ? $this->formatPrice($initialFee) : __('Free');
