@@ -1,5 +1,6 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview $block */ ?>
 <div class="subscription-data-wrapper ">
+    <?= $block->getTabMessagesHtml()  ?>
     <div class="overview-content">
         <?php if ($block->getCanShowNextPayment()): ?>
             <div class="summary-item next-payment"><?php echo $block->getNextPaymentHtml() ?></div>

@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Subscription\Info\Tab\Messages */
+?>
+<div class="subscription-messages messages">
+    <?php $types = $block->getMessageTypes(); ?>
+    <?php foreach ($types as $type): ?>
+        <?php foreach ($block->getGroupMessages($type) as $message): ?>
+            <div class="message-<?php echo $type ?> <?php echo $type ?> message">
+                <div><?php echo $message; ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php endforeach; ?>
+</div>

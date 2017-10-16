@@ -27,11 +27,11 @@
             <?php foreach ($subscriptionsCollection as $subscription): ?>
                 <tr>
                     <td data-th="" class="sub-icons-container">
-                        <?php if ($block->getIconSubClass($subscription->getStatus())): ?>
-                            <div class="sub-icon tooltip-toggle <?php echo $block->getIconSubClass($subscription->getStatus()) ?>"></div>
+                        <?php if ($block->getIconSubClass($subscription)): ?>
+                            <div class="sub-icon tooltip-toggle <?php echo $block->getIconSubClass($subscription) ?>"></div>
                         <?php endif; ?>
                         <div class="sub-message tooltip-content">
-                            <?php echo $block->getStatusMessage($subscription->getStatus(), $subscription->getNextBillingCycleDate()) ?>
+                            <?php echo $block->getStatusMessage($subscription) ?>
                         </div>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Subscription #')) ?>" class="col id">

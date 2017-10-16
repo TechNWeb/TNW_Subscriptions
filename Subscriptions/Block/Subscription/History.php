@@ -11,6 +11,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as SubscriptionProfileManager;
@@ -18,6 +19,8 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 
 /**
  * Subscriptions history block instance.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class History extends \Magento\Framework\View\Element\Template
 {
@@ -68,22 +71,28 @@ class History extends \Magento\Framework\View\Element\Template
     private $config;
 
     /**
+     * @var ProfileCcUtils
+     */
+    private $utils;
+    
+    /**
      * @var int
      */
     private $websiteId;
 
     /**
-     * History constructor.
-     *
-     * @param Session $customerSession
-     * @param PriceCurrencyInterface $priceFormatter
-     * @param ProfileStatus $profileStatus
-     * @param Manager $profileOrderManager
-     * @param Context $context
+     * @param Session                    $customerSession
+     * @param PriceCurrencyInterface     $priceFormatter
+     * @param ProfileStatus              $profileStatus
+     * @param Manager                    $profileOrderManager
+     * @param Context                    $context
      * @param SubscriptionProfileManager $subscriptionProfileManager
-     * @param CollectionFactory $collectionFactory
-     * @param Config $config
-     * @param array $data
+     * @param CollectionFactory          $collectionFactory
+     * @param Config                     $config
+     * @param ProfileCcUtils             $utils
+     * @param array                      $data
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Session $customerSession,
@@ -94,6 +103,7 @@ class History extends \Magento\Framework\View\Element\Template
         SubscriptionProfileManager $subscriptionProfileManager,
         CollectionFactory $collectionFactory,
         Config $config,
+        ProfileCcUtils $utils,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -103,6 +113,7 @@ class History extends \Magento\Framework\View\Element\Template
         $this->subscriptionProfileManager = $subscriptionProfileManager;
         $this->subscriptionCollectionFactory = $collectionFactory;
         $this->config = $config;
+        $this->utils = $utils;
         parent::__construct($context, $data);
     }
 
@@ -118,35 +129,40 @@ class History extends \Magento\Framework\View\Element\Template
         }
         if (!$this->subscriptions) {
             $collection = $this->subscriptionCollectionFactory->create();
-
-            $this->subscriptions = $collection->addFieldToFilter(
-                'main_table.customer_id',
-                ['eq' => $customerId]
-            )->setOrder(
-                'created_at',
-                'desc'
-            );
+            $this->subscriptions = $collection
+                ->addFieldToSelect(
+                    [
+                        'engine_code',
+                        'payment_additional_info',
+                    ]
+                )->addFieldToFilter(
+                    'main_table.customer_id',
+                    ['eq' => $customerId]
+                )->setOrder(
+                    'created_at',
+                    'desc'
+                );
         }
 
         return $this->subscriptions;
     }
 
     /**
-     * @return $this
+     * @inheritdoc
      */
     protected function _prepareLayout()
     {
         parent::_prepareLayout();
         if ($this->getSubscriptionsCollection()) {
             $pager = $this->getLayout()->createBlock(
-                'Magento\Theme\Block\Html\Pager',
+                \Magento\Theme\Block\Html\Pager::class,
                 'sales.order.history.pager'
             )->setCollection(
                 $this->getSubscriptionsCollection()
             );
             $this->setChild('pager', $pager);
-            $this->getSubscriptionsCollection()->load();
         }
+
         return $this;
     }
 
@@ -154,8 +170,8 @@ class History extends \Magento\Framework\View\Element\Template
      * Retrieve format price.
      * e.g. $11.99
      *
-     * @param $price
-     * @param string $currencyCode
+     * @param float $price
+     * @param \Magento\Framework\Model\AbstractModel|string|null $currencyCode
      * @return float
      */
     public function formatPrice($price, $currencyCode)
@@ -163,7 +179,7 @@ class History extends \Magento\Framework\View\Element\Template
         $result = null;
 
         if ($price) {
-            $currencyCode = ($currencyCode) ? $currencyCode : null;
+            $currencyCode = $currencyCode ?: null;
             $result = $this->priceFormatter->format(
                 $price,
                 false,
@@ -220,19 +236,19 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Retrieve icon class for appearance.
      *
-     * @param string $status
+     * @param \Magento\Framework\DataObject $subscription
      * @return string
      */
-    public function getIconSubClass($status)
+    public function getIconSubClass($subscription)
     {
         $result = '';
 
-        switch ($status) {
+        switch ($subscription->getStatus()) {
             case ProfileStatus::STATUS_ACTIVE:
             case ProfileStatus::STATUS_TRIAL:
             case ProfileStatus::STATUS_HOLDED:
                 $result = 'sub-icon-active-green';
-                if ($this->checkCreditCardExpire()) {
+                if ($this->checkCreditCardExpire($subscription)) {
                     $result = 'sub-icon-warning-orange';
                 }
                 break;
@@ -251,13 +267,28 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Retrieve status message.
      *
-     * @param int|string $status
-     * @param $scheduledAt
+     * @param \Magento\Framework\DataObject $subscription
      * @return string
      */
-    public function getStatusMessage($status, $scheduledAt)
+    public function getStatusMessage(\Magento\Framework\DataObject $subscription)
     {
-        return $this->profileOrderManager->getStatusMessage($status, $scheduledAt);
+        $activeStatuses = [
+            ProfileStatus::STATUS_ACTIVE,
+            ProfileStatus::STATUS_HOLDED,
+            ProfileStatus::STATUS_TRIAL,
+        ];
+
+        if (
+            in_array($subscription->getStatus(), $activeStatuses) &&
+            $this->checkCreditCardExpire($subscription)
+        ) {
+            return __('Credit Card will expire before next billing cycle.');
+        }
+
+        return $this->profileOrderManager->getStatusMessage(
+            $subscription->getStatus(),
+            $subscription->getNextBillingCycleDate()
+        );
     }
 
     /** Check if Action Column can be shown. Depends on actions than can be shown.
@@ -368,9 +399,17 @@ class History extends \Magento\Framework\View\Element\Template
         return $this->getChildHtml('pager');
     }
 
-    private function checkCreditCardExpire()
+    /**
+     * Check Cc expiration date.
+     *
+     * @param \Magento\Framework\DataObject $subscription
+     * @return bool
+     */
+    private function checkCreditCardExpire(\Magento\Framework\DataObject $subscription)
     {
-        //todo add logic to check expire date credit card
-        return false;
+        return $this->utils->isCcExpireBy(
+            $subscription,
+            $subscription->getNextBillingCycleDate()
+        );
     }
 }
