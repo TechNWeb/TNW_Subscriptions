@@ -176,34 +176,22 @@ class CreateProfile extends BaseCreate
     public function addToSubscription($productData)
     {
         $this->productModifier->reset();
-
         $result = [];
-        try {
-            $this->productModifier->setData($productData);
-            $product = $this->productModifier->getPreparedProduct();
-            $quote = $this->getSubQuote();
-            $item = $quote->addProduct(
-                $product,
-                $this->productModifier->getPreparedBuyRequest()
-            );
-            if ($item instanceof Item) {
-                $this->productModifier->setInitialFeeToItem($item);
-                $quote->setTotalsCollectedFlag(false);
-                $quote->getShippingAddress()->setCollectShippingRates(true);
-                $this->quoteCreator->getCartRepository()->save($quote);
-                $result['error'] = false;
-            } else {
-                $result = [
-                    'error' => true,
-                    'message' => $item
-                ];
-            }
-        } catch (\Exception $e) {
-            $this->getContext()->log($e->getMessage());
-            $result = [
-                'error' => true,
-                'message' => $e->getMessage()
-            ];
+        $this->productModifier->setData($productData);
+        $product = $this->productModifier->getPreparedProduct();
+        $quote = $this->getSubQuote();
+        $item = $quote->addProduct(
+            $product,
+            $this->productModifier->getPreparedBuyRequest()
+        );
+        if ($item instanceof Item) {
+            $this->productModifier->setInitialFeeToItem($item);
+            $quote->setTotalsCollectedFlag(false);
+            $quote->getShippingAddress()->setCollectShippingRates(true);
+            $this->quoteCreator->getCartRepository()->save($quote);
+            $result['error'] = false;
+        } else {
+            $this->getContext()->throwException($item);
         }
 
         return $result;

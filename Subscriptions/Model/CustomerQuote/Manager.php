@@ -216,7 +216,6 @@ class Manager
     {
         $buyRequest = $item->getBuyRequest()->getDataByPath(CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
         $uniqueData = $buyRequest[CreateProfile::UNIQUE];
-        $nonUniqueData = $buyRequest[CreateProfile::NON_UNIQUE];
         $result = [
             'billing_frequency' => $uniqueData['billing_frequency'],
             'period' => $uniqueData['period'],

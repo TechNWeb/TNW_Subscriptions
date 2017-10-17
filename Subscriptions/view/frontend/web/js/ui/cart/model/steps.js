@@ -43,6 +43,17 @@ define([
             },
 
             /**
+             * Destroys step data source.
+             * @param step
+             */
+            resetDataSource: function (step) {
+                var stepDataSource = registry.get(step.blockNamespace + '.' + step.blockNamespace);
+                if (stepDataSource && stepDataSource.source) {
+                    stepDataSource.source.destroy();
+                }
+            },
+
+            /**
              * Renders current step.
              */
             renderCurrentStep: function () {
@@ -53,9 +64,11 @@ define([
                     var insertForm = registry.get(this.name + '.' + 'insert_form');
                     insertForm.render_url = config.render_url + '?' + this.getRenderParams(step);
                     insertForm.renderSettings.url = insertForm.render_url;
+                    insertForm.externalFormName = step.blockNamespace + '.' + step.blockNamespace;
                     insertForm.ns = step.blockNamespace;
                     insertForm.params.namespace = step.blockNamespace;
                     this.isLoading(true);
+                    this.resetDataSource(step);
                     insertForm.destroyInserted();
                     insertForm.render();
                 }

@@ -7,15 +7,14 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 /**
- * Interface ModifierInterface
+ * Interface ErrorInterface
  */
-interface ProcessInterface  extends ErrorInterface
+interface ErrorInterface
 {
     /**
-     * Processes data.
+     * Returns list of errors.
      *
-     * @param array $data
-     * @return void
+     * @return array
      */
-    public function process(array $data);
+    public function getErrors();
 }

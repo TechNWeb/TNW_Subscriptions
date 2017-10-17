@@ -191,7 +191,7 @@ class Manager
             ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, null, 'null')
             ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID, null, 'notnull')
             ->setSortOrders([$sortOrder]);
-        if (!$all){
+        if (!$all) {
             $this->criteriaBuilder->setPageSize(1);
         }
         /** @var SearchCriteriaInterface $searchCriteria */
@@ -234,7 +234,7 @@ class Manager
      * Retrieve status message.
      *
      * @param int|string $status
-     * @param string$scheduledAt
+     * @param string $scheduledAt
      * @return string
      */
     public function getStatusMessage($status, $scheduledAt)
@@ -242,7 +242,7 @@ class Manager
         $result = '';
         switch ($status) {
             case ProfileStatus::STATUS_ACTIVE:
-                $result =  __('Subscription is current');
+                $result = __('Subscription is current');
                 break;
             case ProfileStatus::STATUS_HOLDED:
                 $result = __('Subscription is inactive');
@@ -305,17 +305,17 @@ class Manager
      */
     private function getDaysUntilSuspended($scheduledAt)
     {
-        if (!$scheduledAt) {
-            return 0;
+        $result = 0;
+        if ($scheduledAt) {
+            $period = min([
+                (int)$this->config->getGracePeriod(),
+                (int)$this->config->getAttemptCount() * (int)$this->config->getAttemptInterval(),
+            ]);
+            $beginPeriod = new \DateTime($scheduledAt . " +$period days");
+            $dayDateDiff = $beginPeriod->diff(new \DateTime())->days;
+            $result = ($dayDateDiff > 0) ? $dayDateDiff : 0;
         }
 
-        $period = min([
-            intval($this->config->getGracePeriod()),
-            intval($this->config->getAttemptCount()) * intval($this->config->getAttemptInterval()),
-        ]);
-        $beginPeriod = new \DateTime($scheduledAt . " +$period days");
-        $dayDateDiff = $beginPeriod->diff(new \DateTime())->days;
-
-        return ($dayDateDiff > 0) ? $dayDateDiff : 0;
+        return $result;
     }
 }
