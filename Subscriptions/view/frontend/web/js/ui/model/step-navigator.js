@@ -54,6 +54,7 @@ define(
                     code: code,
                     alias: alias !== null ? alias : code,
                     blockNamespace: step.blockNamespace,
+                    renderProductListing: step.renderProductListing,
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
                     title: $t(step.title),

@@ -15,7 +15,6 @@
                 <item name="products" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
                 <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
                 <item name="payment" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Payment</item>
-                <item name="shipping" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Address</item>
             </argument>
         </arguments>
     </type>

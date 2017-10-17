@@ -180,6 +180,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                                 'label' => $this->getInfoFieldSetLabel(),
                                 'collapsible' => false,
                                 'componentType' => Form\Fieldset::NAME,
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                 'sortOrder' => 20,
                                 'dataScope' => $this->getInfoFieldSetDataScope(),
                             ],

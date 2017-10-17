@@ -7,8 +7,9 @@ define([
     'Magento_Ui/js/form/element/abstract',
     'TNW_Subscriptions/js/ui/model/step-navigator',
     'jquery',
-    'uiRegistry'
-], function (Abstract, stepNavigator, $, registry) {
+    'uiRegistry',
+    'mage/validation'
+], function (Abstract, stepNavigator, $, registry, validation) {
     'use strict';
 
     return Abstract.extend({
@@ -21,8 +22,10 @@ define([
          */
         onNextStepClick: function () {
             var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
-            if (stepNavigator.getActiveItemCode() === 'products' && isLoggedIn) {
-                stepNavigator.navigateTo('address');
+
+            var activeCode = stepNavigator.getActiveItemCode();
+            if (activeCode === 'products' && isLoggedIn) {
+                stepNavigator.navigateTo('shipping');
             } else {
                 stepNavigator.navigateNext();
             }

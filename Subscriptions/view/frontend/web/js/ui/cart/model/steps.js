@@ -44,7 +44,9 @@ define([
 
             /**
              * Destroys step data source.
+             *
              * @param step
+             * @todo need use array block namespace
              */
             resetDataSource: function (step) {
                 var stepDataSource = registry.get(step.blockNamespace + '.' + step.blockNamespace);
@@ -61,16 +63,38 @@ define([
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
                     var config = registry.get('cart').checkoutConfig;
-                    var insertForm = registry.get(this.name + '.' + 'insert_form');
-                    insertForm.render_url = config.render_url + '?' + this.getRenderParams(step);
-                    insertForm.renderSettings.url = insertForm.render_url;
-                    insertForm.externalFormName = step.blockNamespace + '.' + step.blockNamespace;
-                    insertForm.ns = step.blockNamespace;
-                    insertForm.params.namespace = step.blockNamespace;
+                    var insertFormContent = registry.get(this.name + '.' + 'insert_form_content');
+
+                    insertFormContent.render_url = config.render_url + '?' + this.getRenderParams(step);
+                    insertFormContent.renderSettings.url = insertFormContent.render_url;
+                    insertFormContent.externalFormName = step.blockNamespace.content + '.' + step.blockNamespace.content;
+
+                    insertFormContent.ns = step.blockNamespace.content;
+                    insertFormContent.params.namespace = step.blockNamespace.content;
+
+                    insertFormContent.cssclass = 'checkout_content_' + step.code;
+
+                    if (step.blockNamespace.right) {
+                        var insertFormRight = registry.get(this.name + '.' + 'insert_form_right');
+                        insertFormRight.render_url = config.render_url + '?' + this.getRenderParams(step);
+                        insertFormRight.ns = step.blockNamespace.right;
+                        insertFormRight.params.namespace = step.blockNamespace.right;
+                        insertFormRight.renderSettings.url = insertFormRight.render_url;
+                        insertFormRight.externalFormName = step.blockNamespace.right + '.' + step.blockNamespace.right;
+
+                        insertFormRight.cssclass = 'checkout_right_' + step.code;
+                    }
+
                     this.isLoading(true);
                     this.resetDataSource(step);
-                    insertForm.destroyInserted();
-                    insertForm.render();
+
+                    if (insertFormRight) {
+                        insertFormRight.destroyInserted();
+                        insertFormRight.render();
+                    }
+
+                    insertFormContent.destroyInserted();
+                    insertFormContent.render();
                 }
             },
 
