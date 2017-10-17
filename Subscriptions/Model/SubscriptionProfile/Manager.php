@@ -399,17 +399,21 @@ class Manager
                 $ccNumber = $this->propertyAdditionalInfo($additionalInfo, 'cc_last_4');
                 $ccNumberOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_last_4');
                 if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
-                    $message = __('Payment method changed. Card number changed from %1 to %2',
-                        sprintf('XXXX%s', $ccNumberOld),
-                        sprintf('XXXX%s', $ccNumber));
-
+                    $message = __('Credit Card number was changed to %1', sprintf('XXXX%s', $ccNumber));
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
                 $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
                 $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
                 if (strcasecmp($ccExpOld, $ccExp) !== 0) {
-                    $message = __('Payment method changed. Expiration date changed from %1 to %2', $ccExp, $ccExpOld);
+                    $message = __('Exp. Date was changed to %1', $ccExp);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+
+                $ccVeri = $this->propertyAdditionalInfo($additionalInfo, 'cc_cid');
+                $ccVeriOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_cid');
+                if (strcasecmp($ccVeriOld, $ccVeri) !== 0) {
+                    $message = __('Card Verification Number was changed');
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
             }
