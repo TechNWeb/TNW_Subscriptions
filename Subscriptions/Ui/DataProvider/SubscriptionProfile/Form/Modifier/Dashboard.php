@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use Magento\Framework\Stdlib\DateTime\Timezone;
 
 /**
  * Dashboard for Subscription Profile.
@@ -52,14 +53,18 @@ class Dashboard extends BaseFormModifier
     private $profileOrderManager;
 
     /**
-     * Dashboard constructor.
-     *
+     * @var Timezone
+     */
+    private $timezone;
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param DataPersistorInterface $dataPersistor
      * @param ProfitCalculator $profitCalculator
      * @param ProfileOrderManager $profileOrderManager
-     * @param ProfileCcUtils      $utils
+     * @param ProfileCcUtils $utils
+     * @param Timezone $timezone
      */
     public function __construct(
         UrlInterface $urlBuilder,
@@ -67,12 +72,14 @@ class Dashboard extends BaseFormModifier
         DataPersistorInterface $dataPersistor,
         ProfitCalculator $profitCalculator,
         ProfileOrderManager $profileOrderManager,
-        ProfileCcUtils $utils
+        ProfileCcUtils $utils,
+        Timezone $timezone
     ) {
         $this->dataPersistor = $dataPersistor;
         $this->profitCalculator = $profitCalculator;
         $this->profileOrderManager = $profileOrderManager;
         $this->utils = $utils;
+        $this->timezone = $timezone;
         parent::__construct($urlBuilder, $registry);
     }
 
@@ -152,7 +159,31 @@ class Dashboard extends BaseFormModifier
             }
         }
 
+        // Say that profile will be canceled next cycle
+        if ($profile && $profile->getCancelBeforeNextCycle()) {
+            $date = $this->getCancelBeforeNextCycleDate();
+            if ($date) {
+                $messages[] = sprintf(__("Subscription will be canceled on %s"), $date ?: '--');
+            }
+        }
+
         return $messages;
+    }
+
+    /**
+     * Retrieve cancel date in case of cancellation is delayed.
+     *
+     * @return string
+     */
+    private function getCancelBeforeNextCycleDate()
+    {
+        $result = false;
+        $nextPayment = $this->profileOrderManager->getNextProfileRelation($this->getProfile());
+        if ($nextPayment) {
+            $result = $this->timezone->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
+        }
+
+        return $result;
     }
 
     /**
