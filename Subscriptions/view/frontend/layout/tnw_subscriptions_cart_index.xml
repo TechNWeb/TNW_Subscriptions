@@ -97,6 +97,15 @@
                                         <item name="displayArea" xsi:type="string">data_source</item>
                                         <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
                                     </item>
+                                    <item name="bottom_next_step" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">50</item>
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">bottomNextStep</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/next-step</item>
+                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/action/next-step</item>
+                                        </item>
+                                    </item>
                                 </item>
                             </item>
                         </item>

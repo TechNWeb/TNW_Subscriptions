@@ -6,20 +6,23 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
+use Magento\Backend\Model\View\Result\Redirect;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
+/**
+ * Class Start
+ */
 class Start extends SubscriptionProfile
 {
     /**
      * Start order create action
      *
-     * @return \Magento\Backend\Model\View\Result\Redirect
+     * @return Redirect
      */
     public function execute()
     {
         $this->clearSessionData();
-
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
         return $resultRedirect->setPath('tnw_subscriptions/subscriptionprofile/create');

@@ -137,9 +137,11 @@ class ModifyForm extends Form
                 $product = $this->getProductFromItem($item);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
                 $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-                $itemPrice = $presetQty
-                    ? $subBuyRequest[Create::NON_UNIQUE]['price'] * $item->getQty()
-                    : $subBuyRequest[Create::NON_UNIQUE]['price'];
+                $itemPrice = $this->getItemPrice(
+                    $presetQty,
+                    $subBuyRequest[Create::NON_UNIQUE]['price'],
+                    $item
+                );
                 $data[self::FORM_DATA_VALUE]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
                     'initial_fee' => $this->getInitialFeeFromItem($item),
@@ -267,11 +269,7 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/modify-subscriptions-form',
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
-                        'editButtons' => [
-                            'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
-                            'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
-                            'qty_button' => $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button'
-                        ]
+                        'editButtons' => $this->getFormEditButtons()
                     ]
                 ]
             ],
@@ -306,9 +304,9 @@ class ModifyForm extends Form
      */
     protected function getFormFullName($container, $containerItem)
     {
-        return self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM
-            . '.' . self::CONTAINER_PREFIX . $container
-            . '.' . self::CONTAINER_ITEM_PREFIX . $containerItem
+        return $this::DATA_SCOPE_MODAL_FORM . '.' . $this::DATA_SCOPE_MODAL_FORM
+            . '.' . $this::CONTAINER_PREFIX . $container
+            . '.' . $this::CONTAINER_ITEM_PREFIX . $containerItem
             . '.form';
     }
 
@@ -421,7 +419,7 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'component' => 'Magento_Ui/js/form/components/group',
+                        'component' => 'TNW_Subscriptions/js/components/group',
                         'componentType' => UiContainer::NAME,
                         'additionalForGroup' => false,
                         'fieldTemplate' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -542,7 +540,7 @@ class ModifyForm extends Form
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-primary sub-button-right',
+                        'additionalClasses' => 'action-primary action primary sub-button-right',
                         'subButtonRight' => true,
                         'title' => __('Update'),
                         'actions' => [
@@ -765,7 +763,7 @@ class ModifyForm extends Form
                 'data' => [
                     'config' => [
                         'label' => __('Start on:'),
-                        'additionalClasses' => 'field-wide',
+                        'additionalClasses' => 'field-wide field-date',
                         'dataType' => 'string',
                         'dataScope' => 'start_on',
                         'formElement' => UiForm\Element\DataType\Date::NAME,
@@ -1032,5 +1030,34 @@ class ModifyForm extends Form
         }
 
         return $initialFee;
+    }
+
+    /**
+     * Returns item price.
+     *
+     * @param $presetQty
+     * @param string|float $price
+     * @param DataObject $item
+     * @return float
+     */
+    protected function getItemPrice($presetQty, $price, $item)
+    {
+        return $presetQty
+            ? $price * $item->getQty()
+            : $price;
+    }
+
+    /**
+     * Returns form edit buttons.
+     *
+     * @return array
+     */
+    protected function getFormEditButtons()
+    {
+        return [
+            'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
+            'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
+            'qty_button' => $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button'
+        ];
     }
 }

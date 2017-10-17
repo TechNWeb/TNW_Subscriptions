@@ -113,7 +113,7 @@ define(
                     sortedItems.forEach(function (element) {
                         if (element.code === code) {
                             element.isActive(true);
-                            self._applyHash(code);
+                            self.applyHash(code);
                         } else {
                             element.isActive(false);
                         }
@@ -133,7 +133,7 @@ define(
                 sortedItems.forEach(function (element) {
                     if (element.code === code) {
                         element.isActive(true);
-                        self._applyHash(code);
+                        self.applyHash(code);
                     } else {
                         element.isActive(false);
                     }
@@ -159,7 +159,7 @@ define(
                         scrollTo = steps()[activeIndex + 1].scrollTo;
 
                     steps()[activeIndex + 1].isActive(true);
-                    this._applyHash(code);
+                    this.applyHash(code);
                     if (scrollTo && $(scrollTo).length && $(scrollTo).offset().top > screenHeight) {
                         body.animate({scrollTop: $(scrollTo).offset().top}, 0);
                     }
@@ -205,9 +205,8 @@ define(
              * Apply hash to current url
              *
              * @param {String} hash
-             * @private
              */
-            _applyHash: function (hash) {
+            applyHash: function (hash) {
                 var urlParts = window.location.href.split('#'),
                     url = urlParts[0];
 

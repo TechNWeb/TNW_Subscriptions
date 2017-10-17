@@ -4,9 +4,9 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Product\Modified;
+namespace TNW\Subscriptions\Controller\Subscription\Create\Products;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
+use TNW\Subscriptions\Controller\Subscription\AbstractSave;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 

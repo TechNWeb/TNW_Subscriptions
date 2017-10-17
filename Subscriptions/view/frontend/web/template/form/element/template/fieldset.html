@@ -45,7 +45,7 @@
 
     <div class="fieldset-wrapper-content"
          css="'collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
-        <fieldset
+        <div
                 if="opened() || _wasOpened"
                 class="fieldset"
                 each="data: elems, as: 'element'" render=""/>
