@@ -51,6 +51,18 @@ class Products extends Template
      */
     private $orderRepository;
 
+    /**
+     * Products constructor.
+     * @param Template\Context $context
+     * @param \Magento\Catalog\Helper\ImageFactory $imageFactory
+     * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
+     * @param \Magento\Framework\Locale\CurrencyInterface $currency
+     * @param \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType $frequencyUnitType
+     * @param \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile $resourceSubscriptionProfile
+     * @param \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType $trialLengthUnitType
+     * @param \Magento\Sales\Model\OrderRepository $orderRepository
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         \Magento\Catalog\Helper\ImageFactory $imageFactory,
