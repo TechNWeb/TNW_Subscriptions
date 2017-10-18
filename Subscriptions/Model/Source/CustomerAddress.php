@@ -281,13 +281,10 @@ class CustomerAddress implements OptionSourceInterface
      */
     private function getProfileId()
     {
-        if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND)
-        {
-            $profileId = (int)$this->request->getParam('entity_id', 0);
-        } else {
-            $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
-        }
+        $field = $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND
+            ? 'entity_id'
+            : SummaryInsertForm::FORM_DATA_KEY;
 
-        return $profileId;
+        return (int)$this->request->getParam($field, 0);
     }
 }

@@ -2,7 +2,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
+/*jquery:true*/
 define([
     'jquery'
 ], function ($) {
@@ -39,12 +39,16 @@ define([
 
         /**
          * First initialization.
+         *
+         * @private
+         * @returns void
          */
         _initialize: function () {
-            var showEdit = this.options.showEdit;
+            var showEdit = this.options.showEdit,
+                customerAddresses = $(this.options.customerAddressesList),
+                addressSelectVisibility = false;
+
             this.setFormsVisibility(showEdit);
-            var customerAddresses = $(this.options.customerAddressesList);
-            var addressSelectVisibility = false;
 
             if (customerAddresses && customerAddresses.val() * 1) {
                 addressSelectVisibility = true;
@@ -54,6 +58,9 @@ define([
 
         /**
          * Event binding
+         *
+         * @private
+         * @returns void
          */
         _bind: function () {
             var widget = this,
@@ -106,7 +113,8 @@ define([
         /**
          * Fill address form inputs with data from customer addresses.
          *
-         * @param customerAddressesSelect
+         * @param {} customerAddressesSelect
+         * @returns void
          */
         fillInputsData: function(customerAddressesSelect) {
             var widget = this,
@@ -126,9 +134,7 @@ define([
                 $.each(form.find(this.options.addressFields), function (key, field) {
                     widget.updateFieldValue(field, selectedAddressData[field.id]);
                 });
-
             }
-
         },
 
         /**
@@ -136,6 +142,7 @@ define([
          *
          * @param field
          * @param fieldValue
+         * @returns void
          */
         updateFieldValue: function(field, fieldValue) {
             var fieldElem = $(field);
@@ -144,13 +151,13 @@ define([
                 if ($(field).hasClass('address-field')) {
                     fieldElem.change();
                 }
-
         },
 
         /**
          * Save address.
          *
-         * @param e
+         * @param {EventObject} e
+         * @returns void
          */
         saveAddress: function(e) {
             var form = $(this.options.formSelector);
@@ -177,44 +184,47 @@ define([
         /**
          * Display/hide info/edit forms.
          *
-         * @param showEdit
+         * @param {bool|string} showEdit
+         * @returns void
          */
         setFormsVisibility: function(showEdit) {
-            this.setElemsVisibility($(this.options.infoViewSelector), showEdit);
-            this.setElemsVisibility($(this.options.infoEditSelector), !showEdit);
+            this._setElemsVisibility($(this.options.infoViewSelector), showEdit);
+            this._setElemsVisibility($(this.options.infoEditSelector), !showEdit);
         },
 
         /**
          * Display/hide address fields.
          *
-         * @param visibility
+         * @param {bool} visibility
+         * @returns void
          */
         setAddressFieldsVisibility: function (visibility) {
-            this.setElemsVisibility($(this.options.customerAddressesList), visibility);
-            this.setElemsVisibility($(this.options.addressFieldsList), !visibility);
+            this._setElemsVisibility($(this.options.customerAddressesList), visibility);
+            this._setElemsVisibility($(this.options.addressFieldsList), !visibility);
             if ($(this.options.customerAddressesList+' option').size() > 1) {
-                this.setElemsVisibility($(this.options.pickFromSavedButton), !visibility);
-                this.setElemsVisibility($(this.options.addNewAddressButton), visibility);
+                this._setElemsVisibility($(this.options.pickFromSavedButton), !visibility);
+                this._setElemsVisibility($(this.options.addNewAddressButton), visibility);
             } else {
-                this.setElemsVisibility($(this.options.pickFromSavedButton), false);
-                this.setElemsVisibility($(this.options.addNewAddressButton), false);
+                this._setElemsVisibility($(this.options.pickFromSavedButton), false);
+                this._setElemsVisibility($(this.options.addNewAddressButton), false);
             }
         },
 
         /**
          * Display/hide field.
          *
-         * @param elem
-         * @param visible
+         * @private
+         * @param {jQuery} elem
+         * @param {bool|string} visible
+         * @returns void
          */
-        setElemsVisibility: function (elem, visible) {
+        _setElemsVisibility: function (elem, visible) {
             if (visible) {
                 elem.show();
             } else {
                 elem.hide();
             }
         }
-
     });
 
     return $.mage.tnwSubscribePrice;

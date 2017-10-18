@@ -8,7 +8,8 @@
 
 /** @var $block TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit */
 ?>
-
+<?php /** @var \Magento\Customer\Helper\Address $customerAddressHelper */
+$customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);?>
 <fieldset class="fieldset-shipping" id="customer-data">
     <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Information') ?></span></legend>
 
@@ -20,7 +21,7 @@
                    value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
-                   class="info-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('firstname') ?>"/>
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('firstname') ?>"/>
         </div>
     </div>
     <div class="field field-name-lastname required">
@@ -31,7 +32,7 @@
                    value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
-                   class="info-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('lastname') ?>"/>
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('lastname') ?>"/>
         </div>
     </div>
     <div class="field company">
@@ -42,7 +43,7 @@
                    title="<?php /* @escapeNotVerified */ echo __('Company') ?>"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('Company') ?>"
-                   class="info-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('company') ?>">
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('company') ?>">
         </div>
     </div>
     <div class="field telephone required">
@@ -51,7 +52,7 @@
                    name="shipping_address[telephone]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
-                   class="info-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('telephone') ?>"
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('telephone') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
                    id="telephone">
         </div>
@@ -66,7 +67,7 @@
         <a id="add-new" class="action" href="javascript:"><div><?php /* @escapeNotVerified */ echo __('Add New Address') ?></div></a>
     </div>
     <div id="shipping-fields-list">
-        <?php $_streetValidationClass = $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('street'); ?>
+        <?php $_streetValidationClass = $customerAddressHelper->getAttributeValidationClass('street'); ?>
         <div class="field street required">
             <div class="control">
                 <input type="text"
@@ -78,7 +79,7 @@
                        class="address-field input-text <?php /* @escapeNotVerified */ echo $_streetValidationClass ?>"  />
                 <div class="nested">
                     <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
-                    <?php for ($_i = 1, $_n = $this->helper('Magento\Customer\Helper\Address')->getStreetLines(); $_i < $_n; $_i++): ?>
+                    <?php for ($_i = 1, $_n = $customerAddressHelper->getStreetLines(); $_i < $_n; $_i++): ?>
                         <div class="field additional">
                             <div class="control">
                                 <input type="text"
@@ -95,14 +96,14 @@
             </div>
         </div>
 
-        <?php if ($this->helper('Magento\Customer\Helper\Address')->isVatAttributeVisible()) : ?>
+        <?php if ($customerAddressHelper->isVatAttributeVisible()) : ?>
             <div class="field taxvat">
                 <div class="control">
                     <input type="text"
                            name="shipping_address[vat_id]"
                            value="<?php echo $block->escapeHtml($block->getAddress()->getVatId()) ?>"
                            title="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
-                           class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('vat_id') ?>"
+                           class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('vat_id') ?>"
                            placeholder="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
                            id="vat_id">
                 </div>
@@ -115,7 +116,7 @@
                        value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('City') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('City') ?>"
-                       class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('city') ?>"
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('city') ?>"
                        id="city">
             </div>
         </div>
@@ -130,7 +131,7 @@
                        value="<?php echo $block->escapeHtml($block->getRegion()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
-                       class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
             </div>
         </div>
         <div class="field zip required">
@@ -141,7 +142,7 @@
                        title="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
                        id="zip"
                        placeholder="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
-                       class="address-field input-text validate-zip-international <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('postcode') ?>">
+                       class="address-field input-text validate-zip-international <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('postcode') ?>">
             </div>
         </div>
         <div class="field country required">
@@ -157,7 +158,7 @@
                        title="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
                        value="<?php echo $block->escapeHtml($block->getAddress()->getFax()) ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
-                       class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('fax') ?>">
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('fax') ?>">
             </div>
         </div>
         <div class="field choice">
@@ -183,7 +184,7 @@
                 "form": "#shipping-address-form",
                 "regionJson": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
                 "defaultRegion": "<?php /* @escapeNotVerified */ echo $block->getRegionId() ?>",
-                "countriesWithOptionalZip": <?php /* @escapeNotVerified */ echo $this->helper('Magento\Directory\Helper\Data')->getCountriesWithOptionalZip(true) ?>
+                "countriesWithOptionalZip": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
             }
         }
     }

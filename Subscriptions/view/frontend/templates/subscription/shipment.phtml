@@ -11,12 +11,10 @@
         "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveAddressUrl()) ?>",
         "showEdit": "<?php echo $block->isShowEdit() ?>",
         "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>"
-    }}'
->
+    }}'>
     <?php echo $block->getTabMessagesHtml(); ?>
     <div class="shipping-info-content">
         <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
         <div id="shipping-info-edit"><?php echo $block->getShippingInfoEditHtml() ?></div>
-
     </div>
 </div>

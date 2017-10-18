@@ -173,8 +173,6 @@ class AddressEdit extends Edit
             ->setExtraParams('data-validate="{\'validate-select\':true}"')
             ->getHtml();
 
-        \Magento\Framework\Profiler::stop('TEST: ' . __METHOD__);
-
         return $html;
     }
 
