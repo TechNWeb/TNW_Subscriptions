@@ -35,10 +35,10 @@ class Process extends Action
     private $profileProcessor;
 
     /**
+     * Process constructor.
      * @param Context $context
-     * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
      * @param Manager $queueManager
-     * @param MessageHistoryLogger $messageHistoryLogger
+     * @param ProfileProcessor $profileProcessor
      */
     public function __construct(
         Context $context,
@@ -62,7 +62,8 @@ class Process extends Action
         if ($queueId) {
             try {
                 $collection = $this->queueManager->getBaseCollection();
-                $collection->addFieldToFilter('main_table.' . Queue::ID, $queueId);
+                $collection->addFilterToMap(Queue::ID, 'main_table.' . Queue::ID);
+                $collection->addFieldToFilter(Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
                 if ($item && $item->getId()){
