@@ -3,7 +3,8 @@ define(
         'jquery',
         'Magento_Ui/js/form/form',
         'uiRegistry',
-        'underscore'
+        'underscore',
+        'mage/translate'
     ],
     function ($, Component, registry, _) {
         'use strict';
@@ -11,30 +12,37 @@ define(
         return Component.extend({
 
             beforeSubmit: function () {
-                var fieldset;
-
                 this.validate();
                 if (this.source.params.invalid){
                     return;
                 }
 
-                var current = this;
+                var current = this,
+                    needShowRequiredError = false;
+
                 _.each(this.source.data.payment, function (fields, code) {
-                    fieldset = registry.get('index = ' + code);
-                    fieldset.resetErrors();
-                    if (fields.method === "1"){
+                    if (fields.method === "1") {
                         switch (code) {
                             case 'payflowpro':
-                                fieldset.beforeSubmit();
+                                registry.get('index = ' + code).beforeSubmit();
                                 break;
                             case 'checkmo':
                             default:
                                 current.save();
                         }
+                        needShowRequiredError = false;
                     } else {
-                        fieldset.set('payment_errors', ['Please select payment.']);
+                        needShowRequiredError = true;
                     }
                 });
+
+                if (needShowRequiredError) {
+                    var firstFieldSet = registry.get('index = payment_information').elems()[0];
+                    if (firstFieldSet !== undefined) {
+                        firstFieldSet.resetErrors();
+                        firstFieldSet.set('payment_errors', [$.mage.__('Please select payment.')]);
+                    }
+                }
             },
 
             triggerSave:function (errors) {
