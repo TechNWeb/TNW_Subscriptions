@@ -10,7 +10,8 @@
      data-mage-init='{"tnwSubscribeShipment":{
         "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveAddressUrl()) ?>",
         "showEdit": "<?php echo $block->isShowEdit() ?>",
-        "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>"
+        "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>",
+        "emptyCountryLabel": "<?php echo __('Country') ?>"
     }}'>
     <?php echo $block->getTabMessagesHtml(); ?>
     <div class="shipping-info-content">

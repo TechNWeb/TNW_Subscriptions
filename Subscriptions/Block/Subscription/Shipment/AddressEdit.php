@@ -103,49 +103,6 @@ class AddressEdit extends Edit
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getCountryHtmlSelect(
-        $defValue = null,
-        $name = 'shipping_address[country_id]',
-        $id = 'country',
-        $title = 'Country'
-    ) {
-        \Magento\Framework\Profiler::start('TEST: ' . __METHOD__, ['group' => 'TEST', 'method' => __METHOD__]);
-
-        if ($defValue === null) {
-            $defValue = $this->getCountryId();
-        }
-
-        $cacheKey = 'DIRECTORY_COUNTRY_SELECT_STORE_' . $this->_storeManager->getStore()->getCode();
-        $cache = $this->_configCacheType->load($cacheKey);
-
-        if ($cache) {
-            $options = unserialize($cache);
-        } else {
-            $options = $this->getCountryCollection()
-                ->setForegroundCountries($this->getTopDestinations())
-                ->toOptionArray(__('Country'));
-            $this->_configCacheType->save(serialize($options), $cacheKey);
-        }
-
-        $html = $this->getLayout()
-            ->createBlock(\Magento\Framework\View\Element\Html\Select::class)
-            ->setName($name)
-            ->setId($id)
-            ->setTitle(__($title))
-            ->setValue($defValue)
-            ->setOptions($options)
-            ->setClass('address-field')
-            ->setExtraParams('data-validate="{\'validate-select\':true}"')
-            ->getHtml();
-
-        \Magento\Framework\Profiler::stop('TEST: ' . __METHOD__);
-
-        return $html;
-    }
-
-    /**
      * Retrieve current subscription model instance.
      *
      * @return SubscriptionProfile

@@ -147,7 +147,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         </div>
         <div class="field country required">
             <div class="control">
-                <?php echo $block->getCountryHtmlSelect() ?>
+                <?php echo $block->getCountryHtmlSelect(null, 'shipping_address[country_id]') ?>
             </div>
         </div>
         <div class="field fax">

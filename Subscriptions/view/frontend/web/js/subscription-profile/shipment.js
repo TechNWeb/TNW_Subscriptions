@@ -26,7 +26,9 @@ define([
             saveAddressButton: '#save_address',
             addressFields: '.address-field',
             infoFields: '.info-field',
-            defaultCountryId: 'US'
+            defaultCountryId: 'US',
+            countrySelect: '#country',
+            emptyCountryLabel: ''
         },
 
         /**
@@ -48,6 +50,7 @@ define([
                 customerAddresses = $(this.options.customerAddressesList),
                 addressSelectVisibility = false;
 
+            this._setCountrySelectEmptyLabel();
             this.setFormsVisibility(showEdit);
 
             if (customerAddresses && customerAddresses.val() * 1) {
@@ -108,6 +111,15 @@ define([
                 e.preventDefault();
                 widget.saveAddress(e);
             }, this));
+        },
+
+        /**
+         * Set empty label for countries select.
+         *
+         * @private
+         */
+        _setCountrySelectEmptyLabel: function() {
+            $(this.options.countrySelect+ ' option[value=""]').text(this.options.emptyCountryLabel);
         },
 
         /**
