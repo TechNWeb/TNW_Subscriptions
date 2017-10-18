@@ -126,13 +126,6 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit"
-                 type="TNW\Subscriptions\Model\Source\CustomerAddress">
-        <arguments>
-            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
-        </arguments>
-    </virtualType>
-
     <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileCreate"
                  type="TNW\Subscriptions\Model\Source\CustomerAddress">
         <arguments>

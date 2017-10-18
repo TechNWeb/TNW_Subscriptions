@@ -13,8 +13,8 @@ use Magento\Customer\Model\Address\Mapper;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\State;
 use Magento\Framework\Escaper;
-use Magento\Framework\Registry;
 use Magento\Framework\Data\OptionSourceInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -61,7 +61,6 @@ class CustomerAddress implements OptionSourceInterface
      */
     private $filterBuilder;
 
-
     /**
      * Address mapper.
      *
@@ -96,6 +95,11 @@ class CustomerAddress implements OptionSourceInterface
     private $request;
 
     /**
+     * @var State
+     */
+    private $appState;
+
+    /**
      * CustomerAddress constructor.
      * @param QuoteSessionInterface $session
      * @param Address $addressHelper
@@ -118,6 +122,7 @@ class CustomerAddress implements OptionSourceInterface
         Escaper $escaper,
         SubscriptionProfileRepositoryInterface $profileRepository,
         RequestInterface $request,
+        State $appState,
         $profileState
     ) {
         $this->session = $session;
@@ -130,6 +135,7 @@ class CustomerAddress implements OptionSourceInterface
         $this->profileState = $profileState;
         $this->profileRepository = $profileRepository;
         $this->request = $request;
+        $this->appState = $appState;
     }
 
 
@@ -149,9 +155,14 @@ class CustomerAddress implements OptionSourceInterface
         }
 
         if (count($optionList) > 0) {
+            $label = '';
+            if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND) {
+                $label = __('Please select address');
+            }
+
             $optionList[] = [
                 'value' => 0,
-                'label' => '',
+                'label' => $label,
                 'empty' => true
             ];
 
@@ -252,7 +263,7 @@ class CustomerAddress implements OptionSourceInterface
      */
     private function getProfile()
     {
-        $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
+        $profileId = $this->getProfileId();
         try {
             /** @var SubscriptionProfile $profile */
             $profile = $this->profileRepository->getById($profileId);
@@ -261,5 +272,22 @@ class CustomerAddress implements OptionSourceInterface
         }
 
         return $profile;
+    }
+
+    /**
+     * Retrieve subscription profile id from request.
+     *
+     * @return int|string
+     */
+    private function getProfileId()
+    {
+        if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND)
+        {
+            $profileId = (int)$this->request->getParam('entity_id', 0);
+        } else {
+            $profileId = (int)$this->request->getParam(SummaryInsertForm::FORM_DATA_KEY, 0);
+        }
+
+        return $profileId;
     }
 }

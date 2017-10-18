@@ -23,13 +23,6 @@ abstract class AbstractSave extends Action\Action
     protected $resultPageFactory;
 
     /**
-     * Subscription create model.
-     *
-     * @var CreateProfile
-     */
-    private $createModel;
-
-    /**
      * Save processor model.
      *
      * @var Processor
@@ -39,17 +32,14 @@ abstract class AbstractSave extends Action\Action
     /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param CreateProfile $createModel
      * @param Processor $saveProcessor
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        CreateProfile $createModel,
         Processor $saveProcessor
     ) {
         $this->resultPageFactory = $resultPageFactory;
-        $this->createModel = $createModel;
         $this->saveProcessor = $saveProcessor;
 
         parent::__construct($context);
@@ -63,16 +53,6 @@ abstract class AbstractSave extends Action\Action
     protected function getSaveProcessor()
     {
         return $this->saveProcessor;
-    }
-
-    /**
-     * Returns subscription create model.
-     *
-     * @return CreateProfile
-     */
-    protected function getSubCreateModel()
-    {
-        return $this->createModel;
     }
 
     /**

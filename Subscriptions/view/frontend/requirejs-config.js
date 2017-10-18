@@ -7,7 +7,8 @@ var config = {
     map: {
         '*': {
             tnwSubscribeContainer: 'TNW_Subscriptions/js/product/subscribe-container',
-            tnwSubscribePrice: 'TNW_Subscriptions/js/product/subscribe-price'
+            tnwSubscribePrice: 'TNW_Subscriptions/js/product/subscribe-price',
+            tnwSubscribeShipment: 'TNW_Subscriptions/js/subscription-profile/shipment'
         }
     }
 };
