@@ -30,8 +30,8 @@ class Process extends AbstractSave
      * Process constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param CreateProfile $createModel
      * @param Processor $saveProcessor
+     * @param CreateProfile $createModel
      */
     public function __construct(
         Context $context,

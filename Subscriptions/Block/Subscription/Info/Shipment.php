@@ -45,6 +45,16 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
      */
     private $addressRepository;
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param MessagePool $messagePool
+     * @param FilterBuilder $filterBuilder
+     * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param AddressRepositoryInterface $addressRepository
+     * @param Encoder $encoder
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -78,11 +88,21 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         return true;
     }
 
+    /**
+     * Return shipping info block.
+     *
+     * @return string
+     */
     public function getShippingInfoViewHtml()
     {
         return $this->getChildHtml('shipping-info-view');
     }
 
+    /**
+     * Return shipping address edit block.
+     *
+     * @return string
+     */
     public function getShippingInfoEditHtml()
     {
         return $this->getChildHtml('customer_address_edit_form');
@@ -124,6 +144,11 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         return (int)$this->_request->getParam('edit');
     }
 
+    /**
+     * Retrieve customer addresses data to display.
+     *
+     * @return string
+     */
     public function getCustomerAddressesData()
     {
         $result = [];
@@ -168,5 +193,4 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
 
         return str_replace('"', "'", $this->jsonEncoder->encode($result));
     }
-
 }

@@ -10,16 +10,31 @@ namespace TNW\Subscriptions\Block\Subscription;
  */
 class EditForm extends \Magento\Framework\View\Element\Template
 {
+    /**
+     * Retrieve edit form content.
+     *
+     * @return string
+     */
     public function getFormContentHtml()
     {
         return $this->getChildHtml('customer_address_edit');
     }
 
+    /**
+     * Return form class.
+     *
+     * @return string
+     */
     public function getFormClass()
     {
         return 'shipping-form';
     }
 
+    /**
+     * Return form id.
+     *
+     * @return string
+     */
     public function getFormId()
     {
         return 'shipping-address-form';

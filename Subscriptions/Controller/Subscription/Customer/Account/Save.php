@@ -14,7 +14,6 @@ use TNW\Subscriptions\Controller\Subscription\AbstractSave;
  */
 class Save extends AbstractSave
 {
-
     public function execute()
     {
         $result = [];

@@ -100,7 +100,7 @@
                 <div class="control">
                     <input type="text"
                            name="shipping_address[vat_id]"
-                           value="<?php echo $block->escapeHtml($block->getVatId()) ?>"
+                           value="<?php echo $block->escapeHtml($block->getAddress()->getVatId()) ?>"
                            title="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
                            class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('vat_id') ?>"
                            placeholder="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
@@ -112,7 +112,7 @@
             <div class="control">
                 <input type="text"
                        name="shipping_address[city]"
-                       value="<?php echo $block->escapeHtml($block->getCity()) ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('City') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('City') ?>"
                        class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('city') ?>"
@@ -137,7 +137,7 @@
             <div class="control">
                 <input type="text"
                        name="shipping_address[postcode]"
-                       value="<?php echo $block->escapeHtml($block->getPostcode()) ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getPostcode()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
                        id="zip"
                        placeholder="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
@@ -155,7 +155,7 @@
                        name="shipping_address[fax]"
                        id="fax"
                        title="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
-                       value="<?php echo $block->escapeHtml($block->getFax()) ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getFax()) ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
                        class="address-field input-text <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('fax') ?>">
             </div>

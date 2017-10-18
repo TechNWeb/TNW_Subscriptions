@@ -179,7 +179,7 @@ class AddressEdit extends Edit
     }
 
     /**
-     * Retrieve Customer_address_if from current Subscription profile.
+     * Retrieve Customer_address_id from current Subscription profile.
      *
      * @return int|string
      */
@@ -191,97 +191,5 @@ class AddressEdit extends Edit
         }
 
         return $customerAddressId;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCountryId()
-    {
-        if ($this->getCustomerAddressId()) {
-            return $this->directoryHelper->getDefaultCountry();
-        }
-
-        return parent::getCountryId();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStreetLine($lineNumber)
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return parent::getStreetLine($lineNumber);
-    }
-
-    /**
-     * Retrieve vat_id.
-     *
-     * @return null|string
-     */
-    public function getVatId()
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return $this->getAddress()->getVatId();
-    }
-
-    /**
-     * Retrieve address city.
-     *
-     * @return null|string
-     */
-    public function getCity()
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return $this->getAddress()->getCity();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getRegion()
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return parent::getRegion();
-    }
-
-    /**
-     * Return address postcode.
-     *
-     * @return null|string
-     */
-    public function getPostcode()
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return $this->getAddress()->getPostcode();
-    }
-
-    /**
-     * Return address fax.
-     *
-     * @return null|string
-     */
-    public function getFax()
-    {
-        if ($this->getCustomerAddressId()) {
-            return '';
-        }
-
-        return $this->getAddress()->getFax();
     }
 }

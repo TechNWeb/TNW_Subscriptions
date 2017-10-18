@@ -100,7 +100,6 @@ class CustomerAddress implements OptionSourceInterface
     private $appState;
 
     /**
-     * CustomerAddress constructor.
      * @param QuoteSessionInterface $session
      * @param Address $addressHelper
      * @param AddressRepositoryInterface $addressService
@@ -110,7 +109,8 @@ class CustomerAddress implements OptionSourceInterface
      * @param Escaper $escaper
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param RequestInterface $request
-     * @param $profileState
+     * @param State $appState
+     * @param string $profileState
      */
     public function __construct(
         QuoteSessionInterface $session,
