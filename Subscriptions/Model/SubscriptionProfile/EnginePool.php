@@ -50,7 +50,9 @@ class EnginePool
     }
 
     /**
-     * @param $engine
+     * Returns engine instance by code.
+     *
+     * @param string $engine
      * @return EngineInterface
      * @throws InvalidEngineException
      */
@@ -65,21 +67,34 @@ class EnginePool
                 $result = $this->payflowproFactory->create();
                 break;
             default:
-                throw new InvalidEngineException(__(self::ERROR_INVALID_ENGINE,
-                    $engine));
+                throw new InvalidEngineException(__(self::ERROR_INVALID_ENGINE, $engine));
         }
 
         return $result;
     }
 
     /**
+     * Returns allowed engine codes.
+     *
      * @return array
      */
     public function getEngineList()
     {
         return [
             self::ENGINE_CODE_CHECKMO,
-            self::ENGINE_CODE_PAYFLOW
+            self::ENGINE_CODE_PAYFLOW,
+        ];
+    }
+
+    /**
+     * Returns engine codes working with credit cards.
+     *
+     * @return array
+     */
+    public static function getCcEngineList()
+    {
+        return [
+            self::ENGINE_CODE_PAYFLOW,
         ];
     }
 }

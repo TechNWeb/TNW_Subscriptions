@@ -111,14 +111,12 @@ class Add extends Action
                         $params['qty'] = $filter->filter($params['subscribe_qty']);
                         unset($params['subscribe_qty']);
                     }
-                    $response = $this->createProfile->addToSubscription($params);
-                    $error = $response['error'];
-                    if (!$error) {
-                        $message = __(
-                            'You added %1 to your subscription cart.',
-                            $this->initProduct()->getName()
-                        );
-                    }
+                    $this->createProfile->addToSubscription($params);
+                    $message = __(
+                        'You added %1 to your subscription cart.',
+                        $this->initProduct()->getName()
+                    );
+                    $error = false;
                 } catch (\Exception $e) {
                     $this->_objectManager->get(\Psr\Log\LoggerInterface::class)->critical($e);
                 }
@@ -166,7 +164,7 @@ class Add extends Action
                 $this->messageManager->addSuccessMessage($message);
             }
         }
-        
+
         $result['error'] = $error;
         $result['message'] = $message;
         if ($product && !$product->getIsSalable()) {

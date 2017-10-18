@@ -5,14 +5,32 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
+use TNW\Subscriptions\Model\MessagePool;
+
 /**
  * Subscription items block on customer account dashboard.
  */
-class Items extends \Magento\Framework\View\Element\Template
+class Items extends ContentAbstract implements ExpireWarningSupportInterface
 {
-    protected function _toHtml()
+    /**
+     * @var string
+     */
+    protected $_template = 'subscription/items.phtml';
+
+    /**
+     * @return MessagePool
+     */
+    public function getMessagePool()
     {
-        //toDo: Subscription items block
-        return 'Here is current subscription items info';
+        return $this->messagePool;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        return true;
     }
 }

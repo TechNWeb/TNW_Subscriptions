@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Block\Subscription\Info;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\View\Element\Template\Context;
+use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection as MessagesCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -16,33 +17,34 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory;
 /**
  * Subscription change history block on customer account dashboard.
  */
-class ChangeHistory extends \Magento\Framework\View\Element\Template
+class ChangeHistory extends ContentAbstract
 {
-    /** @var MessagesCollection */
+    /**
+     * @var MessagesCollection
+     */
     private $messagesCollection;
 
-    /** @var CollectionFactory */
+    /**
+     * @var CollectionFactory
+     */
     private $messageHistoryCollectionFactory;
-
-    /** @var Registry  */
-    private $registry;
 
     /**
      * @param Context $context
-     * @param CollectionFactory $collectionFactory
      * @param Registry $registry
+     * @param MessagePool $messagePool
+     * @param CollectionFactory $collectionFactory
      * @param array $data
      */
     public function __construct(
         Context $context,
-        CollectionFactory $collectionFactory,
         Registry $registry,
+        MessagePool $messagePool,
+        CollectionFactory $collectionFactory,
         array $data = []
     ) {
         $this->messageHistoryCollectionFactory = $collectionFactory;
-        $this->registry = $registry;
-
-        parent::__construct($context, $data);
+        parent::__construct($context, $registry, $messagePool, $data);
     }
 
     /**
@@ -55,7 +57,9 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
         if (!$this->messagesCollection) {
             /** @var MessagesCollection $collection */
             $collection = $this->messageHistoryCollectionFactory->create();
-            $this->messagesCollection = $collection->getChangeHistoryCollection($this->getSubscription()->getId());
+            $this->messagesCollection = $collection->getChangeHistoryCollection(
+                $this->getSubscriptionProfile()->getId()
+            );
         }
 
         return $this->messagesCollection;
@@ -88,16 +92,6 @@ class ChangeHistory extends \Magento\Framework\View\Element\Template
     public function getPagerHtml()
     {
         return $this->getChildHtml('pager');
-    }
-
-    /**
-     * Retrieve current subscription model instance.
-     *
-     * @return SubscriptionProfile
-     */
-    private function getSubscription()
-    {
-        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**

@@ -224,6 +224,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ProductsInsertForm</item>
                     <item name="sortOrder" xsi:type="number">90</item>
                 </item>
+                <item name="cancel_button_popup" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\CancelButtonPopup</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -310,6 +314,17 @@
     <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal\Response">
         <arguments>
             <argument name="transaction" xsi:type="object">TNW\Subscriptions\Model\Payflow\Service\Response\Transaction</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Product\Modified\Save">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Modified\Save\Processor</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Process">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Step\Save\Processor</argument>
         </arguments>
     </type>
 </config>

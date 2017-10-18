@@ -46,6 +46,7 @@ define([
         hideButtonIfNeed: function () {
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
+                $('.tnw-subscriptions-cart-bottom-action').hide();
             }
         }
     });

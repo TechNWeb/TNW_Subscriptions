@@ -7,10 +7,11 @@
 namespace TNW\Subscriptions\Model\Queue;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
-use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
+use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
 
 /**
  * Class queue listing data provider
@@ -46,10 +47,17 @@ class DataProvider extends AbstractDataProvider
         /** @var Collection $collection */
         $collection = $this->getCollection();
 
-        /* hide all such records if they are more than 2 months */
+        /* hide all such records if they are more than 2 months and status not complete */
         $collection->addFilterToMap('updated_at', 'main_table.updated_at');
+        $collection->addFilterToMap('status', 'main_table.status');
         $minDate = date('Y-m-d H:i:s', strtotime("-2 months"));
-        $collection->addFieldToFilter('updated_at', ['gteq' => $minDate]);
+        $collection->addFieldToFilter(
+            ['updated_at', 'status'],
+            [
+                ['gteq' => $minDate],
+                ['neq' => QueueStatus::QUEUE_STATUS_COMPLETE],
+            ]
+        );
 
         $collection->addFilterToMap('id', 'main_table.id');
         $collection->getSelect()->join(

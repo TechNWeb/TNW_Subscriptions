@@ -101,11 +101,11 @@ abstract class Base implements ProcessInterface
     /**
      * Updates profile statuses.
      *
-     * @param array $allIds
+     * @param array $data
      */
-    public function process(array $allIds)
+    public function process(array $data)
     {
-        $ids = $this->getIdsToModify($allIds);
+        $ids = $this->getIdsToModify($data);
         $this->criteriaBuilder->addFilter(
             SubscriptionProfileInterface::ID,
             $ids,
@@ -176,5 +176,13 @@ abstract class Base implements ProcessInterface
             false,
             true
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getErrors()
+    {
+        return [];
     }
 }
