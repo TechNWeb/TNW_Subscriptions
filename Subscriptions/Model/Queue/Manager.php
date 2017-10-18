@@ -111,22 +111,7 @@ class Manager
      */
     public function getActiveList($websiteId = null)
     {
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getSelect()->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-            'main_table.profile_order_id = relation.id',
-            [
-                SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
-                SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
-                SubscriptionProfileOrderInterface::SCHEDULED_AT
-            ]
-        );
-        $collection->getSelect()->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
-            'relation.subscription_profile_id = profile.entity_id',
-            []
-        );
+        $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
         $pendingCondition = implode(' AND ', [
             $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
@@ -330,5 +315,32 @@ class Manager
         $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
             ->setMagentoOrderId($order->getId());
         $this->relationManager->saveRelation($relation);
+    }
+
+    /**
+     * Returns base collection.
+     *
+     * @return Collection
+     */
+    public function getBaseCollection()
+    {
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->getSelect()->join(
+            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            'main_table.profile_order_id = relation.id',
+            [
+                SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+                SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
+                SubscriptionProfileOrderInterface::SCHEDULED_AT
+            ]
+        );
+        $collection->getSelect()->join(
+            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+            'relation.subscription_profile_id = profile.entity_id',
+            []
+        );
+
+        return $collection;
     }
 }

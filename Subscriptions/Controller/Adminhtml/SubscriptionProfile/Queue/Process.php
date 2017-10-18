@@ -13,19 +13,13 @@ use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
  * Class Process
  */
 class Process extends Action
 {
-    /**
-     * Repository for retrieving queue items.
-     *
-     * @var SubscriptionProfileQueueRepositoryInterface
-     */
-    private $queueRepository;
-
     /**
      * Profile process queue manager.
      *
@@ -34,11 +28,11 @@ class Process extends Action
     private $queueManager;
 
     /**
-     * Message history logger.
+     * Profile processor.
      *
-     * @var MessageHistoryLogger
+     * @var ProfileProcessor
      */
-    private $messageHistoryLogger;
+    private $profileProcessor;
 
     /**
      * @param Context $context
@@ -48,13 +42,11 @@ class Process extends Action
      */
     public function __construct(
         Context $context,
-        SubscriptionProfileQueueRepositoryInterface $queueRepository,
         Manager $queueManager,
-        MessageHistoryLogger $messageHistoryLogger
+        ProfileProcessor $profileProcessor
     ) {
-        $this->queueRepository = $queueRepository;
         $this->queueManager = $queueManager;
-        $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->profileProcessor = $profileProcessor;
 
         parent::__construct($context);
     }
@@ -69,7 +61,7 @@ class Process extends Action
 
         if ($queueId) {
             try {
-                $collection = $this->queueManager->getActiveList();
+                $collection = $this->queueManager->getBaseCollection();
                 $collection->addFieldToFilter('main_table.' . Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
@@ -77,11 +69,11 @@ class Process extends Action
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->processItem($item);
-
-                        $this->logProcessItem($item);
                         $successIds[] = $item->getId();
                         $this->queueManager->makeCompleted($successIds);
-                        $this->queueManager->updateProfilesStatuses();
+                        $this->profileProcessor->updateProfilesStatuses(
+                            [$item->getSubscriptionProfileId()]
+                        );
                     } catch (\Exception $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage());
                     }
@@ -102,26 +94,4 @@ class Process extends Action
             ->create()
             ->setPath($this->_redirect->getRefererUrl());
     }
-
-    /**
-     * Log Message order create from quote.
-     *
-     * @param Queue $item
-     *
-     * @return void
-     */
-    private function logProcessItem(Queue $item)
-    {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
-            $this->messageHistoryLogger->getOrderIncrementIdById($item->getProfileOrderId()),
-            $this->messageHistoryLogger->getConvertedQuoteId($item->getMagentoQuoteId())
-        );
-
-        $this->messageHistoryLogger->log(
-            $message,
-            $item->getSubscriptionProfileId()
-        );
-    }
-
 }
