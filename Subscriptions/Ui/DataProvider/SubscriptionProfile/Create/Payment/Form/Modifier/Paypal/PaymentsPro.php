@@ -70,6 +70,7 @@ class PaymentsPro extends Base
      * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      */
     public function __construct(
         SubscriptionConfig $config,
@@ -79,7 +80,8 @@ class PaymentsPro extends Base
         Config $paymentConfig,
         Repository $assetRepository,
         RequestInterface $request,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
     ) {
         $this->context = $context;
         $this->paymentPro = $paymentPro;
@@ -88,9 +90,31 @@ class PaymentsPro extends Base
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
 
-        parent::__construct($config, $session);
+        parent::__construct($config, $session, $profileRepository);
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function modifyData(array $data)
+    {
+        $data = parent::modifyData($data);
+
+        $additionalInfoJson = $this->getProfile()
+            ->getPaymentAdditionalInfo();
+
+        if (
+            !empty($additionalInfoJson) &&
+            ($additionalInfo = (array)json_decode($additionalInfoJson)) &&
+            !empty($additionalInfo['cc_type'])
+        ) {
+            $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
+                = $additionalInfo['cc_type'];
+        }
+
+        return $data;
+    }
 
     /**
      * {@inheritdoc}

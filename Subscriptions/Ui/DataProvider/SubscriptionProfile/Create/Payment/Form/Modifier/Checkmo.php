@@ -40,17 +40,19 @@ class Checkmo extends Base
      * @param QuoteSessionInterface $session
      * @param Context $context
      * @param CheckmoPayment $checkmoPayment
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      */
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
         Context $context,
-        CheckmoPayment $checkmoPayment
+        CheckmoPayment $checkmoPayment,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
 
-        parent::__construct($config, $session);
+        parent::__construct($config, $session, $profileRepository);
     }
 
 

@@ -140,8 +140,9 @@ class Manager
                 ? (int)$address[$keyCustomer]
                 : null;
             $saveAddress = isset($address['save_address']) && $address['save_address'];
-            /** @var SubscriptionProfileAddressInterface $profileAddress */
+            /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $profileAddress */
             $profileAddress = $this->getProfileAddress($type);
+            $profileAddress->setOrigData();
             if ($customerAddressId) {
                 /** @var CustomerInterface $customer */
                 list($customer, $addresses) = $this->getCustomerAddresses();

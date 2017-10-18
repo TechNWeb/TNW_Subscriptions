@@ -399,7 +399,7 @@ class Manager
                 $ccType = $this->propertyAdditionalInfo($additionalInfo, 'cc_type');
                 $ccTypeOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_type');
                 if (strcasecmp($ccType, $ccTypeOld) !== 0) {
-                    $message = __('Card type was changed from <b>1%</b> to <b>1%</b>', $ccTypeOld, $ccType);
+                    $message = __('Card type was changed from <b>%1</b> to <b>%1</b>', $ccTypeOld, $ccType);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
