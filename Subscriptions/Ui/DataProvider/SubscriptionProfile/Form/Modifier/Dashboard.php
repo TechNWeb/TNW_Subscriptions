@@ -12,6 +12,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\ProfileCcUtils;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
@@ -160,7 +161,10 @@ class Dashboard extends BaseFormModifier
         }
 
         // Say that profile will be canceled next cycle
-        if ($profile && $profile->getCancelBeforeNextCycle()) {
+        if ($profile
+            && $profile->getStatus() != ProfileStatus::STATUS_CANCELED
+            && $profile->getCancelBeforeNextCycle()
+        ) {
             $date = $this->getCancelBeforeNextCycleDate();
             if ($date) {
                 $messages[] = sprintf(__("Subscription will be canceled on %s"), $date ?: '--');

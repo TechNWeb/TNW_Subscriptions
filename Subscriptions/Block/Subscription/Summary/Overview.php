@@ -189,7 +189,10 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         $profile = $this->getSubscriptionProfile();
 
         // Say that profile will be canceled next cycle
-        if ($profile && $profile->getCancelBeforeNextCycle()) {
+        if ($profile
+            && $profile->getStatus() != ProfileStatus::STATUS_CANCELED
+            && $profile->getCancelBeforeNextCycle()
+        ) {
             $date = $this->getCancelBeforeNextCycleDate();
             if ($date) {
                 $this->messagePool->addMessage(
