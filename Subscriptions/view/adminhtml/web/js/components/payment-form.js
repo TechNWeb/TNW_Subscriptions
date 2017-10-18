@@ -18,7 +18,7 @@ define(
                 }
 
                 var current = this,
-                    needShowRequiredError = false;
+                    needShowRequiredError = true;
 
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
@@ -31,13 +31,11 @@ define(
                                 current.save();
                         }
                         needShowRequiredError = false;
-                    } else {
-                        needShowRequiredError = true;
                     }
                 });
 
                 if (needShowRequiredError) {
-                    var firstFieldSet = registry.get('index = payment_information').elems()[0];
+                    var firstFieldSet = registry.get('index = payment_information');
                     if (firstFieldSet !== undefined) {
                         firstFieldSet.resetErrors();
                         firstFieldSet.set('payment_errors', [$.mage.__('Please select payment.')]);
