@@ -201,7 +201,7 @@ define([
         setAddressFieldsVisibility: function (visibility) {
             this._setElemsVisibility($(this.options.customerAddressesList), visibility);
             this._setElemsVisibility($(this.options.addressFieldsList), !visibility);
-            if ($(this.options.customerAddressesList+' option').size() > 1) {
+            if ($(this.options.customerAddressesList+' option').length > 1) {
                 this._setElemsVisibility($(this.options.pickFromSavedButton), !visibility);
                 this._setElemsVisibility($(this.options.addNewAddressButton), visibility);
             } else {
