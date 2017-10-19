@@ -107,7 +107,7 @@ class ProfileProcessor
      *
      * @param array $allIds
      */
-    private function updateProfilesStatuses(array $allIds)
+    public function updateProfilesStatuses(array $allIds)
     {
         try {
             foreach ($this->statusProcessorsPool->getProcessorsInstances() as $modifier) {

@@ -117,7 +117,7 @@ class DescriptionCreator
         $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
         $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
         $shipmentsPart = ' ';
-        if (!$subscriptionData[CreateProfile::UNIQUE]['term']){
+        if (!$subscriptionData[CreateProfile::UNIQUE]['term']) {
             $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
             $shipmentsPart = sprintf(
                 __('Total of %s %s. '),
@@ -132,6 +132,68 @@ class DescriptionCreator
         );
 
         return $trialPart . $noTrialPart . $priceWithUnit . $shipmentsPart . $shippingInformation;
+    }
+
+    /**
+     * Returns item price with description.
+     *
+     * @param float|string $itemTotal
+     * @param array $subscriptionData
+     * @param float|null $initialFee
+     * @return string
+     */
+    public function getDescribedItemPriceHtml($itemTotal, array $subscriptionData, $initialFee = null)
+    {
+        $result = '';
+        $middlePhrase = '';
+        $lastPhrase = '';
+        $thenPhrase = '';
+        $priceClasses = ['base-price'];
+        $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
+        $formattedPrice = ($itemTotal + $initialFee)
+            ? $this->formatPrice($itemTotal + $initialFee)
+            : __('Free');
+        $formattedPrice = $this->addContainer(
+            $formattedPrice,
+            'price'
+        );
+
+        if ($isTrial) {
+            $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
+            $lastPhrase = __('trial');
+        } elseif ($initialFee) {
+            $middlePhrase = __('for');
+            $lastPhrase = __('initial fee');
+        }
+
+        if ($middlePhrase && $lastPhrase) {
+            $result .= '<div class="subscription-price">';
+            $result .= sprintf(
+                '%s %s ',
+                $formattedPrice,
+                $this->addContainer($middlePhrase .' '. $lastPhrase, 'middle-text')
+            );
+            $result .= '</div>';
+            $thenPhrase = __('then');
+            $priceClasses[] = 'has-trial';
+        }
+
+        $total = $this->addContainer(
+            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']),
+            'price'
+        );
+        $frequencyUnit = $this->addContainer(
+            '/' .$this->getFrequencyWithUnit( $subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
+            'unit'
+        );
+
+        return sprintf(
+            '%s<div class="%s">%s %s</div>',
+            $result,
+            implode(' ', $priceClasses),
+            $thenPhrase,
+            $total . $frequencyUnit
+        );
     }
 
     /**
@@ -228,5 +290,15 @@ class DescriptionCreator
         return __($label);
     }
 
-
+    /**
+     * Adds span container to text.
+     *
+     * @param string $text
+     * @param $class
+     * @return string
+     */
+    private function addContainer($text, $class)
+    {
+        return '<span class="' . $class . '">' . $text . '</span>';
+    }
 }

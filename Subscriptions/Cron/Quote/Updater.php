@@ -69,12 +69,12 @@ class Updater extends Base
     /**
      * Recalculates profile quotes if profile or profile product was changed.
      *
-     * @param array $websiteIds
+     * @param array $data
      * @return void
      */
-    public function process(array $websiteIds)
+    public function process(array $data)
     {
-        foreach ($websiteIds as $websiteId) {
+        foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
                 try {
                     foreach ($this->getProfileQuotes($profile) as $profileQuote) {
@@ -148,5 +148,14 @@ class Updater extends Base
         $profileQuote->removeAllAddresses();
         $profileQuote->removeAllItems();
         $profileQuote->removePayment();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getErrors()
+    {
+        return [];
     }
 }

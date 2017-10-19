@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use Magento\Customer\Model\Url as CustomerUrl;
 use Magento\Framework\Api\Filter;

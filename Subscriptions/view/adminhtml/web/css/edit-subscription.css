@@ -35,7 +35,7 @@ button.profile__cancel-edit_button:before{
     margin-bottom: .86rem;
     margin-top: -0.14rem;
     text-align: left;
-    width: auto;
+    width: 100%;
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form,
 .tnw_subscriptionprofile_form_areas_summary_summary_payment_method_insert_form {

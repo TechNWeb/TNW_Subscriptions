@@ -17,7 +17,6 @@ use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -84,11 +83,11 @@ class Creator extends Base
     /**
      * Generates future quotes for profiles and adds them to queue.
      *
-     * @param array $websiteIds
+     * @param array $data
      */
-    public function process(array $websiteIds)
+    public function process(array $data)
     {
-        foreach ($websiteIds as $websiteId) {
+        foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
                 $this->generateProfileQuotes($profile);
             }
@@ -334,5 +333,13 @@ class Creator extends Base
             : $needGenerate;
 
         return $needGenerate;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getErrors()
+    {
+        return [];
     }
 }
