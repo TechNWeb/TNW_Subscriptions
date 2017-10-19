@@ -484,23 +484,7 @@
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
-                <item name="modifier_name" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
-                    <item name="sortOrder" xsi:type="number">1</item>
-                </item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Shipping">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool</argument>
-        </arguments>
-    </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
-        <arguments>
-            <argument name="modifiers" xsi:type="array">
-                <item name="modifier_name" xsi:type="array">
+                <item name="shipping_address" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">1</item>
                 </item>
@@ -532,7 +516,7 @@
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
-                <item name="billing-address" xsi:type="array">
+                <item name="billing_address" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
@@ -546,58 +530,10 @@
         </arguments>
     </type>
 
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Billing">
-        <arguments>
-            <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool</argument>
-        </arguments>
-    </type>
-
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier"
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
             <argument name="isShipping" xsi:type="string">0</argument>
         </arguments>
     </virtualType>
-
-    <!--Add modifier for Subscription profile creation on review profile page-->
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
-        </arguments>
-    </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
-        <arguments>
-            <argument name="modifiers" xsi:type="array">
-                <item name="checkmo" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
-                <item name="payflowpro" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
-                </item>
-                <item name="subscription_and_account_information" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation</item>
-                    <item name="sortOrder" xsi:type="number">30</item>
-                </item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="SubscriptionProfileCreatePreviewBillingAddress"
-                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
-        <arguments>
-            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING</argument>
-            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_CREATE</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="SubscriptionProfileCreatePreviewShippingAddress"
-                 type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
-        <arguments>
-            <argument name="addressType" xsi:type="const">Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING</argument>
-            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_CREATE</argument>
-        </arguments>
-    </virtualType>
-
-
 </config>

@@ -23,11 +23,6 @@
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">account_form_data</argument>
             <argument name="requestFieldName" xsi:type="string">account_form_data</argument>
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="submit_url" path="tnw_subscriptions/subscription_create/process" xsi:type="url"/>
-                </item>
-            </argument>
         </argument>
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
