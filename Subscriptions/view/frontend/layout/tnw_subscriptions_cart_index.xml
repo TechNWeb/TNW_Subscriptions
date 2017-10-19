@@ -30,36 +30,60 @@
                                                 <item name="0" xsi:type="array">
                                                     <item name="code" xsi:type="string">products</item>
                                                     <item name="alias" xsi:type="string"/>
-                                                    <item name="blockNamespace" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
+                                                    <item name="blockNamespace" xsi:type="array">
+                                                        <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
+                                                    </item>
                                                     <item name="requestFieldName" xsi:type="string">modify_form_data</item>
                                                     <item name="requestFieldValue" xsi:type="string">new_subscription</item>
+                                                    <item name="needSave" xsi:type="boolean">false</item>
                                                     <item name="title" xsi:type="string" translate="true">Products</item>
                                                     <item name="sortOrder" xsi:type="string">0</item>
                                                     <item name="isActive" xsi:type="boolean">true</item>
                                                 </item>
                                                 <item name="1" xsi:type="array">
                                                     <item name="code" xsi:type="string">registration</item>
-                                                    <item name="blockNamespace" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
+                                                    <item name="blockNamespace" xsi:type="array">
+                                                        <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
+                                                    </item>
+                                                    <item name="needSave" xsi:type="boolean">false</item>
                                                     <item name="title" xsi:type="string" translate="true">Registration</item>
                                                     <item name="sortOrder" xsi:type="string">1</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
                                                 <item name="2" xsi:type="array">
-                                                    <item name="code" xsi:type="string">address</item>
-                                                    <item name="title" xsi:type="string" translate="true">Address</item>
+                                                    <item name="code" xsi:type="string">shipping</item>
+                                                    <item name="blockNamespace" xsi:type="array">
+                                                        <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form</item>
+                                                        <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
+                                                    </item>
+                                                    <item name="needSave" xsi:type="boolean">true</item>
+                                                    <item name="title" xsi:type="string" translate="true">Shipping</item>
                                                     <item name="sortOrder" xsi:type="string">2</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
                                                 <item name="3" xsi:type="array">
-                                                    <item name="code" xsi:type="string">payment</item>
-                                                    <item name="title" xsi:type="string" translate="true">Payment</item>
+                                                    <item name="code" xsi:type="string">billing</item>
+                                                    <item name="blockNamespace" xsi:type="array">
+                                                        <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
+                                                        <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
+                                                    </item>
+                                                    <item name="needSave" xsi:type="boolean">true</item>
+                                                    <item name="title" xsi:type="string" translate="true">Billing</item>
                                                     <item name="sortOrder" xsi:type="string">3</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
                                                 <item name="4" xsi:type="array">
-                                                    <item name="code" xsi:type="string">thank_you</item>
-                                                    <item name="title" xsi:type="string" translate="true">Thank You!</item>
+                                                    <item name="code" xsi:type="string">payment</item>
+                                                    <item name="needSave" xsi:type="boolean">true</item>
+                                                    <item name="title" xsi:type="string" translate="true">Payment</item>
                                                     <item name="sortOrder" xsi:type="string">4</item>
+                                                    <item name="isActive" xsi:type="boolean">false</item>
+                                                </item>
+                                                <item name="5" xsi:type="array">
+                                                    <item name="code" xsi:type="string">thank_you</item>
+                                                    <item name="needSave" xsi:type="boolean">false</item>
+                                                    <item name="title" xsi:type="string" translate="true">Thank You!</item>
+                                                    <item name="sortOrder" xsi:type="string">5</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
                                             </item>
@@ -83,9 +107,15 @@
                                         <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps</item>
                                         <item name="provider" xsi:type="string">cart.data_source</item>
                                         <item name="deps" xsi:type="string">cart.data_source</item>
-                                        <item name="handle" xsi:type="string">tnw_subscriptions_subscriptionprofile_create</item>
+                                        <item name="handle" xsi:type="string">tnw_subscriptions_subscriptionprofile_checkout</item>
                                         <item name="children" xsi:type="array">
-                                            <item name="insert_form" xsi:type="array">
+                                            <item name="insert_form_content" xsi:type="array">
+                                                <item name="displayArea" xsi:type="string">insert_form</item>
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
+                                                <item name="autoRender" xsi:type="boolean">false</item>
+                                                <item name="formSubmitType" xsi:type="string">ajax</item>
+                                            </item>
+                                            <item name="insert_form_right" xsi:type="array">
                                                 <item name="displayArea" xsi:type="string">insert_form</item>
                                                 <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
                                                 <item name="autoRender" xsi:type="boolean">false</item>

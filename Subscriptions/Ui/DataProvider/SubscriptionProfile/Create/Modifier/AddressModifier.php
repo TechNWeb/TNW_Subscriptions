@@ -17,6 +17,9 @@ use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
+/**
+ * Class AddressModifier
+ */
 class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
     /**#@+
@@ -180,6 +183,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                                 'label' => $this->getInfoFieldSetLabel(),
                                 'collapsible' => false,
                                 'componentType' => Form\Fieldset::NAME,
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                 'sortOrder' => 20,
                                 'dataScope' => $this->getInfoFieldSetDataScope(),
                             ],

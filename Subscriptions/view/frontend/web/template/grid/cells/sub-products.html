@@ -1,0 +1,25 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="sub-data-column" each="data: $col.getProducts($row()), as: '$product'">
+
+    <div class="sub-data-product-container" data-bind="attr: {class: $col.showDottedBorder($row(), $product) ? ' sub-data-product-container dotted-border' : 'sub-data-product-container'}">
+        <!-- renders product block -->
+        <div class="sub-data-thumbnail">
+            <img class="sub-data-thumbnail-img" attr="src: $col.getSrc($product), alt: $col.getAlt($product)"/>
+        </div>
+
+        <div class="sub-data-product">
+            <span class="sub-data-product-name" html="$product.name"/>
+            <span class="sub-data-product-qty" html="$product.qty"/>
+
+            <!-- renders configurable options -->
+            <div class="sub-data-conf-options" each="data: $col.getConfOptions($product), as: '$option'">
+                <div class="sub-data-content" html="$option"/>
+            </div>
+        </div>
+    </div>
+</div>

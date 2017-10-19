@@ -34,7 +34,7 @@ class ShippingAndBilling extends AbstractDataProvider
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * @var StepPool
