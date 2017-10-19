@@ -374,7 +374,7 @@
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>
             <argument name="processors" xsi:type="array">
-                <item name="canceled" xsi:type="array">
+                <item name="complete" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusComplete</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
@@ -389,6 +389,10 @@
                 <item name="active" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusActive</item>
                     <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+                <item name="canceled" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusCanceled</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
                 </item>
             </argument>
         </arguments>

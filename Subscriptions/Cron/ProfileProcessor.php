@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Cron;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 
@@ -78,9 +79,14 @@ class ProfileProcessor
         $allIds = array_keys($itemsCollection->getItems());
         $this->queueManager->makeRunning($allIds);
         $this->setProcessTypeParam();
+        /** @var \TNW\Subscriptions\Model\Queue $item */
         foreach ($itemsCollection as $item) {
+            $profileIds[] = $item->getSubscriptionProfileId();
+            if ($item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE)) {
+                // Pass if current profile must be canceled in this cycle
+                continue;
+            }
             try {
-                $profileIds[] = $item->getSubscriptionProfileId();
                 $this->queueManager->processItem($item);
                 $successIds[] = $item->getId();
             } catch (\Exception $e) {
