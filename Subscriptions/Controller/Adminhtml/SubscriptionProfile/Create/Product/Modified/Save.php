@@ -6,14 +6,14 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Product\Modified;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 
 /**
  * Saves modified subscription item.
  */
-class Save extends SubscriptionProfile
+class Save extends AbstractSave
 {
     /**
      * Save action
@@ -22,52 +22,17 @@ class Save extends SubscriptionProfile
      */
     public function execute()
     {
-        $objectId = $this->getRequest()->getParam('objectId', false);
-        if ($objectId) {
-            $objectItemId = $this->getRequest()->getParam('objectItemId', false);
-            if ($objectItemId) {
-                $remove = $this->getRequest()->getParam('remove', false);
-                $requestData = $this->getRequest()->getParam('item_' . $objectItemId, false);
-                try {
-                    $request = $this->getSubCreateModel()->removeSubscriptions($requestData, $objectId, $objectItemId);
-                    if (!$remove) {
-                        $this->getSubCreateModel()->addToSubscription($request);
-                    }
-                    $response = [
-                        'error' => false,
-                        'message' => '',
-                        'objects_count' => count($this->_getSession()->getSubQuoteIds())
-                    ];
-                } catch (\Exception $e) {
-                    $response = $this->getErrorResponse(
-                        $e->getMessage()
-                    );
-                }
-            } else {
-                $response = $this->getErrorResponse(
-                    __('Object item id is not defined.')
-                );
-            }
-        } else {
-            $response = $this->getErrorResponse(
-                __('Object id is not defined.')
+        $result = $this->getSaveProcessor()->processSave(
+            $this->getRequest()->getParams()
+        );
+        $response = $this->getJsonResponse($result);
+        if (!$result){
+            $response['objects_count'] = count(
+                $this->getSubCreateModel()->getSession()->getSubQuoteIds()
             );
         }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
-    }
-
-    /**
-     * Returns error response.
-     *
-     * @param string $message
-     * @return array
-     */
-    private function getErrorResponse($message)
-    {
-        return [
-            'error' => true,
-            'message' => $message
-        ];
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
+            ->setData($response);
     }
 }

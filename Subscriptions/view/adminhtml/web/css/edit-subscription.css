@@ -35,7 +35,7 @@ button.profile__cancel-edit_button:before{
     margin-bottom: .86rem;
     margin-top: -0.14rem;
     text-align: left;
-    width: auto;
+    width: 100%;
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form,
 .tnw_subscriptionprofile_form_areas_summary_summary_payment_method_insert_form {
@@ -539,6 +539,7 @@ button.profile__cancel-edit_button:before{
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-label {
     float: left;
     text-align: left;
+    width: 50%;
 }
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
     text-align: right;

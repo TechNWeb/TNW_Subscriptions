@@ -21,10 +21,23 @@ define([
          */
         onNextStepClick: function () {
             var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
-            if (stepNavigator.getActiveItemCode() === 'products' && isLoggedIn) {
-                stepNavigator.navigateTo('address');
+
+            var activeCode = stepNavigator.getActiveItemCode();
+            if (activeCode === 'products' && isLoggedIn) {
+                stepNavigator.navigateTo('shipping');
             } else {
-                stepNavigator.navigateNext();
+                var currentStep = stepNavigator.getCurrentStep();
+                if (currentStep.needSave) {
+                    var stepForm = registry.get('index = tnw_subscriptionprofile_checkout_' + activeCode + '_form')
+                    if (stepForm) {
+                        stepForm.save();
+                        if (!stepForm.additionalInvalid && !stepForm.source.get('params.invalid')) {
+                            stepNavigator.navigateNext();
+                        }
+                    }
+                } else {
+                    stepNavigator.navigateNext();
+                }
             }
 
             this.hideButtonIfNeed();
@@ -46,6 +59,7 @@ define([
         hideButtonIfNeed: function () {
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
+                $('.tnw-subscriptions-cart-bottom-action').hide();
             }
         }
     });

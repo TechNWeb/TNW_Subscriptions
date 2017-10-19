@@ -36,10 +36,24 @@ define([
                 return this;
             },
 
-            /** @inheritdoc */
+            /**
+             * @inheritdoc
+             */
             initObservable: function () {
                 return this._super()
                     .observe(['isLoading']);
+            },
+
+            /**
+             * Destroys step data source.
+             *
+             * @param externalFormName
+             */
+            resetDataSource: function (externalFormName) {
+                var stepDataSource = registry.get(externalFormName);
+                if (stepDataSource && stepDataSource.source) {
+                    stepDataSource.source.destroy();
+                }
             },
 
             /**
@@ -50,14 +64,41 @@ define([
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
                     var config = registry.get('cart').checkoutConfig;
-                    var insertForm = registry.get(this.name + '.' + 'insert_form');
-                    insertForm.render_url = config.render_url + '?' + this.getRenderParams(step);
-                    insertForm.renderSettings.url = insertForm.render_url;
-                    insertForm.ns = step.blockNamespace;
-                    insertForm.params.namespace = step.blockNamespace;
+                    var insertFormContent = registry.get(this.name + '.' + 'insert_form_content');
+
+                    insertFormContent.render_url = config.render_url + '?' + this.getRenderParams(step);
+                    insertFormContent.renderSettings.url = insertFormContent.render_url;
+                    var externalContentFormName =  step.blockNamespace.content + '.' + step.blockNamespace.content;
+                    insertFormContent.externalFormName = externalContentFormName;
+
+                    insertFormContent.ns = step.blockNamespace.content;
+                    insertFormContent.params.namespace = step.blockNamespace.content;
+
+                    insertFormContent.cssclass = 'checkout_content_' + step.code;
+
+                    var externalRightFormName = '';
+                    if (step.blockNamespace.right) {
+                        var insertFormRight = registry.get(this.name + '.' + 'insert_form_right');
+                        insertFormRight.render_url = config.render_url + '?' + this.getRenderParams(step);
+                        insertFormRight.ns = step.blockNamespace.right;
+                        insertFormRight.params.namespace = step.blockNamespace.right;
+                        insertFormRight.renderSettings.url = insertFormRight.render_url;
+                        externalRightFormName =  step.blockNamespace.right + '.' + step.blockNamespace.right;
+                        insertFormRight.externalFormName = externalRightFormName;
+
+                        insertFormRight.cssclass = 'checkout_right_' + step.code;
+                    }
+
                     this.isLoading(true);
-                    insertForm.destroyInserted();
-                    insertForm.render();
+
+                    this.resetDataSource(externalContentFormName);
+                    insertFormContent.destroyInserted();
+                    insertFormContent.render();
+
+                    if (insertFormRight) {
+                        insertFormRight.destroyInserted();
+                        insertFormRight.render();
+                    }
                 }
             },
 

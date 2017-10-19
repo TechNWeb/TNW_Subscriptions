@@ -8,11 +8,13 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
 
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Registry;
-use Magento\Framework\View\Result\PageFactory;
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\Request\Save\Processor;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
@@ -21,7 +23,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 /**
  * Process subscription profile data during creation.
  */
-class Process extends Create
+class Process extends AbstractSave
 {
     /**
      * @var JsonFactory
@@ -29,64 +31,60 @@ class Process extends Create
     private $resultJsonFactory;
 
     /**
-     * @param Context                $context
-     * @param Registry               $coreRegistry
+     * Step pool.
+     *
+     * @var StepPool
+     */
+    private $stepPool;
+
+    /**
+     * Process constructor.
+     * @param Context $context
+     * @param Registry $coreRegistry
      * @param DataPersistorInterface $dataPersistor
-     * @param StepPool               $stepPool
-     * @param PageFactory            $resultPageFactory
-     * @param JsonFactory            $resultJsonFactory
+     * @param Processor $saveProcessor
+     * @param JsonFactory $resultJsonFactory
+     * @param StepPool $stepPool
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
-        StepPool $stepPool,
-        PageFactory $resultPageFactory,
-        JsonFactory $resultJsonFactory
+        Processor $saveProcessor,
+        JsonFactory $resultJsonFactory,
+        StepPool $stepPool
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
-        parent::__construct($context, $coreRegistry, $dataPersistor, $stepPool, $resultPageFactory);
+        $this->stepPool = $stepPool;
+
+        parent::__construct($context, $coreRegistry, $dataPersistor, $saveProcessor);
     }
 
     /**
-     * Errors list
-     *
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @return \Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\Result\Redirect
+     * @return Json|Redirect
      */
     public function execute()
     {
-        $this->resetErrors();
         $currentStep = $this->getRequest()->getParam(
             StepPool::STEP_PARAM_NAME,
             StepPool::STEP_PARAM_TYPE_STORE
         );
         $this->processBackActions($currentStep);
-        $this->processRequestData();
+        $errors = $this->processRequestData();
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $result = $this->resultRedirectFactory->create();
 
         if ($this->getRequest()->getParam('isAjax', false)) {
             $result = $this->resultJsonFactory->create();
-            $result->setData($this->getJsonResponse());
+            $result->setData($this->getJsonResponse($errors));
         } else {
-            if (!empty($this->errors)) {
-
-                foreach ($this->errors as $error) {
+            if (!empty($errors)) {
+                foreach ($errors as $error) {
                     $this->messageManager->addErrorMessage($error);
                 }
-
                 $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
             }
-
-            $redirectParams = [
-                StepPool::STEP_PARAM_NAME => $currentStep,
-            ];
-
+            $redirectParams = [StepPool::STEP_PARAM_NAME => $currentStep];
             $redirectParams = array_merge($redirectParams, $this->getAdditionalParams($currentStep));
             $result->setPath('tnw_subscriptions/subscriptionprofile/create', $redirectParams);
         }
@@ -94,188 +92,19 @@ class Process extends Create
         return $result;
     }
 
-    private function processRequestData()
-    {
-        $requestData = $this->getRequest()->getParams();
-
-        $this->processStoreData($requestData);
-
-        $this->processCustomerData($requestData);
-
-        $this->processCurrencyData($requestData);
-
-        $this->processAccountData($requestData);
-
-        $this->processShippingMethods($requestData);
-
-        $this->processBillingData($requestData);
-
-        $this->processPaymentData($requestData);
-
-        $this->getSubCreateModel()->recollectSubscriptions();
-    }
-
     /**
-     * Process post data from store form.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processStoreData($data)
-    {
-        if (isset($data['store_id'])) {
-            $this->_getSession()->setStoreId($data['store_id']);
-        }
-    }
-
-    /**
-     * Process request data from "choose customer" page.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processCustomerData($data)
-    {
-        if (isset($data['customer_id'])) {
-            $this->_getSession()->setCustomerId($data['customer_id']);
-            $this->_getSession()->setCreateNewCustomer(null);
-        }
-
-        if (isset($data['create_new_customer'])) {
-            $this->_getSession()->setCreateNewCustomer($data['create_new_customer']);
-            $this->_getSession()->setCustomerId(null);
-        }
-
-        if (isset($data['customer_id']) || isset($data['create_new_customer'])) {
-            $this->getSubCreateModel()->changeCustomerInQuote();
-        }
-    }
-
-    /**
-     * Process post data from currency form.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processCurrencyData($data)
-    {
-        if (isset($data['currency_id'])) {
-            $this->_getSession()->setCurrencyId($data['currency_id']);
-
-            $result = $this->getSubCreateModel()->setCurrency($data['currency_id']);
-
-            $this->checkProcessResult($result);
-        }
-    }
-
-    /**
-     * Process post data from account form.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processAccountData($data)
-    {
-        if (isset($data['account'])) {
-            $email = !empty($data['account']['email']) ? $data['account']['email'] : null;
-            $group = !empty($data['account']['group']) ? $data['account']['group'] : null;
-            $this->_getSession()->setCustomerEmail($email);
-            $this->_getSession()->setCustomerGroup($group);
-        }
-
-        if (!empty($data['shipping_address']) && !empty($data['shipping_info'])) {
-            $address = array_merge($data['shipping_address'], $data['shipping_info']);
-            $customerAddressId = !empty($data['shipping_address']['customer_address_id'])
-                ? $data['shipping_address']['customer_address_id']
-                : null;
-
-            $result = $this->getSubCreateModel()->setShippingAddress($address, $customerAddressId);
-
-            $this->checkProcessResult($result);
-        }
-    }
-
-    /**
-     * Process shipping methods.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processShippingMethods($data)
-    {
-        if (isset($data['shipping_methods'])) {
-
-            $result = $this->getSubCreateModel()->setShippingMethods($data['shipping_methods']);
-
-            $this->checkProcessResult($result);
-        }
-    }
-
-    /**
-     * Process post data from payment and billing form.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processBillingData($data)
-    {
-        $address = isset($data['billing_address']) ? $data['billing_address'] : [];
-        $info = isset($data['billing_info']) ? $data['billing_info'] : [];
-        $billing = array_merge($address, $info);
-        if (!empty($billing)) {
-            $customerAddressId = !empty($billing['customer_address_id'])
-                ? $billing['customer_address_id']
-                : null;
-
-            $result = $this->getSubCreateModel()->setBillingAddress($billing, $customerAddressId);
-
-            $this->checkProcessResult($result);
-        }
-    }
-
-    /**
-     * Process post data from payment and billing form.
-     *
-     * @param array $data
-     * @return void
-     */
-    private function processPaymentData($data)
-    {
-        if (isset($data['payment'])) {
-            $result = [];
-
-            foreach ($data['payment'] as $code => $methodData) {
-                if ($methodData['method']) {
-                    $result = $this->getSubCreateModel()->setPaymentMethod($code);
-                    break;
-                }
-            }
-
-            $this->checkProcessResult($result);
-        }
-    }
-
-    /**
-     *  Adds to errors array errors from process request data methods.
-     *
-     * @param array $result
-     * @return void
-     */
-    private function checkProcessResult($result)
-    {
-        if (is_array($result)) {
-            $this->errors = array_merge($this->errors, $result);
-        }
-    }
-
-    /**
-     * Resets errors array.
+     * Processing save post data. Returns list of errors.
      *
      * @return array
      */
-    private function resetErrors()
+    private function processRequestData()
     {
-        $this->errors = [];
+        $result = $this->getSaveProcessor()->processSave(
+            $this->getRequest()->getParams()
+        );
+        $this->getSubCreateModel()->recollectSubscriptions();
+
+        return $result;
     }
 
     /**
@@ -306,26 +135,6 @@ class Process extends Create
         }
 
         return $additionalParams;
-    }
-
-    /**
-     * @return array
-     */
-    private function getJsonResponse()
-    {
-        $result = [
-            'data'  => [],
-            'error' => false
-        ];
-
-        if (!empty($this->errors)) {
-            $result = [
-                'error_messages' => $this->errors,
-                'error'          => true
-            ];
-        }
-
-        return $result;
     }
 
     /**
