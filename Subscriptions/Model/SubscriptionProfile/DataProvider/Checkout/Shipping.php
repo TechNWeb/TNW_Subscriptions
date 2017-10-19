@@ -15,6 +15,9 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Pool;
 
+/**
+ * Class Shipping data provider.
+ */
 class Shipping extends AbstractDataProvider
 {
     /**#@+

@@ -219,6 +219,7 @@ define(
              * Get current step.
              *
              * @returns {Function}
+             * @todo optimize this
              */
             getCurrentStep: function () {
                 var currentStep = null;

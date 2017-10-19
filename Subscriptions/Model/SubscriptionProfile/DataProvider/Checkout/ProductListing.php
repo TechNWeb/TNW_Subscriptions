@@ -18,6 +18,9 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
+/**
+ * Class ProductListing data provider
+ */
 class ProductListing extends AbstractDataProvider
 {
     /**
@@ -28,7 +31,7 @@ class ProductListing extends AbstractDataProvider
     /**
      * Subscription listing data scope
      */
-    const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_create_product_listing';
+    const DATA_SCOPE_SUBSCRIPTION_LISTING = 'tnw_subscriptionprofile_checkout_product_listing';
 
     /**#@+
      * Constants for subscription profile checkout steps
@@ -38,6 +41,9 @@ class ProductListing extends AbstractDataProvider
     const CHECKOUT_STEP_PAYMENT = 'payment';
     /**#@-*/
 
+    /**
+     * @var string
+     */
     private $scopeName;
 
     /**
@@ -181,6 +187,8 @@ class ProductListing extends AbstractDataProvider
     }
 
     /**
+     * Format price.
+     *
      * @param $price
      * @return float
      */
@@ -196,6 +204,8 @@ class ProductListing extends AbstractDataProvider
     }
 
     /**
+     * Retrieve ui shipping method data.
+     *
      * @param ModelQuote $quote
      * @return array
      */
@@ -229,6 +239,11 @@ class ProductListing extends AbstractDataProvider
         ];
     }
 
+    /**
+     * Retrieve current checkout step.
+     *
+     * @return string
+     */
     private function getCurrentCheckoutStep()
     {
         $result= '';

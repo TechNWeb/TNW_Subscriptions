@@ -17,6 +17,9 @@ use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
+/**
+ * Class AddressModifier
+ */
 class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
     /**#@+

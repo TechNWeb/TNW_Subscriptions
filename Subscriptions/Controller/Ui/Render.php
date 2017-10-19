@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Controller\Ui;
 use Magento\Ui\Controller\Adminhtml\Index\Render as MagentoRender;
 
 /**
- * Class Handle
+ * Class renderer insert forms
  */
 class Render extends MagentoRender
 {
