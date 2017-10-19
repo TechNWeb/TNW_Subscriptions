@@ -6,23 +6,22 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Edit;
 
-use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
-use TNW\Subscriptions\Model\SubscriptionProfile\Address\Manager as ProfileAddressManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as SubscriptionProductManager;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
  * Class Save
  */
-class Save extends Action
+class Save extends AbstractSave
 {
-
     /**
      * Core registry
      *
@@ -45,43 +44,25 @@ class Save extends Action
     private $profileManager;
 
     /**
-     * Subscription profile address manager
-     *
-     * @var ProfileAddressManager
-     */
-    private $profileAddressManager;
-
-    /**
-     * Subscription profile product manager.
-     *
-     * @var SubscriptionProductManager
-     */
-    private $subscriptionProductManager;
-
-    /**
      * Save constructor.
      * @param Context $context
      * @param Registry $coreRegistry
      * @param JsonFactory $jsonFactory
      * @param ProfileManager $profileManager
-     * @param ProfileAddressManager $profileAddressManager
-     * @param SubscriptionProductManager $subscriptionProductManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         JsonFactory $jsonFactory,
         ProfileManager $profileManager,
-        ProfileAddressManager $profileAddressManager,
-        SubscriptionProductManager $subscriptionProductManager
+        Processor $saveProcessor,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->jsonFactory = $jsonFactory;
         $this->profileManager = $profileManager;
-        $this->profileAddressManager = $profileAddressManager;
-        $this->subscriptionProductManager = $subscriptionProductManager;
 
-        parent::__construct($context);
+        parent::__construct($context, $coreRegistry, $dataPersistor, $saveProcessor);
     }
 
     /**
@@ -135,11 +116,7 @@ class Save extends Action
     private function processRequestData()
     {
         $requestData = $this->getRequest()->getParams();
-        $this->profileAddressManager->processShippingAddress($requestData);
-        $this->profileAddressManager->processBillingAddress($requestData);
-        $this->profileManager->processPaymentMethod($requestData);
-        $this->profileManager->processShippingMethod($requestData);
-        $this->subscriptionProductManager->processProfileProducts($requestData);
+        $result = $this->getSaveProcessor()->processSave($requestData);
     }
 
     /**

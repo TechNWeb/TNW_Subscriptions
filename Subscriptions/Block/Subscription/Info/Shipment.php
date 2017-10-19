@@ -45,6 +45,8 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
      */
     private $addressRepository;
 
+    const REQUEST_PROFILE_ID = 'profile_id';
+
     /**
      * @param Context $context
      * @param Registry $registry
@@ -128,7 +130,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         return $this->_urlBuilder->getUrl(
             'tnw_subscriptions/subscription_customer_account/save',
             [
-                'profile_id' => $this->getSubscriptionProfile()->getId(),
+                self::REQUEST_PROFILE_ID => $this->getSubscriptionProfile()->getId(),
                 'isAjax' => true,
             ]
         );

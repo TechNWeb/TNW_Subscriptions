@@ -9,8 +9,7 @@ namespace TNW\Subscriptions\Controller\Subscription;
 use Magento\Framework\App\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
 
 /**
  * Abstract controller for subscription creation.

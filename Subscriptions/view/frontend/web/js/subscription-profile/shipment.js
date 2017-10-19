@@ -28,7 +28,9 @@ define([
             infoFields: '.info-field',
             defaultCountryId: 'US',
             countrySelect: '#country',
-            emptyCountryLabel: ''
+            emptyCountryLabel: '',
+            infoBlockContent: '.subscription-profile-shipping-address',
+            buttonDisabledClass: 'disabled'
         },
 
         /**
@@ -125,7 +127,7 @@ define([
         /**
          * Fill address form inputs with data from customer addresses.
          *
-         * @param {} customerAddressesSelect
+         * @param {jQuery} customerAddressesSelect
          * @returns void
          */
         fillInputsData: function(customerAddressesSelect) {
@@ -172,7 +174,16 @@ define([
          * @returns void
          */
         saveAddress: function(e) {
-            var form = $(this.options.formSelector);
+            var form = $(this.options.formSelector),
+                widget = this,
+                editButton = $(this.options.addressEditButton),
+                addNewButton = $(this.options.addNewAddressButton);
+
+            if (!$(this.options.customerAddressesList).is(':visible')) {
+                $(this.options.customerAddressesList).val('0');
+            }
+            this.disableButton(editButton);
+            this.disableButton(addNewButton);
 
             $.ajax({
                 url: this.options.saveAddressUrl,
@@ -186,11 +197,36 @@ define([
                  * @param {Object} response
                  */
                 success: function(response) {
+                    var addressBlock = $(widget.options.infoBlockContent).find('address');
 
-                    //@toDo make response validation
-
+                    if (typeof response.data.shipping_address != 'undefined') {
+                        addressBlock.html(response.data.shipping_address);
+                    }
+                    widget.setFormsVisibility(true);
+                    this.enableButton(editButton);
+                    this.enableButton(addNewButton);
                 }
             });
+        },
+
+        /**
+         * Disable button.
+         *
+         * @param {jQuery} button
+         * @returns void
+         */
+        disableButton: function(button) {
+            button.addClass(this.options.buttonDisabledClass);
+        },
+
+        /**
+         * Enable button.
+         *
+         * @param {jQuery} button
+         * @returns void
+         */
+        enableButton: function(button) {
+            button.removeClass(this.options.buttonDisabledClass);
         },
 
         /**
@@ -213,7 +249,7 @@ define([
         setAddressFieldsVisibility: function (visibility) {
             this._setElemsVisibility($(this.options.customerAddressesList), visibility);
             this._setElemsVisibility($(this.options.addressFieldsList), !visibility);
-            if ($(this.options.customerAddressesList+' option').length > 1) {
+            if ($(this.options.customerAddressesList +' option').length > 1) {
                 this._setElemsVisibility($(this.options.pickFromSavedButton), !visibility);
                 this._setElemsVisibility($(this.options.addNewAddressButton), visibility);
             } else {

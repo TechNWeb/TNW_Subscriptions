@@ -14,7 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;

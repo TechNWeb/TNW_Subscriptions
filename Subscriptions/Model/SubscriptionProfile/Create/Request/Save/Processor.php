@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\Request\Save;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save;
 
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
@@ -20,7 +20,7 @@ class Processor
      *
      * @var Context
      */
-    private $context;
+    protected $context;
 
     /**
      * @var PoolInterface
@@ -28,7 +28,6 @@ class Processor
     private $requestSaveProcessorsPool;
 
     /**
-     * Processor constructor.
      * @param Context $context
      * @param PoolInterface $requestSaveProcessorsPool
      */
@@ -56,7 +55,7 @@ class Processor
      * @param array $data
      * @return array
      */
-    public function processSave($data)
+    public function processSave(array $data)
     {
         $messages = [];
         try {

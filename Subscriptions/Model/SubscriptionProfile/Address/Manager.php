@@ -123,7 +123,7 @@ class Manager
      * @param $data
      * @param $type
      */
-    private function processAddress($data, $type)
+    public function processAddress($data, $type)
     {
         if ($type === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
             $keyAddress = 'shipping_address';

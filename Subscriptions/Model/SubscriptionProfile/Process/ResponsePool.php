@@ -10,9 +10,9 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Pool
+ * Class Response Pool
  */
-class Pool implements PoolInterface
+class ResponsePool implements PoolInterface
 {
     /**
      * @var array
@@ -68,9 +68,9 @@ class Pool implements PoolInterface
                 }
 
                 $modifierObject = $this->objectManager->create($modifier['class']);
-                if (!$modifierObject instanceof ProcessInterface) {
+                if (!$modifierObject instanceof ResponseInterface) {
                     throw new \InvalidArgumentException(
-                        'Type "' . $modifier['class'] . '" is not instance on ' . ProcessInterface::class
+                        'Type "' . $modifier['class'] . '" is not instance on ' . ResponseInterface::class
                     );
                 }
                 $this->processorsInstances[$modifier['class']] = $modifierObject;

@@ -10,7 +10,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
 
 /**
  * Abstract class for profile admin save actions.
