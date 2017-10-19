@@ -11,20 +11,21 @@
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
             <item name="useParentLoader" xsi:type="boolean">true</item>
             <item name="parentForLoader" xsi:type="string">cart.steps</item>
+            <item name="ajaxSave" xsi:type="boolean">true</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/subscriptions-form</item>
             <item name="cssclass" xsi:type="string">checkout-billing-address-fieldset</item>
         </item>
         <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
-    <dataSource name="tnw_subscriptionprofile_checkout_billing_form_data_source">
+    <dataSource name="tnw_subscriptionprofile_checkout_billing_form_data_source">SubscriptionProfile\DataProvider\
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling</argument>
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Billing</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">billing_form_data</argument>
             <argument name="requestFieldName" xsi:type="string">billing_form_data</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="submit_url" path="*/subscriptionprofile_create/process" xsi:type="url"/>
+                    <item name="submit_url" path="tnw_subscriptions/subscription_create/process" xsi:type="url"/>
                 </item>
             </argument>
         </argument>
@@ -58,6 +59,7 @@
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/address-fieldset</item>
+                <item name="label" xsi:type="boolean">false</item>
                 <item name="sortOrder" xsi:type="number">30</item>
                 <item name="imports" xsi:type="array">
                     <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = same_as_shipping:checked</item>
@@ -157,14 +159,5 @@
             </argument>
         </field>
     </fieldset>
-    <item name="next_step" xsi:type="array">
-        <item name="sortOrder" xsi:type="string">20</item>
-        <item name="component" xsi:type="string">uiComponent</item>
-        <item name="displayArea" xsi:type="string">nextStep</item>
-        <item name="config" xsi:type="array">
-            <item name="template" xsi:type="string">TNW_Subscriptions/cart/next-step</item>
-            <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/action/next-step</item>
-        </item>
-    </item>
 </form>
 

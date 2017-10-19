@@ -57,6 +57,7 @@ define(
                     renderProductListing: step.renderProductListing,
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
+                    needSave: step.needSave,
                     title: $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,
@@ -212,6 +213,23 @@ define(
                     url = urlParts[0];
 
                 window.location = url + '#' + hash;
+            },
+
+            /**
+             * Get current step.
+             *
+             * @returns {Function}
+             */
+            getCurrentStep: function () {
+                var currentStep = null;
+
+                steps.sort(this.sortItems).forEach(function (element, index) {
+                    if (element.isActive()) {
+                        currentStep = element;
+                    }
+                });
+
+                return currentStep;
             }
         };
     }

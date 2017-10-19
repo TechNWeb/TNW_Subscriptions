@@ -492,6 +492,22 @@
         </arguments>
     </virtualType>
 
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Shipping">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="modifier_name" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
+                    <item name="sortOrder" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier"
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
@@ -523,11 +539,19 @@
             </argument>
         </arguments>
     </virtualType>
+
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling">
         <arguments>
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Billing">
+        <arguments>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\ShippingAndBilling\Form\Modifier\Pool</argument>
+        </arguments>
+    </type>
+
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier"
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
