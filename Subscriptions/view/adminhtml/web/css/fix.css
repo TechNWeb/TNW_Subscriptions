@@ -1,0 +1,4 @@
+.admin__scope-old .form-inline div:not([class*='fields-group']) > .field > .label span,
+.admin__scope-old .form-inline .fieldset > .field > .label span {
+    word-break: normal !important;
+}
