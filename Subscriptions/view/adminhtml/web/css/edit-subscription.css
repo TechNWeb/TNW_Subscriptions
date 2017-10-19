@@ -539,6 +539,7 @@ button.profile__cancel-edit_button:before{
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-label {
     float: left;
     text-align: left;
+    width: 50%;
 }
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
     text-align: right;
