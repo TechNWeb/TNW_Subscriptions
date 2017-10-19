@@ -401,4 +401,13 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
     {
         return $this->setData(self::TELEPHONE, $telephone);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave()
+    {
+        //TODO: Логирование изменений
+        return parent::afterSave();
+    }
 }

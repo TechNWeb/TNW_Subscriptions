@@ -156,19 +156,8 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
 
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
-        $items = [];
 
-        foreach ($collection as $profileAddressModel) {
-            $profileAddressData = $this->dataAddressFactory->create();
-            $this->dataObjectHelper->populateWithArray(
-                $profileAddressData,
-                $profileAddressModel->getData(),
-                SubscriptionProfileAddressInterface::class
-            );
-            $items[] = $profileAddressData;
-        }
-        $searchResults->setItems($items);
-
+        $searchResults->setItems($collection->getItems());
         return $searchResults;
     }
 

@@ -196,6 +196,9 @@
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" translate="true" xsi:type="string">Subscription Change History</item>
                 <item name="tabLabel" translate="true" xsi:type="string">Change History</item>
+                <item name="listens" xsi:type="array">
+                    <item name="active" xsi:type="string">setParsed</item>
+                </item>
             </item>
         </argument>
         <field name="comment_area">

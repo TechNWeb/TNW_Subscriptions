@@ -145,7 +145,7 @@ class Manager
             $profileAddress->setOrigData();
             if ($customerAddressId) {
                 /** @var CustomerInterface $customer */
-                list($customer, $addresses) = $this->getCustomerAddresses();
+                list(, $addresses) = $this->getCustomerAddresses();
                 $address = null;
                 if (is_array($addresses) && count($addresses) > 0) {
                     /** @var \Magento\Customer\Api\Data\AddressInterface $curAddress */
@@ -187,13 +187,6 @@ class Manager
             $profileAddress->setCustomerAddressId((string)$customerAddressId);
             if ($profileAddress->hasDataChanges()) {
                 $this->profileManager->getProfile()->setNeedRecollect('1');
-
-                if (null !== $this->profileManager->getProfile()->getId()) {
-                    $message = $type === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING
-                        ? __('Shipping Address updated.') : __('Billing Address updated.');
-
-                    $this->historyLogger->log($message, $this->profileManager->getProfile()->getId());
-                }
             }
             $profileAddress->setDataChanges($addressDataChanges || $profileAddress->hasDataChanges());
         }
