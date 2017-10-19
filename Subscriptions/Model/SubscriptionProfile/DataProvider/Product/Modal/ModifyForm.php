@@ -740,7 +740,8 @@ class ModifyForm extends Form
                         ],
                         'previewLabelVisible' => false,
                         'previewLabel' => __('Bill %s times'),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'previewLabelOnce' => __('Bill once'),
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-term',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview'
                     ]
                 ]
