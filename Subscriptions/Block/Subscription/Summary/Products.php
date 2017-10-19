@@ -10,6 +10,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
@@ -32,24 +33,14 @@ class Products extends Template
     private $currency;
 
     /**
-     * @var \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType
-     */
-    private $frequencyUnitType;
-
-    /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile
-     */
-    private $resourceSubscriptionProfile;
-
-    /**
-     * @var \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType
-     */
-    private $trialLengthUnitType;
-
-    /**
      * @var \Magento\Sales\Model\OrderRepository
      */
     private $orderRepository;
+
+    /**
+     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     */
+    private $descriptionCreator;
 
     /**
      * Products constructor.
@@ -57,10 +48,8 @@ class Products extends Template
      * @param \Magento\Catalog\Helper\ImageFactory $imageFactory
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
-     * @param \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType $frequencyUnitType
-     * @param \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile $resourceSubscriptionProfile
-     * @param \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType $trialLengthUnitType
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
+     * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
      * @param array $data
      */
     public function __construct(
@@ -68,20 +57,16 @@ class Products extends Template
         \Magento\Catalog\Helper\ImageFactory $imageFactory,
         \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository,
         \Magento\Framework\Locale\CurrencyInterface $currency,
-        \TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType $frequencyUnitType,
-        \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile $resourceSubscriptionProfile,
-        \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType $trialLengthUnitType,
         \Magento\Sales\Model\OrderRepository $orderRepository,
+        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->imageFactory = $imageFactory;
         $this->frequencyRepository = $frequencyRepository;
         $this->currency = $currency;
-        $this->frequencyUnitType = $frequencyUnitType;
-        $this->resourceSubscriptionProfile = $resourceSubscriptionProfile;
-        $this->trialLengthUnitType = $trialLengthUnitType;
         $this->orderRepository = $orderRepository;
+        $this->descriptionCreator = $descriptionCreator;
     }
 
     /**
@@ -180,10 +165,7 @@ class Products extends Template
      */
     public function getPrice(ProductSubscriptionProfileInterface $item)
     {
-        $product = $this->getProductFromItem($item);
-        $presetQty = null === $product
-            ? (int)$item->getTnwSubscrUnlockPresetQty()
-            : (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $presetQty = (int)$item->getTnwSubscrUnlockPresetQty();
 
         return $presetQty
             ? $item->getPrice() * $item->getQty()
@@ -207,97 +189,31 @@ class Products extends Template
     {
         $profile = $this->getSubscriptionProfile();
 
-        $price = 0;
+        $initialFee = $price = 0;
         foreach ($this->getItems() as $item) {
             $price += $this->getPrice($item);
+            $initialFee += $item->getInitialFee();
         }
 
         $orderData = $this->getSubscriptionProfile()->getResource()
             ->getFirstOrderData($profile);
 
-        $initialFee = $this->orderRepository->get($orderData['magento_order_id'])
-            ->getGrandTotal();
-
-        $formattedPrice = !empty($initialFee)
-            ? $this->formatPrice($initialFee) : __('Free');
-
-        if ($profile->getTrialLength()) {
-            $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
-                $profile->getTrialLength(), $profile->getTrialLengthUnit());
-            $description[] = __('%1 for %2 and then', $formattedPrice, $frequencyTrialPeriod);
-        } else if ($initialFee) {
-            $description[] = __('%1 initial charge and then', $formattedPrice);
-        }
-
-        $frequencyUnit = $this->getFrequencyWithUnit($profile->getBillingFrequencyId());
-        $description[] = __('%1 / every %2.', $this->formatPrice($price), $frequencyUnit);
-
-        if (!$profile->getTerm()) {
-            $subscriptionPeriod = $profile->getTotalBillingCycles();
-            $description[] = __('Total of %1 %2.',
-                $subscriptionPeriod, $this->getShipmentLabel($subscriptionPeriod));
-        }
-
-        $description[] = __('Products will be shipped every %1 starting %2.',
-            $frequencyUnit, $this->getStartOn()->format('F jS Y'));
-
-        return implode(' ', $description);
-    }
-
-    /**
-     * Return Billing Frequency Trial with unit (e.g. "6 months")
-     *
-     * @param $period
-     * @param $unitId
-     * @return string
-     */
-    private function getFrequencyTrialWithUnit($period, $unitId)
-    {
-        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength($unitId, $period);
-        return strtolower($period . ' ' . $unitLabel);
-    }
-
-    /**
-     * Get shipment label depends on subscription period.
-     *
-     * @param int $subscriptionPeriod
-     * @return \Magento\Framework\Phrase
-     */
-    private function getShipmentLabel($subscriptionPeriod)
-    {
-        $label = 'shipment';
-        if ($subscriptionPeriod != 1) {
-            $label .= "s";
-        }
-
-        return __($label);
-    }
-
-    /**
-     * Return Billing Frequency with unit (e.g. "6 months")
-     *
-     * @param string|int $billingFrequencyId
-     * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function getFrequencyWithUnit($billingFrequencyId)
-    {
-        $billingFrequency = $this->frequencyRepository->getById(
-            $billingFrequencyId
-        );
-
-        $frequency = $billingFrequency->getFrequency();
-
-        $label = $this->frequencyUnitType->getLabelByValueAndFrequency(
-            $billingFrequency->getUnit(),
-            $frequency
-        );
-
-        if ($frequency > 1) {
-            $label = $frequency . ' ' . $label;
-        }
-
-        return strtolower($label);
+        return $this->descriptionCreator->getDescription([
+            CreateProfile::UNIQUE => [
+                'is_trial' => (bool)$profile->getTrialLength(),
+                'billing_frequency' => $profile->getBillingFrequencyId(),
+                'period' => $profile->getTotalBillingCycles(),
+                'start_on' => $profile->getStartDate(),
+                'trial_period' => $profile->getTrialLength(),
+                'trial_unit_id' =>  $profile->getTrialLengthUnit(),
+                'term' => $profile->getTerm(),
+            ],
+            CreateProfile::NON_UNIQUE => [
+                'totalPrice' => $this->orderRepository->get($orderData['magento_order_id'])->getGrandTotal(),
+                'initialFee' => $initialFee > 0,
+                'price' => $price,
+            ]
+        ]);
     }
 
     /**

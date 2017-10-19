@@ -84,54 +84,44 @@ class DescriptionCreator
      *
      *      Example: "$10.25 / every month(s). Total of 3 shipments. Products will be shipped every month(s) starting today".
      *
-     * @param ModelQuote $quote
      * @param array $subscriptionData
-     * @param null|int|string $initialFee
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getDescription(ModelQuote $quote, array $subscriptionData, $initialFee = null)
+    public function getDescription(array $subscriptionData)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = ($quote->getSubtotal() + $initialFee)
-            ? $this->formatPrice($quote->getSubtotal() + $initialFee)
+        $formattedPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+            ? $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
             : __('Free');
         $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']);
         $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
         $startDate = $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']);
-        $trialPart = '';
-        $noTrialPart = '';
 
         if ($isTrial) {
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
-            $trialPart = sprintf(__('%s for %s and then '), $formattedPrice, $frequencyTrialPeriod);
-        } else {
-            if ($initialFee) {
-                $noTrialPart = sprintf("%s initial charge and then ", $formattedPrice);
-            }
+            $description[] = __('%1 for %2 and then ', $formattedPrice, $frequencyTrialPeriod);
+        } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
+            $description[] = __("%1 initial charge and then ", $formattedPrice);
         }
 
-        $total = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
-        $priceWithUnit = sprintf('%s / %s %s. ', $total, __('every'), $frequencyUnit);
-        $shipmentsPart = ' ';
+        $description[] = __('%1 / every %2. ',
+            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']), $frequencyUnit);
+
         if (!$subscriptionData[CreateProfile::UNIQUE]['term']){
-            $shipmentLabel = $this->getShipmentLabel($subscriptionPeriod);
-            $shipmentsPart = sprintf(
-                __('Total of %s %s. '),
+            $description[] = __('Total of %1 %2. ',
                 $subscriptionPeriod,
-                $shipmentLabel
+                $this->getShipmentLabel($subscriptionPeriod)
             );
         }
-        $shippingInformation = sprintf(
-            __('Products will be shipped every %s starting %s.'),
-            $frequencyUnit,
-            $startDate
-        );
 
-        return $trialPart . $noTrialPart . $priceWithUnit . $shipmentsPart . $shippingInformation;
+        $description[] = __('Products will be shipped every %1 starting %2.',
+            $frequencyUnit, $startDate);
+
+        return implode(' ', $description);
     }
 
     /**
