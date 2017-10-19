@@ -224,14 +224,14 @@ class Product extends AbstractDataProvider
             }
             $subTotal = $subQuote->getGrandTotal();
             $estimatedPayment += (double)$subTotal;
+
+            $fullSubscriptionData[Create::NON_UNIQUE]['totalPrice'] = $subQuote->getSubtotal() + $initialFee;
+            $fullSubscriptionData[Create::NON_UNIQUE]['initialFee'] = $initialFee > 0;
+
             $items[] = [
                 'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
-                'frequency_description' => $this->frequencyDescriptionCreator->getDescription(
-                    $subQuote,
-                    $fullSubscriptionData,
-                    $initialFee
-                ),
+                'frequency_description' => $this->frequencyDescriptionCreator->getDescription($fullSubscriptionData),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
             ];
             $products = [];

@@ -324,7 +324,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function getProductsHtml()
     {
-        return 'products grid';
+        return $this->getChildHtml('products');
     }
 
     /**
