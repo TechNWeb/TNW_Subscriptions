@@ -1210,6 +1210,96 @@
   }
 }
 
+.shipment-wrapper {
+  padding: 25px 2%;
+
+  input {
+    width: 95%;
+
+    &.checkbox {
+      width: 13px;
+    }
+  }
+
+
+  select {
+    width: 95%;
+  }
+}
+
+.shipping-info-content {
+  width: 47%;
+
+  .legend {
+    border: none;
+    margin-bottom: 0px;
+  }
+
+  .fieldset-shipping {
+    width: 100%;
+    border: none;
+
+    legend {
+      width: 100%;
+    }
+    .additional{
+      margin-top: 10px;
+    }
+
+    .shipping-actions {
+
+      #pick div{
+        margin-bottom: 12px;
+      }
+
+      #add-new div{
+        margin: 12px 0;
+      }
+
+      a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  div.field {
+    margin-bottom: 20px;
+  }
+
+  .actions-toolbar {
+    margin-left: 1rem;
+  }
+
+}
+
+.shipping-form {
+  .actions-toolbar {
+
+    & > div {
+      width: 48%;
+      display: inline-block;
+
+      .action {
+        width:90%;
+      }
+    }
+    .action.save {
+      line-height: 1.6rem;
+      padding: 7px 15px;
+
+      span {
+        font-size: 1.4rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .shipping-info-content {
+    width: 100%;
+  }
+}
+
 /* Checkout */
 .tnw-subscriptions-cart-index {
   .checkout_content_shipping,
@@ -1226,11 +1316,11 @@
       margin-bottom: 3rem;
 
       .fieldset-wrapper-title {
-          font-size: 2rem;
-          margin-bottom: 2rem;
-          span {
-            font-weight: 400;
-          }
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        span {
+          font-weight: 400;
+        }
       }
 
       .field {

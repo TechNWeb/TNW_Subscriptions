@@ -407,6 +407,19 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit"
+                 type="TNW\Subscriptions\Model\Source\CustomerAddress">
+        <arguments>
+            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit">
+        <arguments>
+            <argument name="customerAddressSource" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</argument>
+        </arguments>
+    </type>
+
     <type name="TNW\Subscriptions\Model\MessagePool" shared="false" />
 
     <type name="TNW\Subscriptions\Controller\Subscription\Create\Process">
@@ -500,13 +513,6 @@
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\AddressModifier">
         <arguments>
             <argument name="isShipping" xsi:type="string">1</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit"
-                 type="TNW\Subscriptions\Model\Source\CustomerAddress">
-        <arguments>
-            <argument name="profileState" xsi:type="const">TNW\Subscriptions\Model\SubscriptionProfile::STATE_EDIT</argument>
         </arguments>
     </virtualType>
 
