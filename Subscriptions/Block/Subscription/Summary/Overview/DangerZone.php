@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
-use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
@@ -25,13 +24,6 @@ class DangerZone extends Template
      * @var Config
      */
     private $config;
-
-    /**
-     * Provide current website id for config.
-     *
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
 
     /**
      * Help retrieve current subscription profile model.
@@ -55,7 +47,6 @@ class DangerZone extends Template
         array $data = []
     ) {
         $this->config = $config;
-        $this->storeManager = $context->getStoreManager();
         $this->registry = $registry;
         parent::__construct($context, $data);
     }
@@ -105,7 +96,7 @@ class DangerZone extends Template
         $subscriptionProfile = $this->registry->registry('tnw_subscription_profile');
         $status = $subscriptionProfile->getStatus();
 
-        return $this->config->getCanHoldProfile($this->storeManager->getWebsite()->getId()) &&
+        return $this->config->getCanHoldProfile($this->_storeManager->getWebsite()->getId()) &&
             (int) $status !== ProfileStatus::STATUS_HOLDED;
     }
 
@@ -116,6 +107,6 @@ class DangerZone extends Template
      */
     public function isCancelActive()
     {
-        return $this->config->getCanCancelProfile($this->storeManager->getWebsite()->getId());
+        return $this->config->getCanCancelProfile($this->_storeManager->getWebsite()->getId());
     }
 }

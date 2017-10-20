@@ -231,21 +231,12 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Eav\Model\Entity\AttributeCache">
-        <arguments>
-            <argument name="unsupportedTypes" xsi:type="array">
-                <item name="subscription_profile" xsi:type="string">subscription_profile</item>
-                <item name="tnw_product_subscription_profile" xsi:type="string">tnw_product_subscription_profile</item>
-            </argument>
-        </arguments>
-    </type>
-
     <!-- Product copier plugin for duplicating subscription options -->
     <type name="Magento\Catalog\Model\Product\Copier">
         <plugin name="subscriptions_product_billing_frequency_duplicate"
                 type="TNW\Subscriptions\Plugin\Product\Copier" />
     </type>
-    <type name="Magento\Framework\Console\CommandListInterface">
+    <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
@@ -270,11 +261,6 @@
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 

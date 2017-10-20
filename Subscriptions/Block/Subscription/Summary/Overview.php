@@ -6,9 +6,7 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\Framework\Stdlib\DateTime\Timezone;
 use Magento\Quote\Model\Quote;
-use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
@@ -95,23 +93,12 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     private $subscriptionConfig;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var Timezone
-     */
-    private $timezone;
-
-    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param ProfileOrderCollection $profileOrderCollection ,
      * @param ProfileManager $profileManager
      * @param SubscriptionConfig $subscriptionConfig
-     * @param Timezone $timezone
      * @param array $data
      */
     public function __construct(
@@ -121,14 +108,11 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         ProfileOrderCollection $profileOrderCollection,
         ProfileManager $profileManager,
         SubscriptionConfig $subscriptionConfig,
-        Timezone $timezone,
         array $data = []
     ) {
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
-        $this->timezone = $timezone;
         $this->subscriptionConfig = $subscriptionConfig;
-        $this->storeManager = $context->getStoreManager();
         parent::__construct($context, $registry, $messagePool, $data);
     }
 
@@ -235,7 +219,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         $result = false;
         $nextPayment = $this->getNextProfileRelation();
         if ($nextPayment) {
-            $result = $this->timezone->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
+            $result = $this->_localeDate->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
         }
 
         return $result;
@@ -411,7 +395,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function canShowDangerZone()
     {
-        $websiteId = $this->storeManager->getWebsite()->getId();
+        $websiteId = $this->_storeManager->getWebsite()->getId();
 
         return ($this->subscriptionConfig->getCanHoldProfile($websiteId)
             || $this->subscriptionConfig->getCanCancelProfile($websiteId))

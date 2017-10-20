@@ -128,6 +128,7 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
                     '*/subscription/edit',
                     ['entity_id' => $this->getRequest()->getParam('entity_id')]
                 );
+                break;
         }
 
         return $resultRedirect;
