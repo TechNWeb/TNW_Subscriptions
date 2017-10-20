@@ -27,7 +27,7 @@ class Address extends Base
 
     /**
      * @param ProfileAddressManager $profileAddressManager
-     * @param $type
+     * @param string $type
      */
     public function __construct(
         ProfileAddressManager $profileAddressManager,

@@ -11,7 +11,7 @@ use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
@@ -29,13 +29,13 @@ class Save extends AbstractSave
     /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      * @param CreateProfile $createModel
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         CreateProfile $createModel
     ) {
         $this->createModel = $createModel;

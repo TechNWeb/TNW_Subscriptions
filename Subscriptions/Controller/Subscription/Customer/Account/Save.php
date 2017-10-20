@@ -10,11 +10,10 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
-use TNW\Subscriptions\Block\Subscription\Info\Shipment;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
-use TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Processor as ResponseProcessor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
+use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -41,10 +40,18 @@ class Save extends AbstractSave
      */
     private $responseProcessor;
 
+    /**
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param RequestProcessor $saveProcessor
+     * @param ProfileManager $profileManager
+     * @param Registry $coreRegistry
+     * @param ResponseProcessor $responseProcessor
+     */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         ProfileManager $profileManager,
         Registry $coreRegistry,
         ResponseProcessor $responseProcessor
@@ -56,6 +63,11 @@ class Save extends AbstractSave
     }
 
 
+    /**
+     * Execute save profile data on customer account page.
+     *
+     * @return mixed
+     */
     public function execute()
     {
         $errors = [];
@@ -83,12 +95,16 @@ class Save extends AbstractSave
         return $this->getSaveProcessor()->processSave($request);
     }
 
+    /**
+     * Init profile from request.
+     *
+     * @return bool
+     */
     private function initProfile()
     {
         $result = false;
         /** @var SubscriptionProfile $model */
-        $model = $this->profileManager
-            ->loadProfileFromRequest(Shipment::REQUEST_PROFILE_ID);
+        $model = $this->profileManager->loadProfileFromRequest('profile_id');
         if ($model) {
             $result = true;
             $this->coreRegistry->register('tnw_subscription_profile', $model, true);
@@ -97,6 +113,9 @@ class Save extends AbstractSave
         return $result;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getJsonResponse(array $errors)
     {
         $request = $this->getRequest()->getParams();

@@ -4,16 +4,16 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response;
+namespace TNW\Subscriptions\Model\Processor;
 
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\Process\ResponseInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Response Processor class.
+ * Class Processor
  */
-class Processor
+class Request
 {
     /**
      * Subscription context.
@@ -25,19 +25,18 @@ class Processor
     /**
      * @var PoolInterface
      */
-    private $responseProcessorsPool;
+    private $requestSaveProcessorsPool;
 
     /**
-     * Processor constructor.
      * @param Context $context
      * @param PoolInterface $requestSaveProcessorsPool
      */
     public function __construct(
         Context $context,
-        PoolInterface $responseProcessorsPool
+        PoolInterface $requestSaveProcessorsPool
     ) {
         $this->context = $context;
-        $this->responseProcessorsPool = $responseProcessorsPool;
+        $this->requestSaveProcessorsPool = $requestSaveProcessorsPool;
     }
 
     /**
@@ -45,9 +44,9 @@ class Processor
      *
      * @return PoolInterface
      */
-    protected function getResponseProcessorsPool()
+    protected function getRequestSaveProcessorsPool()
     {
-        return $this->responseProcessorsPool;
+        return $this->requestSaveProcessorsPool;
     }
 
     /**
@@ -56,19 +55,20 @@ class Processor
      * @param array $data
      * @return array
      */
-    public function processResponse(array $data)
+    public function processSave(array $data)
     {
-        $response = [];
+        $messages = [];
         try {
-            /** @var ResponseInterface $processor */
-            foreach ($this->getResponseProcessorsPool()->getProcessorsInstances() as $processor) {
-                $response = array_merge($response, $processor->process($data));
+            /** @var ProcessInterface $processor */
+            foreach ($this->getRequestSaveProcessorsPool()->getProcessorsInstances() as $processor) {
+                $processor->process($data);
+                $messages = array_merge($messages, $processor->getErrors());
             }
         } catch (\Exception $e) {
             $this->context->log($e->getMessage());
-            $response = [$e->getMessage()];
+            $messages = [$e->getMessage()];
         }
 
-        return $response;
+        return $messages;
     }
 }

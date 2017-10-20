@@ -203,8 +203,8 @@ define([
                         addressBlock.html(response.data.shipping_address);
                     }
                     widget.setFormsVisibility(true);
-                    this.enableButton(editButton);
-                    this.enableButton(addNewButton);
+                    widget.enableButton(editButton);
+                    widget.enableButton(addNewButton);
                 }
             });
         },

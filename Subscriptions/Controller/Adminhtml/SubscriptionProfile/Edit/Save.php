@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
@@ -49,13 +49,15 @@ class Save extends AbstractSave
      * @param Registry $coreRegistry
      * @param JsonFactory $jsonFactory
      * @param ProfileManager $profileManager
+     * @param RequestProcessor $saveProcessor
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         JsonFactory $jsonFactory,
         ProfileManager $profileManager,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         DataPersistorInterface $dataPersistor
     ) {
         $this->coreRegistry = $coreRegistry;

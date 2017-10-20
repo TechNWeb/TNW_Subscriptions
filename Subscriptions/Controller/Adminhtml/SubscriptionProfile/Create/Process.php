@@ -14,7 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
@@ -44,7 +44,7 @@ class Process extends AbstractSave
      * @param Context $context
      * @param Registry $coreRegistry
      * @param DataPersistorInterface $dataPersistor
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      * @param JsonFactory $resultJsonFactory
      * @param StepPool $stepPool
      */
@@ -52,7 +52,7 @@ class Process extends AbstractSave
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         JsonFactory $resultJsonFactory,
         StepPool $stepPool
     ) {

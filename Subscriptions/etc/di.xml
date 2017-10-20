@@ -424,7 +424,7 @@
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Model\Profile\Step\Save\Processor"
-                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor">
+                 type="TNW\Subscriptions\Model\Processor\Request">
         <arguments>
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Step\Save\Processor\Pool</argument>
         </arguments>
@@ -471,7 +471,7 @@
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Model\Profile\Modified\Save\Processor"
-                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor">
+                 type="TNW\Subscriptions\Model\Processor\Request">
         <arguments>
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Modified\Save\Processor\Pool</argument>
         </arguments>
@@ -491,7 +491,7 @@
     <type name="TNW\Subscriptions\Controller\Subscription\Customer\Account\Save">
         <arguments>
             <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Edit\Save\Processor</argument>
-            <argument name="responseProcessor" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Processor</argument>
+            <argument name="responseProcessor" xsi:type="object">TNW\Subscriptions\Model\Processor\Response</argument>
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Edit\Save">
@@ -500,7 +500,7 @@
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Model\Profile\Edit\Save\Processor"
-                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Processor">
+                 type="TNW\Subscriptions\Model\Processor\Request">
         <arguments>
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Save\Processor\Pool</argument>
         </arguments>
@@ -556,7 +556,7 @@
             <argument name="type" xsi:type="const">TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING</argument>
         </arguments>
     </virtualType>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Processor">
+    <type name="TNW\Subscriptions\Model\Processor\Response">
         <arguments>
             <argument name="responseProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Process\ResponsePool</argument>
         </arguments>

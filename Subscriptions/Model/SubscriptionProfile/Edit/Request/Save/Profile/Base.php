@@ -20,12 +20,6 @@ abstract class Base implements ProcessInterface
      */
     protected $errors;
 
-    public function __construct(
-
-    ) {
-
-    }
-
     /**
      * @inheritdoc
      */

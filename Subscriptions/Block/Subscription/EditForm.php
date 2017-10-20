@@ -10,8 +10,12 @@ namespace TNW\Subscriptions\Block\Subscription;
  */
 class EditForm extends \Magento\Framework\View\Element\Template
 {
+    /** HTML element form class */
     const FORM_CLASS = 'shipping-form';
+
+    /** HTML element form id */
     const FORM_ID = 'shipping-address-form';
+
     /**
      * Retrieve edit form content.
      *
