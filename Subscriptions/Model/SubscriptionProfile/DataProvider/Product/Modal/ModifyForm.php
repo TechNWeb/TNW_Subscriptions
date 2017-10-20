@@ -78,6 +78,18 @@ class ModifyForm extends Form
     private $currentProduct;
 
     /**
+     * @var array
+     */
+    protected $requestFields = [
+        'price',
+        'billing_frequency',
+        'term',
+        'period',
+        'start_on',
+        'qty',
+    ];
+
+    /**
      * ModifyForm constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -269,6 +281,7 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/modify-subscriptions-form',
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
+                        'requestFields' => $this->getRequestFields(),
                         'editButtons' => $this->getFormEditButtons()
                     ]
                 ]
@@ -1002,6 +1015,22 @@ class ModifyForm extends Form
     protected function getProductFromItem(DataObject $item)
     {
         return $this->productRepository->getById($item->getProduct()->getId());
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestFields()
+    {
+        return $this->requestFields;
+    }
+
+    /**
+     * @param array $requestFields
+     */
+    public function setRequestFields(array $requestFields)
+    {
+        $this->requestFields = $requestFields;
     }
 
     /**
