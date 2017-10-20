@@ -1014,10 +1014,13 @@
   width: 49%;
 }
 
-.subscription-ship-details, .subscription-payment-details {
+.subscription-ship-details,
+.subscription-payment-details {
   float: right;
   width: 49%;
-
+}.subscription-ship-details,
+.subscription-payment-details,
+.shipping-details-content {
   .table-secondary {
     tbody tr td {
       padding: 1rem 1rem;
@@ -1229,6 +1232,8 @@
 
 .shipping-info-content {
   width: 47%;
+  display: inline-block;
+  vertical-align: top;
 
   .legend {
     border: none;
@@ -1272,6 +1277,13 @@
 
 }
 
+.shipping-details-content {
+  width: 47%;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 5%;
+}
+
 .shipping-form {
   .actions-toolbar {
 
@@ -1295,7 +1307,8 @@
 }
 
 @media (max-width: 768px) {
-  .shipping-info-content {
+  .shipping-info-content,
+  .shipping-details-content {
     width: 100%;
   }
 }

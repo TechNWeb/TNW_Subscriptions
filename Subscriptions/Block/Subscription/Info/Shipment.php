@@ -193,4 +193,24 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
 
         return str_replace('"', "'", $this->jsonEncoder->encode($result));
     }
+
+    /**
+     * Return shipping details block.
+     *
+     * @return string
+     */
+    public function getShippingDetailsViewHtml()
+    {
+        return $this->getChildHtml('shipping-details-view');
+    }
+
+    /**
+     * Return shipping details edit block.
+     *
+     * @return string
+     */
+    public function getShippingDetailsEditHtml()
+    {
+        return $this->getChildHtml('customer_shipping_details_edit_form');
+    }
 }
