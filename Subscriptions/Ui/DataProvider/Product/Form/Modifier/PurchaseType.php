@@ -89,7 +89,6 @@ class PurchaseType extends BaseModifier
                                 'formElement' => Fieldset::NAME,
                                 'componentType' => Fieldset::NAME,
                                 'breakLine' => false,
-                                //'component' => 'Magento_Ui/js/form/components/fieldset',
                                 'component' => 'TNW_Subscriptions/js/components/purchase-type',
                                 'imports' => [
                                     'changedPurchaseType' => 'index = ' . Attribute::SUBSCRIPTION_PURCHASE_TYPE . ':value',
