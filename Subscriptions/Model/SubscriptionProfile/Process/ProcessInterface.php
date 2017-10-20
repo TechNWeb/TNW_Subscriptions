@@ -9,13 +9,13 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 /**
  * Interface ModifierInterface
  */
-interface ProcessInterface
+interface ProcessInterface  extends ErrorInterface
 {
     /**
-     * Processes subscription profile statuses.
+     * Processes data.
      *
-     * @param array $ids
+     * @param array $data
      * @return void
      */
-    public function process(array $ids);
+    public function process(array $data);
 }

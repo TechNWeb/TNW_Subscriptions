@@ -58,6 +58,7 @@ define(
                     var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
                     if (step === 'registration' && isLoggedIn) {
                         step = 'address';
+                        stepNavigator.applyHash(step);
                     }
 
                     $.each(this.steps, function () {

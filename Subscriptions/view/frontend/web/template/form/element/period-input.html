@@ -1,0 +1,21 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<span class="ield-label period-first-phrase" text="first_phrase" attr="for: uid"/>
+<input class="control-text period-input" type="text"
+       data-bind="
+        event: {change: userChanges},
+        value: value,
+        hasFocus: focused,
+        valueUpdate: valueUpdate,
+        attr: {
+            name: inputName,
+            placeholder: placeholder,
+            'aria-describedby': noticeId,
+            id: uid,
+            disabled: disabled
+    }"/>
+<span class="field-label period-last-phrase" text="last_phrase" attr="for: uid"/>

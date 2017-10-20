@@ -13,13 +13,24 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
+/**
+ * Abstract class for profile admin actions.
+ */
 abstract class SubscriptionProfile extends Action
 {
+    /**
+     * Authorization level
+     */
     const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
 
-    /** @var Registry */
+    /**
+     * @var Registry
+     */
     protected $_coreRegistry;
-    /** @var DataPersistorInterface */
+
+    /**
+     * @var DataPersistorInterface
+     */
     protected $dataPersistor;
 
     /**
@@ -50,6 +61,7 @@ abstract class SubscriptionProfile extends Action
             ->addBreadcrumb(__('TNW'), __('TNW'))
             ->addBreadcrumb(__('Subscription Profile'),
                 __('Subscription Profile'));
+
         return $resultPage;
     }
 
@@ -66,9 +78,10 @@ abstract class SubscriptionProfile extends Action
      */
     protected function getSubCreateModel()
     {
-        return $this->_objectManager->get(\TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile::class);
+        return $this->_objectManager->get(
+            \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile::class
+        );
     }
-
 
     protected function clearSessionData()
     {

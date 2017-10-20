@@ -9,9 +9,10 @@
      attr="'data-level': $data.level, 'data-index': index"
      data-bind="visible: $data.visible === undefined ? true: $data.visible">
 
+
     <div class="fieldset-wrapper-content"
          css="'collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
-        <div
+        <fieldset
                 if="opened() || _wasOpened"
                 class="fieldset"
                 each="data: elems, as: 'element'" render=""/>

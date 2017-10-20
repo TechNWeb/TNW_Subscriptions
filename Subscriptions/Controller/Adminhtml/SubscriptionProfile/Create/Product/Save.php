@@ -18,10 +18,19 @@ class Save extends SubscriptionProfile
      */
     public function execute()
     {
+        $error = false;
+        $message = '';
         $data = $this->getRequest()->getParams();
+        try {
+            $this->getSubCreateModel()->addToSubscription($data);
+        } catch (\Exception $e) {
+            $error = true;
+            $message = $e->getMessage();
+        }
 
-        $response = $this->getSubCreateModel()->addToSubscription($data);
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData(
+            $this->getJsonResponse($error, $message)
+        );
     }
 
     /**
@@ -34,5 +43,17 @@ class Save extends SubscriptionProfile
         return $this->_authorization->isAllowed(
             'TNW_Subscriptions::SubscriptionProfile_create_product_save'
         );
+    }
+
+    /**
+     * @param $response
+     * @return mixed
+     */
+    private function getJsonResponse($error, $message)
+    {
+        return [
+            'error' => $error,
+            'message' => $message
+        ];
     }
 }

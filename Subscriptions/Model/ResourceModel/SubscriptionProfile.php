@@ -131,6 +131,35 @@ class SubscriptionProfile extends AbstractEntity
     }
 
     /**
+     * Get subscription order data.
+     *
+     * @param \Magento\Framework\Model\AbstractModel $object
+     * @return array
+     */
+    public function getFirstOrderData(\Magento\Framework\Model\AbstractModel $object)
+    {
+        $result = [];
+        $id = $object->getId();
+
+        if ($id) {
+            $select = $this->getConnection()->select()
+                ->from([
+                    'main' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)
+                ])
+                ->where('main.subscription_profile_id = ?', $id)
+                ->where('main.magento_order_id IS NOT NULL')
+                ->order('main.scheduled_at ASC')
+                ->limit(1);
+
+            $result = $this->getConnection()
+                ->query($select)
+                ->fetch();
+        }
+
+        return $result ? : [];
+    }
+
+    /**
      * Reset firstly loaded attributes
      *
      * @param \Magento\Framework\Model\AbstractModel $object

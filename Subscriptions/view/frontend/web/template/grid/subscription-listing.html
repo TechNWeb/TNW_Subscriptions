@@ -1,0 +1,23 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div if="hasData()" class="sub-data-grid-title">
+    <div class="sub-title" translate="'Summary'"/>
+</div>
+
+
+<div if="hasData()" class="sub-data-grid" data-role="grid-wrapper">
+    <div data-bind="attr: {class: showBottomBorder($row()) ? 'sub-data-row border' : 'sub-data-row '}"
+         repeat="foreach: rows, item: '$row'">
+        <div outerfasteach="data: getVisible(), as: '$col'"
+             css="getFieldClass($row())" click="getFieldHandler($row())" template="getBody()"/>
+    </div>
+</div>
+
+<div if="hasData()" class="data-total-container">
+    <div class="total-title" translate="'Estimated Payment'"/>
+    <div class="total-value" text="estimatedPayment"/>
+</div>

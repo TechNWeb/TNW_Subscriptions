@@ -6,8 +6,9 @@
 define([
     'Magento_Ui/js/form/components/insert',
     'mageUtils',
-    'jquery'
-], function (Insert, utils, $) {
+    'jquery',
+    'uiRegistry'
+], function (Insert, utils, $, registry) {
     'use strict';
 
     /**
@@ -94,14 +95,18 @@ define([
 
         /** @inheritdoc*/
         destroyInserted: function () {
-            if (this.isRendered && this.externalForm()) {
-                this.externalForm().delegate('destroy');
+            if (this.isRendered && this.getExternalForm()) {
+                this.getExternalForm().delegate('destroy');
                 this.removeActions();
                 this.responseStatus(undefined);
                 this.responseData = {};
             }
 
             return this._super();
+        },
+
+        getExternalForm: function () {
+            return registry.get(this.externalFormName);
         },
 
         /** @inheritdoc */

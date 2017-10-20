@@ -89,11 +89,13 @@ class Trial extends BaseModifier
                 ],
             ]
         );
+        // Move trial unit to trial length container to make them inline
         $meta = $this->arrayManager->set(
             $trialLengthContainerPath . '/children/' . Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             $meta,
             $this->arrayManager->get($trialLengthUnitPath, $meta)
         );
+        // Remove trial unit container
         $meta = $this->arrayManager->remove($trialLengthUnitContainerPath, $meta);
 
         $meta = $this->arrayManager->merge(

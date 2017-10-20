@@ -8,7 +8,7 @@ define([
     'jquery',
     'TNW_Subscriptions/js/ui/model/step-navigator',
     'uiRegistry'
-], function (uiComponent, $, stepNavigator, registry) {
+], function (uiComponent, $, stepNavigator) {
     'use strict';
 
     return uiComponent.extend({

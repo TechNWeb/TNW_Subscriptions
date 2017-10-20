@@ -12,20 +12,20 @@
             <item name="ajaxSaveType" xsi:type="string">simple</item>
             <item name="useParentLoader" xsi:type="boolean">true</item>
             <item name="parentForLoader" xsi:type="string">cart.steps</item>
-            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/modify-subscriptions-form</item>
-            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_products_form_data_source</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/modify-products-form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
         </item>
-        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_checkout_products_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm</argument>
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Products</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_checkout_products_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">modify_form_data</argument>
             <argument name="requestFieldName" xsi:type="string">modify_form_data</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="submit_url" path="tnw_subscriptions/subscriptionprofile_create_product_modified/save" xsi:type="url"/>
+                    <item name="submit_url" path="tnw_subscriptions/subscription_create_products/save" xsi:type="url"/>
                 </item>
             </argument>
         </argument>
