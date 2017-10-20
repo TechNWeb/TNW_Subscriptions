@@ -85,7 +85,9 @@ define([
          */
         fiterEmptyAddressOption: function(value) {
             var addressSelect = this.getAddressSelect();
-            addressSelect.filter(value, 'empty');
+            if (addressSelect) {
+                addressSelect.filter(value, 'empty');
+            }
         },
 
         /**

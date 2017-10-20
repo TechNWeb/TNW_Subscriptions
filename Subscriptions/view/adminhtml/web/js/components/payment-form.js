@@ -3,7 +3,8 @@ define(
         'jquery',
         'Magento_Ui/js/form/form',
         'uiRegistry',
-        'underscore'
+        'underscore',
+        'mage/translate'
     ],
     function ($, Component, registry, _) {
         'use strict';
@@ -11,27 +12,35 @@ define(
         return Component.extend({
 
             beforeSubmit: function () {
-                var fieldset;
-
                 this.validate();
                 if (this.source.params.invalid){
                     return;
                 }
 
-                var current = this;
+                var current = this,
+                    needShowRequiredError = true;
+
                 _.each(this.source.data.payment, function (fields, code) {
-                    if (fields.method === "1"){
+                    if (fields.method === "1") {
                         switch (code) {
                             case 'payflowpro':
-                                fieldset = registry.get('index = ' + code);
-                                fieldset.beforeSubmit();
+                                registry.get('index = ' + code).beforeSubmit();
                                 break;
                             case 'checkmo':
                             default:
                                 current.save();
                         }
+                        needShowRequiredError = false;
                     }
                 });
+
+                if (needShowRequiredError) {
+                    var firstFieldSet = registry.get('index = payment_information');
+                    if (firstFieldSet !== undefined) {
+                        firstFieldSet.resetErrors();
+                        firstFieldSet.set('payment_errors', [$.mage.__('Please select payment.')]);
+                    }
+                }
             },
 
             triggerSave:function (errors) {

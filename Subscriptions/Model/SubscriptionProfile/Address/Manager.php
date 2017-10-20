@@ -167,7 +167,7 @@ class Manager
 
             if ($address) {
                 $address = $this->normalizeAddressData($address);
-                $address = array_intersect_key($profileAddress->getData(), $address);
+                $address = array_intersect_key($address, $profileAddress->getData());
                 $this->dataObjectHelper->populateWithArray(
                     $profileAddress,
                     $address,

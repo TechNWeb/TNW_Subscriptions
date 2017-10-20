@@ -37,8 +37,6 @@ class Process extends AbstractSave
      */
     private $stepPool;
 
-
-
     /**
      * Process constructor.
      * @param Context $context

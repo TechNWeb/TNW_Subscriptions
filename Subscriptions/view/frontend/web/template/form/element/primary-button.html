@@ -1,0 +1,21 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<button type="button"
+        css="
+            'sub-button-left': $data.subButtonLeft,
+            'sub-button-right': $data.subButtonRight,
+            'action-primary': $data.displayPrimary(),
+            'action-secondary': !$data.displayPrimary()
+        "
+        click="action"
+        disable="disabled"
+
+        attr="'data-index': index"
+        data-bind="visible: $data.visible">
+    <span text="title">
+    </span>
+</button>

@@ -1,0 +1,20 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="fieldset-wrapper"
+     css="$data.additionalClasses"
+     attr="'data-level': $data.level, 'data-index': index"
+     data-bind="visible: $data.visible === undefined ? true: $data.visible">
+
+
+    <div class="fieldset-wrapper-content"
+         css="'collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
+        <fieldset
+                if="opened() || _wasOpened"
+                class="fieldset"
+                each="data: elems, as: 'element'" render=""/>
+    </div>
+</div>

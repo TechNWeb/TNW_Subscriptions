@@ -20,19 +20,27 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 class Process extends AbstractSave
 {
     /**
+     * Subscription create model.
+     *
+     * @var CreateProfile
+     */
+    private $createModel;
+
+    /**
      * Process constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param CreateProfile $createModel
      * @param Processor $saveProcessor
+     * @param CreateProfile $createModel
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        CreateProfile $createModel,
-        Processor $saveProcessor
+        Processor $saveProcessor,
+        CreateProfile $createModel
     ) {
-        parent::__construct($context, $resultPageFactory, $createModel, $saveProcessor);
+        $this->createModel = $createModel;
+        parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
 
@@ -60,7 +68,7 @@ class Process extends AbstractSave
         $result = $this->getSaveProcessor()->processSave(
             $this->getRequest()->getParams()
         );
-        $this->getSubCreateModel()->recollectSubscriptions();
+        $this->createModel->recollectSubscriptions();
 
         return $result;
     }

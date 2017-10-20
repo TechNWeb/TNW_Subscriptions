@@ -1,0 +1,22 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+<div class="field-complex" css="$data.additionalClasses" attr="'data-index': index">
+
+    <div class="field-complex-title subscr-container-title" if="label">
+        <span text="label"/>
+    </div>
+
+    <div class="fieldset-wrapper-title">
+        <div class="field-complex-elements"
+             each="data: elems, as: 'element'"
+             render="" />
+
+        <div class="field-complex-content subscr-container-title"
+             html="$data.content"></div>
+    </div>
+</div>

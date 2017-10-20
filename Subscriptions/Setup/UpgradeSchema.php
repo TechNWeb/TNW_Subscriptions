@@ -844,7 +844,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 [
                     'type' => Table::TYPE_SMALLINT,
                     'nullable' => false,
-                    'comment' => 'Need Recollect',
+                    'comment' => 'Cancel before next cycle',
                     'length' => 1,
                     'default' => '0'
                 ]
