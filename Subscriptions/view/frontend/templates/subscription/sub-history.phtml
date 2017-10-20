@@ -51,12 +51,12 @@
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Action')) ?>" class="col actions">
                         <?php if ($block->canHoldSubscription()): ?>
-                            <a href="<?php /* @escapeNotVerified */ echo $block->getHoldUrl($subscription) ?>" class="action sub-hold">
+                            <a href="<?php /* @escapeNotVerified */ echo $block->getHoldUrl($subscription->getId()) ?>" class="action sub-hold">
                                 <span><?php /* @escapeNotVerified */ echo __('Hold') ?></span>
                             </a>
                         <?php endif; ?>
                         <?php if ($block->canCancelSubscription()): ?>
-                            <a href="<?php /* @escapeNotVerified */ echo $block->getCancelUrl($subscription) ?>" class="action sub-cancel">
+                            <a href="<?php /* @escapeNotVerified */ echo $block->getCancelUrl($subscription->getId()) ?>" class="action sub-cancel">
                                 <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
                             </a>
                         <?php endif; ?>
