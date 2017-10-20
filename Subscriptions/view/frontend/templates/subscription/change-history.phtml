@@ -15,7 +15,7 @@
                 <?php foreach ($messagesCollection as $messageItem): ?>
                     <li class="history-row">
                         <div class="message-text">
-                            <?php echo $messageItem->getMessage();?>
+                            <?php echo $messageItem->formatMessage();?>
                         </div>
                         <div class="message-source">
                             <?php echo sprintf(__('by %s'), $block->getMessageSource($messageItem)); ?>

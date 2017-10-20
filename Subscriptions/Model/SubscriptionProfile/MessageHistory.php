@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as ResourceMessageHistory;
@@ -15,6 +16,30 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as 
  */
 class MessageHistory extends AbstractModel implements SubscriptionProfileMessageHistoryInterface
 {
+    /**
+     * @var UrlInterface
+     */
+    private $backendUrl;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    private $frontendUrl;
+
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Backend\Model\UrlInterface $backendUrl,
+        \Magento\Framework\UrlInterface $frontendUrl,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->backendUrl = $backendUrl;
+        $this->frontendUrl = $frontendUrl;
+    }
+
     /**
      * @return void
      */
@@ -153,5 +178,26 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
         $this->setData(self::USER_ID, $userId);
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function formatMessage()
+    {
+        return preg_replace_callback('/\{productUrl\|(\d+)\}/i', function ($matches) {
+            switch ($this->_appState->getAreaCode()) {
+                case \Magento\Framework\App\Area::AREA_ADMINHTML:
+                    return $this->backendUrl->getUrl('catalog/product/edit', ['id' => $matches[1]]);
+
+                case \Magento\Framework\App\Area::AREA_FRONTEND:
+                    return $this->frontendUrl->getUrl('catalog/product/view', ['id' => $matches[1]]);
+
+                default:
+                    break;
+            }
+
+            return '#';
+        }, $this->getMessage());
     }
 }

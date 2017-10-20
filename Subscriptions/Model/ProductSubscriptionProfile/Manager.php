@@ -247,8 +247,8 @@ class Manager
                         }
 
                         if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::PRICE)) {
-                            $message = __('Updated product <a href="%1" target="_blank">%2</a>. Price changed from <b>%3</b> to <b>%4</b>.',
-                                $product->getMagentoProduct()->getProductUrl(),
+                            $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. Price changed from <b>%3</b> to <b>%4</b>.',
+                                $product->getMagentoProduct()->getId(),
                                 $product->getMagentoProduct()->getName(),
                                 $product->getOrigData(ProductSubscriptionProfileInterface::PRICE),
                                 $product->getData(ProductSubscriptionProfileInterface::PRICE));
@@ -257,8 +257,8 @@ class Manager
                         }
 
                         if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::QTY)) {
-                            $message = __('Updated product <a href="%1" target="_blank">%2</a>. Qty changed from <b>%3</b> to <b>%4</b>.',
-                                $product->getMagentoProduct()->getProductUrl(),
+                            $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. Qty changed from <b>%3</b> to <b>%4</b>.',
+                                $product->getMagentoProduct()->getId(),
                                 $product->getMagentoProduct()->getName(),
                                 $product->getOrigData(ProductSubscriptionProfileInterface::QTY),
                                 $product->getData(ProductSubscriptionProfileInterface::QTY));
