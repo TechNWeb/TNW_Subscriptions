@@ -29,7 +29,7 @@ class Account extends AbstractDataProvider
      *
      * @var UrlInterface
      */
-    private $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * Steps pool for creating subscription.
@@ -56,7 +56,7 @@ class Account extends AbstractDataProvider
      *
      * @var Pool
      */
-    private $modifiersPool;
+    protected $modifiersPool;
 
     /**
      * Account constructor.

@@ -71,9 +71,9 @@ class MessageHistoryLogger
     private $orderRepository;
 
     /**
-     * @var Session
+     * @var \Magento\Customer\Model\SessionFactory
      */
-    private $customerSession;
+    private $customerSessionFactory;
 
     /**
      * Messages to log.
@@ -100,14 +100,14 @@ class MessageHistoryLogger
         \Magento\Framework\Stdlib\DateTime\DateTime $date,
         \Magento\Backend\Model\Auth\SessionFactory $authSessionFactory,
         \Magento\Sales\Model\OrderRepository $orderRepository,
-        Session $customerSession
+        \Magento\Customer\Model\SessionFactory $customerSessionFactory
     ) {
         $this->messageHistoryFactory = $messageHistoryFactory;
         $this->messageHistoryRepository = $messageHistoryRepository;
         $this->date = $date;
         $this->authSessionFactory = $authSessionFactory;
         $this->orderRepository = $orderRepository;
-        $this->customerSession = $customerSession;
+        $this->customerSessionFactory = $customerSessionFactory;
     }
 
     /***
@@ -144,7 +144,8 @@ class MessageHistoryLogger
                 $messageHistory->setUserId($user->getId());
             }
 
-            $customerId = $this->customerSession->getCustomerId();
+            $customerId = $this->customerSessionFactory->create()
+                ->getCustomerId();
 
             if ($customerId) {
                 $messageHistory->setCustomerId($customerId);

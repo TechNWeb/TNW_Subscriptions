@@ -322,7 +322,8 @@ class SummaryProductsForm extends ModifyForm
                         ],
                         'previewLabelVisible' => false,
                         'previewLabel' => __('Bill %s times'),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'previewLabelOnce' => __('Bill once'),
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'showPreview' => $this->getCurrentFormName() . ':previewMode'
                     ]
@@ -387,6 +388,7 @@ class SummaryProductsForm extends ModifyForm
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'showPreview' => $this->getCurrentFormName() . ':previewMode',
+                        'previewLabel' =>  '%s',
                         'imports' => [
                             'onPriceUpdate'=> '${ $.parentName}.price:value'
                         ],

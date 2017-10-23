@@ -111,56 +111,44 @@ class Manager
      */
     public function getActiveList($websiteId = null)
     {
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getSelect()->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-            'main_table.profile_order_id = relation.id',
-            [
-                SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
-                SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
-                SubscriptionProfileOrderInterface::SCHEDULED_AT
-            ]
-        );
-        $collection->getSelect()->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
-            'relation.subscription_profile_id = profile.entity_id',
-            []
-        );
+        $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
-        $pendingCondition = implode(' AND ', [
-            $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
-            $connection->quoteInto(
-                "main_table.status in (?)",
-                [QueueStatus::QUEUE_STATUS_PENDING, QueueStatus::QUEUE_STATUS_RUNNING]
-            )
-        ]);
-        $errorCondition = implode(' AND ', [
-            $connection->quoteInto("main_table.updated_at <= ?", $this->getAttemptDate()),
-            $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_ERROR),
-            $connection->quoteInto("main_table.attempt_count <= ?", $this->config->getAttemptCount())
-        ]);
-
-        $collection->getSelect()->where(
-            '(' . $pendingCondition . ') OR (' . $errorCondition . ')'
-        )->where(
-            'profile.status NOT IN (?)',
+        $pendingCondition = implode(
+            ' AND ',
             [
-                ProfileStatus::STATUS_CANCELED,
-                ProfileStatus::STATUS_HOLDED,
-                ProfileStatus::STATUS_SUSPENDED,
-                ProfileStatus::STATUS_COMPLETE
+                $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
+                $connection->quoteInto(
+                    "main_table.status in (?)",
+                    [QueueStatus::QUEUE_STATUS_PENDING, QueueStatus::QUEUE_STATUS_RUNNING]
+                ),
             ]
-        )->order(
-            'relation.scheduled_at ASC'
-        )->group(
-            ['main_table.profile_order_id']
         );
+        $errorCondition = implode(
+            ' AND ',
+            [
+                $connection->quoteInto("main_table.updated_at <= ?", $this->getAttemptDate()),
+                $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_ERROR),
+                $connection->quoteInto("main_table.attempt_count <= ?", $this->config->getAttemptCount()),
+            ]
+        );
+
+        $collection->getSelect()
+            ->where('(' . $pendingCondition . ') OR (' . $errorCondition . ')')
+            ->where(
+                'profile.status NOT IN (?)',
+                [
+                    ProfileStatus::STATUS_CANCELED,
+                    ProfileStatus::STATUS_HOLDED,
+                    ProfileStatus::STATUS_SUSPENDED,
+                    ProfileStatus::STATUS_COMPLETE,
+                ]
+            )
+            ->order('relation.scheduled_at ASC')
+            ->group(['main_table.profile_order_id']);
 
         if ($websiteId) {
-            $collection->getSelect()->where(
-                'profile.website_id = ?', $websiteId
-            );
+            $collection->getSelect()
+                ->where('profile.website_id = ?', $websiteId);
         }
 
         return $collection;
@@ -330,5 +318,32 @@ class Manager
         $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
             ->setMagentoOrderId($order->getId());
         $this->relationManager->saveRelation($relation);
+    }
+
+    /**
+     * Returns base collection.
+     *
+     * @return Collection
+     */
+    public function getBaseCollection()
+    {
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->getSelect()->join(
+            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            'main_table.profile_order_id = relation.id',
+            [
+                SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+                SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
+                SubscriptionProfileOrderInterface::SCHEDULED_AT
+            ]
+        );
+        $collection->getSelect()->join(
+            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+            'relation.subscription_profile_id = profile.entity_id',
+            [SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE]
+        );
+
+        return $collection;
     }
 }
