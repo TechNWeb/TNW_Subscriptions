@@ -408,6 +408,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                         'checkValidation' => '!ns = ${ $.ns }, index = same_as_shipping:checked',
                         'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
                     ],
+                    'customScope' => 'region'
                 ],
             ]
         );
