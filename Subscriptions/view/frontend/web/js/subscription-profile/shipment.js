@@ -4,7 +4,8 @@
  */
 /*jquery:true*/
 define([
-    'jquery'
+    'jquery',
+    'mage/validation'
 ], function ($) {
     'use strict';
 
@@ -23,14 +24,14 @@ define([
             addNewAddressButton: '#add-new',
             pickFromSavedButton: '#pick',
             cancelButton: '#cancel-save',
-            saveAddressButton: '#save_address',
             addressFields: '.address-field',
             infoFields: '.info-field',
             defaultCountryId: 'US',
             countrySelect: '#country',
             emptyCountryLabel: '',
             infoBlockContent: '.subscription-profile-shipping-address',
-            buttonDisabledClass: 'disabled'
+            buttonDisabledClass: 'disabled',
+            requiredFields: 'required'
         },
 
         /**
@@ -73,10 +74,11 @@ define([
                 addNewButton = $(this.options.addNewAddressButton),
                 pickFromSavedButton = $(this.options.pickFromSavedButton),
                 cancelButton = $(this.options.cancelButton),
-                saveAddressButton = $(this.options.saveAddressButton),
                 customerDataFieldSet = $(this.options.customerDataFieldSet),
                 customerAddressesSelect = $(this.options.customerAddressesList),
-                defaultValue = '';
+                defaultValue = '',
+                form =$(this.options.formSelector),
+                requiredFields = $(this.options.requiredFields);
 
             editButton.on('click', $.proxy(function() {
                 widget.setFormsVisibility(false);
@@ -98,7 +100,6 @@ define([
                 $(field).on('change', $.proxy(function() {
                     widget.setAddressFieldsVisibility(false);
                 }, this));
-
             });
             customerAddressesSelect.on('change', $.proxy(function() {
                 widget.fillInputsData(customerAddressesSelect);
@@ -108,11 +109,16 @@ define([
                 e.preventDefault();
                 widget.setFormsVisibility(true);
             }, this));
-            saveAddressButton.on('click', $.proxy(function(e) {
+            $.each(form.find('.required'), function (key, field) {
+                $(field).on('focusout', $.proxy(function() {
+                    form.valid();
+                }, this));
+            });
+            form.submit(function( e ) {
                 e.stopPropagation();
                 e.preventDefault();
                 widget.saveAddress(e);
-            }, this));
+            });
         },
 
         /**
@@ -179,34 +185,36 @@ define([
                 editButton = $(this.options.addressEditButton),
                 addNewButton = $(this.options.addNewAddressButton);
 
-            if (!$(this.options.customerAddressesList).is(':visible')) {
-                $(this.options.customerAddressesList).val('0');
-            }
-            this.disableButton(editButton);
-            this.disableButton(addNewButton);
-
-            $.ajax({
-                url: this.options.saveAddressUrl,
-                data: form.serialize(),
-                type: 'post',
-                dataType: 'json',
-
-                /**
-                 * Called when request succeeds
-                 *
-                 * @param {Object} response
-                 */
-                success: function(response) {
-                    var addressBlock = $(widget.options.infoBlockContent).find('address');
-
-                    if (typeof response.data.shipping_address != 'undefined') {
-                        addressBlock.html(response.data.shipping_address);
-                    }
-                    widget.setFormsVisibility(true);
-                    widget.enableButton(editButton);
-                    widget.enableButton(addNewButton);
+            if (form.valid()) {
+                if (!$(this.options.customerAddressesList).is(':visible')) {
+                    $(this.options.customerAddressesList).val('0');
                 }
-            });
+                this.disableButton(editButton);
+                this.disableButton(addNewButton);
+
+                $.ajax({
+                    url: this.options.saveAddressUrl,
+                    data: form.serialize(),
+                    type: 'post',
+                    dataType: 'json',
+
+                    /**
+                     * Called when request succeeds
+                     *
+                     * @param {Object} response
+                     */
+                    success: function(response) {
+                        var addressBlock = $(widget.options.infoBlockContent).find('address');
+
+                        if (typeof response.data.shipping_address != 'undefined') {
+                            addressBlock.html(response.data.shipping_address);
+                        }
+                        widget.setFormsVisibility(true);
+                        widget.enableButton(editButton);
+                        widget.enableButton(addNewButton);
+                    }
+                });
+            }
         },
 
         /**
