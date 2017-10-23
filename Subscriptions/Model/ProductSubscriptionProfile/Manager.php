@@ -246,24 +246,21 @@ class Manager
                             $product->setNeedRecollect('1');
                         }
 
-                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::PRICE)) {
-                            $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. Price changed from <b>%3</b> to <b>%4</b>.',
-                                $product->getMagentoProduct()->getId(),
-                                $product->getMagentoProduct()->getName(),
-                                $product->getOrigData(ProductSubscriptionProfileInterface::PRICE),
-                                $product->getData(ProductSubscriptionProfileInterface::PRICE));
-
-                            $this->historyLogger->log($message, $profileModel->getId());
-                        }
-
-                        if ($product->dataHasChangedFor(ProductSubscriptionProfileInterface::QTY)) {
-                            $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. Qty changed from <b>%3</b> to <b>%4</b>.',
-                                $product->getMagentoProduct()->getId(),
-                                $product->getMagentoProduct()->getName(),
-                                $product->getOrigData(ProductSubscriptionProfileInterface::QTY),
-                                $product->getData(ProductSubscriptionProfileInterface::QTY));
-
-                            $this->historyLogger->log($message, $profileModel->getId());
+                        $fields = [
+                            ProductSubscriptionProfileInterface::PRICE => 'Price',
+                            ProductSubscriptionProfileInterface::QTY => 'Qty',
+                        ];
+                        foreach ($fields as $fieldName => $fieldLabel) {
+                            if ($product->dataHasChangedFor($fieldName)) {
+                                $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. %3 changed from <b>%4</b> to <b>%5</b>.',
+                                    $product->getMagentoProduct()->getId(),
+                                    $product->getMagentoProduct()->getName(),
+                                    $fieldLabel,
+                                    $product->getOrigData($fieldName),
+                                    $product->getData($fieldName)
+                                );
+                                $this->historyLogger->log($message, $profileModel->getId());
+                            }
                         }
 
                         $product->setDataChanges($productDataChanges || $product->hasDataChanges());

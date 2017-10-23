@@ -86,8 +86,8 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         MessageHistoryLogger $historyLogger,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->objectCopyService = $objectCopyService;
         $this->addressDataFactory = $addressDataFactory;

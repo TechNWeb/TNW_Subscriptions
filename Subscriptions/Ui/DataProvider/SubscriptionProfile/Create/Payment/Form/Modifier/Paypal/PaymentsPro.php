@@ -62,26 +62,26 @@ class PaymentsPro extends Base
 
     /**
      * PaymentsPro constructor.
+     * @param Context $context
      * @param SubscriptionConfig $config
      * @param QuoteSessionInterface $session
-     * @param Context $context
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
      * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
-     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      */
     public function __construct(
+        Context $context,
         SubscriptionConfig $config,
         QuoteSessionInterface $session,
-        Context $context,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
         Transparent $paymentPro,
         Config $paymentConfig,
         Repository $assetRepository,
         RequestInterface $request,
-        UrlInterface $urlBuilder,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+        UrlInterface $urlBuilder
     ) {
         $this->context = $context;
         $this->paymentPro = $paymentPro;
@@ -101,14 +101,10 @@ class PaymentsPro extends Base
     {
         $data = parent::modifyData($data);
 
-        $additionalInfoJson = $this->getProfile()
-            ->getPaymentAdditionalInfo();
+        $additionalInfo = $this->getProfile()
+            ->getDecodedPaymentAdditionalInfo();
 
-        if (
-            !empty($additionalInfoJson) &&
-            ($additionalInfo = (array)json_decode($additionalInfoJson)) &&
-            !empty($additionalInfo['cc_type'])
-        ) {
+        if (!empty($additionalInfoJson) && $additionalInfo && !empty($additionalInfo['cc_type'])) {
             $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
                 = $additionalInfo['cc_type'];
         }

@@ -36,18 +36,18 @@ class Checkmo extends Base
 
     /**
      * Checkmo constructor.
+     * @param Context $context
      * @param Config $config
      * @param QuoteSessionInterface $session
-     * @param Context $context
-     * @param CheckmoPayment $checkmoPayment
      * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param CheckmoPayment $checkmoPayment
      */
     public function __construct(
+        Context $context,
         Config $config,
         QuoteSessionInterface $session,
-        Context $context,
-        CheckmoPayment $checkmoPayment,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
+        CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
