@@ -104,7 +104,7 @@ class PaymentsPro extends Base
         $additionalInfo = $this->getProfile()
             ->getDecodedPaymentAdditionalInfo();
 
-        if (!empty($additionalInfoJson) && $additionalInfo && !empty($additionalInfo['cc_type'])) {
+        if (!empty($additionalInfo['cc_type'])) {
             $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
                 = $additionalInfo['cc_type'];
         }
