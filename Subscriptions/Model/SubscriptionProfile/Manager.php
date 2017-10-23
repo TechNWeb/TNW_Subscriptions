@@ -383,11 +383,11 @@ class Manager
     {
         $engine = $this->getEngineFromRequestData($requestData);
         if ($engine) {
-            $additionalInfoOld = $this->getProfile()->getPaymentAdditionalInfo();
+            $additionalInfoOld = $this->getProfile()->getDecodedPaymentAdditionalInfo();
             $oldEngine = $this->getProfile()->getEngineCode();
             $this->getProfile()->setEngineCode($engine);
             $this->getEngine()->processProfileByRequestData($requestData);
-            $additionalInfo = $this->getProfile()->getPaymentAdditionalInfo();
+            $additionalInfo = $this->getProfile()->getDecodedPaymentAdditionalInfo();
 
             if (strcasecmp($oldEngine, $engine) !== 0) {
                 $message = __('Payment method changed from %1 to %2',
@@ -396,15 +396,14 @@ class Manager
 
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             } else {
-                $ccType = $this->propertyAdditionalInfo($additionalInfo, 'cc_type');
-                $ccTypeOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_type');
+                $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
+                $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
                 if (strcasecmp($ccType, $ccTypeOld) !== 0) {
                     $message = __('Card type was changed from <b>%1</b> to <b>%1</b>', $ccTypeOld, $ccType);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
-
-                $ccNumber = $this->propertyAdditionalInfo($additionalInfo, 'cc_last_4');
-                $ccNumberOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_last_4');
+                $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
+                $ccNumberOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_last_4'] : null;
                 if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
                     $message = __('Credit Card number was changed to <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                     $this->historyLogger->log($message, $this->getProfile()->getId());
