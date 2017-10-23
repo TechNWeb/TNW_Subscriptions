@@ -36,7 +36,6 @@
                                                     </item>
                                                     <item name="requestFieldName" xsi:type="string">modify_form_data</item>
                                                     <item name="requestFieldValue" xsi:type="string">new_subscription</item>
-                                                    <item name="needSave" xsi:type="boolean">false</item>
                                                     <item name="title" xsi:type="string" translate="true">Products</item>
                                                     <item name="sortOrder" xsi:type="string">0</item>
                                                     <item name="isActive" xsi:type="boolean">true</item>
@@ -46,7 +45,6 @@
                                                     <item name="blockNamespace" xsi:type="array">
                                                         <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
                                                     </item>
-                                                    <item name="needSave" xsi:type="boolean">false</item>
                                                     <item name="title" xsi:type="string" translate="true">Registration</item>
                                                     <item name="sortOrder" xsi:type="string">1</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
@@ -57,7 +55,14 @@
                                                         <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form</item>
                                                         <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
                                                     </item>
-                                                    <item name="needSave" xsi:type="boolean">true</item>
+                                                    <item name="requestFieldName" xsi:type="string">account_form_data</item>
+                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
+                                                    <item name="stepActions" xsi:type="array">
+                                                        <item name="0" xsi:type="array">
+                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form</item>
+                                                            <item name="actionName" xsi:type="string">save</item>
+                                                        </item>
+                                                    </item>
                                                     <item name="title" xsi:type="string" translate="true">Shipping</item>
                                                     <item name="sortOrder" xsi:type="string">2</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
@@ -68,7 +73,14 @@
                                                         <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
                                                         <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
                                                     </item>
-                                                    <item name="needSave" xsi:type="boolean">true</item>
+                                                    <item name="requestFieldName" xsi:type="string">billing_form_data</item>
+                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
+                                                    <item name="stepActions" xsi:type="array">
+                                                        <item name="0" xsi:type="array">
+                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
+                                                            <item name="actionName" xsi:type="string">save</item>
+                                                        </item>
+                                                    </item>
                                                     <item name="title" xsi:type="string" translate="true">Billing</item>
                                                     <item name="sortOrder" xsi:type="string">3</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
@@ -86,7 +98,6 @@
                                                 </item>
                                                 <item name="5" xsi:type="array">
                                                     <item name="code" xsi:type="string">thank_you</item>
-                                                    <item name="needSave" xsi:type="boolean">false</item>
                                                     <item name="title" xsi:type="string" translate="true">Thank You!</item>
                                                     <item name="sortOrder" xsi:type="string">5</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>

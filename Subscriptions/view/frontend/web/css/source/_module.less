@@ -1552,6 +1552,36 @@
       }
     }
   }
+
+  .hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  .sub-data-grid .subscription-shipping-attention {
+    line-height: 3rem;
+    margin-top: 1rem;
+  }
+
+  .sub-data-grid .subscription-shipping-attention::before {
+    color: #eb5202;
+    background: none;
+    border: 0;
+    content: @icon-warning-subscription__content;
+    font-family: @icons-subscription__font-name;
+    font-size: 1.9rem;
+    font-style: normal;
+    font-weight: 400;
+    height: auto;
+    left: 1.9rem;
+    line-height: inherit;
+    speak: none;
+    text-shadow: none;
+    width: auto;
+    float: left;
+    margin-right: 5px;
+  }
+
 }
 
 .subscription-data-wrapper .subscription-products {
