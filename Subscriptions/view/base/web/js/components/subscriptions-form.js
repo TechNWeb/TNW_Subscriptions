@@ -27,6 +27,21 @@ define(
                 }
 
                 return this;
+            },
+
+            /**
+             * Show loader for this form or for parent element.
+             *
+             * @returns {Object}
+             */
+            showLoader: function () {
+                if (this.useParentLoader){
+                    registry.get(this.parentForLoader).isLoading(true);
+                }else {
+                    loader.get(this.name).show();
+                }
+
+                return this;
             }
         });
     }

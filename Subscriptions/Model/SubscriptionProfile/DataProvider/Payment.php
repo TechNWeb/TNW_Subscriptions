@@ -33,14 +33,14 @@ class Payment extends AbstractDataProvider
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * Modifiers pool.
      *
      * @var Pool
      */
-    private $modifiersPool;
+    protected $modifiersPool;
 
     /**
      * Payment constructor.
@@ -117,6 +117,7 @@ class Payment extends AbstractDataProvider
         $meta = parent::getMeta();
 
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            $modifier->setPaymentFormName($this::DATA_SCOPE_PAYMENT_FORM);
             $meta = $modifier->modifyMeta($meta);
         }
 

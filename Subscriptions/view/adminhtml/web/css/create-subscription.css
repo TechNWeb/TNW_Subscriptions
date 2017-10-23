@@ -253,7 +253,7 @@
 [data-index = "account_info"] legend {
   display: none;
 }
-.admin_field_without_legend > div.admin__field{
+.field_without_legend > div.admin__field{
   display: inline-block;
   margin-top: 0px;
 }
@@ -270,7 +270,7 @@
   width: 6rem;
 }
 
-#anchor-content .admin_field_without_legend{
+#anchor-content .field_without_legend{
   width: calc( (100%) * .7 - 30px);
 }
 .admin__control-label-up.select {

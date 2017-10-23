@@ -12,6 +12,7 @@ define([
 
     return Checkbox.extend({
         defaults: {
+            template: 'ui/form/element/checkbox-set',
             clearing: false,
             parentContainer: '',
             parentSelections: '',

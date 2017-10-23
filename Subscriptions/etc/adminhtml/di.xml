@@ -163,12 +163,6 @@
         </arguments>
     </type>
 
-    <!--Add modifier for Subscription profile creation on review profile page-->
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
-        </arguments>
-    </type>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">

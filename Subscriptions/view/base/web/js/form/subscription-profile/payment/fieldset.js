@@ -69,9 +69,7 @@ define([
                 this.showLoader();
                 this.resetErrors();
                 //creating post data, this structure is needed to proper saving
-                postData = {
-                   'form_key': FORM_KEY
-                };
+                postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {};
                 temp[this.options.gateway] = {
                     method: '1'
                 };
@@ -220,18 +218,14 @@ define([
          * Shows form loader.
          */
         hideLoader: function () {
-            loader.get(
-                this.options.formName + '.' + this.options.formName
-            ).hide();
+            registry.get('index = ' + this.options.formName).hideLoader();
         },
 
         /**
          * Hides form loader.
          */
         showLoader: function () {
-            loader.get(
-                this.options.formName + '.' + this.options.formName
-            ).show();
+            registry.get('index = ' + this.options.formName).showLoader();
         },
 
         /**

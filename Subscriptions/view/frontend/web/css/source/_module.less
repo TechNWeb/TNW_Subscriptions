@@ -370,6 +370,54 @@
       height: 100%;
     }
 
+    .field-option {
+      padding-top: .8rem;
+
+      .control-radio {
+        cursor: pointer;
+        opacity: .01;
+        overflow: hidden;
+        position: absolute;
+        vertical-align: top;
+      }
+
+      label {
+        padding-left: 2.6rem;
+        position: relative;
+      }
+
+      label:before {
+        box-sizing: border-box;
+        border-radius: 1.6rem;
+        content: '';
+        transition: border-color .1s linear, color .1s ease-in;
+        background-color: #fff;
+        border: 1px solid #adadad;
+        color: transparent;
+        height: 1.6rem;
+        text-align: center;
+        vertical-align: top;
+        width: 1.6rem;
+        position: absolute;
+        left: 0;
+      }
+
+      :checked + label:after {
+        background-color: #514943;
+        border-radius: 50%;
+        content: '';
+        height: 10px;
+        left: 3px;
+        top: 3px;
+        min-width: 10px;
+        position: absolute;
+      }
+    }
+
+    .field.field-option ~ .field-option {
+      margin-top: .9rem;
+    }
+
     /* "action-editor" button */
     button.action-editor {
       color: #514943;
@@ -1309,10 +1357,13 @@
 /* Checkout */
 .tnw-subscriptions-cart-index {
   .checkout_content_shipping,
-  .checkout_content_billing {
+  .checkout_content_billing,
+  .checkout_content_payment {
     width: 55%;
-    float: left;
+    display: inline-block;
     margin-bottom: 3rem;
+    vertical-align: top;
+    margin-right: 5%;
     @media (max-width: 767px) {
       width: 100%;
       float: none;
@@ -1324,8 +1375,10 @@
       .fieldset-wrapper-title {
         font-size: 2rem;
         margin-bottom: 2rem;
-        span {
-          font-weight: 400;
+        span, div {
+          font-weight: 300;
+          line-height: 1.1;
+          font-size: 2.6rem;
         }
       }
 
@@ -1386,10 +1439,22 @@
     }
   }
 
+  .checkout_content_payment {
+    .fieldset-wrapper-title {
+      padding-bottom: 2rem;
+      margin: 0 !important;
+      border-bottom: 1px solid #ccc;
+      .payment-checkbox{
+        margin: 20px 0 0 0;
+      }
+    }
+  }
+
   .checkout_right_shipping,
-  .checkout_right_billing {
-    width: 40%;
-    float: right;
+  .checkout_right_billing,
+  .checkout_right_payment {
+    width: ~'calc( (40%) * 1 - 5px)';
+    display: inline-block;
     margin-bottom: 3rem;
     @media (max-width: 767px) {
       width: 100%;

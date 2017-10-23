@@ -547,6 +547,12 @@
         </arguments>
     </virtualType>
 
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
+        </arguments>
+    </type>
+
     <!-- Modifiers pool for subscription edit-->
     <type name="TNW\Subscriptions\Controller\Subscription\Customer\Account\Save">
         <arguments>

@@ -167,10 +167,10 @@ class PaymentsPro extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Expiration Date'),
-                            'component' => 'Magento_Ui/js/form/components/group',
+                            'component' => 'TNW_Subscriptions/js/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'admin_field_without_legend',
+                            'additionalClasses' => 'field_without_legend',
                             'dataScope' => '',
                             'sortOrder' => 30,
                         ],
