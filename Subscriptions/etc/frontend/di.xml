@@ -36,15 +36,4 @@
             </argument>
         </arguments>
     </virtualType>
-    <virtualType  name="TNW\Subscriptions\Model\SubscriptionProfile\FrontMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">
-        <arguments>
-            <argument name="url" xsi:type="object">\Magento\Framework\UrlInterface</argument>
-            <argument name="urlPath" xsi:type="string">catalog/product/view</argument>
-        </arguments>
-    </virtualType>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory">
-        <arguments>
-            <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\FrontMessageHistoryFormatter</argument>
-        </arguments>
-    </type>
 </config>

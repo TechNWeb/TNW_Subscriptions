@@ -30,18 +30,14 @@ class MessageHistoryFormatter implements MessageHistoryFormatterInterface
      */
     public function __construct(
         UrlInterface $url,
-        $urlPath = 'catalog/product/edit'
+        $urlPath = 'catalog/product/view'
     ) {
         $this->url = $url;
         $this->urlPath = $urlPath;
     }
 
     /**
-     * Format message.
-     * Add product link to the message.
-     *
-     * @param MessageHistory $history
-     * @return string
+     * @inheritdoc
      */
     public function format(MessageHistory $history)
     {
