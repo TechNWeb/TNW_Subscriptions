@@ -217,14 +217,13 @@ class ProductListing extends AbstractDataProvider
         $this->shippingMethods->setQuote($quote);
         if ($this->shippingMethods->canShowShippingMethodLabel()) {
             $label = __('Selected on next step');
-            $currentStep = $this->getCurrentCheckoutStep();
-            if ($currentStep === self::CHECKOUT_STEP_PAYMENT) {
+            if ($this->getCurrentCheckoutStep() === self::CHECKOUT_STEP_PAYMENT) {
                 $label = $this->shippingMethods->getCurrentMethodLabel();
                 $currentShippingMethod = explode("_", $this->shippingMethods->getCurrentShippingMethod());
                 if (!in_array($currentShippingMethod[0], $this->shippingMethods->getDontCostDependedMethodsCodes())) {
                     $needShowAttention = true;
                 }
-            } elseif ($currentStep === self::CHECKOUT_STEP_BILLING) {
+            } elseif ($this->getCurrentCheckoutStep() === self::CHECKOUT_STEP_BILLING) {
                 $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
                 $needShowAttention = true;
                 $label = '';
@@ -246,15 +245,7 @@ class ProductListing extends AbstractDataProvider
      */
     private function getCurrentCheckoutStep()
     {
-        $result= '';
-
-        $handle = $this->request->getParam('handle');
-        if ($handle) {
-            $handleArray = explode('_', $handle);
-            $result = end($handleArray);
-        }
-
-        return $result;
+        return $this->request->getParam('currentStep');
     }
 
     /**

@@ -13,7 +13,6 @@
             <item name="parentForLoader" xsi:type="string">cart.steps</item>
             <item name="ajaxSave" xsi:type="boolean">true</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/subscriptions-form</item>
-            <item name="cssclass" xsi:type="string">checkout-shipping-address-fieldset</item>
         </item>
         <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>

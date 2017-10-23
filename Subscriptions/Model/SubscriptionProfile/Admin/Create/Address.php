@@ -96,7 +96,10 @@ class Address extends Create
                 // do nothing if customer is not found by id
             }
 
-            if ($addressData->getCustomerId() !== $session->getCustomerId()) {
+            $addressCustomerId = (int)$addressData->getCustomerId();
+            $sessionCustomerId = (int)$session->getCustomerId();
+
+            if ($addressCustomerId !== $sessionCustomerId) {
                 $result = [__('The customer address is not valid.')];
             } else {
                 $result = $this->checkCustomerAddress($addressObject, $addressData);
