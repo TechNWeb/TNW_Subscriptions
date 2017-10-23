@@ -22,6 +22,7 @@ use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Json\Helper\Data;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Subscription Profile model.
@@ -800,5 +801,23 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getProductChangesMadeMessageForProfit()
     {
         return __('Subscription products have changed. The graph may not show correct information until recalculation is complete.');
+    }
+
+    /**
+     * Check if profile can be editable.
+     * Depends on profile status.
+     *
+     * @return bool
+     */
+    public function canEditProfile()
+    {
+        $canEdit = false;
+        $profileStatus = $this->getStatus();
+
+        if (!in_array($profileStatus, [ProfileStatus::STATUS_CANCELED, ProfileStatus::STATUS_COMPLETE])) {
+            $canEdit = true;
+        }
+
+        return $canEdit;
     }
 }

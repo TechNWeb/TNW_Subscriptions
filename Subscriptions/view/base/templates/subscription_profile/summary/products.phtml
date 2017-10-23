@@ -2,7 +2,9 @@
 <div class="block products">
     <div class="block-title">
         <strong><?php echo __('Products') ?></strong>
-        <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+        <?php if ($block->isShowEditLink()) : ?>
+            <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+        <?php endif;?>
     </div>
     <div class="block-content">
         <ol class="items">

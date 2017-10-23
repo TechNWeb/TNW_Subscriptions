@@ -26,6 +26,9 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
     const PAYMENT_DETAILS_HEADER = 'payment_method_header';
     const PAYMENT_DETAILS_FIELDSET = 'payment_method';
 
+    /** Edit payment method button  */
+    const EDIT_PAYMENT_BUTTON = 'edit_payment_method';
+
     /**
      * Subscription profile
      *
@@ -135,8 +138,11 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
                                             'content' => __('Payment Details'),
                                         ],
                                     ],
-                                ]
-                            ]
+                                ],
+                                'children' => [
+                                    self::EDIT_PAYMENT_BUTTON => $this->getEditButtonMeta(),
+                                ],
+                            ],
                         ]
                     ),
                 ],
@@ -153,5 +159,34 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
     private function getProfileId()
     {
         return $this->profile ? $this->profile->getId() : null;
+    }
+
+    /**
+     * Retrieve edit button meta data
+     *
+     * @return array
+     */
+    private function getEditButtonMeta()
+    {
+        $isEditVisible = false;
+
+        if ($this->profile && $this->profile->canEditProfile()) {
+            $isEditVisible = true;
+        }
+
+        $editFieldConfig = [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => $isEditVisible,
+                        'imports' => [
+                            'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = payment_method:preview' : ''
+                        ],
+                    ],
+                ],
+            ]
+        ];
+
+        return $editFieldConfig;
     }
 }

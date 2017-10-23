@@ -7,13 +7,14 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 
 /**
  * Class Payment Details
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
-class Details extends Template
+class Details extends BaseSummary
 {
 
     /**

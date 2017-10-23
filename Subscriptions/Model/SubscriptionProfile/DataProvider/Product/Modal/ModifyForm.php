@@ -583,7 +583,7 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'visible' => isset($this->currentProduct),
+                        'visible' => $this->isEditButtonVisible(),
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
@@ -604,6 +604,16 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * Check if edit button is visible
+     *
+     * @return bool
+     */
+    protected function isEditButtonVisible()
+    {
+        return isset($this->currentProduct);
     }
 
     /**
@@ -972,8 +982,10 @@ class ModifyForm extends Form
                             ]
                         ],
                         'provider' => null,
+                        'visible' => $this->isUpdateButtonVisible(),
                         'imports' => [
-                            'setUpdateQtyButtonVisibility' => $buttonVisibility . $this->currentFormName . ':previewMode'
+                            'setUpdateQtyButtonVisibility' => $this->isUpdateButtonVisible() ?
+                                $buttonVisibility . $this->currentFormName . ':previewMode' : '',
                         ],
                         'exports' => [
                             'active' => '!' . $qtyContainerName . '.qty:showPreview'
@@ -983,6 +995,16 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * Check if update button is visible
+     *
+     * @return bool
+     */
+    protected function isUpdateButtonVisible()
+    {
+        return true;
     }
 
     /**

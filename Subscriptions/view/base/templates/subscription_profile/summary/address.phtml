@@ -2,7 +2,9 @@
 <div class="block">
     <div class="block-title">
         <strong><?php echo $block->getAddressTitle() ?></strong>
-        <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
+        <?php if ($block->isShowEditLink()) : ?>
+            <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
+        <?php endif;?>
     </div>
     <div class="block-content subscription-profile-<?php echo $this->getAddressType() ?>-address">
         <address>

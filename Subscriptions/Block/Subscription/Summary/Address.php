@@ -14,7 +14,7 @@ use Magento\Customer\Model\Address\Config as AddressConfig;
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
-class Address extends Template
+class Address extends BaseSummary
 {
     /**
      * @var AddressConfig
