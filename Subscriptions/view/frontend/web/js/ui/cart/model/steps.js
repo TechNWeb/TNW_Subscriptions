@@ -8,8 +8,10 @@ define([
         'Magento_Ui/js/form/form',
         'TNW_Subscriptions/js/ui/model/step-navigator',
         'uiRegistry',
-        'Magento_Ui/js/model/messageList'
-    ], function ($, Component, stepNavigator, registry, globalMessageList) {
+        'Magento_Ui/js/model/messageList',
+        'ko',
+        'underscore'
+    ], function ($, Component, stepNavigator, registry, globalMessageList, ko, _) {
         'use strict';
 
         return Component.extend({
@@ -17,9 +19,11 @@ define([
                 handle: '',
                 render_url: '',
                 isLoading: true,
+                loadingQueue: [],
                 childResponseData: null,
                 listens: {
-                    childResponseData: 'processAfterSave'
+                    childResponseData: 'processAfterSave',
+                    loadingQueue: 'checkLoadingQueue'
                 },
                 currentStepCode: null
             },
@@ -47,7 +51,7 @@ define([
              */
             initObservable: function () {
                 return this._super()
-                    .observe(['isLoading', 'childResponseData']);
+                    .observe(['isLoading', 'childResponseData', 'loadingQueue']);
             },
 
             /**
@@ -103,7 +107,7 @@ define([
                         this.setLinks(linksExport, 'exports');
                     }
 
-                    this.isLoading(true);
+                    this.addToLoadingQueue(step.blockNamespace.content);
 
                     this.resetDataSource(externalContentFormName);
                     insertFormContent.destroyInserted();
@@ -111,6 +115,7 @@ define([
                     insertFormContent.set('cssclass', 'checkout_content_' + step.code);
 
                     if (insertFormRight) {
+                        this.addToLoadingQueue(step.blockNamespace.right);
                         insertFormRight.destroyInserted();
                         insertFormRight.render();
                         insertFormRight.set('cssclass', 'checkout_right_' + step.code);
@@ -158,6 +163,42 @@ define([
                 globalMessageList.addErrorMessage({
                     message: errorMessage
                 });
+            },
+
+            /**
+             * Add element to loading queue.
+             *
+             * @param {String} initiator
+             */
+            addToLoadingQueue: function (initiator) {
+                if (_.indexOf(this.loadingQueue(), initiator) === -1) {
+                    this.loadingQueue.push(initiator);
+                }
+            },
+
+            /**
+             * Remove current element from loading queue.
+             *
+             * @param {String} initiator
+             */
+            removeFromLoadingQueue: function (initiator) {
+                var index = _.indexOf(this.loadingQueue(), initiator);
+                if (index !== -1) {
+                    this.loadingQueue.splice(index, 1);
+                }
+            },
+
+            /**
+             * Check show/hide spinner.
+             *
+             * @param {Array} loadingQueue
+             */
+            checkLoadingQueue: function (loadingQueue) {
+                if (loadingQueue.length) {
+                    this.isLoading(true);
+                } else {
+                    this.isLoading(false);
+                }
             }
         });
     }
