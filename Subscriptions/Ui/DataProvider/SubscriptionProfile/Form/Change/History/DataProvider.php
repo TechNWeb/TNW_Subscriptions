@@ -94,12 +94,12 @@ class DataProvider extends AbstractDataProvider
         $convertedData['author'] = $messageHistoryData['lastname'] ?
             sprintf('By %s %s (%s)', $messageHistoryData['firstname'], $messageHistoryData['lastname'], $messageHistoryData['email'])
             : __('By automated process');
-        $dateTime = new DateTime();
         // date format like "August 23rd, 2017   2:04:15 PM"
-        $convertedData['date'] = $this->timezone->date(
-            $dateTime->strToTime($messageHistoryData['created_at'])
-        )->format('F dS, Y   g:i:s A');
-
+        $convertedData['date'] = $this->timezone->formatDateTime(
+            $messageHistoryData['created_at'],
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM
+        );
 
         return $convertedData;
     }

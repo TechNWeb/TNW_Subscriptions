@@ -20,7 +20,6 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
-use Magento\Framework\Stdlib\DateTime\Timezone;
 
 /**
  * Subscription Overview block
@@ -85,17 +84,11 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     private $profileManager;
 
     /**
-     * @var Timezone
-     */
-    private $timezone;
-
-    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param ProfileOrderCollection $profileOrderCollection ,
      * @param ProfileManager $profileManager
-     * @param Timezone $timezone
      * @param array $data
      */
     public function __construct(
@@ -104,12 +97,10 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         \TNW\Subscriptions\Model\MessagePool $messagePool,
         ProfileOrderCollection $profileOrderCollection,
         ProfileManager $profileManager,
-        Timezone $timezone,
         array $data = []
     ) {
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
-        $this->timezone = $timezone;
         parent::__construct($context, $registry, $messagePool, $data);
     }
 
@@ -213,7 +204,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         $result = false;
         $nextPayment = $this->getNextProfileRelation();
         if ($nextPayment) {
-            $result = $this->timezone->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
+            $result = $this->_localeDate->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
         }
 
         return $result;

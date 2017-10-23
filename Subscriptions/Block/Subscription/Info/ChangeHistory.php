@@ -120,12 +120,12 @@ class ChangeHistory extends ContentAbstract
      */
     public function getFormattedDate($date)
     {
-        $dateTime = new DateTime();
+        $result = $this->_localeDate->formatDateTime(
+            $date,
+            \IntlDateFormatter::LONG,
+            \IntlDateFormatter::MEDIUM
+        );
 
-        $date = $this->_localeDate->date(
-            $dateTime->strToTime($date)
-        )->format('F dS, Y   g:i:s A');
-
-        return $date;
+        return $result;
     }
 }

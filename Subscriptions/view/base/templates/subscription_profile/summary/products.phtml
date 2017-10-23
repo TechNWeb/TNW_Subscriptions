@@ -27,7 +27,7 @@
                         <dt><?php echo __('Term') ?></dt>
                         <dd><?php echo $block->getTerm() ?></dd>
                         <dt><?php echo __('Start on') ?></dt>
-                        <dd><?php echo $block->getStartOn()->format('m/d/Y') ?></dd>
+                        <dd><?php echo $block->getStartOnFormatted() ?></dd>
                         <dt><?php echo __('Price') ?></dt>
                         <dd><?php echo $block->formatPrice($item->getPrice()) ?></dd>
                     </dl>
