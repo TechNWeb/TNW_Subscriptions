@@ -58,47 +58,33 @@ class AddEmailToSession extends Action
     }
 
     /**
+     * Add subscription email to session
+     *
      * @inheritdoc
      */
     public function execute()
     {
         $response = new \Magento\Framework\DataObject();
         $response->setData('error', false);
-
         try {
             $email = $this->_request->getParam('customer_email');
-
             $customer = $this->tryToGetCustomer($email);
-
             if ($customer && $customer->getId()) {
-                $this->addErrorToMessageManager();
-
-                $response->setData('error', true);
+                $response->addData([
+                    'error_message' => __('There is already an account with this email address.'),
+                    'error'         => true,
+                ]);
             } else {
                 $this->session->setCustomerEmail($email);
             }
         } catch (\Exception $e) {
-            $response->setData('error', true);
+            $response->addData([
+                'exception_message' => $e->getMessage(),
+                'error'             => true,
+            ]);
         }
 
         return $this->resultJsonFactory->create()->setJsonData($response->toJson());
-    }
-
-    /**
-     * Add error to message manager.
-     */
-    private function addErrorToMessageManager()
-    {
-        $url = $this->_url->getUrl('customer/account/forgotpassword');
-
-        // @codingStandardsIgnoreStart
-        $message = __(
-            'There is already an account with this email address. If you are sure that it is your email address, <a href="%1">click here</a> to get your password and access your account.',
-            $url
-        );
-        // @codingStandardsIgnoreEnd
-
-        $this->messageManager->addError($message);
     }
 
     /**

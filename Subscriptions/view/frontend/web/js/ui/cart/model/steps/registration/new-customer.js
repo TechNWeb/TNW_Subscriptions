@@ -7,8 +7,9 @@ define([
     'uiComponent',
     'jquery',
     'TNW_Subscriptions/js/ui/model/step-navigator',
-    'uiRegistry'
-], function (uiComponent, $, stepNavigator) {
+    'uiRegistry',
+    'Magento_Ui/js/model/messageList'
+], function (uiComponent, $, stepNavigator, registry, globalMessageList) {
     'use strict';
 
     return uiComponent.extend({
@@ -91,6 +92,8 @@ define([
             }).done(function (data) {
                 if (!data.error) {
                     stepNavigator.navigateNext();
+                } else if (data.error_message) {
+                    globalMessageList.addErrorMessage({'message' : data.error_message});
                 }
             });
         }
