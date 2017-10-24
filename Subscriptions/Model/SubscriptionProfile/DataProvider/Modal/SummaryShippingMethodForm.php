@@ -173,7 +173,7 @@ class SummaryShippingMethodForm extends AbstractDataProvider
         $isEditVisible = false;
 
         if ($this->profile && $this->profile->canEditProfile()) {
-            $isEditVisible = (bool)$this->nextQuote;
+            $isEditVisible = (null !== $this->nextQuote);
         }
 
         $editFieldConfig = [

@@ -613,7 +613,7 @@ class ModifyForm extends Form
      */
     protected function isEditButtonVisible()
     {
-        return isset($this->currentProduct);
+        return null !== $this->currentProduct;
     }
 
     /**

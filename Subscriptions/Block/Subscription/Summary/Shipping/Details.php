@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Shipping;
 use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 
 /**
- * Class Shipment Details
+ *  Class for subscription profile summary shipping details block on frontend Customer Account.
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */

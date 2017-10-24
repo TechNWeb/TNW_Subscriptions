@@ -14,9 +14,9 @@ use TNW\Subscriptions\Block\Subscription\Summary\Address;
 class AddressView extends Address
 {
     /**
-     * @return string
+     * @inheritdoc
      */
-    public function getEditUrl()
+    public function getEditUrl($tabName = 'shipment', $params = [])
     {
         return 'javascript:';
     }

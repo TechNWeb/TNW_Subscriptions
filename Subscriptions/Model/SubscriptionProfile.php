@@ -811,13 +811,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function canEditProfile()
     {
-        $canEdit = false;
-        $profileStatus = $this->getStatus();
-
-        if (!in_array($profileStatus, [ProfileStatus::STATUS_CANCELED, ProfileStatus::STATUS_COMPLETE])) {
-            $canEdit = true;
-        }
-
-        return $canEdit;
+        return !in_array(
+            (int)$this->getStatus(),
+            [
+                ProfileStatus::STATUS_CANCELED,
+                ProfileStatus::STATUS_COMPLETE,
+            ],
+            true
+        );
     }
 }

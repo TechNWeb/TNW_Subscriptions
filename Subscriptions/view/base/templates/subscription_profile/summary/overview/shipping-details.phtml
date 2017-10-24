@@ -3,7 +3,7 @@
     <div class="block-title">
         <strong><?php echo __("Shipping Details") ?></strong>
         <?php if ($block->isShowEditLink()) : ?>
-            <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/shipment', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+            <a href="<?php echo $block->getEditUrl('shipment') ?>" class="profile__edit_button"></a>
         <?php endif;?>
     </div>
     <div class="block-content">
