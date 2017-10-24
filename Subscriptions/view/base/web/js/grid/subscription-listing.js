@@ -56,7 +56,7 @@ define([
 
             this.set('estimatedPayment', this.source.data.estimatedPayment);
 
-            resolver(this.hideLoader, this);
+            this.hideLoader();
 
             addButton = registry.get('index=button_add_product');
             modifyButton = registry.get('index=button_modify_subscriptions');
@@ -97,7 +97,6 @@ define([
          * @returns {Object}
          */
         hideLoader: function () {
-            debugger;
             if (this.useParentLoader) {
                 registry.get(this.parentForLoader).removeFromLoadingQueue(this.ns);
             } else {
