@@ -99,6 +99,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool" />
     <preference for="TNW\Subscriptions\Api\UrlBuilderInterface"
                 type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatterInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
