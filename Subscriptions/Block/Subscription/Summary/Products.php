@@ -6,10 +6,9 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\Framework\View\Element\Template;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
@@ -173,13 +172,19 @@ class Products extends Template
     }
 
     /**
-     * @return \Magento\Framework\Phrase|string
+     * @return \Magento\Framework\Phrase
      */
     public function getTerm()
     {
-        return !$this->getSubscriptionProfile()->getTerm()
-            ? __('Bill %1 times', $this->getSubscriptionProfile()->getTotalBillingCycles())
-            : __('Until canceled');
+        $result = __('Until canceled');
+        if (!$this->getSubscriptionProfile()->getTerm()) {
+            $totalBillingCycles = $this->getSubscriptionProfile()->getTotalBillingCycles();
+            $result = (int) $totalBillingCycles === 1
+                ? __('Bill once')
+                : __('Bill %1 times', $totalBillingCycles);
+        }
+
+        return $result;
     }
 
     /**
