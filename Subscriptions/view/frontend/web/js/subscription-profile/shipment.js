@@ -49,7 +49,7 @@ define([
          * @returns void
          */
         _initialize: function () {
-            var showEdit = this.options.showEdit,
+            var showEdit = this.options.showEdit * 1 ,
                 customerAddresses = $(this.options.customerAddressesList),
                 addressSelectVisibility = false;
 
@@ -81,7 +81,7 @@ define([
                 requiredFields = $(this.options.requiredFields);
 
             editButton.on('click', $.proxy(function() {
-                widget.setFormsVisibility(false);
+                widget.setFormsVisibility(true);
             }, this));
             addNewButton.on('click', $.proxy(function() {
                 widget.setAddressFieldsVisibility(false);
@@ -107,7 +107,7 @@ define([
             cancelButton.on('click', $.proxy(function(e) {
                 e.stopPropagation();
                 e.preventDefault();
-                widget.setFormsVisibility(true);
+                widget.setFormsVisibility(false);
             }, this));
             $.each(form.find('.required'), function (key, field) {
                 $(field).on('focusout', $.proxy(function() {
@@ -244,8 +244,8 @@ define([
          * @returns void
          */
         setFormsVisibility: function(showEdit) {
-            this._setElemsVisibility($(this.options.infoViewSelector), showEdit);
-            this._setElemsVisibility($(this.options.infoEditSelector), !showEdit);
+            this._setElemsVisibility($(this.options.infoViewSelector), !showEdit);
+            this._setElemsVisibility($(this.options.infoEditSelector), showEdit);
         },
 
         /**

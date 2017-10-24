@@ -72,9 +72,6 @@
                         <item name="displayAsLink" xsi:type="boolean">false</item>
                         <item name="sortOrder" xsi:type="number">0</item>
                         <item name="additionalClasses" xsi:type="string">profile__edit_button</item>
-                        <item name="imports" xsi:type="array">
-                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = shipping_information:preview</item>
-                        </item>
                         <item name="actions" xsi:type="array">
                             <item name="0" xsi:type="array">
                                 <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = shipping_information</item>

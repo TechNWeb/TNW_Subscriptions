@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 /**
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
-class Products extends Template
+class Products extends BaseSummary
 {
     /**
      * @var \Magento\Catalog\Helper\ImageFactory
