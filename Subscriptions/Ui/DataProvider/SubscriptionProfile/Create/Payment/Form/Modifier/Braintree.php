@@ -84,7 +84,8 @@ class Braintree extends Base
         Repository $assetRepository,
         RequestInterface $request,
         UrlInterface $urlBuilder
-    ) {
+    )
+    {
         $this->context = $context;
         $this->paymentPro = $paymentPro;
         $this->braintreeConfig = $braintreeConfig;
@@ -292,7 +293,7 @@ class Braintree extends Base
     {
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
-            'listens'=> $this->getListens(),
+            'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
             'options' => [
@@ -342,7 +343,7 @@ class Braintree extends Base
     private function getCcMonths()
     {
         $result[] = [
-            'label' =>  __('Month'),
+            'label' => __('Month'),
             'value' => ''
         ];
         foreach ($this->paymentConfig->getMonths() as $value => $label) {
@@ -363,7 +364,7 @@ class Braintree extends Base
     private function getCcYears()
     {
         $result[] = [
-            'label' =>  __('Year'),
+            'label' => __('Year'),
             'value' => ''
         ];
         foreach ($this->paymentConfig->getYears() as $value => $label) {
@@ -383,7 +384,7 @@ class Braintree extends Base
      */
     private function hasVerification()
     {
-        return (bool)$this->paymentPro->getConfigData('useccv');
+        return $this->braintreeConfig->isCvvEnabled();// ->paymentPro->getConfigData('useccv');
     }
 
     /**
@@ -470,11 +471,8 @@ class Braintree extends Base
      */
     private function getMethodConfigData($fieldName)
     {
-        if ($this->paymentPro instanceof TransparentInterface) {
-            $result = $this->paymentPro->getConfigInterface()->getValue($fieldName);
-        }else{
-            $result = $this->paymentPro->getConfigData($fieldName);
-        }
+        $result = $this->braintreeConfig->getValue($fieldName);// paymentPro->getConfigData($fieldName);
+
         return $result;
     }
 }
