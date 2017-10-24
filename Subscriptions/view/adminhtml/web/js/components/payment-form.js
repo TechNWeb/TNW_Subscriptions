@@ -26,6 +26,9 @@ define(
                             case 'payflowpro':
                                 registry.get('index = ' + code).beforeSubmit();
                                 break;
+                            case 'braintree':
+                                registry.get('index = ' + code).beforeSubmit();
+                                break;
                             case 'checkmo':
                             default:
                                 current.save();
@@ -54,6 +57,14 @@ define(
                         }
                         switch (code) {
                             case 'payflowpro':
+                                if (fields.additional.cc_number){
+                                    fields.additional.cc_last_4 = fields.additional.cc_number.substr(-4);
+                                    delete fields.additional.cc_number;
+                                }
+                                delete fields.additional.cc_cid;
+                                break;
+
+                                case 'braintree':
                                 if (fields.additional.cc_number){
                                     fields.additional.cc_last_4 = fields.additional.cc_number.substr(-4);
                                     delete fields.additional.cc_number;

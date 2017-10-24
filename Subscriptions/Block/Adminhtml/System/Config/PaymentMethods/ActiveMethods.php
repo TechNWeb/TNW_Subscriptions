@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods;
 
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
+use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Config\Model\Config\Source\Yesno;
@@ -52,7 +53,8 @@ class ActiveMethods extends Fieldset
     private $availableMethodsCodes = [
         Checkmo::PAYMENT_METHOD_CHECKMO_CODE,
         Config::METHOD_PAYFLOWPRO,
-        Config::METHOD_PAYMENT_PRO
+        Config::METHOD_PAYMENT_PRO,
+        BraintreeConfigProvider::CODE
     ];
 
     /**

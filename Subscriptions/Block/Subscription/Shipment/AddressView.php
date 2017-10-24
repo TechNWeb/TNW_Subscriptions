@@ -16,7 +16,7 @@ class AddressView extends Address
     /**
      * @inheritdoc
      */
-    public function getEditUrl($tabName = 'shipment', $params = [])
+    public function getEditUrl($tabName = 'shipment', array $params = [])
     {
         return 'javascript:';
     }

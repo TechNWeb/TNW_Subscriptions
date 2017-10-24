@@ -10,6 +10,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Engine\CheckmoFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\InvalidEngineException;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory;
 
 /**
  * Class EnginePool
@@ -18,6 +19,7 @@ class EnginePool
 {
     const ENGINE_CODE_CHECKMO = 'checkmo';
     const ENGINE_CODE_PAYFLOW = 'payflowpro';
+    const ENGINE_CODE_BRAINTREE = 'braintree';
 
     const ERROR_INVALID_ENGINE = "Invalid engine code: '%1'";
 
@@ -37,16 +39,26 @@ class EnginePool
     private $payflowproFactory;
 
     /**
+     * Factory for creating braintree engine.
+     *
+     * @var BraintreeFactory
+     */
+    private $braintreeFactory;
+
+    /**
      * EnginePool constructor.
      * @param CheckmoFactory $checkmoFactory
      * @param PayflowproFactory $payflowproFactory
+     * @param BraintreeFactory $braintreeFactory
      */
     public function __construct(
         CheckmoFactory $checkmoFactory,
-        PayflowproFactory $payflowproFactory
+        PayflowproFactory $payflowproFactory,
+        BraintreeFactory $braintreeFactory
     ) {
         $this->checkmoFactory = $checkmoFactory;
         $this->payflowproFactory = $payflowproFactory;
+        $this->braintreeFactory = $braintreeFactory;
     }
 
     /**
@@ -66,6 +78,9 @@ class EnginePool
             case self::ENGINE_CODE_PAYFLOW:
                 $result = $this->payflowproFactory->create();
                 break;
+            case self::ENGINE_CODE_BRAINTREE:
+                $result = $this->braintreeFactory->create();
+                break;
             default:
                 throw new InvalidEngineException(__(self::ERROR_INVALID_ENGINE, $engine));
         }
@@ -83,6 +98,7 @@ class EnginePool
         return [
             self::ENGINE_CODE_CHECKMO,
             self::ENGINE_CODE_PAYFLOW,
+            self::ENGINE_CODE_BRAINTREE,
         ];
     }
 
@@ -95,6 +111,7 @@ class EnginePool
     {
         return [
             self::ENGINE_CODE_PAYFLOW,
+            self::ENGINE_CODE_BRAINTREE,
         ];
     }
 }
