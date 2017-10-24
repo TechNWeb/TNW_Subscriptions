@@ -5,8 +5,9 @@
  */
 namespace TNW\Subscriptions\Controller\Subscription;
 
-use Magento\Framework\App\Action;
+use Magento\Customer\Controller\AbstractAccount;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\Forward;
 use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
@@ -17,7 +18,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 /**
  * Abstract controller for subscription information pages.
  */
-abstract class AbstractView extends Action\Action
+abstract class AbstractView extends AbstractAccount
 {
     /**
      * @var PageFactory
@@ -114,7 +115,7 @@ abstract class AbstractView extends Action\Action
     /**
      * Get redirect for not valid subscriptionId in params.
      *
-     * @return $this
+     * @return Forward
      */
     private function noRoutRedirect()
     {
