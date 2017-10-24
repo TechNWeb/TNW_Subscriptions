@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Controller\Paypal;
 use TNW\Subscriptions\Controller\Adminhtml\Paypal\RequestSecureToken as Base;
 
 /**
- * Class RequestSecureToken
+ * Controller to get a secure token from PayPal.
  */
 class RequestSecureToken extends Base
 {

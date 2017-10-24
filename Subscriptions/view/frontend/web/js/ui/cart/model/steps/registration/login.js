@@ -17,13 +17,14 @@ define(
                     'customer/ajax/login',
                     JSON.stringify(loginData),
                     isGlobal
-                ).done(function (response) {
+                ).always(function (response) {
+                    callbacks.forEach(function(callback) {
+                        callback(loginData);
+                    });
+                }).done(function (response) {
                     if (response.errors) {
                         messageContainer.addErrorMessage(response);
                     } else {
-                        callbacks.forEach(function(callback) {
-                            callback(loginData);
-                        });
                         if (redirectUrl) {
                             window.location.href = redirectUrl;
                         } else if (response.redirectUrl) {
@@ -34,10 +35,6 @@ define(
                     }
                 }).fail(function () {
                     messageContainer.addErrorMessage({'message': 'Could not authenticate. Please try again later'});
-                }).always(function (response) {
-                    callbacks.forEach(function(callback) {
-                        callback(loginData);
-                    });
                 });
             };
 

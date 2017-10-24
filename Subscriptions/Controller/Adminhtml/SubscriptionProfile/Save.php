@@ -9,9 +9,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 class Save extends AbstractSave
 {
     /**
-     * Save action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * Controller for creating subscription profiles.
      */
     public function execute()
     {

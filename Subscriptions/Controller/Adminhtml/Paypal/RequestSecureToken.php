@@ -19,7 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class RequestSecureToken
+ * Controller to get a secure token from PayPal.
  */
 class RequestSecureToken extends \Magento\Framework\App\Action\Action
 {
