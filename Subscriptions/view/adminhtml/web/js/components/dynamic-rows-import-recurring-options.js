@@ -179,7 +179,7 @@ define([
          * @return {void}
          */
         checkAddingBillingFrequency: function (rowIndex) {
-            var button = registry.get('name = product_form.product_form.subscription-options.container_header.button_add');
+            var button = registry.get('name = product_form.product_form.subscription-options.container_tnw_subscr_all.container_header.button_add');
             button.set('disabled', false);
             if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
                 button.set('disabled', true);

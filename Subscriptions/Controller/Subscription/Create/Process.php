@@ -11,7 +11,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
@@ -20,19 +20,27 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 class Process extends AbstractSave
 {
     /**
+     * Subscription create model.
+     *
+     * @var CreateProfile
+     */
+    private $createModel;
+
+    /**
      * Process constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
+     * @param RequestProcessor $saveProcessor
      * @param CreateProfile $createModel
-     * @param Processor $saveProcessor
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        CreateProfile $createModel,
-        Processor $saveProcessor
+        RequestProcessor $saveProcessor,
+        CreateProfile $createModel
     ) {
-        parent::__construct($context, $resultPageFactory, $createModel, $saveProcessor);
+        $this->createModel = $createModel;
+        parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
 
@@ -60,7 +68,7 @@ class Process extends AbstractSave
         $result = $this->getSaveProcessor()->processSave(
             $this->getRequest()->getParams()
         );
-        $this->getSubCreateModel()->recollectSubscriptions();
+        $this->createModel->recollectSubscriptions();
 
         return $result;
     }

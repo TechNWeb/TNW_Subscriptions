@@ -13,7 +13,24 @@
             <block class="TNW\Subscriptions\Block\Subscription\Info\Shipment"
                    name="subscription.info.shipment"
                    after="subscription.info.links"
-            />
+                    template="TNW_Subscriptions::subscription/shipment.phtml">
+                <block class="TNW\Subscriptions\Block\Subscription\Shipment\AddressView"
+                       name="subscription.info.view.shipping.information" as="shipping-info-view"
+                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
+                    <action method="setAddressType">
+                        <argument name="type" xsi:type="string">shipping</argument>
+                    </action>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\EditForm"
+                       name="customer_address_edit_form"
+                       template="TNW_Subscriptions::subscription/edit-form.phtml"
+                       cacheable="false">
+                    <block class="TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit"
+                           name="customer_address_edit"
+                           template="TNW_Subscriptions::subscription/shipment/address-edit.phtml"
+                           cacheable="false"/>
+                </block>
+            </block>
         </referenceContainer>
     </body>
 </page>

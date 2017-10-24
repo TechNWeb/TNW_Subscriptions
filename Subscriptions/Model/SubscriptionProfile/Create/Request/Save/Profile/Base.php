@@ -4,11 +4,11 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\Request\Save\Profile;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Base save processor.

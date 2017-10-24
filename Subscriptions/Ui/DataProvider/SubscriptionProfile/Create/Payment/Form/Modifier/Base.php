@@ -55,9 +55,9 @@ class Base implements ModifierInterface
     /**
      * Profile id
      *
-     * @var integer
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile
      */
-    private $profileId;
+    private $profile;
 
     /**
      * Session
@@ -67,13 +67,19 @@ class Base implements ModifierInterface
     private $session;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param QuoteSessionInterface $session
      */
     public function __construct(
         Config $config,
-        QuoteSessionInterface $session
+        QuoteSessionInterface $session,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -81,6 +87,7 @@ class Base implements ModifierInterface
         $this->listens = [
             'checked' => 'saveBilling'
         ];
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -328,7 +335,15 @@ class Base implements ModifierInterface
      */
     protected function getProfileId()
     {
-        return $this->profileId;
+        return $this->profile->getId();
+    }
+
+    /**
+     * @return \TNW\Subscriptions\Model\SubscriptionProfile
+     */
+    protected function getProfile()
+    {
+        return $this->profile;
     }
 
     /**
@@ -339,7 +354,7 @@ class Base implements ModifierInterface
      */
     public function setProfileId($profileId)
     {
-        $this->profileId = $profileId;
+        $this->profile = $this->profileRepository->getById($profileId);
         return $this;
     }
 

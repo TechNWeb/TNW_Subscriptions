@@ -62,6 +62,29 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function _prepareLayout()
+    {
+        foreach ($this->getChildNames() as $names) {
+            $this->initChildBlock($this->getLayout()->getBlock($names));
+        }
+
+        return parent::_prepareLayout();
+    }
+
+    /**
+     * Init child block
+     *
+     * @param \Magento\Framework\View\Element\AbstractBlock $block
+     * @return \Magento\Framework\View\Element\AbstractBlock
+     */
+    protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
+    {
+        return $block;
+    }
+
+    /**
      * Return messages block.
      *
      * @return \TNW\Subscriptions\Block\Subscription\Info\Messages|bool

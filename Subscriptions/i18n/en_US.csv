@@ -375,3 +375,4 @@ The number of future quotes to generate at a time for the new subscription profi
 "There are no messages about current subscription history","There are no messages about current subscription history"
 "merchant","merchant"
 "customer","customer"
+"Subscription will be canceled on %s","Subscription will be canceled on %s"

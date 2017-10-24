@@ -9,8 +9,7 @@ namespace TNW\Subscriptions\Controller\Subscription;
 use Magento\Framework\App\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 
 /**
  * Abstract controller for subscription creation.
@@ -23,33 +22,23 @@ abstract class AbstractSave extends Action\Action
     protected $resultPageFactory;
 
     /**
-     * Subscription create model.
-     *
-     * @var CreateProfile
-     */
-    private $createModel;
-
-    /**
      * Save processor model.
      *
-     * @var Processor
+     * @var RequestProcessor
      */
     private $saveProcessor;
 
     /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param CreateProfile $createModel
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        CreateProfile $createModel,
-        Processor $saveProcessor
+        RequestProcessor $saveProcessor
     ) {
         $this->resultPageFactory = $resultPageFactory;
-        $this->createModel = $createModel;
         $this->saveProcessor = $saveProcessor;
 
         parent::__construct($context);
@@ -58,21 +47,11 @@ abstract class AbstractSave extends Action\Action
     /**
      * Returns request same model.
      *
-     * @return Processor
+     * @return RequestProcessor
      */
     protected function getSaveProcessor()
     {
         return $this->saveProcessor;
-    }
-
-    /**
-     * Returns subscription create model.
-     *
-     * @return CreateProfile
-     */
-    protected function getSubCreateModel()
-    {
-        return $this->createModel;
     }
 
     /**

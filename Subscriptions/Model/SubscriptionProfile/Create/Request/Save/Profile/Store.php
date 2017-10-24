@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\Request\Save\Profile;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
  * Save store processor.

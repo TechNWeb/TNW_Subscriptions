@@ -644,9 +644,14 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getDecodedPaymentAdditionalInfo()
     {
-        return $this->jsonHelper->jsonDecode(
-            $this->getData(self::PAYMENT_ADDITIONAL_INFO)
-        );
+        $return = null;
+        if ($this->getData(self::PAYMENT_ADDITIONAL_INFO)) {
+            $return = $this->jsonHelper->jsonDecode(
+                $this->getData(self::PAYMENT_ADDITIONAL_INFO)
+            );
+        }
+
+        return $return;
     }
 
     /**

@@ -1,0 +1,40 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block */ ?>
+<div class="block products">
+    <div class="block-title products-title">
+        <strong><?php echo __('Products') ?></strong>
+        <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+    </div>
+    <div class="block-content">
+        <ol class="items">
+            <?php foreach ($block->getItems() as $item): ?>
+            <li class="item">
+                <div class="product-item-photo">
+                    <img class="photo image" src="<?php echo $block->getImageUrl($item); ?>" />
+                </div>
+                <div class="product-item-details">
+                    <strong class="product-item-name"><?php echo $block->getName($item) ?></strong>
+                    <span class="product-item-qty">(x<?php echo (int)$item->getQty() ?>)</span>
+                    <div class="product-item-description"><?php echo $block->getDescription($item) ?></div>
+                    <dl class="item-options">
+                        <dt class="qty"><?php echo __('Qty') ?></dt>
+                        <dd><?php echo (int)$item->getQty() ?></dd>
+                    </dl>
+                </div>
+                <div class="additional">
+                    <dl>
+                        <dt><?php echo __('Billing Frequency') ?></dt>
+                        <dd><?php echo $block->getBillingFrequencyLabel() ?></dd>
+                        <dt><?php echo __('Term') ?></dt>
+                        <dd><?php echo $block->getTerm() ?></dd>
+                        <dt><?php echo __('Start on') ?></dt>
+                        <dd><?php echo $block->getStartOn()->format('m/d/Y') ?></dd>
+                        <dt><?php echo __('Price') ?></dt>
+                        <dd><?php echo $block->formatPrice($item->getPrice()) ?></dd>
+                    </dl>
+                </div>
+            </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="product-frequency-description"><?php echo $block->getFrequencyDescription() ?></div>
+    </div>
+</div>

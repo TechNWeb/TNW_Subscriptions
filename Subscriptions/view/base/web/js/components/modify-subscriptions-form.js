@@ -14,6 +14,7 @@ define(
                 previewMode: true,
                 buttonPreviewMode: true,
                 editButtons: {},
+                requestFields: {},
                 additionalData: {},
                 productsFormName: null,
                 listens: {
@@ -128,6 +129,7 @@ define(
                 this.validate();
 
                 if (!this.additionalInvalid && !this.source.get('params.invalid')) {
+                    this.filterRequestFields();
                     this.setAdditionalData(this.additionalData);
                     this.setAdditionalData(data)
                         .submit(redirect);
@@ -142,6 +144,27 @@ define(
                     remove: true
                 });
                 this.save();
+            },
+
+            /**
+             * Remove excluded fields from saving data.
+             */
+            filterRequestFields: function () {
+                var itemId = this.additionalData.objectItemId,
+                    requestFields = this.requestFields;
+                if (itemId){
+                    var item = this.source.get('data.item_' + itemId);
+                    if (item){
+                        _.each(Object.keys(item), function (name) {
+                            if (_.indexOf(requestFields, name) === -1){
+                                delete item[name];
+                            }
+                        }, this);
+                        this.source.set('data.item_' + itemId, item);
+                    }
+                }
+
+                return this;
             }
         });
     }

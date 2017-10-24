@@ -24,7 +24,7 @@ class Address extends Template
     /**
      * @var string
      */
-    private $addressType;
+    protected $addressType;
 
     /**
      * Address constructor.
@@ -90,7 +90,19 @@ class Address extends Template
     public function getEditUrl()
     {
         return $this->addressType === \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING
-            ? $this->getUrl('tnw_subscriptions/subscription/shipment', ['entity_id' => $this->getSubscriptionProfile()->getId()])
-            : $this->getUrl('tnw_subscriptions/subscription/billing', ['entity_id' => $this->getSubscriptionProfile()->getId()]);
+            ? $this->getUrl(
+                'tnw_subscriptions/subscription/shipment',
+                [
+                    'entity_id' => $this->getSubscriptionProfile()->getId(),
+                    'edit'      => 1,
+                ]
+            )
+            : $this->getUrl(
+                'tnw_subscriptions/subscription/billing',
+                [
+                    'entity_id' => $this->getSubscriptionProfile()->getId(),
+                    'edit'      => 1,
+                ]
+            );
     }
 }
