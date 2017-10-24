@@ -331,11 +331,16 @@ class Base implements ModifierInterface
     /**
      * Returns profile id
      *
-     * @return int
+     * @return int|null
      */
     protected function getProfileId()
     {
-        return $this->profile->getId();
+        $profileId = null;
+        if ($this->profile) {
+            $profileId = $this->profile->getId();
+        }
+
+        return $profileId;
     }
 
     /**

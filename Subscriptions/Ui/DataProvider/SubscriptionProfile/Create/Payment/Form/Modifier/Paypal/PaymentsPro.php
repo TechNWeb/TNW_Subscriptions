@@ -102,7 +102,8 @@ class PaymentsPro extends Base
         $data = parent::modifyData($data);
 
         $additionalInfo = $this->getProfile()
-            ->getDecodedPaymentAdditionalInfo();
+            ? $this->getProfile()->getDecodedPaymentAdditionalInfo()
+            : [];
 
         if (!empty($additionalInfo['cc_type'])) {
             $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
