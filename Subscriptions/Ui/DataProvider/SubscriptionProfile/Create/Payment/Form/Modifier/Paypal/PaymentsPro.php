@@ -438,12 +438,17 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      */
     private function getOrderUrl()
     {
+        $routeParams = [
+            '_secure' => $this->request->isSecure(),
+        ];
+
+        if (null !== $this->getProfileId()) {
+            $routeParams[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
+        }
+
         return $this->urlBuilder->getUrl(
             'tnw_subscriptions/paypal/requestSecureToken',
-            [
-                '_secure' => $this->request->isSecure(),
-                SummaryInsertForm::FORM_DATA_KEY => $this->getProfileId()
-            ]
+            $routeParams
         );
     }
 
