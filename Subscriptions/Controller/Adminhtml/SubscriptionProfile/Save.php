@@ -6,10 +6,13 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
+/**
+ * Controller for creating subscription profiles.
+ */
 class Save extends AbstractSave
 {
     /**
-     * Controller for creating subscription profiles.
+     * @inheritdoc
      */
     public function execute()
     {
