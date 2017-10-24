@@ -278,4 +278,9 @@
             <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Step\Save\Processor</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Save">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Save\Processor</argument>
+        </arguments>
+    </type>
 </config>

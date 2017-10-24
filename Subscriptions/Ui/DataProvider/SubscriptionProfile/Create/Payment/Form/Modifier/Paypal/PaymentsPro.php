@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
@@ -26,7 +27,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 /**
  * PayPal payment methods form modifier.
  */
-class PaymentsPro extends Base
+class PaymentsPro extends Base implements PaymentModifierInterface
 {
     const SORT_ORDER = 20;
 
@@ -417,7 +418,7 @@ class PaymentsPro extends Base
     private function getOrderUrl()
     {
         return $this->urlBuilder->getUrl(
-            'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
+            'tnw_subscriptions/paypal/requestSecureToken',
             [
                 '_secure' => $this->request->isSecure(),
                 SummaryInsertForm::FORM_DATA_KEY => $this->getProfileId()

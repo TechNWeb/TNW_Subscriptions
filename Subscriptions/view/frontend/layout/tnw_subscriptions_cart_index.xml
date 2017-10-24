@@ -91,6 +91,12 @@
                                                         <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
                                                         <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
                                                     </item>
+                                                    <item name="stepActions" xsi:type="array">
+                                                        <item name="0" xsi:type="array">
+                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
+                                                            <item name="actionName" xsi:type="string">beforeSubmit</item>
+                                                        </item>
+                                                    </item>
                                                     <item name="needSave" xsi:type="boolean">true</item>
                                                     <item name="title" xsi:type="string" translate="true">Payment</item>
                                                     <item name="sortOrder" xsi:type="string">4</item>

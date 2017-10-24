@@ -93,13 +93,13 @@ define([
             }
         },
 
-
+        /**
+         * Before submit action for payment method.
+         */
         beforeSubmit: function () {
-            var postData = {
-                'form_key': FORM_KEY,
-                'cc_type': this.ccType()
-            };
-
+            var postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {},
+                self = this;
+            postData['cc_type'] =  this.ccType();
             this.showLoader();
             this.resetErrors();
             $j.ajax({
@@ -109,7 +109,7 @@ define([
                 data: postData,
                 dataType: 'json',
                 success: function (response) {
-                    if (response.success && response[this.options.gateway]) {
+                    if (response.success && response[self.options.gateway]) {
                         this.postPaymentToGateway(response);
                     } else {
                         this.processErrors(response.error_messages);

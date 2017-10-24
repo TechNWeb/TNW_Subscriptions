@@ -11,6 +11,7 @@
             <item name="useParentLoader" xsi:type="boolean">true</item>
             <item name="parentForLoader" xsi:type="string">cart.steps</item>
             <item name="ajaxSaveType" xsi:type="string">simple</item>
+            <item name="ajaxSave" xsi:type="boolean">true</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/payment-form</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
         </item>
@@ -34,7 +35,7 @@
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" xsi:type="string" translate="true">Payment Information</item>
-                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/payment/fieldset</item>
+                <item name="template" xsi:type="string">TNW_Subscriptions/form/element/template/fieldset</item>
                 <item name="sortOrder" xsi:type="number">10</item>
                 <item name="additionalClasses" xsi:type="string">sub-fieldset</item>
                 <item name="dataScope" xsi:type="string">payment</item>

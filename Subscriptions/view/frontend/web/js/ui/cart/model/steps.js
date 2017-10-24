@@ -81,7 +81,7 @@ define([
 
                     insertFormContent.ns = step.blockNamespace.content;
                     insertFormContent.params.namespace = step.blockNamespace.content;
-                    insertFormContent.params.currentStep = step.code;
+                    insertFormContent.params.step = step.code;
 
                     var linksImports = {childResponseData: 'index = ' + step.blockNamespace.content + ':responseData'};
                     this.setLinks(linksImports, 'imports');
@@ -95,10 +95,10 @@ define([
                         insertFormRight.renderSettings.url = insertFormRight.render_url;
                         externalRightFormName = step.blockNamespace.right + '.' + step.blockNamespace.right;
                         insertFormRight.externalFormName = externalRightFormName;
-                        insertFormRight.params.currentStep = step.code;
+                        insertFormRight.params.step = step.code;
 
                         var linksExport = {
-                            currentStepCode: 'index = ' + step.blockNamespace.right + '_data_source:params.currentStep'
+                            currentStepCode: 'index = ' + step.blockNamespace.right + '_data_source:params.step'
                         };
                         this.setLinks(linksExport, 'exports');
                     }

@@ -179,7 +179,6 @@ class Base implements ModifierInterface
                                         'visible' => true,
                                         'opened' => true,
                                         'dataScope' => $this->getPaymentCode(),
-                                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                         'componentType' => Fieldset::NAME,
                                         'additionalClasses' => 'fieldset-wrapper-title',
                                         'sortOrder' => $this::SORT_ORDER,

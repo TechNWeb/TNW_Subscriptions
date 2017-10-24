@@ -3,7 +3,8 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal;
+
+namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;

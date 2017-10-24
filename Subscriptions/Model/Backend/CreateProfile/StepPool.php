@@ -12,6 +12,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Framework\App\Request\Http;
 
 /**
  * Subscription profile creation steps pool.
@@ -30,8 +31,8 @@ class StepPool
      */
     const STEP_PARAM_TYPE_CUSTOMER = 'customer';
     const STEP_PARAM_TYPE_STORE = 'store';
-    const STEP_PARAM_TYPE_ACCOUNT_INFORMATION = 'account';
-    const STEP_PARAM_TYPE_SHIPPING_BILLING = 'shipping_and_billing';
+    const STEP_PARAM_TYPE_SHIPPING = 'shipping';
+    const STEP_PARAM_TYPE_BILLING = 'billing';
     const STEP_PARAM_TYPE_PAYMENT = 'payment';
     /**#@-*/
 
@@ -43,8 +44,8 @@ class StepPool
     private $stepArray = [
         self::STEP_PARAM_TYPE_STORE,
         self::STEP_PARAM_TYPE_CUSTOMER,
-        self::STEP_PARAM_TYPE_ACCOUNT_INFORMATION,
-        self::STEP_PARAM_TYPE_SHIPPING_BILLING,
+        self::STEP_PARAM_TYPE_SHIPPING,
+        self::STEP_PARAM_TYPE_BILLING,
         self::STEP_PARAM_TYPE_PAYMENT,
     ];
 
@@ -59,6 +60,13 @@ class StepPool
      * @var DataPersistorInterface
      */
     private $dataPersistor;
+
+    /**
+     * Request.
+     *
+     * @var Http
+     */
+    private $request;
 
     /**
      * Store manager.
@@ -86,17 +94,20 @@ class StepPool
      * @param DataPersistorInterface $dataPersistor
      * @param QuoteSessionInterface $session
      * @param CustomerRepositoryInterface $customerRepository
+     * @param Http $request
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor,
         QuoteSessionInterface $session,
-        CustomerRepositoryInterface $customerRepository
+        CustomerRepositoryInterface $customerRepository,
+        Http $request
     ) {
         $this->storeManager = $storeManager;
         $this->dataPersistor = $dataPersistor;
         $this->session = $session;
         $this->customerRepository = $customerRepository;
+        $this->request = $request;
     }
 
     /**
@@ -110,13 +121,21 @@ class StepPool
     /**
      * Returns current step.
      *
-     * If step is assigned - return it. In other case try to retrieve from session.
+     * If step is assigned - return it. In other case try to retrieve from session or from request.
      *
      * @return string|null
      */
     public function getCurrentStep()
     {
-        return $this->currentStep ?: $this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME);
+        if ($this->currentStep) {
+            $result = $this->currentStep;
+        } elseif ($this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME)) {
+            $result = $this->dataPersistor->get(self::PERSISTOR_STEP_PARAM_NAME);
+        } else {
+            $result = $this->request->getParam(self::STEP_PARAM_NAME);
+        }
+
+        return $result;
     }
 
     /**

@@ -6,9 +6,7 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
-
-class Save extends SubscriptionProfile
+class Save extends AbstractSave
 {
     /**
      * Save action
@@ -19,25 +17,13 @@ class Save extends SubscriptionProfile
     {
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-
-        //process additional payment data
-        $paymentPostData = $this->getRequest()->getParam('payment', []);
-        $additionalData = [];
-        foreach ($paymentPostData as  $code => $methodData) {
-            if ($methodData['method']) {
-                $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
-                $additionalData['method'] = $code;
-                break;
-            }
-        }
-
-        $this->getSubCreateModel()->setPaymentData($additionalData);
-        $profiles = $this->getSubCreateModel()->createSubscriptions();
-        $this->_getSession()->clearStorage();
-
-        if ($profiles) {
+        $errors = $this->getSaveProcessor()->processSave(
+            $this->getRequest()->getParams()
+        );
+        if (empty($errors)) {
+            $this->_getSession()->clearStorage();
             $this->messageManager->addSuccessMessage(
-                sprintf(__('Total of %s profiles was created.'), count($profiles))
+                __('Profile(s) was successfully created.')
             );
         }
 

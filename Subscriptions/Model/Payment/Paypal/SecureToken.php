@@ -53,7 +53,7 @@ class SecureToken
     /**
      * Gets the Secure Token from Paypal for TR.
      *
-     * @param Quote $quote
+     * @param DataObject $object
      *
      * @return DataObject
      * @throws \Exception
@@ -67,7 +67,7 @@ class SecureToken
         $request->setAmt(0);
         $request->setCreatesecuretoken('Y');
         $request->setSecuretokenid($this->mathRandom->getUniqueHash());
-        $routePath = 'tnw_subscriptions/subscriptionprofile_create_paypal/response';
+        $routePath = 'tnw_subscriptions/paypal/response';
         $url = ($object instanceof SubscriptionProfileInterface)
             ? $this->url->getUrl(
                 $routePath,
@@ -78,8 +78,6 @@ class SecureToken
             : $this->url->getUrl($routePath);
         $request->setReturnurl($url);
         $request->setErrorurl($url);
-        //TODO WTF? Where is this controller?
-        //$request->setCancelurl($this->url->getUrl('paypal/transparent/cancel'));
         $request->setDisablereceipt('TRUE');
         $request->setSilenttran('TRUE');
 

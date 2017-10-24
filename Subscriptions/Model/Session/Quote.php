@@ -52,7 +52,7 @@ class Quote extends QuoteSession
      */
     public function getCustomerGroupId()
     {
-        return (int)$this->getCustomerSession()->getCustomerId();
+        return (int)$this->getCustomerSession()->getCustomerGroupId();
     }
 
     /**

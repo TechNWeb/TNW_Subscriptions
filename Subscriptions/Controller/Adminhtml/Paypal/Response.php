@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal;
+namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\DataObject;
@@ -120,6 +120,7 @@ class Response extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $parameters = [];
+        $profile = null;
         if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
             /** @var SubscriptionProfileInterface $profile */
             $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
@@ -150,10 +151,24 @@ class Response extends \Magento\Framework\App\Action\Action
         $resultLayout->getLayout()->getUpdate()->load(['paypal_payment_response']);
         /** @var AbstractBlock $iframeBlock */
         $iframeBlock = $resultLayout->getLayout()->getBlock('transparent_iframe');
+        $index = $this->getFormIndex($profile);
+        $iframeBlock->setData('index', $index);
+
+        return $resultLayout;
+    }
+
+    /**
+     * Returns response form index.
+     *
+     * @param null|SubscriptionProfileInterface $profile
+     * @return string
+     */
+    protected function getFormIndex($profile = null)
+    {
         $index = isset($profile)
             ? SummaryPaymentMethodForm::FORM_NAME
             : Payment::DATA_SCOPE_PAYMENT_FORM;
-        $iframeBlock->setData('index', $index);
-        return $resultLayout;
+
+        return $index;
     }
 }

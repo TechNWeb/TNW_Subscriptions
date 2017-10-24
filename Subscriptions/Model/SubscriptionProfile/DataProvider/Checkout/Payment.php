@@ -26,7 +26,7 @@ class Payment extends BasePayment
     {
         $configData = parent::getConfigData();
         $configData['submit_url'] = $this->urlBuilder->getUrl(
-            '*/subscriptionprofile/save'
+            '*/subscription/save'
         );
         $configData['process_url'] = $this->urlBuilder->getUrl(
             '*/subscription_create/process'

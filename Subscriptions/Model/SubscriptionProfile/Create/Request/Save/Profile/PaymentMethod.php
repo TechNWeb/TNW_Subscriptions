@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profil
 /**
  * Save payment processor.
  */
-class Payment extends Base
+class PaymentMethod extends Base
 {
     /**
      * @inheritdoc
