@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
- * Interface for creating subscription quote.
+ * Interface for Subscription profile formatting messages.
  */
 interface MessageHistoryFormatterInterface
 {
