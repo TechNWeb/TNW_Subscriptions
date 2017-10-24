@@ -7,15 +7,25 @@ define([
         'jquery',
         'Magento_Ui/js/form/form',
         'TNW_Subscriptions/js/ui/model/step-navigator',
-        'uiRegistry'
-    ], function ($, Component, stepNavigator, registry) {
+        'uiRegistry',
+        'Magento_Ui/js/model/messageList',
+        'ko',
+        'underscore'
+    ], function ($, Component, stepNavigator, registry, globalMessageList, ko, _) {
         'use strict';
 
         return Component.extend({
             defaults: {
                 handle: '',
                 render_url: '',
-                isLoading: true
+                isLoading: true,
+                loadingQueue: [],
+                childResponseData: null,
+                listens: {
+                    childResponseData: 'processAfterSave',
+                    loadingQueue: 'checkLoadingQueue'
+                },
+                currentStepCode: null
             },
 
             /**
@@ -41,7 +51,7 @@ define([
              */
             initObservable: function () {
                 return this._super()
-                    .observe(['isLoading']);
+                    .observe(['isLoading', 'childResponseData', 'loadingQueue']);
             },
 
             /**
@@ -63,43 +73,53 @@ define([
                 var stepIndex = stepNavigator._getActiveItemIndex();
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
+                    var current = this;
+                    _.each(step.blocks, function (item) {
+                        current.addToLoadingQueue(item.handle);
+                    });
+                    this.currentStepCode = step.code;
                     var config = registry.get('cart').checkoutConfig;
-                    var insertFormContent = registry.get(this.name + '.' + 'insert_form_content');
-
-                    insertFormContent.render_url = config.render_url + '?' + this.getRenderParams(step);
-                    insertFormContent.renderSettings.url = insertFormContent.render_url;
-                    var externalContentFormName =  step.blockNamespace.content + '.' + step.blockNamespace.content;
-                    insertFormContent.externalFormName = externalContentFormName;
-
-                    insertFormContent.ns = step.blockNamespace.content;
-                    insertFormContent.params.namespace = step.blockNamespace.content;
-
-                    insertFormContent.cssclass = 'checkout_content_' + step.code;
-
-                    var externalRightFormName = '';
-                    if (step.blockNamespace.right) {
-                        var insertFormRight = registry.get(this.name + '.' + 'insert_form_right');
-                        insertFormRight.render_url = config.render_url + '?' + this.getRenderParams(step);
-                        insertFormRight.ns = step.blockNamespace.right;
-                        insertFormRight.params.namespace = step.blockNamespace.right;
-                        insertFormRight.renderSettings.url = insertFormRight.render_url;
-                        externalRightFormName =  step.blockNamespace.right + '.' + step.blockNamespace.right;
-                        insertFormRight.externalFormName = externalRightFormName;
-
-                        insertFormRight.cssclass = 'checkout_right_' + step.code;
-                    }
-
-                    this.isLoading(true);
-
-                    this.resetDataSource(externalContentFormName);
-                    insertFormContent.destroyInserted();
-                    insertFormContent.render();
-
-                    if (insertFormRight) {
-                        insertFormRight.destroyInserted();
-                        insertFormRight.render();
-                    }
+                    _.each(step.blocks, function (item, index) {
+                        var form = registry.get(current.name + '.' + 'insert_form_' + index);
+                        form.render_url = config.render_url + '?' + current.getRenderParams(step);
+                        form.renderSettings.url = form.render_url;
+                        var externalFormName =  item.handle + '.' + item.handle;
+                        form.externalFormName = externalFormName;
+                        form.ns = item.handle;
+                        form.params.namespace = item.handle;
+                        form.params.currentStep = step.code;
+                        if (item.type === 'form') {
+                            var linksImports = {
+                                childResponseData: 'index = ' + item.handle + ':responseData'
+                            };
+                            current.setLinks(linksImports, 'imports');
+                            current.resetDataSource(externalFormName);
+                        } else if (item.type === 'listing') {
+                            var linksExport = {
+                                currentStepCode: 'index = ' + item.handle + '_data_source:params.currentStep'
+                            };
+                            current.setLinks(linksExport, 'exports');
+                        }
+                        current.renderBlock(form, step);
+                    });
                 }
+            },
+
+            /**
+             * Render form block.
+             *
+             * @param {Object} form
+             * @param {Object} step
+             * @returns {boolean}
+             */
+            renderBlock: function (form, step) {
+                if (!form && !stepCode) {
+                    return false;
+                }
+                form.destroyInserted();
+                form.set('cssclass', form.cssPrefix + '_' +  step.code);
+                form.contentSelector = form.cssPrefix + '_' +  step.code;
+                form.render();
             },
 
             /**
@@ -116,6 +136,68 @@ define([
                 result['handle'] = this.handle + '_' + step.code;
 
                 return $.param(result);
+            },
+
+            /**
+             * Process after form save.
+             *
+             * @param {Object} data
+             */
+            processAfterSave: function (data) {
+                this.isLoading(false);
+
+                if (!data.error) {
+                    stepNavigator.navigateNext();
+                } else {
+                    this.showError(data.error_messages);
+                }
+            },
+
+            /**
+             * Show error message.
+             *
+             * @param {String} errorMessage
+             */
+            showError: function (errorMessage) {
+                globalMessageList.addErrorMessage({
+                    message: errorMessage
+                });
+            },
+
+            /**
+             * Add element to loading queue.
+             *
+             * @param {String} initiator
+             */
+            addToLoadingQueue: function (initiator) {
+                if (_.indexOf(this.loadingQueue(), initiator) === -1) {
+                    this.loadingQueue.push(initiator);
+                }
+            },
+
+            /**
+             * Remove current element from loading queue.
+             *
+             * @param {String} initiator
+             */
+            removeFromLoadingQueue: function (initiator) {
+                var index = _.indexOf(this.loadingQueue(), initiator);
+                if (index !== -1) {
+                    this.loadingQueue.splice(index, 1);
+                }
+            },
+
+            /**
+             * Check show/hide spinner.
+             *
+             * @param {Array} loadingQueue
+             */
+            checkLoadingQueue: function (loadingQueue) {
+                if (loadingQueue.length) {
+                    this.isLoading(true);
+                } else {
+                    this.isLoading(false);
+                }
             }
         });
     }

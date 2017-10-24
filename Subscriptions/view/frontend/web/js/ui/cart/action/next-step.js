@@ -27,14 +27,15 @@ define([
                 stepNavigator.navigateTo('shipping');
             } else {
                 var currentStep = stepNavigator.getCurrentStep();
-                if (currentStep.needSave) {
-                    var stepForm = registry.get('index = tnw_subscriptionprofile_checkout_' + activeCode + '_form')
-                    if (stepForm) {
-                        stepForm.save();
-                        if (!stepForm.additionalInvalid && !stepForm.source.get('params.invalid')) {
-                            stepNavigator.navigateNext();
+                if (currentStep.stepActions) {
+                    currentStep.stepActions.forEach(function (element) {
+                        var component = registry.async('index = ' + element.targetName),
+                            params = [];
+                        if (component) {
+                            params.unshift(element.actionName);
+                            component.apply(component, params);
                         }
-                    }
+                    });
                 } else {
                     stepNavigator.navigateNext();
                 }
