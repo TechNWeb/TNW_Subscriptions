@@ -102,6 +102,7 @@ define([
                         current.renderBlock(form, step);
                     });
                 }
+                registry.get('index = next_step').hideButtonIfNeed();
             },
 
             /**
@@ -146,7 +147,7 @@ define([
                 this.isLoading(false);
 
                 if (!data.error) {
-                    stepNavigator.navigateNext();
+                    nextStep.onNextStepClick();
                 } else {
                     this.showError(data.error_messages);
                 }

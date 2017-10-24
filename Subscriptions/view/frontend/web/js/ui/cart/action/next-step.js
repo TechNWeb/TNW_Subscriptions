@@ -40,18 +40,6 @@ define([
                     stepNavigator.navigateNext();
                 }
             }
-
-            this.hideButtonIfNeed();
-        },
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function () {
-            this._super();
-            this.hideButtonIfNeed();
-
-            return this;
         },
 
         /**
@@ -61,6 +49,9 @@ define([
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
                 $('.tnw-subscriptions-cart-bottom-action').hide();
+            } else {
+                this.show();
+                $('.tnw-subscriptions-cart-bottom-action').show();
             }
         }
     });

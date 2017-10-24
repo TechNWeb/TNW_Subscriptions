@@ -105,9 +105,15 @@
                                                 </item>
                                                 <item name="4" xsi:type="array">
                                                     <item name="code" xsi:type="string">payment</item>
-                                                    <item name="blockNamespace" xsi:type="array">
-                                                        <item name="content" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
-                                                        <item name="right" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
+                                                    <item name="blocks" xsi:type="array">
+                                                        <item name="content" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
+                                                        </item>
+                                                        <item name="right" xsi:type="array">
+                                                            <item name="type" xsi:type="string">listing</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
+                                                        </item>
                                                     </item>
                                                     <item name="stepActions" xsi:type="array">
                                                         <item name="0" xsi:type="array">
@@ -115,7 +121,6 @@
                                                             <item name="actionName" xsi:type="string">beforeSubmit</item>
                                                         </item>
                                                     </item>
-                                                    <item name="needSave" xsi:type="boolean">true</item>
                                                     <item name="title" xsi:type="string" translate="true">Payment</item>
                                                     <item name="sortOrder" xsi:type="string">4</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
