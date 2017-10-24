@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 class ProductListing extends Product
 {
     /**
-     * Listing image id.
+     * Listing render url.
      */
     const LISTING_RENDER_URL = 'tnw_subscriptions/ui/render';
 
@@ -24,7 +24,7 @@ class ProductListing extends Product
     const LISTING_IMAGE_ID = 'product_thumbnail_image';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMeta()
     {

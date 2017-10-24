@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
@@ -26,7 +27,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 /**
  * PayPal payment methods form modifier.
  */
-class PaymentsPro extends Base
+class PaymentsPro extends Base implements PaymentModifierInterface
 {
     const SORT_ORDER = 20;
 
@@ -188,10 +189,10 @@ class PaymentsPro extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Expiration Date'),
-                            'component' => 'Magento_Ui/js/form/components/group',
+                            'component' => 'TNW_Subscriptions/js/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'admin_field_without_legend',
+                            'additionalClasses' => 'field_without_legend',
                             'dataScope' => '',
                             'sortOrder' => 30,
                         ],
@@ -446,7 +447,7 @@ class PaymentsPro extends Base
         }
 
         return $this->urlBuilder->getUrl(
-            'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
+            'tnw_subscriptions/paypal/requestSecureToken',
             $routeParams
         );
     }

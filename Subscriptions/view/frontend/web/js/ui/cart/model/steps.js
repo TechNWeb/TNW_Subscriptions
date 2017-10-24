@@ -9,9 +9,8 @@ define([
         'TNW_Subscriptions/js/ui/model/step-navigator',
         'uiRegistry',
         'Magento_Ui/js/model/messageList',
-        'ko',
         'underscore'
-    ], function ($, Component, stepNavigator, registry, globalMessageList, ko, _) {
+    ], function ($, Component, stepNavigator, registry, globalMessageList, _) {
         'use strict';
 
         return Component.extend({
@@ -87,7 +86,7 @@ define([
                         form.externalFormName = externalFormName;
                         form.ns = item.handle;
                         form.params.namespace = item.handle;
-                        form.params.currentStep = step.code;
+                        form.params.step = step.code;
                         if (item.type === 'form') {
                             var linksImports = {
                                 childResponseData: 'index = ' + item.handle + ':responseData'
@@ -96,13 +95,14 @@ define([
                             current.resetDataSource(externalFormName);
                         } else if (item.type === 'listing') {
                             var linksExport = {
-                                currentStepCode: 'index = ' + item.handle + '_data_source:params.currentStep'
+                                currentStepCode: 'index = ' + item.handle + '_data_source:params.step'
                             };
                             current.setLinks(linksExport, 'exports');
                         }
                         current.renderBlock(form, step);
                     });
                 }
+                registry.get('index = next_step').hideButtonIfNeed();
             },
 
             /**

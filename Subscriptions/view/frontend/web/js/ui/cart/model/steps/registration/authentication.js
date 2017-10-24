@@ -6,7 +6,7 @@ define(
     [
         'jquery',
         'Magento_Ui/js/form/form',
-        'Magento_Customer/js/action/login',
+        './login',
         'Magento_Customer/js/model/customer',
         'mage/validation',
         'Magento_Checkout/js/model/full-screen-loader',

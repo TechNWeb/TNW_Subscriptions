@@ -3,7 +3,8 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Paypal;
+
+namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
@@ -18,7 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class RequestSecureToken
+ * Controller to get a secure token from PayPal.
  */
 class RequestSecureToken extends \Magento\Framework\App\Action\Action
 {

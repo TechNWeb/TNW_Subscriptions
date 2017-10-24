@@ -419,12 +419,10 @@ class CreateProfile extends BaseCreate
     public function setPaymentData($data)
     {
         $result = [];
-
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
         try {
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            $subQuotes = $session->getSubQuotes();
-
             foreach ($subQuotes as $subQuote) {
                 $subQuote->getPayment()->importData($data);
             }

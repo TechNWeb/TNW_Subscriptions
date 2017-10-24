@@ -51,25 +51,12 @@ class Process extends AbstractSave
      */
     public function execute()
     {
-        $this->resultFactory;
-        $errors = $this->processRequestData();
-
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
-            ->setData($this->getJsonResponse($errors));
-    }
-
-    /**
-     * Processing save post data. Returns list of errors.
-     *
-     * @return array
-     */
-    private function processRequestData()
-    {
-        $result = $this->getSaveProcessor()->processSave(
+        $errors = $this->getSaveProcessor()->processSave(
             $this->getRequest()->getParams()
         );
         $this->createModel->recollectSubscriptions();
 
-        return $result;
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
+            ->setData($this->getJsonResponse($errors));
     }
 }

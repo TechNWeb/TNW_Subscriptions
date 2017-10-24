@@ -1,7 +1,12 @@
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
 define(
     [
         'jquery',
-        'Magento_Ui/js/form/form',
+        'TNW_Subscriptions/js/components/subscriptions-form',
         'uiRegistry',
         'underscore',
         'mage/translate'
