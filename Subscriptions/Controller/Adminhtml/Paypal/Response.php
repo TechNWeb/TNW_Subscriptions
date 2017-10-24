@@ -27,7 +27,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class Response
+ * Controller to processing response from PayPal gateway.
  */
 class Response extends \Magento\Framework\App\Action\Action
 {

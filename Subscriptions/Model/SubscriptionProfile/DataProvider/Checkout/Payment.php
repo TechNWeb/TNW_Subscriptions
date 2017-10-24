@@ -13,11 +13,11 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment as BasePaym
  */
 class Payment extends BasePayment
 {
-    /**#@+
+    /**
      * Form data scope
      */
     const DATA_SCOPE_PAYMENT_FORM = 'tnw_subscriptionprofile_checkout_payment_form';
-    /**#@-*/
+
 
     /**
      * @inheritdoc

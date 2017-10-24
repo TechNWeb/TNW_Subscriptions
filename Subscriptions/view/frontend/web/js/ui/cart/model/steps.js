@@ -147,7 +147,7 @@ define([
                 this.isLoading(false);
 
                 if (!data.error) {
-                    nextStep.onNextStepClick();
+                    stepNavigator.navigateNext();
                 } else {
                     this.showError(data.error_messages);
                 }

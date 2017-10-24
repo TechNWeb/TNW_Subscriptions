@@ -12,7 +12,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use Magento\Framework\App\Request\Http;
+use Magento\Framework\App\RequestInterface;
 
 /**
  * Subscription profile creation steps pool.
@@ -64,7 +64,7 @@ class StepPool
     /**
      * Request.
      *
-     * @var Http
+     * @var RequestInterface
      */
     private $request;
 
@@ -94,14 +94,14 @@ class StepPool
      * @param DataPersistorInterface $dataPersistor
      * @param QuoteSessionInterface $session
      * @param CustomerRepositoryInterface $customerRepository
-     * @param Http $request
+     * @param RequestInterface $request
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor,
         QuoteSessionInterface $session,
         CustomerRepositoryInterface $customerRepository,
-        Http $request
+        RequestInterface $request
     ) {
         $this->storeManager = $storeManager;
         $this->dataPersistor = $dataPersistor;

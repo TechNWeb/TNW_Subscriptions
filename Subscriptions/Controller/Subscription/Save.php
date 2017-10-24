@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Controller\Subscription;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 
+/**
+ * Controller for creating subscription profiles.
+ */
 class Save extends AbstractSave
 {
     /**

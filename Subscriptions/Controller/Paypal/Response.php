@@ -10,7 +10,7 @@ use TNW\Subscriptions\Controller\Adminhtml\Paypal\Response as Base;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Payment;
 
 /**
- * Class Response
+ * Controller to processing response from PayPal gateway.
  */
 class Response extends Base
 {

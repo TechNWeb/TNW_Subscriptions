@@ -1,8 +1,7 @@
 /**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
-/*global define*/
 define(
     [
         'jquery',
@@ -21,9 +20,6 @@ define(
                 ).done(function (response) {
                     if (response.errors) {
                         messageContainer.addErrorMessage(response);
-                        callbacks.forEach(function(callback) {
-                            callback(loginData);
-                        });
                     } else {
                         callbacks.forEach(function(callback) {
                             callback(loginData);
@@ -38,6 +34,7 @@ define(
                     }
                 }).fail(function () {
                     messageContainer.addErrorMessage({'message': 'Could not authenticate. Please try again later'});
+                }).always(function (response) {
                     callbacks.forEach(function(callback) {
                         callback(loginData);
                     });
