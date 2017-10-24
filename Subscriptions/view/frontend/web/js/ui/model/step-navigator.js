@@ -53,11 +53,11 @@ define(
                 steps.push({
                     code: code,
                     alias: alias !== null ? alias : code,
-                    blockNamespace: step.blockNamespace,
+                    blocks: step.blocks,
                     renderProductListing: step.renderProductListing,
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
-                    needSave: step.needSave,
+                    stepActions: step.stepActions,
                     title: $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,

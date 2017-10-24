@@ -6,8 +6,10 @@
 
 namespace TNW\Subscriptions\Controller\Subscription\Actions;
 
-use Magento\Framework\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Framework\App\Action\Context;
+use TNW\Subscriptions\Block\Subscription\History;
+use TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
@@ -84,6 +86,7 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addErrorMessage(
                     __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
                 );
+
                 return $this->getRedirect();
             }
 
@@ -99,6 +102,7 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
 
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
+
             return $this->getRedirect();
         }
 
@@ -114,7 +118,20 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     {
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        return $resultRedirect->setPath('*/subscription/history');
+        $redirect = $this->getRequest()->getParam('redirect');
+        switch ($redirect) {
+            case History::REDIRECT:
+                $resultRedirect->setPath('*/subscription/history');
+                break;
+            case Overview::REDIRECT:
+                $resultRedirect->setPath(
+                    '*/subscription/edit',
+                    ['entity_id' => $this->getRequest()->getParam('entity_id')]
+                );
+                break;
+        }
+
+        return $resultRedirect;
     }
 
     /**

@@ -17,7 +17,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="control">
             <input type="text"
                    id="firstname"
-                   name="shipping_address[firstname]"
+                   name="shipping_info[firstname]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
@@ -28,7 +28,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="control">
             <input type="text"
                    id="lastname"
-                   name="shipping_address[lastname]"
+                   name="shipping_info[lastname]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
@@ -38,7 +38,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
     <div class="field company">
         <div class="control">
             <input type="text"
-                   name="shipping_address[company]"
+                   name="shipping_info[company]"
                    id="company"
                    title="<?php /* @escapeNotVerified */ echo __('Company') ?>"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>"
@@ -49,7 +49,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
     <div class="field telephone required">
         <div class="control">
             <input type="text"
-                   name="shipping_address[telephone]"
+                   name="shipping_info[telephone]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
                    class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('telephone') ?>"
@@ -164,7 +164,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="field choice">
             <input
                 type="checkbox"
-                name="shipping_address[save_in_address_book]"
+                name="shipping_address[save_address]"
                 id="save_in_address_book"
                 title="<?php /* @escapeNotVerified */ echo __('Save in address book') ?>"
                 class="address-field checkbox" />
@@ -175,6 +175,9 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
 
 <script type="text/x-magento-init">
     {
+        "#shipping-address-form": {
+            "validation": {}
+        },
         "#country": {
             "regionUpdater": {
                 "optionalRegionAllowed": <?php /* @escapeNotVerified */ echo($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,

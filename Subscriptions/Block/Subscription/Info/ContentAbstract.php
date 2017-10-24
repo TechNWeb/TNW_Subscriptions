@@ -121,4 +121,15 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     {
         return $this->registry->registry('tnw_subscription_profile');
     }
+
+    /**
+     * Check if it is possible to edit subscription profile.
+     * Depends on profile status.
+     *
+     * @return bool
+     */
+    public function isShowEditLink()
+    {
+        return $this->getSubscriptionProfile()->canEditProfile();
+    }
 }

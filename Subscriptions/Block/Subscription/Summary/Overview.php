@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\Backend\Block\Template;
 use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
@@ -14,11 +13,11 @@ use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\MissedPayments;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\Status;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Collection as ProfileOrderCollection;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
@@ -28,6 +27,11 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
  */
 class Overview extends ContentAbstract implements ExpireWarningSupportInterface
 {
+    /**
+     * Used for redirect path specification.
+     */
+    const REDIRECT = 'overview_page';
+
     /**
      * @inheritdoc
      */
@@ -84,11 +88,17 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     private $profileManager;
 
     /**
+     * @var SubscriptionConfig
+     */
+    private $subscriptionConfig;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param ProfileOrderCollection $profileOrderCollection ,
      * @param ProfileManager $profileManager
+     * @param SubscriptionConfig $subscriptionConfig
      * @param array $data
      */
     public function __construct(
@@ -97,10 +107,12 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         \TNW\Subscriptions\Model\MessagePool $messagePool,
         ProfileOrderCollection $profileOrderCollection,
         ProfileManager $profileManager,
+        SubscriptionConfig $subscriptionConfig,
         array $data = []
     ) {
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
+        $this->subscriptionConfig = $subscriptionConfig;
         parent::__construct($context, $registry, $messagePool, $data);
     }
 
@@ -119,6 +131,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
                 $this->nextSubscriptionProfileOrder = $this->profileManager->getNextProfileRelation();
             }
         }
+
         return $this->nextSubscriptionProfileOrder;
     }
 
@@ -137,6 +150,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
                 $this->nextQuote = $this->profileManager->getNextQuote();
             }
         }
+
         return $this->nextQuote;
     }
 
@@ -152,8 +166,9 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         $block->addData([
             'subscription_profile' => $this->getSubscriptionProfile(),
             'next_profile_relation' => $this->getNextProfileRelation(),
-            'next_quote'=> $this->getNextQuote(),
+            'next_quote' => $this->getNextQuote(),
         ]);
+
         return $block;
     }
 
@@ -165,8 +180,49 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         foreach ($this->getChildNames() as $names) {
             $this->initChildBlock($this->getLayout()->getBlock($names));
         }
+        $this->prepareTabMessages();
 
         return parent::_prepareLayout();
+    }
+
+    /**
+     * Prepare messages for tab.
+     *
+     * @return void
+     */
+    private function prepareTabMessages()
+    {
+        $profile = $this->getSubscriptionProfile();
+
+        // Say that profile will be canceled next cycle
+        if ($profile
+            && $profile->getStatus() != ProfileStatus::STATUS_CANCELED
+            && $profile->getCancelBeforeNextCycle()
+        ) {
+            $date = $this->getCancelBeforeNextCycleDate();
+            if ($date) {
+                $this->messagePool->addMessage(
+                    \Magento\Framework\Message\MessageInterface::TYPE_WARNING,
+                    sprintf(__("Subscription will be canceled on %s"), $date ?: '--')
+                );
+            }
+        }
+    }
+
+    /**
+     * Retrieve cancel date in case of cancellation is delayed.
+     *
+     * @return string
+     */
+    private function getCancelBeforeNextCycleDate()
+    {
+        $result = false;
+        $nextPayment = $this->getNextProfileRelation();
+        if ($nextPayment) {
+            $result = $this->_localeDate->formatDate($nextPayment->getScheduledAt(), \IntlDateFormatter::LONG);
+        }
+
+        return $result;
     }
 
     /**
@@ -183,6 +239,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
             );
             $this->initChildBlock($this->blockNextPayment);
         }
+
         return $this->blockNextPayment;
     }
 
@@ -210,6 +267,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
             );
             $this->initChildBlock($this->blockMessage);
         }
+
         return $this->blockMessage;
     }
 
@@ -237,6 +295,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
             );
             $this->initChildBlock($this->blockMissedPayments);
         }
+
         return $this->blockMissedPayments;
     }
 
@@ -264,6 +323,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
             );
             $this->initChildBlock($this->blockStatus);
         }
+
         return $this->blockStatus;
     }
 
@@ -279,7 +339,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
 
     /**
      * Can show Next payment block
-     * 
+     *
      * @return bool
      */
     public function getCanShowNextPayment()
@@ -324,7 +384,22 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function getProductsHtml()
     {
-        return 'products grid';
+        return $this->getChildHtml('products');
+    }
+
+    /**
+     * Show danger zone block, if at least one option :"Can Place On Hold" or "Can Cancel" are "Yes"
+     * and current subscription profile hasn't status "Canceled".
+     *
+     * @return bool
+     */
+    public function canShowDangerZone()
+    {
+        $websiteId = $this->_storeManager->getWebsite()->getId();
+
+        return ($this->subscriptionConfig->getCanHoldProfile($websiteId)
+            || $this->subscriptionConfig->getCanCancelProfile($websiteId))
+            && (int) $this->getSubscriptionProfile()->getStatus() !== ProfileStatus::STATUS_CANCELED;
     }
 
     /**
@@ -332,7 +407,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function getDangerZoneHtml()
     {
-        return 'DangerZone block';
+        return $this->getChildHtml('danger-zone');
     }
 
     /**

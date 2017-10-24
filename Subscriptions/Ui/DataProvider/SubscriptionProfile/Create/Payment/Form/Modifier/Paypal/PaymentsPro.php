@@ -62,9 +62,10 @@ class PaymentsPro extends Base
 
     /**
      * PaymentsPro constructor.
+     * @param Context $context
      * @param SubscriptionConfig $config
      * @param QuoteSessionInterface $session
-     * @param Context $context
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
      * @param Repository $assetRepository
@@ -72,9 +73,10 @@ class PaymentsPro extends Base
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
+        Context $context,
         SubscriptionConfig $config,
         QuoteSessionInterface $session,
-        Context $context,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
         Transparent $paymentPro,
         Config $paymentConfig,
         Repository $assetRepository,
@@ -88,9 +90,28 @@ class PaymentsPro extends Base
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
 
-        parent::__construct($config, $session);
+        parent::__construct($config, $session, $profileRepository);
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function modifyData(array $data)
+    {
+        $data = parent::modifyData($data);
+
+        $additionalInfo = $this->getProfile()
+            ? $this->getProfile()->getDecodedPaymentAdditionalInfo()
+            : [];
+
+        if (!empty($additionalInfo['cc_type'])) {
+            $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
+                = $additionalInfo['cc_type'];
+        }
+
+        return $data;
+    }
 
     /**
      * {@inheritdoc}
@@ -416,12 +437,17 @@ class PaymentsPro extends Base
      */
     private function getOrderUrl()
     {
+        $routeParams = [
+            '_secure' => $this->request->isSecure(),
+        ];
+
+        if (null !== $this->getProfileId()) {
+            $routeParams[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
+        }
+
         return $this->urlBuilder->getUrl(
             'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
-            [
-                '_secure' => $this->request->isSecure(),
-                SummaryInsertForm::FORM_DATA_KEY => $this->getProfileId()
-            ]
+            $routeParams
         );
     }
 

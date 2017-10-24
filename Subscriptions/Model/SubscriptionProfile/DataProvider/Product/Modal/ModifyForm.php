@@ -78,6 +78,18 @@ class ModifyForm extends Form
     private $currentProduct;
 
     /**
+     * @var array
+     */
+    protected $requestFields = [
+        'price',
+        'billing_frequency',
+        'term',
+        'period',
+        'start_on',
+        'qty',
+    ];
+
+    /**
      * ModifyForm constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -269,6 +281,7 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/modify-subscriptions-form',
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
+                        'requestFields' => $this->getRequestFields(),
                         'editButtons' => $this->getFormEditButtons()
                     ]
                 ]
@@ -570,7 +583,7 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'visible' => isset($this->currentProduct),
+                        'visible' => $this->isEditButtonVisible(),
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
@@ -591,6 +604,16 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * Check if edit button is visible
+     *
+     * @return bool
+     */
+    protected function isEditButtonVisible()
+    {
+        return null !== $this->currentProduct;
     }
 
     /**
@@ -740,7 +763,8 @@ class ModifyForm extends Form
                         ],
                         'previewLabelVisible' => false,
                         'previewLabel' => __('Bill %s times'),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'previewLabelOnce' => __('Bill once'),
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview'
                     ]
                 ]
@@ -958,8 +982,10 @@ class ModifyForm extends Form
                             ]
                         ],
                         'provider' => null,
+                        'visible' => $this->isUpdateButtonVisible(),
                         'imports' => [
-                            'setUpdateQtyButtonVisibility' => $buttonVisibility . $this->currentFormName . ':previewMode'
+                            'setUpdateQtyButtonVisibility' => $this->isUpdateButtonVisible() ?
+                                $buttonVisibility . $this->currentFormName . ':previewMode' : '',
                         ],
                         'exports' => [
                             'active' => '!' . $qtyContainerName . '.qty:showPreview'
@@ -969,6 +995,16 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * Check if update button is visible
+     *
+     * @return bool
+     */
+    protected function isUpdateButtonVisible()
+    {
+        return true;
     }
 
     /**
@@ -1001,6 +1037,22 @@ class ModifyForm extends Form
     protected function getProductFromItem(DataObject $item)
     {
         return $this->productRepository->getById($item->getProduct()->getId());
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequestFields()
+    {
+        return $this->requestFields;
+    }
+
+    /**
+     * @param array $requestFields
+     */
+    public function setRequestFields(array $requestFields)
+    {
+        $this->requestFields = $requestFields;
     }
 
     /**

@@ -16,6 +16,31 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory as 
 class MessageHistory extends AbstractModel implements SubscriptionProfileMessageHistoryInterface
 {
     /**
+     * @var MessageHistoryFormatterInterface
+     */
+    private $messageFormatter;
+
+    /**
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param MessageHistoryFormatterInterface $messageFormatter
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        MessageHistoryFormatterInterface $messageFormatter,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->messageFormatter = $messageFormatter;
+    }
+
+    /**
      * @return void
      */
     protected function _construct()
@@ -153,5 +178,13 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
         $this->setData(self::USER_ID, $userId);
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function formatMessage()
+    {
+        return $this->messageFormatter->format($this);
     }
 }

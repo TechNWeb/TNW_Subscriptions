@@ -170,7 +170,12 @@ class SummaryShippingMethodForm extends AbstractDataProvider
      */
     private function getEditFieldConfig()
     {
-        $isEditVisible = (bool)$this->nextQuote;
+        $isEditVisible = false;
+
+        if ($this->profile && $this->profile->canEditProfile()) {
+            $isEditVisible = (null !== $this->nextQuote);
+        }
+
         $editFieldConfig = [
             'config' => [
                 'visible' => $isEditVisible,
@@ -179,6 +184,7 @@ class SummaryShippingMethodForm extends AbstractDataProvider
                 ]
             ],
         ];
+
         return $editFieldConfig;
     }
 

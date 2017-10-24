@@ -28,9 +28,8 @@ class Products extends ModifyForm
 {
     /**#@+
      * Insert form data scope
-     * //TODO change constant value to 'insert_form_content' after merge
      */
-    const DATA_SCOPE_INSERT_FORM = 'insert_form';
+    const DATA_SCOPE_INSERT_FORM = 'insert_form_content';
     /**#@-*/
 
     /**#@+
@@ -45,6 +44,17 @@ class Products extends ModifyForm
      * @var DescriptionCreator
      */
     private $descriptionCreator;
+
+    /**
+     * @var array
+     */
+    protected $requestFields = [
+        'billing_frequency',
+        'term',
+        'period',
+        'start_on',
+        'qty',
+    ];
 
     /**
      * Products constructor.
@@ -94,8 +104,6 @@ class Products extends ModifyForm
             $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
             $currencyFactory, $context, $imageHelper, $scope, $meta, $data);
     }
-
-
 
     /**
      * @inheritdoc
@@ -276,6 +284,7 @@ class Products extends ModifyForm
                         'component' => 'TNW_Subscriptions/js/components/modify-products-form',
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
+                        'requestFields' => $this->getRequestFields(),
                         'editButtons' => $this->getFormEditButtons()
                     ]
                 ]

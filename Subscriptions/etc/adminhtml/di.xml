@@ -52,6 +52,7 @@
                 <item name="subscriptionDiscount" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Discount</item>
                 <item name="subscriptionTrial" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Trial</item>
                 <item name="unlockPresetQty" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\UnlockPresetQty</item>
+                <item name="subscriptionPurchaseType" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\PurchaseType</item>
             </argument>
         </arguments>
     </type>
@@ -281,6 +282,17 @@
     <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Process">
         <arguments>
             <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Step\Save\Processor</argument>
+        </arguments>
+    </type>
+    <virtualType  name="TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">
+        <arguments>
+            <argument name="url" xsi:type="object">\Magento\Backend\Model\UrlInterface</argument>
+            <argument name="urlPath" xsi:type="string">catalog/product/edit</argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory">
+        <arguments>
+            <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter</argument>
         </arguments>
     </type>
 </config>

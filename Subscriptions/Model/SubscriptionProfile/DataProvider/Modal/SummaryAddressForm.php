@@ -63,6 +63,13 @@ class SummaryAddressForm extends AbstractDataProvider
     const CUSTOMER_SHIPPING_ADDRESS_SELECT = 'customer_shipping_address_id';
     const CUSTOMER_BILLING_ADDRESS_SELECT = 'customer_billing_address_id';
 
+    /**#@+
+     * Edit Buttons Names
+     */
+    const SHIPPING_ADDRESS_EDIT_BUTTON = 'edit_shipping_address';
+    const BILLING_ADDRESS_EDIT_BUTTON = 'edit_billing_address';
+    /**#@-*/
+
     /**
      * Information fieldSet attributes.
      */
@@ -100,20 +107,6 @@ class SummaryAddressForm extends AbstractDataProvider
      * @var bool
      */
     private $isShipping;
-
-    /**
-     * Information fieldset name.
-     *
-     * @var string
-     */
-    private $infoFieldSetName;
-
-    /**
-     * Address fieldset name.
-     *
-     * @var string
-     */
-    private $addressDataFieldSetName;
 
     /**
      * Customer address Id.
@@ -313,6 +306,7 @@ class SummaryAddressForm extends AbstractDataProvider
                 ],
             ]
         );
+
         return $meta;
     }
 
@@ -981,6 +975,18 @@ class SummaryAddressForm extends AbstractDataProvider
     }
 
     /**
+     * Returns address edit button name depends on "isShipping" param
+     *
+     * @return string
+     */
+    private function getEditAddressButtonName()
+    {
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_ADDRESS_EDIT_BUTTON
+            : self::BILLING_ADDRESS_EDIT_BUTTON;
+    }
+
+    /**
      * Return customer address select id
      *
      * @return string
@@ -999,6 +1005,19 @@ class SummaryAddressForm extends AbstractDataProvider
      */
     private function getButtonsSet()
     {
+        $subscriptionProfile = $this->getProfile();
+        $isEditVisible = $subscriptionProfile && $subscriptionProfile->canEditProfile();
+
+        $editButtonConfig = [
+            'config' => [
+                'visible' => $isEditVisible,
+                'imports' => [
+                    'visible' => $isEditVisible ?
+                        'ns = ${ $.ns }, index = ' . $this->getAddressInfoFieldsetName() . ':preview' : '',
+                ]
+            ],
+        ];
+
         return [
             $this->getAddressInfoHeaderName() => [
                 'arguments' => [
@@ -1007,8 +1026,15 @@ class SummaryAddressForm extends AbstractDataProvider
                             'content' => $this->getInfoFieldSetLabel(),
                         ],
                     ],
-                ]
-            ]
+                ],
+                'children' => [
+                    $this->getEditAddressButtonName() => [
+                        'arguments' => [
+                            'data' => $editButtonConfig,
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

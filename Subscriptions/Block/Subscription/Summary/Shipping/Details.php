@@ -6,14 +6,14 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary\Shipping;
 
-use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 
 /**
- * Class Shipment Details
+ *  Class for subscription profile summary shipping details block on frontend Customer Account.
  *
  * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
-class Details extends Template
+class Details extends BaseSummary
 {
     /**
      * @return string

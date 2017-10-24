@@ -99,6 +99,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool" />
     <preference for="TNW\Subscriptions\Api\UrlBuilderInterface"
                 type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatterInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -231,21 +233,12 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Eav\Model\Entity\AttributeCache">
-        <arguments>
-            <argument name="unsupportedTypes" xsi:type="array">
-                <item name="subscription_profile" xsi:type="string">subscription_profile</item>
-                <item name="tnw_product_subscription_profile" xsi:type="string">tnw_product_subscription_profile</item>
-            </argument>
-        </arguments>
-    </type>
-
     <!-- Product copier plugin for duplicating subscription options -->
     <type name="Magento\Catalog\Model\Product\Copier">
         <plugin name="subscriptions_product_billing_frequency_duplicate"
                 type="TNW\Subscriptions\Plugin\Product\Copier" />
     </type>
-    <type name="Magento\Framework\Console\CommandListInterface">
+    <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
@@ -254,42 +247,6 @@
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Controller\Subscription\History">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Edit">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Shipment">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Billing">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Items">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Orderhistory">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Changehistory">
         <plugin name="authentication"
                 type="\Magento\Sales\Controller\Order\Plugin\Authentication"
                 sortOrder="100"
@@ -306,11 +263,6 @@
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 
@@ -428,7 +380,7 @@
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Model\Profile\Step\Save\Processor"
-                 type="TNW\Subscriptions\Model\Request\Save\Processor">
+                 type="TNW\Subscriptions\Model\Processor\Request">
         <arguments>
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Step\Save\Processor\Pool</argument>
         </arguments>
@@ -438,31 +390,31 @@
         <arguments>
             <argument name="processors" xsi:type="array">
                 <item name="store" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Store</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Store</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
                 <item name="customer" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Customer</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Customer</item>
                     <item name="sortOrder" xsi:type="number">20</item>
                 </item>
                 <item name="currency" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Currency</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Currency</item>
                     <item name="sortOrder" xsi:type="number">30</item>
                 </item>
                 <item name="account" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Account</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Account</item>
                     <item name="sortOrder" xsi:type="number">40</item>
                 </item>
                 <item name="shipping_methods" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\ShippingMethods</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\ShippingMethods</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
                 <item name="billing" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Billing</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Billing</item>
                     <item name="sortOrder" xsi:type="number">60</item>
                 </item>
                 <item name="payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\Payment</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Payment</item>
                     <item name="sortOrder" xsi:type="number">70</item>
                 </item>
             </argument>
@@ -475,7 +427,7 @@
         </arguments>
     </type>
     <virtualType name="TNW\Subscriptions\Model\Profile\Modified\Save\Processor"
-                 type="TNW\Subscriptions\Model\Request\Save\Processor">
+                 type="TNW\Subscriptions\Model\Processor\Request">
         <arguments>
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Modified\Save\Processor\Pool</argument>
         </arguments>
@@ -485,7 +437,7 @@
         <arguments>
             <argument name="processors" xsi:type="array">
                 <item name="modified_products" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\Request\Save\Profile\ModifiedProducts</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\ModifiedProducts</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
             </argument>
@@ -546,4 +498,106 @@
             <argument name="isShipping" xsi:type="string">0</argument>
         </arguments>
     </virtualType>
+
+    <!-- Modifiers pool for subscription edit-->
+    <type name="TNW\Subscriptions\Controller\Subscription\Customer\Account\Save">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Edit\Save\Processor</argument>
+            <argument name="responseProcessor" xsi:type="object">TNW\Subscriptions\Model\Processor\Response</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Edit\Save">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Edit\Save\Processor</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Model\Profile\Edit\Save\Processor"
+                 type="TNW\Subscriptions\Model\Processor\Request">
+        <arguments>
+            <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Save\Processor\Pool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\ShippingAddress"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\Address">
+        <arguments>
+            <argument name="type" xsi:type="const">TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\BillingAddress"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\Address">
+        <arguments>
+            <argument name="type" xsi:type="const">TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Save\Processor\Pool"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="shippingAddress" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\ShippingAddress</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="billingAddress" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\BillingAddress</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="paymentMethod" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\Payment</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="shippingMethods" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\ShippingMethods</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\ModifiedProducts</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\ShippingAddress"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\Address">
+        <arguments>
+            <argument name="type" xsi:type="const">TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\BillingAddress"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\Address">
+        <arguments>
+            <argument name="type" xsi:type="const">TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING</argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\Processor\Response">
+        <arguments>
+            <argument name="responseProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Process\ResponsePool</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Process\ResponsePool">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="shippingAddress" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\ShippingAddress</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="billingAddress" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\BillingAddress</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="paymentMethod" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\Payment</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="shippingMethods" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\ShippingMethods</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile\ModifiedProducts</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                </item>
+
+            </argument>
+        </arguments>
+    </type>
 </config>

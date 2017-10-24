@@ -57,7 +57,7 @@ define(
                 if (step) {
                     var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
                     if (step === 'registration' && isLoggedIn) {
-                        step = 'address';
+                        step = 'shipping';
                         stepNavigator.applyHash(step);
                     }
 
