@@ -9,6 +9,8 @@
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing.tnw_subscriptionprofile_checkout_product_listing_data_source</item>
             <item name="deps" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing.tnw_subscriptionprofile_checkout_product_listing_data_source</item>
+            <item name="useParentLoader" xsi:type="boolean">true</item>
+            <item name="parentForLoader" xsi:type="string">cart.steps</item>
         </item>
         <item name="template" xsi:type="string">templates/listing/subs-default</item>
     </argument>

@@ -20,9 +20,9 @@ define(
              * @returns {Object}
              */
             hideLoader: function () {
-                if (this.useParentLoader){
-                    registry.get(this.parentForLoader).isLoading(false);
-                }else {
+                if (this.useParentLoader) {
+                    registry.get(this.parentForLoader).removeFromLoadingQueue(this.ns);
+                } else {
                     loader.get(this.name).hide();
                 }
 
@@ -30,18 +30,16 @@ define(
             },
 
             /**
-             * Show loader for this form or for parent element.
+             * Show loader for this listing or for parent element.
              *
              * @returns {Object}
              */
             showLoader: function () {
-                if (this.useParentLoader){
-                    registry.get(this.parentForLoader).isLoading(true);
-                }else {
+                if (this.useParentLoader) {
+                    registry.get(this.parentForLoader).addToLoadingQueue(this.ns);
+                } else {
                     loader.get(this.name).show();
                 }
-
-                return this;
             }
         });
     }

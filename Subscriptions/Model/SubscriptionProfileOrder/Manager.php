@@ -180,7 +180,7 @@ class Manager
      */
     public function getNextProfileRelation(SubscriptionProfileInterface $profile, $all = null)
     {
-        $result = null;
+        $result = false;
         /** @var \Magento\Framework\Api\SortOrder $sortOrder */
         $sortOrder = $this->sortOrderBuilder
             ->setField(SubscriptionProfileOrderInterface::SCHEDULED_AT)
@@ -224,7 +224,7 @@ class Manager
         if (count($results)) {
             /* @var SubscriptionProfileOrderInterface $item */
             $item = $results[0];
-            return intval($item->getSubscriptionProfileId());
+            return (int)$item->getSubscriptionProfileId();
         }
         
         return false;

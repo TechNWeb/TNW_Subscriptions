@@ -72,6 +72,9 @@ class ChangeHistory extends BaseFormModifier
                                 'exports' => [
                                     'profileId' => '${ $.externalProvider }:params.subscription_profile_id'
                                 ],
+                                'listens' => [
+                                    'tnw_subscriptionprofile_form.areas.change_history:active' => 'reload',
+                                ]
                             ],
                         ],
                     ],

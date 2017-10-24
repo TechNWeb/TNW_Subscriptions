@@ -99,6 +99,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool" />
     <preference for="TNW\Subscriptions\Api\UrlBuilderInterface"
                 type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatterInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -231,21 +233,12 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Eav\Model\Entity\AttributeCache">
-        <arguments>
-            <argument name="unsupportedTypes" xsi:type="array">
-                <item name="subscription_profile" xsi:type="string">subscription_profile</item>
-                <item name="tnw_product_subscription_profile" xsi:type="string">tnw_product_subscription_profile</item>
-            </argument>
-        </arguments>
-    </type>
-
     <!-- Product copier plugin for duplicating subscription options -->
     <type name="Magento\Catalog\Model\Product\Copier">
         <plugin name="subscriptions_product_billing_frequency_duplicate"
                 type="TNW\Subscriptions\Plugin\Product\Copier" />
     </type>
-    <type name="Magento\Framework\Console\CommandListInterface">
+    <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
@@ -254,42 +247,6 @@
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Controller\Subscription\History">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Edit">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Shipment">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Billing">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Items">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Orderhistory">
-        <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-    <type name="TNW\Subscriptions\Controller\Subscription\Changehistory">
         <plugin name="authentication"
                 type="\Magento\Sales\Controller\Order\Plugin\Authentication"
                 sortOrder="100"
@@ -306,11 +263,6 @@
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
-        </arguments>
-    </type>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger">
-        <arguments>
-            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 

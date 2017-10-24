@@ -6,6 +6,52 @@
 
 & when (@media-common = true) {
 
+  .block-title {
+    margin-top: 2.5rem;
+  }
+
+  .danger-zone {
+    border-bottom-color: red !important;
+  }
+
+  .danger-zone-title {
+    color: red
+  }
+
+  .action.primary.place-on-hold {
+    background: #bababa;
+    color: #000000;
+    border: none;
+    border-radius: 0;
+    margin-right: 2%;
+    width: 19%;
+  }
+
+  .action.primary.place-on-hold:hover {
+    background: #c7c7c7;
+    color: #000000;
+    border: none;
+    border-radius: 0;
+    margin-right: 2%;
+  }
+
+  .action.primary.cancel-subscription {
+    background: #d80001;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    margin-right: 2%;
+    width: 19%;
+  }
+
+  .action.primary.cancel-subscription:hover {
+    background: #e43834;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    margin-right: 2%;
+  }
+
   .tnw-subscriptions-cart-link__container {
     display: inline-block;
     position: relative;
@@ -1149,6 +1195,28 @@
     width: 100%;
   }
 
+  .action.primary.place-on-hold {
+    width: 51%;
+  }
+
+  .action.primary.cancel-subscription {
+    width: 51%;
+  }
+
+  .cancel-subscription-comment {
+    width: 100%;
+    display: block;
+    margin-bottom: 8%;
+    margin-top: 3%;
+  }
+
+  .place-on-hold-comment {
+    width: 100%;
+    display: block;
+    margin-bottom: 8%;
+    margin-top: 3%;
+  }
+
   .overview-content {
     .next-payment {
       width: 100%;
@@ -1586,6 +1654,11 @@
 
 .subscription-data-wrapper .subscription-products {
   .products {
+    .products-title {
+      border-bottom-width: 0;
+      margin-bottom: 0;
+    }
+
     .block-content {
       border: 1px solid #ccc;
       padding: 0 2rem;

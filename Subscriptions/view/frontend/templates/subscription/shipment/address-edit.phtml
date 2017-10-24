@@ -175,6 +175,9 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
 
 <script type="text/x-magento-init">
     {
+        "#shipping-address-form": {
+            "validation": {}
+        },
         "#country": {
             "regionUpdater": {
                 "optionalRegionAllowed": <?php /* @escapeNotVerified */ echo($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,

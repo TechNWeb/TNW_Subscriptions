@@ -25,6 +25,11 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 class History extends \Magento\Framework\View\Element\Template
 {
     /**
+     * Used for redirect path specification.
+     */
+    const REDIRECT = 'history_page';
+
+    /**
      * @var Session
      */
     protected $customerSession;
@@ -348,16 +353,17 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Return hold url.
      *
-     * @param object $subscription
+     * @param string $subscriptionId
      * @return string
      */
-    public function getHoldUrl($subscription)
+    public function getHoldUrl($subscriptionId)
     {
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $subscription->getId(),
-                'status' => ProfileStatus::STATUS_HOLDED
+                'entity_id' => $subscriptionId,
+                'status' => ProfileStatus::STATUS_HOLDED,
+                'redirect' => self::REDIRECT
             ]
         );
     }
@@ -365,16 +371,17 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Return cancel url.
      *
-     * @param object $subscription
+     * @param string $subscriptionId
      * @return string
      */
-    public function getCancelUrl($subscription)
+    public function getCancelUrl($subscriptionId)
     {
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $subscription->getId(),
-                'status' => ProfileStatus::STATUS_CANCELED
+                'entity_id' => $subscriptionId,
+                'status' => ProfileStatus::STATUS_CANCELED,
+                'redirect' => self::REDIRECT
             ]
         );
     }
