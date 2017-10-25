@@ -1,12 +1,15 @@
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
 define(
     [
         'jquery',
         'TNW_Subscriptions/js/components/modify-subscriptions-form',
-        'uiRegistry',
-        'underscore',
-        'TNW_Subscriptions/js/ui/cart/model/steps'
+        'uiRegistry'
     ],
-    function ($, Component, registry, _, steps) {
+    function ($, Component, registry) {
         'use strict';
 
         return Component.extend({
@@ -15,6 +18,8 @@ define(
              */
             processResponseStatus: function () {
                 if (this.responseStatus()) {
+                    var localStorage = $.initNamespaceStorage('mage-cache-storage-section-invalidation').localStorage;
+                    localStorage.set('tnw-subscriptions-subscription-cart', true);
                     registry.get('cart.steps').renderCurrentStep();
                 }
             }
