@@ -9,48 +9,21 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Customer\Model\Customer\Mapper;
+use Magento\Customer\Model\Metadata\FormFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\QuoteFactory;
 use TNW\Subscriptions\Api\CustomerQuoteRepositoryInterface;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\CustomerQuote\Manager as CustomerQuoteManager;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote as AdminQuote;
 
 /**
  * Create Quote for subscription profile on storefront.
  */
-class Quote extends Create implements QuoteCreateInterface
+class Quote extends AdminQuote
 {
-    /**
-     * @var QuoteFactory
-     */
-    private $quoteFactory;
-
-    /**
-     * @var GroupManagementInterface
-     */
-    private $groupManagement;
-
-    /**
-     * @var Address
-     */
-    private $addressCreator;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * Customer Repository
-     *
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-
     /**
      * Customer Quote Repository
      *
@@ -60,7 +33,6 @@ class Quote extends Create implements QuoteCreateInterface
 
     /**
      * Quote constructor.
-     *
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param QuoteFactory $quoteFactory
@@ -68,6 +40,8 @@ class Quote extends Create implements QuoteCreateInterface
      * @param Address $addressCreator
      * @param CartRepositoryInterface $cartRepository
      * @param CustomerRepositoryInterface $customerRepository
+     * @param FormFactory $customerFormFactory
+     * @param Mapper $customerMapper
      * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
      */
     public function __construct(
@@ -78,25 +52,14 @@ class Quote extends Create implements QuoteCreateInterface
         Address $addressCreator,
         CartRepositoryInterface $cartRepository,
         CustomerRepositoryInterface $customerRepository,
+        FormFactory $customerFormFactory,
+        Mapper $customerMapper,
         CustomerQuoteRepositoryInterface $customerQuoteRepository
     ) {
-        parent::__construct($context, $session);
-        $this->quoteFactory = $quoteFactory;
-        $this->groupManagement = $groupManagement;
-        $this->addressCreator = $addressCreator;
-        $this->cartRepository = $cartRepository;
-        $this->customerRepository = $customerRepository;
         $this->customerQuoteRepository = $customerQuoteRepository;
-    }
-
-    /**
-     * Returns repository for retrieving quotes.
-     *
-     * @return CartRepositoryInterface
-     */
-    public function getCartRepository()
-    {
-        return $this->cartRepository;
+        parent::__construct($context, $session, $quoteFactory, $groupManagement, $addressCreator,
+            $cartRepository, $customerRepository, $customerFormFactory, $customerMapper
+        );
     }
 
     /**

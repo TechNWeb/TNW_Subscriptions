@@ -182,618 +182,526 @@
       }
     }
 
-      .progress-bar_item {
-        margin: 0 0 10px;
-        width: 25%;
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        vertical-align: top;
-        -webkit-flex: 1 1 auto;
-        -ms-flex: 1 1 auto;
-        flex: 1 1 auto;
-      }
-
-      .progress-bar_item:before {
-        background: #e4e4e4;
-        top: 17px;
-        transition: background 0.3s;
-        content: '';
-        height: 7px;
-        left: 0;
-        position: absolute;
-        width: 100%;
-      }
-
-      .progress-bar_item._active > span:before,
-      .progress-bar_item._active:before {
-        background: #ff5501;
-      }
-
-      .progress-bar_item:first-child:before {
-        left: 50%;
-        width: 50%;
-      }
-
-      .progress-bar_item:last-child:before {
-        left: 0;
-        width: 50%;
-      }
-
-      .progress-bar_item > span {
-        display: inline-block;
-        padding-top: 45px;
-        width: 100%;
-        word-wrap: break-word;
-        color: #e4e4e4;
-        font-weight: 300;
-        font-size: 1.4rem;
-      }
-
-      .progress-bar_item._active > span {
-        color: #333333;
-      }
-
-      .progress-bar_item._complete > span {
-        color: #1979c3;
-      }
-
-      .progress-bar_item._complete > span:before,
-      .progress-bar_item._complete:before {
-        background: #1979c3;
-      }
-
-      .progress-bar_item > span:before,
-      .progress-bar_item > span:after {
-        background: #e4e4e4;
-        height: 38px;
-        margin-left: -19px;
-        transition: background 0.3s;
-        width: 38px;
-        border-radius: 50%;
-        content: '';
-        left: 50%;
-        position: absolute;
-        top: 0;
-      }
-
-      .progress-bar_item > span:after {
-        background: #ffffff;
-        height: 26px;
-        margin-left: -13px;
-        top: 6px;
-        width: 26px;
-        content: counter(i);
-        counter-increment: i;
-        color: #333333;
-        font-weight: 600;
-        font-size: 1.8rem;
-      }
-    }
-  }
-
-  .select-action.next-step{
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    border-top: 1px solid #ccc;
-    background: #fff;
-    height: 77px;
-    display: none;
-
-    .action.primary {
-      height: 45px;
-      margin-top: 15px
-    }
-  }
-
-  .catalog-product-view {
-    .addtocart-tabs {
-      padding-top: 20px;
-
-      .title-container {
-        display: inline-block;
-        width: 100%;
-
-        .tab-title {
-          display: inline-block;
-          float: left;
-          background: #f6f6f6;
-          border: 1px solid #cccccc;
-          border-bottom: none;
-          margin-right: -1px;
-
-          > a {
-            padding: 8px 15px;
-            line-height: 2.5em;
-            color: #7d7d7d;
-            text-decoration: none;
-          }
-        }
-        .tab-title.active {
-          > a {
-            padding-bottom: 10px;
-            color: #333333;
-            background: #ffffff;
-            cursor: default;
-          }
-        }
-      }
-      .content-container {
-        margin-top: -5px;
-        margin-bottom: 10px;
-        padding: 0 30px;
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #cccccc;
-
-        .tab-content.subscribe-tab {
-          padding: 30px 0;
-
-          .fieldset {
-            margin: 0 0 20px;
-          }
-
-          .fieldset > .field > .label {
-            margin: 0 0 10px;
-          }
-
-          .fieldset > .field.required > .label:after,
-          .fieldset > .fields > .field.required > .label:after {
-            content: '';
-          }
-
-          .input-text.qty {
-            text-align: center;
-            width: 54px;
-          }
-
-          .field.term {
-            margin-bottom: 10px;
-          }
-
-          .field.period .control {
-            position: relative;
-
-            > label {
-              margin-right: 3px;
-            }
-
-            > label.after-input {
-              position: absolute;
-              top: 6px;
-              left: 101px;
-            }
-          }
-
-          .field.date {
-            .control {
-              position: relative;
-              width: 57%;
-
-              &:after {
-                font-family: 'luma-icons';
-                font-size: 20px;
-                content: '\e612';
-                right: 2em;
-                position: absolute;
-                z-index: 1;
-              }
-
-              .ui-datepicker-trigger {
-                position: absolute;
-                top: 7px;
-                right: 0;
-              }
-
-              #start_at {
-                z-index: 2;
-                position: relative;
-                background: inherit;
-              }
-            }
-          }
-
-          .action.primary {
-            padding: 14px 17px;
-            width: 49%;
-            line-height: 2.2rem;
-            font-size: 1.8rem;
-          }
-        }
-      }
-    }
-  }
-
-  .subscription-container {
-    padding-top: 2.5rem;
-    vertical-align: top;
-
-    .fieldset-wrapper-content {
+    .progress-bar_item {
+      margin: 0 0 10px;
+      width: 25%;
+      display: inline-block;
       position: relative;
+      text-align: center;
+      vertical-align: top;
+      -webkit-flex: 1 1 auto;
+      -ms-flex: 1 1 auto;
+      flex: 1 1 auto;
+    }
+
+    .progress-bar_item:before {
+      background: #e4e4e4;
+      top: 17px;
+      transition: background 0.3s;
+      content: '';
+      height: 7px;
+      left: 0;
+      position: absolute;
+      width: 100%;
+    }
+
+    .progress-bar_item._active > span:before,
+    .progress-bar_item._active:before {
+      background: #ff5501;
+    }
+
+    .progress-bar_item:first-child:before {
+      left: 50%;
+      width: 50%;
+    }
+
+    .progress-bar_item:last-child:before {
+      left: 0;
+      width: 50%;
+    }
+
+    .progress-bar_item > span {
+      display: inline-block;
+      padding-top: 45px;
+      width: 100%;
+      word-wrap: break-word;
+      color: #e4e4e4;
+      font-weight: 300;
+      font-size: 1.4rem;
+    }
+
+    .progress-bar_item._active > span {
+      color: #333333;
+    }
+
+    .progress-bar_item._complete > span {
+      color: #1979c3;
+    }
+
+    .progress-bar_item._complete > span:before,
+    .progress-bar_item._complete:before {
+      background: #1979c3;
+    }
+
+    .progress-bar_item > span:before,
+    .progress-bar_item > span:after {
+      background: #e4e4e4;
+      height: 38px;
+      margin-left: -19px;
+      transition: background 0.3s;
+      width: 38px;
+      border-radius: 50%;
+      content: '';
+      left: 50%;
+      position: absolute;
+      top: 0;
+    }
+
+    .progress-bar_item > span:after {
+      background: #ffffff;
+      height: 26px;
+      margin-left: -13px;
+      top: 6px;
+      width: 26px;
+      content: counter(i);
+      counter-increment: i;
+      color: #333333;
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+  }
+}
+
+.select-action.next-step {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  border-top: 1px solid #ccc;
+  background: #fff;
+  height: 77px;
+  display: none;
+
+  .action.primary {
+    height: 45px;
+    margin-top: 15px
+  }
+}
+
+.catalog-product-view {
+  .addtocart-tabs {
+    padding-top: 20px;
+
+    .title-container {
+      display: inline-block;
+      width: 100%;
+
+      .tab-title {
+        display: inline-block;
+        float: left;
+        background: #f6f6f6;
+        border: 1px solid #cccccc;
+        border-bottom: none;
+        margin-right: -1px;
+
+        > a {
+          padding: 8px 15px;
+          line-height: 2.5em;
+          color: #7d7d7d;
+          text-decoration: none;
+        }
+      }
+      .tab-title.active {
+        > a {
+          padding-bottom: 10px;
+          color: #333333;
+          background: #ffffff;
+          cursor: default;
+        }
+      }
+    }
+    .content-container {
+      margin-top: -5px;
+      margin-bottom: 10px;
+      padding: 0 30px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #cccccc;
+
+      .tab-content.subscribe-tab {
+        padding: 30px 0;
+
+        .fieldset {
+          margin: 0 0 20px;
+        }
+
+        .fieldset > .field > .label {
+          margin: 0 0 10px;
+        }
+
+        .fieldset > .field.required > .label:after,
+        .fieldset > .fields > .field.required > .label:after {
+          content: '';
+        }
+
+        .input-text.qty {
+          text-align: center;
+          width: 54px;
+        }
+
+        .field.term {
+          margin-bottom: 10px;
+        }
+
+        .field.period .control {
+          position: relative;
+
+          > label {
+            margin-right: 3px;
+          }
+
+          > label.after-input {
+            position: absolute;
+            top: 6px;
+            left: 101px;
+          }
+        }
+
+        .field.date {
+          .control {
+            position: relative;
+            width: 57%;
+
+            &:after {
+              font-family: 'luma-icons';
+              font-size: 20px;
+              content: '\e612';
+              right: 2em;
+              position: absolute;
+              z-index: 1;
+            }
+
+            .ui-datepicker-trigger {
+              position: absolute;
+              top: 7px;
+              right: 0;
+            }
+
+            #start_at {
+              z-index: 2;
+              position: relative;
+              background: inherit;
+            }
+          }
+        }
+
+        .action.primary {
+          padding: 14px 17px;
+          width: 49%;
+          line-height: 2.2rem;
+          font-size: 1.8rem;
+        }
+      }
+    }
+  }
+}
+
+.subscription-container {
+  padding-top: 2.5rem;
+  vertical-align: top;
+
+  .fieldset-wrapper-content {
+    position: relative;
+    height: 100%;
+  }
+
+  /* "action-editor" button */
+  button.action-editor {
+    color: #514943;
+    background: none;
+    border: none;
+    padding: 1rem;
+    box-shadow: none;
+    margin: 0;
+
+    :before {
+      font-size: 2.2rem;
+      font-family: 'luma-icons';
+      content: '\e601';
+    }
+  }
+
+  button.action-editor.active {
+    :before {
+      content: '\e616';
+    }
+  }
+
+  /* "action-remove" button */
+  button.remove-button-icon {
+    color: #514943;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 1rem;
+    margin: 0;
+
+    :before {
+      font-size: 2.2rem;
+      font-family: 'luma-icons';
+      content: '\e604';
+    }
+  }
+
+  .fieldset-wrapper-title {
+    padding-bottom: 1.5rem;
+
+    span {
+      font-weight: 300;
+      line-height: 1.1;
+      font-size: 2.6rem;
+    }
+  }
+
+  .mage-error input {
+    border-color: #ed8380;
+  }
+
+  > .fieldset-wrapper-content {
+    border: 1px solid #ccc;
+    padding: 0 2rem;
+  }
+
+  .subscription-item-form:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .subscription-item-form {
+    padding: 2rem 0;
+
+    .fieldset {
+      display: inline-flex;
+      width: -webkit-fill-available;
       height: 100%;
     }
 
-    .field-option {
-      padding-top: .8rem;
+    .description-fieldset {
+      display: inline-block;
+      width: 75%;
+      vertical-align: top;
+      position: relative;
 
-      .control-radio {
-        cursor: pointer;
-        opacity: .01;
-        overflow: hidden;
-        position: absolute;
+      .middle-container {
+        padding-right: 1.5rem;
+        display: inline-block;
         vertical-align: top;
-      }
-
-      label {
-        padding-left: 2.6rem;
-        position: relative;
-      }
-
-      label:before {
-        box-sizing: border-box;
-        border-radius: 1.6rem;
-        content: '';
-        transition: border-color .1s linear, color .1s ease-in;
-        background-color: #fff;
-        border: 1px solid #adadad;
-        color: transparent;
-        height: 1.6rem;
-        text-align: center;
-        vertical-align: top;
-        width: 1.6rem;
-        position: absolute;
-        left: 0;
-      }
-
-      :checked + label:after {
-        background-color: #514943;
-        border-radius: 50%;
-        content: '';
-        height: 10px;
-        left: 3px;
-        top: 3px;
-        min-width: 10px;
-        position: absolute;
-      }
-    }
-
-    .field.field-option ~ .field-option {
-      margin-top: .9rem;
-    }
-
-    /* "action-editor" button */
-    button.action-editor {
-      color: #514943;
-      background: none;
-      border: none;
-      padding: 1rem;
-      box-shadow: none;
-      margin: 0;
-
-      :before {
-        font-size: 2.2rem;
-        font-family: 'luma-icons';
-        content: '\e601';
-      }
-    }
-
-    button.action-editor.active {
-      :before {
-        content: '\e616';
-      }
-    }
-
-    /* "action-remove" button */
-    button.remove-button-icon {
-      color: #514943;
-      background: none;
-      border: none;
-      box-shadow: none;
-      padding: 1rem;
-      margin: 0;
-
-      :before {
-        font-size: 2.2rem;
-        font-family: 'luma-icons';
-        content: '\e604';
-      }
-    }
-
-    .fieldset-wrapper-title {
-      padding-bottom: 1.5rem;
-
-      span {
-        font-weight: 300;
-        line-height: 1.1;
-        font-size: 2.6rem;
-      }
-    }
-
-    .mage-error input {
-      border-color: #ed8380;
-    }
-
-    > .fieldset-wrapper-content {
-      border: 1px solid #ccc;
-      padding: 0 2rem;
-    }
-
-    .subscription-item-form:not(:last-child) {
-      border-bottom: 1px solid #ccc;
-    }
-
-    .subscription-item-form {
-      padding: 2rem 0;
-
-      .fieldset {
-        display: inline-flex;
-        width: -webkit-fill-available;
+        width: 100%;
         height: 100%;
-      }
 
-      .description-fieldset {
-        display: inline-block;
-        width: 75%;
-        vertical-align: top;
-        position: relative;
+        .fieldset {
+          display: block;
+          text-align: end;
 
-        .middle-container {
-          padding-right: 1.5rem;
-          display: inline-block;
-          vertical-align: top;
-          width: 100%;
-          height: 100%;
-
-          .fieldset {
-            display: block;
-            text-align: end;
-
-            .field {
-              text-align: start;
-            }
-
-            .label {
-              margin: 0;
-              display: block;
-            }
-
-            .field-name {
-              font-size: 2.6rem;
-              margin-bottom: 0;
-            }
-
-            .field-description {
-              margin-top: 0.5rem;
-            }
-
-            .qty-container {
-              display: inline-block;
-              width: 50%;
-              margin: 0;
-              margin-top: 1.5rem;
-
-              .field-qty {
-                float: left;
-                width: 16rem;
-
-                label {
-                  float: left;
-                  font-weight: 600;
-                  padding: 0.5rem 0.5rem 0 0;
-                }
-
-                .field-control {
-                  float: left;
-
-                  input {
-                    width: 8rem;
-                    margin: 0 0.5rem;
-                  }
-
-                  .control-preview {
-                    margin: 0.5rem 0.5rem;
-                  }
-                }
-              }
-
-              .qty-edit-button {
-                float: left;
-                line-height: 1.36;
-                padding: 0.3rem 0 0 0;
-                color: #007bdb;
-                text-decoration: none;
-                background: none;
-                border: 0;
-                display: inline;
-                font-weight: 400;
-                border-radius: 0;
-                box-shadow: none;
-              }
-            }
-
-            .field-price {
-              display: inline-block;
-              vertical-align: top;
-              text-align: end;
-              width: 50%;
-            }
-          }
-        }
-
-        .left-container {
-          display: inline-block;
-          min-width: 27%;
-          text-align: center;
-          margin-right: 2rem;
-
-          .fieldset {
-            display: block;
-            width: 100%;
+          .field {
+            text-align: start;
           }
 
-          .sub-product-image {
+          .label {
+            margin: 0;
+            display: block;
+          }
+
+          .field-name {
+            font-size: 2.6rem;
             margin-bottom: 0;
-            margin-left: 0;
-            position: relative;
+          }
 
-            .control {
-              width: 100%;
-              margin-left: 0;
-              padding-left: 30px;
-              padding-bottom: 100%;
+          .field-description {
+            margin-top: 0.5rem;
+          }
 
-              img {
-                bottom: 0;
-                left: 0;
-                margin: auto;
-                position: absolute;
-                right: 0;
-                top: 0;
+          .qty-container {
+            display: inline-block;
+            width: 50%;
+            margin: 0;
+            margin-top: 1.5rem;
+
+            .field-qty {
+              float: left;
+              width: 16rem;
+
+              label {
+                float: left;
+                font-weight: 600;
+                padding: 0.5rem 0.5rem 0 0;
+              }
+
+              .field-control {
+                float: left;
+
+                input {
+                  width: 8rem;
+                  margin: 0 0.5rem;
+                }
+
+                .control-preview {
+                  margin: 0.5rem 0.5rem;
+                }
               }
             }
+
+            .qty-edit-button {
+              float: left;
+              line-height: 1.36;
+              padding: 0.3rem 0 0 0;
+              color: #007bdb;
+              text-decoration: none;
+              background: none;
+              border: 0;
+              display: inline;
+              font-weight: 400;
+              border-radius: 0;
+              box-shadow: none;
+            }
+          }
+
+          .field-price {
+            display: inline-block;
+            vertical-align: top;
+            text-align: end;
+            width: 50%;
           }
         }
       }
 
-      .edit-fieldset {
+      .left-container {
         display: inline-block;
-        width: 20%;
-        border-left: 1px solid #ccc;
-        padding-left: 2rem;
-        padding-right: 3rem;
-        position: relative;
+        min-width: 27%;
+        text-align: center;
+        margin-right: 2rem;
 
         .fieldset {
           display: block;
           width: 100%;
         }
 
-        .fieldset > .field.field-wide[class]:not(.field-option)._required > .label:after {
-          margin: 0 5px 0px 0;
-          float: left;
-        }
+        .sub-product-image {
+          margin-bottom: 0;
+          margin-left: 0;
+          position: relative;
 
-        .field-option {
-          padding-top: .8rem;
+          .control {
+            width: 100%;
+            margin-left: 0;
+            padding-left: 30px;
+            padding-bottom: 100%;
 
-          .control-radio {
-            cursor: pointer;
-            opacity: .01;
-            overflow: hidden;
-            position: absolute;
-            vertical-align: top;
-          }
-
-          label {
-            padding-left: 2.6rem;
-            position: relative;
-          }
-
-          label:before {
-            box-sizing: border-box;
-            border-radius: 1.6rem;
-            content: '';
-            transition: border-color .1s linear, color .1s ease-in;
-            background-color: #fff;
-            border: 1px solid #adadad;
-            color: transparent;
-            height: 1.6rem;
-            text-align: center;
-            vertical-align: top;
-            width: 1.6rem;
-            position: absolute;
-            left: 0;
-          }
-
-          :checked + label:after {
-            background-color: #514943;
-            border-radius: 50%;
-            content: '';
-            height: 10px;
-            left: 3px;
-            top: 3px;
-            min-width: 10px;
-            position: absolute;
-          }
-        }
-
-        .field.field-option ~ .field-option {
-          margin-top: .9rem;
-        }
-
-        .sub-period-input {
-          input {
-            width: 4rem !important;
-            margin: 0 0.5rem;
-          }
-        }
-
-        .field-date {
-          .field-control {
-            position: relative;
-
-            .field-container:after {
-              font-family: 'luma-icons';
-              font-size: 20px;
-              content: '\e612';
+            img {
+              bottom: 0;
+              left: 0;
+              margin: auto;
               position: absolute;
-              bottom: 0.3rem;
-              right: 1rem;
-              z-index: 1;
+              right: 0;
+              top: 0;
             }
           }
         }
-
-        .field-price, .button-container {
-          display: none;
-        }
       }
+    }
 
-      .button-container {
+    .edit-fieldset {
+      display: inline-block;
+      width: 20%;
+      border-left: 1px solid #ccc;
+      padding-left: 2rem;
+      padding-right: 3rem;
+      position: relative;
+
+      .fieldset {
         display: block;
-        height: 4rem;
+        width: 100%;
+      }
 
-        .sub-button-right {
-          padding-top: .6875em;
-          padding-bottom: .6875em;
-          font-size: 16px;
-          position: absolute;
-          bottom: 0;
-          right: 0;
+      .fieldset > .field.field-wide[class]:not(.field-option)._required > .label:after {
+        margin: 0 5px 0px 0;
+        float: left;
+      }
+
+      .sub-period-input {
+        input {
+          width: 4rem !important;
+          margin: 0 0.5rem;
         }
       }
 
-      .action-editor {
-        position: absolute;
-        right: -20px;
-        top: -20px;
-        padding: 2rem;
+      .field-date {
+        .field-control {
+          position: relative;
+
+          .field-container:after {
+            font-family: 'luma-icons';
+            font-size: 20px;
+            content: '\e612';
+            position: absolute;
+            bottom: 0.3rem;
+            right: 1rem;
+            z-index: 1;
+          }
+        }
       }
 
-      .field-price {
-        .control {
-          span {
-            font-size: 16px;
-            font-weight: 600;
-            display: inline-block;
+      .field-price, .button-container {
+        display: none;
+      }
 
+      .field-option {
+        padding-top: .8rem;
+      }
+    }
+
+    .button-container {
+      display: block;
+      height: 4rem;
+
+      .sub-button-right {
+        padding-top: .6875em;
+        padding-bottom: .6875em;
+        font-size: 16px;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+    }
+
+    .action-editor {
+      position: absolute;
+      right: -20px;
+      top: -20px;
+      padding: 2rem;
+    }
+
+    .field-price {
+      .control {
+        span {
+          font-size: 16px;
+          font-weight: 600;
+          display: inline-block;
+
+          .price {
+            font-size: 35px;
+          }
+
+          .base-price.has-trial {
             .price {
-              font-size: 35px;
-            }
-
-            .base-price.has-trial {
-              .price {
-                font-size: 22px;
-              }
+              font-size: 22px;
             }
           }
         }
       }
     }
   }
+}
 
 @media (min-width: 768px) and (max-width: 1024px) {
 
@@ -820,6 +728,7 @@
       }
     }
   }
+
   .subscription-container {
     .subscription-item-form {
       .edit-fieldset {
@@ -1343,7 +1252,6 @@
     }
   }
 
-
   select {
     width: 95%;
   }
@@ -1364,17 +1272,17 @@
     legend {
       width: 100%;
     }
-    .additional{
+    .additional {
       margin-top: 10px;
     }
 
     .shipping-actions {
 
-      #pick div{
+      #pick div {
         margin-bottom: 12px;
       }
 
-      #add-new div{
+      #add-new div {
         margin: 12px 0;
       }
 
@@ -1402,7 +1310,7 @@
       display: inline-block;
 
       .action {
-        width:90%;
+        width: 90%;
       }
     }
     .action.save {
@@ -1491,7 +1399,7 @@
         }
       }
     }
-    .sub-checkout-checkbox{
+    .sub-checkout-checkbox {
       line-height: 1.5rem;
       position: relative;
       cursor: pointer;
@@ -1512,8 +1420,48 @@
       padding-bottom: 2rem;
       margin: 0 !important;
       border-bottom: 1px solid #ccc;
-      .payment-checkbox{
+      .payment-checkbox {
         margin: 20px 0 0 0;
+      }
+    }
+
+    .payment-checkbox {
+      font-weight: 300;
+      line-height: 1.1;
+      font-size: 1.8rem;
+    }
+
+    .payment-additional-fieldset {
+      margin: 0;
+      .fieldset {
+        padding-left: 2rem;
+        width: 30rem;
+
+        .control-label-up.select {
+          display: inline-block;
+        }
+
+        .month {
+          width: 61%;
+          padding-right: 2%;
+        }
+
+        .year {
+          width: 35%;
+        }
+
+        .payment-cvv {
+          width: 70%;
+        }
+      }
+      .field:first-child{
+        margin-top: 2rem;
+      }
+
+      .control-fields{
+        .field:first-child{
+          margin: 0;
+        }
       }
     }
   }
