@@ -16,6 +16,6 @@ class Submit extends Base
      */
     public function process(array $data)
     {
-        $this->getSubCreateModel()->createSubscriptions();
+        $profiles = $this->getSubCreateModel()->createSubscriptions();
     }
 }

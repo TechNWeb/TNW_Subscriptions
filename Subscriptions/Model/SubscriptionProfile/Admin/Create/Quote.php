@@ -33,49 +33,49 @@ class Quote extends Create implements QuoteCreateInterface
      *
      * @var ModelQuoteFactory
      */
-    private $quoteFactory;
+    protected $quoteFactory;
 
     /**
      * Customer group manager.
      *
      * @var GroupManagementInterface
      */
-    private $groupManagement;
+    protected $groupManagement;
 
     /**
      * Quote addresses creator.
      *
      * @var Address
      */
-    private $addressCreator;
+    protected $addressCreator;
 
     /**
      * Repository for retrieving quotes.
      *
      * @var CartRepositoryInterface
      */
-    private $cartRepository;
+    protected $cartRepository;
 
     /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface
      */
-    private $customerRepository;
+    protected $customerRepository;
 
     /**
      * Factory for creating customer metadata form.
      *
      * @var FormFactory
      */
-    private $customerFormFactory;
+    protected $customerFormFactory;
 
     /**
      * Customer mapper.
      *
      * @var Mapper
      */
-    private $customerMapper;
+    protected $customerMapper;
 
     /**
      * Quote constructor.

@@ -24,7 +24,11 @@ define([
                     childResponseData: 'processAfterSave',
                     loadingQueue: 'checkLoadingQueue'
                 },
-                currentStepCode: null
+                currentStepCode: null,
+                modules: {
+                    nextStep: 'index = next_step',
+                    cart: 'cart'
+                }
             },
 
             /**
@@ -77,7 +81,7 @@ define([
                         current.addToLoadingQueue(item.handle);
                     });
                     this.currentStepCode = step.code;
-                    var config = registry.get('cart').checkoutConfig;
+                    var config = this.cart().checkoutConfig;
                     _.each(step.blocks, function (item, index) {
                         var form = registry.get(current.name + '.' + 'insert_form_' + index);
                         form.render_url = config.render_url + '?' + current.getRenderParams(step);
@@ -102,7 +106,7 @@ define([
                         current.renderBlock(form, step);
                     });
                 }
-                registry.get('index = next_step').hideButtonIfNeed();
+                this.nextStep().hideButtonIfNeed();
             },
 
             /**
@@ -145,7 +149,6 @@ define([
              */
             processAfterSave: function (data) {
                 this.isLoading(false);
-
                 if (!data.error) {
                     stepNavigator.navigateNext();
                 } else {

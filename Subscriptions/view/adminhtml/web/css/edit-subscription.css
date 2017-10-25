@@ -272,14 +272,14 @@ button.profile__cancel-edit_button:before{
     overflow: auto;
 }
 
-#anchor-content .admin__control-label-up label{
+#anchor-content .control-label-up label{
     width: auto;
     position: relative;
     margin-left: 0;
     float: none;
 
 }
-#anchor-content .admin__control-label-up{
+#anchor-content .control-label-up{
     position: relative;
 }
 [data-index = "account_info"] legend {
@@ -305,11 +305,11 @@ button.profile__cancel-edit_button:before{
 #anchor-content .field_without_legend{
     width: calc( (100%) * .7 - 30px);
 }
-.admin__control-label-up.select {
+.control-label-up.select {
     width: 20%;
     min-width: 11rem;
 }
-.admin__control-label-up.input {
+.control-label-up.input {
     width: 74%;
 }
 .admin__address-information-preview {
