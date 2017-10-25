@@ -17,6 +17,14 @@ define([
         },
 
         /**
+         * @inheritdoc
+         */
+        initObservable: function () {
+            return this._super()
+                .observe(['buttonTitle']);
+        },
+
+        /**
          * Next step button click.
          */
         onNextStepClick: function () {
