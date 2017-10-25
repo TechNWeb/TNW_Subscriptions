@@ -63,7 +63,7 @@
                         <item name="formElement" xsi:type="string">select</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">group</item>
-                        <item name="additionalClasses" xsi:type="string">admin__control-label-up select</item>
+                        <item name="additionalClasses" xsi:type="string">control-label-up select</item>
                      </item>
                 </argument>
             </field>
@@ -75,7 +75,7 @@
                         <item name="formElement" xsi:type="string">input</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">email</item>
-                        <item name="additionalClasses" xsi:type="string">admin__control-label-up input</item>
+                        <item name="additionalClasses" xsi:type="string">control-label-up input</item>
                         <item name="component" xsi:type="string">TNW_Subscriptions/js/components/field/email</item>
                         <item name="validation" xsi:type="array">
                             <item name="validate-email" xsi:type="boolean">true</item>

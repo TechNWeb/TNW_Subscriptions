@@ -5,7 +5,6 @@
  */
 -->
 <input class="control-text" type="text"
-       attr="'data-container': dataContainer"
        data-bind="
         event: {change: userChanges},
         value: value,
@@ -16,5 +15,6 @@
             placeholder: placeholder,
             'aria-describedby': noticeId,
             id: uid,
-            disabled: disabled
+            disabled: disabled,
+            'data-container': dataContainer
     }"/>

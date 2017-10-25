@@ -21,7 +21,6 @@ class Save extends AbstractSave
      */
     public function execute()
     {
-        $this->resultFactory;
         $errors = $this->getSaveProcessor()->processSave(
             $this->getRequest()->getParams()
         );

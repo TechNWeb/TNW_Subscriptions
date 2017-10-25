@@ -490,50 +490,45 @@ class CreateProfile extends BaseCreate
     public function createSubscriptions()
     {
         $profiles = [];
-        try {
-            $customer = $this->customerCreator->prepareCustomer();
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            $subQuotes = $session->getSubQuotes();
-            $basicPayment = $session->getFirstQuote()->getPayment();
-            /** @var ModelQuote $subQuote */
-            foreach ($subQuotes as $subQuote) {
-                $this->quoteCreator->fillCustomerData($customer, $subQuote);
-                $this->quoteCreator->validate($subQuote);
-                //Create new profile
-                $profile = $this->createProfile($subQuote, $basicPayment);
-                //Assign quote to new profile
-                $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile);
-                //Add new relation to profile processing queue in "running" state.
-                $queueItemIds = $this->queueManager->insertItems(
-                    [$relation->getId()],
-                    true
+        $customer = $this->customerCreator->prepareCustomer();
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
+        $basicPayment = $session->getFirstQuote()->getPayment();
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $this->quoteCreator->fillCustomerData($customer, $subQuote);
+            $this->quoteCreator->validate($subQuote);
+            //Create new profile
+            $profile = $this->createProfile($subQuote, $basicPayment);
+            //Assign quote to new profile
+            $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile);
+            //Add new relation to profile processing queue in "running" state.
+            $queueItemIds = $this->queueManager->insertItems(
+                [$relation->getId()],
+                true
+            );
+            try {
+                $order = $this->profileManager->processProfile($subQuote);
+            } catch (\Exception $e) {
+                $this->getContext()->getMessageManager()->addError(
+                    __('Unable to process order for profile ') . $profile->getId()
                 );
-                try {
-                    $order = $this->profileManager->processProfile($subQuote);
-                } catch (\Exception $e) {
-                    $this->getContext()->getMessageManager()->addError(
-                        __('Unable to process order for profile ') . $profile->getId()
-                    );
-                    $this->getContext()->log($e->getMessage());
-                    $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                }
-                if (isset($order)) {
-                    $this->profileManager->assignOrderToProfile($relation, $order);
-                    $this->queueManager->makeCompleted($queueItemIds);
-                    $this->eventManager->dispatch(
-                        'checkout_submit_all_after',
-                        ['order' => $order, 'quote' => $subQuote]
-                    );
-                }
-                //Generate quote for next payment.
-                $this->quoteGenerator->generateProfileQuotes($profile, 1);
-                $profiles[] = $profile;
-                //TODO add here email sending
+                $this->getContext()->log($e->getMessage());
+                $this->queueManager->makeError($queueItemIds, $e->getMessage());
             }
-        } catch (\Exception $e) {
-            $this->getContext()->log($e->getMessage());
-            $this->getContext()->getMessageManager()->addError($e->getMessage());
+            if (isset($order)) {
+                $this->profileManager->assignOrderToProfile($relation, $order);
+                $this->queueManager->makeCompleted($queueItemIds);
+                $this->eventManager->dispatch(
+                    'checkout_submit_all_after',
+                    ['order' => $order, 'quote' => $subQuote]
+                );
+            }
+            //Generate quote for next payment.
+            $this->quoteGenerator->generateProfileQuotes($profile, 1);
+            $profiles[] = $profile;
+            //TODO add here email sending
         }
 
         return $profiles;

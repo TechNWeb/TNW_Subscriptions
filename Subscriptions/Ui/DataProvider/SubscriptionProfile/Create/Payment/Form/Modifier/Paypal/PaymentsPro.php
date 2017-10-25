@@ -147,6 +147,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                             'dataContainer' => $this->getPaymentCode() . '-cc-type',
+                            'additionalClasses' => 'credit-card-type',
                             'sortOrder' => 10,
                             'options' => $this->getPaymentCcTypes(),
                             'imports' => [
@@ -165,11 +166,13 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                     'data' => [
                         'config' => [
                             'label' => __('Credit Card Number'),
+                            'placeholder' => __('Credit card number'),
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
+                            'additionalClasses' => 'credit-card-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
@@ -210,7 +213,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'dataType' => Text::NAME,
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
@@ -234,7 +237,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'dataScope' => 'cc_exp_year',
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
@@ -258,6 +261,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                     'data' => [
                         'config' => [
                             'label' => __('Card Verification Number'),
+                            'placeholder' => __('Credit verification number'),
                             'name' => '',
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
@@ -272,6 +276,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                             ],
                             'validation' => [
                                 'required-number' => true,
+                                'required-entry' => true,
                                 'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
