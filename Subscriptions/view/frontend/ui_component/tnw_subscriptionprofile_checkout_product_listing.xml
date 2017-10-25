@@ -33,6 +33,7 @@
                     <item name="update_url" path="tnw_subscriptions/ui/render" xsi:type="url"/>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">id</item>
+                        <item name="cacheRequests" xsi:type="boolean">false</item>
                     </item>
                 </item>
             </argument>

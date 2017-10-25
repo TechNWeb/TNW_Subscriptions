@@ -46,6 +46,8 @@ define([
          * Handler of the data providers' 'reloaded' event.
          */
         onDataReloaded: function () {
+            this._super();
+
             var addButton,
                 modifyButton,
                 continueButton,
@@ -55,8 +57,6 @@ define([
                 currencySelect;
 
             this.set('estimatedPayment', this.source.data.estimatedPayment);
-
-            this.hideLoader();
 
             addButton = registry.get('index=button_add_product');
             modifyButton = registry.get('index=button_modify_subscriptions');
