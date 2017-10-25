@@ -27,6 +27,7 @@ define([
                 currentStepCode: null,
                 modules: {
                     nextStep: 'index = next_step',
+                    bottomNextStep: 'index = bottom_next_step',
                     cart: 'cart'
                 }
             },
@@ -106,7 +107,20 @@ define([
                         current.renderBlock(form, step);
                     });
                 }
+                this.modifyNextStepButton(step);
+            },
+
+            /**
+             * Modifies next step button according to step.
+             *
+             * @param {Object} step
+             */
+            modifyNextStepButton: function (step) {
                 this.nextStep().hideButtonIfNeed();
+                if (step.nextButtonTitle){
+                    this.nextStep().buttonTitle(step.nextButtonTitle);
+                    this.bottomNextStep().buttonTitle(step.nextButtonTitle)
+                }
             },
 
             /**

@@ -122,12 +122,14 @@
                                                         </item>
                                                     </item>
                                                     <item name="title" xsi:type="string" translate="true">Payment</item>
+                                                    <item name="nextButtonTitle" xsi:type="string" translate="true">Place Order</item>
                                                     <item name="sortOrder" xsi:type="string">4</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
                                                 <item name="5" xsi:type="array">
                                                     <item name="code" xsi:type="string">thank_you</item>
                                                     <item name="title" xsi:type="string" translate="true">Thank You!</item>
+                                                    <item name="nextButtonTitle" xsi:type="string" translate="true">Browse Catalog</item>
                                                     <item name="sortOrder" xsi:type="string">5</item>
                                                     <item name="isActive" xsi:type="boolean">false</item>
                                                 </item>
