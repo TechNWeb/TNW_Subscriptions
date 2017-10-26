@@ -28,6 +28,7 @@
 <div if="$col.needShowAttention($row())" class="data-grid-cell-content subscription-shipping-attention" data-bind="
      attr: {
          id: 'subscription-shipping-attention-' + $col.getId($row()),
-     }"
+     },
+     css: { 'hidden': $col.showAttention($row())}"
      html="$col.getAttentionMessage()"
 />

@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 -->
-<div data-bind="blockLoader: isLoading()">
+<div data-bind="blockLoader: isLoading(), afterRender: onElementRender">
     <each args="data: elems, as: 'element'">
         <render if="hasTemplate()"/>
     </each>
