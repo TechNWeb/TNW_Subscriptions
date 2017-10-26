@@ -438,7 +438,7 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
                 $this->setOrigData($field, implode("\n", $this->getOrigData($field)));
             }
 
-            if (!$this->dataHasChangedFor($field)) {
+            if (!$this->dataHasChangedFor($field) || !$this->getOrigData($field)) {
                 continue;
             }
 
