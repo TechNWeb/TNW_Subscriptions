@@ -279,12 +279,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function getDefaultStartOn()
     {
-        $format = $this->_localeDate->getDateFormatWithLongYear();
-        $format = preg_replace('/(?<!M)M/', 'm', $format);
-        $date = $this->_localeDate->date();
-        $result = $date->format($format);
-
-        return $result;
+        return $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
     }
 
     /**
