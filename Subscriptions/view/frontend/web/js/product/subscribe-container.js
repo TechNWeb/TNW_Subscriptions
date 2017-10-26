@@ -137,45 +137,44 @@ define([
             var self = this,
                 form = $(this.options.formSelector);
             
-            if (!form.validation('isValid')) {
-                return;
+            if (form.validation() && form.validation('isValid')) {
+
+                self.disableCartButton(form);
+
+                $.ajax({
+                    url: this.options.subscribeUrl,
+                    data: form.serialize(),
+                    type: 'post',
+                    dataType: 'json',
+
+                    /**
+                     * Called when request succeeds
+                     *
+                     * @param {Object} response
+                     */
+                    success: function(response) {
+                        if (response.redirectUrl) {
+                            window.location = response.redirectUrl;
+                            return;
+                        }
+                        /*if (response.message) {
+                            $(self.options.messagesSelector).html(response.message);
+                        }*/
+                        if (response.minicart) {
+                            $(self.options.minicartSelector).replaceWith(response.minicart);
+                            $(self.options.minicartSelector).trigger('contentUpdated');
+                        }
+                        if (response.product && response.product.statusText) {
+                            $(self.options.productStatusSelector)
+                                .removeClass('available')
+                                .addClass('unavailable')
+                                .find('span')
+                                .html(response.product.statusText);
+                        }
+                        self.enableCartButton(form);
+                    }
+                });
             }
-
-            self.disableCartButton(form);
-
-            $.ajax({
-                url: this.options.subscribeUrl,
-                data: form.serialize(),
-                type: 'post',
-                dataType: 'json',
-
-                /**
-                 * Called when request succeeds
-                 *
-                 * @param {Object} response
-                 */
-                success: function(response) {
-                    if (response.redirectUrl) {
-                        window.location = response.redirectUrl;
-                        return;
-                    }
-                    /*if (response.message) {
-                        $(self.options.messagesSelector).html(response.message);
-                    }*/
-                    if (response.minicart) {
-                        $(self.options.minicartSelector).replaceWith(response.minicart);
-                        $(self.options.minicartSelector).trigger('contentUpdated');
-                    }
-                    if (response.product && response.product.statusText) {
-                        $(self.options.productStatusSelector)
-                            .removeClass('available')
-                            .addClass('unavailable')
-                            .find('span')
-                            .html(response.product.statusText);
-                    }
-                    self.enableCartButton(form);
-                }
-            });
         },
 
         disableCartButton: function(form) {
