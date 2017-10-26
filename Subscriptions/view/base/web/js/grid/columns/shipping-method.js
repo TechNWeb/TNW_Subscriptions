@@ -77,24 +77,6 @@ define([
          * @param id
          */
         onValueChange: function (id) {
-            this.displayAttention(id);
-        },
-
-        showAttention: function (row) {
-            debugger;
-            if (row.shipping_method && row.shipping_method.methods.length) {
-                var currentSelectedValue = row.shipping_method.methods[0].value.split('_');
-                if (this.dependsCodes.indexOf(currentSelectedValue[0]) === -1) {
-                    return false;
-                }
-            } else {
-                return !this.needShowAttention(row);
-            }
-
-            return true;
-        },
-
-        displayAttention: function (id) {
             var element = $j("select[name='shipping_methods[" + id + "]']").get(0);
             if (element) {
                 var currentSelectedValue = element.value;
@@ -107,6 +89,24 @@ define([
                     }
                 }
             }
+        },
+
+        /**
+         * Checks if need to show message.
+         * @param row
+         * @returns {boolean}
+         */
+        showAttention: function (row) {
+            if (row.shipping_method && row.shipping_method.methods.length) {
+                var currentSelectedValue = row.shipping_method.methods[0].value.split('_');
+                if (this.dependsCodes.indexOf(currentSelectedValue[0]) === -1) {
+                    return false;
+                }
+            } else {
+                return !this.needShowAttention(row);
+            }
+
+            return true;
         }
     });
 });
