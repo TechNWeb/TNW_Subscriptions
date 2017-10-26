@@ -28,6 +28,6 @@ class ProductListing extends Product
      */
     public function getMeta()
     {
-        return [];
+        return $this->getProductColumnsData();
     }
 }

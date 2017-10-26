@@ -195,6 +195,11 @@
   margin-top: 1rem;
 }
 
+.sub-data-grid .hidden {
+  display: none;
+  visibility: hidden;
+}
+
 .sub-data-grid .subscription-shipping-attention::before{
   color: #eb5202;
   content: '\e623';

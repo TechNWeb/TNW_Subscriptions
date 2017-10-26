@@ -749,7 +749,7 @@ class Product extends AbstractDataProvider
      *
      * @return array
      */
-    private function getProductColumnsData()
+    protected function getProductColumnsData()
     {
         return [
             self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [

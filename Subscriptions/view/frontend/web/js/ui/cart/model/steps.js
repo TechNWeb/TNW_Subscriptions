@@ -45,9 +45,15 @@ define([
                         }
                     });
                 });
-                this.renderCurrentStep();
 
                 return this;
+            },
+
+            /**
+             * Renders current step after self rendering.
+             */
+            onElementRender: function () {
+                this.renderCurrentStep();
             },
 
             /**
@@ -64,9 +70,9 @@ define([
              * @param externalFormName
              */
             resetDataSource: function (externalFormName) {
-                var stepDataSource = registry.get(externalFormName);
-                if (stepDataSource && stepDataSource.source) {
-                    stepDataSource.source.destroy();
+                var stepDataSource = registry.get(externalFormName + '_data_source');
+                if (stepDataSource) {
+                    stepDataSource.destroy();
                 }
             },
 
@@ -78,6 +84,9 @@ define([
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
                     var current = this;
+                    _.each(current.elems(), function (item) {
+                        item.destroyInserted();
+                    });
                     _.each(step.blocks, function (item) {
                         current.addToLoadingQueue(item.handle);
                     });
@@ -99,6 +108,7 @@ define([
                             current.setLinks(linksImports, 'imports');
                             current.resetDataSource(externalFormName);
                         } else if (item.type === 'listing') {
+                            current.resetDataSource(externalFormName);
                             var linksExport = {
                                 currentStepCode: 'index = ' + item.handle + '_data_source:params.step'
                             };
