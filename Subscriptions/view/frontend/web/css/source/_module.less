@@ -53,6 +53,7 @@
   }
 
   .tnw-subscriptions-cart-link__container {
+
     display: inline-block;
     position: relative;
     float: right;
@@ -290,6 +291,12 @@
 }
 
 .catalog-product-view {
+  .product-info-price{
+    .price-box:not(.subscription-price-container) {
+      display: none;
+    }
+  }
+
   .addtocart-tabs {
     padding-top: 20px;
 
@@ -1083,7 +1090,17 @@
   padding: 0;
 }
 
+@media (max-width: 639px) {
+  .tnw-subscriptions-cart-link__container {
+    margin-top: 10px;
+  }
+}
+
 @media (max-width: 768px) {
+  .tnw-subscriptions-cart-link__container {
+    margin-right: 10px;
+  }
+
   .select-action.next-step {
     display: block;
   }
