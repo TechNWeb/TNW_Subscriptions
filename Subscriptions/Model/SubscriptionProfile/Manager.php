@@ -524,10 +524,11 @@ class Manager
      * Set data to profile from quote.
      *
      * @param Quote $quote
+     * @param null|\DateTime $date
      * @return $this
      * @throws \Exception
      */
-    public function populateProfileData(Quote $quote)
+    public function populateProfileData(Quote $quote, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
 
@@ -539,7 +540,7 @@ class Manager
         }
 
         if (isset($frequency)) {
-            $startDate = $this->getFullStartDate($request['start_on']);
+            $startDate = $this->getFullStartDate($request['start_on'], $date);
             $this->getProfile()
                 ->setCustomerId($quote->getCustomerId())
                 ->setWebsiteId($quote->getStore()->getWebsiteId())
@@ -761,13 +762,16 @@ class Manager
      * Returns full start date.
      *
      * @param string $startOn
+     * @param null|\DateTime $date
      * @return string
      */
-    private function getFullStartDate($startOn)
+    private function getFullStartDate($startOn, $date = null)
     {
-        $currentDate = new \DateTime();
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $startDate = new \DateTime($startOn);
-        $diff = $currentDate->diff($startDate, true);
+        $diff = $date->diff($startDate, true);
         //Add hours, minutes, and seconds to start date
         $expression = 'PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S';
         $startDate->add(new \DateInterval($expression));

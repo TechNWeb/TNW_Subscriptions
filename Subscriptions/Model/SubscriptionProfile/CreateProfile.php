@@ -499,10 +499,16 @@ class CreateProfile extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
             $this->quoteCreator->validate($subQuote);
+            //Current time
+            $date = new \DateTime();
             //Create new profile
-            $profile = $this->createProfile($subQuote, $basicPayment);
+            $profile = $this->createProfile($subQuote, $basicPayment, $date);
             //Assign quote to new profile
-            $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile);
+            $relation = $this->profileManager->assignQuoteToProfile(
+                $subQuote,
+                $profile,
+                $date->format('Y-m-d H:i:s')
+            );
             //Add new relation to profile processing queue in "running" state.
             $queueItemIds = $this->queueManager->insertItems(
                 [$relation->getId()],
@@ -539,14 +545,16 @@ class CreateProfile extends BaseCreate
      *
      * @param ModelQuote $subQuote
      * @param $payment
+     * @param null|\DateTime $date
      * @return SubscriptionProfileInterface
      */
     private function createProfile(
         ModelQuote $subQuote,
-        $payment
+        $payment,
+        $date = null
     ) {
         $profile = $this->profileManager->reset()
-            ->populateProfileData($subQuote)
+            ->populateProfileData($subQuote, $date)
             ->populatePaymentData($payment)
             ->saveProfile();
         //Add comment about profile creating
