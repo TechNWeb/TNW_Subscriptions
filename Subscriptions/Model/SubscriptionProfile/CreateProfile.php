@@ -511,11 +511,8 @@ class CreateProfile extends BaseCreate
             try {
                 $order = $this->profileManager->processProfile($subQuote);
             } catch (\Exception $e) {
-                $this->getContext()->getMessageManager()->addError(
-                    __('Unable to process order for profile ') . $profile->getId()
-                );
-                $this->getContext()->log($e->getMessage());
                 $this->queueManager->makeError($queueItemIds, $e->getMessage());
+                $this->getContext()->throwException($e->getMessage());
             }
             if (isset($order)) {
                 $this->profileManager->assignOrderToProfile($relation, $order);
