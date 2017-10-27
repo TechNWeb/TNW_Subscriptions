@@ -31,11 +31,17 @@ define([
             emptyCountryLabel: '',
             infoBlockContent: '.subscription-profile-billing-address',
             buttonDisabledClass: 'disabled',
-            requiredFields: 'required'
+            requiredFields: 'required',
+
+            showEditDetails: 0,
+            viewSelectorDetails: '#payment-details-view',
+            editSelectorDetails: '#payment-details-edit',
+            editButtonDetails: '#payment-details-edit-button'
         },
 
         /**
          * Initialize widget.
+         * @returns void
          */
         _create: function () {
             this._initialize();
@@ -60,6 +66,9 @@ define([
                 addressSelectVisibility = true;
             }
             this.setAddressFieldsVisibility(addressSelectVisibility);
+
+            var showEditDetails = this.options.showEditDetails * 1;
+            this.setFormsVisibilityDetails(showEditDetails);
         },
 
         /**
@@ -119,6 +128,11 @@ define([
                 e.preventDefault();
                 widget.saveAddress(e);
             });
+
+            var editButtonDetails = $(this.options.editButtonDetails);
+            editButtonDetails.on('click', $.proxy(function() {
+                widget.setFormsVisibilityDetails(true);
+            }, this));
         },
 
         /**
@@ -249,6 +263,17 @@ define([
         },
 
         /**
+         * Display/hide info/edit forms for payment details.
+         *
+         * @param {bool|string} showEdit
+         * @returns void
+         */
+        setFormsVisibilityDetails: function(showEdit) {
+            this._setElemsVisibility($(this.options.viewSelectorDetails), !showEdit);
+            this._setElemsVisibility($(this.options.editSelectorDetails), showEdit);
+        },
+
+        /**
          * Display/hide address fields.
          *
          * @param {bool} visibility
@@ -283,5 +308,5 @@ define([
         }
     });
 
-    return $.mage.tnwSubscribePrice;
+    return $.mage.tnwSubscribeBilling;
 });

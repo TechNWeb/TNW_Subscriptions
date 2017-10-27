@@ -1,0 +1,17 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Checkout\ThankYouPage */
+?>
+<div class="thank-you-page_content">
+    <ul>
+        <?php foreach ($block->getCreatedProfilesIds() as $profileId): ?>
+            <li>
+                <span><?php echo $block->getSubscriptionListElementInfo($profileId); ?></span>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

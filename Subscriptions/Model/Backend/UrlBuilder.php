@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model\Backend;
 
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\UrlBuilderInterface;
@@ -16,11 +18,18 @@ use TNW\Subscriptions\Api\UrlBuilderInterface;
 class UrlBuilder implements UrlBuilderInterface
 {
     /**
-     * URL path to edit subscription
+     * URL admin path to edit subscription
      * 
      * @var string 
      */
-    private $editPath = 'tnw_subscriptions/subscriptionprofile/edit/';
+    private $adminEditPath = 'tnw_subscriptions/subscriptionprofile/edit/';
+
+    /**
+     * URL frontend path to edit subscription
+     *
+     * @var string
+     */
+    private $frontendEditPath = 'tnw_subscriptions/subscription/edit/';
 
     /**
      * Url Builder
@@ -30,11 +39,20 @@ class UrlBuilder implements UrlBuilderInterface
     private $baseUrlBuilder;
 
     /**
-     * @param UrlInterface $baseUrlBuilder
+     * App state.
+     *
+     * @var State
      */
-    public function __construct(UrlInterface $baseUrlBuilder)
+    private $state;
+
+    /**
+     * @param UrlInterface $baseUrlBuilder
+     * @param State $state
+     */
+    public function __construct(UrlInterface $baseUrlBuilder, State $state)
     {
         $this->baseUrlBuilder = $baseUrlBuilder;
+        $this->state = $state;
     }
 
     /**
@@ -45,7 +63,12 @@ class UrlBuilder implements UrlBuilderInterface
      */
     public function getEditUrl($id)
     {
-        return $this->baseUrlBuilder->getUrl($this->editPath, ['entity_id' => $id]);
+        $currentPath = $this->frontendEditPath;
+        if ($this->state->getAreaCode() === Area::AREA_ADMINHTML) {
+            $currentPath = $this->adminEditPath;
+        }
+
+        return $this->baseUrlBuilder->getUrl($currentPath, ['entity_id' => $id]);
     }
 
     /**

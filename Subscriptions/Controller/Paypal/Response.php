@@ -6,8 +6,10 @@
 
 namespace TNW\Subscriptions\Controller\Paypal;
 
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Controller\Adminhtml\Paypal\Response as Base;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Payment;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\PaymentMethodForm;
 
 /**
  * Controller to processing response from PayPal gateway.
@@ -15,10 +17,17 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Payment;
 class Response extends Base
 {
     /**
-     * @inheritdoc
+     * Returns response form index.
+     *
+     * @param null|SubscriptionProfileInterface $profile
+     * @return string
      */
     protected function getFormIndex($profile = null)
     {
-        return Payment::DATA_SCOPE_PAYMENT_FORM;
+        $index = isset($profile)
+            ? PaymentMethodForm::FORM_NAME
+            : Payment::DATA_SCOPE_PAYMENT_FORM;
+
+        return $index;
     }
 }

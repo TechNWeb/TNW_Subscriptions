@@ -193,4 +193,34 @@ class Billing extends ContentAbstract implements ExpireWarningSupportInterface
 
         return str_replace('"', "'", $this->jsonEncoder->encode($result));
     }
+
+    /**
+     * Return payment methods view form
+     *
+     * @return string
+     */
+    public function getPaymentDetailsViewHtml()
+    {
+        return $this->getChildHtml('payment-details');
+    }
+
+    /**
+     * Return payment methods edit form.
+     *
+     * @return string
+     */
+    public function getPaymentDetailsEditHtml()
+    {
+        return $this->getChildHtml('tnw_subscriptionprofile_account_payment_method_form');
+    }
+
+    /**
+     * Check if it necessary to show edit form payment details.
+     *
+     * @return int
+     */
+    public function isShowEditDetails()
+    {
+        return (int)$this->_request->getParam('payment_details');
+    }
 }

@@ -836,3 +836,13 @@ button.action-editor.active:before{
 .tnw_subscriptionprofile_cancel_button_popup .modal-header {
     display: none;
 }
+.table-secondary {
+    width: 100%;
+}
+.table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
+    background-color: #f1f1f1;
+}
+.table-secondary th, .table-secondary td {
+    padding: 1rem 1rem;
+    text-align: left;
+}

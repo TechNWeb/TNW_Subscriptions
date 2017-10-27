@@ -30,6 +30,15 @@
                            template="TNW_Subscriptions::subscription/billing/address-edit.phtml"
                            cacheable="false"/>
                 </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Billing\DetailsView"
+                       name="subscription.info.view.payment.details"
+                       template="TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml"
+                       as="payment-details" >
+                    <arguments>
+                        <argument name="show_title" xsi:type="boolean">true</argument>
+                    </arguments>
+                </block>
+                <uiComponent name="tnw_subscriptionprofile_account_payment_method_form"/>
             </block>
         </referenceContainer>
     </body>

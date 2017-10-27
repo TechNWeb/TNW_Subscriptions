@@ -520,12 +520,6 @@
         </arguments>
     </type>
 
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
-        </arguments>
-    </type>
-
     <!-- Modifiers pool for subscription edit-->
     <type name="TNW\Subscriptions\Controller\Subscription\Customer\Account\Save">
         <arguments>
@@ -650,6 +644,26 @@
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
                     <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!--Add modifier for Subscription profile edit on Summary tab-->
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </arguments>

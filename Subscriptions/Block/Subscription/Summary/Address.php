@@ -12,8 +12,6 @@ use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
  * Class Address
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class Address extends BaseSummary
 {
@@ -92,9 +90,7 @@ class Address extends BaseSummary
     {
         $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing': $tabName;
 
-        $params = [
-            'edit'      => 1,
-        ];
+        $params['shipping_address'] = 1;
 
         return parent::getEditUrl($tabName, $params);
     }

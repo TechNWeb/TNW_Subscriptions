@@ -10,6 +10,7 @@
      data-mage-init='{"tnwSubscribeBilling":{
         "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveAddressUrl()) ?>",
         "showEdit": "<?php echo $block->isShowEdit() ?>",
+        "showEditDetails": "<?php echo $block->isShowEditDetails() ?>",
         "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>",
         "emptyCountryLabel": "<?php echo __('Country') ?>"
     }}'>
@@ -17,5 +18,13 @@
     <div class="billing-info-content">
         <div id="billing-info-view"><?php echo $block->getBillingInfoViewHtml() ?></div>
         <div id="billing-info-edit" style="display: none"><?php echo $block->getBillingInfoEditHtml() ?></div>
+    </div>
+    <div class="payment-details-content content-block">
+        <div id="payment-details-view">
+            <?php echo $block->getPaymentDetailsViewHtml() ?>
+        </div>
+        <div id="payment-details-edit">
+            <?php echo $block->getPaymentDetailsEditHtml() ?>
+        </div>
     </div>
 </div>

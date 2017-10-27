@@ -10,8 +10,6 @@ use Magento\Framework\View\Element\Template;
 
 /**
  * Base block class for subscription profile summary blocks on frontend Customer Account.
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class BaseSummary extends Template
 {
@@ -41,5 +39,15 @@ class BaseSummary extends Template
             'tnw_subscriptions/subscription/' . $tabName,
             $params
         );
+    }
+
+    /**
+     * Returns current subscription profile.
+     *
+     * @return \TNW\Subscriptions\Model\SubscriptionProfile
+     */
+    public function getSubscriptionProfile()
+    {
+        return $this->getData('subscription_profile');
     }
 }

@@ -14,7 +14,6 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="products" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
                 <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
-                <item name="payment" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Payment</item>
             </argument>
         </arguments>
     </type>
@@ -51,4 +50,14 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
 </config>
