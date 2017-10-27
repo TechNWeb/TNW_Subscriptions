@@ -141,7 +141,19 @@ class Products extends BaseSummary
             ? $trialStartDate
             : $this->getSubscriptionProfile()->getStartDate();
 
-        return new \DateTime($startOn);
+        return $this->_localeDate->date(new \DateTime($startOn));
+    }
+
+    /**
+     * Start on date formatted.
+     *
+     * @return string
+     */
+    public function getStartOnFormatted()
+    {
+        $date = $this->getStartOn();
+
+        return $this->_localeDate->formatDate($date, \IntlDateFormatter::SHORT);
     }
 
     /**

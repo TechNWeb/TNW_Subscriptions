@@ -35,6 +35,7 @@
 .overview-content .next-payment .date.month {
     font-size: 3rem;
     padding: 4px 0;
+    text-transform: capitalize;
 }
 .overview-content .next-payment .cost {
     margin-top: 30px;
