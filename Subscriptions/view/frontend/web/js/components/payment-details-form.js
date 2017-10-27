@@ -2,7 +2,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
+/*jquery:true*/
 define(
     [
         'jquery',
@@ -31,6 +31,8 @@ define(
 
             /**
              * Run before form submit
+             *
+             * @returns void
              */
             beforeSubmit: function() {
                 $('body').trigger('processStart');
@@ -39,13 +41,13 @@ define(
                 if (!parentResult) {
                     $('body').trigger('processStop');
                 }
-
             },
 
             /**
              * Process response data.
              *
              * @param {Object} data
+             * @returns void
              */
             processResponseData: function (data) {
                 var viewElem = $(this.detailsView),
@@ -65,6 +67,8 @@ define(
 
             /**
              * Hide edit block and show view block.
+             *
+             * @returns void
              */
             cancelEdit: function() {
                 $(this.viewSelectorBlock).show();
@@ -75,6 +79,7 @@ define(
              * Trigger save
              *
              * @param {Object} errors
+             * @returns void
              */
             triggerSave: function(errors) {
                 this._super();
@@ -85,6 +90,7 @@ define(
              * Clear elements values
              *
              * @param {mixed} elems
+             * @returns void
              */
             clearElemsData: function(elems) {
                 var form = this;
@@ -94,7 +100,6 @@ define(
                     } else {
                         field.value('');
                     }
-
                 });
             }
         });

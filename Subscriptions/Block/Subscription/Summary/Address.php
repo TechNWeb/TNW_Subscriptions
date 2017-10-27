@@ -93,7 +93,7 @@ class Address extends BaseSummary
         $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing': $tabName;
 
         $params = [
-            'ship_address'      => 1,
+            'shipping_address'      => 1,
         ];
 
         return parent::getEditUrl($tabName, $params);

@@ -19,6 +19,7 @@ define([
 
         /**
          * Initialize widget.
+         * @returns void
          */
         _create: function () {
             this._initialize();

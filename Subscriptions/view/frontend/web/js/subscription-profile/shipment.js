@@ -283,6 +283,7 @@ define([
         _setElemsVisibility: function (elem, visible) {
             if (visible) {
                 elem.show();
+                elem.removeClass('hidden');
             } else {
                 elem.hide();
             }

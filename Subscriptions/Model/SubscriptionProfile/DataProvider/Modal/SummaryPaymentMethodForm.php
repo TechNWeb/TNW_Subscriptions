@@ -56,7 +56,6 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
     private $requestProfileIdField;
 
     /**
-     * SummaryPaymentMethodForm constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName

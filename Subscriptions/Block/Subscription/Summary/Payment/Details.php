@@ -7,14 +7,13 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Class for subscription profile summary payment details block on frontend Customer Account.
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class Details extends BaseSummary
 {
@@ -35,6 +34,16 @@ class Details extends BaseSummary
     private $profileManager;
 
     /**
+     * @var string
+     */
+    private $requestProfileIdField;
+
+    /**
+     * @var SubscriptionProfileInterface
+     */
+    private $subscriptionProfile;
+
+    /**
      * Details constructor.
      * @param Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
@@ -49,9 +58,9 @@ class Details extends BaseSummary
     ) {
         $this->profileManager = $profileManager;
         $this->paymentConfig = $paymentConfig;
-        $subscriptionProfile = $this->profileManager->loadProfileFromRequest($requestProfileIdField);
+        $this->requestProfileIdField = $requestProfileIdField;
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml');
-        parent::__construct($context, ['subscription_profile' => $subscriptionProfile]);
+        parent::__construct($context);
     }
 
     /**
@@ -134,7 +143,7 @@ class Details extends BaseSummary
     /**
      * Return if is necessary to show block title
      *
-     * @return mixed
+     * @return null|bool
      */
     public function isShowTitle()
     {
@@ -143,7 +152,7 @@ class Details extends BaseSummary
 
     /**
      * Return if only table would be shown
-     * @return mixed
+     * @return null|bool
      */
     public function isOnlyTableContent()
     {
@@ -155,10 +164,22 @@ class Details extends BaseSummary
      */
     public function getEditUrl($tabName = 'billing', array $params = [])
     {
-        $params = [
-            'payment_details'      => 1,
-        ];
+        $params['payment_details'] = 1;
 
         return parent::getEditUrl($tabName, $params);
+    }
+
+    /**
+     * Return subscription profile model
+     *
+     * @return SubscriptionProfileInterface
+     */
+    public function getSubscriptionProfile()
+    {
+        if (!$this->subscriptionProfile) {
+            $this->subscriptionProfile = $this->profileManager->loadProfileFromRequest($this->requestProfileIdField);
+        }
+
+        return $this->subscriptionProfile;
     }
 }

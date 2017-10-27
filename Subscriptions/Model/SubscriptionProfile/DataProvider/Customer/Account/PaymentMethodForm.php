@@ -16,7 +16,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Mo
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class SummaryPaymentMethodForm
+ * Payment methods form on customer account dashboard
  */
 class PaymentMethodForm extends SummaryPaymentMethodForm
 {
@@ -64,7 +64,6 @@ class PaymentMethodForm extends SummaryPaymentMethodForm
             $data
         );
     }
-
 
     /**
      * @return array|mixed

@@ -141,7 +141,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function isShowEdit()
     {
-        return (int)$this->_request->getParam('ship_address');
+        return (int)$this->_request->getParam('shipping_address');
     }
 
     /**
