@@ -111,13 +111,16 @@ define([
                 widget.setFormsVisibility(false);
             }, this));
             $.each(form.find('.required'), function (key, field) {
-                $(field).on('focusout', $.proxy(function() {
-                    form.valid();
+                $(field).on('focusout', $.proxy(function(event) {;
+                    $(event.target).valid();
                 }, this));
             });
             form.submit(function( e ) {
                 e.stopPropagation();
                 e.preventDefault();
+                if (!form.valid()) {
+                    return;
+                };
                 widget.saveAddress(e);
             });
         },
