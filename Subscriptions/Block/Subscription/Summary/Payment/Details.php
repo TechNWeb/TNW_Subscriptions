@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -39,7 +39,7 @@ class Details extends BaseSummary
     private $requestProfileIdField;
 
     /**
-     * @var SubscriptionProfileInterface
+     * @var SubscriptionProfile
      */
     private $subscriptionProfile;
 
@@ -170,9 +170,7 @@ class Details extends BaseSummary
     }
 
     /**
-     * Return subscription profile model
-     *
-     * @return SubscriptionProfileInterface
+     * @inheritdoc
      */
     public function getSubscriptionProfile()
     {
