@@ -44,7 +44,6 @@ class ThankYouPage extends Template
     protected $_template = 'TNW_Subscriptions::checkout/thankyoupage.phtml';
 
     /**
-     * ThankYouPage constructor.
      *
      * @param UrlBuilder $urlBuilder
      * @param QuoteSessionInterface $quoteSession
