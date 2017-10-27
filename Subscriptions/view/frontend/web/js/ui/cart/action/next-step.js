@@ -54,12 +54,18 @@ define([
          * Hide button next step if need.
          */
         hideButtonIfNeed: function () {
+            var bottomCartAction = $('.tnw-subscriptions-cart-bottom-action');
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
-                $('.tnw-subscriptions-cart-bottom-action').hide();
+                bottomCartAction.hide();
             } else {
                 this.show();
-                $('.tnw-subscriptions-cart-bottom-action').show();
+                bottomCartAction.show();
+            }
+
+            if (stepNavigator.getActiveItemCode() === 'thankyou') {
+                this.hide();
+                bottomCartAction.addClass('thankyoupage-bottom-cart-action');
             }
         }
     });

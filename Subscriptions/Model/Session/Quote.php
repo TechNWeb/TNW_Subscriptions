@@ -112,4 +112,26 @@ class Quote extends QuoteSession
             }
         }
     }
+
+    /**
+     * Get profile ids.
+     *
+     * @return array
+     */
+    public function getProfileIds()
+    {
+        return ($this->storage->getProfileIds()) ? $this->storage->getProfileIds() : [];
+    }
+
+    /**
+     * Set profile ids.
+     *
+     * @param array $profileIds
+     * @return $this
+     */
+    public function setProfileIds($profileIds)
+    {
+        $this->storage->setProfileIds($profileIds);
+        return $this;
+    }
 }
