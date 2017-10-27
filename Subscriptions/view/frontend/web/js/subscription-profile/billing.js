@@ -9,17 +9,17 @@ define([
 ], function ($) {
     'use strict';
 
-    $.widget('mage.tnwSubscribeShipment', {
+    $.widget('mage.tnwSubscribeBilling', {
         options: {
             saveAddressUrl: '#',
             showEdit: 0,
             customerAddressesData: [],
-            formSelector: '#shipping-address-form',
-            infoViewSelector: '#shipping-info-view',
-            infoEditSelector: '#shipping-info-edit',
+            formSelector: '#billing-address-form',
+            infoViewSelector: '#billing-info-view',
+            infoEditSelector: '#billing-info-edit',
             customerDataFieldSet: '#customer-data',
             addressEditButton: '#shipping-edit-button',
-            addressFieldsList: '#shipping-fields-list',
+            addressFieldsList: '#billing-fields-list',
             customerAddressesList: '#customer_address_id',
             addNewAddressButton: '#add-new',
             pickFromSavedButton: '#pick',
@@ -29,7 +29,7 @@ define([
             defaultCountryId: 'US',
             countrySelect: '#country',
             emptyCountryLabel: '',
-            infoBlockContent: '.subscription-profile-shipping-address',
+            infoBlockContent: '.subscription-profile-billing-address',
             buttonDisabledClass: 'disabled',
             requiredFields: 'required'
         },
@@ -206,8 +206,8 @@ define([
                     success: function(response) {
                         var addressBlock = $(widget.options.infoBlockContent).find('address');
 
-                        if (typeof response.data.shipping_address != 'undefined') {
-                            addressBlock.html(response.data.shipping_address);
+                        if (typeof response.data.billing_address != 'undefined') {
+                            addressBlock.html(response.data.billing_address);
                         }
                         widget.setFormsVisibility(false);
                         widget.enableButton(editButton);

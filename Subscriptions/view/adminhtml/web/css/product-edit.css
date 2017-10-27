@@ -4,3 +4,6 @@
 .long_note .admin__field-note span{
     position: absolute;
 }
+.container_tnw_subscr_all .admin__fieldset {
+    padding-top: 0;
+}

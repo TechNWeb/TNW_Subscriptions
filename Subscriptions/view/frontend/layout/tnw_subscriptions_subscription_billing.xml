@@ -13,7 +13,24 @@
             <block class="TNW\Subscriptions\Block\Subscription\Info\Billing"
                    name="subscription.info.billing"
                    after="subscription.info.links"
-            />
+                   template="TNW_Subscriptions::subscription/billing.phtml">
+                <block class="TNW\Subscriptions\Block\Subscription\Billing\AddressView"
+                       name="subscription.info.view.billing.information" as="billing-info-view"
+                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
+                    <action method="setAddressType">
+                        <argument name="type" xsi:type="string">billing</argument>
+                    </action>
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Billing\EditForm"
+                       name="customer_address_edit_form"
+                       template="TNW_Subscriptions::subscription/edit-form.phtml"
+                       cacheable="false">
+                    <block class="TNW\Subscriptions\Block\Subscription\Billing\AddressEdit"
+                           name="customer_address_edit"
+                           template="TNW_Subscriptions::subscription/billing/address-edit.phtml"
+                           cacheable="false"/>
+                </block>
+            </block>
         </referenceContainer>
     </body>
 </page>

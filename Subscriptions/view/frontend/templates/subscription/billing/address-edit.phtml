@@ -6,18 +6,18 @@
 
 // @codingStandardsIgnoreFile
 
-/** @var $block TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit */
+/** @var $block TNW\Subscriptions\Block\Subscription\Billing\AddressEdit */
 ?>
 <?php /** @var \Magento\Customer\Helper\Address $customerAddressHelper */
 $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);?>
-<fieldset class="fieldset-shipping" id="customer-data">
-    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Information') ?></span></legend>
+<fieldset class="fieldset-billing" id="customer-data">
+    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Billing Information') ?></span></legend>
 
     <div class="field field-name-firstname required">
         <div class="control">
             <input type="text"
                    id="firstname"
-                   name="shipping_info[firstname]"
+                   name="billing_info[firstname]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
@@ -28,7 +28,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="control">
             <input type="text"
                    id="lastname"
-                   name="shipping_info[lastname]"
+                   name="billing_info[lastname]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
                    placeholder="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
@@ -38,7 +38,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
     <div class="field company">
         <div class="control">
             <input type="text"
-                   name="shipping_info[company]"
+                   name="billing_info[company]"
                    id="company"
                    title="<?php /* @escapeNotVerified */ echo __('Company') ?>"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>"
@@ -49,7 +49,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
     <div class="field telephone required">
         <div class="control">
             <input type="text"
-                   name="shipping_info[telephone]"
+                   name="billing_info[telephone]"
                    value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>"
                    title="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
                    class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('telephone') ?>"
@@ -59,19 +59,19 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
     </div>
 </fieldset>
 
-<fieldset class="fieldset-shipping">
-    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span></legend>
+<fieldset class="fieldset-billing">
+    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Billing Address') ?></span></legend>
     <div class="customer-addresses"><?php echo $block->getCustomerAddressesSelect() ?></div>
-    <div class="shipping-actions">
+    <div class="billing-actions">
         <a id="pick" class="action" href="javascript:"><div><?php /* @escapeNotVerified */ echo __('Pick from saved addresses') ?></div></a>
         <a id="add-new" class="action" href="javascript:"><div><?php /* @escapeNotVerified */ echo __('Add New Address') ?></div></a>
     </div>
-    <div id="shipping-fields-list">
+    <div id="billing-fields-list">
         <?php $_streetValidationClass = $customerAddressHelper->getAttributeValidationClass('street'); ?>
         <div class="field street required">
             <div class="control">
                 <input type="text"
-                       name="shipping_address[street0]"
+                       name="billing_address[street0]"
                        value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Street Address') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('Street Address') ?>"
@@ -83,7 +83,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
                         <div class="field additional">
                             <div class="control">
                                 <input type="text"
-                                       name="shipping_address[street<?php /* @escapeNotVerified */ echo $_i ?>]"
+                                       name="billing_address[street<?php /* @escapeNotVerified */ echo $_i ?>]"
                                        value="<?php echo $block->escapeHtml($block->getStreetLine($_i+1)) ?>"
                                        title="<?php /* @escapeNotVerified */ echo __('Street Address %1', $_i+1) ?>"
                                        id="street_<?php /* @escapeNotVerified */ echo $_i+1 ?>"
@@ -100,7 +100,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
             <div class="field taxvat">
                 <div class="control">
                     <input type="text"
-                           name="shipping_address[vat_id]"
+                           name="billing_address[vat_id]"
                            value="<?php echo $block->escapeHtml($block->getAddress()->getVatId()) ?>"
                            title="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
                            class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('vat_id') ?>"
@@ -112,7 +112,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="field city required">
             <div class="control">
                 <input type="text"
-                       name="shipping_address[city]"
+                       name="billing_address[city]"
                        value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('City') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('City') ?>"
@@ -122,12 +122,15 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         </div>
         <div class="field region required">
             <div class="control">
-                <select id="region_id" name="shipping_address[region_id]" title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>" class="address-field validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
+                <select id="region_id"
+                        name="billing_address[region_id]"
+                        title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
+                        class="address-field validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
                     <option value=""><?php /* @escapeNotVerified */ echo __('Please select a region, state or province.') ?></option>
                 </select>
                 <input type="text"
                        id="region"
-                       name="shipping_address[region]"
+                       name="billing_address[region]"
                        value="<?php echo $block->escapeHtml($block->getRegion()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
                        placeholder="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
@@ -137,7 +140,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="field zip required">
             <div class="control">
                 <input type="text"
-                       name="shipping_address[postcode]"
+                       name="billing_address[postcode]"
                        value="<?php echo $block->escapeHtml($block->getAddress()->getPostcode()) ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
                        id="zip"
@@ -147,13 +150,13 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         </div>
         <div class="field country required">
             <div class="control">
-                <?php echo $block->getCountryHtmlSelect(null, 'shipping_address[country_id]') ?>
+                <?php echo $block->getCountryHtmlSelect(null, 'billing_address[country_id]') ?>
             </div>
         </div>
         <div class="field fax">
             <div class="control">
                 <input type="text"
-                       name="shipping_address[fax]"
+                       name="billing_address[fax]"
                        id="fax"
                        title="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
                        value="<?php echo $block->escapeHtml($block->getAddress()->getFax()) ?>"
@@ -164,7 +167,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         <div class="field choice">
             <input
                 type="checkbox"
-                name="shipping_address[save_address]"
+                name="billing_address[save_address]"
                 id="save_in_address_book"
                 title="<?php /* @escapeNotVerified */ echo __('Save in address book') ?>"
                 class="address-field checkbox" />
@@ -175,7 +178,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
 
 <script type="text/x-magento-init">
     {
-        "#shipping-address-form": {
+        "#billing-address-form": {
             "validation": {}
         },
         "#country": {
@@ -184,7 +187,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
                 "regionListId": "#region_id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
-                "form": "#shipping-address-form",
+                "form": "#billing-address-form",
                 "regionJson": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
                 "defaultRegion": "<?php /* @escapeNotVerified */ echo $block->getRegionId() ?>",
                 "countriesWithOptionalZip": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
