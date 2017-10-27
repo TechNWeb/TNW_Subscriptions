@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php /* @var TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone $block */ ?>
+<div class="block">
+    <div class="block-title danger-zone">
+        <strong class="danger-zone-title"><?php echo __("Danger Zone") ?></strong>
+    </div>
+    <div class="block-content">
+        <?php if ($block->isPlaceOnHoldActive()): ?>
+            <div>
+                <button onclick="window.location.href='<?php echo $block->getPlaceOnHoldUrl() ?>'"
+                        class="action primary place-on-hold">
+                    <?php echo __('Place on Hold') ?>
+                </button>
+                <span class="place-on-hold-comment">
+                    <?php echo __('Place subscription On Hold. While "On Hold" your will not be billed.') ?>
+                </span>
+            </div>
+        <?php endif ?>
+        <?php if ($block->isCancelActive()): ?>
+            <div style="margin-top: 1%">
+                <button onclick="window.location.href='<?php echo $block->getCancelUrl() ?>'"
+                        class="action primary cancel-subscription">
+                    <?php echo __('Cancel Subscription') ?>
+                </button>
+                <span class="cancel-subscription-comment">
+                <?php echo __('Cancel the subscription. This action cannot be reversed.') ?>
+                </span>
+            </div>
+        <?php endif ?>
+    </div>
+</div>

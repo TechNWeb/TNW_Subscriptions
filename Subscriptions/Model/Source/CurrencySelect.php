@@ -185,8 +185,8 @@ class CurrencySelect extends AbstractSource
     {
         $dataFormPart = '';
 
-        if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION
-            || $currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+        if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING
+            || $currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
             $dataFormPart = 'tnw_subscriptionprofile_create_' . $currentStep . '_form';
         }
 

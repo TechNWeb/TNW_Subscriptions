@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -33,7 +39,7 @@
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" translate="true" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="boolean">false</item>
                 <item name="additionalClasses" xsi:type="string">registration-fieldset</item>
                 <item name="template" xsi:type="string">TNW_Subscriptions/form/element/template/fieldset</item>
             </item>

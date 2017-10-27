@@ -7,13 +7,15 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class Payment Details
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
+ * Class for subscription profile summary payment details block on frontend Customer Account.
  */
-class Details extends Template
+class Details extends BaseSummary
 {
 
     /**
@@ -27,6 +29,21 @@ class Details extends Template
     private $paymentConfig;
 
     /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
+     * @var string
+     */
+    private $requestProfileIdField;
+
+    /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfile;
+
+    /**
      * Details constructor.
      * @param Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
@@ -35,10 +52,15 @@ class Details extends Template
     public function __construct(
         Template\Context $context,
         \Magento\Payment\Model\Config $paymentConfig,
-        array $data = [])
-    {
-        parent::__construct($context, $data);
+        ProfileManager $profileManager,
+        $requestProfileIdField = SummaryInsertForm::FORM_DATA_KEY,
+        array $data = []
+    ) {
+        $this->profileManager = $profileManager;
         $this->paymentConfig = $paymentConfig;
+        $this->requestProfileIdField = $requestProfileIdField;
+        $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml');
+        parent::__construct($context);
     }
 
     /**
@@ -74,12 +96,12 @@ class Details extends Template
     public function getCreditCardExpDate()
     {
         $additionalInfo = $this->getPaymentAdditionalInfo();
-        $creditCardNumber = '';
+        $creditCardExpDate = '';
         if (isset($additionalInfo['cc_exp_month']) && isset($additionalInfo['cc_exp_year'])) {
-            $creditCardNumber = "{$additionalInfo['cc_exp_month']}/{$additionalInfo['cc_exp_year']}";
+            $creditCardExpDate = "{$additionalInfo['cc_exp_month']}/{$additionalInfo['cc_exp_year']}";
         }
 
-        return $creditCardNumber;
+        return $creditCardExpDate;
     }
 
     /**
@@ -116,5 +138,46 @@ class Details extends Template
         }
 
         return $this->additionalInfo;
+    }
+
+    /**
+     * Return if is necessary to show block title
+     *
+     * @return null|bool
+     */
+    public function isShowTitle()
+    {
+        return $this->getShowTitle();
+    }
+
+    /**
+     * Return if only table would be shown
+     * @return null|bool
+     */
+    public function isOnlyTableContent()
+    {
+        return $this->getOnlyTableContent();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEditUrl($tabName = 'billing', array $params = [])
+    {
+        $params['payment_details'] = 1;
+
+        return parent::getEditUrl($tabName, $params);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubscriptionProfile()
+    {
+        if (!$this->subscriptionProfile) {
+            $this->subscriptionProfile = $this->profileManager->loadProfileFromRequest($this->requestProfileIdField);
+        }
+
+        return $this->subscriptionProfile;
     }
 }

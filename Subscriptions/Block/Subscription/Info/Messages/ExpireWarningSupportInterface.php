@@ -17,15 +17,15 @@ interface ExpireWarningSupportInterface
     /**
      * @return MessagePool
      */
-    function getMessagePool();
+    public function getMessagePool();
 
     /**
      * @return SubscriptionProfile
      */
-    function getSubscriptionProfile();
+    public function getSubscriptionProfile();
 
     /**
      * @return bool
      */
-    function isSupported();
+    public function isSupported();
 }

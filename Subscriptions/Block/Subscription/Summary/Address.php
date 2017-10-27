@@ -8,13 +8,12 @@ namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Customer\Model\Address\Config as AddressConfig;
+use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
  * Class Address
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
-class Address extends Template
+class Address extends BaseSummary
 {
     /**
      * @var AddressConfig
@@ -66,7 +65,7 @@ class Address extends Template
      */
     public function getAddressHtml()
     {
-        $addressData = $this->addressType === \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING
+        $addressData = $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
             ? $this->getSubscriptionProfile()->getShippingAddress()->getData()
             : $this->getSubscriptionProfile()->getBillingAddress()->getData();
 
@@ -80,29 +79,19 @@ class Address extends Template
      */
     public function getAddressTitle()
     {
-        return $this->addressType === \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING
+        return $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
             ? __('Shipping Information') : __('Billing Information');
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    public function getEditUrl()
+    public function getEditUrl($tabName = 'shipment', array $params = [])
     {
-        return $this->addressType === \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_SHIPPING
-            ? $this->getUrl(
-                'tnw_subscriptions/subscription/shipment',
-                [
-                    'entity_id' => $this->getSubscriptionProfile()->getId(),
-                    'edit'      => 1,
-                ]
-            )
-            : $this->getUrl(
-                'tnw_subscriptions/subscription/billing',
-                [
-                    'entity_id' => $this->getSubscriptionProfile()->getId(),
-                    'edit'      => 1,
-                ]
-            );
+        $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing': $tabName;
+
+        $params['shipping_address'] = 1;
+
+        return parent::getEditUrl($tabName, $params);
     }
 }

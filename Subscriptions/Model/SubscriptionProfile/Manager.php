@@ -383,11 +383,11 @@ class Manager
     {
         $engine = $this->getEngineFromRequestData($requestData);
         if ($engine) {
-            $additionalInfoOld = $this->getProfile()->getPaymentAdditionalInfo();
+            $additionalInfoOld = $this->getProfile()->getDecodedPaymentAdditionalInfo();
             $oldEngine = $this->getProfile()->getEngineCode();
             $this->getProfile()->setEngineCode($engine);
             $this->getEngine()->processProfileByRequestData($requestData);
-            $additionalInfo = $this->getProfile()->getPaymentAdditionalInfo();
+            $additionalInfo = $this->getProfile()->getDecodedPaymentAdditionalInfo();
 
             if (strcasecmp($oldEngine, $engine) !== 0) {
                 $message = __('Payment method changed from %1 to %2',
@@ -396,20 +396,30 @@ class Manager
 
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             } else {
-                $ccNumber = $this->propertyAdditionalInfo($additionalInfo, 'cc_last_4');
-                $ccNumberOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_last_4');
+                $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
+                $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
+                if (strcasecmp($ccType, $ccTypeOld) !== 0) {
+                    $message = __('Card type was changed from <b>%1</b> to <b>%1</b>', $ccTypeOld, $ccType);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+                $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
+                $ccNumberOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_last_4'] : null;
                 if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
-                    $message = __('Payment method changed. Card number changed from %1 to %2',
-                        sprintf('XXXX%s', $ccNumberOld),
-                        sprintf('XXXX%s', $ccNumber));
-
+                    $message = __('Credit Card number was changed to <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
                 $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
                 $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
                 if (strcasecmp($ccExpOld, $ccExp) !== 0) {
-                    $message = __('Payment method changed. Expiration date changed from %1 to %2', $ccExp, $ccExpOld);
+                    $message = __('Exp. Date was changed to <b>%1</b>', $ccExp);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+
+                $ccVeri = $this->propertyAdditionalInfo($additionalInfo, 'cc_cid');
+                $ccVeriOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_cid');
+                if (strcasecmp($ccVeriOld, $ccVeri) !== 0) {
+                    $message = __('Card Verification Number was changed');
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
             }
@@ -428,7 +438,10 @@ class Manager
             return null;
         }
 
-        $additionalInfo = (array)json_decode($additionalInfo);
+        if (is_string($additionalInfo)) {
+            $additionalInfo = (array)json_decode($additionalInfo);
+        }
+
         if (empty($additionalInfo[$property])) {
             return null;
         }
@@ -514,10 +527,11 @@ class Manager
      * Set data to profile from quote.
      *
      * @param Quote $quote
+     * @param null|\DateTime $date
      * @return $this
      * @throws \Exception
      */
-    public function populateProfileData(Quote $quote)
+    public function populateProfileData(Quote $quote, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
 
@@ -529,7 +543,7 @@ class Manager
         }
 
         if (isset($frequency)) {
-            $startDate = $this->getFullStartDate($request['start_on']);
+            $startDate = $this->getFullStartDate($request['start_on'], $date);
             $this->getProfile()
                 ->setCustomerId($quote->getCustomerId())
                 ->setWebsiteId($quote->getStore()->getWebsiteId())
@@ -751,13 +765,16 @@ class Manager
      * Returns full start date.
      *
      * @param string $startOn
+     * @param null|\DateTime $date
      * @return string
      */
-    private function getFullStartDate($startOn)
+    private function getFullStartDate($startOn, $date = null)
     {
-        $currentDate = new \DateTime();
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $startDate = new \DateTime($startOn);
-        $diff = $currentDate->diff($startDate, true);
+        $diff = $date->diff($startDate, true);
         //Add hours, minutes, and seconds to start date
         $expression = 'PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S';
         $startDate->add(new \DateInterval($expression));
@@ -768,10 +785,10 @@ class Manager
     /**
      * Returns engine code form request data
      *
-     * @param $requestData
+     * @param array $requestData
      * @return int|null|string
      */
-    private function getEngineFromRequestData($requestData)
+    public function getEngineFromRequestData(array $requestData)
     {
         $engine = null;
         $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
@@ -787,10 +804,10 @@ class Manager
     /**
      * Returns shipping method code form request data
      *
-     * @param $requestData
+     * @param array $requestData
      * @return int|null|string
      */
-    private function getShippingMethodFromRequestData($requestData)
+    private function getShippingMethodFromRequestData(array $requestData)
     {
         $shippingMethodCode= isset($requestData['shipping_method_id'])
             ? $requestData['shipping_method_id']

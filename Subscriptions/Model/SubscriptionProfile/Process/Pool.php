@@ -38,9 +38,8 @@ class Pool implements PoolInterface
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
-        array $processors = []
+        array $processors
     ) {
-        //@toDo $processors cant' be empty
         $this->objectManager = $objectManager;
         $this->processors = $processors;
     }

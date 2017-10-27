@@ -7,14 +7,17 @@ define([
     'Magento_Ui/js/grid/listing',
     'rjsResolver',
     'uiRegistry',
-    'jquery'
-], function (_, Listing, resolver, registry, $j) {
+    'jquery',
+    'Magento_Ui/js/lib/spinner'
+], function (_, Listing, resolver, registry, $j, loader) {
     'use strict';
 
     return Listing.extend({
         defaults: {
             template: 'TNW_Subscriptions/grid/subscription-listing',
-            estimatedPayment: null
+            estimatedPayment: null,
+            useParentLoader: false,
+            parentForLoader: ''
         },
 
         /**
@@ -43,6 +46,8 @@ define([
          * Handler of the data providers' 'reloaded' event.
          */
         onDataReloaded: function () {
+            this._super();
+
             var addButton,
                 modifyButton,
                 continueButton,
@@ -52,8 +57,6 @@ define([
                 currencySelect;
 
             this.set('estimatedPayment', this.source.data.estimatedPayment);
-
-            resolver(this.hideLoader, this);
 
             addButton = registry.get('index=button_add_product');
             modifyButton = registry.get('index=button_modify_subscriptions');
@@ -86,6 +89,32 @@ define([
 
             // main save button near 'cancel' or 'back'
             saveFormButton.prop('disabled', !show);
+        },
+
+        /**
+         * Hide loader for this listing or for parent element.
+         *
+         * @returns {Object}
+         */
+        hideLoader: function () {
+            if (this.useParentLoader) {
+                registry.get(this.parentForLoader).removeFromLoadingQueue(this.ns);
+            } else {
+                loader.get(this.name).hide();
+            }
+        },
+
+        /**
+         * Show loader for this listing or for parent element.
+         *
+         * @returns {Object}
+         */
+        showLoader: function () {
+            if (this.useParentLoader) {
+                registry.get(this.parentForLoader).addToLoadingQueue(this.ns);
+            } else {
+                loader.get(this.name).show();
+            }
         }
     });
 });

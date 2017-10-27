@@ -545,4 +545,38 @@ class SummaryProductsForm extends ModifyForm
 
         return $result;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function isEditButtonVisible()
+    {
+        return $this->canEditProfile();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function isUpdateButtonVisible()
+    {
+        return $this->canEditProfile();
+    }
+
+    /**
+     * Check if subscription profile can be editable
+     *
+     * @return bool
+     */
+    private function canEditProfile()
+    {
+        $canEdit = false;
+        /** @var \TNW\Subscriptions\Model\SubscriptionProfile $currentProfile */
+        $currentProfile = $this->getCurrentProfile();
+
+        if ($currentProfile && $currentProfile->canEditProfile()) {
+            $canEdit = true;
+        }
+
+        return $canEdit;
+    }
 }

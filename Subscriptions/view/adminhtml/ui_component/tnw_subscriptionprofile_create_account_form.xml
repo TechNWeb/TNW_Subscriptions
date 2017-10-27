@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -45,7 +51,7 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/form/components/group</item>
                     <item name="dataScope" xsi:type="string">account</item>
                     <item name="breakLine" xsi:type="boolean">false</item>
-                    <item name="additionalClasses" xsi:type="string">admin_field_without_legend</item>
+                    <item name="additionalClasses" xsi:type="string">field_without_legend</item>
                 </item>
             </argument>
             <field name="group">
@@ -57,7 +63,7 @@
                         <item name="formElement" xsi:type="string">select</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">group</item>
-                        <item name="additionalClasses" xsi:type="string">admin__control-label-up select</item>
+                        <item name="additionalClasses" xsi:type="string">control-label-up select</item>
                      </item>
                 </argument>
             </field>
@@ -69,7 +75,7 @@
                         <item name="formElement" xsi:type="string">input</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">email</item>
-                        <item name="additionalClasses" xsi:type="string">admin__control-label-up input</item>
+                        <item name="additionalClasses" xsi:type="string">control-label-up input</item>
                         <item name="component" xsi:type="string">TNW_Subscriptions/js/components/field/email</item>
                         <item name="validation" xsi:type="array">
                             <item name="validate-email" xsi:type="boolean">true</item>

@@ -122,7 +122,7 @@ class AddressEdit extends Edit
         $options = $this->customerAddressSource->toOptionArray();
         $html = $this->getLayout()
             ->createBlock(\Magento\Framework\View\Element\Html\Select::class)
-            ->setName('shipping_address[customer_address_id]')
+            ->setName('shipping_address[customer_shipping_address_id]')
             ->setId('customer_address_id')
             ->setTitle(__('Customer Address'))
             ->setValue($this->getCustomerAddressId())

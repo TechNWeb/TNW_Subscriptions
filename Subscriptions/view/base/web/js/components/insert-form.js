@@ -53,6 +53,7 @@ define([
             template: 'TNW_Subscriptions/form/insert',
             pageActionsClass: 'page-actions',
             actionsContainerClass: 'page-main-actions',
+            cssclass: '',
             exports: {
                 prefix: '${ $.externalFormName }:selectorPrefix'
             },
@@ -81,7 +82,7 @@ define([
         /** @inheritdoc */
         initObservable: function () {
             return this._super()
-                .observe('responseStatus');
+                .observe(['responseStatus', 'cssclass']);
         },
 
         /** @inheritdoc */

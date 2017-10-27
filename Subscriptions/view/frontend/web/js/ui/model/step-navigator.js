@@ -53,11 +53,12 @@ define(
                 steps.push({
                     code: code,
                     alias: alias !== null ? alias : code,
-                    blockNamespace: step.blockNamespace,
+                    blocks: step.blocks,
                     renderProductListing: step.renderProductListing,
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
-                    needSave: step.needSave,
+                    stepActions: step.stepActions,
+                    nextButtonTitle: step.nextButtonTitle,
                     title: $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,
@@ -219,7 +220,6 @@ define(
              * Get current step.
              *
              * @returns {Function}
-             * @todo optimize this
              */
             getCurrentStep: function () {
                 var currentStep = null;

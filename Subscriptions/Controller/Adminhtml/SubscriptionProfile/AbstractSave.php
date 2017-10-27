@@ -10,7 +10,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 
 /**
  * Abstract class for profile admin save actions.
@@ -20,7 +20,7 @@ abstract class AbstractSave extends SubscriptionProfile
     /**
      * Save processor model.
      *
-     * @var Processor
+     * @var RequestProcessor
      */
     private $saveProcessor;
 
@@ -29,13 +29,13 @@ abstract class AbstractSave extends SubscriptionProfile
      * @param Context $context
      * @param Registry $coreRegistry
      * @param DataPersistorInterface $dataPersistor
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
-        Processor $saveProcessor
+        RequestProcessor $saveProcessor
     ) {
         $this->saveProcessor = $saveProcessor;
         parent::__construct($context, $coreRegistry, $dataPersistor);
@@ -44,7 +44,7 @@ abstract class AbstractSave extends SubscriptionProfile
     /**
      * Returns save processor model.
      *
-     * @return Processor
+     * @return RequestProcessor
      */
     protected function getSaveProcessor()
     {

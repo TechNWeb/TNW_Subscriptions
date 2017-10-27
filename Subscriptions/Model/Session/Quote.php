@@ -52,7 +52,7 @@ class Quote extends QuoteSession
      */
     public function getCustomerGroupId()
     {
-        return (int)$this->getCustomerSession()->getCustomerId();
+        return (int)$this->getCustomerSession()->getCustomerGroupId();
     }
 
     /**
@@ -111,5 +111,27 @@ class Quote extends QuoteSession
                 $quote->setCustomerAddressData($this->getCustomer()->getAddresses());
             }
         }
+    }
+
+    /**
+     * Get profile ids.
+     *
+     * @return array
+     */
+    public function getProfileIds()
+    {
+        return ($this->storage->getProfileIds()) ? $this->storage->getProfileIds() : [];
+    }
+
+    /**
+     * Set profile ids.
+     *
+     * @param array $profileIds
+     * @return $this
+     */
+    public function setProfileIds($profileIds)
+    {
+        $this->storage->setProfileIds($profileIds);
+        return $this;
     }
 }

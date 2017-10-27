@@ -11,7 +11,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
@@ -30,13 +30,13 @@ class Process extends AbstractSave
      * Process constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      * @param CreateProfile $createModel
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         CreateProfile $createModel
     ) {
         $this->createModel = $createModel;
@@ -51,25 +51,12 @@ class Process extends AbstractSave
      */
     public function execute()
     {
-        $this->resultFactory;
-        $errors = $this->processRequestData();
-
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
-            ->setData($this->getJsonResponse($errors));
-    }
-
-    /**
-     * Processing save post data. Returns list of errors.
-     *
-     * @return array
-     */
-    private function processRequestData()
-    {
-        $result = $this->getSaveProcessor()->processSave(
+        $errors = $this->getSaveProcessor()->processSave(
             $this->getRequest()->getParams()
         );
         $this->createModel->recollectSubscriptions();
 
-        return $result;
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
+            ->setData($this->getJsonResponse($errors));
     }
 }

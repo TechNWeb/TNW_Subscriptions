@@ -4,7 +4,8 @@
  */
 /*jquery:true*/
 define([
-    'jquery'
+    'jquery',
+    'mage/validation'
 ], function ($) {
     'use strict';
 
@@ -23,12 +24,15 @@ define([
             addNewAddressButton: '#add-new',
             pickFromSavedButton: '#pick',
             cancelButton: '#cancel-save',
-            saveAddressButton: '#save_address',
             addressFields: '.address-field',
             infoFields: '.info-field',
             defaultCountryId: 'US',
             countrySelect: '#country',
-            emptyCountryLabel: ''
+            emptyCountryLabel: '',
+            infoBlockContent: '.subscription-profile-shipping-address',
+            buttonDisabledClass: 'disabled',
+            requiredFields: 'required',
+            saveAddressButton: '#save_address'
         },
 
         /**
@@ -46,7 +50,7 @@ define([
          * @returns void
          */
         _initialize: function () {
-            var showEdit = this.options.showEdit,
+            var showEdit = this.options.showEdit * 1 ,
                 customerAddresses = $(this.options.customerAddressesList),
                 addressSelectVisibility = false;
 
@@ -71,13 +75,14 @@ define([
                 addNewButton = $(this.options.addNewAddressButton),
                 pickFromSavedButton = $(this.options.pickFromSavedButton),
                 cancelButton = $(this.options.cancelButton),
-                saveAddressButton = $(this.options.saveAddressButton),
                 customerDataFieldSet = $(this.options.customerDataFieldSet),
                 customerAddressesSelect = $(this.options.customerAddressesList),
-                defaultValue = '';
+                defaultValue = '',
+                form =$(this.options.formSelector),
+                requiredFields = $(this.options.requiredFields);
 
             editButton.on('click', $.proxy(function() {
-                widget.setFormsVisibility(false);
+                widget.setFormsVisibility(true);
             }, this));
             addNewButton.on('click', $.proxy(function() {
                 widget.setAddressFieldsVisibility(false);
@@ -96,7 +101,6 @@ define([
                 $(field).on('change', $.proxy(function() {
                     widget.setAddressFieldsVisibility(false);
                 }, this));
-
             });
             customerAddressesSelect.on('change', $.proxy(function() {
                 widget.fillInputsData(customerAddressesSelect);
@@ -104,13 +108,21 @@ define([
             cancelButton.on('click', $.proxy(function(e) {
                 e.stopPropagation();
                 e.preventDefault();
-                widget.setFormsVisibility(true);
+                widget.setFormsVisibility(false);
             }, this));
-            saveAddressButton.on('click', $.proxy(function(e) {
+            $.each(form.find('.required'), function (key, field) {
+                $(field).on('focusout', $.proxy(function(event) {;
+                    $(event.target).valid();
+                }, this));
+            });
+            form.submit(function( e ) {
                 e.stopPropagation();
                 e.preventDefault();
+                if (!form.valid()) {
+                    return;
+                };
                 widget.saveAddress(e);
-            }, this));
+            });
         },
 
         /**
@@ -125,7 +137,7 @@ define([
         /**
          * Fill address form inputs with data from customer addresses.
          *
-         * @param {} customerAddressesSelect
+         * @param {jQuery} customerAddressesSelect
          * @returns void
          */
         fillInputsData: function(customerAddressesSelect) {
@@ -172,25 +184,66 @@ define([
          * @returns void
          */
         saveAddress: function(e) {
-            var form = $(this.options.formSelector);
+            $('body').trigger('processStart');
+            var form = $(this.options.formSelector),
+                widget = this,
+                saveAddressButton = $(this.options.saveAddressButton),
+                cancelButton = $(this.options.cancelButton);
 
-            $.ajax({
-                url: this.options.saveAddressUrl,
-                data: form.serialize(),
-                type: 'post',
-                dataType: 'json',
-
-                /**
-                 * Called when request succeeds
-                 *
-                 * @param {Object} response
-                 */
-                success: function(response) {
-
-                    //@toDo make response validation
-
+            if (form.valid()) {
+                if (!$(this.options.customerAddressesList).is(':visible')) {
+                    $(this.options.customerAddressesList).val('0');
                 }
-            });
+                this.disableButton(saveAddressButton);
+                this.disableButton(cancelButton);
+
+                $.ajax({
+                    url: this.options.saveAddressUrl,
+                    data: form.serialize(),
+                    type: 'post',
+                    dataType: 'json',
+
+                    /**
+                     * Called when request succeeds
+                     *
+                     * @param {Object} response
+                     */
+                    success: function(response) {
+                        var addressBlock = $(widget.options.infoBlockContent).find('address');
+
+                        if (typeof response.data.shipping_address != 'undefined') {
+                            addressBlock.html(response.data.shipping_address);
+                        }
+                        widget.setFormsVisibility(false);
+                        widget.enableButton(saveAddressButton);
+                        widget.enableButton(cancelButton);
+                    }
+
+                }).always(function() {
+                    $('body').trigger('processStop');
+                });
+
+            }
+        },
+
+        /**
+         * Disable button.
+         *
+         * @param {jQuery} button
+         * @returns void
+         */
+        disableButton: function(button) {
+            button.addClass(this.options.buttonDisabledClass);
+        },
+
+        /**
+         * Enable button.
+         *
+         * @param {jQuery} button
+         * @returns void
+         */
+        enableButton: function(button) {
+            button.removeClass(this.options.buttonDisabledClass);
         },
 
         /**
@@ -200,8 +253,8 @@ define([
          * @returns void
          */
         setFormsVisibility: function(showEdit) {
-            this._setElemsVisibility($(this.options.infoViewSelector), showEdit);
-            this._setElemsVisibility($(this.options.infoEditSelector), !showEdit);
+            this._setElemsVisibility($(this.options.infoViewSelector), !showEdit);
+            this._setElemsVisibility($(this.options.infoEditSelector), showEdit);
         },
 
         /**
@@ -213,7 +266,7 @@ define([
         setAddressFieldsVisibility: function (visibility) {
             this._setElemsVisibility($(this.options.customerAddressesList), visibility);
             this._setElemsVisibility($(this.options.addressFieldsList), !visibility);
-            if ($(this.options.customerAddressesList+' option').length > 1) {
+            if ($(this.options.customerAddressesList +' option').length > 1) {
                 this._setElemsVisibility($(this.options.pickFromSavedButton), !visibility);
                 this._setElemsVisibility($(this.options.addNewAddressButton), visibility);
             } else {
@@ -233,11 +286,12 @@ define([
         _setElemsVisibility: function (elem, visible) {
             if (visible) {
                 elem.show();
+                elem.removeClass('hidden');
             } else {
                 elem.hide();
             }
         }
     });
 
-    return $.mage.tnwSubscribePrice;
+    return $.mage.tnwSubscribeShipment;
 });

@@ -69,6 +69,7 @@ class DataProvider extends AbstractDataProvider
             $arrItems['totalRecords'] = $this->getCollection()->getSize();
             /** @var \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory $item */
             foreach ($changeHistoryCollection as $item) {
+                $item->setMessage($item->formatMessage());
                 $arrItems['items'][]
                     = $this->getConvertMessageHistoryData($item->toArray([]));
             }

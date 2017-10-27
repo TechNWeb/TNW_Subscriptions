@@ -28,7 +28,11 @@ define([
     return Select.extend({
 
         defaults:{
-            customerAddressSelector: 'customer_address_id'
+            customerAddressSelector: 'customer_address_id',
+
+            listens: {
+                '${ $.provider }:data.validate': 'validate'
+            }
         },
 
         /**

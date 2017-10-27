@@ -6,15 +6,12 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileAddressRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Address as ResourceProfileAddress;
@@ -31,11 +28,6 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
     private $addressCollectionFactory;
 
     /**
-     * @var DataObjectHelper
-     */
-    private $dataObjectHelper;
-
-    /**
      * @var SubscriptionProfileAddressSearchResultsInterfaceFactory
      */
     private $searchResultsFactory;
@@ -46,50 +38,31 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
     private $resource;
 
     /**
-     * @var DataObjectProcessor
-     */
-    private $dataObjectProcessor;
-
-    /**
      * @var AddressFactory
      */
     private $addressFactory;
 
     /**
-     * @var SubscriptionProfileAddressInterfaceFactory
-     */
-    private $dataAddressFactory;
-
-    /**
      * AddressRepository constructor.
      * @param ResourceProfileAddress $resource
      * @param AddressFactory $profileAddressFactory
-     * @param SubscriptionProfileAddressInterfaceFactory $dataProfileAddressFactory
      * @param AddressCollectionFactory $addressCollectionFactory
      * @param SubscriptionProfileAddressSearchResultsInterfaceFactory $searchResultsFactory
-     * @param DataObjectHelper $dataObjectHelper
-     * @param DataObjectProcessor $dataObjectProcessor
      */
     public function __construct(
         ResourceProfileAddress $resource,
         AddressFactory $profileAddressFactory,
-        SubscriptionProfileAddressInterfaceFactory $dataProfileAddressFactory,
         AddressCollectionFactory $addressCollectionFactory,
-        SubscriptionProfileAddressSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor
+        SubscriptionProfileAddressSearchResultsInterfaceFactory $searchResultsFactory
     ) {
         $this->resource = $resource;
         $this->addressFactory = $profileAddressFactory;
         $this->addressCollectionFactory = $addressCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataAddressFactory = $dataProfileAddressFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(
         SubscriptionProfileAddressInterface $profileAddress
@@ -107,7 +80,7 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById($profileAddressId)
     {
@@ -124,7 +97,7 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getList(
         SearchCriteriaInterface $criteria
@@ -156,24 +129,13 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
 
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
-        $items = [];
 
-        foreach ($collection as $profileAddressModel) {
-            $profileAddressData = $this->dataAddressFactory->create();
-            $this->dataObjectHelper->populateWithArray(
-                $profileAddressData,
-                $profileAddressModel->getData(),
-                SubscriptionProfileAddressInterface::class
-            );
-            $items[] = $profileAddressData;
-        }
-        $searchResults->setItems($items);
-
+        $searchResults->setItems($collection->getItems());
         return $searchResults;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(
         SubscriptionProfileAddressInterface $profileAddress
@@ -191,7 +153,7 @@ class AddressRepository implements SubscriptionProfileAddressRepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById($profileAddressId)
     {
