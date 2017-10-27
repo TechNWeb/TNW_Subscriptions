@@ -7,6 +7,17 @@
 /* @var $block \TNW\Subscriptions\Block\Subscription\Info\Billing */
 ?>
 <div class="subscription-data-wrapper">
-<?php echo $block->getTabMessagesHtml(); ?>
-<span>Here is current subscription billing info</span>
+    <?php echo $block->getTabMessagesHtml(); ?>
+    <div class="billing-info-content content-block">Here is current subscription billing info</div>
+    <div class="payment-details-content content-block"
+         data-mage-init='{"tnwSubscribeBilling":{
+        "showEdit": "<?php echo $block->isShowEdit() ?>"
+    }}'>
+        <div id="payment-details-view">
+            <?php echo $block->getPaymentDetailsViewHtml() ?>
+        </div>
+        <div id="payment-details-edit">
+            <?php echo $block->getPaymentDetailsEditHtml() ?>
+        </div>
+    </div>
 </div>

@@ -711,3 +711,10 @@ button.action-editor.active:before{
   left: 0;
   margin-left: 0px;
 }
+.table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
+  background-color: #f1f1f1;
+}
+.table-secondary th, .table-secondary td {
+  padding: 1rem 1rem;
+  text-align: left;
+}

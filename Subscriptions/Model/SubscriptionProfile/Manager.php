@@ -438,7 +438,10 @@ class Manager
             return null;
         }
 
-        $additionalInfo = (array)json_decode($additionalInfo);
+        if (is_string($additionalInfo)) {
+            $additionalInfo = (array)json_decode($additionalInfo);
+        }
+
         if (empty($additionalInfo[$property])) {
             return null;
         }
@@ -782,10 +785,10 @@ class Manager
     /**
      * Returns engine code form request data
      *
-     * @param $requestData
+     * @param array $requestData
      * @return int|null|string
      */
-    private function getEngineFromRequestData($requestData)
+    public function getEngineFromRequestData(array $requestData)
     {
         $engine = null;
         $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
@@ -801,10 +804,10 @@ class Manager
     /**
      * Returns shipping method code form request data
      *
-     * @param $requestData
+     * @param array $requestData
      * @return int|null|string
      */
-    private function getShippingMethodFromRequestData($requestData)
+    private function getShippingMethodFromRequestData(array $requestData)
     {
         $shippingMethodCode= isset($requestData['shipping_method_id'])
             ? $requestData['shipping_method_id']

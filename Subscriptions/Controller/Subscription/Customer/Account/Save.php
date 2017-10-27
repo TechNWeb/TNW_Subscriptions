@@ -74,7 +74,22 @@ class Save extends AbstractSave
         $request = $this->getRequest()->getParams();
         $result = $this->initProfile();
         if ($result) {
-            $errors = $this->processRequestData($request);
+            try {
+                /** @var SubscriptionProfile $profile */
+                $profile = $this->profileManager->getProfile();
+                $profileDataChanges = $profile->hasDataChanges();
+                $profile->setDataChanges(false);
+
+                $errors = $this->processRequestData($request);
+
+                if ($profile->hasDataChanges()) {
+                    $profile->setNeedRecollect('1');
+                }
+                $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
+                $this->profileManager->saveProfile();
+            } catch (\Exception $e) {
+                $errors[] = $e->getMessage();
+            }
         } else {
             $errors[] = __('Subscription profile wasn\'t loaded');
         }
@@ -104,7 +119,7 @@ class Save extends AbstractSave
     {
         $result = false;
         /** @var SubscriptionProfile $model */
-        $model = $this->profileManager->loadProfileFromRequest('profile_id');
+        $model = $this->profileManager->loadProfileFromRequest('entity_id');
         if ($model) {
             $result = true;
             $this->coreRegistry->register('tnw_subscription_profile', $model, true);
