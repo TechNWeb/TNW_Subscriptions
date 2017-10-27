@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="tnw_subscriptions_cart_default"/>
+    <referenceContainer name="content">
+        <uiComponent name="tnw_subscriptionprofile_checkout_thankyoupage_form"/>
+    </referenceContainer>
+</page>

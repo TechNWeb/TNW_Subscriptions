@@ -225,6 +225,18 @@ define([
                 } else {
                     this.isLoading(false);
                 }
+            },
+
+            /**
+             * Redirect to catalog.
+             *
+             * @return void
+             */
+            redirectToCatalog: function () {
+                var base_url = this.cart().checkoutConfig.base_url;
+                if (base_url) {
+                    window.location.href = base_url;
+                }
             }
         });
     }
