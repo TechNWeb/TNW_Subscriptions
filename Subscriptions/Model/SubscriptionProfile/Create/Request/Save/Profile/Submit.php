@@ -24,9 +24,11 @@ class Submit extends Base
     }
 
     /**
-     * Setting created profiles to session.
+     *  Setting created profiles to session.
      *
-     * @param [] $profiles
+     * @param $session
+     * @param $profiles
+     * @return void
      */
     private function setCreatedProfilesToSession($session, $profiles)
     {

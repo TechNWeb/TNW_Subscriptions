@@ -46,8 +46,6 @@ class UrlBuilder implements UrlBuilderInterface
     private $state;
 
     /**
-     * UrlBuilder constructor.
-     *
      * @param UrlInterface $baseUrlBuilder
      * @param State $state
      */
@@ -92,14 +90,5 @@ class UrlBuilder implements UrlBuilderInterface
         );
         
         return $html;
-    }
-
-    /**
-     * Retrieve base url.
-     *
-     */
-    public function getBaseUrl()
-    {
-        $this->baseUrlBuilder->getUrl();
     }
 }

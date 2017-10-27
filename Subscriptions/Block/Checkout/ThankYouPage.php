@@ -44,18 +44,17 @@ class ThankYouPage extends Template
     protected $_template = 'TNW_Subscriptions::checkout/thankyoupage.phtml';
 
     /**
-     *
+     * @param Context $context
      * @param UrlBuilder $urlBuilder
      * @param QuoteSessionInterface $quoteSession
      * @param Manager $profileManager
-     * @param Context $context
      * @param array $data
      */
     public function __construct(
+        Context $context,
         UrlBuilder $urlBuilder,
         QuoteSessionInterface $quoteSession,
         Manager $profileManager,
-        Context $context,
         array $data = []
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -83,7 +82,7 @@ class ThankYouPage extends Template
     public function getSubscriptionListElementInfo($profileId)
     {
         $profileLinkHtml = $this->getSubscriptionEditUrlHtml($profileId);
-        return sprintf(__("Subscription %s created"), $profileLinkHtml);
+        return sprintf(__("Subscription %1 created"), $profileLinkHtml);
     }
 
     /**
@@ -94,6 +93,6 @@ class ThankYouPage extends Template
      */
     private function getSubscriptionEditUrlHtml($profileId)
     {
-        return $this->urlBuilder->getEditHtmlLink($profileId,true);
+        return $this->urlBuilder->getEditHtmlLink($profileId, true);
     }
 }

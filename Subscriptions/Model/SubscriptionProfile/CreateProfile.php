@@ -512,7 +512,7 @@ class CreateProfile extends BaseCreate
                 $order = $this->profileManager->processProfile($subQuote);
             } catch (\Exception $e) {
                 $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                $this->getContext()->throwException($e->getMessage());
+                throw $e;
             }
             if (isset($order)) {
                 $this->profileManager->assignOrderToProfile($relation, $order);

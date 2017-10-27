@@ -15,11 +15,10 @@ use TNW\Subscriptions\Model\Backend\UrlBuilder;
  */
 class ThankYouPage extends AbstractDataProvider
 {
-    /**#@+
+    /**
      * Form data scope
      */
     const DATA_SCOPE_THANKYOUPAGE_FORM = 'tnw_subscriptionprofile_checkout_thankyoupage_form';
-    /**#@-*/
 
     /**
      * Subscription url builder.
@@ -29,8 +28,6 @@ class ThankYouPage extends AbstractDataProvider
     private $urlBuilder;
 
     /**
-     * ThankYouPage constructor.
-     *
      * @param UrlBuilder $urlBuilder
      * @param string $name
      * @param string $primaryFieldName

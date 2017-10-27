@@ -52,6 +52,8 @@ define([
 
         /**
          * Hide button next step if need.
+         *
+         * @return void
          */
         hideButtonIfNeed: function () {
             var bottomCartAction = $('.tnw-subscriptions-cart-bottom-action');

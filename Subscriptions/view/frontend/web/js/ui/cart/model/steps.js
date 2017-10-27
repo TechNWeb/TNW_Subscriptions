@@ -230,6 +230,7 @@ define([
             /**
              * Redirect to catalog.
              *
+             * @return void
              */
             redirectToCatalog: function () {
                 var base_url = this.cart().checkoutConfig.base_url;
