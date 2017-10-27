@@ -123,7 +123,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * @return string
      */
-    public function getSaveAddressUrl()
+    public function getSaveUrl()
     {
         return $this->_urlBuilder->getUrl(
             'tnw_subscriptions/subscription_customer_account/save',

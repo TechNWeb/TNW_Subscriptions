@@ -6,7 +6,7 @@
 
 // @codingStandardsIgnoreFile
 
-/** @var $block TNW\Subscriptions\Block\Subscription\EditForm */
+/** @var $block TNW\Subscriptions\Block\Subscription\Shipment\DetailsEditForm */
 ?>
 
 <form class="<?php echo $block->getFormClass()?>"
@@ -17,12 +17,12 @@
     <?php echo $block->getFormContentHtml() ?>
     <div class="actions-toolbar">
         <div class="primary">
-            <button id="<?php echo $block->getFormId()?>-save"  class="action save primary" title="<?php /* @escapeNotVerified */ echo __('Save Address') ?>">
+            <button id="<?php echo $block->getFormId()?>-save"  class="action save primary" title="<?php /* @escapeNotVerified */ echo __('Save') ?>">
                 <span><?php /* @escapeNotVerified */ echo __('Save') ?></span>
             </button>
         </div>
         <div class="secondary">
-            <button id="cancel-save" class="action cancel" data-action="cancel" title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
+            <button id="<?php echo $block->getFormId()?>-cancel" class="action cancel" data-action="cancel" title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
                 <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
             </button>
         </div>

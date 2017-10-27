@@ -8,7 +8,8 @@ var config = {
         '*': {
             tnwSubscribeContainer: 'TNW_Subscriptions/js/product/subscribe-container',
             tnwSubscribePrice: 'TNW_Subscriptions/js/product/subscribe-price',
-            tnwSubscribeShipment: 'TNW_Subscriptions/js/subscription-profile/shipment'
+            tnwSubscribeShipment: 'TNW_Subscriptions/js/subscription-profile/shipment',
+            tnwSubscribeShipmentDetails: 'TNW_Subscriptions/js/subscription-profile/shipment-details'
         }
     }
 };

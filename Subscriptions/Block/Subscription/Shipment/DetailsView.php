@@ -16,7 +16,7 @@ class DetailsView extends Details
     /**
      * @return string
      */
-    public function getEditUrl()
+    public function getEditUrl($tabName = 'shipment', array $params = [])
     {
         return 'javascript:';
     }

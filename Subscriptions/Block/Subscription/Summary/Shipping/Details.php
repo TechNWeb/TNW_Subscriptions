@@ -22,17 +22,4 @@ class Details extends BaseSummary
     {
         return $this->getSubscriptionProfile()->getShippingDescription();
     }
-
-    /**
-     * @return string
-     */
-    public function getEditUrl()
-    {
-        return $this->getUrl(
-            'tnw_subscriptions/subscription/shipment',
-            [
-                'entity_id' => $this->getSubscriptionProfile()->getId()
-            ]
-        );
-    }
 }
