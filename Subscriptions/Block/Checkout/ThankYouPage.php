@@ -82,7 +82,7 @@ class ThankYouPage extends Template
     public function getSubscriptionListElementInfo($profileId)
     {
         $profileLinkHtml = $this->getSubscriptionEditUrlHtml($profileId);
-        return sprintf(__("Subscription %1 created"), $profileLinkHtml);
+        return __("Subscription %1 created", $profileLinkHtml);
     }
 
     /**
