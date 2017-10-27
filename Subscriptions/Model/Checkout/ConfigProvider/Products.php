@@ -38,6 +38,7 @@ class Products implements ConfigProviderInterface
     {
         return [
             'render_url' => $this->url->getUrl('tnw_subscriptions/ui_render/handle'),
+            'base_url' => $this->url->getBaseUrl(),
         ];
     }
 }

@@ -17,5 +17,27 @@ class Submit extends Base
     public function process(array $data)
     {
         $profiles = $this->getSubCreateModel()->createSubscriptions();
+        /** @var \TNW\Subscriptions\Model\Session\Quote $session */
+        $session = $this->getSubCreateModel()->getSession();
+        $session->clearStorage();
+        $this->setCreatedProfilesToSession($session, $profiles);
+    }
+
+    /**
+     *  Setting created profiles to session.
+     *
+     * @param $session
+     * @param $profiles
+     * @return void
+     */
+    private function setCreatedProfilesToSession($session, $profiles)
+    {
+        $profilesIds = array_map(
+            function ($profile) {
+                return $profile->getEntityId();
+            },
+            $profiles
+        );
+        $session->setProfileIds($profilesIds);
     }
 }
