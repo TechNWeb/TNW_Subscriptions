@@ -14,8 +14,6 @@ use TNW\Subscriptions\Block\Subscription\Summary\Payment\Details;
 
 /**
  * Class for subscription profile summary payment details block on frontend Customer Account.
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class DetailsView extends Details
 {

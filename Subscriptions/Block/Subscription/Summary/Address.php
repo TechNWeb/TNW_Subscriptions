@@ -12,8 +12,6 @@ use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
  * Class Address
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class Address extends BaseSummary
 {
