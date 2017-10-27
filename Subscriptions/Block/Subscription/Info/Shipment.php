@@ -128,7 +128,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         return $this->_urlBuilder->getUrl(
             'tnw_subscriptions/subscription_customer_account/save',
             [
-                'profile_id' => $this->getSubscriptionProfile()->getId(),
+                'entity_id' => $this->getSubscriptionProfile()->getId(),
                 'isAjax' => true,
             ]
         );
@@ -141,7 +141,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function isShowEdit()
     {
-        return (int)$this->_request->getParam('edit');
+        return (int)$this->_request->getParam('ship_address');
     }
 
     /**

@@ -48,15 +48,21 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
      *
      * @var PoolInterface
      */
-    private $modifiersPool;
+    protected $modifiersPool;
 
     /**
-     * SummaryForm constructor.
+     * @var string
+     */
+    private $requestProfileIdField;
+
+    /**
+     * SummaryPaymentMethodForm constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param ProfileManager $profileManager
      * @param PoolInterface $modifiersPool
+     * @param string $requestProfileIdField
      * @param array $meta
      * @param array $data
      */
@@ -66,11 +72,12 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
         $requestFieldName,
         ProfileManager $profileManager,
         PoolInterface $modifiersPool,
+        $requestProfileIdField = SummaryInsertForm::FORM_DATA_KEY,
         array $meta = [],
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        $this->profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+        $this->requestProfileIdField = $requestProfileIdField;
         $this->modifiersPool = $modifiersPool;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -86,7 +93,7 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
             $data = $modifier->modifyData($data);
         }
 
-        $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
+        $data[$this->requestProfileIdField] = $this->getProfileId();
 
         $data['payment'][$this->profileManager->getProfile()->getEngineCode()]['method'] = "1";
 
@@ -111,7 +118,7 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
         $poolMeta = [];
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
             if (method_exists($modifier, 'setPaymentFormName')) {
-                $modifier->setPaymentFormName(self::FORM_NAME);
+                $modifier->setPaymentFormName($this::FORM_NAME);
             }
             if (method_exists($modifier, 'setAdditionalNamespace')) {
                 $modifier->setAdditionalNamespace(self::PAYMENT_DETAILS_FIELDSET);
@@ -156,9 +163,23 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
      *
      * @return null|string
      */
-    private function getProfileId()
+    protected function getProfileId()
     {
-        return $this->profile ? $this->profile->getId() : null;
+        return $this->getProfile() ? $this->getProfile()->getId() : null;
+    }
+
+    /**
+     * Return current subscription profile
+     *
+     * @return null|SubscriptionProfile
+     */
+    private function getProfile()
+    {
+        if (!$this->profile) {
+            $this->profile = $this->profileManager->loadProfileFromRequest($this->requestProfileIdField);
+        }
+
+        return $this->profile;
     }
 
     /**
@@ -166,11 +187,11 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
      *
      * @return array
      */
-    private function getEditButtonMeta()
+    protected function getEditButtonMeta()
     {
         $isEditVisible = false;
 
-        if ($this->profile && $this->profile->canEditProfile()) {
+        if ($this->getProfile() && $this->getProfile()->canEditProfile()) {
             $isEditVisible = true;
         }
 

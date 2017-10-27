@@ -1,12 +1,19 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\Details $block */ ?>
+<?php if (!$block->isOnlyTableContent()): ?>
 <div class="block">
+    <?php if ($block->isShowTitle()) :?>
     <div class="block-title">
         <strong><?php echo __("Payment Details") ?></strong>
         <?php if ($block->isShowEditLink()) : ?>
-            <a href="<?php echo $block->getEditUrl('billing'); ?>" class="profile__edit_button"></a>
+            <a href="<?php echo $block->getEditUrl('billing'); ?>"
+               class="profile__edit_button"
+               id="payment-details-edit-button">
+            </a>
         <?php endif; ?>
     </div>
-    <div class="block-content">
+    <?php endif; ?>
+    <div class="block-content inner-block tnw_subscriptions">
+<?php endif;?>
         <table class="table-secondary data-table">
             <tbody>
             <tr class="col-0">
@@ -33,5 +40,7 @@
             </tr>
             </tbody>
         </table>
+<?php if (!$block->isOnlyTableContent()):?>
     </div>
 </div>
+<?php endif; ?>

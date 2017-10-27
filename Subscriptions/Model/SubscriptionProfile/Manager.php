@@ -438,7 +438,10 @@ class Manager
             return null;
         }
 
-        $additionalInfo = (array)json_decode($additionalInfo);
+        if (is_string($additionalInfo)) {
+            $additionalInfo = (array)json_decode($additionalInfo);
+        }
+
         if (empty($additionalInfo[$property])) {
             return null;
         }
@@ -781,7 +784,7 @@ class Manager
      * @param $requestData
      * @return int|null|string
      */
-    private function getEngineFromRequestData($requestData)
+    public function getEngineFromRequestData($requestData)
     {
         $engine = null;
         $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];

@@ -31,7 +31,8 @@ define([
             emptyCountryLabel: '',
             infoBlockContent: '.subscription-profile-shipping-address',
             buttonDisabledClass: 'disabled',
-            requiredFields: 'required'
+            requiredFields: 'required',
+            saveAddressButton: '#save_address'
         },
 
         /**
@@ -180,17 +181,18 @@ define([
          * @returns void
          */
         saveAddress: function(e) {
+            $('body').trigger('processStart');
             var form = $(this.options.formSelector),
                 widget = this,
-                editButton = $(this.options.addressEditButton),
-                addNewButton = $(this.options.addNewAddressButton);
+                saveAddressButton = $(this.options.saveAddressButton),
+                cancelButton = $(this.options.cancelButton);
 
             if (form.valid()) {
                 if (!$(this.options.customerAddressesList).is(':visible')) {
                     $(this.options.customerAddressesList).val('0');
                 }
-                this.disableButton(editButton);
-                this.disableButton(addNewButton);
+                this.disableButton(saveAddressButton);
+                this.disableButton(cancelButton);
 
                 $.ajax({
                     url: this.options.saveAddressUrl,
@@ -209,11 +211,15 @@ define([
                         if (typeof response.data.shipping_address != 'undefined') {
                             addressBlock.html(response.data.shipping_address);
                         }
-                        widget.setFormsVisibility(true);
-                        widget.enableButton(editButton);
-                        widget.enableButton(addNewButton);
+                        widget.setFormsVisibility(false);
+                        widget.enableButton(saveAddressButton);
+                        widget.enableButton(cancelButton);
                     }
+
+                }).always(function() {
+                    $('body').trigger('processStop');
                 });
+
             }
         },
 
@@ -283,5 +289,5 @@ define([
         }
     });
 
-    return $.mage.tnwSubscribePrice;
+    return $.mage.tnwSubscribeShipment;
 });

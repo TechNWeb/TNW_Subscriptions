@@ -8,6 +8,8 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Class for subscription profile summary payment details block on frontend Customer Account.
@@ -28,6 +30,11 @@ class Details extends BaseSummary
     private $paymentConfig;
 
     /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
      * Details constructor.
      * @param Template\Context $context
      * @param \Magento\Payment\Model\Config $paymentConfig
@@ -36,10 +43,15 @@ class Details extends BaseSummary
     public function __construct(
         Template\Context $context,
         \Magento\Payment\Model\Config $paymentConfig,
-        array $data = [])
-    {
-        parent::__construct($context, $data);
+        ProfileManager $profileManager,
+        $requestProfileIdField = SummaryInsertForm::FORM_DATA_KEY,
+        array $data = []
+    ) {
+        $this->profileManager = $profileManager;
         $this->paymentConfig = $paymentConfig;
+        $subscriptionProfile = $this->profileManager->loadProfileFromRequest($requestProfileIdField);
+        $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml');
+        parent::__construct($context, ['subscription_profile' => $subscriptionProfile]);
     }
 
     /**
@@ -75,12 +87,12 @@ class Details extends BaseSummary
     public function getCreditCardExpDate()
     {
         $additionalInfo = $this->getPaymentAdditionalInfo();
-        $creditCardNumber = '';
+        $creditCardExpDate = '';
         if (isset($additionalInfo['cc_exp_month']) && isset($additionalInfo['cc_exp_year'])) {
-            $creditCardNumber = "{$additionalInfo['cc_exp_month']}/{$additionalInfo['cc_exp_year']}";
+            $creditCardExpDate = "{$additionalInfo['cc_exp_month']}/{$additionalInfo['cc_exp_year']}";
         }
 
-        return $creditCardNumber;
+        return $creditCardExpDate;
     }
 
     /**
@@ -117,5 +129,36 @@ class Details extends BaseSummary
         }
 
         return $this->additionalInfo;
+    }
+
+    /**
+     * Return if is necessary to show block title
+     *
+     * @return mixed
+     */
+    public function isShowTitle()
+    {
+        return $this->getShowTitle();
+    }
+
+    /**
+     * Return if only table would be shown
+     * @return mixed
+     */
+    public function isOnlyTableContent()
+    {
+        return $this->getOnlyTableContent();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEditUrl($tabName = 'billing', array $params = [])
+    {
+        $params = [
+            'payment_details'      => 1,
+        ];
+
+        return parent::getEditUrl($tabName, $params);
     }
 }

@@ -51,4 +51,14 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
 </config>

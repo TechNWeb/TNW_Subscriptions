@@ -429,9 +429,23 @@ class Config
      */
     public function isPaymentAvailable($paymentCode, $websiteId = null)
     {
-        $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
+        if ($paymentCode === PaypalConfig::METHOD_PAYFLOWPRO || $paymentCode === PaypalConfig::METHOD_PAYMENT_PRO) {
+            $pathPayFLowPro = ActiveMethods::SECTION_ID . '/'
+                . ActiveMethods::GROUP_ID . '/'
+                . PaypalConfig::METHOD_PAYFLOWPRO;
+            $pathPaymentPro = ActiveMethods::SECTION_ID . '/'
+                . ActiveMethods::GROUP_ID . '/'
+                . PaypalConfig::METHOD_PAYMENT_PRO;
 
-        return (bool)$this->getStoreConfig($path, $websiteId);
+            return (bool)(
+                $this->getStoreConfig($pathPayFLowPro, $websiteId)
+                || $this->getStoreConfig($pathPaymentPro, $websiteId)
+            );
+        } else {
+            $path = ActiveMethods::SECTION_ID . '/' . ActiveMethods::GROUP_ID . '/' . $paymentCode;
+
+            return (bool)$this->getStoreConfig($path, $websiteId);
+        }
     }
 
     /**
