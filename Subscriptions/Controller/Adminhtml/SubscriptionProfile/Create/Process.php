@@ -116,11 +116,11 @@ class Process extends AbstractSave
     private function getAdditionalParams($currentStep)
     {
         $additionalParams = [];
-        if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+        if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING) {
             $additionalParams = [
                 Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
             ];
-        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
             $additionalParams = [
                 ShippingAndBilling::FORM_DATA_KEY => ShippingAndBilling::FORM_DATA_VALUE,
             ];
@@ -148,9 +148,9 @@ class Process extends AbstractSave
         $back = $this->getRequest()->getParam('back', 0);
 
         if (1 == $back) {
-            if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+            if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING) {
                 $this->getSubCreateModel()->clearAccountStepData();
-            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
                 $this->getSubCreateModel()->clearBillingStepData();
             }
         }

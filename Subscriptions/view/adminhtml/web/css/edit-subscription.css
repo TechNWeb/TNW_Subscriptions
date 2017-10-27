@@ -95,7 +95,7 @@ button.profile__cancel-edit_button:before{
     border: none;
     padding: 0;
 }
-.admin__profile_summary .admin_field_without_legend > div.admin__field {
+.admin__profile_summary .field_without_legend > div.admin__field {
     display: inline-block;
     margin-top: 0;
 }
@@ -272,20 +272,20 @@ button.profile__cancel-edit_button:before{
     overflow: auto;
 }
 
-#anchor-content .admin__control-label-up label{
+#anchor-content .control-label-up label{
     width: auto;
     position: relative;
     margin-left: 0;
     float: none;
 
 }
-#anchor-content .admin__control-label-up{
+#anchor-content .control-label-up{
     position: relative;
 }
 [data-index = "account_info"] legend {
     display: none;
 }
-.admin_field_without_legend > div.admin__field{
+.field_without_legend > div.admin__field{
     display: inline-block;
     margin-top: 0px;
 }
@@ -302,14 +302,14 @@ button.profile__cancel-edit_button:before{
     width: 6rem;
 }
 
-#anchor-content .admin_field_without_legend{
+#anchor-content .field_without_legend{
     width: calc( (100%) * .7 - 30px);
 }
-.admin__control-label-up.select {
+.control-label-up.select {
     width: 20%;
     min-width: 11rem;
 }
-.admin__control-label-up.input {
+.control-label-up.input {
     width: 74%;
 }
 .admin__address-information-preview {
@@ -835,4 +835,14 @@ button.action-editor.active:before{
 
 .tnw_subscriptionprofile_cancel_button_popup .modal-header {
     display: none;
+}
+.table-secondary {
+    width: 100%;
+}
+.table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
+    background-color: #f1f1f1;
+}
+.table-secondary th, .table-secondary td {
+    padding: 1rem 1rem;
+    text-align: left;
 }

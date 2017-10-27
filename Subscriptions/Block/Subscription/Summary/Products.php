@@ -12,7 +12,7 @@ use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
+ * Class Products
  */
 class Products extends BaseSummary
 {

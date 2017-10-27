@@ -20,9 +20,9 @@
         }
      }'>
     <?php echo $block->getTabMessagesHtml(); ?>
-    <div class="shipping-info-content">
+    <div class="shipping-info-content content-block">
         <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
-        <div id="shipping-info-edit"><?php echo $block->getShippingInfoEditHtml() ?></div>
+        <div id="shipping-info-edit" class="hidden"><?php echo $block->getShippingInfoEditHtml() ?></div>
     </div>
     <div class="shipping-details-content">
         <div id="shipping-details-view"><?php echo $block->getShippingDetailsViewHtml() ?></div>

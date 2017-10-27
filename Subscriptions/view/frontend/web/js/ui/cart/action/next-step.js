@@ -17,6 +17,14 @@ define([
         },
 
         /**
+         * @inheritdoc
+         */
+        initObservable: function () {
+            return this._super()
+                .observe(['buttonTitle']);
+        },
+
+        /**
          * Next step button click.
          */
         onNextStepClick: function () {
@@ -40,27 +48,26 @@ define([
                     stepNavigator.navigateNext();
                 }
             }
-
-            this.hideButtonIfNeed();
-        },
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function () {
-            this._super();
-            this.hideButtonIfNeed();
-
-            return this;
         },
 
         /**
          * Hide button next step if need.
+         *
+         * @return void
          */
         hideButtonIfNeed: function () {
+            var bottomCartAction = $('.tnw-subscriptions-cart-bottom-action');
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
-                $('.tnw-subscriptions-cart-bottom-action').hide();
+                bottomCartAction.hide();
+            } else {
+                this.show();
+                bottomCartAction.show();
+            }
+
+            if (stepNavigator.getActiveItemCode() === 'thankyou') {
+                this.hide();
+                bottomCartAction.addClass('thankyoupage-bottom-cart-action');
             }
         }
     });

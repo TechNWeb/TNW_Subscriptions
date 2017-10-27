@@ -10,8 +10,6 @@ use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 
 /**
  *  Class for subscription profile summary shipping details block on frontend Customer Account.
- *
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
  */
 class Details extends BaseSummary
 {

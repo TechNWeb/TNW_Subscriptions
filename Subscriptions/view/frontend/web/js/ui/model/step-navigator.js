@@ -58,6 +58,7 @@ define(
                     requestFieldName: step.requestFieldName,
                     requestFieldValue: step.requestFieldValue,
                     stepActions: step.stepActions,
+                    nextButtonTitle: step.nextButtonTitle,
                     title: $t(step.title),
                     sortOrder: step.sortOrder,
                     isActive: isActive,
@@ -219,7 +220,6 @@ define(
              * Get current step.
              *
              * @returns {Function}
-             * @todo optimize this
              */
             getCurrentStep: function () {
                 var currentStep = null;

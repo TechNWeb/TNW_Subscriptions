@@ -273,6 +273,7 @@ class Customer extends Create
         $session = $this->getSession();
         $shippingAddress = $session->getFirstQuote()->getShippingAddress();
         $customerAddressObject = $shippingAddress->exportCustomerAddress();
+        $groupId = $session->getCustomerGroup() ?: $session->getFirstQuote()->getCustomerGroupId();
         $customer->setSuffix($customerAddressObject->getSuffix())
             ->setFirstname($customerAddressObject->getFirstname())
             ->setLastname($customerAddressObject->getLastname())
@@ -281,7 +282,7 @@ class Customer extends Create
             ->setStoreId($store->getId())
             ->setWebsiteId($store->getWebsiteId())
             ->setEmail($session->getCustomerEmail())
-            ->setGroupId($session->getCustomerGroup());
+            ->setGroupId($groupId);
 
         return $customer;
     }

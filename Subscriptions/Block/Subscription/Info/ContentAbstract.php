@@ -67,7 +67,10 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     protected function _prepareLayout()
     {
         foreach ($this->getChildNames() as $names) {
-            $this->initChildBlock($this->getLayout()->getBlock($names));
+            if ($this->getLayout()->getBlock($names)) {
+                $this->initChildBlock($this->getLayout()->getBlock($names));
+            }
+
         }
 
         return parent::_prepareLayout();

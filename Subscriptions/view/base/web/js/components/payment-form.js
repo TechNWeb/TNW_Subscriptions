@@ -1,7 +1,12 @@
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
 define(
     [
         'jquery',
-        'Magento_Ui/js/form/form',
+        'TNW_Subscriptions/js/components/subscriptions-form',
         'uiRegistry',
         'underscore',
         'mage/translate'
@@ -12,13 +17,16 @@ define(
         return Component.extend({
 
             beforeSubmit: function () {
+                var current = this,
+                    needShowRequiredError = true,
+                    validForm = true;
+
                 this.validate();
                 if (this.source.params.invalid){
-                    return;
+                    validForm = false;
+                    return validForm;
                 }
 
-                var current = this,
-                    needShowRequiredError = true;
 
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
@@ -39,8 +47,11 @@ define(
                     if (firstFieldSet !== undefined) {
                         firstFieldSet.resetErrors();
                         firstFieldSet.set('payment_errors', [$.mage.__('Please select payment.')]);
+                        validForm = false;
                     }
                 }
+
+                return validForm;
             },
 
             triggerSave:function (errors) {
@@ -50,6 +61,7 @@ define(
                         if (errors && errors.length > 0){
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
+
                             return;
                         }
                         switch (code) {

@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -16,7 +22,7 @@
         </item>
         <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
-    <dataSource name="tnw_subscriptionprofile_checkout_billing_form_data_source">SubscriptionProfile\DataProvider\
+    <dataSource name="tnw_subscriptionprofile_checkout_billing_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout\Billing</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form_data_source</argument>

@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
@@ -26,7 +27,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 /**
  * PayPal payment methods form modifier.
  */
-class PaymentsPro extends Base
+class PaymentsPro extends Base implements PaymentModifierInterface
 {
     const SORT_ORDER = 20;
 
@@ -146,6 +147,7 @@ class PaymentsPro extends Base
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                             'dataContainer' => $this->getPaymentCode() . '-cc-type',
+                            'additionalClasses' => 'credit-card-type',
                             'sortOrder' => 10,
                             'options' => $this->getPaymentCcTypes(),
                             'imports' => [
@@ -164,11 +166,13 @@ class PaymentsPro extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Credit Card Number'),
+                            'placeholder' => __('Credit card number'),
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
+                            'additionalClasses' => 'credit-card-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
@@ -188,10 +192,10 @@ class PaymentsPro extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Expiration Date'),
-                            'component' => 'Magento_Ui/js/form/components/group',
+                            'component' => 'TNW_Subscriptions/js/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'admin_field_without_legend',
+                            'additionalClasses' => 'field_without_legend',
                             'dataScope' => '',
                             'sortOrder' => 30,
                         ],
@@ -209,7 +213,7 @@ class PaymentsPro extends Base
                                     'dataType' => Text::NAME,
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
@@ -233,7 +237,7 @@ class PaymentsPro extends Base
                                     'dataScope' => 'cc_exp_year',
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
@@ -257,6 +261,7 @@ class PaymentsPro extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Card Verification Number'),
+                            'placeholder' => __('Credit verification number'),
                             'name' => '',
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
@@ -271,6 +276,7 @@ class PaymentsPro extends Base
                             ],
                             'validation' => [
                                 'required-number' => true,
+                                'required-entry' => true,
                                 'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
@@ -446,7 +452,7 @@ class PaymentsPro extends Base
         }
 
         return $this->urlBuilder->getUrl(
-            'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
+            'tnw_subscriptions/paypal/requestSecureToken',
             $routeParams
         );
     }
