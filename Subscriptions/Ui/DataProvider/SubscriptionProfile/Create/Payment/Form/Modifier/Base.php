@@ -55,9 +55,9 @@ class Base implements ModifierInterface
     /**
      * Profile id
      *
-     * @var integer
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile
      */
-    private $profileId;
+    private $profile;
 
     /**
      * Session
@@ -67,13 +67,19 @@ class Base implements ModifierInterface
     private $session;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param QuoteSessionInterface $session
      */
     public function __construct(
         Config $config,
-        QuoteSessionInterface $session
+        QuoteSessionInterface $session,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -81,6 +87,7 @@ class Base implements ModifierInterface
         $this->listens = [
             'checked' => 'saveBilling'
         ];
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -210,6 +217,7 @@ class Base implements ModifierInterface
                         'description' => $this->getPaymentTitle(),
                         'dataScope' => 'method',
                         'component' => 'TNW_Subscriptions/js/components/extended-checkbox',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/radio',
                         'parentContainer' => static::PAYMENT_INFORMATION_FIELD_SET_NAME,
                         'parentSelections' => static::PAYMENT_INFORMATION_FIELD_SET_NAME,
                         'additionalClasses' => 'payment-checkbox',
@@ -243,6 +251,7 @@ class Base implements ModifierInterface
                 'data' => [
                     'config' => [
                         'componentType' => Fieldset::NAME,
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',
@@ -324,11 +333,24 @@ class Base implements ModifierInterface
     /**
      * Returns profile id
      *
-     * @return int
+     * @return int|null
      */
     protected function getProfileId()
     {
-        return $this->profileId;
+        $profileId = null;
+        if ($this->profile) {
+            $profileId = $this->profile->getId();
+        }
+
+        return $profileId;
+    }
+
+    /**
+     * @return \TNW\Subscriptions\Model\SubscriptionProfile
+     */
+    protected function getProfile()
+    {
+        return $this->profile;
     }
 
     /**
@@ -339,7 +361,7 @@ class Base implements ModifierInterface
      */
     public function setProfileId($profileId)
     {
-        $this->profileId = $profileId;
+        $this->profile = $this->profileRepository->getById($profileId);
         return $this;
     }
 

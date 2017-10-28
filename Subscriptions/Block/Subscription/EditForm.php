@@ -10,6 +10,12 @@ namespace TNW\Subscriptions\Block\Subscription;
  */
 class EditForm extends \Magento\Framework\View\Element\Template
 {
+    /** HTML element form class */
+    const FORM_CLASS = 'shipping-form';
+
+    /** HTML element form id */
+    const FORM_ID = 'shipping-address-form';
+
     /**
      * Retrieve edit form content.
      *
@@ -27,7 +33,7 @@ class EditForm extends \Magento\Framework\View\Element\Template
      */
     public function getFormClass()
     {
-        return 'shipping-form';
+        return self::FORM_CLASS;
     }
 
     /**
@@ -37,6 +43,6 @@ class EditForm extends \Magento\Framework\View\Element\Template
      */
     public function getFormId()
     {
-        return 'shipping-address-form';
+        return self::FORM_ID;
     }
 }

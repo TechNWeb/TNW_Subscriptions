@@ -33,4 +33,47 @@ class Billing extends ContentAbstract implements ExpireWarningSupportInterface
     {
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
+    {
+        $block->addData([
+            'subscription_profile' => $this->getSubscriptionProfile(),
+        ]);
+
+        return $block;
+    }
+
+    /**
+     * Return payment methods view form
+     *
+     * @return string
+     */
+    public function getPaymentDetailsViewHtml()
+    {
+        return $this->getChildHtml('payment-details');
+    }
+
+    /**
+     * Return payment methods edit form.
+     *
+     * @return string
+     */
+    public function getPaymentDetailsEditHtml()
+    {
+        return $this->getChildHtml('tnw_subscriptionprofile_account_payment_method_form');
+    }
+
+    /**
+     * Check if it necessary to show edit form.
+     *
+     * @return int
+     */
+    public function isShowEdit()
+    {
+        return (int)$this->_request->getParam('payment_details');
+    }
+
 }

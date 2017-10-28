@@ -14,7 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Request\Save\Processor;
+use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Store;
@@ -42,7 +42,7 @@ class Process extends AbstractSave
      * @param Context $context
      * @param Registry $coreRegistry
      * @param DataPersistorInterface $dataPersistor
-     * @param Processor $saveProcessor
+     * @param RequestProcessor $saveProcessor
      * @param JsonFactory $resultJsonFactory
      * @param StepPool $stepPool
      */
@@ -50,7 +50,7 @@ class Process extends AbstractSave
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
-        Processor $saveProcessor,
+        RequestProcessor $saveProcessor,
         JsonFactory $resultJsonFactory,
         StepPool $stepPool
     ) {
@@ -116,11 +116,11 @@ class Process extends AbstractSave
     private function getAdditionalParams($currentStep)
     {
         $additionalParams = [];
-        if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+        if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING) {
             $additionalParams = [
                 Account::FORM_DATA_KEY => Account::FORM_DATA_VALUE,
             ];
-        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+        } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
             $additionalParams = [
                 ShippingAndBilling::FORM_DATA_KEY => ShippingAndBilling::FORM_DATA_VALUE,
             ];
@@ -148,9 +148,9 @@ class Process extends AbstractSave
         $back = $this->getRequest()->getParam('back', 0);
 
         if (1 == $back) {
-            if ($currentStep === StepPool::STEP_PARAM_TYPE_ACCOUNT_INFORMATION) {
+            if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING) {
                 $this->getSubCreateModel()->clearAccountStepData();
-            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
                 $this->getSubCreateModel()->clearBillingStepData();
             }
         }

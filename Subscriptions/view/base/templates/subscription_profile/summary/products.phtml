@@ -1,8 +1,10 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block */ ?>
 <div class="block products">
-    <div class="block-title">
+    <div class="block-title products-title">
         <strong><?php echo __('Products') ?></strong>
-        <a href="<?php echo $block->getUrl('tnw_subscriptions/subscription/items', ['entity_id' => $block->getSubscriptionProfile()->getId()]) ?>" class="profile__edit_button"></a>
+        <?php if ($block->isShowEditLink()) : ?>
+            <a href="<?php echo $block->getEditUrl('items')?>" class="profile__edit_button"></a>
+        <?php endif;?>
     </div>
     <div class="block-content">
         <ol class="items">
@@ -27,7 +29,7 @@
                         <dt><?php echo __('Term') ?></dt>
                         <dd><?php echo $block->getTerm() ?></dd>
                         <dt><?php echo __('Start on') ?></dt>
-                        <dd><?php echo $block->getStartOn()->format('m/d/Y') ?></dd>
+                        <dd><?php echo $block->getStartOnFormatted() ?></dd>
                         <dt><?php echo __('Price') ?></dt>
                         <dd><?php echo $block->formatPrice($item->getPrice()) ?></dd>
                     </dl>

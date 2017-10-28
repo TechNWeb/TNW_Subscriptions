@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 /**
  * Form modifier to display payment method Checkmo.
  */
-class Checkmo extends Base
+class Checkmo extends Base implements PaymentModifierInterface
 {
     /**#@+
      * Checkmo additional field names.
@@ -36,21 +36,23 @@ class Checkmo extends Base
 
     /**
      * Checkmo constructor.
+     * @param Context $context
      * @param Config $config
      * @param QuoteSessionInterface $session
-     * @param Context $context
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
      * @param CheckmoPayment $checkmoPayment
      */
     public function __construct(
+        Context $context,
         Config $config,
         QuoteSessionInterface $session,
-        Context $context,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
         CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
 
-        parent::__construct($config, $session);
+        parent::__construct($config, $session, $profileRepository);
     }
 
 

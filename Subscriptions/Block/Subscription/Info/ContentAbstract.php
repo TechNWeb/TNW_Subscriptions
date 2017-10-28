@@ -67,7 +67,10 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     protected function _prepareLayout()
     {
         foreach ($this->getChildNames() as $names) {
-            $this->initChildBlock($this->getLayout()->getBlock($names));
+            if ($this->getLayout()->getBlock($names)) {
+                $this->initChildBlock($this->getLayout()->getBlock($names));
+            }
+
         }
 
         return parent::_prepareLayout();
@@ -120,5 +123,16 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     public function getSubscriptionProfile()
     {
         return $this->registry->registry('tnw_subscription_profile');
+    }
+
+    /**
+     * Check if it is possible to edit subscription profile.
+     * Depends on profile status.
+     *
+     * @return bool
+     */
+    public function isShowEditLink()
+    {
+        return $this->getSubscriptionProfile()->canEditProfile();
     }
 }

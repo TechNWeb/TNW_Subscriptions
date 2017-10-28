@@ -288,7 +288,7 @@ class Product extends AbstractDataProvider
                 if (!in_array($currentShippingMethod[0], $this->shippingMethods->getDontCostDependedMethodsCodes())) {
                     $needShowAttention = true;
                 }
-            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_SHIPPING_BILLING) {
+            } elseif ($this->stepPool->getCurrentStep() === StepPool::STEP_PARAM_TYPE_BILLING) {
                 $shippingMethods = $this->shippingMethods->getShippingMethodsAsOptionArray();
                 $needShowAttention = true;
                 $label = '';
@@ -749,7 +749,7 @@ class Product extends AbstractDataProvider
      *
      * @return array
      */
-    private function getProductColumnsData()
+    protected function getProductColumnsData()
     {
         return [
             self::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS_COLUMNS => [

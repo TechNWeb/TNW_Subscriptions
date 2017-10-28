@@ -17,6 +17,14 @@ define([
         },
 
         /**
+         * @inheritdoc
+         */
+        initObservable: function () {
+            return this._super()
+                .observe(['buttonTitle']);
+        },
+
+        /**
          * Next step button click.
          */
         onNextStepClick: function () {
@@ -27,39 +35,39 @@ define([
                 stepNavigator.navigateTo('shipping');
             } else {
                 var currentStep = stepNavigator.getCurrentStep();
-                if (currentStep.needSave) {
-                    var stepForm = registry.get('index = tnw_subscriptionprofile_checkout_' + activeCode + '_form')
-                    if (stepForm) {
-                        stepForm.save();
-                        if (!stepForm.additionalInvalid && !stepForm.source.get('params.invalid')) {
-                            stepNavigator.navigateNext();
+                if (currentStep.stepActions) {
+                    currentStep.stepActions.forEach(function (element) {
+                        var component = registry.async('index = ' + element.targetName),
+                            params = [];
+                        if (component) {
+                            params.unshift(element.actionName);
+                            component.apply(component, params);
                         }
-                    }
+                    });
                 } else {
                     stepNavigator.navigateNext();
                 }
             }
-
-            this.hideButtonIfNeed();
-        },
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function () {
-            this._super();
-            this.hideButtonIfNeed();
-
-            return this;
         },
 
         /**
          * Hide button next step if need.
+         *
+         * @return void
          */
         hideButtonIfNeed: function () {
+            var bottomCartAction = $('.tnw-subscriptions-cart-bottom-action');
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
-                $('.tnw-subscriptions-cart-bottom-action').hide();
+                bottomCartAction.hide();
+            } else {
+                this.show();
+                bottomCartAction.show();
+            }
+
+            if (stepNavigator.getActiveItemCode() === 'thankyou') {
+                this.hide();
+                bottomCartAction.addClass('thankyoupage-bottom-cart-action');
             }
         }
     });

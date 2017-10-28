@@ -419,12 +419,10 @@ class CreateProfile extends BaseCreate
     public function setPaymentData($data)
     {
         $result = [];
-
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
         try {
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            $subQuotes = $session->getSubQuotes();
-
             foreach ($subQuotes as $subQuote) {
                 $subQuote->getPayment()->importData($data);
             }
@@ -492,50 +490,48 @@ class CreateProfile extends BaseCreate
     public function createSubscriptions()
     {
         $profiles = [];
-        try {
-            $customer = $this->customerCreator->prepareCustomer();
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            $subQuotes = $session->getSubQuotes();
-            $basicPayment = $session->getFirstQuote()->getPayment();
-            /** @var ModelQuote $subQuote */
-            foreach ($subQuotes as $subQuote) {
-                $this->quoteCreator->fillCustomerData($customer, $subQuote);
-                $this->quoteCreator->validate($subQuote);
-                //Create new profile
-                $profile = $this->createProfile($subQuote, $basicPayment);
-                //Assign quote to new profile
-                $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile);
-                //Add new relation to profile processing queue in "running" state.
-                $queueItemIds = $this->queueManager->insertItems(
-                    [$relation->getId()],
-                    true
-                );
-                try {
-                    $order = $this->profileManager->processProfile($subQuote);
-                } catch (\Exception $e) {
-                    $this->getContext()->getMessageManager()->addError(
-                        __('Unable to process order for profile ') . $profile->getId()
-                    );
-                    $this->getContext()->log($e->getMessage());
-                    $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                }
-                if (isset($order)) {
-                    $this->profileManager->assignOrderToProfile($relation, $order);
-                    $this->queueManager->makeCompleted($queueItemIds);
-                    $this->eventManager->dispatch(
-                        'checkout_submit_all_after',
-                        ['order' => $order, 'quote' => $subQuote]
-                    );
-                }
-                //Generate quote for next payment.
-                $this->quoteGenerator->generateProfileQuotes($profile, 1);
-                $profiles[] = $profile;
-                //TODO add here email sending
+        $customer = $this->customerCreator->prepareCustomer();
+        /** @var QuoteSessionInterface $session */
+        $session = $this->getSession();
+        $subQuotes = $session->getSubQuotes();
+        $basicPayment = $session->getFirstQuote()->getPayment();
+        /** @var ModelQuote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $this->quoteCreator->fillCustomerData($customer, $subQuote);
+            $this->quoteCreator->validate($subQuote);
+            //Current time
+            $date = new \DateTime();
+            //Create new profile
+            $profile = $this->createProfile($subQuote, $basicPayment, $date);
+            //Assign quote to new profile
+            $relation = $this->profileManager->assignQuoteToProfile(
+                $subQuote,
+                $profile,
+                $date->format('Y-m-d H:i:s')
+            );
+            //Add new relation to profile processing queue in "running" state.
+            $queueItemIds = $this->queueManager->insertItems(
+                [$relation->getId()],
+                true
+            );
+            try {
+                $order = $this->profileManager->processProfile($subQuote);
+            } catch (\Exception $e) {
+                $this->queueManager->makeError($queueItemIds, $e->getMessage());
+                throw $e;
             }
-        } catch (\Exception $e) {
-            $this->getContext()->log($e->getMessage());
-            $this->getContext()->getMessageManager()->addError($e->getMessage());
+            if (isset($order)) {
+                $this->profileManager->assignOrderToProfile($relation, $order);
+                $this->queueManager->makeCompleted($queueItemIds);
+                $this->eventManager->dispatch(
+                    'checkout_submit_all_after',
+                    ['order' => $order, 'quote' => $subQuote]
+                );
+            }
+            //Generate quote for next payment.
+            $this->quoteGenerator->generateProfileQuotes($profile, 1);
+            $profiles[] = $profile;
+            //TODO add here email sending
         }
 
         return $profiles;
@@ -546,14 +542,16 @@ class CreateProfile extends BaseCreate
      *
      * @param ModelQuote $subQuote
      * @param $payment
+     * @param null|\DateTime $date
      * @return SubscriptionProfileInterface
      */
     private function createProfile(
         ModelQuote $subQuote,
-        $payment
+        $payment,
+        $date = null
     ) {
         $profile = $this->profileManager->reset()
-            ->populateProfileData($subQuote)
+            ->populateProfileData($subQuote, $date)
             ->populatePaymentData($payment)
             ->saveProfile();
         //Add comment about profile creating

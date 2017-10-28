@@ -43,14 +43,38 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
     private $dataObjectHelper;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
+     * @var array
+     */
+    protected $logField = [
+        self::FIRSTNAME => 'First Name',
+        self::MIDDLENAME => 'Middle Name',
+        self::LASTNAME => 'Last Name',
+        self::SUFFIX => 'Suffix Name',
+        self::COMPANY => 'Company',
+        self::STREET => 'Street',
+        self::CITY => 'City',
+        self::REGION => 'Region',
+        self::POSTCODE => 'Postcode',
+        self::COUNTRY_ID => 'Country',
+        self::TELEPHONE => 'Telephone',
+        self::FAX => 'Fax'
+    ];
+
+    /**
      * Address constructor.
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param Copy $objectCopyService
      * @param AddressInterfaceFactory $addressDataFactory
      * @param DataObjectHelper $dataObjectHelper
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $historyLogger
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
      */
     public function __construct(
@@ -59,14 +83,16 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
         Copy $objectCopyService,
         AddressInterfaceFactory $addressDataFactory,
         DataObjectHelper $dataObjectHelper,
+        MessageHistoryLogger $historyLogger,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->objectCopyService = $objectCopyService;
         $this->addressDataFactory = $addressDataFactory;
         $this->dataObjectHelper = $dataObjectHelper;
+        $this->historyLogger = $historyLogger;
     }
 
     /**
@@ -400,5 +426,34 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
     public function setTelephone($telephone)
     {
         return $this->setData(self::TELEPHONE, $telephone);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave()
+    {
+        foreach ($this->logField as $field => $fieldName) {
+            if ($field === self::STREET && is_array($this->getOrigData($field))) {
+                $this->setOrigData($field, implode("\n", $this->getOrigData($field)));
+            }
+
+            if (!$this->dataHasChangedFor($field) || !$this->getOrigData($field)) {
+                continue;
+            }
+
+            $type = $this->getAddressType() == self::ADDRESS_TYPE_SHIPPING
+                ? __('Shipping Address') : __('Billing Address');
+
+            $oldValue = (string)$this->getOrigData($field);
+            $newValue = (string)$this->getData($field);
+
+            $message = __('%1 %2 changed from  <b>%3</b> to <b>%4</b>',
+                $type, $fieldName, $oldValue, $newValue);
+
+            $this->historyLogger->log($message, $this->getProfileId());
+        }
+
+        return parent::afterSave();
     }
 }

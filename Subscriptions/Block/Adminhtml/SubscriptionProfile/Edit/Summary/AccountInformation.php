@@ -276,9 +276,9 @@ class AccountInformation extends Template
     {
         $result = self::DATE_NOT_FOUND;
         if ($date) {
-            $dateTime = new DateTime();
-            $result = $this->_localeDate->date($dateTime->strToTime($date))->format('F dS, Y');
+            $result = $this->_localeDate->formatDate($date, \IntlDateFormatter::LONG);
         }
+
         return $result;
     }
 

@@ -195,6 +195,11 @@
   margin-top: 1rem;
 }
 
+.sub-data-grid .hidden {
+  display: none;
+  visibility: hidden;
+}
+
 .sub-data-grid .subscription-shipping-attention::before{
   color: #eb5202;
   content: '\e623';
@@ -240,20 +245,20 @@
   overflow: auto;
 }
 
-#anchor-content .admin__control-label-up label{
+#anchor-content .control-label-up label{
   width: auto;
   position: relative;
   margin-left: 0;
   float: none;
 
 }
-#anchor-content .admin__control-label-up{
+#anchor-content .control-label-up{
   position: relative;
 }
 [data-index = "account_info"] legend {
   display: none;
 }
-.admin_field_without_legend > div.admin__field{
+.field_without_legend > div.admin__field{
   display: inline-block;
   margin-top: 0px;
 }
@@ -270,14 +275,14 @@
   width: 6rem;
 }
 
-#anchor-content .admin_field_without_legend{
+#anchor-content .field_without_legend{
   width: calc( (100%) * .7 - 30px);
 }
-.admin__control-label-up.select {
+.control-label-up.select {
   width: 20%;
   min-width: 11rem;
 }
-.admin__control-label-up.input {
+.control-label-up.input {
   width: 74%;
 }
 .admin__address-information-preview {
@@ -705,4 +710,11 @@ button.action-editor.active:before{
 .admin__field-control .field-qty .admin__field-label span:after {
   left: 0;
   margin-left: 0px;
+}
+.table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
+  background-color: #f1f1f1;
+}
+.table-secondary th, .table-secondary td {
+  padding: 1rem 1rem;
+  text-align: left;
 }

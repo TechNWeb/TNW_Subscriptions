@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -73,9 +79,6 @@
                         <item name="displayAsLink" xsi:type="boolean">false</item>
                         <item name="sortOrder" xsi:type="number">0</item>
                         <item name="additionalClasses" xsi:type="string">profile__edit_button</item>
-                        <item name="imports" xsi:type="array">
-                            <item name="visible" xsi:type="string">ns = ${ $.ns }, index = payment_method:preview</item>
-                        </item>
                         <item name="actions" xsi:type="array">
                             <item name="0" xsi:type="array">
                                 <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = payment_method</item>
@@ -116,7 +119,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\PaymentDetails</argument>
+                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Payment\Details</argument>
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="imports" xsi:type="array">
