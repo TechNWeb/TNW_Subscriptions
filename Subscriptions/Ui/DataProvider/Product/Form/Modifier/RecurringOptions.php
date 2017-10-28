@@ -115,6 +115,7 @@ class RecurringOptions extends BaseModifier
     private $forbiddenProductTypes = [
         \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
         \Magento\Bundle\Model\Product\Type::TYPE_CODE,
+        \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
     ];
 
     /**
