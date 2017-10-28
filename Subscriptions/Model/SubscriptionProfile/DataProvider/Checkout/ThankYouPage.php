@@ -31,7 +31,7 @@ class ThankYouPage extends AbstractDataProvider
      * @param UrlBuilder $urlBuilder
      * @param string $name
      * @param string $primaryFieldName
-     * @param array $requestFieldName
+     * @param string $requestFieldName
      * @param array $meta
      * @param array $data
      */

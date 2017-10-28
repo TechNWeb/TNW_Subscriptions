@@ -37,7 +37,7 @@ class PaymentMethodForm extends SummaryPaymentMethodForm
      * @param ProfileManager $profileManager
      * @param PoolInterface $modifiersPool
      * @param UrlInterface $urlBuilder
-     * @param array|string $requestProfileIdField
+     * @param string $requestProfileIdField
      * @param array $meta
      * @param array $data
      */
