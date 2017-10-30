@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\CustomerData;
 
 use Magento\Customer\CustomerData\SectionSourceInterface;
-use TNW\Subscriptions\Model\QuoteSession;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Section to reload cart items qty.
@@ -15,14 +15,14 @@ use TNW\Subscriptions\Model\QuoteSession;
 class SubscriptionCart implements SectionSourceInterface
 {
     /**
-     * @var QuoteSession
+     * @var QuoteSessionInterface
      */
     private $session;
 
     /**
-     * @param QuoteSession $session
+     * @param QuoteSessionInterface $session
      */
-    public function __construct(QuoteSession $session)
+    public function __construct(QuoteSessionInterface $session)
     {
         $this->session = $session;
     }
