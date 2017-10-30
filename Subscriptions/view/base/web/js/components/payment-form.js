@@ -58,15 +58,15 @@ define(
                 var current = this;
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1"){
-                        if (errors && errors.length > 0){
+                        if (errors && errors.length > 0) {
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
-
+                            current.hideLoader();
                             return;
                         }
                         switch (code) {
                             case 'payflowpro':
-                                if (fields.additional.cc_number){
+                                if (fields.additional.cc_number) {
                                     fields.additional.cc_last_4 = fields.additional.cc_number.substr(-4);
                                     delete fields.additional.cc_number;
                                 }
@@ -74,6 +74,7 @@ define(
                                 break;
                         }
                         current.save();
+                        current.hideLoader();
                     }
                 });
             }
