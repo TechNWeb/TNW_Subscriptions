@@ -15,7 +15,7 @@ use Magento\Tax\Helper\Data;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * ShippingMethods source class
+ * Shipping methods source class
  */
 class ShippingMethods
 {

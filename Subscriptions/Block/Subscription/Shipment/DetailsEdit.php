@@ -76,9 +76,9 @@ class DetailsEdit extends \Magento\Framework\View\Element\Template
         if ($this->getSubscriptionProfile()) {
             $this->profileManager->setProfile($this->getSubscriptionProfile());
             $nextQuote = $this->profileManager->getNextQuote();
-        if ($nextQuote) {
-            $options = $this->shippingMethods->getFormattedShippingMethodOptions($nextQuote);
-        }
+            if ($nextQuote) {
+                $options = $this->shippingMethods->getFormattedShippingMethodOptions($nextQuote);
+            }
         }
 
         return $options;
