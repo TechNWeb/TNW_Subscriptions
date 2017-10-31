@@ -142,6 +142,9 @@
   }
 
   .tnw-subscriptions-cart__container {
+    .block-main {
+      margin-bottom: 3rem;
+    }
 
     .block-main,
     .block-step {
@@ -283,17 +286,12 @@
 }
 
 .select-action.next-step {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  border-top: 1px solid #ccc;
   background: #fff;
   height: 77px;
   display: none;
 
   .action.primary {
+    width: 230px;
     height: 45px;
     margin-top: 15px
   }
@@ -1833,7 +1831,7 @@
 }
 
 .thankyoupage-bottom-cart-action {
-  .select-action.next-step {
+  /*.select-action.next-step {
     position: relative;
     width: 100%;
     text-align: left;
@@ -1849,26 +1847,7 @@
       width: 230px;
       text-align: center;
     }
-  }
-
-  @media (max-width: 767px) {
-    .select-action.next-step {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      border-top: 1px solid #ccc;
-      background: #fff;
-      height: 77px;
-
-      .action.primary {
-        height: 45px;
-        width: initial;
-        margin-top: 15px
-      }
-    }
-  }
+  }*/
 }
 
 .payment-details-content {

@@ -9,7 +9,7 @@ define([
     'mage/template',
     'Magento_Ui/js/lib/spinner',
     'jquery/ui'
-], function (Collapsible, registry, $j, template, loader) {
+], function (Collapsible, registry, $j, template) {
     'use strict';
 
     return Collapsible.extend({
@@ -114,10 +114,6 @@ define([
                     } else {
                         this.processErrors(response.error_messages);
                     }
-                    this.hideLoader();
-                },
-                complete: function () {
-                    this.hideLoader();
                 }
             });
         },

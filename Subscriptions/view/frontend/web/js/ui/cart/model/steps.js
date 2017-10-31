@@ -20,9 +20,13 @@ define([
                 isLoading: true,
                 loadingQueue: [],
                 childResponseData: null,
+                imports: {
+                    buttonInitialized: 'index = next_step:buttonInitialized'
+                },
                 listens: {
                     childResponseData: 'processAfterSave',
-                    loadingQueue: 'checkLoadingQueue'
+                    loadingQueue: 'checkLoadingQueue',
+                    buttonInitialized: 'checkButtonInitialized'
                 },
                 currentStepCode: null,
                 modules: {
@@ -61,7 +65,7 @@ define([
              */
             initObservable: function () {
                 return this._super()
-                    .observe(['isLoading', 'childResponseData', 'loadingQueue']);
+                    .observe(['isLoading', 'childResponseData', 'loadingQueue', 'buttonInitialized']);
             },
 
             /**
@@ -117,7 +121,6 @@ define([
                         current.renderBlock(form, step);
                     });
                 }
-                this.modifyNextStepButton(step);
             },
 
             /**
@@ -237,6 +240,17 @@ define([
                 if (base_url) {
                     window.location.href = base_url;
                 }
+            },
+
+            /**
+             * Check if "next step" button initialized.
+             *
+             * @return void
+             */
+            checkButtonInitialized: function () {
+                var stepIndex = stepNavigator._getActiveItemIndex();
+                var step = stepNavigator.steps()[stepIndex];
+                this.modifyNextStepButton(step);
             }
         });
     }
