@@ -60,7 +60,6 @@ class DataProvider extends AbstractDataProvider
             ]
         );
 
-        $collection->addFilterToMap('id', 'main_table.id');
         $collection->getSelect()->join(
             ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
             'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.' . SubscriptionProfileOrderInterface::ID,
