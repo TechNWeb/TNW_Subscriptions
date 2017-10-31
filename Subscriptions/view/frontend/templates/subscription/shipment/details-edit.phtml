@@ -1,0 +1,27 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/** @var $block TNW\Subscriptions\Block\Subscription\Shipment\DetailsEdit */
+?>
+<fieldset class="fieldset-shipping" id="customer-data">
+    <div class="methods-list">
+        <?php foreach ($block->getShippingMethodsArray() as $shippingMethod):?>
+            <div class="method">
+                <input type="radio"
+                       name="shipping_method_id"
+                       value="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
+                       id="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
+                       <?php echo $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
+                <label for="<?php echo $block->escapeHtml($shippingMethod['value'])?>">
+                    <?php echo $block->escapeHtml($shippingMethod['label'])?>
+                </label>
+                <div class="<?php echo $block->escapeHtml($shippingMethod['css'])?>"
+                     data-title="<?php echo $block->escapeHtml(__($shippingMethod['title']))?>">
+                </div>
+            </div>
+        <?php endforeach;?>
+    </div>
+</fieldset>

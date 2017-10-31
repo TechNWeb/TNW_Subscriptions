@@ -193,7 +193,7 @@ class DescriptionCreator
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getFrequencyWithUnit($billingFrequencyId)
+    public function getFrequencyWithUnit($billingFrequencyId)
     {
         $billingFrequency = $this->frequencyRepository->getById(
             $billingFrequencyId

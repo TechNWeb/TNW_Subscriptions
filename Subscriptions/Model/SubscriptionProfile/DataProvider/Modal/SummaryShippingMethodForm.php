@@ -197,20 +197,9 @@ class SummaryShippingMethodForm extends AbstractDataProvider
     {
         $options = [];
         if ($this->nextQuote) {
-            $options = $this->shippingMethods->getShippingMethodOptions($this->nextQuote);
-            $shippingMethodsCodesWithoutWarning = $this->shippingMethods->getDontCostDependedMethodsCodes();
-            foreach ($options as $key=> $option) {
-                $options[$key]['css'] = 'subscription-shipping-attention';
-                $options[$key]['title'] = $this->shippingMethods->getShippingAttentionMessage();
-                foreach ($shippingMethodsCodesWithoutWarning as $code) {
-                    if(strpos($option['value'], $code) === 0) {
-                        $options[$key]['css'] = '';
-                        $options[$key]['title'] = '';
-                        break;
-                    }
-                }
-            }
+            $options = $this->shippingMethods->getFormattedShippingMethodOptions($this->nextQuote);
         }
+
         return $options;
     }
 }
