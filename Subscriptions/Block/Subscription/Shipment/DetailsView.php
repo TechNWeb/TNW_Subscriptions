@@ -14,7 +14,7 @@ use TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details;
 class DetailsView extends Details
 {
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getEditUrl($tabName = 'shipment', array $params = [])
     {

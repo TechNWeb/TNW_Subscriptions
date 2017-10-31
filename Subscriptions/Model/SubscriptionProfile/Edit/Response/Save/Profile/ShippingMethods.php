@@ -29,7 +29,6 @@ class ShippingMethods extends Base
     ) {
         parent::__construct($profileManager);
         $this->shippingDetailsViewBlock = $shippingDetailsViewBlock;
-
     }
 
     /**
@@ -38,9 +37,9 @@ class ShippingMethods extends Base
     public function process(array $data)
     {
         $result = [];
-        $engine = $this->profileManager->getShippingMethodFromRequestData($data);
+        $shippingMethodCode = $this->profileManager->getShippingMethodFromRequestData($data);
 
-        if ($engine) {
+        if ($shippingMethodCode) {
             $this->shippingDetailsViewBlock->addData([
                 'subscription_profile' => $this->getSubscriptionProfile(),
                 'only_table_content' => true,

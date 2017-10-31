@@ -36,15 +36,15 @@ class DetailsEdit extends \Magento\Framework\View\Element\Template
     private $profileManager;
 
     /**
-     * @param Registry $registry
      * @param Context $context
+     * @param Registry $registry
      * @param ShippingMethodsSource $shippingMethods
      * @param ProfileManager $profileManager
      * @param array $data
      */
     public function __construct(
-        Registry $registry,
         Context $context,
+        Registry $registry,
         ShippingMethodsSource $shippingMethods,
         ProfileManager $profileManager,
         array $data = []
@@ -92,6 +92,6 @@ class DetailsEdit extends \Magento\Framework\View\Element\Template
      */
     public function isSubscriptionShippingMethod($shippingMethodName)
     {
-        return ($shippingMethodName === $this->getSubscriptionProfile()->getShippingMethod())? 'checked':'';
+        return ($shippingMethodName === $this->getSubscriptionProfile()->getShippingMethod()) ? 'checked' : '';
     }
 }

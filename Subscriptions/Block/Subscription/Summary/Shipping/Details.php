@@ -15,14 +15,11 @@ use TNW\Subscriptions\Block\Subscription\Summary\BaseSummary;
 class Details extends BaseSummary
 {
     /**
-     * @param Template\Context $context
+     * Path to template file in theme.
+     *
+     * @var string
      */
-    public function __construct(
-        Template\Context $context
-    ) {
-        $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml');
-        parent::__construct($context);
-    }
+    protected $_template = 'TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml';
 
     /**
      * Return current profile shipping method description
@@ -59,10 +56,10 @@ class Details extends BaseSummary
     /**
      * Check if only table should be rendered
      *
-     * @return bool|null
+     * @return bool
      */
     public function isOnlyTableContent()
     {
-        return $this->getOnlyTableContent();
+        return (bool)$this->getOnlyTableContent();
     }
 }
