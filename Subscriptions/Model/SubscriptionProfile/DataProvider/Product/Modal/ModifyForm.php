@@ -73,9 +73,16 @@ class ModifyForm extends Form
     /**
      * Product for current item.
      *
-     * @var
+     * @var \Magento\Catalog\Api\Data\ProductInterface
      */
-    private $currentProduct;
+    protected $currentProduct;
+
+    /**
+     * Current item.
+     *
+     * @var DataObject
+     */
+    protected $currentItem;
 
     /**
      * @var array
@@ -239,6 +246,7 @@ class ModifyForm extends Form
             $objectId = $subQuote->getId();
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
+            $this->currentItem = $item;
             $orderIterator++;
             $result[self::CONTAINER_ITEM_PREFIX . $itemId] = [
                 'children' => [
@@ -303,7 +311,7 @@ class ModifyForm extends Form
     protected function getAdditionalData($objectId, $objectItemId)
     {
         return [
-            'objectId' => $objectId ,
+            'objectId' => $objectId,
             'objectItemId' => $objectItemId,
         ];
     }
@@ -613,7 +621,9 @@ class ModifyForm extends Form
      */
     protected function isEditButtonVisible()
     {
-        return null !== $this->currentProduct;
+        return (null !== $this->currentProduct
+            && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+        );
     }
 
     /**
@@ -686,7 +696,7 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
-                            'onPriceUpdate'=> '${ $.parentName}.price:value'
+                            'onPriceUpdate' => '${ $.parentName}.price:value'
                         ],
                         'parentForm' => $this->currentFormName,
                         'priceFormat' => $this->getPriceFormatData(),
@@ -839,14 +849,15 @@ class ModifyForm extends Form
                         'addbefore' => $this->getCurrentCurrencySymbol(),
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'previewLabel' =>  $this->getCurrentCurrencySymbol() . '%s',
+                        'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                         'modifySubscription' => true,
-                        'parentForm' => $this->currentFormName,                    ]
+                        'parentForm' => $this->currentFormName,
+                    ]
                 ]
             ]
         ];
@@ -1106,10 +1117,15 @@ class ModifyForm extends Form
      */
     protected function getFormEditButtons()
     {
-        return [
+        $result = [
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
             'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
-            'qty_button' => $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button'
         ];
+
+        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)){
+            $result['qty_button'] = $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button';
+        }
+
+        return $result;
     }
 }

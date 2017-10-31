@@ -14,6 +14,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
@@ -258,12 +259,21 @@ class Products extends ModifyForm
         return $this->descriptionCreator->getDescribedItemPriceHtml($item->getRowTotal(), $subBuyRequest, $initialFee);
     }
 
+    /**
+     * Returns edit form button names.
+     *
+     * @return array
+     */
     protected function getFormEditButtons()
     {
-        return [
+        $result = [
             'form_button' => $this->getCurrentFormName() . '.edit_button',
-            'qty_button' => $this->getCurrentFormName() . '.description_fieldset.middle_container.qty_container.qty_edit_button'
         ];
+        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)){
+            $result['qty_button'] =  $this->getCurrentFormName() . '.description_fieldset.middle_container.qty_container.qty_edit_button';
+        }
+
+        return $result;
     }
 
     /**

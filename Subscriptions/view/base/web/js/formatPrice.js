@@ -68,7 +68,6 @@ define([
         }
 
         returnNumber = returnNumber + decimalSymbol + fraction;
-        returnNumber = returnNumber * 1;
 
         return returnNumber;
     }
