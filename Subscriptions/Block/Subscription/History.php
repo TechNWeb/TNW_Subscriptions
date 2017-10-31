@@ -249,9 +249,7 @@ class History extends \Magento\Framework\View\Element\Template
         $result = '';
 
         switch ($subscription->getStatus()) {
-            case ProfileStatus::STATUS_ACTIVE:
             case ProfileStatus::STATUS_TRIAL:
-            case ProfileStatus::STATUS_HOLDED:
                 $result = 'sub-icon-active-green';
                 if ($this->checkCreditCardExpire($subscription)) {
                     $result = 'sub-icon-warning-orange';
@@ -263,6 +261,10 @@ class History extends \Magento\Framework\View\Element\Template
                 break;
             case ProfileStatus::STATUS_SUSPENDED:
                 $result = 'sub-icon-warning-red';
+                break;
+            case ProfileStatus::STATUS_COMPLETE:
+            case ProfileStatus::STATUS_CANCELED:
+                $result = 'sub-icon-active-green';
                 break;
         }
 
