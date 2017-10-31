@@ -88,7 +88,7 @@ class NextPayment extends Template
         if ($date) {
             $result = [
                 'year' => $this->_localeDate->formatDateTime(
-                    $result,
+                    $date,
                     \IntlDateFormatter::SHORT,
                     \IntlDateFormatter::SHORT,
                     null,
@@ -96,7 +96,7 @@ class NextPayment extends Template
                     'y'
                 ),
                 'month' => $this->_localeDate->formatDateTime(
-                    $result,
+                    $date,
                     \IntlDateFormatter::SHORT,
                     \IntlDateFormatter::SHORT,
                     null,
@@ -104,7 +104,7 @@ class NextPayment extends Template
                     'MMMM'
                 ),
                 'day' => $this->_localeDate->formatDateTime(
-                    $result,
+                    $date,
                     \IntlDateFormatter::SHORT,
                     \IntlDateFormatter::SHORT,
                     null,

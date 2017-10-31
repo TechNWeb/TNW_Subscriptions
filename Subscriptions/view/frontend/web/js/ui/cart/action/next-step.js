@@ -13,7 +13,17 @@ define([
 
     return Abstract.extend({
         defaults: {
-            buttonTitle: $.mage.__('Next step >')
+            buttonTitle: $.mage.__('Next step >'),
+            buttonInitialized: false
+        },
+
+        /**
+         * @inheritdoc
+         */
+        initialize: function () {
+            this._super();
+            this.buttonInitialized(true);
+            return this;
         },
 
         /**
@@ -21,7 +31,7 @@ define([
          */
         initObservable: function () {
             return this._super()
-                .observe(['buttonTitle']);
+                .observe(['buttonTitle', 'buttonInitialized']);
         },
 
         /**

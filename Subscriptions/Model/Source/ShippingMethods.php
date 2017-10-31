@@ -8,13 +8,14 @@ namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Rate;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Tax\Helper\Data;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Class ShippingMethods
+ * Shipping methods source class
  */
 class ShippingMethods
 {
@@ -278,4 +279,31 @@ class ShippingMethods
         return $this->getQuote()->getShippingAddress()->getShippingMethod();
     }
 
+    /**
+     * Returns shipping method options
+     *
+     * @param Quote $quote
+     * @return array
+     */
+    public function getFormattedShippingMethodOptions(Quote $quote)
+    {
+        $options = [];
+        if ($quote) {
+            $options = $this->getShippingMethodOptions($quote);
+            $shippingMethodsCodesWithoutWarning = $this->getDontCostDependedMethodsCodes();
+            foreach ($options as $key => $option) {
+                $options[$key]['css'] = 'subscription-shipping-attention';
+                $options[$key]['title'] = $this->getShippingAttentionMessage();
+                foreach ($shippingMethodsCodesWithoutWarning as $code) {
+                    if(strpos($option['value'], $code) === 0) {
+                        $options[$key]['css'] = '';
+                        $options[$key]['title'] = '';
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $options;
+    }
 }

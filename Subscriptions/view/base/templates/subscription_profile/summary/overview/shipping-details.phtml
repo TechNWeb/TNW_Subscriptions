@@ -1,19 +1,23 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details $block */ ?>
+<?php if (!$block->isOnlyTableContent()): ?>
 <div class="block">
     <div class="block-title">
         <strong><?php echo __("Shipping Details") ?></strong>
         <?php if ($block->isShowEditLink()) : ?>
-            <a href="<?php echo $block->getEditUrl('shipment') ?>" class="profile__edit_button"></a>
+            <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-details-edit-button"></a>
         <?php endif;?>
     </div>
-    <div class="block-content">
-        <table class="table-secondary data-table">
-            <tbody>
-            <tr class="col-0">
-                <td class="label"><?php echo __("Shipping Method") ?></td>
-                <td class="right"><?php echo $block->getShippingDescription() ?></td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="block-content subscription-profile-<?php echo $block->getTabName() ?>-details" id="shipping-details-view">
+<?php endif; ?>
+            <table class="table-secondary data-table">
+                <tbody>
+                <tr class="col-0">
+                    <td class="label"><?php echo __("Shipping Method") ?></td>
+                    <td class="right"><?php echo $block->getShippingDescription() ?></td>
+                </tr>
+                </tbody>
+            </table>
+<?php if (!$block->isOnlyTableContent()): ?>
     </div>
 </div>
+<?php endif;?>

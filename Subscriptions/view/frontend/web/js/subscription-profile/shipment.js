@@ -184,13 +184,13 @@ define([
          * @returns void
          */
         saveAddress: function(e) {
-            $('body').trigger('processStart');
             var form = $(this.options.formSelector),
                 widget = this,
                 saveAddressButton = $(this.options.saveAddressButton),
                 cancelButton = $(this.options.cancelButton);
 
             if (form.valid()) {
+                $('body').trigger('processStart');
                 if (!$(this.options.customerAddressesList).is(':visible')) {
                     $(this.options.customerAddressesList).val('0');
                 }
@@ -222,7 +222,6 @@ define([
                 }).always(function() {
                     $('body').trigger('processStop');
                 });
-
             }
         },
 
