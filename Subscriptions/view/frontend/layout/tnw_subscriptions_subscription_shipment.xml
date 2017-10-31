@@ -30,6 +30,19 @@
                            template="TNW_Subscriptions::subscription/shipment/address-edit.phtml"
                            cacheable="false"/>
                 </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsView"
+                       name="subscription.info.view.shipping.details" as="shipping-details-view"
+                       >
+                </block>
+                <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsEditForm"
+                       name="customer_shipping_details_edit_form"
+                       template="TNW_Subscriptions::subscription/edit-form.phtml"
+                       cacheable="false">
+                    <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsEdit"
+                           name="customer_shipping_details_edit"
+                           template="TNW_Subscriptions::subscription/shipment/details-edit.phtml"
+                           cacheable="false"/>
+                </block>
             </block>
         </referenceContainer>
     </body>

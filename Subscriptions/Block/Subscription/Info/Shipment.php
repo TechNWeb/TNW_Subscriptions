@@ -123,7 +123,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * @return string
      */
-    public function getSaveAddressUrl()
+    public function getSaveUrl()
     {
         return $this->_urlBuilder->getUrl(
             'tnw_subscriptions/subscription_customer_account/save',
@@ -135,13 +135,23 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
-     * Check if it necessary to show edit form.
+     * Check if it necessary to show edit address form.
      *
      * @return int
      */
-    public function isShowEdit()
+    public function isShowEditAddress()
     {
         return (int)$this->_request->getParam('shipping_address');
+    }
+
+    /**
+     * Check if it necessary to show edit shipping details form.
+     *
+     * @return int
+     */
+    public function isShowEditDetails()
+    {
+        return (int)$this->_request->getParam('shipping_details');
     }
 
     /**
@@ -192,5 +202,25 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         }
 
         return str_replace('"', "'", $this->jsonEncoder->encode($result));
+    }
+
+    /**
+     * Return shipping details block.
+     *
+     * @return string
+     */
+    public function getShippingDetailsViewHtml()
+    {
+        return $this->getChildHtml('shipping-details-view');
+    }
+
+    /**
+     * Return shipping details edit block.
+     *
+     * @return string
+     */
+    public function getShippingDetailsEditHtml()
+    {
+        return $this->getChildHtml('customer_shipping_details_edit_form');
     }
 }
