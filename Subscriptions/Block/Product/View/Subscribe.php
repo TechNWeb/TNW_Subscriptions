@@ -11,6 +11,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -67,6 +68,11 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     private $contextModel;
 
     /**
+     * @var StockRegistryInterface
+     */
+    private $stockRegistry;
+
+    /**
      * @param Context $context
      * @param ProductRepositoryInterface $productRepository
      * @param Config $config
@@ -81,6 +87,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         ContextModel $contextModel,
+        StockRegistryInterface $stockRegistry,
         array $data = []
     ) {
         $this->coreRegistry = $context->getRegistry();
@@ -89,6 +96,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
         $this->contextModel = $contextModel;
+        $this->stockRegistry = $stockRegistry;
         parent::__construct($context, $data);
     }
 
@@ -324,5 +332,34 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     private function getProductSubscriptionPurchaseType()
     {
         return $this->getProduct()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+    }
+
+    /**
+     * Returns validators for qty field. Depends on product settings
+     *
+     * @return array
+     */
+    public function getQtyValidators()
+    {
+        $params = [];
+        $validators = [];
+        $validators['required-number'] = true;
+
+        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        $stockItem = $this->stockRegistry->getStockItem(
+            $this->getProduct()->getId(),
+            $this->getProduct()->getStore()->getWebsiteId()
+        );
+
+        $params['minAllowed']  = max((float)$stockItem->getQtyMinAllowed(), 1);
+        if ($stockItem->getQtyMaxAllowed()) {
+            $params['maxAllowed'] = $stockItem->getQtyMaxAllowed();
+        }
+        if ($stockItem->getQtyIncrements() > 0) {
+            $params['qtyIncrements'] = (float)$stockItem->getQtyIncrements();
+        }
+        $validators['validate-item-quantity'] = $params;
+
+        return $validators;
     }
 }

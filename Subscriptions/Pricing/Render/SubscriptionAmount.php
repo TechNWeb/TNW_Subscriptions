@@ -72,12 +72,16 @@ class SubscriptionAmount extends BaseAmount
     /**
      * Retrieve format price.
      *
-     * @return float
+     * @return string
      */
     public function getDisplayPrice()
     {
         $defaultData = $this->getPriceData();
-        return $this->formatCurrency($defaultData['price'], true);
+        $result = $this->formatCurrency($defaultData['price'], true);
+        if ($defaultData['frequency_unit_message']) {
+            $result .= $defaultData['frequency_unit_message'];
+        }
+        return $result;
     }
 
     /**
