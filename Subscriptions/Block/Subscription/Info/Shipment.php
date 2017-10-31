@@ -165,7 +165,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
             ->getItems();
 
         foreach ($addressesList as $address) {
-            $streetData = '';
+            $streetData = [];
             if ($address->getStreet()) {
                 foreach ($address->getStreet() as $key =>$streetValue) {
                     $streetKey = 'street_' . ($key+1);
