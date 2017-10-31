@@ -5,18 +5,48 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Shipment;
 
+use TNW\Subscriptions\Block\Subscription\EditForm;
+
 /**
- * Edit wrapper
+ * Shipping details edit wrapper
  */
-class DetailsEditForm extends \Magento\Framework\View\Element\Template
+class DetailsEditForm extends EditForm
 {
     /**
-     * Retrieve edit form content.
+     * HTML element form class.
      *
-     * @return string
+     * @var string
+     */
+    protected $formClass = 'shipping-form';
+
+    /**
+     * HTML element form id.
+     *
+     * @var string
+     */
+    protected $formId = 'shipping-details-form';
+
+    /**
+     * @inheritdoc
      */
     public function getFormContentHtml()
     {
         return $this->getChildHtml();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCancelButtonId()
+    {
+        return $this->getFormId() . '-cancel';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSaveButtonId()
+    {
+        return $this->getFormId() . '-save';
     }
 }

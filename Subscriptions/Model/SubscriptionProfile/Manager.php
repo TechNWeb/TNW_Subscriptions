@@ -807,7 +807,7 @@ class Manager
      * @param array $requestData
      * @return int|null|string
      */
-    private function getShippingMethodFromRequestData(array $requestData)
+    public function getShippingMethodFromRequestData(array $requestData)
     {
         $shippingMethodCode= isset($requestData['shipping_method_id'])
             ? $requestData['shipping_method_id']

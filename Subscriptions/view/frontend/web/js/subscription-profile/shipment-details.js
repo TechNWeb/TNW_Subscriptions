@@ -14,6 +14,7 @@ define([
             formSelector: '#shipping-details-form',
             viewSelector: '#shipping-details-view',
             editSelector: '#shipping-details-edit',
+            methodsListSelector: '.methods-list',
             editButton: '#shipping-details-edit-button',
             cancelButton: '#shipping-details-form-cancel',
             saveButton: '#shipping-details-form-save',
@@ -51,6 +52,8 @@ define([
                 editButton = $(this.options.editButton),
                 cancelButton = $(this.options.cancelButton),
                 defaultValue = '',
+                methodsList = $(this.options.methodsListSelector),
+                methods = methodsList.find('input[type=radio]'),
                 form =$(this.options.formSelector);
 
             editButton.on('click', $.proxy(function() {
@@ -69,7 +72,7 @@ define([
         },
 
         /**
-         * Save from data.
+         * Save form data.
          *
          * @param {EventObject} e
          * @returns void
@@ -77,13 +80,16 @@ define([
         save: function(e) {
             var form = $(this.options.formSelector),
                 widget = this,
-                editButton = $(this.options.addressEditButton);
+                saveButton = $(this.options.saveButton),
+                cancelButton = $(this.options.cancelButton);
 
             if (form.valid()) {
-                this.disableButton(editButton);
+                $('body').trigger('processStart');
+                this.disableButton(saveButton);
+                this.disableButton(cancelButton);
 
                 $.ajax({
-                    url: this.options.saveAddressUrl,
+                    url: this.options.saveUrl,
                     data: form.serialize(),
                     type: 'post',
                     dataType: 'json',
@@ -94,14 +100,17 @@ define([
                      * @param {Object} response
                      */
                     success: function(response) {
-                        var addressBlock = $(widget.options.blockContent);//todo
+                        var methodBlock = $(widget.options.blockContent);
 
                         if (typeof response.data.shipping_details !== 'undefined') {
-                            addressBlock.html(response.data.shipping_details);
+                            methodBlock.html(response.data.shipping_details);
                         }
-                        widget.setFormsVisibility(true);
-                        widget.enableButton(editButton);
+                        widget.setFormsVisibility(false);
+                        widget.enableButton(saveButton);
+                        widget.enableButton(cancelButton);
                     }
+                }).always(function() {
+                    $('body').trigger('processStop');
                 });
             }
         },
@@ -133,8 +142,9 @@ define([
          * @returns void
          */
         setFormsVisibility: function(showEdit) {
-            this._setElemsVisibility($(this.options.infoViewSelector), !showEdit);
-            this._setElemsVisibility($(this.options.infoEditSelector), showEdit);
+            this._setElemsVisibility($(this.options.viewSelector), !showEdit);
+            this._setElemsVisibility($(this.options.editSelector), showEdit);
+            this._setElemsVisibility($(this.options.editButton), !showEdit);
         },
 
         /**
@@ -148,6 +158,7 @@ define([
         _setElemsVisibility: function (elem, visible) {
             if (visible) {
                 elem.show();
+                elem.removeClass('hidden');
             } else {
                 elem.hide();
             }

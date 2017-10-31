@@ -32,18 +32,12 @@
                 </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsView"
                        name="subscription.info.view.shipping.details" as="shipping-details-view"
-                       template="TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml">
+                       >
                 </block>
-                <block class="TNW\Subscriptions\Block\Subscription\EditForm"
+                <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsEditForm"
                        name="customer_shipping_details_edit_form"
                        template="TNW_Subscriptions::subscription/edit-form.phtml"
                        cacheable="false">
-                    <action method="setFormId">
-                        <argument name="type" xsi:type="string">shipping-details-form</argument>
-                    </action>
-                    <action method="setFormClass">
-                        <argument name="type" xsi:type="string">shipping-form</argument>
-                    </action>
                     <block class="TNW\Subscriptions\Block\Subscription\Shipment\DetailsEdit"
                            name="customer_shipping_details_edit"
                            template="TNW_Subscriptions::subscription/shipment/details-edit.phtml"

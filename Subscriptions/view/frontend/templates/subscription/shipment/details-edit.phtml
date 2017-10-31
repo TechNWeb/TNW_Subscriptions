@@ -4,12 +4,24 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
-/** @var $block TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit */
+/** @var $block TNW\Subscriptions\Block\Subscription\Shipment\DetailsEdit */
 ?>
-<?php /** @var \Magento\Customer\Helper\Address $customerAddressHelper */
-$customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);?>
 <fieldset class="fieldset-shipping" id="customer-data">
-    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Details') ?></span></legend>
+    <div class="methods-list">
+        <?php foreach ($block->getShippingMethodsArray() as $shippingMethod):?>
+            <div class="method">
+                <input type="radio"
+                       name="shipping_method_id"
+                       value="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
+                       id="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
+                       <?php echo $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
+                <label for="<?php echo $block->escapeHtml($shippingMethod['value'])?>">
+                    <?php echo $block->escapeHtml($shippingMethod['label'])?>
+                </label>
+                <div class="<?php echo $block->escapeHtml($shippingMethod['css'])?>"
+                     data-title="<?php echo $block->escapeHtml(__($shippingMethod['title']))?>">
+                </div>
+            </div>
+        <?php endforeach;?>
+    </div>
 </fieldset>

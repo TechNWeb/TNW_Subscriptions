@@ -1333,6 +1333,10 @@
 .content-block {
   width: 49%;
   display: inline-block;
+
+  .block-title {
+    margin: 0;
+  }
 }
 
 .shipping-info-content {
@@ -1934,6 +1938,7 @@
   }
 }
 
+//Customer account payment details
 .payment-details-content {
   #payment-details-edit {
     .sub-fieldset {
@@ -2061,7 +2066,6 @@
   #payment-details-view {
     .block-title {
       border: none;
-      margin: 0;
     }
 
     .table-secondary {
@@ -2078,4 +2082,79 @@
 
 .hidden {
   display: none
+}
+
+//Customer account shipping details
+div.shipping-details-content {
+  .block {
+    margin-bottom: 0px;
+
+    .block-title {
+      strong {
+        padding-top: 3px;
+      }
+
+    }
+  }
+  #shipping-details-edit {
+
+    fieldset {
+      border: none;
+
+      .methods-list {
+        .method {
+          margin-bottom: 10px;
+
+          .subscription-shipping-attention {
+            position: relative;
+            display: inline-block;
+
+            &::before {
+              font-size: 1.5rem;
+              color: #fd720f;
+              content: '\e602';
+              font-family: 'luma-icons';
+              top: -15px;
+              position: absolute;
+            }
+
+            &:hover:after {
+              content: attr(data-title);
+              background-color: white;
+              color: #000;
+              position: absolute;
+              top: 8px;
+              white-space: normal;
+              -moz-border-radius: 5px;
+              -webkit-border-radius: 5px;
+              border-radius: 5px;
+              -moz-box-shadow: 0px 0px 1px #000;
+              -webkit-box-shadow: 0px 0px 1px #000;
+              box-shadow: 0px 0px 1px #000;
+              padding: 5px;
+              width: 165px;
+              text-align: center;
+              z-index: 20;
+              font-size: 1.2rem;
+              left: -64px;
+            }
+          }
+        }
+
+        input {
+          &[type="radio"] {
+            width: auto;
+          }
+        }
+      }
+
+    }
+  }
+}
+
+@media (max-width: 880px) {
+  .content-block, .shipping-info-content {
+    margin-left: 0;
+    margin-top: 15px;
+  }
 }

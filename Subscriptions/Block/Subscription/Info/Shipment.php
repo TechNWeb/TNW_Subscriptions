@@ -135,13 +135,23 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
-     * Check if it necessary to show edit form.
+     * Check if it necessary to show edit address form.
      *
      * @return int
      */
-    public function isShowEdit()
+    public function isShowEditAddress()
     {
         return (int)$this->_request->getParam('shipping_address');
+    }
+
+    /**
+     * Check if it necessary to show edit shipping details form.
+     *
+     * @return int
+     */
+    public function isShowEditDetails()
+    {
+        return (int)$this->_request->getParam('shipping_details');
     }
 
     /**
@@ -165,7 +175,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
             ->getItems();
 
         foreach ($addressesList as $address) {
-            $streetData = '';
+            $streetData = [];
             if ($address->getStreet()) {
                 foreach ($address->getStreet() as $key =>$streetValue) {
                     $streetKey = 'street_' . ($key+1);

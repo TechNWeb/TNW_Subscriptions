@@ -14,7 +14,7 @@ use Magento\Tax\Helper\Data;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Class ShippingMethods
+ * ShippingMethods source class
  */
 class ShippingMethods
 {
@@ -278,4 +278,31 @@ class ShippingMethods
         return $this->getQuote()->getShippingAddress()->getShippingMethod();
     }
 
+    /**
+     * Returns shipping method options
+     *
+     * @param \Magento\Quote\Model\Quote $quote
+     * @return array
+     */
+    public function getFormattedShippingMethodOptions($quote)
+    {
+        $options = [];
+        if ($quote) {
+            $options = $this->getShippingMethodOptions($quote);
+            $shippingMethodsCodesWithoutWarning = $this->getDontCostDependedMethodsCodes();
+            foreach ($options as $key=> $option) {
+                $options[$key]['css'] = 'subscription-shipping-attention';
+                $options[$key]['title'] = $this->getShippingAttentionMessage();
+                foreach ($shippingMethodsCodesWithoutWarning as $code) {
+                    if(strpos($option['value'], $code) === 0) {
+                        $options[$key]['css'] = '';
+                        $options[$key]['title'] = '';
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $options;
+    }
 }
