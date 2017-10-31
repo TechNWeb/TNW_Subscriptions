@@ -36,6 +36,8 @@ class DataProvider extends AbstractDataProvider
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
+        $this->addColumnsFiltersToMap();
+
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -48,8 +50,7 @@ class DataProvider extends AbstractDataProvider
         $collection = $this->getCollection();
 
         /* hide all such records if they are more than 2 months and status not complete */
-        $collection->addFilterToMap('updated_at', 'main_table.updated_at');
-        $collection->addFilterToMap('status', 'main_table.status');
+
         $minDate = date('Y-m-d H:i:s', strtotime("-2 months"));
         $collection->addFieldToFilter(
             ['updated_at', 'status'],
@@ -79,5 +80,26 @@ class DataProvider extends AbstractDataProvider
         );
 
         return $collection->toArray();
+    }
+
+    /**
+     * Adds filters to map
+     */
+    private function addColumnsFiltersToMap()
+    {
+        /** @var Collection $collection */
+        $collection = $this->getCollection();
+        $columns = [
+            'id',
+            'profile_order_id',
+            'status',
+            'attempt_count',
+            'message',
+            'created_at',
+            'updated_at',
+        ];
+        foreach ($columns as $column) {
+            $collection->addFilterToMap($column, "main_table.$column");
+        }
     }
 }
