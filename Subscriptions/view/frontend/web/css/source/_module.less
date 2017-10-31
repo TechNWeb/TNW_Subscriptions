@@ -539,6 +539,15 @@
               float: left;
               width: 16rem;
 
+              &._required {
+                & > .label:after {
+                  content: '*';
+                  color: #e02b27;
+                  font-size: 1.2rem;
+                  margin: 0 0 0 5px;
+                }
+              }
+
               label {
                 float: left;
                 font-weight: 600;
@@ -629,11 +638,6 @@
       .fieldset {
         display: block;
         width: 100%;
-      }
-
-      .fieldset > .field.field-wide[class]:not(.field-option)._required > .label:after {
-        margin: 0 5px 0px 0;
-        float: left;
       }
 
       .sub-period-input {
