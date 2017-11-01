@@ -6,16 +6,20 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
-use Magento\Directory\Model\CurrencyFactory;
-use Magento\Framework\ObjectManager\ContextInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\ObjectManager\ContextInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use Magento\Catalog\Helper\Image as ImageHelper;
 
+/**
+ * Data providers form context.
+ */
 class Context implements ContextInterface
 {
     /**
@@ -75,7 +79,13 @@ class Context implements ContextInterface
     private $imageHelper;
 
     /**
-     * Context constructor.
+     * Help convert trial unit value into label.
+     *
+     * @var TrialLengthUnitType
+     */
+    private $unitType;
+
+    /**
      * @param ProductRepositoryInterface $productRepository
      * @param RecurringOptionRepository $repository
      * @param BillingFrequencyRepository $frequencyRepository
@@ -84,6 +94,7 @@ class Context implements ContextInterface
      * @param QuoteSessionInterface $sessionQuote
      * @param CurrencyFactory $currencyFactory
      * @param ImageHelper $imageHelper
+     * @param TrialLengthUnitType $unitType
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -93,7 +104,8 @@ class Context implements ContextInterface
         StoreManagerInterface $storeManager,
         QuoteSessionInterface $sessionQuote,
         CurrencyFactory $currencyFactory,
-        ImageHelper $imageHelper
+        ImageHelper $imageHelper,
+        TrialLengthUnitType $unitType
     ) {
         $this->productRepository = $productRepository;
         $this->recurringOptionRepository = $repository;
@@ -103,6 +115,7 @@ class Context implements ContextInterface
         $this->sessionQuote = $sessionQuote;
         $this->currencyFactory = $currencyFactory;
         $this->imageHelper = $imageHelper;
+        $this->unitType = $unitType;
     }
 
     /**
@@ -183,5 +196,15 @@ class Context implements ContextInterface
     public function getImageHelper()
     {
         return $this->imageHelper;
+    }
+
+    /**
+     * Returns trial length unit type source.
+     *
+     * @return TrialLengthUnitType
+     */
+    public function getUnitType()
+    {
+        return $this->unitType;
     }
 }

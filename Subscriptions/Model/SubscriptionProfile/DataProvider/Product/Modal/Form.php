@@ -13,7 +13,6 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
@@ -55,13 +54,6 @@ class Form extends AbstractDataProvider
     private $productBillingFrequencies;
 
     /**
-     * Help convert trial unit value into label.
-     *
-     * @var TrialLengthUnitType
-     */
-    private $unitType;
-
-    /**
      * Trial period holder.
      *
      * @var array
@@ -93,11 +85,9 @@ class Form extends AbstractDataProvider
     protected $formContext;
 
     /**
-     * Form constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
      * @param SubscriptionContext $context
      * @param string $scope
@@ -108,7 +98,6 @@ class Form extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
         SubscriptionContext $context,
         Context $formContext,
@@ -116,7 +105,6 @@ class Form extends AbstractDataProvider
         array $meta = [],
         array $data = []
     ) {
-        $this->unitType = $unitType;
         $this->priceCalculator = $priceCalculator;
         $this->context = $context;
         $this->formContext = $formContext;
@@ -141,7 +129,7 @@ class Form extends AbstractDataProvider
      */
     public function getConfigData()
     {
-        return array_merge(parent::getConfigData(), $this->getAdditionalConfig());;
+        return array_merge(parent::getConfigData(), $this->getAdditionalConfig());
     }
 
     /**
@@ -437,7 +425,8 @@ class Form extends AbstractDataProvider
                     $formattedPrice = $trialPrice
                         ? $this->formatPrice($this->convertPrice($trialPrice))
                         : __('Free');
-                    $formattedTrialUnit = $this->unitType->getLabelByValueAndLength($trialUnit, $trialLength);
+                    $formattedTrialUnit = $this->formContext->getUnitType()
+                        ->getLabelByValueAndLength($trialUnit, $trialLength);
                     $trialPriceLabel = $formattedPrice . ' ' . __('for') . ' ';
                     if ($trialLength && $trialUnit) {
                         $this->trialPeriod[$productId] = $trialPriceLabel . $trialLength . ' ' . $formattedTrialUnit;
@@ -647,6 +636,8 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns billing frequency label.
+     *
      * @param int|string $frequencyId
      * @return \Magento\Framework\Phrase|string
      */

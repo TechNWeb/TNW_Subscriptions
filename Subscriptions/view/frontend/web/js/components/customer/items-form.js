@@ -12,12 +12,7 @@ define(
         'use strict';
 
         return Component.extend({
-
-            /**
-             * Hide loader for this form or for parent element.
-             *
-             * @returns {Object}
-             */
+            /** @inheritdoc */
             hideLoader: function () {
                 $('body').trigger('processStop');
 

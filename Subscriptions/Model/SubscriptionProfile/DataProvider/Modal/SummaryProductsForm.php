@@ -12,7 +12,6 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -56,11 +55,9 @@ class SummaryProductsForm extends ModifyForm
     protected $profileManager;
 
     /**
-     * SummaryProductsForm constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
      * @param Context $context
      * @param FormContext $formContext
@@ -73,7 +70,6 @@ class SummaryProductsForm extends ModifyForm
         $name,
         $primaryFieldName,
         $requestFieldName,
-        TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
         Context $context,
         FormContext $formContext,
@@ -83,7 +79,7 @@ class SummaryProductsForm extends ModifyForm
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $unitType, $priceCalculator, $context,
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context,
             $formContext, $scope, $meta, $data);
     }
 

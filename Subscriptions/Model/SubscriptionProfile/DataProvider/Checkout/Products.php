@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
@@ -52,11 +51,9 @@ class Products extends ModifyForm
     ];
 
     /**
-     * Products constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
      * @param Context $context
      * @param FormContext $formContext
@@ -69,7 +66,6 @@ class Products extends ModifyForm
         $name,
         $primaryFieldName,
         $requestFieldName,
-        TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
         Context $context,
         FormContext $formContext,
@@ -79,7 +75,7 @@ class Products extends ModifyForm
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $unitType, $priceCalculator, $context,
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context,
             $formContext, $scope, $meta, $data);
     }
 

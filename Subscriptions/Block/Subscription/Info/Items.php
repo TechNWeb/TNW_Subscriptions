@@ -85,7 +85,7 @@ class Items extends ContentAbstract implements ExpireWarningSupportInterface
             'tnw_subscriptions/ui_render/handle',
             [
                 'handle' => self::ITEMS_FORM_HANDLE,
-                'entity_id' => $this->getSubscriptionProfile()->getId()
+                'entity_id' => $this->getSubscriptionProfile()->getId(),
             ]
         );
     }
