@@ -172,7 +172,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                             'dataScope' => 'cc_number',
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
-                            'additionalClasses' => 'credit-card-number',
+                            'additionalClasses' => 'credit-card-number _required-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
@@ -195,9 +195,13 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                             'component' => 'TNW_Subscriptions/js/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'field_without_legend',
+                            'additionalClasses' => 'field_without_legend _required-date',
                             'dataScope' => '',
                             'sortOrder' => 30,
+                            'required' => true,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ],
                         ],
                     ],
                 ],
@@ -217,7 +221,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                        'disabled' => '!ns = ${ $.ns }, index=exp_date_container:visible' ,
                                     ],
                                     'validation' => [
                                         'required-entry' => true,
@@ -242,7 +246,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
                                     'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                        'disabled' => '!ns = ${ $.ns }, index=exp_date_container:visible' ,
                                     ],
                                     'validation' => [
                                         'required-entry' => true

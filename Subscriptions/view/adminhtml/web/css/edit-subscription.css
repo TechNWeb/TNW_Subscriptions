@@ -846,3 +846,15 @@ button.action-editor.active:before{
     padding: 1rem 1rem;
     text-align: left;
 }
+.payment-additional-fieldset ._required-number > .admin__field-label > span:after {
+    color: #eb5202;
+    content: '*';
+    display: inline-block;
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1;
+    margin-left: 10px;
+    margin-top: .2rem;
+    position: absolute;
+    z-index: 1;
+}

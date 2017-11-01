@@ -251,6 +251,7 @@ class Base implements ModifierInterface
                 'data' => [
                     'config' => [
                         'componentType' => Fieldset::NAME,
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'label' => false,
                         'visible' => false,
@@ -259,7 +260,7 @@ class Base implements ModifierInterface
                         'collapsible' => false,
                         'opened' => true,
                         'imports' => [
-                            'visible' => $checkBoxName . ':checked'
+                            'changeVisibility' => $checkBoxName . ':checked'
                         ],
                         'exports' => [
                             'visible' => $fieldsetName . ':checked'
