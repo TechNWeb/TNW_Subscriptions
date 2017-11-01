@@ -1,0 +1,13 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\View\Link $block */?>
+<?php if ($block->canShow()): ?>
+<tr data-mage-init='{"orderProfileLink":{}}' style="display:none">
+    <th><?= __('Subscription Profile') ?></th>
+    <td><a target="_blank" href="<?= $block->getLinkUrl() ?>"><?= $block->getLinkLabel() ?></a></td>
+</tr>
+<?php endif; ?>
