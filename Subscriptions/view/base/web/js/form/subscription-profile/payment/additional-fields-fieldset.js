@@ -5,9 +5,8 @@
 define([
     'jquery',
     'Magento_Ui/js/form/components/fieldset',
-    'uiRegistry',
     'underscore'
-], function ($, Collapsible, registry, _) {
+], function ($, Collapsible, _) {
     'use strict';
 
     return Collapsible.extend({
@@ -22,10 +21,9 @@ define([
          * Change fieldset visibility and clear child elems values if fieldset was hidden
          *
          * @param {boolean} checkBoxChecked
-         * @returns {void}
+         * @return void
          */
-        changeVisibility: function (checkBoxChecked) {
-            var form;
+        changeVisibility: function(checkBoxChecked) {
             this.visible(checkBoxChecked);
             if (!checkBoxChecked) {
                 this.clearElemsData(this.elems());
@@ -36,16 +34,16 @@ define([
          * Clear elements values
          *
          * @param {mixed} elems
-         * @returns void
+         * @return void
          */
         clearElemsData: function(elems) {
-            var form = this;
-            var rules = {};
+            var fieldSet = this,
+                rules = {};
             _.each(elems, function (field, code) {
                 if ($.inArray(field.componentType, form.complexComponents) != -1) {
-                    form.clearElemsData(field.elems());
+                    fieldSet.clearElemsData(field.elems());
                 } else {
-                     field.restoreToDefault();
+                    field.restoreToDefault();
                     field.error('');
                 }
             });
