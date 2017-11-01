@@ -47,8 +47,8 @@ class Link extends \Magento\Backend\Block\Template
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param UrlBuilderInterface $profileUrlBuilder
-     * @param Manager $manager
      * @param OrderInfo $orderInfo
+     * @param Manager $manager
      * @param array $data
      */
     public function __construct(
@@ -90,6 +90,8 @@ class Link extends \Magento\Backend\Block\Template
 
     /**
      * Get subscription link label
+     * 
+     * @return string
      */
     public function getLinkLabel()
     {
