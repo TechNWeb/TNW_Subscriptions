@@ -662,4 +662,10 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form">
+        <arguments>
+            <argument name="formContext" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context\Proxy</argument>
+        </arguments>
+    </type>
 </config>

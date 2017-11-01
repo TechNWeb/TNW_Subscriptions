@@ -12,11 +12,7 @@ define([
     'use strict';
 
     return Insert.extend({
-        /**
-         * Request for render content.
-         *
-         * @returns {Object}
-         */
+        /** @inheritdoc */
         render: function (params) {
             $('body').trigger('processStart');
             this._super();

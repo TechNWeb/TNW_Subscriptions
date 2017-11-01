@@ -6,21 +6,12 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Item;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
-use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 
@@ -29,39 +20,27 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductD
  */
 class ModifyForm extends Form
 {
-    /**#@+
+    /**
      * Constants for container names.
      */
     const CONTAINER_PREFIX = 'container_';
     const CONTAINER_ITEM_PREFIX = 'container_item_';
-    /**#@-*/
 
-    /**#@+
+    /**
      * Form data scope
      */
     const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_create_modify_modal_form';
-    /**#@-*/
 
-    /**#@+
-     *
+    /**
      * Form request values
      */
     const FORM_DATA_KEY = 'modify_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
-    /**#@-*/
 
-    /**#@+
+    /**
      * Edit button name.
      */
     const EDIT_BUTTON_NAME = 'edit_button';
-    /**#@-*/
-
-    /**
-     * Image helper.
-     *
-     * @var ImageHelper
-     */
-    private $imageHelper;
 
     /**
      * Current item form name.
@@ -97,55 +76,7 @@ class ModifyForm extends Form
     ];
 
     /**
-     * ModifyForm constructor.
-     * @param string $name
-     * @param string $primaryFieldName
-     * @param string $requestFieldName
-     * @param ProductRepositoryInterface $productRepository
-     * @param RecurringOptionRepository $repository
-     * @param BillingFrequencyRepository $frequencyRepository
-     * @param RequestInterface $request
-     * @param TrialLengthUnitType $unitType
-     * @param PriceCalculator $priceCalculator
-     * @param StoreManagerInterface $storeManager
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $sessionQuote
-     * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
-     * @param Context $context
-     * @param ImageHelper $imageHelper
-     * @param string $scope
-     * @param array $meta
-     * @param array $data
-     */
-    public function __construct(
-        $name,
-        $primaryFieldName,
-        $requestFieldName,
-        ProductRepositoryInterface $productRepository,
-        RecurringOptionRepository $repository,
-        BillingFrequencyRepository $frequencyRepository,
-        RequestInterface $request,
-        TrialLengthUnitType $unitType,
-        PriceCalculator $priceCalculator,
-        StoreManagerInterface $storeManager,
-        \TNW\Subscriptions\Model\Config $config,
-        QuoteSessionInterface $sessionQuote,
-        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
-        Context $context,
-        ImageHelper $imageHelper,
-        $scope = '',
-        array $meta = [],
-        array $data = []
-    ) {
-        $this->imageHelper = $imageHelper;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
-            $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
-            $currencyFactory, $context, $scope, $meta, $data);
-    }
-
-
-    /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getData()
     {
@@ -187,16 +118,14 @@ class ModifyForm extends Form
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMeta()
     {
-        $meta = array_merge_recursive(
+        return array_merge_recursive(
             [],
             $this->getMetaData()
         );
-
-        return $meta;
     }
 
     /**
@@ -239,15 +168,12 @@ class ModifyForm extends Form
      */
     protected function getChildren($subQuote)
     {
-        $result = [];
-        $orderIterator = 0;
         foreach ($this->getObjectItems($subQuote) as $item) {
             $itemId = $item->getId();
             $objectId = $subQuote->getId();
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
-            $orderIterator++;
             $result[self::CONTAINER_ITEM_PREFIX . $itemId] = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId)
@@ -261,14 +187,13 @@ class ModifyForm extends Form
                             'dataScope' => 'item_' . $itemId,
                             'additionalClasses' => 'subscription-item-form',
                             'template' => 'TNW_Subscriptions/form/element/template/fieldset',
-                            'sortOrder' => $orderIterator
                         ],
                     ],
                 ]
             ];
         }
 
-        return $result;
+        return !empty($result) ? $result : [];
     }
 
     /**
@@ -310,10 +235,7 @@ class ModifyForm extends Form
      */
     protected function getAdditionalData($objectId, $objectItemId)
     {
-        return [
-            'objectId' => $objectId,
-            'objectItemId' => $objectItemId,
-        ];
+        return ['objectId' => $objectId, 'objectItemId' => $objectItemId];
     }
 
     /**
@@ -325,10 +247,8 @@ class ModifyForm extends Form
      */
     protected function getFormFullName($container, $containerItem)
     {
-        return $this::DATA_SCOPE_MODAL_FORM . '.' . $this::DATA_SCOPE_MODAL_FORM
-            . '.' . $this::CONTAINER_PREFIX . $container
-            . '.' . $this::CONTAINER_ITEM_PREFIX . $containerItem
-            . '.form';
+        return $this::DATA_SCOPE_MODAL_FORM . '.' . $this::DATA_SCOPE_MODAL_FORM . '.' . $this::CONTAINER_PREFIX
+            . $container . '.' . $this::CONTAINER_ITEM_PREFIX . $containerItem . '.form';
     }
 
     /**
@@ -463,7 +383,7 @@ class ModifyForm extends Form
     protected function getLeftContainerDefinition()
     {
         $imageHelper = $this->getImageHelper();
-
+        $imageUrl = $this->currentProduct ? $imageHelper->getUrl() : $imageHelper->getDefaultPlaceholderUrl('small_image');
         return [
             'arguments' => [
                 'data' => [
@@ -485,15 +405,13 @@ class ModifyForm extends Form
                                 'formElement' => UiForm\Element\Input::NAME,
                                 'elementTmpl' => 'TNW_Subscriptions/form/element/image',
                                 'additionalClasses' => 'sub-product-image',
-                                'src' => isset($this->currentProduct) ? $imageHelper->getUrl()
-                                    : $imageHelper->getDefaultPlaceholderUrl('small_image')
+                                'src' => $imageUrl
                             ]
                         ]
                     ]
                 ],
                 'edit_button' => $this->getEditButton(),
                 'remove_button' => $this->getRemoveButton(),
-
             ]
         ];
     }
@@ -505,17 +423,10 @@ class ModifyForm extends Form
      */
     protected function getImageHelper()
     {
-        $imageHelper = $this->imageHelper;
-
+        $imageHelper = $this->formContext->getImageHelper();
         if (isset($this->currentProduct)) {
-            $imageHelper = $imageHelper->init(
-                $this->currentProduct,
-                'category_page_grid',
-                [
-                    'type' => 'small_image',
-                    'width' => '240',
-                    'height' => '240',
-                ]
+            $imageHelper = $imageHelper->init($this->currentProduct, 'category_page_grid',
+                ['type' => 'small_image', 'width' => '240', 'height' => '240']
             );
         }
 
@@ -621,9 +532,7 @@ class ModifyForm extends Form
      */
     protected function isEditButtonVisible()
     {
-        return (null !== $this->currentProduct
-            && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
-        );
+        return (null !== $this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY));
     }
 
     /**
@@ -689,9 +598,7 @@ class ModifyForm extends Form
                         'additionalClasses' => 'radio-options-one-column sub-legend field-wide',
                         'additionalForGroup' => false,
                         'validation' => ['required-entry' => true],
-                        'options' => $this->getProductBillingFrequenciesAsOptionArray(
-                            $this->currentProduct->getId()
-                        ),
+                        'options' => $this->getProductBillingFrequenciesAsOptionArray($this->currentProduct->getId()),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-set',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
@@ -789,9 +696,6 @@ class ModifyForm extends Form
      */
     protected function getStartOnDefinition()
     {
-        $visibleOnEdit = $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'];
-        $nowDate = new \DateTime();
-
         return [
             'arguments' => [
                 'data' => [
@@ -802,11 +706,11 @@ class ModifyForm extends Form
                         'dataScope' => 'start_on',
                         'formElement' => UiForm\Element\DataType\Date::NAME,
                         'componentType' => UiForm\Element\DataType\Date::NAME,
-                        'current_date' => $nowDate->format('m/d/Y'),
+                        'current_date' => (new \DateTime())->format('m/d/Y'),
                         'validation' => ['required-entry' => true],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-date',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'visibleOnEdit' => $visibleOnEdit,
+                        'visibleOnEdit' => $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'],
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode'
                         ],
@@ -827,8 +731,7 @@ class ModifyForm extends Form
     protected function getPriceDefinition()
     {
         $label = __('Price') . ':';
-        if (isset($this->currentProduct)
-            && $this->getTrialPeriod($this->currentProduct->getId())) {
+        if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
         }
         return [
@@ -1025,7 +928,7 @@ class ModifyForm extends Form
      */
     protected function getObjects()
     {
-        return $this->sessionQuote->getSubQuotes();
+        return $this->formContext->getSession()->getSubQuotes();
     }
 
     /**
@@ -1047,7 +950,7 @@ class ModifyForm extends Form
      */
     protected function getProductFromItem(DataObject $item)
     {
-        return $this->productRepository->getById($item->getProduct()->getId());
+        return $this->formContext->getProductRepository()->getById($item->getProduct()->getId());
     }
 
     /**
@@ -1084,7 +987,6 @@ class ModifyForm extends Form
      */
     protected function getInitialFeeFromItem($item)
     {
-        $initialFee = 0;
         $initialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
@@ -1092,7 +994,7 @@ class ModifyForm extends Form
             $initialFee = $initialFees->getSubsInitialFee();
         }
 
-        return $initialFee;
+        return !empty($initialFee) ? $initialFee : 0;
     }
 
     /**
@@ -1105,9 +1007,7 @@ class ModifyForm extends Form
      */
     protected function getItemPrice($presetQty, $price, $item)
     {
-        return $presetQty
-            ? $price * $item->getQty()
-            : $price;
+        return $presetQty ? $price * $item->getQty() : $price;
     }
 
     /**
@@ -1121,8 +1021,7 @@ class ModifyForm extends Form
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
             'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
         ];
-
-        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)){
+        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
             $result['qty_button'] = $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button';
         }
 

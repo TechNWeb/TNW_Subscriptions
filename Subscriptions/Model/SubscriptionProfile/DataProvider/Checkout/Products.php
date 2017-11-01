@@ -6,23 +6,17 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Framework\App\RequestInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Ui\Component\Container as UiContainer;
+use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
-use Magento\Ui\Component\Form as UiForm;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
-use Magento\Ui\Component\Container as UiContainer;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 
 
 class Products extends ModifyForm
@@ -62,18 +56,10 @@ class Products extends ModifyForm
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param ProductRepositoryInterface $productRepository
-     * @param RecurringOptionRepository $repository
-     * @param BillingFrequencyRepository $frequencyRepository
-     * @param RequestInterface $request
      * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
-     * @param StoreManagerInterface $storeManager
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $sessionQuote
-     * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param Context $context
-     * @param ImageHelper $imageHelper
+     * @param FormContext $formContext
      * @param DescriptionCreator $descriptionCreator
      * @param string $scope
      * @param array $meta
@@ -83,27 +69,18 @@ class Products extends ModifyForm
         $name,
         $primaryFieldName,
         $requestFieldName,
-        ProductRepositoryInterface $productRepository,
-        RecurringOptionRepository $repository,
-        BillingFrequencyRepository $frequencyRepository,
-        RequestInterface $request,
         TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
-        StoreManagerInterface $storeManager,
-        \TNW\Subscriptions\Model\Config $config,
-        QuoteSessionInterface $sessionQuote,
-        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         Context $context,
-        ImageHelper $imageHelper,
+        FormContext $formContext,
         DescriptionCreator $descriptionCreator,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
-            $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
-            $currencyFactory, $context, $imageHelper, $scope, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $unitType, $priceCalculator, $context,
+            $formContext, $scope, $meta, $data);
     }
 
     /**
@@ -269,8 +246,8 @@ class Products extends ModifyForm
         $result = [
             'form_button' => $this->getCurrentFormName() . '.edit_button',
         ];
-        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)){
-            $result['qty_button'] =  $this->getCurrentFormName() . '.description_fieldset.middle_container.qty_container.qty_edit_button';
+        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
+            $result['qty_button'] = $this->getCurrentFormName() . '.description_fieldset.middle_container.qty_container.qty_edit_button';
         }
 
         return $result;

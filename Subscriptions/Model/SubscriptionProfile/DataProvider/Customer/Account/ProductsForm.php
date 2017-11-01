@@ -6,21 +6,9 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Framework\App\RequestInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
-use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
-use  TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
-use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\Component\Container as UiContainer;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use Magento\Framework\UrlInterface;
+use Magento\Ui\Component\Form as UiForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -33,13 +21,6 @@ class ProductsForm extends SummaryProductsForm
     const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_products_and_services_form';
 
     /**
-     * Url Builder.
-     *
-     * @var UrlInterface
-     */
-    private $url;
-
-    /**
      * @var array
      */
     protected $requestFields = [
@@ -49,58 +30,6 @@ class ProductsForm extends SummaryProductsForm
         'start_on',
         'qty',
     ];
-
-    /**
-     * ProductsForm constructor.
-     * @param string $name
-     * @param string $primaryFieldName
-     * @param string $requestFieldName
-     * @param ProductRepositoryInterface $productRepository
-     * @param RecurringOptionRepository $repository
-     * @param BillingFrequencyRepository $frequencyRepository
-     * @param RequestInterface $request
-     * @param TrialLengthUnitType $unitType
-     * @param PriceCalculator $priceCalculator
-     * @param StoreManagerInterface $storeManager
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $sessionQuote
-     * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
-     * @param Context $context
-     * @param ImageHelper $imageHelper
-     * @param Manager $profileManager
-     * @param UrlInterface $url
-     * @param string $scope
-     * @param array $meta
-     * @param array $data
-     */
-    public function __construct(
-        $name,
-        $primaryFieldName,
-        $requestFieldName,
-        ProductRepositoryInterface $productRepository,
-        RecurringOptionRepository $repository,
-        BillingFrequencyRepository $frequencyRepository,
-        RequestInterface $request,
-        TrialLengthUnitType $unitType,
-        PriceCalculator $priceCalculator,
-        StoreManagerInterface $storeManager,
-        \TNW\Subscriptions\Model\Config $config,
-        QuoteSessionInterface $sessionQuote,
-        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
-        Context $context,
-        ImageHelper $imageHelper,
-        Manager $profileManager,
-        UrlInterface $url,
-        $scope = '',
-        array $meta = [],
-        array $data = []
-    ) {
-        $this->url = $url;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
-            $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
-            $currencyFactory, $context, $imageHelper, $profileManager, $scope, $meta, $data);
-    }
-
 
     /**
      * @inheritdoc
@@ -127,7 +56,7 @@ class ProductsForm extends SummaryProductsForm
     protected function getPriceDefinition()
     {
         $label = __('Price') . ':';
-        if (isset($this->currentProduct)
+        if (null !== $this->currentProduct
             && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
         }
@@ -161,7 +90,6 @@ class ProductsForm extends SummaryProductsForm
             ]
         ];
     }
-
 
     /**
      * @inheritdoc
