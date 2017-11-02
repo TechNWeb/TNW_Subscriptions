@@ -6,7 +6,7 @@
 
 /* @var $block \TNW\Subscriptions\Block\Subscription\Info\Billing */
 ?>
-<div class="subscription-data-wrapper billing-wrapper"
+<div class="subscription-data-wrapper"
      data-mage-init='{"tnwSubscribeBilling":{
         "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveAddressUrl()) ?>",
         "showEdit": "<?php echo $block->isShowEdit() ?>",
@@ -15,16 +15,18 @@
         "emptyCountryLabel": "<?php echo __('Country') ?>"
     }}'>
     <?php echo $block->getTabMessagesHtml(); ?>
-    <div class="billing-info-content content-block">
-        <div id="billing-info-view"><?php echo $block->getBillingInfoViewHtml() ?></div>
-        <div id="billing-info-edit" style="display: none"><?php echo $block->getBillingInfoEditHtml() ?></div>
-    </div>
-    <div class="payment-details-content content-block">
-        <div id="payment-details-view">
-            <?php echo $block->getPaymentDetailsViewHtml() ?>
+    <div class="grid-row">
+        <div class="billing-info-content grid-col2-lg">
+            <div id="billing-info-view"><?php echo $block->getBillingInfoViewHtml() ?></div>
+            <div id="billing-info-edit" style="display: none"><?php echo $block->getBillingInfoEditHtml() ?></div>
         </div>
-        <div id="payment-details-edit">
-            <?php echo $block->getPaymentDetailsEditHtml() ?>
+        <div class="payment-details-content grid-col2-lg">
+            <div id="payment-details-view">
+                <?php echo $block->getPaymentDetailsViewHtml() ?>
+            </div>
+            <div id="payment-details-edit">
+                <?php echo $block->getPaymentDetailsEditHtml() ?>
+            </div>
         </div>
     </div>
 </div>
