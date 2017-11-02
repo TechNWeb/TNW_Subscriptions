@@ -709,3 +709,4 @@ button.action-editor.active:before{
   padding: 1rem 1rem;
   text-align: left;
 }
+.tnw-subscriptions-subscriptionprofile-create [data-index="account"] label span:after { display: none !important; }
