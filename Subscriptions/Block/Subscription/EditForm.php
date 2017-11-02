@@ -53,4 +53,24 @@ class EditForm extends \Magento\Framework\View\Element\Template
     {
         return $this->formId;
     }
+
+    /**
+     * Return Cancel button id.
+     *
+     * @return string
+     */
+    public function getCancelButtonId()
+    {
+        return 'cancel-save';
+    }
+
+    /**
+     * Return save button id.
+     *
+     * @return string
+     */
+    public function getSaveButtonId()
+    {
+        return 'save_address';
+    }
 }

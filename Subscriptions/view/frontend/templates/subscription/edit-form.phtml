@@ -4,11 +4,8 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
 /** @var $block TNW\Subscriptions\Block\Subscription\EditForm */
 ?>
-
 <form class="<?php echo $block->getFormClass()?>"
       id="<?php echo $block->getFormId()?>"
       enctype="multipart/form-data"
@@ -17,13 +14,18 @@
     <?php echo $block->getFormContentHtml() ?>
     <div class="actions-toolbar">
         <div class="grid-row">
-            <div class="grid-col2-xs primary">
-                <button id="save_address"  class="action save primary" title="<?php /* @escapeNotVerified */ echo __('Save Address') ?>">
+            <div class="primary grid-col2-xs">
+                <button id="<?php echo $block->getSaveButtonId()?>"
+                        class="action save primary"
+                        title="<?php /* @escapeNotVerified */ echo __('Save') ?>">
                     <span><?php /* @escapeNotVerified */ echo __('Save') ?></span>
                 </button>
             </div>
-            <div class="grid-col2-xs secondary">
-                <button id="cancel-save" class="action cancel" data-action="cancel" title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
+            <div class="secondary grid-col2-xs">
+                <button id="<?php echo $block->getCancelButtonId()?>"
+                        class="action cancel"
+                        data-action="cancel"
+                        title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
                     <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
                 </button>
             </div>
