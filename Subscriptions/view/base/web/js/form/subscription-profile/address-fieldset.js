@@ -19,7 +19,8 @@ define([
             previousAddressId: null,
             customerAddressSelector: 'customer_address_id',
             regionIdInputPreSelector: null,
-            countryIdSelection: null
+            countryIdSelection: null,
+            customerAddressesData: ''
         },
 
         /**
@@ -27,12 +28,18 @@ define([
          *
          * @return void
          */
-        openAddressForm: function () {
+        openAddressForm: function (needFillData) {
+            var customerAddressesSelect = registry.get('index = ' + this.customerAddressSelector);
+            if (customerAddressesSelect && needFillData) {
+                this.fillCustomerAddressData(customerAddressesSelect);
+            }
             this.setAddressSelectVisibility(false);
             this.filterEmptyAddressOption(true);
             $j(this.getPreSelector() + "[data-index=region_id_input]").removeClass('hidden');
-            var countryId = registry.get(this.getSelectionForCountryId());
-            countryId.value('US');
+            if (!needFillData) {
+                var countryId = registry.get(this.getSelectionForCountryId());
+                countryId.value('US');
+            }
         },
 
         /**
@@ -45,6 +52,44 @@ define([
             this.setAddressSelectVisibility(true);
             this.clearElemsData();
             $j(this.getPreSelector() + "[data-index=region_id_input]").addClass('hidden');
+        },
+
+        /**
+         * Fill customer address fields from saved address.
+         *
+         * @param customerAddressesSelect
+         * @return void
+         */
+        fillCustomerAddressData: function (customerAddressesSelect) {
+
+            var addressesData = this.customerAddressesData.replace(/'/g,'"'),
+                selectedOptionVal = customerAddressesSelect.value(),
+                current = this;
+
+            addressesData = JSON.parse(addressesData);
+
+            if (typeof addressesData[selectedOptionVal] !== 'undefined') {
+                var selectedAddressData = addressesData[selectedOptionVal];
+
+                $j.each(this.elems(), function (key, field) {
+                    current.updateFieldValue(field, selectedAddressData[field.index]);
+                });
+            }
+
+        },
+
+        /**
+         * Update input or select field value.
+         *
+         * @param field
+         * @param fieldValue
+         * @return void
+         */
+        updateFieldValue: function(field, fieldValue) {
+            if (fieldValue === null || fieldValue === undefined) {
+                return;
+            }
+            field.value(fieldValue);
         },
 
         /**
@@ -67,6 +112,17 @@ define([
             return this.countryIdSelection
                 ? 'inputName=' + this.countryIdSelection + '[country_id]'
                 : 'index=country_id';
+        },
+
+        /**
+         * Get parent selection for region id field
+         *
+         * @return {String}
+         */
+        getSelectionForRegionId: function () {
+            return this.countryIdSelection
+            ? 'inputName=' + this.countryIdSelection + '[region_id]'
+            : 'index=region_id';
         },
 
         /**
@@ -126,7 +182,8 @@ define([
                     if (item.formElement == 'checkbox') {
                         item.checked(false);
                     } else if (typeof item.value() != 'undefined') {
-                        item.value('');
+                        item.restoreToDefault();
+                        item.error('');
                     }
                 }
             });
