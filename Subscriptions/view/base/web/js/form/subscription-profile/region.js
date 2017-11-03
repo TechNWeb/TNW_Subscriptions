@@ -82,6 +82,15 @@ define([
                     this.setVisible(true);
                 }
             }
+        },
+
+        /** @inheritdoc */
+        filter: function (value, field) {
+            var country = registry.get(this.parentName + '.' + 'country_id');
+
+            if (country) {
+                this._super(value, field);
+            }
         }
     });
 });
