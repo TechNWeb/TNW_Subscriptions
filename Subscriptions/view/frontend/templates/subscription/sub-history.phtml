@@ -40,7 +40,7 @@
                         </a>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Next Payment On')) ?>" class="col date">
-                        <?php /* @escapeNotVerified */ echo $block->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG) ?>
+                        <?php /* @escapeNotVerified */ echo $block->getNextPaymentFormatted($subscription); ?>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>"
                         class="col status <?php echo $block->getStatusClass($subscription->getStatus())?>">

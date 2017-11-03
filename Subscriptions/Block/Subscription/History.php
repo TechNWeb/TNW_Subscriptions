@@ -10,6 +10,7 @@ namespace TNW\Subscriptions\Block\Subscription;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
@@ -420,5 +421,18 @@ class History extends \Magento\Framework\View\Element\Template
             $subscription,
             $subscription->getNextBillingCycleDate()
         );
+    }
+
+    /**
+     * Return formatted next payment date.
+     *
+     * @param Document $subscription
+     * @return string
+     */
+    public function getNextPaymentFormatted(Document $subscription)
+    {
+        return $subscription->getNextBillingCycleDate()
+            ? $this->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG)
+            : '';
     }
 }
