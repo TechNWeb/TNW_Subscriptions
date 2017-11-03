@@ -68,7 +68,7 @@
                 <item name="sortOrder" xsi:type="number">30</item>
                 <item name="imports" xsi:type="array">
                     <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = same_as_shipping:checked</item>
-                    <item name="fiterEmptyAddressOption" xsi:type="string">ns = ${ $.ns }, index = same_as_shipping:checked</item>
+                    <item name="filterEmptyAddressOption" xsi:type="string">!ns = ${ $.ns }, index = customer_address_id:visible</item>
                 </item>
             </item>
         </argument>

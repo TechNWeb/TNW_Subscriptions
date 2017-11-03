@@ -322,7 +322,7 @@ class SummaryAddressForm extends AbstractDataProvider
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'issetShippingAddress' => true,
+                            'hasAddress' => $this->hasCustomerAddresses(),
                             'visible' => (bool)$this->getAddressId(),
                             'addressesData' => $this->getCustomerAddressesData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
@@ -878,6 +878,23 @@ class SummaryAddressForm extends AbstractDataProvider
     private function getCustomer()
     {
         return $this->getProfile() ? $this->getProfile()->getCustomer() : null;
+    }
+
+    /**
+     * Checks if customer has any address.
+     * 
+     * @return bool
+     */
+    private function hasCustomerAddresses()
+    {
+        $result = false;
+        $customer = $this->getCustomer();
+
+        if (null !== $customer) {
+            $result = !empty($customer->getAddresses());
+        }
+
+        return $result;
     }
 
     /**
