@@ -78,8 +78,7 @@ define([
                 customerDataFieldSet = $(this.options.customerDataFieldSet),
                 customerAddressesSelect = $(this.options.customerAddressesList),
                 defaultValue = '',
-                form =$(this.options.formSelector),
-                requiredFields = $(this.options.requiredFields);
+                form = $(this.options.formSelector);
 
             editButton.on('click', $.proxy(function() {
                 widget.setFormsVisibility(true);
@@ -95,16 +94,15 @@ define([
                 });
             }, this));
             pickFromSavedButton.on('click', $.proxy(function() {
+                widget.fillAddressDataFromCustomer(customerAddressesSelect, 'information');
                 widget.setAddressFieldsVisibility(true);
             }, this));
             $.each(customerDataFieldSet.find('input'), function (key, field) {
                 $(field).on('change', $.proxy(function() {
+                    widget.fillAddressDataFromCustomer(customerAddressesSelect, 'address');
                     widget.setAddressFieldsVisibility(false);
                 }, this));
             });
-            customerAddressesSelect.on('change', $.proxy(function() {
-                widget.fillInputsData(customerAddressesSelect);
-            }, this));
             cancelButton.on('click', $.proxy(function(e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -120,7 +118,7 @@ define([
                 e.preventDefault();
                 if (!form.valid()) {
                     return;
-                };
+                }
                 widget.saveAddress(e);
             });
         },
@@ -138,27 +136,39 @@ define([
          * Fill address form inputs with data from customer addresses.
          *
          * @param {jQuery} customerAddressesSelect
+         * @param {String} type
          * @returns void
          */
-        fillInputsData: function(customerAddressesSelect) {
+        fillAddressDataFromCustomer: function(customerAddressesSelect, type) {
             var widget = this,
                 selectedOptionVal = customerAddressesSelect.val(),
-                addressesData = this.options.customerAddressesData.replace(/'/g,'"'),
                 form = $(this.options.formSelector),
-                selectedAddressData = [];
-
-            addressesData = JSON.parse(addressesData);
+                selectedAddressData = [],
+                addressesData = this.getCustomerAddressData();
 
             if (typeof addressesData[selectedOptionVal] != 'undefined') {
                 selectedAddressData = addressesData[selectedOptionVal];
 
-                $.each(form.find(this.options.infoFields), function (key, field) {
-                    widget.updateFieldValue(field, selectedAddressData[field.id]);
-                });
-                $.each(form.find(this.options.addressFields), function (key, field) {
-                    widget.updateFieldValue(field, selectedAddressData[field.id]);
-                });
+                if (type === 'information') {
+                    $.each(form.find(this.options.infoFields), function (key, field) {
+                        widget.updateFieldValue(field, selectedAddressData[field.id]);
+                    });
+                } else if (type === 'address') {
+                    $.each(form.find(this.options.addressFields), function (key, field) {
+                        widget.updateFieldValue(field, selectedAddressData[field.id]);
+                    });
+                }
             }
+        },
+
+        /**
+         * Retrieve customer address data from json.
+         *
+         * @return {Object}
+         */
+        getCustomerAddressData: function () {
+            var addressesData = this.options.customerAddressesData.replace(/'/g, '"');
+            return JSON.parse(addressesData);
         },
 
         /**
