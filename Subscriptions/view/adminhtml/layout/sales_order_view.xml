@@ -14,5 +14,10 @@
                 </action>
             </block>
         </referenceBlock>
+        <referenceBlock name="order_info">
+            <block class="TNW\Subscriptions\Block\Adminhtml\Sales\Order\View\Link"
+                   name="order.profile.link"
+                   template="TNW_Subscriptions::order/view/link.phtml"/>
+        </referenceBlock>
     </body>
 </page>
