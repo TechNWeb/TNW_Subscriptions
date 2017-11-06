@@ -346,6 +346,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 '!index=same_as_shipping:checked',
                 '!index=customer_address_id:visible',
             ];
+            $fieldConfig['config']['imports']['disabled'] = '!${$.parentName}:visible';
         }
 
         $attributeMeta = array_replace_recursive(
@@ -369,6 +370,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $additionalElementFormData = [
                     'config' => [
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/shipping-information-input',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/input',
                         'addressFieldsetIndex' => self::ADDRESS_FIELDSET_NAME
                     ]
                 ];

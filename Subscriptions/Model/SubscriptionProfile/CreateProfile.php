@@ -715,19 +715,6 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Cleares customer_address_id fro quote addresses.
-     *
-     * @param array $quoteAddresses
-     * @return void
-     */
-    private function clearCustomerAddressId($quoteAddresses)
-    {
-        foreach ($quoteAddresses as $quoteAddress) {
-            $quoteAddress->setCustomerAddressId(null);
-        }
-    }
-
-    /**
      * Log message for Subscription Profile creation.
      *
      * @param SubscriptionProfileInterface $profile

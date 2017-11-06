@@ -124,7 +124,9 @@ class Address extends Create
         //may be make sense don't do this and always save address to quotes
         if ($result === true) {
             $addressObject->setSaveInAddressBook(!empty($address['save_address']));
-            $addressObject->setCustomerAddressId($customerAddressId);
+            if (!($addressType === QuoteAddress::ADDRESS_TYPE_BILLING && !empty($address['same_as_shipping']))) {
+                $addressObject->setCustomerAddressId($customerAddressId);
+            }
 
             foreach ($session->getSubQuotes() as $subQuote) {
                 if ($addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING) {
