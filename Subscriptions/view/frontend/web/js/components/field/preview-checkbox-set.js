@@ -54,6 +54,7 @@ define([
         onUpdate: function () {
             this._super();
             this.setDiscountLabel('all');
+            this.changeItemPriceLabel();
         },
 
         /**
@@ -100,7 +101,7 @@ define([
         /**
          * Returns preview label.
          *
-         * @returns {string}
+         * @return string
          */
         getPreviewLabel: function () {
             var label = this.getLabelForOption(this.value());
@@ -147,7 +148,7 @@ define([
          * Also deletes discount data if frequency price for options bigger then product price.
          *
          * @param value
-         * @returns {Object}
+         * @return Object
          */
         setDiscountLabel: function (value) {
             var frequencyData = this.getFrequencyData(),
@@ -255,6 +256,7 @@ define([
             } else {
                 issetFrequencyPrice = (optionValue && frequencyData[optionValue]);
             }
+
             return issetFrequencyPrice
         },
 
@@ -294,7 +296,7 @@ define([
         /**
          * Returns current item data.
          *
-         * @returns {}
+         * @returns {Array}
          */
         getCurrentItemData: function() {
             var result = [];
@@ -320,6 +322,106 @@ define([
             }
 
             return priceFormat;
+        },
+
+        /**
+         * Change current grid item price label.
+         *
+         * @return void
+         */
+        changeItemPriceLabel: function() {
+            var priceLabel = '',
+                parentForm = registry.get(this.parentForm),
+                priceComponent = registry.get('dataScope = ' + parentForm.dataScope +'.price'),
+                priceFormat = this.getPriceFormat(),
+                currentItemData = this.getCurrentItemData(),
+                frequencyData = this.getFrequencyData(),
+                currentFrequencyId = this.value(),
+                currentItemFrequencyData = frequencyData[currentFrequencyId],
+
+                qty = Number(currentItemData.qty),
+                price,
+
+                middlePhrase = '',
+                lastPhrase = '',
+                total = '',
+                priceClasses = ['base-price'],
+                thenPhrase = '',
+                frequencyUnit,
+                isTrial,
+                noFormatInitialFee,
+                startSum,
+                formattedStartPrice,
+                trialPrice,
+                presetQty,
+                sum,
+                result = '';
+
+            if (currentItemFrequencyData && priceComponent) {
+                presetQty = Number(currentItemFrequencyData.preset_qty);
+                isTrial = Number(currentItemFrequencyData.is_trial);
+                noFormatInitialFee = Number(currentItemFrequencyData.no_format_initial_fee);
+                price = Number(currentItemFrequencyData.price);
+                trialPrice = Number(currentItemFrequencyData.trial_price);
+                frequencyUnit = currentItemFrequencyData.frequency_unit;
+
+                startSum = isTrial ? trialPrice : price;
+                startSum = presetQty ? startSum : startSum * qty;
+                startSum = startSum + noFormatInitialFee;
+
+                formattedStartPrice = startSum
+                    ? this.currencySymbol + formatPrice.formatPrice(startSum, priceFormat)
+                    : $.mage.__('Free');
+
+                formattedStartPrice = this.addContainer(formattedStartPrice, 'price');
+
+                if (isTrial) {
+                    middlePhrase = (startSum) ? $.mage.__('for the') : '';
+                    lastPhrase = $.mage.__('trial');
+                } else {
+                    if (noFormatInitialFee) {
+                        middlePhrase = $.mage.__('for');
+                        lastPhrase = $.mage.__('initial fee');
+                    }
+                }
+
+                if (middlePhrase && lastPhrase) {
+                    result += '<div class="subscription-price">';
+                    result +=
+                        '%1 %2 '.replace('%1', formattedStartPrice)
+                            .replace('%2', this.addContainer(middlePhrase + ' ' + lastPhrase, 'middle-text'));
+
+                    result += '</div>';
+                    thenPhrase = $.mage.__('then');
+
+                    priceClasses.push('has-trial');
+                }
+
+                sum = presetQty ? price : price * qty;
+
+                total = this.addContainer(formatPrice.formatPrice(sum, priceFormat), 'price');
+                frequencyUnit = this.addContainer(frequencyUnit, 'unit');
+
+                priceLabel = '%1<div class="%2">%3 %4/%5</div>'
+                    .replace('%1', result)
+                    .replace('%2', priceClasses.join(' '))
+                    .replace('%3', thenPhrase)
+                    .replace('%4', total)
+                    .replace('%5', frequencyUnit);
+
+                priceComponent.value(priceLabel);
+            }
+        },
+
+        /**
+         * Add container to string.
+         *
+         * @param {string} text
+         * @param {string} className
+         * @returns {string}
+         */
+        addContainer: function(text, className) {
+            return '<span class="' + className + '">' + text + '</span>';
         }
     });
 });
