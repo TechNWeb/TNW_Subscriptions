@@ -1612,6 +1612,7 @@
 
     .payment-additional-fieldset {
       margin: 0;
+
       .fieldset {
         padding-left: 2rem;
         width: 30rem;
@@ -1995,7 +1996,7 @@
             clear: both;
           }
 
-          &._required {
+          &._required, &._required-number, &._required-date {
             .label {
               span {
                 &:after {
@@ -2041,6 +2042,7 @@
             width: ~'calc( (100%) * 0.35 - 30px )';
             margin-left: 30px;
             display: inline-block;
+            float: left;
 
             &:after {
               display: none;

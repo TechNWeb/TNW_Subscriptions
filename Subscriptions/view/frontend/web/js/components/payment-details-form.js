@@ -98,7 +98,8 @@ define(
                     if ($.inArray(field.componentType, form.complexComponents) != -1) {
                         form.clearElemsData(field.elems());
                     } else {
-                        field.value('');
+                        field.restoreToDefault();
+                        field.error('');
                     }
                 });
             }
