@@ -21,6 +21,17 @@
                 </span>
             </div>
         <?php endif ?>
+        <?php if ($block->isReActiveActive()): ?>
+            <div style="margin-top: 1%">
+                <button onclick="window.location.href='<?php echo $block->getReActivateUrl() ?>'"
+                        class="action primary place-on-hold">
+                    <?php echo __('Re-activate') ?>
+                </button>
+                <span class="re-activate-comment">
+                    <?php echo __('Re-activate subscription.') ?>
+                </span>
+            </div>
+        <?php endif ?>
         <?php if ($block->isCancelActive()): ?>
             <div style="margin-top: 1%">
                 <button onclick="window.location.href='<?php echo $block->getCancelUrl() ?>'"

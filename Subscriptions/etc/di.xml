@@ -122,11 +122,6 @@
                 sortOrder="50"
                 disabled="false"/>
     </type>
-    <type name="Magento\Sales\Block\Adminhtml\Order\View\Info">
-        <plugin name="subscriptions_order_view"
-                type="TNW\Subscriptions\Plugin\Block\Order\Info"
-                disabled="false"/>
-    </type>
 
     <type name="Magento\Catalog\Controller\Adminhtml\Product\MassDelete">
         <plugin name="subscriptions_product_mass_delete"
@@ -376,6 +371,12 @@
     </virtualType>
 
     <type name="TNW\Subscriptions\Block\Subscription\Shipment\AddressEdit">
+        <arguments>
+            <argument name="customerAddressSource" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Block\Subscription\Billing\AddressEdit">
         <arguments>
             <argument name="customerAddressSource" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</argument>
         </arguments>
@@ -662,4 +663,10 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form">
+        <arguments>
+            <argument name="formContext" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context\Proxy</argument>
+        </arguments>
+    </type>
 </config>

@@ -344,7 +344,13 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      */
     public function getCanShowNextPayment()
     {
-        return $this->getSubscriptionProfile()->getStatus() != ProfileStatus::STATUS_COMPLETE;
+        return !in_array(
+            $this->getSubscriptionProfile()->getStatus(),
+            [
+                ProfileStatus::STATUS_COMPLETE,
+                ProfileStatus::STATUS_CANCELED,
+            ]
+        );
     }
 
     /**
@@ -424,5 +430,16 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     public function isSupported()
     {
         return $this->_appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND;
+    }
+
+    /**
+     * Return additional class on status message subscription block.
+     * Depends on whether the next payment block is displayed.
+     *
+     * @return string
+     */
+    public function getStatusMessageBlockClass()
+    {
+        return !$this->getCanShowNextPayment() ? 'full-block': '';
     }
 }

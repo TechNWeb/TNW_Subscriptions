@@ -6,16 +6,12 @@
 
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
-use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\ResourceModel\Order as OrderResource;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
 
 /**
  * Class Total Price column

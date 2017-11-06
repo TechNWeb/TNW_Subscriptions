@@ -698,10 +698,6 @@ button.action-editor.active:before{
 .admin__field-control .field-qty .admin__field-label span {
   margin-left: 1rem;
 }
-.admin__field-control .field-qty .admin__field-label span:after {
-  left: 0;
-  margin-left: 0px;
-}
 .table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
   background-color: #f1f1f1;
 }
@@ -709,3 +705,17 @@ button.action-editor.active:before{
   padding: 1rem 1rem;
   text-align: left;
 }
+.payment-additional-fieldset ._required-number > .admin__field-label > span:after {
+  color: #eb5202;
+  content: '*';
+  display: inline-block;
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 1;
+  margin-left: 10px;
+  margin-top: .2rem;
+  position: absolute;
+  z-index: 1;
+}
+
+.tnw-subscriptions-subscriptionprofile-create [data-index="account"] label span:after { display: none !important; }

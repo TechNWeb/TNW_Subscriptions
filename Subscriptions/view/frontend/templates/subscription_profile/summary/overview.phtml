@@ -5,7 +5,7 @@
         <?php if ($block->getCanShowNextPayment()): ?>
             <div class="summary-item next-payment"><?php echo $block->getNextPaymentHtml() ?></div>
         <?php endif ?>
-        <div class="summary-item status-message">
+        <div class="summary-item status-message <?php echo $block->getStatusMessageBlockClass() ?>">
             <div class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>">
                 <?php echo $block->getMessageHtml() ?>
             </div>

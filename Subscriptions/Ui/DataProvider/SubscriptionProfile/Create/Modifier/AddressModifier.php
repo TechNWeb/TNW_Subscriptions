@@ -7,18 +7,20 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
 
 use Magento\Customer\Api\AddressMetadataInterface;
+use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Customer\Model\Attribute;
 use Magento\Customer\Model\AttributeMetadataDataProvider;
+use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
 use Magento\Customer\Model\ResourceModel\AddressRepository;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
-use Magento\Ui\Component\Form;
-use Magento\Customer\Model\Address\Mapper as AddressMapper;
-use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
+use Magento\Framework\Phrase;
+use Magento\Ui\Component\Form\Fieldset;
+use Magento\Framework\Json\Encoder;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
 /**
- * Class AddressModifier
+ * Address form modifier.
  */
 class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
@@ -69,7 +71,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      *
      * @var array
      */
-    private $formElementsmapping = [
+    private $formElementsMapping = [
         'text' => 'input',
         'multiline' => 'input',
         'select' => 'select',
@@ -81,20 +83,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @var bool
      */
     private $isShipping;
-
-    /**
-     * Information fieldset name.
-     *
-     * @var string
-     */
-    private $infoFieldSetName;
-
-    /**
-     * Address fieldset name.
-     *
-     * @var string
-     */
-    private $addressDataFieldSetName;
 
     /**
      * Customer address Id.
@@ -115,13 +103,19 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private $addressAttributes;
 
-    /** @var QuoteSessionInterface */
+    /**
+     * @var QuoteSessionInterface
+     */
     private $session;
 
-    /** @var CustomerRepository */
+    /**
+     * @var CustomerRepository
+     */
     private $customerRepository;
 
-    /** @var AddressRepository */
+    /**
+     * @var AddressRepository
+     */
     private $addressRepository;
 
     /**
@@ -139,14 +133,19 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     private $customerMapper;
 
     /**
-     * AddressModifier constructor.
-     *
+     * @var Encoder
+     */
+    private $jsonEncoder;
+
+    /**
      * @param AttributeMetadataDataProvider $attributeMetadataDataProvider
      * @param CustomerRepository $customerRepository
      * @param AddressRepository $addressRepository
      * @param AddressMapper $addressMapper
      * @param CustomerMapper $customerMapper
      * @param QuoteSessionInterface $session
+     * @param Encoder $encoder
+     * @param bool $isShipping
      */
     public function __construct(
         AttributeMetadataDataProvider $attributeMetadataDataProvider,
@@ -155,6 +154,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         AddressMapper $addressMapper,
         CustomerMapper $customerMapper,
         QuoteSessionInterface $session,
+        Encoder $encoder,
         $isShipping
     ) {
         $this->attributeMetadataDataProvider = $attributeMetadataDataProvider;
@@ -163,6 +163,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         $this->addressMapper = $addressMapper;
         $this->customerMapper = $customerMapper;
         $this->session = $session;
+        $this->jsonEncoder = $encoder;
         $this->isShipping = $isShipping;
     }
 
@@ -182,7 +183,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                             'config' => [
                                 'label' => $this->getInfoFieldSetLabel(),
                                 'collapsible' => false,
-                                'componentType' => Form\Fieldset::NAME,
+                                'componentType' => Fieldset::NAME,
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                 'sortOrder' => 20,
                                 'dataScope' => $this->getInfoFieldSetDataScope(),
@@ -195,7 +196,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'dataScope' => $this->getAddressDataFieldSetdataScope()
+                                'dataScope' => $this->getAddressDataFieldSetdataScope(),
+                                'customerAddressesData' => $this->getCustomerAddressesData()
                             ],
                         ],
                     ],
@@ -243,9 +245,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'issetShippingAddress' => $this->checkIfIssetShippingId(),
-                            'visible' => $this->checkIfIssetShippingId(),
-                            'addressesData' => $this->getCustomerAddressesData(),
+                            'hasAddress' => $this->hasAddressId() || $this->hasCustomerAddresses(),
+                            'visible' => $this->isCustomerAddressVisible(),
+                            'addressesData' => $this->getCustomerShippingInformationData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
                         ]
                     ]
@@ -279,7 +281,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                     //Get meta data for attribute
                     $childrenData = array_merge_recursive(
                         $childrenData,
-                        $this->getAttributeMeta($attribute, $sortOrder, $i )
+                        $this->getAttributeMeta($attribute, $sortOrder, $i)
                     );
                     $i++;
                     $lineCount--;
@@ -298,7 +300,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param int $attributeLine
      * @return array
      */
-    private function getAttributeMeta($attribute, $sortOrder, $attributeLine)
+    private function getAttributeMeta(Attribute $attribute, $sortOrder, $attributeLine)
     {
         $attributeCode = $attribute->getAttributeCode();
         $result = [];
@@ -314,41 +316,68 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         );
 
         //Meta data for all attributes.
-        $attributeMeta = array_merge_recursive(
-            $attributeMeta,
-            [
-                'config' => [
-                    'componentType' => 'field',
-                    'placeholder' => __($elemLabel),
-                    'additionalClasses' => $additionalClasses,
-                    'validation' => $this->getValidation($attribute, $attributeLine),
-                    'sortOrder' => $sortOrder,
-                    'dataScope' => $elemName,
-                    'imports' => $this->getImportsData($attributeCode)
-                ],
-            ]
-        );
+        $fieldConfig = [
+            'config' => [
+                'componentType'     => 'field',
+                'placeholder'       => __($elemLabel),
+                'additionalClasses' => $additionalClasses,
+                'validation'        => $this->getValidation($attribute, $attributeLine),
+                'sortOrder'         => $sortOrder,
+                'dataScope'         => $elemName,
+                'imports'           => $this->getImportsData($attributeCode),
+            ],
+        ];
 
         //Additional meta data for attributes.
         $attributeMeta = $this->getPostCodeAttributeMeta($attributeCode, $attributeMeta);
 
-        if ($attribute->getAttributeCode()=='region_id') {
+        // Change default field components to process complicated visibility logic
+        // for billing address.
+        if (
+            !in_array($attribute->getAttributeCode(), $this->infoAttributes)
+            && $attribute->getAttributeCode() !== 'region_id'
+            && !$this->isShippingFieldSet()
+        ) {
+            $fieldConfig['config']['component'] = $this->getFieldComponent(
+                $attribute->getAttributeCode(),
+                $formElement
+            );
+            $fieldConfig['config']['visibilityDependencies'] = [
+                '!index=same_as_shipping:checked',
+                '!index=customer_address_id:visible',
+            ];
+        }
+
+        $attributeMeta = array_replace_recursive(
+            $attributeMeta,
+            $fieldConfig
+        );
+
+        if ($attribute->getAttributeCode() == 'region_id') {
             $attributeMeta = $this->getRegionIdAttributeMeta($attributeMeta);
         } else {
-            $attributeMeta = array_merge_recursive(
-                $attributeMeta,
-                [
-                    'config' => [
-                        'formElement' => $formElement,
-                        'dataType' => 'text',
+            $elementFormData = [
+                'config' => [
+                    'formElement' => $formElement,
+                    'dataType' => 'text',
 
-                    ]
                 ]
-            );
+            ];
+
+            $additionalElementFormData = [];
+            if (in_array($attribute->getAttributeCode(), $this->infoAttributes)) {
+                $additionalElementFormData = [
+                    'config' => [
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/shipping-information-input',
+                        'addressFieldsetIndex' => self::ADDRESS_FIELDSET_NAME
+                    ]
+                ];
+            }
+
+            $attributeMeta = array_merge_recursive($attributeMeta, $elementFormData, $additionalElementFormData);
         }
 
         $fieldSetName = $this->getFieldSetName($attributeCode);
-
         $result[$fieldSetName][$elemName]['arguments']['data'] = $attributeMeta;
 
         return $result;
@@ -361,7 +390,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param array $attributeMeta
      * @return array
      */
-    private function getPostCodeAttributeMeta($attributeCode, $attributeMeta)
+    private function getPostCodeAttributeMeta($attributeCode, array $attributeMeta)
     {
         if ($attributeCode == 'postcode') {
             $attributeMeta = array_merge_recursive(
@@ -386,7 +415,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param array $attributeMeta
      * @return array
      */
-    private function getRegionIdAttributeMeta($attributeMeta)
+    private function getRegionIdAttributeMeta(array $attributeMeta)
     {
         $attributeMeta = array_merge_recursive(
             $attributeMeta,
@@ -401,12 +430,12 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                         'field' => 'country_id',
                     ],
                     'validation' => [
-                        'required-entry' => (!($this->getShippingId() || $this->isShippingFieldSet())),
+                        'required-entry' => true,
                     ],
-                    'additionalClass' => ($this->checkIfIssetShippingId())? ' hidden': '',
+                    'additionalClass' => $this->hasAddressId() ? ' hidden' : '',
                     'imports' => [
                         'checkValidation' => '!ns = ${ $.ns }, index = same_as_shipping:checked',
-                        'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
+                        'checkVisibility' => 'ns = ${ $.ns }, index = country_id:visible',
                     ],
                     'customScope' => 'region'
                 ],
@@ -420,19 +449,23 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * Returns additional meta data for select/multiselect attributes.
      *
      * @param Attribute $attribute
-     * @param array $attributeMeta
-     * @param string $elemLabel
-     * @param string $additionalClasses
+     * @param array     $attributeMeta
+     * @param string    $elemLabel
+     * @param string    $additionalClasses
      * @return array
      */
-    private function getSourceAttributeMeta($attribute, $attributeMeta, $elemLabel, $additionalClasses)
-    {
+    private function getSourceAttributeMeta(
+        Attribute $attribute,
+        array $attributeMeta,
+        $elemLabel,
+        $additionalClasses
+    ) {
         if ($attribute->usesSource()) {
             $attributeMeta = array_merge_recursive(
                 $attributeMeta,
                 [
                     'options' => $attribute->getSource(),
-                    'config' => [
+                    'config'  => [
                         'caption' => __($elemLabel),
                     ]
                 ]
@@ -440,7 +473,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             $additionalClasses = $additionalClasses . ' wide-select';
         }
 
-        return array($attributeMeta, $additionalClasses);
+        return [$attributeMeta, $additionalClasses];
     }
 
     /**
@@ -460,14 +493,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getInfoFieldSetDataScope()
     {
-        if (!$this->infoFieldSetName) {
-            $this->infoFieldSetName = self::SHIPPING_INFO_FIELDSET;
-            if (!$this->isShippingFieldSet()) {
-                $this->infoFieldSetName = self::BILLING_INFO_FIELDSET;
-            }
-        }
-
-        return $this->infoFieldSetName;
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_INFO_FIELDSET
+            : self::BILLING_INFO_FIELDSET;
     }
 
     /**
@@ -477,44 +505,33 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getAddressDataFieldSetdataScope()
     {
-        if (!$this->addressDataFieldSetName) {
-            $this->addressDataFieldSetName = self::SHIPPING_ADDRESS_FIELDSET;
-            if (!$this->isShippingFieldSet()) {
-                $this->addressDataFieldSetName = self::BILLING_ADDRESS_FIELDSET;
-            }
-        }
-
-        return $this->addressDataFieldSetName;
+        return $this->isShippingFieldSet()
+            ? self::SHIPPING_ADDRESS_FIELDSET
+            : self::BILLING_ADDRESS_FIELDSET;
     }
 
     /**
      * Returns label for customer address information fieldset.
      *
-     * @return string
+     * @return Phrase
      */
     private function getInfoFieldSetLabel()
     {
-        $infoFieldSetLabel = __('Shipping Information');
-        if (!$this->isShippingFieldSet()) {
-            $infoFieldSetLabel = __('Billing Information');
-        }
-
-        return $infoFieldSetLabel;
+        return $this->isShippingFieldSet()
+            ? __('Shipping Information')
+            : __('Billing Information');
     }
 
     /**
      * Returns label for customer address data fieldset.
      *
-     * @return string
+     * @return Phrase
      */
     private function getAddressFieldSetLabel()
     {
-        $addressFieldSetLabel = __('Shipping Address');
-        if (!$this->isShippingFieldSet()) {
-            $addressFieldSetLabel = __('Billing Address');
-        }
-
-        return $addressFieldSetLabel;
+        return $this->isShippingFieldSet()
+            ? __('Shipping Address')
+            : __('Billing Address');
     }
 
     /**
@@ -524,7 +541,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getAddressAttributes()
     {
-        if (!$this->addressAttributes) {
+        if (null === $this->addressAttributes) {
             $this->addressAttributes = $this->attributeMetadataDataProvider->loadAttributesCollection(
                 AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
                 self::FORM_CODE
@@ -541,7 +558,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param int $attributeLine
      * @return array
      */
-    private function getValidation($attribute, $attributeLine)
+    private function getValidation(Attribute $attribute, $attributeLine)
     {
         $validation = [];
         //Form validation rules array
@@ -564,12 +581,12 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param Attribute $attribute
      * @return string
      */
-    private function getFormElement($attribute)
+    private function getFormElement(Attribute $attribute)
     {
         $formElement = $attribute->getFrontendInput();
 
-        if (isset($this->formElementsmapping[$attribute->getFrontendInput()])) {
-            $formElement = $this->formElementsmapping[$attribute->getFrontendInput()];
+        if (isset($this->formElementsMapping[$formElement])) {
+            $formElement = $this->formElementsMapping[$formElement];
         }
 
         return $formElement;
@@ -582,7 +599,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param int $attributeLine
      * @return array
      */
-    private function getElemNameAndLabel($attribute, $attributeLine)
+    private function getElemNameAndLabel(Attribute $attribute, $attributeLine)
     {
         $attributeCode = $attribute->getAttributeCode();
         $elemName = $attributeCode;
@@ -594,7 +611,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             $elemLabel = $attribute->getStoreLabel() . ' ' . sprintf(__('(Line %s)'), $attributeLine + 1);
         }
 
-        return array($elemName, $elemLabel);
+        return [$elemName, $elemLabel];
     }
 
     /**
@@ -605,11 +622,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getFieldSetName($attributeCode)
     {
-        if (in_array($attributeCode, $this->infoAttributes)) {
-            $fieldSetName = static::INFO_FIELDSET_NAME;
-        } else {
-            $fieldSetName = static::ADDRESS_FIELDSET_NAME;
-        }
+        $fieldSetName = in_array($attributeCode, $this->infoAttributes)
+            ? static::INFO_FIELDSET_NAME
+            : static::ADDRESS_FIELDSET_NAME;
 
         return $fieldSetName;
     }
@@ -622,9 +637,17 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      */
     private function getAdditionalClasses($attribute)
     {
-        $additionalClasses = $attribute->getFrontend()->getClass();
+        return $attribute->getFrontend()->getClass();
+    }
 
-        return $additionalClasses;
+    /**
+     * Checks if quote has selected customer address.
+     *
+     * @return bool
+     */
+    private function hasAddressId()
+    {
+        return (bool)$this->getAddressId();
     }
 
     /**
@@ -632,14 +655,15 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      *
      * @return bool
      */
-    private function checkIfIssetShippingId()
+    private function hasCustomerAddresses()
     {
-        $return = true;
-        if (!$this->getShippingId()) {
-            $return = false;
+        $result = false;
+        if ($this->getCustomerId()) {
+            $customerModel = $this->customerRepository->getById($this->getCustomerId());
+            $result = !empty($customerModel->getAddresses());
         }
 
-        return $return;
+        return $result;
     }
 
     /**
@@ -654,15 +678,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         if (!in_array($attributeCode, $this->infoAttributes)) {
 
             if ($attributeCode != 'region_id') {
-                if ($this->getShippingId() || $this->isShippingFieldSet()) {
-                    $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
-                } else {
-                    $imports['visible'] = '!ns = ${ $.ns }, index = same_as_shipping:checked';
-                }
+                $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
             }
 
         } else {
-            $imports['visible'] = '!${ $.parentName}.same_as_shipping:checked';
+            $imports['visible'] = '!${$.parentName}.same_as_shipping:checked';
         }
 
         return $imports;
@@ -675,7 +695,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         $getFromQuoteAddress = false;
         $dataArray = [];
-        $addressId = $this->getShippingId();
+        $addressId = $this->getAddressId();
 
         if ($addressId) {
             $dataObject = $this->addressRepository->getById($addressId);
@@ -694,7 +714,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             }
         }
 
-        if (count($dataArray) || $getFromQuoteAddress) {
+        if (!empty($dataArray) || $getFromQuoteAddress) {
             $data = array_merge_recursive(
                 $data,
                 $this->getAddressData($dataArray, $getFromQuoteAddress)
@@ -706,14 +726,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $data,
                 $this->modifyShippingIdData($addressId)
             );
-        } else {
-            if (!isset ($data[Account::FORM_DATA_VALUE][$this->getAddressDataFieldSetdataScope()]['country_id']) ||
-            !$data[Account::FORM_DATA_VALUE][$this->getAddressDataFieldSetdataScope()]['country_id']) {
-                $data = array_merge_recursive(
-                    $data,
-                    $this->modifyCountryIdData()
-                );
-            }
+        } elseif (empty($data[Account::FORM_DATA_VALUE][$this->getAddressDataFieldSetdataScope()]['country_id'])) {
+            $data = array_merge_recursive(
+                $data,
+                $this->modifyCountryIdData()
+            );
         }
 
         return $data;
@@ -724,7 +741,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      *
      * @return array
      */
-    private function getCustomerAddressesData()
+    private function getCustomerShippingInformationData()
     {
         $data = [];
         $customerId = $this->getCustomerId();
@@ -732,7 +749,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             /** @var \Magento\Customer\Api\Data\CustomerInterface $customerModel */
             $customerModel = $this->customerRepository->getById($customerId);
             $addresses = $customerModel->getAddresses();
-            if (is_array($addresses) && count($addresses) > 0) {
+            if (is_array($addresses) && !empty($addresses)) {
                 /** @var \Magento\Customer\Api\Data\AddressInterface $address */
                 foreach ($addresses as $address) {
                     /** @var array $addressData */
@@ -747,7 +764,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         return $data;
     }
 
-
     /**
      * Returns necessary customer address data.
      *
@@ -755,16 +771,17 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
      * @param bool $getFromQuoteAddress
      * @return array
      */
-    private function getAddressData($addressData, $getFromQuoteAddress)
+    private function getAddressData(array $addressData, $getFromQuoteAddress)
     {
         $infoArray = [];
         $addressDataArray = [];
 
         if ($getFromQuoteAddress) {
-            //If there is a quote and we retrieve some address data from quote address we have to devide it
+            //If there is a quote and we retrieve some address data from quote address we have to divide it
             //for two fieldsets.
-            $firstQuote = $this->session->getFirstQuote();
-            $customerAddressDataObject = $firstQuote->getShippingAddress()->exportCustomerAddress();
+            $address = $this->getAddress();
+
+            $customerAddressDataObject = $address->exportCustomerAddress();
             $addressData = array_merge(
                 $addressData,
                 $this->addressMapper->toFlatArray($customerAddressDataObject)
@@ -847,29 +864,37 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     }
 
     /**
-     * Returns shipping address Id.
+     * Returns selected address Id.
      *
-     * If customer has default shipping address - returns it's id.
-     * If customer doesn't have default shipping address, but he has array of addresses -
-     * returns the first item of array.
+     * If quote already present and has saved address - take it.
+     * If customer has default address - returns it's id.
+     * If customer doesn't have default address, but he has array of addresses - the first is taken.
      * If there is new customer - returns null.
      *
      * @return int|null|string
      */
-    private function getShippingId()
+    private function getAddressId()
     {
         if ($this->addressId === false) {
             $addressId = null;
-            $customerId = $this->getCustomerId();
-            if ($customerId) {
-                $customerModel = $this->customerRepository->getById($customerId);
-                $addressId = $customerModel->getDefaultShipping();
+            $address = $this->getAddress();
 
-                if (!$addressId) {
-                    $customerAddresses = $customerModel->getAddresses();
-                    $customerAddress = array_shift($customerAddresses);
-                    if ($customerAddress instanceof \Magento\Customer\Model\Data\Address) {
-                        $addressId = $customerAddress->getId();
+            if ($address && !$address->isObjectNew()) {
+                $addressId = $address->getCustomerAddressId();
+            } elseif (null === $addressId) {
+                $customerId = $this->getCustomerId();
+                if ($customerId) {
+                    $customerModel = $this->customerRepository->getById($customerId);
+                    $addressId = $this->isShippingFieldSet()
+                        ? $customerModel->getDefaultShipping()
+                        : $customerModel->getDefaultBilling();
+
+                    if (!$addressId) {
+                        $customerAddresses = $customerModel->getAddresses();
+                        $customerAddress = array_shift($customerAddresses);
+                        if ($customerAddress instanceof \Magento\Customer\Model\Data\Address) {
+                            $addressId = $customerAddress->getId();
+                        }
                     }
                 }
             }
@@ -883,11 +908,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     /**
      * Returns address attribute data from customer address or quote address.
      *
-     * @param array $addressData
+     * @param array     $addressData
      * @param Attribute $addressAttribute
      * @return array
      */
-    private function getAddressAttributeData($addressData, $addressAttribute)
+    private function getAddressAttributeData(array $addressData, Attribute $addressAttribute)
     {
         $attributeData = [];
         $attributeCode = $addressAttribute->getAttributeCode();
@@ -895,21 +920,17 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         if ($addressAttribute->getFrontendInput() == 'multiline') {
             $lineCount = $addressAttribute->getMultilineCount();
             $i = 0;
-                do {
-                    if (isset($addressData[$attributeCode][$i])) {
-                        $attributeLineData = [
-                            $attributeCode . $i => $addressData[$attributeCode][$i]
-                        ];
-                    } else {
-                        $attributeLineData = [
-                            $attributeCode . $i => '',
-                        ];
-                    }
+            do {
+                $attributeLineData = [
+                    $attributeCode . $i => isset($addressData[$attributeCode][$i])
+                        ? $addressData[$attributeCode][$i]
+                        : '',
+                ];
 
-                    $attributeData = array_merge($attributeData, $attributeLineData);
-                    $i++;
-                    $lineCount--;
-                } while ($lineCount > 0);
+                $attributeData = array_merge($attributeData, $attributeLineData);
+                $i++;
+                $lineCount--;
+            } while ($lineCount > 0);
         } elseif (isset($addressData[$attributeCode])) {
             $attributeData = [
                 $attributeCode => $addressData[$attributeCode]
@@ -921,5 +942,119 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         }
 
         return $attributeData;
+    }
+
+    /**
+     * Returns field component.
+     *
+     * @param string $attributeCode
+     * @param string $formElement
+     * @return string
+     */
+    private function getFieldComponent($attributeCode, $formElement)
+    {
+        $component = '';
+        switch ($formElement) {
+            case 'select':
+                $component = 'TNW_Subscriptions/js/form/element/visibility/select';
+                break;
+            case 'input':
+                $component = 'TNW_Subscriptions/js/form/element/visibility/input';
+                // no break
+            default:
+                if ($attributeCode === 'postcode') {
+                    $component = 'TNW_Subscriptions/js/form/element/visibility/post-code';
+                }
+                break;
+        }
+
+        return $component;
+    }
+
+    /**
+     * Returns current address.
+     *
+     * @return \Magento\Quote\Model\Quote\Address|null
+     */
+    private function getAddress()
+    {
+        $quote = $this->session->getFirstQuote();
+        $address = null;
+
+        if (false !== $quote) {
+            $address = $this->isShippingFieldSet()
+                ? $quote->getShippingAddress()
+                : $quote->getBillingAddress();
+        }
+
+        return $address;
+    }
+
+    /**
+     * Returns if customer address should be visible.
+     *
+     * @return bool
+     */
+    private function isCustomerAddressVisible()
+    {
+        return $this->hasAddressId() || (!$this->isQuoteAddressFilled() && $this->hasCustomerAddresses());
+    }
+
+    /**
+     * Is address filled or not.
+     *
+     * @return bool
+     */
+    private function isQuoteAddressFilled()
+    {
+        $address = $this->getAddress();
+
+        return (null !== $address && !$address->isObjectNew() && $address->hasCity());
+    }
+
+    /**
+     * Retrieve customer addresses data to display.
+     *
+     * @return string
+     */
+    private function getCustomerAddressesData()
+    {
+        $result = [];
+        $customerId = $this->getCustomerId();
+        if ($customerId) {
+
+            /** @var \Magento\Customer\Api\Data\CustomerInterface $customerModel */
+            $customerModel = $this->customerRepository->getById($customerId);
+            $addressesList = $customerModel->getAddresses();
+
+            foreach ($addressesList as $address) {
+                $streetData = [];
+                if ($address->getStreet()) {
+                    foreach ($address->getStreet() as $key => $streetValue) {
+                        $streetKey = 'street' . $key;
+                        $streetData[$streetKey] = $streetValue;
+                    }
+                }
+
+                $addressData = [
+                    'firstname' => $address->getFirstname(),
+                    'lastname' => $address->getLastname(),
+                    'company' => $address->getCompany(),
+                    'telephone' => $address->getTelephone(),
+                    'city' => $address->getCity(),
+                    'country_id' => $address->getCountryId(),
+                    'region' => $address->getRegion()->getRegion(),
+                    'region_id' => $address->getRegionId(),
+                    'postcode' => $address->getPostcode(),
+                    'fax' => $address->getFax(),
+                    'vat_id' => $address->getVatId()
+                ];
+
+                $result[$address->getId()] = array_merge($addressData, $streetData);
+
+            }
+        }
+
+        return str_replace('"', "'", $this->jsonEncoder->encode($result));
     }
 }

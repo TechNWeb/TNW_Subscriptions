@@ -10,6 +10,7 @@ define([
     'uiRegistry'
 ], function (Select, layout, utils, registry) {
     'use strict';
+
     var inputNode = {
         parent: '${ $.$data.parentName }',
         component: 'Magento_Ui/js/form/element/abstract',
@@ -29,8 +30,8 @@ define([
 
         defaults:{
             customerAddressSelector: 'customer_address_id',
-
             listens: {
+                '${ $.parentName }:visible': 'checkVisibility',
                 '${ $.provider }:data.validate': 'validate'
             }
         },
@@ -46,22 +47,59 @@ define([
             return this;
         },
 
+        /**
+         * Checks field "required" validation flag.
+         *
+         * @param {boolean} checkedSame
+         * @return void
+         */
         checkValidation: function (checkedSame) {
             this.setValidation('required-entry', checkedSame);
         },
 
+        /**
+         * Checks field visibility.
+         *
+         * @return void
+         */
         checkVisibility: function () {
-            var customerAddressId = registry.get('index=' + this.customerAddressSelector);
-            var options = this.options();
-            var optionsLength = 0;
-            if (typeof options == 'Array') {
-                optionsLength = options.length;
+            var customerAddressId = registry.get('index=' + this.customerAddressSelector),
+                country = registry.get(this.parentName + '.' + 'country_id'),
+                options = this.options(),
+                optionsLength = 0;
+
+            // hide select and corresponding text input field if country editor invisible.
+            if (country && !country.visible()) {
+                this.setVisible(false);
+
+                if (this.customEntry) {
+                    this.toggleInput(false);
+                }
+            } else if (options instanceof Array) {
+                    optionsLength = options.length;
+
+                if (!customerAddressId.visible() && optionsLength > 0) {
+                    this.setVisible(true);
+                }
             }
-            if (!customerAddressId.visible() && optionsLength > 0) {
-                this.setVisible(true);
+        },
+
+        /** @inheritdoc */
+        filter: function (value, field) {
+            var country = registry.get(this.parentName + '.' + 'country_id');
+
+            if (country) {
+                this._super(value, field);
+
+                if (!country.visible()) {
+                    // hide select and corresponding text input field if region must not be shown for selected country
+                    this.setVisible(false);
+
+                    if (this.customEntry) {
+                        this.toggleInput(false);
+                    }
+                }
             }
         }
-
     });
 });
-

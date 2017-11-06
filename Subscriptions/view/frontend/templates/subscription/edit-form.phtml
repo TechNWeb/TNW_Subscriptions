@@ -13,20 +13,22 @@
       method="post">
     <?php echo $block->getFormContentHtml() ?>
     <div class="actions-toolbar">
-        <div class="primary">
-            <button id="<?php echo $block->getSaveButtonId()?>"
-                    class="action save primary"
-                    title="<?php /* @escapeNotVerified */ echo __('Save') ?>">
-                <span><?php /* @escapeNotVerified */ echo __('Save') ?></span>
-            </button>
-        </div>
-        <div class="secondary">
-            <button id="<?php echo $block->getCancelButtonId()?>"
-                    class="action cancel"
-                    data-action="cancel"
-                    title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
-                <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
-            </button>
+        <div class="grid-row">
+            <div class="primary grid-col2-xs">
+                <button id="<?php echo $block->getSaveButtonId()?>"
+                        class="action save primary"
+                        title="<?php /* @escapeNotVerified */ echo __('Save') ?>">
+                    <span><?php /* @escapeNotVerified */ echo __('Save') ?></span>
+                </button>
+            </div>
+            <div class="secondary grid-col2-xs">
+                <button id="<?php echo $block->getCancelButtonId()?>"
+                        class="action cancel"
+                        data-action="cancel"
+                        title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
+                    <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
+                </button>
+            </div>
         </div>
     </div>
 </form>

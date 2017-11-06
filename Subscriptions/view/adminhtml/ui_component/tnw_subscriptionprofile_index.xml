@@ -172,7 +172,15 @@
         <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Total</item>
+                    <item name="label" xsi:type="string" translate="true">Next Payment</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </column>
+        <column name="current_value" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\CurrentValue">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Current Value</item>
                     <item name="sortable" xsi:type="boolean">false</item>
                 </item>
             </argument>

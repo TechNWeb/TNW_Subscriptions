@@ -19,7 +19,7 @@
             <item name="insertFormName" xsi:type="string">shipping_information_insert_form</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_summary_shipping_address_form</item>
         </item>
-        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_summary_shipping_address_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">

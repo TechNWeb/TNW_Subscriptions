@@ -309,7 +309,7 @@ class CreateProfile extends BaseCreate
      *
      * @param [] $address
      * @param null $customerAddressId
-     * @return array
+     * @return array|bool
      */
     public function setShippingAddress($address, $customerAddressId = null)
     {
@@ -690,16 +690,7 @@ class CreateProfile extends BaseCreate
      */
     public function clearAccountStepData()
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        /** @var array $subQuotes */
-        $subQuotes = $session->getSubQuotes();
-
-        foreach ($subQuotes as $subQuote) {
-            $quoteAddresses = $subQuote->getAddressesCollection();
-            $this->clearCustomerAddressId($quoteAddresses);
-            $this->setNeedCollect(true);
-        }
+        //
     }
 
     /**
@@ -717,7 +708,6 @@ class CreateProfile extends BaseCreate
 
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
-            $this->clearCustomerAddressId([$subQuote->getBillingAddress()]);
             $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
             $subQuote->getShippingAddress()->setCollectShippingRates(true);
             $this->setNeedCollect(true);
