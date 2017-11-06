@@ -40,7 +40,7 @@ define([
             var fieldSet = this,
                 rules = {};
             _.each(elems, function (field, code) {
-                if ($.inArray(field.componentType, form.complexComponents) != -1) {
+                if ($.inArray(field.componentType, fieldSet.complexComponents) != -1) {
                     fieldSet.clearElemsData(field.elems());
                 } else {
                     field.restoreToDefault();

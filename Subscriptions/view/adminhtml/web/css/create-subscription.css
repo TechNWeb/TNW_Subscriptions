@@ -698,10 +698,6 @@ button.action-editor.active:before{
 .admin__field-control .field-qty .admin__field-label span {
   margin-left: 1rem;
 }
-.admin__field-control .field-qty .admin__field-label span:after {
-  left: 0;
-  margin-left: 0px;
-}
 .table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
   background-color: #f1f1f1;
 }
