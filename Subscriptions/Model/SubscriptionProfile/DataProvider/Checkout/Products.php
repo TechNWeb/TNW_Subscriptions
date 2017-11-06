@@ -114,7 +114,6 @@ class Products extends ModifyForm
                         ]
                     ]
                 ],
-                'remove_button' => $this->getRemoveButton(),
             ]
         ];
     }
@@ -146,6 +145,7 @@ class Products extends ModifyForm
             ],
             'children' => [
                 'name' => $this->getTextFieldDefenition('name'),
+                'remove_button' => $this->getRemoveButton(),
                 'description' => $this->getTextFieldDefenition('description'),
                 'qty_container' => $this->getQtyContainerDefinition(),
                 'price' => $this->getPriceDefinition(),
