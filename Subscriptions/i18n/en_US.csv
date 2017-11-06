@@ -377,3 +377,5 @@ The number of future quotes to generate at a time for the new subscription profi
 "customer","customer"
 "Subscription will be canceled on %s","Subscription will be canceled on %s"
 "Subscription %1 created","Subscription %1 created"
+"Re-activate","Re-activate"
+"Re-activate subscription.","Re-activate subscription."

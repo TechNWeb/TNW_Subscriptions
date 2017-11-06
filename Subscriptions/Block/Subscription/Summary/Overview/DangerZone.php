@@ -12,6 +12,7 @@ use TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
 /**
  * Provide necessary information to render "Danger Zone" section on Subscription Profile Overview page.
@@ -33,21 +34,29 @@ class DangerZone extends Template
     private $registry;
 
     /**
-     * DangerZone constructor.
+     * Subscription profile status manager.
      *
+     * @var StatusManager
+     */
+    private $statusManager;
+
+    /**
      * @param Template\Context $context
      * @param Config $config
      * @param Registry $registry
+     * @param StatusManager $statusManager
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         Config $config,
         Registry $registry,
+        StatusManager $statusManager,
         array $data = []
     ) {
         $this->config = $config;
         $this->registry = $registry;
+        $this->statusManager = $statusManager;
         parent::__construct($context, $data);
     }
 
@@ -61,7 +70,7 @@ class DangerZone extends Template
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $this->registry->registry('tnw_subscription_profile')->getId(),
+                'entity_id' => $this->getCurrentSubscriptionId(),
                 'status' => ProfileStatus::STATUS_HOLDED,
                 'redirect' => Overview::REDIRECT
             ]
@@ -78,7 +87,7 @@ class DangerZone extends Template
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $this->registry->registry('tnw_subscription_profile')->getId(),
+                'entity_id' => $this->getCurrentSubscriptionId(),
                 'status' => ProfileStatus::STATUS_CANCELED,
                 'redirect' => Overview::REDIRECT
             ]
@@ -86,27 +95,69 @@ class DangerZone extends Template
     }
 
     /**
-     * Check whether show "Place On Hold" button or not for current website.
+     * Get url for update subscription profile status(active) with redirect on Overview page.
+     *
+     * @return string
+     */
+    public function getReActivateUrl()
+    {
+        return $this->getUrl(
+            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            [
+                'entity_id' => $this->getCurrentSubscriptionId(),
+                'status' => ProfileStatus::STATUS_ACTIVE,
+                'redirect' => Overview::REDIRECT
+            ]
+        );
+    }
+
+    /**
+     * Check whether show "Place On Hold" button.
      *
      * @return bool
      */
     public function isPlaceOnHoldActive()
     {
-        /** @var SubscriptionProfile $subscriptionProfile */
-        $subscriptionProfile = $this->registry->registry('tnw_subscription_profile');
-        $status = $subscriptionProfile->getStatus();
-
-        return $this->config->getCanHoldProfile($this->_storeManager->getWebsite()->getId()) &&
-            (int) $status !== ProfileStatus::STATUS_HOLDED;
+        return $this->statusManager->canHoldSubscription($this->getCurrentSubscriptionProfile());
     }
 
     /**
-     * Check whether show "Cancel Subscription" button or not for current website.
+     * Check whether show "Cancel Subscription" button.
      *
      * @return bool
      */
     public function isCancelActive()
     {
-        return $this->config->getCanCancelProfile($this->_storeManager->getWebsite()->getId());
+        return $this->statusManager->canCancelSubscription($this->getCurrentSubscriptionProfile());
+    }
+
+    /**
+     * whether show "Re-activate" button.
+     *
+     * @return bool
+     */
+    public function isReActiveActive()
+    {
+        return $this->statusManager->canReActiveSubscription($this->getCurrentSubscriptionProfile());
+    }
+
+    /**
+     * Return current subscription profile.
+     *
+     * @return SubscriptionProfile
+     */
+    private function getCurrentSubscriptionProfile()
+    {
+        return $this->registry->registry('tnw_subscription_profile');
+    }
+
+    /**
+     * Return current subscription profile id.
+     *
+     * @return int
+     */
+    private function getCurrentSubscriptionId()
+    {
+        return (int)$this->getCurrentSubscriptionProfile()->getId();
     }
 }
