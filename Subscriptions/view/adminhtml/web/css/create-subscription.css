@@ -721,3 +721,5 @@ button.action-editor.active:before{
   position: absolute;
   z-index: 1;
 }
+
+.tnw-subscriptions-subscriptionprofile-create [data-index="account"] label span:after { display: none !important; }

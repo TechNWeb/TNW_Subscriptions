@@ -6,90 +6,61 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Helper\Image as ImageHelper;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Item;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
-use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
-
 /**
- * Class SummaryProductsForm
+ * Subscription items form data provider for subscription admin edit page.
  */
 class SummaryProductsForm extends ModifyForm
 {
-    /**#@+
+    /**
      * Constants for container names.
      */
     const CONTAINER_PREFIX = 'container_';
     const CONTAINER_ITEM_PREFIX = 'container_item_';
-    /**#@-*/
 
-    /**#@+
+    /**
      * Form data scope
      */
-    const DATA_SCOPE_SUMMARY_PRODUCTS_FORM = 'tnw_subscriptionprofile_summary_products_form';
-    /**#@-*/
+    const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_summary_products_form';
 
-    /**#@+
-     *
+    /**
      * Form request values
      */
     const FORM_DATA_KEY = 'modify_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
-    /**#@-*/
 
-    /**#@+
+    /**
      * Edit button name.
      */
     const EDIT_BUTTON_NAME = 'edit_button';
-    /**#@-*/
 
     /**
+     * Subscription profile manager.
+     *
      * @var Manager
      */
-    private $profileManager;
+    protected $profileManager;
 
     /**
-     * Product for current item.
-     *
-     * @var
-     */
-    private $currentProduct;
-
-    /**
-     * SummaryProductsForm constructor.
-     *
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param ProductRepositoryInterface $productRepository
-     * @param RecurringOptionRepository $repository
-     * @param BillingFrequencyRepository $frequencyRepository
-     * @param RequestInterface $request
-     * @param TrialLengthUnitType $unitType
      * @param PriceCalculator $priceCalculator
-     * @param StoreManagerInterface $storeManager
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $sessionQuote
-     * @param \Magento\Directory\Model\CurrencyFactory $currencyFactory
      * @param Context $context
-     * @param ImageHelper $imageHelper
+     * @param FormContext $formContext
      * @param Manager $profileManager
      * @param string $scope
      * @param array $meta
@@ -99,59 +70,42 @@ class SummaryProductsForm extends ModifyForm
         $name,
         $primaryFieldName,
         $requestFieldName,
-        ProductRepositoryInterface $productRepository,
-        RecurringOptionRepository $repository,
-        BillingFrequencyRepository $frequencyRepository,
-        RequestInterface $request,
-        TrialLengthUnitType $unitType,
         PriceCalculator $priceCalculator,
-        StoreManagerInterface $storeManager,
-        \TNW\Subscriptions\Model\Config $config,
-        QuoteSessionInterface $sessionQuote,
-        \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         Context $context,
-        ImageHelper $imageHelper,
+        FormContext $formContext,
         Manager $profileManager,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $productRepository, $repository,
-            $frequencyRepository, $request, $unitType, $priceCalculator, $storeManager, $config, $sessionQuote,
-            $currencyFactory, $context, $imageHelper, $scope, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context,
+            $formContext, $scope, $meta, $data);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getData()
     {
         $data = [];
         foreach ($this->getObjects() as $subQuote) {
+            $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
-                $presetQty = $isProductDeleted ? (int)$item->getTnwSubscrUnlockPresetQty()
-                    : (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-                $itemPrice = $presetQty
-                    ? $item->getPrice() * $item->getQty()
-                    : $item->getPrice();
+                $presetQty = (int)$item->getTnwSubscrUnlockPresetQty();
+                $itemPrice = $presetQty ? $item->getPrice() * $item->getQty() : $item->getPrice();
                 $term = !empty($subQuote->getTerm()) ? 1 : 0;
                 $trialStartDate = $subQuote->getTrialStartDate();
-                $startOn = isset($trialStartDate) ?
-                    $trialStartDate : $subQuote->getStartDate();
-                try {
-                    $billingFrequencyLabel = $this->frequencyRepository->getById($subQuote->getBillingFrequencyId())->getLabel();
-                } catch (NoSuchEntityException $e) {
-                    $billingFrequencyLabel = __('Product was deleted');
-                }
+                $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
-                    'price' => $itemPrice,
+                    'price' => (string)$itemPrice,
                     'billing_frequency' => $billingFrequencyLabel,
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
+                    'unlock_preset_qty' => $presetQty,
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
                     'description' => $isProductDeleted ? __('Product deleted')
@@ -166,9 +120,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns meta data.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getMetaData()
     {
@@ -185,6 +137,7 @@ class SummaryProductsForm extends ModifyForm
                             'collapsible' => false,
                             'componentType' => UiForm\Fieldset::NAME,
                             'additionalClasses' => 'subscription-container',
+                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                             'dataScope' => '',
                             'sortOrder' => $iterator
                         ]
@@ -197,9 +150,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns initial fee field definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getInitialFeeDefinition()
     {
@@ -230,9 +181,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns edit fieldset definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getEditFieldsetDefinition()
     {
@@ -244,6 +193,7 @@ class SummaryProductsForm extends ModifyForm
                         'collapsible' => false,
                         'componentType' => UiForm\Fieldset::NAME,
                         'additionalClasses' => 'edit-fieldset',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'dataScope' => ''
                     ],
                 ],
@@ -260,9 +210,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns term field definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getTermDefinition()
     {
@@ -291,9 +239,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns period field definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getPeriodDefenition()
     {
@@ -333,9 +279,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns start on field definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getStartOnDefinition()
     {
@@ -348,7 +292,7 @@ class SummaryProductsForm extends ModifyForm
                 'data' => [
                     'config' => [
                         'label' => __('Start on:'),
-                        'additionalClasses' => 'field-wide admin__field-date',
+                        'additionalClasses' => 'field-wide field-date',
                         'dataType' => 'string',
                         'dataScope' => 'start_on',
                         'formElement' => UiForm\Element\DataType\Date::NAME,
@@ -366,9 +310,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns billing frequency field definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getBillingFrequencyDefinition()
     {
@@ -388,9 +330,9 @@ class SummaryProductsForm extends ModifyForm
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'showPreview' => $this->getCurrentFormName() . ':previewMode',
-                        'previewLabel' =>  '%s',
+                        'previewLabel' => '%s',
                         'imports' => [
-                            'onPriceUpdate'=> '${ $.parentName}.price:value'
+                            'onPriceUpdate' => '${ $.parentName}.price:value'
                         ],
                         'parentForm' => $this->getCurrentFormName(),
                         'priceFormat' => $this->getPriceFormatData(),
@@ -402,9 +344,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns update button definition.
-     *
-     * @return array
+     * @inheritdoc
      */
     protected function getUpdateButton()
     {
@@ -415,7 +355,7 @@ class SummaryProductsForm extends ModifyForm
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-primary sub-button-right',
+                        'additionalClasses' => 'action-primary action primary sub-button-right',
                         'subButtonRight' => true,
                         'title' => __('Save Changes'),
                         'actions' => [
@@ -435,24 +375,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns full name of edit form.
-     *
-     * @param string|int $container
-     * @param string|int $containerItem
-     * @return string
-     */
-    protected function getFormFullName($container, $containerItem)
-    {
-        return self::DATA_SCOPE_SUMMARY_PRODUCTS_FORM . '.' . self::DATA_SCOPE_SUMMARY_PRODUCTS_FORM
-            . '.' . self::CONTAINER_PREFIX . $container
-            . '.' . self::CONTAINER_ITEM_PREFIX . $containerItem
-            . '.form';
-    }
-
-    /**
-     * Returns name of product form.
-     *
-     * @return string
+     * @inheritdoc
      */
     protected function getProductFormName()
     {
@@ -460,9 +383,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns list of objects to display.
-     *
-     * @return DataObject[]
+     * @inheritdoc
      */
     protected function getObjects()
     {
@@ -472,10 +393,7 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Returns list of object items to display.
-     *
-     * @param DataObject $object
-     * @return mixed
+     * @inheritdoc
      */
     protected function getObjectItems(DataObject $object)
     {
@@ -501,16 +419,12 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * Retrieve additional data to form.
-     *
-     * @param string $objectId
-     * @param string $objectItemId
-     * @return array
+     * @inheritdoc
      */
     protected function getAdditionalData($objectId, $objectItemId)
     {
         return [
-            'subscription_profile_id' => $objectId ,
+            'subscription_profile_id' => $objectId,
             'objectItemId' => $objectItemId,
         ];
     }
@@ -520,7 +434,7 @@ class SummaryProductsForm extends ModifyForm
      *
      * @return null|SubscriptionProfileInterface
      */
-    private function getCurrentProfile()
+    protected function getCurrentProfile()
     {
         return $this->profileManager->loadProfileFromRequest('subscription_profile_id');
     }
@@ -536,7 +450,7 @@ class SummaryProductsForm extends ModifyForm
     protected function getRemoveButtonVisibility()
     {
         $result = false;
-        /** @var \TNW\Subscriptions\Model\SubscriptionProfile $currentProfile */
+        /** @var SubscriptionProfile $currentProfile */
         $currentProfile = $this->getCurrentProfile();
 
         if ($currentProfile && count($currentProfile->getProfileProducts()) > 1) {
@@ -570,10 +484,11 @@ class SummaryProductsForm extends ModifyForm
     private function canEditProfile()
     {
         $canEdit = false;
-        /** @var \TNW\Subscriptions\Model\SubscriptionProfile $currentProfile */
+        /** @var SubscriptionProfile $currentProfile */
         $currentProfile = $this->getCurrentProfile();
 
-        if ($currentProfile && $currentProfile->canEditProfile()) {
+        if ($currentProfile && $currentProfile->canEditProfile()
+            && !$this->currentItem->getTnwSubscrUnlockPresetQty()) {
             $canEdit = true;
         }
 

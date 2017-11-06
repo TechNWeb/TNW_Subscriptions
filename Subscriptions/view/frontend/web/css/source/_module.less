@@ -434,9 +434,11 @@
     margin: 0;
 
     :before {
-      font-size: 2.2rem;
       font-family: 'luma-icons';
+      font-size: 2.4rem;
+      color: #333333;
       content: '\e601';
+      font-weight: normal;
     }
   }
 
@@ -629,10 +631,9 @@
 
     .edit-fieldset {
       display: inline-block;
-      width: 20%;
+      width: 23%;
       border-left: 1px solid #ccc;
-      padding-left: 2rem;
-      padding-right: 3rem;
+      padding-left: 2%;
       position: relative;
 
       .fieldset {
@@ -640,12 +641,65 @@
         width: 100%;
       }
 
-      .sub-period-input {
-        input {
-          width: 4rem !important;
-          margin: 0 0.5rem;
-        }
+      .fieldset > .field.field-wide[class]:not(.field-option)._required > .label:after {
+        margin: 0 5px 0px 0;
+        float: left;
       }
+
+        .field-option {
+          padding-top: .8rem;
+
+          .control-radio {
+            cursor: pointer;
+            opacity: .01;
+            overflow: hidden;
+            position: absolute;
+            vertical-align: top;
+          }
+
+          label {
+            padding-left: 2.6rem;
+            position: relative;
+          }
+
+          label:before {
+            box-sizing: border-box;
+            border-radius: 1.6rem;
+            content: '';
+            transition: border-color .1s linear, color .1s ease-in;
+            background-color: #fff;
+            border: 1px solid #adadad;
+            color: transparent;
+            height: 1.6rem;
+            text-align: center;
+            vertical-align: top;
+            width: 1.6rem;
+            position: absolute;
+            left: 0;
+          }
+
+          :checked + label:after {
+            background-color: #514943;
+            border-radius: 50%;
+            content: '';
+            height: 10px;
+            left: 3px;
+            top: 3px;
+            min-width: 10px;
+            position: absolute;
+          }
+        }
+
+        .field.field-option ~ .field-option {
+          margin-top: .9rem;
+        }
+
+        .sub-period-input {
+          input {
+            width: 4rem !important;
+            margin: 0 0.5rem;
+          }
+        }
 
       .field-date {
         .field-control {
@@ -1030,10 +1084,14 @@
   width: 49%;
 }
 
-.subscription-ship-details, .subscription-payment-details {
+.subscription-ship-details,
+.subscription-payment-details {
   float: right;
   width: 49%;
-
+}
+.subscription-ship-details,
+.subscription-payment-details,
+.shipping-details-content {
   .table-secondary {
     tbody tr td {
       padding: 1rem 1rem;
@@ -1283,9 +1341,16 @@
 .content-block {
   width: 49%;
   display: inline-block;
+
+  .block-title {
+    margin: 0;
+  }
 }
 
 .shipping-info-content {
+  width: 47%;
+  display: inline-block;
+  vertical-align: top;
 
   .legend {
     border: none;
@@ -1329,6 +1394,13 @@
 
 }
 
+.shipping-details-content {
+  width: 47%;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 5%;
+}
+
 .shipping-form {
   .actions-toolbar {
 
@@ -1358,7 +1430,8 @@
 }
 
 @media (max-width: 768px) {
-  .shipping-info-content {
+  .shipping-info-content,
+  .shipping-details-content {
     width: 100%;
   }
 }
@@ -1562,12 +1635,12 @@
           width: 70%;
         }
       }
-      .field:first-child{
+      .field:first-child {
         margin-top: 2rem;
       }
 
-      .control-fields{
-        .field:first-child{
+      .control-fields {
+        .field:first-child {
           margin: 0;
         }
       }
@@ -1708,132 +1781,168 @@
 
 }
 
-.subscription-data-wrapper .subscription-products {
-  .products {
-    .products-title {
-      border-bottom-width: 0;
-      margin-bottom: 0;
-    }
-
-    .block-content {
-      border: 1px solid #ccc;
-      padding: 0 2rem;
-    }
-
-    .product-item-photo {
-      display: inline-block;
-      width: 18%;
-      text-align: center;
-    }
-
-    .product-item-details {
-      display: inline-block;
-      width: 54%;
-      padding-left: 1rem;
-    }
-
-    .product-item-name {
-      font-size: 2rem;
+.subscription-data-wrapper {
+  .items-details-view{
+    .block {
       margin: 0;
-      display: inline-block;
-    }
 
-    .product-item-qty {
-      display: none;
-      font-weight: bold;
-    }
-
-    .additional {
-      display: inline-block;
-      width: 18%;
-      border-left: 1px solid #ccc;
-      margin: 5px;
-      padding: 5px 5px 5px 1rem;
-
-      &:after {
-        content: '';
-        clear: both;
-        display: block;
+      .block-title {
+        border: none !important;
+        margin: 0 !important;
       }
     }
+  }
 
-    .product-frequency-description {
-      display: none;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
+  .subscription-container {
+    padding: 0;
 
-    dt:after {
-      content: ':';
-    }
-
-    .item-options {
-      dt {
-        float: left;
+    .subscription-item-form {
+      .edit-fieldset {
+        .field-price {
+          display: block !important;
+        }
       }
 
-      dd {
-        padding-left: 4rem;
+      .description-fieldset {
+        .middle-container {
+          .fieldset {
+            .qty-container{
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .subscription-products {
+    .products {
+      .products-title {
+        border-bottom-width: 0;
+        margin-bottom: 0;
+      }
+
+      .block-content {
+        border: 1px solid #ccc;
+        padding: 0 2rem;
+      }
+
+      .product-item-photo {
+        display: inline-block;
+        width: 18%;
+        text-align: center;
+      }
+
+      .product-item-details {
+        display: inline-block;
+        width: 54%;
+        padding-left: 1rem;
+      }
+
+      .product-item-name {
+        font-size: 2rem;
+        margin: 0;
+        display: inline-block;
+      }
+
+      .product-item-qty {
+        display: none;
+        font-weight: bold;
+      }
+
+      .additional {
+        display: inline-block;
+        width: 18%;
+        border-left: 1px solid #ccc;
+        margin: 5px;
+        padding: 5px 5px 5px 1rem;
 
         &:after {
           content: '';
+          clear: both;
+          display: block;
+        }
+      }
+
+      .product-frequency-description {
+        display: none;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+      }
+
+      dt:after {
+        content: ':';
+      }
+
+      .item-options {
+        dt {
+          float: left;
+        }
+
+        dd {
+          padding-left: 4rem;
+
+          &:after {
+            content: '';
+            display: block;
+          }
+        }
+      }
+
+      .items {
+        .item {
+          border-bottom: 1px solid #ccc;
+          margin: 0;
+          padding-top: 1rem;
+          padding-bottom: 1rem;
+
+          &:last-child {
+            border-bottom-width: 0;
+          }
+        }
+
+        .item > div {
+          vertical-align: top;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .additional {
+          display: none;
+        }
+
+        .product-item-name {
+          font-size: 1.6rem;
+        }
+
+        .product-item-photo {
+          width: 10%;
+        }
+
+        .product-item-details {
+          width: 80%;
+        }
+
+        .product-item-description {
+          display: none;
+        }
+
+        .product-item-qty {
+          display: inline-block;
+        }
+
+        .item-options .qty, .item-options .qty + dd {
+          display: none;
+        }
+
+        .product-frequency-description {
           display: block;
         }
       }
     }
-
-    .items {
-      .item {
-        border-bottom: 1px solid #ccc;
-        margin: 0;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-
-        &:last-child {
-          border-bottom-width: 0;
-        }
-      }
-
-      .item > div {
-        vertical-align: top;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .additional {
-        display: none;
-      }
-
-      .product-item-name {
-        font-size: 1.6rem;
-      }
-
-      .product-item-photo {
-        width: 10%;
-      }
-
-      .product-item-details {
-        width: 80%;
-      }
-
-      .product-item-description {
-        display: none;
-      }
-
-      .product-item-qty {
-        display: inline-block;
-      }
-
-      .item-options .qty, .item-options .qty + dd {
-        display: none;
-      }
-
-      .product-frequency-description {
-        display: block;
-      }
-    }
   }
 }
+
 
 .thankyoupage-bottom-cart-action {
   /*.select-action.next-step {
@@ -1855,6 +1964,7 @@
   }*/
 }
 
+//Customer account payment details
 .payment-details-content {
   #payment-details-edit {
     .sub-fieldset {
@@ -1905,7 +2015,7 @@
           }
 
           &.field_without_legend {
-            >.control {
+            > .control {
               margin-left: 11px;
 
               .field {
@@ -1983,7 +2093,6 @@
   #payment-details-view {
     .block-title {
       border: none;
-      margin: 0;
     }
 
     .table-secondary {
@@ -2008,5 +2117,80 @@
       display: block;
       width: 100%;
     }
+  }
+}
+
+//Customer account shipping details
+div.shipping-details-content {
+  .block {
+    margin-bottom: 0px;
+
+    .block-title {
+      strong {
+        padding-top: 3px;
+      }
+
+    }
+  }
+  #shipping-details-edit {
+
+    fieldset {
+      border: none;
+
+      .methods-list {
+        .method {
+          margin-bottom: 10px;
+
+          .subscription-shipping-attention {
+            position: relative;
+            display: inline-block;
+
+            &::before {
+              font-size: 1.5rem;
+              color: #fd720f;
+              content: '\e602';
+              font-family: 'luma-icons';
+              top: -15px;
+              position: absolute;
+            }
+
+            &:hover:after {
+              content: attr(data-title);
+              background-color: white;
+              color: #000;
+              position: absolute;
+              top: 8px;
+              white-space: normal;
+              -moz-border-radius: 5px;
+              -webkit-border-radius: 5px;
+              border-radius: 5px;
+              -moz-box-shadow: 0px 0px 1px #000;
+              -webkit-box-shadow: 0px 0px 1px #000;
+              box-shadow: 0px 0px 1px #000;
+              padding: 5px;
+              width: 165px;
+              text-align: center;
+              z-index: 20;
+              font-size: 1.2rem;
+              left: -64px;
+            }
+          }
+        }
+
+        input {
+          &[type="radio"] {
+            width: auto;
+          }
+        }
+      }
+
+    }
+  }
+}
+
+@media (max-width: 880px) {
+  .content-block, .shipping-info-content {
+    margin-left: 0;
+    margin-top: 15px;
   }
 }

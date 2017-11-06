@@ -18,7 +18,7 @@ define([
             var visible = true;
             var addressSelect = registry.get('index=' + this.customerAddressSelector);
 
-            if (addressSelect.visible() || !addressSelect.issetShippingAddress) {
+            if (addressSelect.visible() || !addressSelect.hasAddress) {
                 visible = false;
             }
             addressSelect.filter(!addressSelect.visible(), 'empty');

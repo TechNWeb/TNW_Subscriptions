@@ -234,13 +234,17 @@ class Manager
                         $productDataChanges = $product->hasDataChanges();
                         $product->setDataChanges(false);
                         $remove = isset($data['remove']);
-                        $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : false;
+                        $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : [];
                         if ($remove) {
                             $product->delete();
                             $this->historyLogger->log(__('Deleted product %1.', $product->getMagentoProduct()->getName()), $profileModel->getId());
                         } else {
-                            $product->setPrice(number_format($requestData['price'], 4));
-                            $product->setQty(number_format($requestData['qty'], 4));
+                            if (!empty($requestData['price'])){
+                                $product->setPrice(number_format($requestData['price'], 4));
+                            }
+                            if (!empty($requestData['qty'])){
+                                $product->setQty(number_format($requestData['qty'], 4));
+                            }
                         }
                         if ($product->hasDataChanges()) {
                             $product->setNeedRecollect('1');

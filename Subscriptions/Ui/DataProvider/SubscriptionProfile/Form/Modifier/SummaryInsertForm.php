@@ -73,7 +73,7 @@ class SummaryInsertForm extends BaseFormModifier
         ],
         self::PRODUCTS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_products',
-            self::INSERT_FORM_NAMESPACE => SummaryProductsForm::DATA_SCOPE_SUMMARY_PRODUCTS_FORM,
+            self::INSERT_FORM_NAMESPACE => SummaryProductsForm::DATA_SCOPE_MODAL_FORM,
             self::INSERT_FORM_SORT_ORDER => 50,
         ],
     ];
