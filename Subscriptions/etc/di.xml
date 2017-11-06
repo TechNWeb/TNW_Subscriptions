@@ -376,6 +376,12 @@
         </arguments>
     </type>
 
+    <type name="TNW\Subscriptions\Block\Subscription\Billing\AddressEdit">
+        <arguments>
+            <argument name="customerAddressSource" xsi:type="object">TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit</argument>
+        </arguments>
+    </type>
+
     <type name="TNW\Subscriptions\Model\MessagePool" shared="false" />
 
     <type name="TNW\Subscriptions\Controller\Subscription\Create\Process">

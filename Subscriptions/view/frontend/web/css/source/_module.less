@@ -100,12 +100,6 @@
       width: 6%
     }
 
-    .actions-toolbar {
-      .primary {
-        float: left;
-      }
-    }
-
     .new-customer,
     .existing-customer {
       position: relative;
@@ -769,7 +763,7 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: @screen-xs) and (max-width: 1024px) {
 
   .catalog-product-view {
     .addtocart-tabs {
@@ -925,7 +919,7 @@
   position: relative;
 }
 
-@media (min-width: 768px) {
+@media (min-width: @screen-xs) {
   .sub-items.order-links li.item a {
     padding: 1px 2rem;
   }
@@ -1142,7 +1136,7 @@
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: @screen-xs) {
       .profile__edit_button {
         float: right;
       }
@@ -1164,7 +1158,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: @screen-xs) {
   .tnw-subscriptions-cart-link__container {
     margin-right: 10px;
   }
@@ -1326,22 +1320,6 @@
   }
 }
 
-.shipment-wrapper {
-  padding: 25px 2%;
-
-  input {
-    width: 95%;
-
-    &.checkbox {
-      width: 13px;
-    }
-  }
-
-  select {
-    width: 95%;
-  }
-}
-
 .content-block {
   width: 49%;
   display: inline-block;
@@ -1351,19 +1329,20 @@
   }
 }
 
-.shipping-info-content {
-  width: 47%;
-  display: inline-block;
-  vertical-align: top;
+.shipping-info-content,
+.billing-info-content {
 
   .legend {
     border: none;
     margin-bottom: 0px;
   }
 
-  .fieldset-shipping {
+  .fieldset-shipping,
+  .fieldset-billing {
     width: 100%;
     border: none;
+    padding: 0;
+    margin: 0;
 
     legend {
       width: 100%;
@@ -1372,7 +1351,8 @@
       margin-top: 10px;
     }
 
-    .shipping-actions {
+    .shipping-actions,
+    .billing-actions {
 
       #pick div {
         margin-bottom: 12px;
@@ -1391,51 +1371,10 @@
   div.field {
     margin-bottom: 20px;
   }
-
-  .actions-toolbar {
-    margin-left: 1rem;
-  }
-
 }
 
-.shipping-details-content {
-  width: 47%;
-  display: inline-block;
-  vertical-align: top;
-  margin-left: 5%;
-}
-
-.shipping-form {
-  .actions-toolbar {
-
-    & > div {
-      width: 48%;
-      display: inline-block;
-
-      .action {
-        width: 90%;
-      }
-    }
-    .action.save {
-      line-height: 1.6rem;
-      padding: 7px 15px;
-
-      span {
-        font-size: 1.4rem;
-      }
-    }
-  }
-}
-
-@media (max-width: 880px) {
-  .content-block, .shipping-info-content {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .shipping-info-content,
-  .shipping-details-content {
+.actions-toolbar {
+  .action {
     width: 100%;
   }
 }
@@ -1910,10 +1849,10 @@
         }
       }
 
-      @media (max-width: 768px) {
-        .additional {
-          display: none;
-        }
+    @media (max-width: @screen-xs) {
+      .additional {
+        display: none;
+      }
 
         .product-item-name {
           font-size: 1.6rem;
@@ -1969,11 +1908,18 @@
 }
 
 //Customer account payment details
+
+.billing-info-content {
+    #billing-info-edit {
+        margin-top: 2.5rem;
+    }
+}
+
 .payment-details-content {
   #payment-details-edit {
     .sub-fieldset {
       .block-title {
-        margin: 0;
+        margin-bottom: 0;
         padding-bottom: 13px;
 
         strong {
@@ -1984,6 +1930,7 @@
 
       .payment-checkbox {
         margin-bottom: 10px;
+        //padding-left: 25px;
 
         label.label {
           display: none;
@@ -2082,10 +2029,12 @@
     }
 
     button {
-      width: 45%;
-      margin: 12px 10px;
+      float: right;
+      width: 47.5%;
+      margin-top: 12px;
 
       &.action-primary {
+        float: left;
         background: #1979c3;
         color: #ffffff;
         border: 1px solid #1979c3;
@@ -2097,6 +2046,7 @@
   #payment-details-view {
     .block-title {
       border: none;
+      margin-bottom: 0;
     }
 
     .table-secondary {
@@ -2196,5 +2146,62 @@ div.shipping-details-content {
   .content-block, .shipping-info-content {
     margin-left: 0;
     margin-top: 15px;
+  }
+}
+
+// ************* Grid system ********************
+
+.grid-container {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: ceil((@grid-gutter-width / 2));
+  padding-right: floor((@grid-gutter-width / 2));
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid-container:before,
+.grid-container:after,
+.grid-row:before,
+.grid-row:after {
+  content: " ";
+  display: table;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid-container:after,
+.grid-row:after {
+  clear: both;
+}
+
+.grid-row {
+  margin-left:  floor((@grid-gutter-width / -2));
+  margin-right: ceil((@grid-gutter-width / -2));
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid-col2-xs,
+.grid-col2-lg {
+  position: relative;
+  // Prevent columns from collapsing when empty
+  min-height: 1px;
+  // Inner gutter via padding
+  padding-left: ceil((@grid-gutter-width / 2));
+  padding-right: floor((@grid-gutter-width / 2));
+  float: left;
+  width: 50%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+@media (max-width: @screen-lg) {
+  .grid-col2-lg {
+    width: 100%;
   }
 }
