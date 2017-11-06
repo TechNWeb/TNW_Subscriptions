@@ -257,7 +257,6 @@ class History extends \Magento\Framework\View\Element\Template
 
         switch ($subscription->getStatus()) {
             case ProfileStatus::STATUS_TRIAL:
-                $result = 'sub-icon-active-green';
                 if ($this->checkCreditCardExpire($subscription)) {
                     $result = 'sub-icon-warning-orange';
                 }
