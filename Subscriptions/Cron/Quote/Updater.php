@@ -104,6 +104,7 @@ class Updater extends Base
     {
         $result = [];
         $relations = $this->relationManager->getNextProfileRelation($profile, true);
+        $relations = $relations ?: [];
         $quoteIds = array_map(
             function (ProfileRelation $relation) {
                 return $relation->getMagentoQuoteId();
