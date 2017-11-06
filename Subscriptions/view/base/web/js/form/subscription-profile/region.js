@@ -90,6 +90,15 @@ define([
 
             if (country) {
                 this._super(value, field);
+
+                if (!country.visible()) {
+                    // hide select and corresponding text input field if region must not be shown for selected country
+                    this.setVisible(false);
+
+                    if (this.customEntry) {
+                        this.toggleInput(false);
+                    }
+                }
             }
         }
     });

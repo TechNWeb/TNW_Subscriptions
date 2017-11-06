@@ -369,7 +369,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $additionalElementFormData = [
                     'config' => [
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/shipping-information-input',
-                        'addressFieldsetIndex' => self::INFO_FIELDSET_NAME
+                        'addressFieldsetIndex' => self::ADDRESS_FIELDSET_NAME
                     ]
                 ];
             }
