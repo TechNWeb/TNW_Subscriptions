@@ -28,7 +28,7 @@ class StatusManager
      *
      * @var StoreManagerInterface
      */
-    protected $storeManager;
+    private $storeManager;
 
     /**
      * @var int
@@ -44,7 +44,6 @@ class StatusManager
         $this->config = $config;
         $this->storeManager = $storeManager;
     }
-
 
     /**
      * Get allowed next statuses for Subscription Profile instance
@@ -113,10 +112,7 @@ class StatusManager
      */
     public function canHoldSubscription($subscription)
     {
-        $result = false;
-        if ((int)$subscription->getStatus() === ProfileStatus::STATUS_ACTIVE) {
-            $result = true;
-        }
+        $result = ((int)$subscription->getStatus() === ProfileStatus::STATUS_ACTIVE) ? true : false;
         return $result && $this->config->getCanHoldProfile($this->getWebsiteId());
     }
 

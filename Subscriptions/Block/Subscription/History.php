@@ -308,7 +308,7 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can hold subscription.
      *
-     * @param $subscription
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
      * @return bool
      */
     public function canHoldSubscription($subscription)
@@ -319,7 +319,7 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can cancel subscription.
      *
-     * @param $subscription
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
      * @return bool
      */
     public function canCancelSubscription($subscription)
@@ -330,7 +330,7 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can re-activate subscription.
      *
-     * @param $subscription
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
      * @return bool
      */
     public function canReActiveSubscription($subscription)
@@ -358,7 +358,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getHoldUrl($subscriptionId)
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $subscriptionId,
                 'status' => ProfileStatus::STATUS_HOLDED,
@@ -376,7 +376,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getCancelUrl($subscriptionId)
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $subscriptionId,
                 'status' => ProfileStatus::STATUS_CANCELED,
@@ -394,7 +394,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getReActivateUrl($subscriptionId)
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $subscriptionId,
                 'status' => ProfileStatus::STATUS_ACTIVE,

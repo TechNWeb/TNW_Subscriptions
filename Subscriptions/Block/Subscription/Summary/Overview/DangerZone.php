@@ -70,7 +70,7 @@ class DangerZone extends Template
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $this->getCurrentSubscriptionId(),
+                'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_HOLDED,
                 'redirect' => Overview::REDIRECT
             ]
@@ -87,7 +87,7 @@ class DangerZone extends Template
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $this->getCurrentSubscriptionId(),
+                'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_CANCELED,
                 'redirect' => Overview::REDIRECT
             ]
@@ -104,7 +104,7 @@ class DangerZone extends Template
         return $this->getUrl(
             'tnw_subscriptions/subscription_actions/UpdateStatus',
             [
-                'entity_id' => $this->getCurrentSubscriptionId(),
+                'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_ACTIVE,
                 'redirect' => Overview::REDIRECT
             ]
@@ -132,7 +132,7 @@ class DangerZone extends Template
     }
 
     /**
-     * whether show "Re-activate" button.
+     * Check whether show "Re-activate" button.
      *
      * @return bool
      */
@@ -149,15 +149,5 @@ class DangerZone extends Template
     private function getCurrentSubscriptionProfile()
     {
         return $this->registry->registry('tnw_subscription_profile');
-    }
-
-    /**
-     * Return current subscription profile id.
-     *
-     * @return int
-     */
-    private function getCurrentSubscriptionId()
-    {
-        return (int)$this->getCurrentSubscriptionProfile()->getId();
     }
 }
