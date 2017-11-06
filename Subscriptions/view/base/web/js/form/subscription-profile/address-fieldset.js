@@ -182,8 +182,7 @@ define([
                     if (item.formElement == 'checkbox') {
                         item.checked(false);
                     } else if (typeof item.value() != 'undefined') {
-                        item.restoreToDefault();
-                        item.error('');
+                        item.value('');
                     }
                 }
             });
