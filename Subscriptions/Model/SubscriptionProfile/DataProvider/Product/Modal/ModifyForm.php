@@ -532,7 +532,13 @@ class ModifyForm extends Form
      */
     protected function isEditButtonVisible()
     {
-        return (null !== $this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY));
+        return (
+            null !== $this->currentProduct
+            && !(
+                $this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+                && count($this->getProductBillingFrequencies($this->currentProduct->getId())) <= 1
+            )
+        );
     }
 
     /**
@@ -856,6 +862,9 @@ class ModifyForm extends Form
                         'previewLabel' => '%s',
                         'imports' => [
                             'canShowEdit' => $this->currentFormName . ':previewMode'
+                        ],
+                        'exports' => [
+                            'value' => '${ $.parentForm}.edit_fieldset.billing_frequency:changeItemPriceLabel',
                         ],
                         'parentForm' => $this->currentFormName,
                     ]

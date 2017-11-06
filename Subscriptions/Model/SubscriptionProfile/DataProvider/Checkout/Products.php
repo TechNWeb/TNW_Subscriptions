@@ -6,9 +6,11 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
+use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
@@ -288,5 +290,32 @@ class Products extends ModifyForm
     protected function getProductFormName()
     {
         return self::DATA_SCOPE_INSERT_FORM;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getBillingFrequencyData(
+        $productId,
+        ProductBillingFrequencyInterface $frequency
+    ) {
+        $data = parent::getBillingFrequencyData($productId, $frequency);
+        $billingFrequencyId = $frequency->getBillingFrequencyId();
+        /** @var MagentoProduct $product */
+        $product = $this->formContext->getProductRepository()->getById($productId);
+        $data['is_trial'] = $this->getProductCustomAttribute(
+            $product,
+            Attribute::SUBSCRIPTION_TRIAL_STATUS,
+            0
+        );
+        $data['no_format_initial_fee'] = $this->getNotFormattedInitialFee($billingFrequencyId, $productId);
+        $data['trial_price'] = $this->getProductCustomAttribute(
+            $product,
+            Attribute::SUBSCRIPTION_TRIAL_PRICE,
+            0
+        );
+        $data['frequency_unit'] = $this->descriptionCreator->getFrequencyWithUnit($billingFrequencyId);
+
+        return $data;
     }
 }
