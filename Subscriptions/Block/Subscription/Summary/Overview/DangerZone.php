@@ -68,7 +68,7 @@ class DangerZone extends Template
     public function getPlaceOnHoldUrl()
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_HOLDED,
@@ -85,7 +85,7 @@ class DangerZone extends Template
     public function getCancelUrl()
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_CANCELED,
@@ -102,7 +102,7 @@ class DangerZone extends Template
     public function getReActivateUrl()
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $this->getCurrentSubscriptionProfile()->getId(),
                 'status' => ProfileStatus::STATUS_ACTIVE,
