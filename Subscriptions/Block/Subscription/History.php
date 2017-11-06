@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFac
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as SubscriptionProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
+use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
 /**
  * Subscriptions history block instance.
@@ -82,9 +83,11 @@ class History extends \Magento\Framework\View\Element\Template
     private $utils;
     
     /**
-     * @var int
+     * Subscription profile status manager.
+     *
+     * @var StatusManager
      */
-    private $websiteId;
+    private $statusManager;
 
     /**
      * @param Session                    $customerSession
@@ -96,6 +99,7 @@ class History extends \Magento\Framework\View\Element\Template
      * @param CollectionFactory          $collectionFactory
      * @param Config                     $config
      * @param ProfileCcUtils             $utils
+     * @param StatusManager              $statusManager
      * @param array                      $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -110,6 +114,7 @@ class History extends \Magento\Framework\View\Element\Template
         CollectionFactory $collectionFactory,
         Config $config,
         ProfileCcUtils $utils,
+        StatusManager $statusManager,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -120,6 +125,7 @@ class History extends \Magento\Framework\View\Element\Template
         $this->subscriptionCollectionFactory = $collectionFactory;
         $this->config = $config;
         $this->utils = $utils;
+        $this->statusManager = $statusManager;
         parent::__construct($context, $data);
     }
 
@@ -299,47 +305,37 @@ class History extends \Magento\Framework\View\Element\Template
         );
     }
 
-    /** Check if Action Column can be shown. Depends on actions than can be shown.
-     *
-     * @return bool
-     */
-    public function canShowActionColumn()
-    {
-        return $this->canHoldSubscription() || $this->canCancelSubscription();
-    }
-
     /**
      * Check if we can hold subscription.
      *
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canHoldSubscription()
+    public function canHoldSubscription(\Magento\Framework\DataObject $subscription)
     {
-        return $this->config->getCanHoldProfile($this->getWebsiteId());
+        return $this->statusManager->canHoldSubscription($subscription);
     }
 
     /**
      * Check if we can cancel subscription.
      *
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canCancelSubscription()
+    public function canCancelSubscription(\Magento\Framework\DataObject $subscription)
     {
-        return $this->config->getCanCancelProfile($this->getWebsiteId());
+        return $this->statusManager->canCancelSubscription($subscription);
     }
 
     /**
-     * Return current website id.
+     * Check if we can re-activate subscription.
      *
-     * @return int
+     * @param \Magento\Framework\DataObject $subscription
+     * @return bool
      */
-    private function getWebsiteId()
+    public function canReActiveSubscription(\Magento\Framework\DataObject $subscription)
     {
-        if (!$this->websiteId) {
-            $this->websiteId = $this->_storeManager->getWebsite()->getId();
-        }
-
-        return $this->websiteId;
+        return $this->statusManager->canReActiveSubscription($subscription);
     }
 
     /**
@@ -362,7 +358,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getHoldUrl($subscriptionId)
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $subscriptionId,
                 'status' => ProfileStatus::STATUS_HOLDED,
@@ -380,10 +376,28 @@ class History extends \Magento\Framework\View\Element\Template
     public function getCancelUrl($subscriptionId)
     {
         return $this->getUrl(
-            'tnw_subscriptions/subscription_actions/UpdateStatus',
+            'tnw_subscriptions/subscription_actions/updateStatus',
             [
                 'entity_id' => $subscriptionId,
                 'status' => ProfileStatus::STATUS_CANCELED,
+                'redirect' => self::REDIRECT
+            ]
+        );
+    }
+
+    /**
+     * Return re-activate url.
+     *
+     * @param string $subscriptionId
+     * @return string
+     */
+    public function getReActivateUrl($subscriptionId)
+    {
+        return $this->getUrl(
+            'tnw_subscriptions/subscription_actions/updateStatus',
+            [
+                'entity_id' => $subscriptionId,
+                'status' => ProfileStatus::STATUS_ACTIVE,
                 'redirect' => self::REDIRECT
             ]
         );
