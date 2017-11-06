@@ -22,12 +22,15 @@ define([
             },
             parentForm: null,
             currencySymbol: '',
-            optionsForLabel: {}
+            labelsForOptions: {}
         },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function () {
             this._super();
-            this.getOptionsForLabel();
+            this.getLabelsForOptions();
             this.setDiscountLabel('all');
 
             return this;
@@ -45,6 +48,8 @@ define([
 
         /**
          * Callback that fires when 'value' property is updated.
+         *
+         * @return void
          */
         onUpdate: function () {
             this._super();
@@ -54,28 +59,41 @@ define([
 
         /**
          * Callback that fires when frequency price value property is updated.
+         *
+         * @return void
          */
         onPriceUpdate: function(priceValue) {
             this.setDiscountLabel(priceValue);
         },
 
-        getOptionsForLabel: function() {
-            if (Object.keys(this.optionsForLabel).length == 0) {
+        /**
+         * Return options labels.
+         *
+         * @return {Object}
+         */
+        getLabelsForOptions: function() {
+            if (Object.keys(this.labelsForOptions).length == 0) {
                 var options = this.options(),
-                    optionsForLabel = {};
+                    labelsForOptions = {};
 
                 options.forEach(function(option, index, arr) {
-                    optionsForLabel[option.value] = option.label;
+                    labelsForOptions[option.value] = option.label;
                 });
 
-                this.optionsForLabel = optionsForLabel;
+                this.labelsForOptions = labelsForOptions;
             }
 
-            return this.optionsForLabel;
+            return this.labelsForOptions;
         },
 
-        getOptionForLabel: function(value) {
-            var labels = this.getOptionsForLabel();
+        /**
+         * Return option label.
+         *
+         * @param {string|integer} value
+         * @return string
+         */
+        getLabelForOption: function(value) {
+            var labels = this.getLabelsForOptions();
 
             return labels[value];
         },
@@ -83,10 +101,10 @@ define([
         /**
          * Returns preview label.
          *
-         * @returns {string}
+         * @return string
          */
         getPreviewLabel: function () {
-            var label = this.getOptionForLabel(this.value());
+            var label = this.getLabelForOption(this.value());
 
             return label ? label: '';
         },
@@ -95,6 +113,7 @@ define([
          * Resets value if "showPreview" property changed.
          *
          * @param value
+         * @return void
          */
         onShowPreviewChanged: function (value) {
             if (value && this.initialValue && this.value() !== this.initialValue){
@@ -106,7 +125,7 @@ define([
          * Returns current option label.
          *
          * @param value
-         * @returns string
+         * @return string
          */
         getCurrentLabel: function (value) {
             return this.getOption(value).label;
@@ -129,7 +148,7 @@ define([
          * Also deletes discount data if frequency price for options bigger then product price.
          *
          * @param value
-         * @returns {}
+         * @return Object
          */
         setDiscountLabel: function (value) {
             var frequencyData = this.getFrequencyData(),
@@ -165,7 +184,7 @@ define([
          */
         changeOptionLabel: function(option, optionIndex, changeType) {
             var optionValue = option.value,
-                frequencyLabel = this.getOptionForLabel(optionValue),
+                frequencyLabel = this.getLabelForOption(optionValue),
                 frequencyData = this.getFrequencyData(),
                 discount = 0,
                 productPrice = this.getProductPrice(),
@@ -237,6 +256,7 @@ define([
             } else {
                 issetFrequencyPrice = (optionValue && frequencyData[optionValue]);
             }
+
             return issetFrequencyPrice
         },
 
@@ -276,7 +296,7 @@ define([
         /**
          * Returns current item data.
          *
-         * @returns {}
+         * @returns {Array}
          */
         getCurrentItemData: function() {
             var result = [];
@@ -306,6 +326,7 @@ define([
 
         /**
          * Change current grid item price label.
+         *
          * @return void
          */
         changeItemPriceLabel: function() {
