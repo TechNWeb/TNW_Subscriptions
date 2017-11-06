@@ -245,7 +245,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'hasAddress' => $this->hasAddressId() || $this->hasCustomerAddresses(),
+                            'hasAddress' => $this->hasCustomerAddresses(),
                             'visible' => $this->isCustomerAddressVisible(),
                             'addressesData' => $this->getCustomerShippingInformationData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
