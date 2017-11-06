@@ -391,36 +391,46 @@ class Manager
     {
         $engine = $this->getEngineFromRequestData($requestData);
         if ($engine) {
+            $types = $this->paymentConfig->getCcTypes();
             $additionalInfoOld = $this->getProfile()->getDecodedPaymentAdditionalInfo();
             $oldEngine = $this->getProfile()->getEngineCode();
             $this->getProfile()->setEngineCode($engine);
             $this->getEngine()->processProfileByRequestData($requestData);
             $additionalInfo = $this->getProfile()->getDecodedPaymentAdditionalInfo();
+            $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
+            $ccType = $ccType ? $types[$ccType] : $ccType;
+            $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
+            $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
 
             if (strcasecmp($oldEngine, $engine) !== 0) {
-                $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
-                    $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
-                    $this->scopeConfig->getValue("payment/{$engine}/title"));
+                if ($ccType) {
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                        $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                    $message .= '<br/>';
+                    $message .= __('Credit Card type was added <b>%1</b>', $ccType);
+                    $message .= '<br/>';
+                    $message .= __('Credit Card number was added <b>%1</b>', sprintf('XXXX%s', $ccNumber));
+                } else {
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                        $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                }
 
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             } else {
-                $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
                 $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
-                $types = $this->paymentConfig->getCcTypes();
-                $ccType = $types[$ccType];
-                $ccTypeOld = $types[$ccTypeOld];
+                $ccTypeOld = $ccTypeOld ? $types[$ccTypeOld] : $ccTypeOld;
                 if (strcasecmp($ccType, $ccTypeOld) !== 0) {
                     $message = __('Card type was changed from <b>%1</b> to <b>%2</b>', $ccTypeOld, $ccType);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
-                $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
                 $ccNumberOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_last_4'] : null;
                 if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
                     $message = __('Credit Card number was changed to <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
-                $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
                 $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
                 if (strcasecmp($ccExpOld, $ccExp) !== 0) {
                     $message = __('Exp. Date was changed to <b>%1</b>', $ccExp);
@@ -435,6 +445,7 @@ class Manager
                 }
             }
         }
+
         return $this;
     }
 

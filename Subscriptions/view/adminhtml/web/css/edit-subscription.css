@@ -115,6 +115,7 @@ button.profile__cancel-edit_button:before{
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention{
     display: inline-block;
+    position: relative;
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention::before{
     color: #eb5202;
@@ -130,7 +131,8 @@ button.profile__cancel-edit_button:before{
     background-color: white;
     color: #000;
     position: absolute;
-    top: 25px;
+    top: 22px;
+    left: 28px;
     white-space: normal;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -861,4 +863,7 @@ button.action-editor.active:before{
     margin-top: .2rem;
     position: absolute;
     z-index: 1;
+}
+.admin__field.shipping-methods-fieldset>.admin__field-control {
+    width: calc(100%  - 30px );
 }
