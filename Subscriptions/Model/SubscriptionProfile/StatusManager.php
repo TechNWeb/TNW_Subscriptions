@@ -110,9 +110,10 @@ class StatusManager
      * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canHoldSubscription( \Magento\Framework\DataObject$subscription)
+    public function canHoldSubscription( \Magento\Framework\DataObject $subscription)
     {
         $result = ((int)$subscription->getStatus() === ProfileStatus::STATUS_ACTIVE) ? true : false;
+
         return $result && $this->config->getCanHoldProfile($this->getWebsiteId());
     }
 
