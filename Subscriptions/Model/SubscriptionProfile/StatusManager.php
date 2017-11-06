@@ -107,10 +107,10 @@ class StatusManager
     /**
      * Check if we can hold subscription.
      *
-     * @param SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canHoldSubscription($subscription)
+    public function canHoldSubscription( \Magento\Framework\DataObject$subscription)
     {
         $result = ((int)$subscription->getStatus() === ProfileStatus::STATUS_ACTIVE) ? true : false;
         return $result && $this->config->getCanHoldProfile($this->getWebsiteId());
@@ -119,10 +119,10 @@ class StatusManager
     /**
      * Check if we can cancel subscription.
      *
-     * @param SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canCancelSubscription($subscription)
+    public function canCancelSubscription(\Magento\Framework\DataObject $subscription)
     {
         $result = true;
         switch ($subscription->getStatus()) {
@@ -140,10 +140,10 @@ class StatusManager
     /**
      * Check if we can re-activate subscription.
      *
-     * @param SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canReActiveSubscription($subscription)
+    public function canReActiveSubscription(\Magento\Framework\DataObject $subscription)
     {
         return (int)$subscription->getStatus() === ProfileStatus::STATUS_HOLDED;
     }

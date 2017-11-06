@@ -308,10 +308,10 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can hold subscription.
      *
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canHoldSubscription($subscription)
+    public function canHoldSubscription(\Magento\Framework\DataObject $subscription)
     {
         return $this->statusManager->canHoldSubscription($subscription);
     }
@@ -319,10 +319,10 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can cancel subscription.
      *
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canCancelSubscription($subscription)
+    public function canCancelSubscription(\Magento\Framework\DataObject $subscription)
     {
         return $this->statusManager->canCancelSubscription($subscription);
     }
@@ -330,10 +330,10 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Check if we can re-activate subscription.
      *
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canReActiveSubscription($subscription)
+    public function canReActiveSubscription(\Magento\Framework\DataObject $subscription)
     {
         return $this->statusManager->canReActiveSubscription($subscription);
     }
