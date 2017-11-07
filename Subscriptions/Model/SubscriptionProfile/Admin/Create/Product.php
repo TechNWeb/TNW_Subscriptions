@@ -63,7 +63,6 @@ class Product extends Create
     private $extensionManager;
 
     /**
-     * Product constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
@@ -95,6 +94,9 @@ class Product extends Create
         return $this->buyRequest;
     }
 
+    /**
+     * Resets buy request and data array.
+     */
     public function reset()
     {
         $this->buyRequest = null;
@@ -107,6 +109,7 @@ class Product extends Create
     public function setData($data)
     {
         $this->data = $data;
+        $this->buyRequest = null;
     }
 
     /**
@@ -194,8 +197,12 @@ class Product extends Create
                 $result = $result->format('Y-m-d');
                 break;
             default:
+                $nowDate = (new \DateTime())->format('Y-m-d');
                 $result = new \DateTime($startOn);
                 $result = $result->format('Y-m-d');
+                if (strtotime($result) < strtotime($nowDate)){
+                    $result = $nowDate;
+                }
                 break;
         }
 
@@ -203,6 +210,8 @@ class Product extends Create
     }
 
     /**
+     * Returns calculated product price.
+     *
      * @param array $productData
      * @param bool $full
      * @return string
@@ -231,6 +240,7 @@ class Product extends Create
      * Sets initial fee to quote item.
      *
      * @param Item $item
+     * @return void
      */
     public function setInitialFeeToItem(Item $item)
     {
@@ -264,9 +274,6 @@ class Product extends Create
      */
     private function getProduct($productId)
     {
-        /** @var MagentoProduct $product */
-        $product = $this->productRepository->getById($productId);
-
-        return $product;
+        return $this->productRepository->getById($productId);
     }
 }

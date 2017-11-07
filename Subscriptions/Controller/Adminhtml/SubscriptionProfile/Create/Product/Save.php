@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Prod
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Add to subscription controller
+ */
 class Save extends SubscriptionProfile
 {
     /**
@@ -18,13 +21,17 @@ class Save extends SubscriptionProfile
      */
     public function execute()
     {
-        $error = false;
-        $message = '';
+        $error = true;
+        $message = __('We can\'t add this item to your subscription shopping cart right now.');
         $data = $this->getRequest()->getParams();
         try {
-            $this->getSubCreateModel()->addToSubscription($data);
+            $result = $this->getSubCreateModel()->addToSubscription($data);
+            if ($result){
+                $error = false;
+                $message = '';
+                $this->_getSession()->addSubQuote($result->getQuote());
+            }
         } catch (\Exception $e) {
-            $error = true;
             $message = $e->getMessage();
         }
 
@@ -46,8 +53,11 @@ class Save extends SubscriptionProfile
     }
 
     /**
-     * @param $response
-     * @return mixed
+     * Returns responce array.
+     *
+     * @param bool $error
+     * @param string $message
+     * @return array
      */
     private function getJsonResponse($error, $message)
     {

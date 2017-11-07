@@ -6,12 +6,8 @@
 
 namespace TNW\Subscriptions\Api;
 
-use Magento\Framework\Api\SearchCriteriaInterface;
-
 interface BillingFrequencyRepositoryInterface
 {
-
-
     /**
      * Save BillingFrequency
      * @param \TNW\Subscriptions\Api\Data\BillingFrequencyInterface $billingFrequency
@@ -26,7 +22,7 @@ interface BillingFrequencyRepositoryInterface
      * Retrieve BillingFrequency
      * @param string $id
      * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 

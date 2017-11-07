@@ -21,6 +21,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Validator;
 
 /**
  * Abstract quote session for admin and storefront subscriptions quote sessions.
@@ -58,6 +59,13 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     protected $searchCriteriaBuilder;
 
     /**
+     * Subscription quotes validator.
+     *
+     * @var Validator
+     */
+    protected $quoteValidator;
+
+    /**
      * Quote constructor.
      *
      * @param Http $request
@@ -84,11 +92,13 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
         State $appState,
         CartRepositoryInterface $quoteRepository,
         StoreManagerInterface $storeManager,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        Validator $quoteValidator
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->storeManager = $storeManager;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->quoteValidator = $quoteValidator;
         parent::__construct(
             $request,
             $sidResolver,
@@ -200,7 +210,16 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
                     $quoteIds,
                     'in'
                 )->create();
-                $this->quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+                $quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+                $quotes = $this->quoteValidator->setSession($this)->validate($quotes);
+                $quoteIds = array_map(
+                    function (ModelQuote $quote) {
+                        return $quote->getId();
+                    },
+                    $quotes
+                );
+                $this->setSubQuoteIds($quoteIds);
+                $this->quotes = $quotes;
                 $this->processQuote();
             }
         }
@@ -211,17 +230,19 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     /**
      * Removes quote from subscription quotes list.
      *
-     * @param ModelQuote $quote
+     * @param ModelQuote|string|int $quote
      * @return $this
      */
-    public function removeSubQuote(ModelQuote $quote)
+    public function removeSubQuote($quote)
     {
-        $quoteId = $quote->getId();
-        $this->removeSubQuoteId($quoteId);
+        if ($quote instanceof ModelQuote){
+            $quote = $quote->getId();
+        }
+        $this->removeSubQuoteId($quote);
         $this->quotes = array_filter(
             $this->getSubQuotes(),
-            function ($subQuote) use ($quoteId) {
-                return ($subQuote->getId() !== $quoteId);
+            function ($subQuote) use ($quote) {
+                return ($subQuote->getId() !== $quote);
             }
         );
 

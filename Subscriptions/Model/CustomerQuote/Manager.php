@@ -7,19 +7,18 @@
 namespace TNW\Subscriptions\Model\CustomerQuote;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
-use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\CustomerQuoteRepositoryInterface;
 use TNW\Subscriptions\Api\Data\CustomerQuoteInterface;
 use TNW\Subscriptions\Model\CustomerQuote;
-use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
-use TNW\Subscriptions\Model\CustomerQuoteFactory;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
- * Class Manager
+ * Customer subscriptions manager
  */
 class Manager
 {
@@ -45,13 +44,6 @@ class Manager
     private $customerQuoteRepository;
 
     /**
-     * Customer quote factory
-     *
-     * @var CustomerQuoteFactory
-     */
-    private $customerQuoteFactory;
-
-    /**
      * Profile creator
      *
      * @var CreateProfile
@@ -59,30 +51,38 @@ class Manager
     private $createProfile;
 
     /**
-     * Manager constructor.
+     * Subscription session
+     *
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+
      * @param CartRepositoryInterface $cartRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
-     * @param CustomerQuoteFactory $customerQuoteFactory
      * @param CreateProfile $createProfile
+     * @param QuoteSessionInterface $session
      */
     public function __construct(
         CartRepositoryInterface $cartRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         CustomerQuoteRepositoryInterface $customerQuoteRepository,
-        CustomerQuoteFactory $customerQuoteFactory,
-        CreateProfile $createProfile
+        CreateProfile $createProfile,
+        QuoteSessionInterface $session
     ) {
         $this->cartRepository = $cartRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->customerQuoteRepository = $customerQuoteRepository;
-        $this->customerQuoteFactory = $customerQuoteFactory;
         $this->createProfile = $createProfile;
+        $this->session = $session;
     }
 
     /**
-     * Returns customer quotes
+     * Returns customer quotes.
      *
+     * @param int|string $customerId
      * @return CartInterface[]
      */
     public function getQuotesByCustomer($customerId)
@@ -98,19 +98,16 @@ class Manager
         foreach ($customerQuotes as $customerQuote) {
             $quoteIds[] = $customerQuote->getQuoteId();
         }
-        $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-            Quote::KEY_ENTITY_ID,
-            $quoteIds,
-            'in'
-        )->create();
-        return $this->cartRepository->getList($searchCriteria)->getItems();
+
+        return $this->getQuotes($quoteIds);
     }
 
     /**
-     * Save customer quote by customer id and quote id
+     * Save customer quote by customer id and quote id.
      *
      * @param string $customerId
      * @param string $quoteId
+     * @return void
      */
     public function saveCustomerQuote($customerId, $quoteId)
     {
@@ -125,7 +122,7 @@ class Manager
      * @return bool
      */
     public function updateItems(
-        $quoteIds,
+        array $quoteIds,
         $customerId
     ) {
         if (!$customerId) {
@@ -162,20 +159,20 @@ class Manager
      */
     public function loadCustomerSubQuote()
     {
-        $customerId =$this->createProfile->getSession()->getCustomerId();
+        $customerId =$this->session->getCustomerId();
         if (!$customerId) {
             return $this;
         }
         try {
             /** @var CartInterface[] $customerQuotes */
             $quotes = $this->getQuotesByCustomer($customerId);
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+        } catch (NoSuchEntityException $e) {
             $quotes = [];
         }
         if (count($quotes)) {
             $this->mergeSubQuotes($quotes);
         }
-        $this->updateItems($this->createProfile->getSession()->getSubQuoteIds(), $customerId);
+        $this->updateItems($this->session->getSubQuoteIds(), $customerId);
         return $this;
     }
 
@@ -192,38 +189,26 @@ class Manager
         foreach ($quotes as $quote) {
             $newQuotesIds[] = $quote->getId();
         }
-        $currentSubQuotes = $this->createProfile->getSession()->getSubQuotes();
-        $this->createProfile->getSession()->setSubQuoteIds($newQuotesIds);
-        /** @var Quote $currentSubQuote */
-        foreach ($currentSubQuotes as $currentSubQuote) {
-            /** @var Item $item */
-            foreach ($currentSubQuote->getAllItems() as $item) {
-                $this->createProfile->addToSubscription($this->getProductData($item));
-            }
-            $this->cartRepository->delete($currentSubQuote);
-        }
+        $currentSubQuoteIds = $this->session->getSubQuoteIds() ?: [];
+        $this->session->setSubQuoteIds(array_merge($newQuotesIds, $currentSubQuoteIds));
+        $this->createProfile->setSubQuotes($this->session->getSubQuotes());
         $this->createProfile->recollectUnmodifiedQuotes();
         return $this;
     }
 
     /**
-     * Returns prepared data for adding to sub quote
+     * Loads quotes by ids.
      *
-     * @param Item $item
-     * @return array
+     * @param array $quoteIds
+     * @return CartInterface[]
      */
-    private function getProductData(Item $item)
+    private function getQuotes(array $quoteIds)
     {
-        $buyRequest = $item->getBuyRequest()->getDataByPath(CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
-        $uniqueData = $buyRequest[CreateProfile::UNIQUE];
-        $result = [
-            'billing_frequency' => $uniqueData['billing_frequency'],
-            'period' => $uniqueData['period'],
-            'term' => $uniqueData['term'],
-            'start_on' => $uniqueData['start_on'],
-            'product_id' => $item->getProduct()->getId(),
-            'qty' => $item->getQty(),
-        ];
-        return $result;
+        $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+            Quote::KEY_ENTITY_ID,
+            $quoteIds,
+            'in'
+        )->create();
+        return $this->cartRepository->getList($searchCriteria)->getItems();
     }
 }

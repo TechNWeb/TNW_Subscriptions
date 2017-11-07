@@ -313,13 +313,13 @@ class Form extends AbstractDataProvider
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
             if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
-                if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE) === StartDateType::DEFINED_BY_CUSTOMER) {
+                if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
                     $visible = true;
                 } else {
                     $value = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
                 }
             } else {
-                if ($product->getData(Attribute::SUBSCRIPTION_START_DATE) === StartDateType::DEFINED_BY_CUSTOMER) {
+                if ($product->getData(Attribute::SUBSCRIPTION_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
                     $visible = true;
                 } else {
                     $value = $product->getData(Attribute::SUBSCRIPTION_START_DATE);

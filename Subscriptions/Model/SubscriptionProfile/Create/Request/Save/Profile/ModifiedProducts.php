@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+
 /**
  * Save modified products processor.
  */
@@ -21,11 +23,19 @@ class ModifiedProducts extends Base
         if ($objectId) {
             $objectItemId = $this->getFieldValue($data, 'objectItemId', false);
             if ($objectItemId) {
+                $quote = $this->getSubCreateModel()->getQuoteCreator()->getCartRepository()->get($objectId);
+                $item = $quote->getItemById($objectItemId);
                 $remove = $this->getFieldValue($data, 'remove', false);
-                $requestData = $this->getFieldValue($data, 'item_' . $objectItemId, false);
-                $request = $saveModel->removeSubscriptions($requestData, $objectId, $objectItemId);
+                $request = $this->getFieldValue($data, 'item_' . $objectItemId, false);
+                $request['product_id'] = $item->getProduct()->getId();
+                $saveModel->removeSubscriptions($item);
                 if (!$remove) {
-                    $saveModel->addToSubscription($request);
+                    $result = $saveModel->addToSubscription($request);
+                    if (!$result){
+                        $this->errors[] = __('We can\'t add this item to your subscription shopping cart right now.');
+                    }else{
+                        $this->getSession()->addSubQuote($result->getQuote());
+                    }
                 }
             } else {
                 $this->errors[] = __('Object item id is not defined.');
