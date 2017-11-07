@@ -13,7 +13,6 @@ use Magento\Customer\Model\AttributeMetadataDataProvider;
 use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
 use Magento\Customer\Model\ResourceModel\AddressRepository;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Phrase;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Framework\Json\Encoder;
@@ -139,18 +138,12 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     private $jsonEncoder;
 
     /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
      * @param AttributeMetadataDataProvider $attributeMetadataDataProvider
      * @param CustomerRepository $customerRepository
      * @param AddressRepository $addressRepository
      * @param AddressMapper $addressMapper
      * @param CustomerMapper $customerMapper
      * @param QuoteSessionInterface $session
-     * @param RequestInterface $request
      * @param Encoder $encoder
      * @param bool $isShipping
      */
@@ -161,7 +154,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         AddressMapper $addressMapper,
         CustomerMapper $customerMapper,
         QuoteSessionInterface $session,
-        RequestInterface $request,
         Encoder $encoder,
         $isShipping
     ) {
@@ -171,7 +163,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
         $this->addressMapper = $addressMapper;
         $this->customerMapper = $customerMapper;
         $this->session = $session;
-        $this->request = $request;
         $this->jsonEncoder = $encoder;
         $this->isShipping = $isShipping;
     }
