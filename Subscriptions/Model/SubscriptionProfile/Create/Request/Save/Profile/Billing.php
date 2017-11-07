@@ -26,6 +26,13 @@ class Billing extends Base
 
             $this->errors = $this->getSubCreateModel()
                 ->setBillingAddress($billing, $customerAddressId);
+
+            // Save billing address "Save As Shipping" flag state.
+            if (isset($info['same_as_shipping'])) {
+                $quoteAddressData = $this->getSession()->getQuoteAddressData() ?: [];
+                $quoteAddressData[$this->getSession()->getFirstQuote()->getId()] = $info['same_as_shipping'];
+                $this->getSession()->setQuoteAddressData($quoteAddressData);
+            }
         }
     }
 }
