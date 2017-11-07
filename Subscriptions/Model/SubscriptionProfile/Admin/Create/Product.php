@@ -16,8 +16,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
  * Class Product
@@ -96,6 +96,8 @@ class Product extends Create
 
     /**
      * Resets buy request and data array.
+     *
+     * @return void
      */
     public function reset()
     {
@@ -105,6 +107,7 @@ class Product extends Create
 
     /**
      * @param mixed $data
+     * @return void
      */
     public function setData($data)
     {
@@ -200,7 +203,7 @@ class Product extends Create
                 $nowDate = (new \DateTime())->format('Y-m-d');
                 $result = new \DateTime($startOn);
                 $result = $result->format('Y-m-d');
-                if (strtotime($result) < strtotime($nowDate)){
+                if (strtotime($result) < strtotime($nowDate)) {
                     $result = $nowDate;
                 }
                 break;
@@ -229,7 +232,7 @@ class Product extends Create
             $full
         );
 
-        if ($usePresetQty){
+        if ($usePresetQty) {
             $price = round($price / $productData['qty'], 4);
         }
 
@@ -255,7 +258,7 @@ class Product extends Create
             $requestData['product_id'],
             true
         );
-        if ($origInitialFee > 0 && $initialFee > 0){
+        if ($origInitialFee > 0 && $initialFee > 0) {
             $quoteItemAttribute = $this->extensionManager->getEmptyQuoteItemAttribute()
                 ->setBaseSubsInitialFee($origInitialFee)
                 ->setSubsInitialFee($initialFee);

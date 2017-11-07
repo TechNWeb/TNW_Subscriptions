@@ -71,8 +71,8 @@ class Add extends Action
     private $session;
 
     /**
-     * @param QuoteSessionInterface $session
      * @param Context $context
+     * @param QuoteSessionInterface $session
      * @param Validator $formKeyValidator
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
@@ -80,21 +80,21 @@ class Add extends Action
      * @param Config $config
      */
     public function __construct(
-        QuoteSessionInterface $session,
         Context $context,
+        QuoteSessionInterface $session,
         Validator $formKeyValidator,
         ProductRepositoryInterface $productRepository,
         StoreManagerInterface $storeManager,
         CreateProfile $createProfile,
         Config $config
     ) {
-        parent::__construct($context);
         $this->formKeyValidator = $formKeyValidator;
         $this->productRepository = $productRepository;
         $this->storeManager = $storeManager;
         $this->createProfile = $createProfile;
         $this->config = $config;
         $this->session = $session;
+        parent::__construct($context);
     }
 
     /**
@@ -118,7 +118,7 @@ class Add extends Action
                         unset($params['subscribe_qty']);
                     }
                     $result = $this->createProfile->addToSubscription($params);
-                    if ($result){
+                    if ($result) {
                         $message = __(
                             'You added %1 to your subscription cart.',
                             $this->initProduct()->getName()

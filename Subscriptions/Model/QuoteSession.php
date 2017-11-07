@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\State;
 use Magento\Framework\Session\Config\ConfigInterface;
@@ -17,10 +18,9 @@ use Magento\Framework\Session\ValidatorInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Quote\Model\Quote as ModelQuote;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Validator;
 
 /**
@@ -66,8 +66,6 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     protected $quoteValidator;
 
     /**
-     * Quote constructor.
-     *
      * @param Http $request
      * @param SidResolverInterface $sidResolver
      * @param ConfigInterface $sessionConfig
@@ -79,6 +77,8 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      * @param State $appState
      * @param CartRepositoryInterface $quoteRepository
      * @param StoreManagerInterface $storeManager
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Validator $quoteValidator
      */
     public function __construct(
         Http $request,
@@ -235,7 +235,7 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      */
     public function removeSubQuote($quote)
     {
-        if ($quote instanceof ModelQuote){
+        if ($quote instanceof ModelQuote) {
             $quote = $quote->getId();
         }
         $this->removeSubQuoteId($quote);

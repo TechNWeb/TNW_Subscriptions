@@ -58,7 +58,6 @@ class Manager
     private $session;
 
     /**
-
      * @param CartRepositoryInterface $cartRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
@@ -159,7 +158,7 @@ class Manager
      */
     public function loadCustomerSubQuote()
     {
-        $customerId =$this->session->getCustomerId();
+        $customerId = $this->session->getCustomerId();
         if (!$customerId) {
             return $this;
         }
@@ -204,11 +203,16 @@ class Manager
      */
     private function getQuotes(array $quoteIds)
     {
-        $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-            Quote::KEY_ENTITY_ID,
-            $quoteIds,
-            'in'
-        )->create();
-        return $this->cartRepository->getList($searchCriteria)->getItems();
+        $result = [];
+        if (!empty($quoteIds)) {
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                Quote::KEY_ENTITY_ID,
+                $quoteIds,
+                'in'
+            )->create();
+            $result = $this->cartRepository->getList($searchCriteria)->getItems();
+        }
+
+        return $result;
     }
 }

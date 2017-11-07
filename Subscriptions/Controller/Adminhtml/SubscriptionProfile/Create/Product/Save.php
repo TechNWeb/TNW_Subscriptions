@@ -26,7 +26,7 @@ class Save extends SubscriptionProfile
         $data = $this->getRequest()->getParams();
         try {
             $result = $this->getSubCreateModel()->addToSubscription($data);
-            if ($result){
+            if ($result) {
                 $error = false;
                 $message = '';
                 $this->_getSession()->addSubQuote($result->getQuote());
@@ -53,7 +53,7 @@ class Save extends SubscriptionProfile
     }
 
     /**
-     * Returns responce array.
+     * Returns response array.
      *
      * @param bool $error
      * @param string $message

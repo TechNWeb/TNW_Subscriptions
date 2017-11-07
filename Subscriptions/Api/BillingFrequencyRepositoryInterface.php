@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface for billing frequency repository.
+ */
 interface BillingFrequencyRepositoryInterface
 {
     /**

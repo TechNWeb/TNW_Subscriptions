@@ -6,12 +6,12 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Quote;
 
-use TNW\Subscriptions\Model\BillingFrequencyRepository;
-use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
-use Magento\Quote\Model\Quote\Item;
-use Magento\Quote\Model\Quote;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Subscription quotes validator.
@@ -28,7 +28,7 @@ class Validator
     /**
      * Repository for retrieving billing frequencies.
      *
-     * @var BillingFrequencyRepository
+     * @var BillingFrequencyRepositoryInterface
      */
     private $frequencyRepository;
 
@@ -41,11 +41,11 @@ class Validator
 
     /**
      * @param CreateProfile $createProfile
-     * @param BillingFrequencyRepository $frequencyRepository
+     * @param BillingFrequencyRepositoryInterface $frequencyRepository
      */
     public function __construct(
         CreateProfile $createProfile,
-        BillingFrequencyRepository $frequencyRepository
+        BillingFrequencyRepositoryInterface $frequencyRepository
     ) {
         $this->createProfile = $createProfile;
         $this->frequencyRepository = $frequencyRepository;
@@ -79,7 +79,7 @@ class Validator
      * @param Quote[] $quotes
      * @return Quote[]
      */
-    public function validate($quotes)
+    public function validate(array $quotes)
     {
         $result = $quotes;
         foreach ($quotes as $quote) {
@@ -90,9 +90,9 @@ class Validator
                     $productsData = $this->getProductsData($item, $currentRequest);
                     $newRequest = $this->getNewBuyRequest($productsData);
                     if ($currentRequest != $newRequest) {
-                         if (!$this->createProfile->removeSubscriptions($item)){
-                             $result = $this->filterResult($result, $quote);
-                         };
+                        if (!$this->createProfile->removeSubscriptions($item)) {
+                            $result = $this->filterResult($result, $quote);
+                        };
                         $this->createProfile->setSubQuotes($result);
                         $newItem = $this->createProfile->addToSubscription(
                             $this->getProductsData($item, $newRequest)
@@ -100,7 +100,6 @@ class Validator
                         if ($newItem) {
                             $newQuote = $newItem->getQuote();
                             $result = $this->addQuoteToResult($result, $newQuote);
-
                         }
                     }
                 }
@@ -135,7 +134,7 @@ class Validator
      * Returns current subscription item buy request.
      *
      * @param Item $item
-     * @return array
+     * @return mixed
      */
     private function getCurrentBuyRequest(Item $item)
     {
@@ -216,7 +215,7 @@ class Validator
      * @param Quote $newQuote
      * @return array
      */
-    private function addQuoteToResult(array $result,Quote $newQuote)
+    private function addQuoteToResult(array $result, Quote $newQuote)
     {
         $needAddQuote = true;
         foreach ($result as $oldQuote) {

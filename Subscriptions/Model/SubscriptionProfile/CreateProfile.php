@@ -159,6 +159,8 @@ class CreateProfile extends BaseCreate
     }
 
     /**
+     * Gets subscription quotes.
+     *
      * @return array
      */
     public function getSubQuotes()
@@ -171,7 +173,10 @@ class CreateProfile extends BaseCreate
     }
 
     /**
+     * Sets subscription quotes.
+     *
      * @param array $subQuotes
+     * @return void
      */
     public function setSubQuotes(array $subQuotes)
     {
@@ -194,10 +199,10 @@ class CreateProfile extends BaseCreate
     /**
      * Adds product into new or already existing subscription quote.
      *
-     * @param [] $productData
+     * @param array $productData
      * @return false|Item
      */
-    public function addToSubscription($productData)
+    public function addToSubscription(array $productData)
     {
         $this->productModifier->reset();
         $result = false;
@@ -385,10 +390,10 @@ class CreateProfile extends BaseCreate
     /**
      * Sets into subscription quotes shipping methods.
      *
-     * @param [] $methods
+     * @param array $methods
      * @return array
      */
-    public function setShippingMethods($methods)
+    public function setShippingMethods(array $methods)
     {
         $result = [];
         foreach ($this->getSubQuotes() as $subQuote) {
