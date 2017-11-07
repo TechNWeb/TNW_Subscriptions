@@ -117,7 +117,7 @@ class PriceCalculator
                 $price = $trialPrice ?: 0;
             } else {
                 if ($lockProductPrice) {
-                    $discountAmount = $this->getDiscountAmount($product);
+                    $discountAmount = $this->getDiscountAmount($product, $productPrice);
                     $origPrice = $this->convertToCurrency($product->getOrigData('price'));
                     $price= isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
                 } else {
@@ -204,10 +204,14 @@ class PriceCalculator
      * Get product discount amount considering discount type.
      *
      * @param Product $product
+     * @param null|float $processPrice
      * @return float
      */
-    private function getDiscountAmount(Product $product)
+    private function getDiscountAmount(Product $product, $processPrice = null)
     {
+        if ($processPrice === null) {
+            $processPrice = $product->getOrigData('price');
+        }
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {
             $discountType = $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)
@@ -218,7 +222,7 @@ class PriceCalculator
                     ? $product->getCustomAttribute(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)->getValue()
                     : 0;
                 if ($discountType == DiscountAmount::PERCENT_DISCOUNT && $discountAmount) {
-                    $discountAmount = $product->getPrice() * $discountAmount / 100;
+                    $discountAmount = $processPrice * $discountAmount / 100;
                 }
             }
         }

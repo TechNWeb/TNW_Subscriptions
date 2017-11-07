@@ -191,6 +191,7 @@ class GridMetadata
      * @param null|Phrase $notice
      * @param bool $visible
      * @param array $imports
+     * @param array $validate
      *
      * @return array
      */
@@ -203,7 +204,8 @@ class GridMetadata
         $addAfter = null,
         Phrase $notice = null,
         $visible = true,
-        $imports = []
+        $imports = [],
+        $validate = []
     ) {
         $component ? $column['arguments']['data']['config']['component'] = $component : null;
         $elementTmpl ? $column['arguments']['data']['config']['elementTmpl'] = $elementTmpl : null;
@@ -213,6 +215,7 @@ class GridMetadata
         $notice ? $column['arguments']['data']['config']['notice'] = $notice : null;
         $visible ?: $column['arguments']['data']['config']['visible'] = $visible;
         $imports ? $column['arguments']['data']['config']['imports'] = $imports : null;
+        $validate ? $column['arguments']['data']['config']['validation'] = $validate : null;
 
         return $column;
     }
@@ -348,7 +351,12 @@ class GridMetadata
             [],
             null,
             null,
-            __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.')
+            __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.'),
+            true,
+            [],
+            [
+                'validate-zero-or-greater' => true,
+            ]
         );
 
         $statusColumn = $this->getColumnBaseData('status', false, __('Status'), 100);
