@@ -87,7 +87,6 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         ContextModel $contextModel,
-        StockRegistryInterface $stockRegistry,
         array $data = []
     ) {
         $this->coreRegistry = $context->getRegistry();
@@ -96,7 +95,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
         $this->contextModel = $contextModel;
-        $this->stockRegistry = $stockRegistry;
+        $this->stockRegistry = $context->getStockRegistry();
         parent::__construct($context, $data);
     }
 
@@ -344,7 +343,6 @@ class Subscribe extends \Magento\Framework\View\Element\Template
         $params = [];
         $validators = [];
         $validators['required-number'] = true;
-
         /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem(
             $this->getProduct()->getId(),
