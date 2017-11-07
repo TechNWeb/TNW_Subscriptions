@@ -121,6 +121,7 @@ define([
                         current.renderBlock(form, step);
                     });
                 }
+                this.modifyNextStepButton(step);
             },
 
             /**
@@ -129,10 +130,12 @@ define([
              * @param {Object} step
              */
             modifyNextStepButton: function (step) {
-                this.nextStep().hideButtonIfNeed();
-                if (step.nextButtonTitle){
-                    this.nextStep().buttonTitle(step.nextButtonTitle);
-                    this.bottomNextStep().buttonTitle(step.nextButtonTitle)
+                if (this.buttonInitialized()) {
+                    this.nextStep().hideButtonIfNeed();
+                    if (step.nextButtonTitle){
+                        this.nextStep().buttonTitle(step.nextButtonTitle);
+                        this.bottomNextStep().buttonTitle(step.nextButtonTitle)
+                    }
                 }
             },
 
