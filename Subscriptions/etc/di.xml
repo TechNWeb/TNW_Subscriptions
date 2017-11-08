@@ -669,4 +669,9 @@
             <argument name="formContext" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context\Proxy</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Quote\Validator">
+        <arguments>
+            <argument name="createProfile" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile\Proxy</argument>
+        </arguments>
+    </type>
 </config>

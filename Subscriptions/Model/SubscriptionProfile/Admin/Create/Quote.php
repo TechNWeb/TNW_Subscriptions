@@ -111,9 +111,7 @@ class Quote extends Create implements QuoteCreateInterface
     }
 
     /**
-     * Returns repository for retrieving quotes.
-     *
-     * @return CartRepositoryInterface
+     * @inheritdoc
      */
     public function getCartRepository()
     {
