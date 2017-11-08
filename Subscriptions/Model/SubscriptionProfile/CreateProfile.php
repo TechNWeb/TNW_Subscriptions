@@ -684,16 +684,6 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Clears extra data on account step (ex. customer_address_id from quote address if it is exist).
-     *
-     * @return void
-     */
-    public function clearAccountStepData()
-    {
-        //
-    }
-
-    /**
      * Clears extra data on payment and billing step
      * (ex. customer_address_id, shipping method).
      *
