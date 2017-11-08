@@ -555,6 +555,7 @@ button.action-editor:before {
 }
 
 button.action-editor {
+    float: right;
     background: none;
     border: none;
     padding: 1rem;
@@ -568,6 +569,7 @@ button.remove-button-icon:before {
     content: '\e630';
 }
 button.remove-button-icon {
+    float: right;
     background: none;
     border: none;
     padding: 1rem;
@@ -654,6 +656,11 @@ button.action-editor.active:before{
 .subscription-item-form .description-fieldset .field-name{
     font-size: 2.6rem;
     margin-bottom: 0;
+    float: left;
+}
+
+.subscription-item-form .description-fieldset .field-name .admin__field-control {
+    width: inherit;
 }
 
 .subscription-item-form .description-fieldset .field-description{
