@@ -17,7 +17,7 @@ define([
         onUpdate: function () {
             this._super();
             var addressFieldset = registry.get('index = ' + this.addressFieldsetIndex);
-            if (addressFieldset && typeof addressFieldset.openAddressForm === 'function') {
+            if (this.valueChangedByUser && addressFieldset && typeof addressFieldset.openAddressForm === 'function') {
                 addressFieldset.openAddressForm(true);
             }
         }

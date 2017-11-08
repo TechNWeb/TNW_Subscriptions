@@ -686,16 +686,6 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Clears extra data on account step (ex. customer_address_id from quote address if it is exist).
-     *
-     * @return void
-     */
-    public function clearAccountStepData()
-    {
-        //
-    }
-
-    /**
      * Clears extra data on payment and billing step
      * (ex. customer_address_id, shipping method).
      *
@@ -708,19 +698,6 @@ class CreateProfile extends BaseCreate
             $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
             $subQuote->getShippingAddress()->setCollectShippingRates(true);
             $this->setNeedCollect(true);
-        }
-    }
-
-    /**
-     * Cleares customer_address_id fro quote addresses.
-     *
-     * @param array $quoteAddresses
-     * @return void
-     */
-    private function clearCustomerAddressId($quoteAddresses)
-    {
-        foreach ($quoteAddresses as $quoteAddress) {
-            $quoteAddress->setCustomerAddressId(null);
         }
     }
 

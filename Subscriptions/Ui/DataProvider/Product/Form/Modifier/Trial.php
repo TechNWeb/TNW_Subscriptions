@@ -74,7 +74,7 @@ class Trial extends BaseModifier
                 ],
                 'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
-                'elementTmpl' => 'TNW_Subscriptions/form/element/input',
+                'elementTmpl' => 'TNW_Subscriptions/form/element/render-binding-input',
             ]
         );
         $meta = $this->arrayManager->merge(

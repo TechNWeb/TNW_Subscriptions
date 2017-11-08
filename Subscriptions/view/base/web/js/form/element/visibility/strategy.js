@@ -8,10 +8,44 @@ define([
 ], function (_, registry) {
     'use strict';
 
+    /**
+     * Returns dependency elements indexes.
+     *
+     * @param {Array} visibilityDependencies
+     * @return {Array}
+     */
+    var resolveDependencies = function(visibilityDependencies) {
+        var dependencies = [];
+        _.each(visibilityDependencies, function (dependency) {
+            var propertyData = dependency.split(':'),
+                index = propertyData[0];
+            if (index[0] == '!') {
+                index = index.substring(1);
+            }
+            dependencies.push(index);
+        });
+
+        return dependencies;
+    };
+
     return {
         defaults: {
             visibilityDependencies: [],
-            visibilityLogic: 'AND',
+            visibilityLogic: 'AND'
+        },
+
+        /** @inheritdoc */
+        initialize: function () {
+            var dependencies;
+            this._super();
+
+            if (!_.isEmpty(this.visibilityDependencies)) {
+                dependencies = resolveDependencies(this.visibilityDependencies);
+                // Set the initial visibility of our fields after all dependency components are loaded.
+                registry.promise(dependencies).done(_.bind(function () {
+                    this.refreshVisibility();
+                }, this));
+            }
         },
 
         /** @inheritdoc */

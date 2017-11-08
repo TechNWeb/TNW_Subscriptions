@@ -18,7 +18,7 @@ define([
             noticeTemplate: 'The iteration will occur every %1 %2',
             plural: 's',
 
-            elementTmpl: 'TNW_Subscriptions/form/element/input',
+            elementTmpl: 'TNW_Subscriptions/form/element/render-binding-input',
 
             imports: {
                 'onUnitUpdate': 'index = unit:value'
@@ -70,15 +70,14 @@ define([
          * Update element notice.
          */
         updateNotice: function () {
-
-            var notice = '';
-            var unitField = uiRegistry.get('index = unit');
-            var frequencyField = uiRegistry.get('index = frequency');
+            var notice = '',
+                unitField = uiRegistry.get('index = unit'),
+                frequencyField = uiRegistry.get('index = frequency');
 
             if (unitField && this.value() && frequencyField) {
-                var unitOption = unitField.value();
-                var unit = unitField.getOption(unitOption);
-                var template = this.noticeTemplate;
+                var unitOption = unitField.value(),
+                    unit = unitField.getOption(unitOption),
+                    template = this.noticeTemplate;
 
                 if (frequencyField.value() != 1) {
                     template += this.plural;
@@ -102,15 +101,15 @@ define([
          * Update unit value which depend of frequency.
          */
         updateUnitValues: function () {
-            var unitField = uiRegistry.get('index = unit');
-            var frequencyField = uiRegistry.get('index = frequency');
+            var unitField = uiRegistry.get('index = unit'),
+                frequencyField = uiRegistry.get('index = frequency');
 
             if (frequencyField && unitField && this.value()) {
-                var unitOption = unitField.value();
-                var unit = unitField.getOption(unitOption);
-                var selector = '[data-index=unit] .admin__control-select [value=' + unit.value + ']';
-                var value = 0;
-                var options = unitField.indexedOptions;
+                var unitOption = unitField.value(),
+                    unit = unitField.getOption(unitOption),
+                    selector = '[data-index=unit] .admin__control-select [value=' + unit.value + ']',
+                    value = 0,
+                    options = unitField.indexedOptions;
 
                 if ($j(selector).text() != '') {
                     if (this.previousFrequency == 1 && frequencyField.value() != 1) {
