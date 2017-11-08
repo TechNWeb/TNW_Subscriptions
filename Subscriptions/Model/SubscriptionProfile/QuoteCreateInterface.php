@@ -17,4 +17,11 @@ interface QuoteCreateInterface
      * @return \Magento\Quote\Api\Data\CartInterface
      */
     public function createSubCart();
+
+    /**
+     * Returns repository for retrieving quotes.
+     *
+     * @return CartRepositoryInterface
+     */
+    public function getCartRepository();
 }
