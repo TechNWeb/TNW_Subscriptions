@@ -6,20 +6,22 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute as SubscriptionAttributes;
+use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
-use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
-use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 
 /**
  * Class for creating subscription profile.
@@ -210,21 +212,41 @@ class CreateProfile extends BaseCreate
         $this->productModifier->setData($productData);
         $product = $this->productModifier->getPreparedProduct();
         $quote = $this->getSubQuote();
-        $item = $quote->addProduct(
-            $product,
-            $this->productModifier->getPreparedBuyRequest()
-        );
-        if ($item instanceof Item) {
-            $this->productModifier->setInitialFeeToItem($item);
-            $quote->setTotalsCollectedFlag(false);
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-            $this->quoteCreator->getCartRepository()->save($quote);
-            $result = $item;
-        } else {
-            $this->getContext()->throwException($item);
+        if ($this->canUpdateItemQty($quote, $product)) {
+            $item = $quote->addProduct(
+                $product,
+                $this->productModifier->getPreparedBuyRequest()
+            );
+            if ($item instanceof Item) {
+                $this->productModifier->setInitialFeeToItem($item);
+                $quote->setTotalsCollectedFlag(false);
+                $quote->getShippingAddress()->setCollectShippingRates(true);
+                $this->quoteCreator->getCartRepository()->save($quote);
+                $result = $item;
+            } else {
+                $this->getContext()->throwException($item);
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * Check if quote item qty can be updated.
+     * Depends on:
+     * 1. product attribute 'tnw_subscr_unlock_preset_qty' value;
+     * 2. quote item existence.
+     *
+     * @param ModelQuote $quote
+     * @param MagentoProduct $product
+     * @return bool
+     */
+    private function canUpdateItemQty(ModelQuote $quote, MagentoProduct $product)
+    {
+        $productPresetQty = $product->getData(SubscriptionAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $quoteItem = $quote->getItemByProduct($product);
+
+        return !($productPresetQty && $quoteItem);
     }
 
     /**
