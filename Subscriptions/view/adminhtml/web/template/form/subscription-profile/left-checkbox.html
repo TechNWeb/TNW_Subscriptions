@@ -11,7 +11,7 @@
     <label id="chekbox-label" class="admin__field-label" if="$data.label" visible="$data.labelVisible" attr="for: uid">
         <span text="label" attr="'data-config-scope': $data.scopeLabel"/>
     </label>
-    <div class="admin__field-control 111"
+    <div class="admin__field-control"
          css="'_with-tooltip': $data.tooltip, '_with-reset': $data.showFallbackReset && $data.isDifferedFromDefault">
         <render args="elementTmpl" ifnot="hasAddons()"/>
 

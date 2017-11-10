@@ -12,7 +12,7 @@ use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
- * @method \TNW\Subscriptions\Model\SubscriptionProfile getSubscriptionProfile()
+ * Class Products
  */
 class Products extends BaseSummary
 {
@@ -141,7 +141,19 @@ class Products extends BaseSummary
             ? $trialStartDate
             : $this->getSubscriptionProfile()->getStartDate();
 
-        return new \DateTime($startOn);
+        return $this->_localeDate->date(new \DateTime($startOn));
+    }
+
+    /**
+     * Start on date formatted.
+     *
+     * @return string
+     */
+    public function getStartOnFormatted()
+    {
+        $date = $this->getStartOn();
+
+        return $this->_localeDate->formatDate($date, \IntlDateFormatter::SHORT);
     }
 
     /**

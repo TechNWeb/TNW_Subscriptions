@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -51,7 +57,7 @@
                     <item name="formElement" xsi:type="string">radioset</item>
                     <item name="dataScope" xsi:type="string">billing_frequency</item>
                     <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend
-                        admin__field-wide</item>
+                        field-wide</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -77,7 +83,7 @@
                     <item name="description" xsi:type="string" translate="true">Until canceled</item>
                     <item name="label" xsi:type="string" translate="true">Term:</item>
                     <item name="dataScope" xsi:type="string">term</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
                 </item>
             </argument>
         </field>
@@ -85,7 +91,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="boolean">false</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide sub-period-input</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide sub-period-input</item>
                     <item name="dataType" xsi:type="string">string</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">input</item>
@@ -104,7 +110,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Start on:</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide admin__field-date</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide admin__field-date</item>
                     <item name="dataType" xsi:type="string">string</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">date</item>
@@ -125,7 +131,7 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
                 </item>
             </argument>
         </field>
@@ -136,7 +142,7 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
                     <item name="component" xsi:type="string">TNW_Subscriptions/js/components/add-product-form-initial-fee</item>
                     <item name="imports" xsi:type="array">
                         <item name="changeValue" xsi:type="string">${ $.parentName}.billing_frequency:value</item>
@@ -151,7 +157,7 @@
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">price</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
                         <item name="required-entry" xsi:type="boolean">true</item>

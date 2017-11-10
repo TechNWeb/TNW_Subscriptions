@@ -95,7 +95,7 @@ button.profile__cancel-edit_button:before{
     border: none;
     padding: 0;
 }
-.admin__profile_summary .admin_field_without_legend > div.admin__field {
+.admin__profile_summary .field_without_legend > div.admin__field {
     display: inline-block;
     margin-top: 0;
 }
@@ -115,6 +115,7 @@ button.profile__cancel-edit_button:before{
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention{
     display: inline-block;
+    position: relative;
 }
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form .subscription-shipping-attention::before{
     color: #eb5202;
@@ -130,7 +131,8 @@ button.profile__cancel-edit_button:before{
     background-color: white;
     color: #000;
     position: absolute;
-    top: 25px;
+    top: 22px;
+    left: 28px;
     white-space: normal;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -272,20 +274,20 @@ button.profile__cancel-edit_button:before{
     overflow: auto;
 }
 
-#anchor-content .admin__control-label-up label{
+#anchor-content .control-label-up label{
     width: auto;
     position: relative;
     margin-left: 0;
     float: none;
 
 }
-#anchor-content .admin__control-label-up{
+#anchor-content .control-label-up{
     position: relative;
 }
 [data-index = "account_info"] legend {
     display: none;
 }
-.admin_field_without_legend > div.admin__field{
+.field_without_legend > div.admin__field{
     display: inline-block;
     margin-top: 0px;
 }
@@ -302,14 +304,14 @@ button.profile__cancel-edit_button:before{
     width: 6rem;
 }
 
-#anchor-content .admin_field_without_legend{
+#anchor-content .field_without_legend{
     width: calc( (100%) * .7 - 30px);
 }
-.admin__control-label-up.select {
+.control-label-up.select {
     width: 20%;
     min-width: 11rem;
 }
-.admin__control-label-up.input {
+.control-label-up.input {
     width: 74%;
 }
 .admin__address-information-preview {
@@ -553,6 +555,7 @@ button.action-editor:before {
 }
 
 button.action-editor {
+    float: right;
     background: none;
     border: none;
     padding: 1rem;
@@ -566,6 +569,7 @@ button.remove-button-icon:before {
     content: '\e630';
 }
 button.remove-button-icon {
+    float: right;
     background: none;
     border: none;
     padding: 1rem;
@@ -652,10 +656,19 @@ button.action-editor.active:before{
 .subscription-item-form .description-fieldset .field-name{
     font-size: 2.6rem;
     margin-bottom: 0;
+    float: left;
+}
+
+.subscription-item-form .description-fieldset .field-name .admin__field-control {
+    width: inherit;
 }
 
 .subscription-item-form .description-fieldset .field-description{
     margin-top: 0.5rem;
+}
+
+.subscription-item-form .description-fieldset .field-description .admin__field-control{
+    width: calc( (100%) - 30px );
 }
 
 .subscription-item-form .description-fieldset .qty-container{
@@ -835,4 +848,29 @@ button.action-editor.active:before{
 
 .tnw_subscriptionprofile_cancel_button_popup .modal-header {
     display: none;
+}
+.table-secondary {
+    width: 100%;
+}
+.table-secondary tbody tr:nth-child(odd) th, .table-secondary tbody tr:nth-child(odd) td {
+    background-color: #f1f1f1;
+}
+.table-secondary th, .table-secondary td {
+    padding: 1rem 1rem;
+    text-align: left;
+}
+.payment-additional-fieldset ._required-number > .admin__field-label > span:after {
+    color: #eb5202;
+    content: '*';
+    display: inline-block;
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1;
+    margin-left: 10px;
+    margin-top: .2rem;
+    position: absolute;
+    z-index: 1;
+}
+.admin__field.shipping-methods-fieldset>.admin__field-control {
+    width: calc(100%  - 30px );
 }

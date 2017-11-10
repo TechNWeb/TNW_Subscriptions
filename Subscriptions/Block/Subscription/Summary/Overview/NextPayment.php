@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Pricing\Helper\Data as PriceHelper;
-use Magento\Framework\Stdlib\DateTime\Timezone;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ResourceModel\Quote\Collection as QuoteCollection;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -35,11 +34,6 @@ class NextPayment extends Template
     private $quoteCollection;
 
     /**
-     * @var Timezone
-     */
-    private $timezone;
-
-    /**
      * @var PriceHelper
      */
     private $priceHelper;
@@ -52,19 +46,16 @@ class NextPayment extends Template
     /**
      * @param Context $context
      * @param QuoteCollection $quoteCollection
-     * @param Timezone $timezone
      * @param PriceHelper $priceHelper
      * @param array $data
      */
     public function __construct(
         Context $context,
         QuoteCollection $quoteCollection,
-        Timezone $timezone,
         PriceHelper $priceHelper,
         array $data = []
     ) {
         $this->quoteCollection = $quoteCollection;
-        $this->timezone = $timezone;
         $this->priceHelper = $priceHelper;
         parent::__construct($context, $data);
     }
@@ -76,11 +67,54 @@ class NextPayment extends Template
      */
     public function getNextPaymentDate()
     {
+        $result = false;
         $nextPayment = $this->getNextProfileRelation();
-        if (!$nextPayment) {
-            return false;
+        if ($nextPayment) {
+            $result = $this->_localeDate->date(new \DateTime($nextPayment->getScheduledAt()));
         }
-        return $this->timezone->date($nextPayment->getScheduledAt());
+
+        return $result;
+    }
+
+    /**
+     * Get next payment date as array of date parts.
+     *
+     * @return array
+     */
+    public function getNextPaymentDateParts()
+    {
+        $result = false;
+        $date = $this->getNextPaymentDate();
+        if ($date) {
+            $result = [
+                'year' => $this->_localeDate->formatDateTime(
+                    $date,
+                    \IntlDateFormatter::SHORT,
+                    \IntlDateFormatter::SHORT,
+                    null,
+                    null,
+                    'y'
+                ),
+                'month' => $this->_localeDate->formatDateTime(
+                    $date,
+                    \IntlDateFormatter::SHORT,
+                    \IntlDateFormatter::SHORT,
+                    null,
+                    null,
+                    'MMMM'
+                ),
+                'day' => $this->_localeDate->formatDateTime(
+                    $date,
+                    \IntlDateFormatter::SHORT,
+                    \IntlDateFormatter::SHORT,
+                    null,
+                    null,
+                    'd'
+                ),
+            ];
+        }
+
+        return $result;
     }
 
     /**

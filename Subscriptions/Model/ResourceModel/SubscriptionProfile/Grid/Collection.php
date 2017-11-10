@@ -15,6 +15,7 @@ use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -136,6 +137,11 @@ class Collection extends SearchResult
             'main_table.entity_id=' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
         )->where(
             SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NULL'
+        )->where(
+            'main_table.status not in (?)', [
+                ProfileStatus::STATUS_COMPLETE,
+                ProfileStatus::STATUS_CANCELED,
+            ]
         )->order(
             SubscriptionProfileOrderInterface::SCHEDULED_AT . ' ASC'
         )->limit(1);

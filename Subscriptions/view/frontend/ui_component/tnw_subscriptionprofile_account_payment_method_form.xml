@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_account_payment_method_form.tnw_subscriptionprofile_account_payment_method_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_account_payment_method_form.tnw_subscriptionprofile_account_payment_method_form_data_source</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="ajaxSaveType" xsi:type="string">simple</item>
+            <item name="ajaxSave" xsi:type="boolean">true</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/payment-details-form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_account_payment_method_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_account_payment_method_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\PaymentMethodForm</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_account_payment_method_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">entity_id</argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="payment_information">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Payment Details</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/payment/fieldset</item>
+                <item name="sortOrder" xsi:type="number">10</item>
+                <item name="additionalClasses" xsi:type="string">sub-fieldset</item>
+                <item name="additionalTitleClasses" xsi:type="string">block-title</item>
+                <item name="dataScope" xsi:type="string">payment</item>
+            </item>
+        </argument>
+        <field name="save">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="title" translate="true" xsi:type="string">Save</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="subButtonLeft" xsi:type="string">true</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                    <item name="displayPrimary" xsi:type="boolean">true</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_account_payment_method_form</item>
+                            <item name="actionName" xsi:type="string">beforeSubmit</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="cancel">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="title" translate="true" xsi:type="string">Cancel</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                    <item name="sortOrder" xsi:type="number">120</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_account_payment_method_form</item>
+                            <item name="actionName" xsi:type="string">cancelEdit</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>

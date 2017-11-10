@@ -61,6 +61,7 @@ class Email extends \Magento\Ui\Component\Form\Field
             $this->setData('config', $config);
         } else {
             $config['imports'] = ['checkEmailUrl' => $this->getCheckEmailUrl()];
+            $config['validation']['required-entry'] = true;
             $this->setData('config', $config);
         }
 

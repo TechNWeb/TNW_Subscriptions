@@ -217,6 +217,7 @@ class Base implements ModifierInterface
                         'description' => $this->getPaymentTitle(),
                         'dataScope' => 'method',
                         'component' => 'TNW_Subscriptions/js/components/extended-checkbox',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/radio',
                         'parentContainer' => static::PAYMENT_INFORMATION_FIELD_SET_NAME,
                         'parentSelections' => static::PAYMENT_INFORMATION_FIELD_SET_NAME,
                         'additionalClasses' => 'payment-checkbox',
@@ -250,6 +251,8 @@ class Base implements ModifierInterface
                 'data' => [
                     'config' => [
                         'componentType' => Fieldset::NAME,
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
+                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',
@@ -257,7 +260,7 @@ class Base implements ModifierInterface
                         'collapsible' => false,
                         'opened' => true,
                         'imports' => [
-                            'visible' => $checkBoxName . ':checked'
+                            'changeVisibility' => $checkBoxName . ':checked'
                         ],
                         'exports' => [
                             'visible' => $fieldsetName . ':checked'

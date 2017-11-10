@@ -9,9 +9,8 @@ define([
         'TNW_Subscriptions/js/ui/model/step-navigator',
         'uiRegistry',
         'Magento_Ui/js/model/messageList',
-        'ko',
         'underscore'
-    ], function ($, Component, stepNavigator, registry, globalMessageList, ko, _) {
+    ], function ($, Component, stepNavigator, registry, globalMessageList, _) {
         'use strict';
 
         return Component.extend({
@@ -21,11 +20,20 @@ define([
                 isLoading: true,
                 loadingQueue: [],
                 childResponseData: null,
+                imports: {
+                    buttonInitialized: 'index = next_step:buttonInitialized'
+                },
                 listens: {
                     childResponseData: 'processAfterSave',
-                    loadingQueue: 'checkLoadingQueue'
+                    loadingQueue: 'checkLoadingQueue',
+                    buttonInitialized: 'checkButtonInitialized'
                 },
-                currentStepCode: null
+                currentStepCode: null,
+                modules: {
+                    nextStep: 'index = next_step',
+                    bottomNextStep: 'index = bottom_next_step',
+                    cart: 'cart'
+                }
             },
 
             /**
@@ -41,9 +49,15 @@ define([
                         }
                     });
                 });
-                this.renderCurrentStep();
 
                 return this;
+            },
+
+            /**
+             * Renders current step after self rendering.
+             */
+            onElementRender: function () {
+                this.renderCurrentStep();
             },
 
             /**
@@ -51,7 +65,7 @@ define([
              */
             initObservable: function () {
                 return this._super()
-                    .observe(['isLoading', 'childResponseData', 'loadingQueue']);
+                    .observe(['isLoading', 'childResponseData', 'loadingQueue', 'buttonInitialized']);
             },
 
             /**
@@ -60,9 +74,9 @@ define([
              * @param externalFormName
              */
             resetDataSource: function (externalFormName) {
-                var stepDataSource = registry.get(externalFormName);
-                if (stepDataSource && stepDataSource.source) {
-                    stepDataSource.source.destroy();
+                var stepDataSource = registry.get(externalFormName + '_data_source');
+                if (stepDataSource) {
+                    stepDataSource.destroy();
                 }
             },
 
@@ -74,11 +88,14 @@ define([
                 var step = stepNavigator.steps()[stepIndex];
                 if (step) {
                     var current = this;
+                    _.each(current.elems(), function (item) {
+                        item.destroyInserted();
+                    });
                     _.each(step.blocks, function (item) {
                         current.addToLoadingQueue(item.handle);
                     });
                     this.currentStepCode = step.code;
-                    var config = registry.get('cart').checkoutConfig;
+                    var config = this.cart().checkoutConfig;
                     _.each(step.blocks, function (item, index) {
                         var form = registry.get(current.name + '.' + 'insert_form_' + index);
                         form.render_url = config.render_url + '?' + current.getRenderParams(step);
@@ -87,7 +104,7 @@ define([
                         form.externalFormName = externalFormName;
                         form.ns = item.handle;
                         form.params.namespace = item.handle;
-                        form.params.currentStep = step.code;
+                        form.params.step = step.code;
                         if (item.type === 'form') {
                             var linksImports = {
                                 childResponseData: 'index = ' + item.handle + ':responseData'
@@ -95,13 +112,30 @@ define([
                             current.setLinks(linksImports, 'imports');
                             current.resetDataSource(externalFormName);
                         } else if (item.type === 'listing') {
+                            current.resetDataSource(externalFormName);
                             var linksExport = {
-                                currentStepCode: 'index = ' + item.handle + '_data_source:params.currentStep'
+                                currentStepCode: 'index = ' + item.handle + '_data_source:params.step'
                             };
                             current.setLinks(linksExport, 'exports');
                         }
                         current.renderBlock(form, step);
                     });
+                }
+                this.modifyNextStepButton(step);
+            },
+
+            /**
+             * Modifies next step button according to step.
+             *
+             * @param {Object} step
+             */
+            modifyNextStepButton: function (step) {
+                if (this.buttonInitialized()) {
+                    this.nextStep().hideButtonIfNeed();
+                    if (step.nextButtonTitle){
+                        this.nextStep().buttonTitle(step.nextButtonTitle);
+                        this.bottomNextStep().buttonTitle(step.nextButtonTitle)
+                    }
                 }
             },
 
@@ -145,7 +179,6 @@ define([
              */
             processAfterSave: function (data) {
                 this.isLoading(false);
-
                 if (!data.error) {
                     stepNavigator.navigateNext();
                 } else {
@@ -198,6 +231,29 @@ define([
                 } else {
                     this.isLoading(false);
                 }
+            },
+
+            /**
+             * Redirect to catalog.
+             *
+             * @return void
+             */
+            redirectToCatalog: function () {
+                var base_url = this.cart().checkoutConfig.base_url;
+                if (base_url) {
+                    window.location.href = base_url;
+                }
+            },
+
+            /**
+             * Check if "next step" button initialized.
+             *
+             * @return void
+             */
+            checkButtonInitialized: function () {
+                var stepIndex = stepNavigator._getActiveItemIndex();
+                var step = stepNavigator.steps()[stepIndex];
+                this.modifyNextStepButton(step);
             }
         });
     }

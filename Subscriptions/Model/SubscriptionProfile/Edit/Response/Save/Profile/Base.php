@@ -18,7 +18,7 @@ abstract class Base implements ResponseInterface
     /**
      * @var ProfileManager
      */
-    private $profileManager;
+    protected $profileManager;
 
     /**
      * @param ProfileManager $profileManager

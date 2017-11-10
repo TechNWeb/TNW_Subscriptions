@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 /**
  * Form modifier to display payment method Checkmo.
  */
-class Checkmo extends Base
+class Checkmo extends Base implements PaymentModifierInterface
 {
     /**#@+
      * Checkmo additional field names.

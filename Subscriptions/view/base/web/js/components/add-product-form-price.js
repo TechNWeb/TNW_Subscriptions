@@ -33,21 +33,18 @@ define([
         changeValue: function (value) {
             var frequencyPrices = this.getFrequencyPrices(),
                 priceFormat = this.getPriceFormat(),
-                priceNumber = 0,
-                priceValue = 0;
+                currentValue = 0;
 
             if (frequencyPrices && value && frequencyPrices[value]){
-                priceNumber = frequencyPrices[value].price;
+                currentValue = frequencyPrices[value].price;
             } else {
-                var currentValue = '0';
                 if (this.value()) {
                     currentValue = this.value();
                 }
-                priceNumber = formatPrice.formatToNumber(currentValue, priceFormat);
             }
 
-            priceValue = formatPrice.formatPrice(priceNumber, priceFormat);
-            this.value(priceValue);
+            currentValue = formatPrice.formatPrice(currentValue, priceFormat);
+            this.value(currentValue);
         },
 
         /**
@@ -117,18 +114,8 @@ define([
          * Sets initial value of the element and subscribes to it's changes.
          */
         setInitialValue: function () {
-            var priceFormat = this.getPriceFormat(),
-                priceNumber = this.value(),
-                priceValue;
-
-            if (typeof this.value() == 'string') {
-                priceNumber = formatPrice.formatToNumber(this.value(), priceFormat);
-            }
-
-            priceValue = formatPrice.formatPrice(priceNumber, priceFormat);
             this._super();
-            this.value(priceValue);
-            this.setCompletePreviewLabel(priceValue);
+            this.setCompletePreviewLabel(this.value());
 
             return this;
         }

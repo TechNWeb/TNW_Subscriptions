@@ -11,6 +11,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\Pool;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 
 /**
  * Payment step form data provider.
@@ -33,14 +34,14 @@ class Payment extends AbstractDataProvider
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    protected $urlBuilder;
 
     /**
      * Modifiers pool.
      *
      * @var Pool
      */
-    private $modifiersPool;
+    protected $modifiersPool;
 
     /**
      * Payment constructor.
@@ -117,6 +118,9 @@ class Payment extends AbstractDataProvider
         $meta = parent::getMeta();
 
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            if ($modifier instanceof PaymentModifierInterface){
+                $modifier->setPaymentFormName($this::DATA_SCOPE_PAYMENT_FORM);
+            }
             $meta = $modifier->modifyMeta($meta);
         }
 

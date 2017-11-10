@@ -90,6 +90,7 @@ class PurchaseType extends BaseModifier
                                 'componentType' => Fieldset::NAME,
                                 'breakLine' => false,
                                 'component' => 'TNW_Subscriptions/js/components/purchase-type',
+                                'additionalClasses' => $this->containerName,
                                 'imports' => [
                                     'changedPurchaseType' => 'index = ' . Attribute::SUBSCRIPTION_PURCHASE_TYPE . ':value',
                                     'changedTrialStatus' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',

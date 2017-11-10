@@ -18,6 +18,7 @@ use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Ui\Component\Form;
 use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
+use Magento\Framework\Json\Encoder;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -162,6 +163,11 @@ class SummaryAddressForm extends AbstractDataProvider
     private $request;
 
     /**
+     * @var Encoder
+     */
+    private $jsonEncoder;
+
+    /**
      * SummaryForm constructor.
      * @param string $name
      * @param string $primaryFieldName
@@ -173,6 +179,7 @@ class SummaryAddressForm extends AbstractDataProvider
      * @param CustomerMapper $customerMapper
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param RequestInterface $request
+     * @param Encoder $encoder
      * @param $isShipping
      * @param array $meta
      * @param array $data
@@ -190,6 +197,7 @@ class SummaryAddressForm extends AbstractDataProvider
         CustomerMapper $customerMapper,
         SubscriptionProfileRepositoryInterface $profileRepository,
         RequestInterface $request,
+        Encoder $encoder,
         $isShipping,
         array $meta = [],
         array $data = []
@@ -201,6 +209,7 @@ class SummaryAddressForm extends AbstractDataProvider
         $this->customerMapper = $customerMapper;
         $this->profileRepository = $profileRepository;
         $this->request = $request;
+        $this->jsonEncoder = $encoder;
         $this->isShipping = $isShipping;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
 
@@ -293,6 +302,7 @@ class SummaryAddressForm extends AbstractDataProvider
                                     'data' => [
                                         'config' => [
                                             'dataScope' => $this->getAddressDataFieldSetdataScope(),
+                                            'customerAddressesData' => $this->getCustomerAddressesData(),
                                         ],
                                     ],
                                 ],
@@ -322,9 +332,9 @@ class SummaryAddressForm extends AbstractDataProvider
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'issetShippingAddress' => true,
+                            'hasAddress' => $this->hasCustomerAddresses(),
                             'visible' => (bool)$this->getAddressId(),
-                            'addressesData' => $this->getCustomerAddressesData(),
+                            'addressesData' => $this->getCustomerShippingInformationData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
                         ]
                     ]
@@ -423,15 +433,27 @@ class SummaryAddressForm extends AbstractDataProvider
         if ($attribute->getAttributeCode()=='region_id') {
             $attributeMeta = $this->getRegionIdAttributeMeta($attributeMeta);
         } else {
-            $attributeMeta = array_merge_recursive(
-                $attributeMeta,
-                [
-                    'config' => [
-                        'formElement' => $formElement,
-                        'dataType' => 'text',
-                    ]
+            $elementFormData = [
+                'config' => [
+                    'formElement' => $formElement,
+                    'dataType' => 'text',
+
                 ]
-            );
+            ];
+
+            $additionalElementFormData = [];
+            if (in_array($attribute->getAttributeCode(), $this->infoAttributes)) {
+                $currentFieldSetIndex = ($this->isShippingFieldSet())
+                    ? self::SHIPPING_ADDRESS_FIELDSET_NAME : self::BILLING_ADDRESS_FIELDSET_NAME;
+                $additionalElementFormData = [
+                    'config' => [
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/shipping-information-input',
+                        'addressFieldsetIndex' => $currentFieldSetIndex
+                    ]
+                ];
+            }
+
+            $attributeMeta = array_merge_recursive($attributeMeta, $elementFormData, $additionalElementFormData);
         }
 
         $fieldSetName = $this->getFieldSetName($attributeCode);
@@ -663,7 +685,7 @@ class SummaryAddressForm extends AbstractDataProvider
      *
      * @return array
      */
-    private function getCustomerAddressesData()
+    private function getCustomerShippingInformationData()
     {
         $data = [];
         /** @var \Magento\Customer\Api\Data\CustomerInterface $customerModel */
@@ -881,6 +903,23 @@ class SummaryAddressForm extends AbstractDataProvider
     }
 
     /**
+     * Checks if customer has any address.
+     * 
+     * @return bool
+     */
+    private function hasCustomerAddresses()
+    {
+        $result = false;
+        $customer = $this->getCustomer();
+
+        if (null !== $customer) {
+            $result = !empty($customer->getAddresses());
+        }
+
+        return $result;
+    }
+
+    /**
      * Checks if it is shipping address form.
      *
      * @return bool
@@ -1036,5 +1075,49 @@ class SummaryAddressForm extends AbstractDataProvider
                 ],
             ],
         ];
+    }
+
+    /**
+     * Retrieve customer addresses data to display.
+     *
+     * @return string
+     */
+    private function getCustomerAddressesData()
+    {
+        $result = [];
+        /** @var \Magento\Customer\Api\Data\CustomerInterface $customerModel */
+        $customerModel = $this->getCustomer();
+        if ($customerModel) {
+            $addressesList = $customerModel->getAddresses();
+
+            foreach ($addressesList as $address) {
+                $streetData = [];
+                if ($address->getStreet()) {
+                    foreach ($address->getStreet() as $key => $streetValue) {
+                        $streetKey = 'street' . $key;
+                        $streetData[$streetKey] = $streetValue;
+                    }
+                }
+
+                $addressData = [
+                    'firstname' => $address->getFirstname(),
+                    'lastname' => $address->getLastname(),
+                    'company' => $address->getCompany(),
+                    'telephone' => $address->getTelephone(),
+                    'city' => $address->getCity(),
+                    'country_id' => $address->getCountryId(),
+                    'region' => $address->getRegion()->getRegion(),
+                    'region_id' => $address->getRegionId(),
+                    'postcode' => $address->getPostcode(),
+                    'fax' => $address->getFax(),
+                    'vat_id' => $address->getVatId()
+                ];
+
+                $result[$address->getId()] = array_merge($addressData, $streetData);
+
+            }
+        }
+
+        return str_replace('"', "'", $this->jsonEncoder->encode($result));
     }
 }

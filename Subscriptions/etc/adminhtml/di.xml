@@ -163,12 +163,6 @@
         </arguments>
     </type>
 
-    <!--Add modifier for Subscription profile creation on review profile page-->
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
-        </arguments>
-    </type>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">
@@ -214,31 +208,6 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
-
-    <!--Add modifier for Subscription profile edit on Summary tab-->
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
-        <arguments>
-            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool</argument>
-        </arguments>
-    </type>
-    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SummaryPaymentMethodForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
-        <arguments>
-            <argument name="modifiers" xsi:type="array">
-                <item name="checkmo" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
-                <item name="payflowpro" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
-                </item>
-                <item name="braintree" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Braintree</item>
-                    <item name="sortOrder" xsi:type="number">25</item>
-                </item>
-            </argument>
-        </arguments>
-    </virtualType>
 
     <type name="Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer">
         <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
@@ -290,6 +259,11 @@
     <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Create\Process">
         <arguments>
             <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Step\Save\Processor</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Save">
+        <arguments>
+            <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Save\Processor</argument>
         </arguments>
     </type>
     <virtualType  name="TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">

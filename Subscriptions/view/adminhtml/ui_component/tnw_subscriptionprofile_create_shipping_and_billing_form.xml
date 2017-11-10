@@ -1,4 +1,10 @@
 <?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
@@ -62,7 +68,7 @@
                 <item name="sortOrder" xsi:type="number">30</item>
                 <item name="imports" xsi:type="array">
                     <item name="visible" xsi:type="string">!ns = ${ $.ns }, index = same_as_shipping:checked</item>
-                    <item name="fiterEmptyAddressOption" xsi:type="string">ns = ${ $.ns }, index = same_as_shipping:checked</item>
+                    <item name="filterEmptyAddressOption" xsi:type="string">ns = ${ $.ns }, index = same_as_shipping:checked</item>
                 </item>
             </item>
         </argument>

@@ -55,4 +55,12 @@ class Grid extends DataProvider
 
         parent::addFilter($filter);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function addOrder($field, $direction)
+    {
+        parent::addOrder($field, \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
+    }
 }

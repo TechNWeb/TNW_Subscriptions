@@ -9,7 +9,7 @@ define([
     'mage/template',
     'Magento_Ui/js/lib/spinner',
     'jquery/ui'
-], function (Collapsible, registry, $j, template, loader) {
+], function (Collapsible, registry, $j, template) {
     'use strict';
 
     return Collapsible.extend({
@@ -69,9 +69,7 @@ define([
                 this.showLoader();
                 this.resetErrors();
                 //creating post data, this structure is needed to proper saving
-                postData = {
-                   'form_key': FORM_KEY
-                };
+                postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {};
                 temp[this.options.gateway] = {
                     method: '1'
                 };
@@ -95,13 +93,13 @@ define([
             }
         },
 
-
+        /**
+         * Before submit action for payment method.
+         */
         beforeSubmit: function () {
-            var postData = {
-                'form_key': FORM_KEY,
-                'cc_type': this.ccType()
-            };
-
+            var postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {},
+                self = this;
+            postData['cc_type'] =  this.ccType();
             this.showLoader();
             this.resetErrors();
             $j.ajax({
@@ -111,15 +109,11 @@ define([
                 data: postData,
                 dataType: 'json',
                 success: function (response) {
-                    if (response.success && response[this.options.gateway]) {
+                    if (response.success && response[self.options.gateway]) {
                         this.postPaymentToGateway(response);
                     } else {
                         this.processErrors(response.error_messages);
                     }
-                    this.hideLoader();
-                },
-                complete: function () {
-                    this.hideLoader();
                 }
             });
         },
@@ -220,18 +214,14 @@ define([
          * Shows form loader.
          */
         hideLoader: function () {
-            loader.get(
-                this.options.formName + '.' + this.options.formName
-            ).hide();
+            registry.get('index = ' + this.options.formName).hideLoader();
         },
 
         /**
          * Hides form loader.
          */
         showLoader: function () {
-            loader.get(
-                this.options.formName + '.' + this.options.formName
-            ).show();
+            registry.get('index = ' + this.options.formName).showLoader();
         },
 
         /**

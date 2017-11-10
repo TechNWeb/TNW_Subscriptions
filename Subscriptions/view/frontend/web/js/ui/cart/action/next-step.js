@@ -13,7 +13,25 @@ define([
 
     return Abstract.extend({
         defaults: {
-            buttonTitle: $.mage.__('Next step >')
+            buttonTitle: $.mage.__('Next step >'),
+            buttonInitialized: false
+        },
+
+        /**
+         * @inheritdoc
+         */
+        initialize: function () {
+            this._super();
+            this.buttonInitialized(true);
+            return this;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        initObservable: function () {
+            return this._super()
+                .observe(['buttonTitle', 'buttonInitialized']);
         },
 
         /**
@@ -40,27 +58,29 @@ define([
                     stepNavigator.navigateNext();
                 }
             }
-
-            this.hideButtonIfNeed();
-        },
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function () {
-            this._super();
-            this.hideButtonIfNeed();
-
-            return this;
         },
 
         /**
          * Hide button next step if need.
+         *
+         * @return void
          */
         hideButtonIfNeed: function () {
+            var bottomCartAction = $('.tnw-subscriptions-cart-bottom-action');
             if (stepNavigator.getActiveItemCode() === 'registration') {
                 this.hide();
-                $('.tnw-subscriptions-cart-bottom-action').hide();
+                bottomCartAction.hide();
+            } else {
+                this.show();
+                bottomCartAction.show();
+            }
+
+            if (stepNavigator.getActiveItemCode() === 'thankyou') {
+                var localStorage = $.initNamespaceStorage('mage-cache-storage-section-invalidation').localStorage;
+                localStorage.set('tnw-subscriptions-subscription-cart', true);
+
+                this.hide();
+                bottomCartAction.addClass('thankyoupage-bottom-cart-action');
             }
         }
     });

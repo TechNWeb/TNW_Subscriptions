@@ -6,16 +6,28 @@
 
 /* @var $block \TNW\Subscriptions\Block\Subscription\Info\Shipment */
 ?>
-<div class="subscription-data-wrapper shipment-wrapper"
-     data-mage-init='{"tnwSubscribeShipment":{
-        "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveAddressUrl()) ?>",
-        "showEdit": "<?php echo $block->isShowEdit() ?>",
-        "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>",
-        "emptyCountryLabel": "<?php echo __('Country') ?>"
-    }}'>
+<div class="subscription-data-wrapper"
+     data-mage-init='{
+        "tnwSubscribeShipment":{
+            "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveUrl()) ?>",
+            "showEdit": "<?php echo $block->isShowEditAddress() ?>",
+            "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>",
+            "emptyCountryLabel": "<?php echo __('Country') ?>"
+        },
+        "tnwSubscribeShipmentDetails":{
+            "saveUrl": "<?php echo $block->escapeUrl($block->getSaveUrl()) ?>",
+            "showEdit": "<?php echo $block->isShowEditDetails() ?>"
+        }
+     }'>
     <?php echo $block->getTabMessagesHtml(); ?>
-    <div class="shipping-info-content">
-        <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
-        <div id="shipping-info-edit"><?php echo $block->getShippingInfoEditHtml() ?></div>
+    <div class="grid-row">
+        <div class="shipping-info-content grid-col2-lg">
+            <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
+            <div id="shipping-info-edit" class="hidden"><?php echo $block->getShippingInfoEditHtml() ?></div>
+        </div>
+        <div class="shipping-details-content grid-col2-lg">
+            <?php echo $block->getShippingDetailsViewHtml() ?>
+            <div id="shipping-details-edit" class="hidden"><?php echo $block->getShippingDetailsEditHtml() ?></div>
+        </div>
     </div>
 </div>

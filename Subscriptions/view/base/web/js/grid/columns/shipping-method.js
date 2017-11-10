@@ -15,10 +15,7 @@ define([
             bodyTmpl: 'TNW_Subscriptions/grid/cells/shipping-method',
             value: null,
             dependsCodes: [],
-            attentionMessage: '',
-            /*listens: {
-                'value': 'onValueChange'
-            }*/
+            attentionMessage: ''
         },
 
         /**
@@ -31,7 +28,7 @@ define([
                 .observe([
                     'value'
                 ]);
-            _.bindAll(this, 'onValueChange');
+            _.bindAll(this, 'onValueChange', 'showAttention');
 
             return this;
         },
@@ -80,22 +77,36 @@ define([
          * @param id
          */
         onValueChange: function (id) {
-            var messageElem = $j("#subscription-shipping-attention-" + id).get(0);
-            if (messageElem) {
-                $j(messageElem).hide();
-            } else {
-                $j(".subscription-shipping-attention").hide();
-            }
             var element = $j("select[name='shipping_methods[" + id + "]']").get(0);
             if (element) {
                 var currentSelectedValue = element.value;
                 if (currentSelectedValue) {
                     var currentShippingMethod = currentSelectedValue.split('_');
                     if (this.dependsCodes.indexOf(currentShippingMethod[0]) === -1) {
-                        $j("#subscription-shipping-attention-" + id).show();
+                        $j("#subscription-shipping-attention-" + id).removeClass('hidden');
+                    } else {
+                        $j("#subscription-shipping-attention-" + id).addClass('hidden');
                     }
                 }
             }
+        },
+
+        /**
+         * Checks if need to show message.
+         * @param row
+         * @returns {boolean}
+         */
+        showAttention: function (row) {
+            if (row.shipping_method && row.shipping_method.methods.length) {
+                var currentSelectedValue = row.shipping_method.methods[0].value.split('_');
+                if (this.dependsCodes.indexOf(currentSelectedValue[0]) === -1) {
+                    return false;
+                }
+            } else {
+                return !this.needShowAttention(row);
+            }
+
+            return true;
         }
     });
 });

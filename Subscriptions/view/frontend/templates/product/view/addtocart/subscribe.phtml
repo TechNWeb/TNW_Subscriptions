@@ -103,11 +103,19 @@
                        value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
                        class="input-text qty"
-                       data-validate='{"required-number":true}'
+                       data-validate='<?php echo $block->escapeHtml(json_encode($block->getQtyValidators())) ?>'
                     <?php if (!$block->getAllowEditSubscribeQty()): ?>
                        disabled="disabled"
                     <?php endif ?>
                 />
+                <?php if (!$block->getAllowEditSubscribeQty()): ?>
+                    <input type="hidden"
+                           name="subscribe_qty"
+                           id="subscribe_qty_hidden"
+                           value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
+                    />
+                <?php endif ?>
+
             </div>
         </div>
     </div>
