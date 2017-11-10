@@ -425,9 +425,7 @@ class Braintree extends Base
      */
     private function getCardFieldsMap()
     {
-        $keys = ['cccvv', 'ccexpdate', 'ccnum'];
-        $ccfields = array_combine($keys, explode(',', $this->getMethodConfigData('ccfields')));
-        return json_encode($ccfields);
+        return json_encode(['cccvv' => 'csc', 'ccexpdate'=>'expdate', 'ccnum' => 'acct']);
     }
 
     /**
