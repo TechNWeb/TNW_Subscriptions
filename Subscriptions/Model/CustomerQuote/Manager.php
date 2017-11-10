@@ -127,12 +127,6 @@ class Manager
         if (!$customerId) {
             return false;
         }
-        if (!$quoteIds) {
-            $quoteIds = [];
-        }
-        if (!is_array($quoteIds)) {
-            $quoteIds = [$quoteIds];
-        }
         $normalizedQuoteIds = [];
         foreach ($quoteIds as $quoteId) {
             $normalizedQuoteIds[] = (int)$quoteId;
