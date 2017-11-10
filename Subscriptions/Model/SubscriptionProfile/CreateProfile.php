@@ -226,6 +226,8 @@ class CreateProfile extends BaseCreate
             } else {
                 $this->getContext()->throwException($item);
             }
+        } else {
+            $result = $quote->getItemByProduct($product);
         }
 
         return $result;
