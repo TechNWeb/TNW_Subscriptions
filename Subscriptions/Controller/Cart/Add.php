@@ -71,6 +71,22 @@ class Add extends Action
     private $session;
 
     /**
+     * @var array
+     */
+    private $allowedRequestFields = [
+        'product',
+        'product_id',
+        'qty',
+        'subscribe_qty',
+        'billing_frequency',
+        'term',
+        'period',
+        'start_on',
+        'selected_configurable_option',
+        'super_attribute'
+    ];
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Validator $formKeyValidator
@@ -108,7 +124,7 @@ class Add extends Action
         $error = true;
         if ($this->config->isSubscriptionsActive()) {
             if ($this->formKeyValidator->validate($this->getRequest()) && $this->initProduct()) {
-                $params = $this->getRequest()->getParams();
+                $params = $this->getFilteredParams();
                 try {
                     if (isset($params['subscribe_qty'])) {
                         $filter = new \Zend_Filter_LocalizedToNormalized(
@@ -183,6 +199,23 @@ class Add extends Action
         }
         $this->getResponse()->representJson(
             $this->_objectManager->get(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($result)
+        );
+    }
+
+    /**
+     * Returns filtered request params.
+     *
+     * @return array
+     */
+    private function getFilteredParams()
+    {
+        $allowed  = $this->allowedRequestFields;
+        return array_filter(
+            $this->getRequest()->getParams(),
+            function ($key) use ($allowed) {
+                return in_array($key, $allowed);
+            },
+            ARRAY_FILTER_USE_KEY
         );
     }
 }

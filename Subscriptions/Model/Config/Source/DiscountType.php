@@ -13,19 +13,16 @@ use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
  */
 class DiscountType extends AbstractSource
 {
-    /**#@+
+    /**
      * Constants for Discount Type.
      */
     const FLAT_FEE_DISCOUNT_TYPE = 1;
     const PERCENT_DISCOUNT_TYPE = 2;
-    /**#@-*/
 
     /**
-     * Get options for Discount Type.
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getAllOptions()
+    public function getAllOptions($withEmpty = true, $defaultValues = false)
     {
         /** @var array $optionList */
         $optionList = [
@@ -40,5 +37,25 @@ class DiscountType extends AbstractSource
         ];
 
         return $optionList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFlatColumns()
+    {
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $type = \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER;
+        $columns[$attributeCode] = [
+            'type' => $type,
+            'length' => null,
+            'unsigned' => false,
+            'nullable' => true,
+            'default' => null,
+            'extra' => null,
+            'comment' => $attributeCode . ' column',
+        ];
+
+        return $columns;
     }
 }

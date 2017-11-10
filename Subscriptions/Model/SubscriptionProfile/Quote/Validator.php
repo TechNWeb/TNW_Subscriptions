@@ -85,18 +85,15 @@ class Validator
         foreach ($quotes as $quote) {
             if ($this->isBillingFrequencyExists($quote)) {
                 /** @var Item $item */
-                foreach ($quote->getAllItems() as $item) {
+                foreach ($quote->getAllVisibleItems() as $item) {
                     $currentRequest = $this->getCurrentBuyRequest($item);
-                    $productsData = $this->getProductsData($item, $currentRequest);
-                    $newRequest = $this->getNewBuyRequest($productsData);
+                    list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
                     if ($currentRequest != $newRequest) {
                         if (!$this->createProfile->removeSubscriptions($item)) {
                             $result = $this->filterResult($result, $quote);
                         };
                         $this->createProfile->setSubQuotes($result);
-                        $newItem = $this->createProfile->addToSubscription(
-                            $this->getProductsData($item, $newRequest)
-                        );
+                        $newItem = $this->createProfile->addToSubscription($productsData);
                         if ($newItem) {
                             $newQuote = $newItem->getQuote();
                             $result = $this->addQuoteToResult($result, $newQuote);
@@ -115,19 +112,37 @@ class Validator
     /**
      * Returns new subscription item buy request, depends for old one.
      *
-     * @param array $productsData
+     * @param Item $item
+     * @param array $currentRequest
      * @return array
      */
-    private function getNewBuyRequest(array $productsData)
+    private function getNewBuyRequest(Item $item, array $currentRequest)
     {
         $productModifier = $this->createProfile->getProductModifier();
+        $productsData = [
+            'billing_frequency' => $currentRequest[CreateProfile::UNIQUE]['billing_frequency'],
+            'period' => $currentRequest[CreateProfile::UNIQUE]['period'],
+            'term' => $currentRequest[CreateProfile::UNIQUE]['term'],
+            'product_id' => $item->getProduct()->getId(),
+            'start_on' => $currentRequest[CreateProfile::UNIQUE]['start_on'],
+            'qty' => $item->getQty(),
+        ];
+        switch ($item->getProductType()) {
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $additionalParams['super_attribute'] = $item->getBuyRequest()->getDataByPath('super_attribute');
+                break;
+            default:
+                $additionalParams = [];
+                break;
+        }
+        $productsData = array_merge($productsData, $additionalParams);
         $productModifier->setData($productsData);
-
-        $result = $productModifier->getPreparedBuyRequest()->getData(
+        $productModifier->setProduct($item->getProduct());
+        $result = $productModifier->getPreparedBuyRequest(true)->getData(
             CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
         );
 
-        return $result;
+        return [$result, $productsData];
     }
 
     /**
@@ -138,28 +153,17 @@ class Validator
      */
     private function getCurrentBuyRequest(Item $item)
     {
-        return $item->getBuyRequest()->getData(
+        $request = $item->getBuyRequest()->getData(
             CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
         );
-    }
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        $fee = $initialFees ? $initialFees->getSubsInitialFee() : 0;
+        $request[CreateProfile::NON_UNIQUE]['current_price'] = (float)$item->getPrice();
+        $request[CreateProfile::NON_UNIQUE]['initial_fee'] = $fee;
 
-    /**
-     * Returns products data for buy request.
-     *
-     * @param Item $item
-     * @param array $currentRequest
-     * @return array
-     */
-    private function getProductsData(Item $item, array $currentRequest)
-    {
-        return [
-            'billing_frequency' => $currentRequest[CreateProfile::UNIQUE]['billing_frequency'],
-            'period' => $currentRequest[CreateProfile::UNIQUE]['period'],
-            'term' => $currentRequest[CreateProfile::UNIQUE]['term'],
-            'product_id' => $item->getProduct()->getId(),
-            'start_on' => $currentRequest[CreateProfile::UNIQUE]['start_on'],
-            'qty' => $item->getQty(),
-        ];
+        return $request;
     }
 
     /**
@@ -171,14 +175,14 @@ class Validator
     public function isBillingFrequencyExists(Quote $quote)
     {
         $result = false;
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
         if ($items) {
             /** @var Item $firstItem */
             $firstItem = reset($items);
-            $frequnecyIdPath = CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
+            $frequencyIdPath = CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
                 . DIRECTORY_SEPARATOR . CreateProfile::UNIQUE
                 . DIRECTORY_SEPARATOR . 'billing_frequency';
-            $frequencyId = $firstItem->getBuyRequest()->getDataByPath($frequnecyIdPath);
+            $frequencyId = $firstItem->getBuyRequest()->getDataByPath($frequencyIdPath);
             try {
                 $this->frequencyRepository->getById($frequencyId);
                 $result = true;

@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Framework\Locale\Format;
 
 /**
  * Calculate unit price for billing frequency.
@@ -50,23 +51,30 @@ class PriceCalculator
      */
     private $session;
 
+    /**
+     * @var Format
+     */
+    private $localeFormat;
 
     /**
-     * PriceCalculator constructor.
      * @param ProductRepository $productRepository
      * @param CollectionFactory $productBillingFrequencyCollectionFactory
      * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param Format $localeFormat
      */
     public function __construct(
         ProductRepository $productRepository,
         CollectionFactory $productBillingFrequencyCollectionFactory,
         Context $context,
-        QuoteSessionInterface $session
+        QuoteSessionInterface $session,
+        Format $localeFormat
     ) {
         $this->productRepository = $productRepository;
         $this->collectionFactory = $productBillingFrequencyCollectionFactory;
         $this->context = $context;
         $this->session = $session;
+        $this->localeFormat = $localeFormat;
     }
 
     /**
@@ -93,7 +101,7 @@ class PriceCalculator
      *    If "Discount amount type" = "Percent" then:
      *        "Discount amount" = "Price"(product) * "Discount amount"(product).
      *
-     * @param int $productId
+     * @param int|Product $product
      * @param int $billingFrequencyId
      * @param float|string $productPrice
      * @param bool $useTrial
@@ -101,15 +109,18 @@ class PriceCalculator
      * @return string
      */
     public function getUnitPrice(
-        $productId,
+        $product,
         $billingFrequencyId,
         $productPrice = null,
         $useTrial = false
     ) {
         $price = 0;
-        if ($productId && $billingFrequencyId) {
-            /** @var Product $product */
-            $product = $this->productRepository->getById($productId);
+        if ($product && $billingFrequencyId) {
+            $productPrice = $this->localeFormat->getNumber($productPrice);
+            if (!$product instanceof Product){
+                /** @var Product $product */
+                $product = $this->productRepository->getById($product);
+            }
             $trialOffered = $this->getTrialOfferedStatus($product);
             $lockProductPrice = $this->getProductLockPriceSatus($product);
             if ($trialOffered && $useTrial) {
@@ -121,7 +132,7 @@ class PriceCalculator
                     $origPrice = $this->convertToCurrency($product->getOrigData('price'));
                     $price= isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
                 } else {
-                    $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $productId);
+                    $billingFrequencyPrice = $this->getBillingFrequencyPrice($billingFrequencyId, $product->getId());
                     $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
                 }
             }

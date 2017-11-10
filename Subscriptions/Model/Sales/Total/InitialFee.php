@@ -33,7 +33,7 @@ class InitialFee extends AbstractTotal
         Total $total
     ) {
         $address = $shippingAssignment->getShipping()->getAddress();
-        $quoteItems = $quote->getAllItems();
+        $quoteItems = $quote->getAllVisibleItems();
         $totalInitialFee = 0;
         $baseTotalInitialFee = 0;
         if ($quote->getItemsCount() > 0 && $quote->getId() && $address->getAddressType() === 'shipping') {

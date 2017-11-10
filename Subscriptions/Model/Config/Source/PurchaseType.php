@@ -13,13 +13,12 @@ use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
  */
 class PurchaseType extends AbstractSource
 {
-    /**#@+
+    /**
      * Constants for Purchase Type.
      */
     const ONE_TIME_PURCHASE_TYPE = 1;
     const RECURRING_PURCHASE_TYPE = 2;
     const ONE_TIME_AND_RECURRING_PURCHASE_TYPE = 3;
-    /**#@-*/
 
     /**
      * Get options for Purchase Type.
@@ -45,5 +44,25 @@ class PurchaseType extends AbstractSource
         ];
 
         return $optionList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFlatColumns()
+    {
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $type = \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER;
+        $columns[$attributeCode] = [
+            'type' => $type,
+            'length' => null,
+            'unsigned' => false,
+            'nullable' => true,
+            'default' => null,
+            'extra' => null,
+            'comment' => $attributeCode . ' column',
+        ];
+
+        return $columns;
     }
 }

@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\DataObject;
-use Magento\Framework\Locale\Format;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
@@ -18,6 +17,9 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\TypeInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\SimpleFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\ConfigurableFactory;
 
 /**
  * Class Product
@@ -51,11 +53,6 @@ class Product extends Create
     private $data;
 
     /**
-     * @var Format
-     */
-    private $localeFormat;
-
-    /**
      * Quote item extension attribute manager.
      *
      * @var ExtensionManager
@@ -63,35 +60,50 @@ class Product extends Create
     private $extensionManager;
 
     /**
+     * Factory for creating buy request modifier for simple product types.
+     *
+     * @var SimpleFactory
+     */
+    private $simpleFactory;
+
+    /**
+     * Factory for creating buy request modifier for configurable product type.
+     *
+     * @var ConfigurableFactory
+     */
+    private $configurableFactory;
+
+    /**
+     * Current used product.
+     *
+     * @var MagentoProduct
+     */
+    private $product;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
-     * @param Format $localeFormat
+     * @param ExtensionManager $extensionManager
+     * @param SimpleFactory $simpleFactory
+     * @param ConfigurableFactory $configurableFactory
      */
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
-        Format $localeFormat,
-        ExtensionManager $extensionManager
+        ExtensionManager $extensionManager,
+        SimpleFactory $simpleFactory,
+        ConfigurableFactory $configurableFactory
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
-        $this->localeFormat = $localeFormat;
         $this->extensionManager = $extensionManager;
+        $this->simpleFactory = $simpleFactory;
+        $this->configurableFactory = $configurableFactory;
         parent::__construct($context, $session);
-    }
-
-    /**
-     * Returns buy request.
-     *
-     * @return DataObject
-     */
-    public function getBuyRequest()
-    {
-        return $this->buyRequest;
     }
 
     /**
@@ -113,6 +125,7 @@ class Product extends Create
     {
         $this->data = $data;
         $this->buyRequest = null;
+        $this->product = null;
     }
 
     /**
@@ -124,43 +137,53 @@ class Product extends Create
     }
 
     /**
-     * Prepares product to adding product in to quote.
+     * Returns product from data array.
      *
      * @return MagentoProduct
      */
-    public function getPreparedProduct()
+    public function getProduct()
     {
-        $productData = $this->getData();
-        /** @var MagentoProduct $product */
-        $product = $this->getProduct($productData['product_id']);
-        $price = $this->getCalculatedPrice($productData, true);
-        $product->setPrice($price);
+        if (!$this->product) {
+            $productData = $this->getData();
+            $this->product = $this->loadProduct($productData['product_id']);
+        }
 
-        return $product;
+        return $this->product;
+    }
+
+    /**
+     * Sets product.
+     *
+     * @param MagentoProduct $product
+     * @return $this
+     */
+    public function setProduct(MagentoProduct $product)
+    {
+        $this->product = $product;
+        return $this;
     }
 
     /**
      * Returns prepared product buy request.
      *
+     * @param bool $fullRequest
      * @return DataObject
      */
-    public function getPreparedBuyRequest()
+    public function getPreparedBuyRequest($fullRequest = false)
     {
         if (!$this->buyRequest) {
             $productData = $this->getData();
-            /** @var MagentoProduct $product */
-            $product = $this->getProduct($productData['product_id']);
+            $product = $this->getProduct();
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
-            $startOn = isset($productData['start_on']) ?
-                $productData['start_on'] : $product->getData(Attribute::SUBSCRIPTION_START_DATE);
-
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
+            $startOn = isset($productData['start_on']) ?
+                $productData['start_on'] : $product->getData(Attribute::SUBSCRIPTION_START_DATE);
             $data = [
                 'qty' => $productData['qty'],
-                'custom_price' => sprintf("%F", $product->getPrice()),
+                'custom_price' => sprintf("%F", $this->getCustomPrice($product, $productData)),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
@@ -171,72 +194,43 @@ class Product extends Create
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
                     ],
-                    static::NON_UNIQUE => [
-                        'price' => $this->getCalculatedPrice($productData)
-                    ],
                 ],
             ];
-            $this->buyRequest = new DataObject($data);
+            if ($fullRequest){
+                $data = $this->addPricesToRequest($data, $productData);
+            }
+            //unset already unused fields
+            unset($productData['billing_frequency'], $productData['term'], $productData['period'], $productData['start_on']);
+            $this->buyRequest = new DataObject(array_merge($data, $productData));
         }
 
         return $this->buyRequest;
     }
 
     /**
-     * Calculates start date for subscription.
+     * Returns buy request modifier by product type.
      *
-     * @param $startOn
-     * @return string
+     * @param string $type
+     * @return TypeInterface
+     * @throws \Exception
      */
-    private function getStartOnDate($startOn)
+    public function getBuyRequestModifier($type)
     {
-        switch ($startOn) {
-            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-t');
+        switch ($type) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $result = $this->simpleFactory->create();
                 break;
-            case StartDateType::MOMENT_OF_PURCHASE:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-d');
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $result = $this->configurableFactory->create();
                 break;
             default:
-                $nowDate = (new \DateTime())->format('Y-m-d');
-                $result = new \DateTime($startOn);
-                $result = $result->format('Y-m-d');
-                if (strtotime($result) < strtotime($nowDate)) {
-                    $result = $nowDate;
-                }
+                throw new \Exception(__('Unsupported product type -' . $type));
                 break;
         }
 
         return $result;
-    }
-
-    /**
-     * Returns calculated product price.
-     *
-     * @param array $productData
-     * @param bool $full
-     * @return string
-     */
-    private function getCalculatedPrice(array $productData, $full = false)
-    {
-        $usePresetQty = $this->getProduct($productData['product_id'])
-            ->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-
-        //Calculate product Price
-        $price = $this->priceCalculator->getUnitPrice(
-            $productData['product_id'],
-            $productData['billing_frequency'],
-            $this->localeFormat->getNumber(isset($productData['price']) ? $productData['price'] : null),
-            $full
-        );
-
-        if ($usePresetQty) {
-            $price = round($price / $productData['qty'], 4);
-        }
-
-        return $price;
     }
 
     /**
@@ -270,13 +264,98 @@ class Product extends Create
     }
 
     /**
+     * Calculates start date for subscription.
+     *
+     * @param $startOn
+     * @return string
+     */
+    private function getStartOnDate($startOn)
+    {
+        switch ($startOn) {
+            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
+                $result = new \DateTime();
+                $result = $result->format('Y-m-t');
+                break;
+            case StartDateType::MOMENT_OF_PURCHASE:
+                $result = new \DateTime();
+                $result = $result->format('Y-m-d');
+                break;
+            default:
+                $nowDate = (new \DateTime())->format('Y-m-d');
+                $result = new \DateTime($startOn);
+                $result = $result->format('Y-m-d');
+                if (strtotime($result) < strtotime($nowDate)) {
+                    $result = $nowDate;
+                }
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns product.
      *
      * @param $productId
      * @return MagentoProduct
      */
-    private function getProduct($productId)
+    private function loadProduct($productId)
     {
-        return $this->productRepository->getById($productId);
+        return $this->productRepository->getById($productId);;
+    }
+
+    /**
+     * Adds prices to buy request array.
+     *
+     * @param array $data
+     * @param array $productData
+     * @return array
+     */
+    private function addPricesToRequest(array $data, array $productData)
+    {
+        $initialFee = $this->priceCalculator->getInitialFee(
+            $productData['billing_frequency'],
+            $this->getProduct()->getId()
+        );
+        $data = array_merge_recursive(
+            $data,
+            [
+                static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
+                    static::NON_UNIQUE => [
+                        'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
+                        'initial_fee' =>  (float)$initialFee,
+                        'price' => $this->getPrice($this->getProduct(), $productData)
+                    ]
+                ],
+            ]
+        );
+
+        return $data;
+    }
+
+    /**
+     * Returns product subscription custom price.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getCustomPrice($product, $productData)
+    {
+        return $this->getBuyRequestModifier($product->getTypeId())
+            ->getSubscriptionCustomPrice($product, $productData);
+    }
+
+    /**
+     * Returns product subscription price.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getPrice($product, $productData)
+    {
+        return $this->getBuyRequestModifier($product->getTypeId())
+            ->getSubscriptionPrice($product, $productData);
     }
 }
