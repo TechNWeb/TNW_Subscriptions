@@ -171,7 +171,10 @@ class Manager
         if (count($quotes)) {
             $this->mergeSubQuotes($quotes);
         }
-        $this->updateItems($this->session->getSubQuoteIds(), $customerId);
+        $this->updateItems(
+            $this->session->getSubQuoteIds() ?: [],
+            $customerId
+        );
         return $this;
     }
 
