@@ -148,7 +148,6 @@ class ProductsForm extends SummaryProductsForm
                         ]
                     ]
                 ],
-                'remove_button' => $this->getRemoveButton(),
             ]
         ];
     }

@@ -11,7 +11,6 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Model\Product;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -19,34 +18,20 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as Frequenc
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
-use TNW\Subscriptions\Model\Context as ContextModel;
 use TNW\Subscriptions\Model\Product\Attribute;
+use Magento\Catalog\Block\Product\View;
 
 /**
  * Subscribe product block instance
  */
-class Subscribe extends \Magento\Framework\View\Element\Template
+class Subscribe extends View
 {
-    /**
-     * Api Product repository
-     * 
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
     /**
      * Subscription module config
      * 
      * @var Config
      */
     private $config;
-
-    /**
-     * Core registry
-     *
-     * @var \Magento\Framework\Registry
-     */
-    private $coreRegistry;
 
     /**
      * Modal form for adding single product to subscription
@@ -63,18 +48,17 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     private $frequencyRepository;
 
     /**
-     * @var ContextModel
-     */
-    private $contextModel;
-
-    /**
-     * @var StockRegistryInterface
-     */
-    private $stockRegistry;
-
-    /**
+     * Subscribe constructor.
      * @param Context $context
+     * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Stdlib\StringUtils $string
+     * @param \Magento\Catalog\Helper\Product $productHelper
+     * @param \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig
+     * @param \Magento\Framework\Locale\FormatInterface $localeFormat
+     * @param \Magento\Customer\Model\Session $customerSession
      * @param ProductRepositoryInterface $productRepository
+     * @param PriceCurrencyInterface $priceCurrency
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
@@ -82,22 +66,27 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function __construct(
         Context $context,
+        \Magento\Framework\Url\EncoderInterface $urlEncoder,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Stdlib\StringUtils $string,
+        \Magento\Catalog\Helper\Product $productHelper,
+        \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig,
+        \Magento\Framework\Locale\FormatInterface $localeFormat,
+        \Magento\Customer\Model\Session $customerSession,
         ProductRepositoryInterface $productRepository,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
-        ContextModel $contextModel,
         array $data = []
     ) {
-        $this->coreRegistry = $context->getRegistry();
-        $this->productRepository = $productRepository;
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
-        $this->contextModel = $contextModel;
-        $this->stockRegistry = $context->getStockRegistry();
-        parent::__construct($context, $data);
+        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
+            $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
+
 
     /**
      * Retrieve current product model
@@ -106,12 +95,12 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function getProduct()
     {
-        if (!$this->coreRegistry->registry('product')) {
+        if (!$this->_coreRegistry->registry('product')) {
             $productId = $this->getRequest()->getParam('id');
             $product = $this->productRepository->getById($productId);
-            $this->coreRegistry->register('product', $product);
+            $this->_coreRegistry->register('product', $product);
         }
-        return $this->coreRegistry->registry('product');
+        return $this->_coreRegistry->registry('product');
     }
 
     /**
@@ -144,7 +133,8 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function IsOnlySubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE);
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE)
+            && $this->getProduct()->getIsSalable();
     }
 
     /**
@@ -154,7 +144,8 @@ class Subscribe extends \Magento\Framework\View\Element\Template
      */
     public function IsOneTimeAndSubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE);
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
+            && $this->getProduct()->getIsSalable();
     }
 
     /**
@@ -319,7 +310,7 @@ class Subscribe extends \Magento\Framework\View\Element\Template
     {
         $currentStore = $this->_storeManager->getStore();
 
-        return $this->contextModel->getPriceCurrency()->format(
+        return $this->priceCurrency->format(
             $price,
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION,

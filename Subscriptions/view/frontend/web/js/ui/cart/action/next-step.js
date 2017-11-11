@@ -76,6 +76,9 @@ define([
             }
 
             if (stepNavigator.getActiveItemCode() === 'thankyou') {
+                var localStorage = $.initNamespaceStorage('mage-cache-storage-section-invalidation').localStorage;
+                localStorage.set('tnw-subscriptions-subscription-cart', true);
+
                 this.hide();
                 bottomCartAction.addClass('thankyoupage-bottom-cart-action');
             }

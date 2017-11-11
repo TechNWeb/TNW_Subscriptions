@@ -6,20 +6,22 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute as SubscriptionAttributes;
+use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
-use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
-use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 
 /**
  * Class for creating subscription profile.
@@ -97,7 +99,13 @@ class CreateProfile extends BaseCreate
     private $quoteGenerator;
 
     /**
-     * CreateProfile constructor.
+     * Subscription quotes.
+     *
+     * @var array
+     */
+    private $subQuotes;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Address $addressCreator
@@ -153,14 +161,37 @@ class CreateProfile extends BaseCreate
     }
 
     /**
+     * Gets subscription quotes.
+     *
+     * @return array
+     */
+    public function getSubQuotes()
+    {
+        if (!$this->subQuotes){
+            $this->subQuotes = $this->getSession()->getSubQuotes();
+        }
+
+        return $this->subQuotes;
+    }
+
+    /**
+     * Sets subscription quotes.
+     *
+     * @param array $subQuotes
+     * @return void
+     */
+    public function setSubQuotes(array $subQuotes)
+    {
+        $this->subQuotes = $subQuotes;
+    }
+
+    /**
      * Recollects and saves all subscription quotes if "needCollect" flag is set.
      */
     public function recollectSubscriptions()
     {
         if ($this->isNeedCollect()) {
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            foreach ($session->getSubQuotes() as $subQuote) {
+            foreach ($this->getSubQuotes() as $subQuote) {
                 $subQuote->collectTotals();
                 $this->quoteCreator->getCartRepository()->save($subQuote);
             }
@@ -170,31 +201,54 @@ class CreateProfile extends BaseCreate
     /**
      * Adds product into new or already existing subscription quote.
      *
-     * @param [] $productData
-     * @return array
+     * @param array $productData
+     * @return false|Item
      */
-    public function addToSubscription($productData)
+    public function addToSubscription(array $productData)
     {
         $this->productModifier->reset();
-        $result = [];
+        $result = false;
+        $this->setSubQuotes($this->getSession()->getSubQuotes());
         $this->productModifier->setData($productData);
         $product = $this->productModifier->getPreparedProduct();
         $quote = $this->getSubQuote();
-        $item = $quote->addProduct(
-            $product,
-            $this->productModifier->getPreparedBuyRequest()
-        );
-        if ($item instanceof Item) {
-            $this->productModifier->setInitialFeeToItem($item);
-            $quote->setTotalsCollectedFlag(false);
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-            $this->quoteCreator->getCartRepository()->save($quote);
-            $result['error'] = false;
+        if ($this->canUpdateItemQty($quote, $product)) {
+            $item = $quote->addProduct(
+                $product,
+                $this->productModifier->getPreparedBuyRequest()
+            );
+            if ($item instanceof Item) {
+                $this->productModifier->setInitialFeeToItem($item);
+                $quote->setTotalsCollectedFlag(false);
+                $quote->getShippingAddress()->setCollectShippingRates(true);
+                $this->quoteCreator->getCartRepository()->save($quote);
+                $result = $item;
+            } else {
+                $this->getContext()->throwException($item);
+            }
         } else {
-            $this->getContext()->throwException($item);
+            $result = $quote->getItemByProduct($product);
         }
 
         return $result;
+    }
+
+    /**
+     * Check if quote item qty can be updated.
+     * Depends on:
+     * 1. product attribute 'tnw_subscr_unlock_preset_qty' value;
+     * 2. quote item existence.
+     *
+     * @param ModelQuote $quote
+     * @param MagentoProduct $product
+     * @return bool
+     */
+    private function canUpdateItemQty(ModelQuote $quote, MagentoProduct $product)
+    {
+        $productPresetQty = $product->getData(SubscriptionAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $quoteItem = $quote->getItemByProduct($product);
+
+        return !($productPresetQty && $quoteItem);
     }
 
     /**
@@ -202,9 +256,7 @@ class CreateProfile extends BaseCreate
      */
     public function recollectUnmodifiedQuotes()
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        foreach ($session->getSubQuotes() as $subQuote) {
+        foreach ($this->getSubQuotes() as $subQuote) {
             if (!$subQuote->getIsModified()) {
                 $subQuote->setTotalsCollectedFlag(false);
                 $this->quoteCreator->getCartRepository()->save($subQuote);
@@ -215,30 +267,24 @@ class CreateProfile extends BaseCreate
     /**
      * Removes product from subscription.
      *
-     * @param array $request
-     * @param string|int $quoteId
-     * @param string|int $quoteItemId
-     * @return array
+     * @param Item $quoteItem
+     * @return ModelQuote|bool
      */
-    public function removeSubscriptions(array $request, $quoteId, $quoteItemId)
+    public function removeSubscriptions(Item $quoteItem)
     {
         /** @var ModelQuote $quote */
-        $quote = $this->quoteCreator->getCartRepository()->get($quoteId);
-        $item = $quote->getItemById($quoteItemId);
-        $request['product_id'] = $item->getProduct()->getId();
-        $item->isDeleted(true);
-
+        $quote = $quoteItem->getQuote();
+        $quoteItem->isDeleted(true);
         if (!$quote->getAllItems()) {
             $this->quoteCreator->getCartRepository()->delete($quote);
-            /** @var QuoteSessionInterface $session */
-            $session = $this->getSession();
-            $session->removeSubQuote($quote);
+            $result = false;
         } else {
             $quote->getShippingAddress()->setCollectShippingRates(true);
             $this->quoteCreator->getCartRepository()->save($quote);
+            $result = $quote;
         }
 
-        return $request;
+        return $result;
     }
 
     /**
@@ -249,9 +295,7 @@ class CreateProfile extends BaseCreate
     private function getSubQuote()
     {
         $result = null;
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
+        $subQuotes = $this->getSubQuotes();
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             if ($this->canAddProduct($subQuote)) {
@@ -260,7 +304,6 @@ class CreateProfile extends BaseCreate
             }
         }
         $result = $result ?: $this->createSubCart();
-        $session->addSubQuote($result);
 
         return $result;
     }
@@ -371,24 +414,18 @@ class CreateProfile extends BaseCreate
     /**
      * Sets into subscription quotes shipping methods.
      *
-     * @param $methods
+     * @param array $methods
      * @return array
      */
-    public function setShippingMethods($methods)
+    public function setShippingMethods(array $methods)
     {
         $result = [];
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
-
-        foreach ($subQuotes as $subQuote) {
+        foreach ($this->getSubQuotes() as $subQuote) {
             if ($subQuote->isVirtual()) {
                 continue;
             }
-
             /** @var string|null $method */
             $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;
-
             if ($method) {
                 try {
                     $subQuote->getShippingAddress()->setShippingMethod($method);
@@ -419,11 +456,8 @@ class CreateProfile extends BaseCreate
     public function setPaymentData($data)
     {
         $result = [];
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
         try {
-            foreach ($subQuotes as $subQuote) {
+            foreach ($this->getSubQuotes() as $subQuote) {
                 $subQuote->getPayment()->importData($data);
             }
             $this->setNeedCollect(true);
@@ -438,17 +472,14 @@ class CreateProfile extends BaseCreate
     /**
      * Sets payment method in to subscription quotes.
      *
-     * @param $method
+     * @param string $method
      * @return array
      */
     public function setPaymentMethod($method)
     {
         $result = [];
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
         try {
-            foreach ($subQuotes as $subQuote) {
+            foreach ($this->getSubQuotes() as $subQuote) {
                 $subQuote->getPayment()->setMethod($method);
             }
             $this->setNeedCollect(true);
@@ -467,10 +498,7 @@ class CreateProfile extends BaseCreate
      */
     public function getPayment()
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $quotes = $session->getSubQuotes();
-
+        $quotes = $this->getSubQuotes();
         if (!empty($quotes)) {
             $quote = reset($quotes);
 
@@ -486,15 +514,14 @@ class CreateProfile extends BaseCreate
      * Creates subscription profiles.
      *
      * @return SubscriptionProfileInterface[]
+     * @throws \Exception
      */
     public function createSubscriptions()
     {
         $profiles = [];
         $customer = $this->customerCreator->prepareCustomer();
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
-        $basicPayment = $session->getFirstQuote()->getPayment();
+        $subQuotes = $this->getSubQuotes();
+        $basicPayment = reset($subQuotes)->getPayment();
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
@@ -541,46 +568,41 @@ class CreateProfile extends BaseCreate
      * Creates subscription profile.
      *
      * @param ModelQuote $subQuote
-     * @param $payment
+     * @param Payment $payment
      * @param null|\DateTime $date
      * @return SubscriptionProfileInterface
      */
     private function createProfile(
         ModelQuote $subQuote,
-        $payment,
+        Payment $payment,
         $date = null
     ) {
         $profile = $this->profileManager->reset()
             ->populateProfileData($subQuote, $date)
             ->populatePaymentData($payment)
             ->saveProfile();
-        //Add comment about profile creating
+        //Add comment about profile creation.
         $this->logToMessageCreateSubscription($profile);
 
         return $profile;
     }
 
     /**
-     * Set selected currency to all subscription quotes
-     * and start recollect quotes.
+     * Set selected currency to all subscription quotes and start recollect quotes.
      *
-     * @param $currencyCode
+     * @param string $currencyCode
+     * @return void
      */
     public function setCurrency($currencyCode)
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $subQuotes = $session->getSubQuotes();
-
+        $subQuotes = $this->getSubQuotes();
         $needRecollect = false;
-
         foreach ($subQuotes as $subQuote) {
             if (!$subQuote->getQuoteCurrencyCode() || $subQuote->getQuoteCurrencyCode() != $currencyCode) {
                 $subQuote->setQuoteCurrencyCode($currencyCode);
                 $needRecollect = true;
             }
         }
-
         if ($needRecollect) {
             $this->setNeedCollect(true);
         }
@@ -590,35 +612,21 @@ class CreateProfile extends BaseCreate
      * Reassign quotes by customer id.
      *
      * @param int $customerId
+     * @return void
      */
     public function reassignQuote($customerId)
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-
         $customer = $this->customerCreator->getCustomer($customerId);
-
-        foreach ($session->getSubQuotes() as $quote) {
+        foreach ($this->getSubQuotes() as $quote) {
             $quote->assignCustomer($customer);
             $this->quoteCreator->getCartRepository()->save($quote);
         }
     }
 
     /**
-     * Change customer id value in session.
-     *
-     * @param int $customerId
-     * @return void
-     */
-    public function changeCustomerIdInSession($customerId)
-    {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        $session->setCustomerId($customerId);
-    }
-
-    /**
      * If customer on the first step is changed we need to change customer in all quotes.
+     *
+     * @return void
      */
     public function changeCustomerInQuote()
     {
@@ -629,19 +637,15 @@ class CreateProfile extends BaseCreate
         if ($sessionCustomerId) {
             $customer = $this->customerCreator->getCustomer($sessionCustomerId);
         }
-
         /** @var array $subQuotes */
-        $subQuotes = $session->getSubQuotes();
-
+        $subQuotes = $this->getSubQuotes();
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subQuoteCustomerId = $subQuote->getCustomerId();
-
             if ($sessionCustomerId != $subQuoteCustomerId) {
                 $defaultShippingId = null;
                 $defaultBillingId = null;
                 $customerEmail = null;
-
                 //If there is a customer we find customer's default addresses
                 if ($customer) {
                     $defaultShippingId = $customer->getDefaultShipping();
@@ -665,7 +669,7 @@ class CreateProfile extends BaseCreate
                     $billingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
                 }
                 //If there is existing customer we assign his to the quote.
-                //Otherewise we assign empty customer and empty addresses.
+                //Otherwise we assign empty customer and empty addresses.
                 if ($customer) {
                     $subQuote->assignCustomerWithAddressChange($customer, $billingAddress, $shippingAddress);
                 } else {
@@ -684,16 +688,6 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Clears extra data on account step (ex. customer_address_id from quote address if it is exist).
-     *
-     * @return void
-     */
-    public function clearAccountStepData()
-    {
-        //
-    }
-
-    /**
      * Clears extra data on payment and billing step
      * (ex. customer_address_id, shipping method).
      *
@@ -701,29 +695,11 @@ class CreateProfile extends BaseCreate
      */
     public function clearBillingStepData()
     {
-        /** @var QuoteSessionInterface $session */
-        $session = $this->getSession();
-        /** @var array $subQuotes */
-        $subQuotes = $session->getSubQuotes();
-
         /** @var ModelQuote $subQuote */
-        foreach ($subQuotes as $subQuote) {
+        foreach ($this->getSubQuotes() as $subQuote) {
             $subQuote->getShippingAddress()->setShippingMethod('')->setShippingDescription('');
             $subQuote->getShippingAddress()->setCollectShippingRates(true);
             $this->setNeedCollect(true);
-        }
-    }
-
-    /**
-     * Cleares customer_address_id fro quote addresses.
-     *
-     * @param array $quoteAddresses
-     * @return void
-     */
-    private function clearCustomerAddressId($quoteAddresses)
-    {
-        foreach ($quoteAddresses as $quoteAddress) {
-            $quoteAddress->setCustomerAddressId(null);
         }
     }
 
@@ -745,5 +721,45 @@ class CreateProfile extends BaseCreate
             $message,
             $profile->getId()
         );
+    }
+
+    /**
+     * Returns product modifier.
+     *
+     * @return Product
+     */
+    public function getProductModifier()
+    {
+        return $this->productModifier;
+    }
+
+    /**
+     * Returns quote address creator.
+     *
+     * @return Address
+     */
+    public function getAddressCreator()
+    {
+        return $this->addressCreator;
+    }
+
+    /**
+     * Returns quote creator.
+     *
+     * @return QuoteCreateInterface
+     */
+    public function getQuoteCreator()
+    {
+        return $this->quoteCreator;
+    }
+
+    /**
+     * Returns customer creator.
+     *
+     * @return Customer
+     */
+    public function getCustomerCreator()
+    {
+        return $this->customerCreator;
     }
 }

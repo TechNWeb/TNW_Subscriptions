@@ -245,7 +245,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'hasAddress' => $this->hasAddressId() || $this->hasCustomerAddresses(),
+                            'hasAddress' => $this->hasCustomerAddresses(),
                             'visible' => $this->isCustomerAddressVisible(),
                             'addressesData' => $this->getCustomerShippingInformationData(),
                             'infoFieldSet' => static::INFO_FIELDSET_NAME,
@@ -346,6 +346,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 '!index=same_as_shipping:checked',
                 '!index=customer_address_id:visible',
             ];
+            $fieldConfig['config']['imports']['disabled'] = '!${$.parentName}:visible';
         }
 
         $attributeMeta = array_replace_recursive(
@@ -369,6 +370,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $additionalElementFormData = [
                     'config' => [
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/shipping-information-input',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/input',
                         'addressFieldsetIndex' => self::ADDRESS_FIELDSET_NAME
                     ]
                 ];
@@ -731,6 +733,16 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 $data,
                 $this->modifyCountryIdData()
             );
+        }
+
+        if (!$this->isShippingFieldSet() && $this->session->hasQuoteAddressData()) {
+            $quoteId = $this->session->getFirstQuote()->getId();
+            /** @var array $addressData */
+            $addressData = $this->session->getQuoteAddressData();
+            if (array_key_exists($quoteId, $addressData)) {
+                $data[Account::FORM_DATA_VALUE][$this->getInfoFieldSetDataScope()]['same_as_shipping'] =
+                    (string)$addressData[$quoteId];
+            }
         }
 
         return $data;

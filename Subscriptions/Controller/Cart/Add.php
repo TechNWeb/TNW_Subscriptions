@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Controller\Cart;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Data\Form\FormKey\Validator;
@@ -16,6 +15,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
@@ -64,10 +64,15 @@ class Add extends Action
     private $storeManager;
 
     /**
-     * Add constructor.
+     * Subscription session.
      *
-     * @param Session $checkoutSession
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
      * @param Context $context
+     * @param QuoteSessionInterface $session
      * @param Validator $formKeyValidator
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
@@ -75,26 +80,27 @@ class Add extends Action
      * @param Config $config
      */
     public function __construct(
-        Session $checkoutSession,
         Context $context,
+        QuoteSessionInterface $session,
         Validator $formKeyValidator,
         ProductRepositoryInterface $productRepository,
         StoreManagerInterface $storeManager,
         CreateProfile $createProfile,
         Config $config
     ) {
-        parent::__construct($context);
         $this->formKeyValidator = $formKeyValidator;
         $this->productRepository = $productRepository;
         $this->storeManager = $storeManager;
         $this->createProfile = $createProfile;
         $this->config = $config;
+        $this->session = $session;
+        parent::__construct($context);
     }
 
     /**
      * Add product to subscription quote action.
      *
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function execute()
     {
@@ -111,12 +117,15 @@ class Add extends Action
                         $params['qty'] = $filter->filter($params['subscribe_qty']);
                         unset($params['subscribe_qty']);
                     }
-                    $this->createProfile->addToSubscription($params);
-                    $message = __(
-                        'You added %1 to your subscription cart.',
-                        $this->initProduct()->getName()
-                    );
-                    $error = false;
+                    $result = $this->createProfile->addToSubscription($params);
+                    if ($result) {
+                        $message = __(
+                            'You added %1 to your subscription cart.',
+                            $this->initProduct()->getName()
+                        );
+                        $error = false;
+                        $this->session->addSubQuote($result->getQuote());
+                    }
                 } catch (\Exception $e) {
                     $this->_objectManager->get(\Psr\Log\LoggerInterface::class)->critical($e);
                 }

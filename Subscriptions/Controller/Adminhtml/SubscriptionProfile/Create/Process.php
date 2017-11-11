@@ -147,12 +147,8 @@ class Process extends AbstractSave
     {
         $back = $this->getRequest()->getParam('back', 0);
 
-        if (1 == $back) {
-            if ($currentStep === StepPool::STEP_PARAM_TYPE_SHIPPING) {
-                $this->getSubCreateModel()->clearAccountStepData();
-            } elseif ($currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
-                $this->getSubCreateModel()->clearBillingStepData();
-            }
+        if (1 == $back && $currentStep === StepPool::STEP_PARAM_TYPE_BILLING) {
+            $this->getSubCreateModel()->clearBillingStepData();
         }
     }
 }
