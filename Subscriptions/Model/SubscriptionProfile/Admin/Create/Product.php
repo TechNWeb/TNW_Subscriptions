@@ -143,7 +143,7 @@ class Product extends Create
      */
     public function getProduct()
     {
-        if (null !== $this->product) {
+        if (null === $this->product) {
             $productData = $this->getData();
             $this->product = $this->loadProduct($productData['product_id']);
         }
