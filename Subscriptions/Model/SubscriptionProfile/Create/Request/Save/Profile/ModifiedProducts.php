@@ -22,6 +22,7 @@ class ModifiedProducts extends Base
             $objectItemId = $this->getFieldValue($data, 'objectItemId', false);
             if ($objectItemId) {
                 $quote = $saveModel->getQuoteCreator()->getCartRepository()->get($objectId);
+                $quoteId = $quote->getId();
                 $item = $quote->getItemById($objectItemId);
                 $remove = $this->getFieldValue($data, 'remove', false);
                 $request = $this->getFieldValue($data, 'item_' . $objectItemId, false);
@@ -34,6 +35,8 @@ class ModifiedProducts extends Base
                     } else {
                         $this->getSession()->addSubQuote($result->getQuote());
                     }
+                } else {
+                    $this->getSession()->removeSubQuote($quoteId);
                 }
             } else {
                 $this->errors[] = __('Object item id is not defined.');
