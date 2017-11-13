@@ -9,6 +9,9 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
 use Magento\Catalog\Api\Data\ProductInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
+/**
+ * Buy request modifier for simple, virtual and downloadable products.
+ */
 class Simple extends Base
 {
     /**
@@ -29,7 +32,7 @@ class Simple extends Base
                     [
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                             Create::NON_UNIQUE => [
-                                'price' => $price
+                                'price' => $price,
                             ],
                         ],
                     ]

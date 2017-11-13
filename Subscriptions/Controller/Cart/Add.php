@@ -83,7 +83,7 @@ class Add extends Action
         'period',
         'start_on',
         'selected_configurable_option',
-        'super_attribute'
+        'super_attribute',
     ];
 
     /**

@@ -9,11 +9,11 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-
 
 /**
  * Base class for buy request modifiers.
@@ -63,7 +63,7 @@ abstract class Base implements TypeInterface
      *
      * @param $billingFrequency
      * @param $productIds
-     * @throws \Exception
+     * @throws LocalizedException
      */
     protected function checkFrequencyExistanse($billingFrequency, $productIds)
     {
@@ -80,7 +80,7 @@ abstract class Base implements TypeInterface
         $relations = $this->productFrequencyRepository->getList($searchCriteria)->getItems();
 
         if (count($relations) !== count($productIds)) {
-            throw new \Exception(__('Not all products have the same frequency'));
+            throw new LocalizedException(__('Not all products have the same frequency'));
         }
     }
 
@@ -103,7 +103,7 @@ abstract class Base implements TypeInterface
             $full
         );
 
-        if ($usePresetQty) {
+        if ($usePresetQty && $productData['qty'] !== 0) {
             $price = round($price / $productData['qty'], 4);
         }
 

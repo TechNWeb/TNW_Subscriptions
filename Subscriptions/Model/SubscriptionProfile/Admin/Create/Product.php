@@ -143,7 +143,7 @@ class Product extends Create
      */
     public function getProduct()
     {
-        if (!$this->product) {
+        if (null !== $this->product) {
             $productData = $this->getData();
             $this->product = $this->loadProduct($productData['product_id']);
         }
@@ -196,7 +196,7 @@ class Product extends Create
                     ],
                 ],
             ];
-            if ($fullRequest){
+            if ($fullRequest) {
                 $data = $this->addPricesToRequest($data, $productData);
             }
             //unset already unused fields
@@ -212,7 +212,7 @@ class Product extends Create
      *
      * @param string $type
      * @return TypeInterface
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function getBuyRequestModifier($type)
     {
@@ -226,7 +226,7 @@ class Product extends Create
                 $result = $this->configurableFactory->create();
                 break;
             default:
-                throw new \Exception(__('Unsupported product type -' . $type));
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
                 break;
         }
 
@@ -266,7 +266,7 @@ class Product extends Create
     /**
      * Calculates start date for subscription.
      *
-     * @param $startOn
+     * @param string|int $startOn
      * @return string
      */
     private function getStartOnDate($startOn)
@@ -296,7 +296,7 @@ class Product extends Create
     /**
      * Returns product.
      *
-     * @param $productId
+     * @param string|int $productId
      * @return MagentoProduct
      */
     private function loadProduct($productId)
@@ -324,7 +324,7 @@ class Product extends Create
                     static::NON_UNIQUE => [
                         'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
                         'initial_fee' =>  (float)$initialFee,
-                        'price' => $this->getPrice($this->getProduct(), $productData)
+                        'price' => $this->getPrice($this->getProduct(), $productData),
                     ]
                 ],
             ]
@@ -340,7 +340,7 @@ class Product extends Create
      * @param array $productData
      * @return string
      */
-    private function getCustomPrice($product, $productData)
+    private function getCustomPrice(MagentoProduct $product, array $productData)
     {
         return $this->getBuyRequestModifier($product->getTypeId())
             ->getSubscriptionCustomPrice($product, $productData);

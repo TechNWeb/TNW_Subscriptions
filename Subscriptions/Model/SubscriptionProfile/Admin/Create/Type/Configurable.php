@@ -7,8 +7,12 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
+/**
+ * Buy request modifier for configurable products.
+ */
 class Configurable extends Base
 {
     /**
@@ -23,10 +27,10 @@ class Configurable extends Base
             if ($request) {
                 $requestValue = unserialize($request->getValue());
                 $subscriptionPart = $requestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
-                if (!empty($requestValue['super_attribute'])){
-                    $subscriptionPart['super_attribute'] =  $requestValue['super_attribute'];
+                if (!empty($requestValue['super_attribute'])) {
+                    $subscriptionPart['super_attribute'] = $requestValue['super_attribute'];
                 } else {
-                    throw new \Exception(__('Super attributes must be set'));
+                    throw new LocalizedException(__('Super attributes must be set'));
                 }
 
                 $frequency = $subscriptionPart['billing_frequency'];
@@ -42,7 +46,7 @@ class Configurable extends Base
                                 'price' => $this->getSubscriptionPrice(
                                     $mainProduct,
                                     $subscriptionPart
-                                )
+                                ),
                             ],
                         ],
                     ]
@@ -61,7 +65,7 @@ class Configurable extends Base
         $superAttributes = !empty($productData['super_attribute']) ? $productData['super_attribute'] : [];
         if ($superAttributes) {
             $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
-            if ($childProduct){
+            if ($childProduct) {
                 $result = $this->getCalculatedPrice($childProduct, $productData, true);
             }
         }
@@ -78,7 +82,7 @@ class Configurable extends Base
         $superAttributes = !empty($productData['super_attribute']) ? $productData['super_attribute'] : [];
         if ($superAttributes) {
             $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
-            if ($childProduct){
+            if ($childProduct) {
                 $result = $this->getCalculatedPrice($childProduct, $productData);
             }
         }

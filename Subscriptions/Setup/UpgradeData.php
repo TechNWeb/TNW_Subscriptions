@@ -621,10 +621,13 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     * @param $eavSetup
+     * Updates product attribute "apply_to" property.
+     *
+     * @param EavSetup $eavSetup
      * @param array $codes
+     * @return void
      */
-    private function updateApplyToForProductAttributes($eavSetup, array $codes)
+    private function updateApplyToForProductAttributes(EavSetup $eavSetup, array $codes)
     {
         $codes = implode(',', $codes);
         $eavSetup->updateAttribute(
@@ -702,10 +705,13 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     * @param $eavSetup
+     * Updates product attribute "used_in_product_listing" property.
+     *
+     * @param EavSetup $eavSetup
      * @param bool $value
+     * @return void
      */
-    private function updateUseInListingForProductAttributes($eavSetup, $value)
+    private function updateUseInListingForProductAttributes(EavSetup $eavSetup, $value)
     {
         $eavSetup->updateAttribute(
             Product::ENTITY,
