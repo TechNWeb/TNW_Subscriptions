@@ -948,7 +948,7 @@ class ModifyForm extends Form
      */
     protected function getObjectItems(DataObject $object)
     {
-        return $object->getAllItems();
+        return $object->getAllVisibleItems();
     }
 
     /**
@@ -959,7 +959,7 @@ class ModifyForm extends Form
      */
     protected function getProductFromItem(DataObject $item)
     {
-        return $this->formContext->getProductRepository()->getById($item->getProduct()->getId());
+        return $item->getProduct();
     }
 
     /**

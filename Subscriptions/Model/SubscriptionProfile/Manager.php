@@ -596,7 +596,7 @@ class Manager
                 $this->populateAddressesData($quote)
             );
             $this->getProfile()->setProducts(
-                $this->populateProductsData($quote->getAllItems())
+                $this->populateProductsData($quote->getAllVisibleItems())
             );
         }
 
@@ -718,7 +718,7 @@ class Manager
     private function getUniqueBuyRequest(Quote $quote)
     {
         $result = null;
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
 
         if ($items) {
             /** @var Item $item */

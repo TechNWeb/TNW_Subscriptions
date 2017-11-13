@@ -210,7 +210,7 @@ class CreateProfile extends BaseCreate
         $result = false;
         $this->setSubQuotes($this->getSession()->getSubQuotes());
         $this->productModifier->setData($productData);
-        $product = $this->productModifier->getPreparedProduct();
+        $product = $this->productModifier->getProduct();
         $quote = $this->getSubQuote();
         if ($this->canUpdateItemQty($quote, $product)) {
             $item = $quote->addProduct(
@@ -275,7 +275,7 @@ class CreateProfile extends BaseCreate
         /** @var ModelQuote $quote */
         $quote = $quoteItem->getQuote();
         $quoteItem->isDeleted(true);
-        if (!$quote->getAllItems()) {
+        if (!$quote->getAllVisibleItems()) {
             $this->quoteCreator->getCartRepository()->delete($quote);
             $result = false;
         } else {
@@ -318,7 +318,7 @@ class CreateProfile extends BaseCreate
     {
         $result = false;
 
-        $quoteItems = $subQuote->getAllItems();
+        $quoteItems = $subQuote->getAllVisibleItems();
         /** @var Item $item */
         $item = $quoteItems ? reset($quoteItems) : null;
 

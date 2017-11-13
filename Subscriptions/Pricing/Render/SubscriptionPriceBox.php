@@ -156,7 +156,7 @@ class SubscriptionPriceBox extends BasePriceBox
             foreach ($productBillingFrequencies as $billingFrequency) {
                 $billingFrequencyId = $billingFrequency->getBillingFrequencyId();
 
-                $price = $this->priceCalculator->getUnitPrice($product->getId(), $billingFrequencyId);
+                $price = $this->priceCalculator->getUnitPrice($product, $billingFrequencyId);
 
                 $topMessage = '';
                 $bottomMessage = '';

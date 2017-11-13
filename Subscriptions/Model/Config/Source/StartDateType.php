@@ -13,13 +13,12 @@ use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
  */
 class StartDateType extends AbstractSource
 {
-    /**#@+
+    /**
      * Constants for start date type.
      */
     const MOMENT_OF_PURCHASE = 1;
     const DEFINED_BY_CUSTOMER = 2;
     const LAST_DAY_OF_THE_CURRENT_MONTH = 3;
-    /**#@-*/
 
     /**
      * Get options for Start date type.
@@ -45,5 +44,25 @@ class StartDateType extends AbstractSource
         ];
 
         return $optionList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFlatColumns()
+    {
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $type = \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER;
+        $columns[$attributeCode] = [
+            'type' => $type,
+            'length' => null,
+            'unsigned' => false,
+            'nullable' => true,
+            'default' => null,
+            'extra' => null,
+            'comment' => $attributeCode . ' column',
+        ];
+
+        return $columns;
     }
 }
