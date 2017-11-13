@@ -61,11 +61,12 @@ abstract class Base implements TypeInterface
     /**
      * Checks products if they have same billing frequency.
      *
-     * @param $billingFrequency
-     * @param $productIds
+     * @param string|int $billingFrequency
+     * @param array $productIds
      * @throws LocalizedException
+     * @return void
      */
-    protected function checkFrequencyExistanse($billingFrequency, $productIds)
+    protected function checkFrequencyExistanse($billingFrequency, array $productIds)
     {
         $this->searchCriteriaBuilder->addFilter(
             ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
