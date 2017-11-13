@@ -353,7 +353,7 @@ class Product extends Create
      * @param array $productData
      * @return string
      */
-    private function getPrice($product, $productData)
+    private function getPrice(MagentoProduct $product, array $productData)
     {
         return $this->getBuyRequestModifier($product->getTypeId())
             ->getSubscriptionPrice($product, $productData);
