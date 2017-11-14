@@ -24,14 +24,14 @@ class StatusSuspended extends Base
     {
         $select = $this->resource->getConnection()->select();
         $select->from(
-            ['main_table' => Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE],
+            ['main_table' => $this->resource->getTableName(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE)],
             []
         )->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            ['relation' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             'main_table.profile_order_id = relation.id',
             [SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]
         )->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+            ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(

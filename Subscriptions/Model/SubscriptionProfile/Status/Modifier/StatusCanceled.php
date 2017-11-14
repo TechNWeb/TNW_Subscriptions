@@ -21,8 +21,10 @@ class StatusCanceled extends Base
     {
         $select = $this->resource->getConnection()->select();
         $select
-            ->from(['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY], [SubscriptionProfile::ID])
-            ->where('profile.' . SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE . ' > ?', 0)
+            ->from(
+                ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                [SubscriptionProfile::ID]
+            )->where('profile.' . SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE . ' > ?', 0)
             ->where('profile.status NOT IN (?)', $this->getIgnoredStatuses())
             ->where('profile.entity_id IN (?)', $allIds);
 
