@@ -534,7 +534,7 @@ class Manager
     ) {
         if (!$date) {
             $date = new \DateTime();
-            $date = $date->format('Y-m-d H:i:s');
+            $date = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
 
         $relation = $this->orderRelationManager
@@ -585,7 +585,7 @@ class Manager
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
                 ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
-            $nowDate = (new \DateTime())->format('Y-m-d H:i:s');
+            $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
             //set trial start date to profile
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
@@ -780,7 +780,7 @@ class Manager
 
             $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
             $result = $startDate->add(new \DateInterval($expression))
-                ->format('Y-m-d H:i:s');
+                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
 
         return $result;
@@ -805,7 +805,7 @@ class Manager
             . $date->format('s') . 'S';
         $startDate->add(new \DateInterval($expression));
 
-        return $startDate->format('Y-m-d H:i:s');
+        return $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**

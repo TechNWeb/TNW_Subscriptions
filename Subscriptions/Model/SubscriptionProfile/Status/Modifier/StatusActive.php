@@ -22,7 +22,7 @@ class StatusActive extends Base
      */
     protected function getIdsToModify(array $allIds)
     {
-        $currentDate = (new \DateTime())->format('Y-m-d H:i:s');
+        $currentDate = $this->resource->getConnection()->formatDate((new \DateTime()));
         $select = $this->resource->getConnection()->select();
         $select->from(
             ['main_table' => Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE],

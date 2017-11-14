@@ -534,7 +534,7 @@ class CreateProfile extends BaseCreate
             //Add new relation to profile processing queue in "pending" state.
             $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
             //Current time
-            $date = (new \DateTime())->format('Y-m-d H:i:s');
+            $date = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
             // if start date of profile in future do not create order
             if (strtotime($startDate) <= strtotime($date)){
                 try {
