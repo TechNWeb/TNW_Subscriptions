@@ -221,7 +221,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
-                                        'disabled' => '!ns = ${ $.ns }, index=exp_date_container:visible' ,
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible'
                                     ],
                                     'validation' => [
                                         'required-entry' => true,
@@ -246,7 +246,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
                                     'imports' => [
-                                        'disabled' => '!ns = ${ $.ns }, index=exp_date_container:visible' ,
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible'
                                     ],
                                     'validation' => [
                                         'required-entry' => true

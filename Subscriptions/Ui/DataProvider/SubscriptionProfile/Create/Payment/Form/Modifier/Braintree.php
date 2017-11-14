@@ -7,19 +7,14 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Payment\Model\Config;
-use Magento\Paypal\Model\Payflow\Transparent;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
-use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
-use Magento\Payment\Model\Method\TransparentInterface;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
@@ -62,39 +57,49 @@ class Braintree extends Base
     private $urlBuilder;
 
     /**
-     * PaymentsPro constructor.
-     * @param Context $context
-     * @param SubscriptionConfig $config
-     * @param QuoteSessionInterface $session
+     * @var \Magento\Braintree\Model\Adapter\BraintreeAdapter
+     */
+    private $braintreeAdapter;
+
+    /**
+     * @var string
+     */
+    private $clientToken = '';
+
+    /**
+     * Braintree constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
-     * @param Transparent $paymentPro
+     * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
+     * @param \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter
+     * @param Context $context
      * @param Config $paymentConfig
      * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
-        Context $context,
-        SubscriptionConfig $config,
-        QuoteSessionInterface $session,
+        \TNW\Subscriptions\Model\Config $config,
+        \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
-        Transparent $paymentPro,
         \Magento\Braintree\Gateway\Config\Config $braintreeConfig,
+        \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter,
+        Context $context,
         Config $paymentConfig,
         Repository $assetRepository,
         RequestInterface $request,
         UrlInterface $urlBuilder
-    )
-    {
+    ) {
+        parent::__construct($config, $session, $profileRepository);
+
         $this->context = $context;
-        $this->paymentPro = $paymentPro;
         $this->braintreeConfig = $braintreeConfig;
+        $this->braintreeAdapter = $braintreeAdapter;
         $this->paymentConfig = $paymentConfig;
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-
-        parent::__construct($config, $session, $profileRepository);
     }
 
     /**
@@ -130,7 +135,7 @@ class Braintree extends Base
      */
     protected function getPaymentTitle()
     {
-        return 'Braintree';//$this->paymentPro->getTitle();
+        return $this->getMethodConfigData('title');
     }
 
     /**
@@ -150,6 +155,7 @@ class Braintree extends Base
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                             'dataContainer' => $this->getPaymentCode() . '-cc-type',
+                            'additionalClasses' => 'credit-card-type',
                             'sortOrder' => 10,
                             'options' => $this->getPaymentCcTypes(),
                             'imports' => [
@@ -168,11 +174,13 @@ class Braintree extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Credit Card Number'),
+                            'placeholder' => __('Credit card number'),
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
+                            'additionalClasses' => 'credit-card-number _required-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
@@ -195,9 +203,13 @@ class Braintree extends Base
                             'component' => 'Magento_Ui/js/form/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'admin_field_without_legend',
+                            'additionalClasses' => 'field_without_legend _required-date',
                             'dataScope' => '',
                             'sortOrder' => 30,
+                            'required' => true,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ],
                         ],
                     ],
                 ],
@@ -213,7 +225,7 @@ class Braintree extends Base
                                     'dataType' => Text::NAME,
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
@@ -237,7 +249,7 @@ class Braintree extends Base
                                     'dataScope' => 'cc_exp_year',
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
-                                    'additionalClasses' => 'admin__control-label-up select',
+                                    'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
@@ -261,6 +273,7 @@ class Braintree extends Base
                     'data' => [
                         'config' => [
                             'label' => __('Card Verification Number'),
+                            'placeholder' => __('Credit verification number'),
                             'name' => '',
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
@@ -275,6 +288,7 @@ class Braintree extends Base
                             ],
                             'validation' => [
                                 'required-number' => true,
+                                'required-entry' => true,
                                 'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
@@ -292,20 +306,39 @@ class Braintree extends Base
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/braintree',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
-            'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
+            'code' => $this->getPaymentCode(),
+            'sdkUrl' => $this->braintreeConfig->getSdkUrl(),
+            'clientToken' => $this->getClientToken(),
+            'useCvv' => $this->hasVerification(),
             'options' => [
-                'gateway' => $this->getPaymentCode(),
-                'dateDelim' => $this->context->getEscaper()->escapeHtml($this->getDateDelim()),
-                'cardFieldsMap' => $this->getCardFieldsMap(),
                 'orderSaveUrl' => $this->context->getEscaper()->escapeUrl($this->getOrderUrl()),
-                'cgiUrl' => $this->context->getEscaper()->escapeUrl($this->getCgiUrl()),
                 'expireYearLength' => $this->context->getEscaper()->escapeHtml($this->getMethodConfigData('cc_year_length')),
                 'formName' => $this->getPaymentFormName(),
             ]
         ];
+    }
+
+    /**
+     * Generate a new client token if necessary
+     * @return string
+     */
+    public function getClientToken()
+    {
+        if (empty($this->clientToken)) {
+            $params = [];
+
+            $merchantAccountId = $this->braintreeConfig->getMerchantAccountId();
+            if (!empty($merchantAccountId)) {
+                $params[\Magento\Braintree\Gateway\Request\PaymentDataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
+            }
+
+            $this->clientToken = $this->braintreeAdapter->generate($params);
+        }
+
+        return $this->clientToken;
     }
 
     /**
@@ -384,48 +417,7 @@ class Braintree extends Base
      */
     private function hasVerification()
     {
-        return $this->braintreeConfig->isCvvEnabled();// ->paymentPro->getConfigData('useccv');
-    }
-
-    /**
-     * Retrieves url of a view file.
-     *
-     * @param string $fileId
-     * @param array $params
-     * @return string
-     */
-    private function getViewFileUrl($fileId, array $params = [])
-    {
-        $result = false;
-        try {
-            $params = array_merge(['_secure' => $this->request->isSecure()], $params);
-            $result = $this->assetRepository->getUrlWithParams($fileId, $params);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->context->throwException($e->getMessage());
-        }
-
-        return $result;
-    }
-
-    /**
-     * Gets delimiter for date.
-     *
-     * @return string
-     */
-    private function getDateDelim()
-    {
-        return $this->getMethodConfigData('date_delim');
-    }
-
-    /**
-     * Gets map of cc_code, cc_num, cc_expdate for gateway.
-     * Returns json formatted string.
-     *
-     * @return string
-     */
-    private function getCardFieldsMap()
-    {
-        return json_encode(['cccvv' => 'csc', 'ccexpdate'=>'expdate', 'ccnum' => 'acct']);
+        return $this->braintreeConfig->isCvvEnabled();
     }
 
     /**
@@ -444,21 +436,9 @@ class Braintree extends Base
         }
 
         return $this->urlBuilder->getUrl(
-            'tnw_subscriptions/subscriptionprofile_create_paypal/requestSecureToken',
+            'tnw_subscriptions/paypal/requestSecureToken',
             $routeParams
         );
-    }
-
-    /**
-     * Retrieves gateway url.
-     *
-     * @return string
-     */
-    private function getCgiUrl()
-    {
-        return (bool)$this->getMethodConfigData('sandbox_flag')
-            ? $this->getMethodConfigData('cgi_url_test_mode')
-            : $this->getMethodConfigData('cgi_url');
     }
 
     /**
@@ -469,8 +449,6 @@ class Braintree extends Base
      */
     private function getMethodConfigData($fieldName)
     {
-        $result = $this->braintreeConfig->getValue($fieldName);// paymentPro->getConfigData($fieldName);
-
-        return $result;
+        return $this->braintreeConfig->getValue($fieldName);
     }
 }
