@@ -585,13 +585,16 @@ class Manager
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
                 ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
-
+            $nowDate = (new \DateTime())->format('Y-m-d H:i:s');
+            //set trial start date to profile
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
                 $this->getProfile()->setStartDate($this->calculateStartDate());
+            }
+            //set status "trial" if trial period starts immediately
+            if (strtotime($startDate) <= strtotime($nowDate)){
                 $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
-
             $this->getProfile()->setAddresses(
                 $this->populateAddressesData($quote)
             );
@@ -638,7 +641,7 @@ class Manager
     public function getNextQuote()
     {
         $quote = null;
-        $nextProfileRelation =  $this->getNextProfileRelation();
+        $nextProfileRelation = $this->getNextProfileRelation();
         if ($nextProfileRelation) {
             $quoteId = $nextProfileRelation->getMagentoQuoteId();
             $searchCriteria = $this->searchCriteriaBuilder
@@ -796,9 +799,10 @@ class Manager
             $date = new \DateTime();
         }
         $startDate = new \DateTime($startOn);
-        $diff = $date->diff($startDate, true);
         //Add hours, minutes, and seconds to start date
-        $expression = 'PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S';
+        $expression = 'PT' . $date->format('H') . 'H'
+            . $date->format('i') . 'M'
+            . $date->format('s') . 'S';
         $startDate->add(new \DateInterval($expression));
 
         return $startDate->format('Y-m-d H:i:s');
@@ -813,7 +817,7 @@ class Manager
     public function getEngineFromRequestData(array $requestData)
     {
         $engine = null;
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] : [];
         foreach ($paymentPostData as $code => $methodData) {
             if ($methodData['method']) {
                 $engine = $code;
@@ -831,7 +835,7 @@ class Manager
      */
     public function getShippingMethodFromRequestData(array $requestData)
     {
-        $shippingMethodCode= isset($requestData['shipping_method_id'])
+        $shippingMethodCode = isset($requestData['shipping_method_id'])
             ? $requestData['shipping_method_id']
             : null;
         return $shippingMethodCode;

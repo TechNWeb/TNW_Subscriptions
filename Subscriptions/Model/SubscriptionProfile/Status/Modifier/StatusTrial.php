@@ -13,12 +13,12 @@ use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
- * Modifier to set "Active" status
+ * Modifier to set "Trial" status
  */
-class StatusActive extends Base
+class StatusTrial extends Base
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getIdsToModify(array $allIds)
     {
@@ -42,7 +42,10 @@ class StatusActive extends Base
         )->where(
             'profile.entity_id IN (?)', $allIds
         )->where(
-            'profile.start_date < ?', $currentDate
+            'profile.trial_start_date IS NOT NULL'
+        )->where(
+            'profile.trial_start_date <= ? AND ? <= profile.start_date',
+            $currentDate
         )->group(
             ['relation.subscription_profile_id']
         );
@@ -51,15 +54,15 @@ class StatusActive extends Base
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getNewStatus()
     {
-        return ProfileStatus::STATUS_ACTIVE;
+        return ProfileStatus::STATUS_TRIAL;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getIgnoredStatuses()
     {
@@ -67,7 +70,10 @@ class StatusActive extends Base
             ProfileStatus::STATUS_COMPLETE,
             ProfileStatus::STATUS_HOLDED,
             ProfileStatus::STATUS_CANCELED,
-            ProfileStatus::STATUS_SUSPENDED
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_ACTIVE,
+            ProfileStatus::STATUS_TRIAL,
+            ProfileStatus::STATUS_PAST_DUE,
         ];
     }
 
