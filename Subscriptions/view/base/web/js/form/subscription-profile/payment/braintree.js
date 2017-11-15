@@ -21,14 +21,7 @@ define([
             checked: false,
             braintree: null,
             selectedCardType: null,
-            selector: 'co-transparent-form-braintree',
-            hiddenFormTmpl:
-            '<form id="<%= data.id %>" target="<%= data.target %>" action="#" method="POST">' +
-                '<div id="card-number"></div>' +
-                '<div id="expiration-month"></div>' +
-                '<div id="expiration-year"></div>' +
-                '<div id="cvv"></div>' +
-            '</form>'
+            selector: 'co-transparent-form-braintree'
         },
 
         /**
@@ -60,18 +53,28 @@ define([
         },
 
         /**
-         * Before submit action for payment method.
+         * Change fieldset visibility and clear child elems values if fieldset was hidden
+         *
+         * @param {boolean} checkBoxChecked
+         * @return void
          */
-        beforeSubmit: function () {
-            if (!this.clientToken) {
+        changeVisibility: function(checkBoxChecked) {
+            if (checkBoxChecked && !this.clientToken) {
                 this.processErrors($.mage.__('This payment is not available'));
 
                 return;
             }
 
-            if (!this.scriptLoaded()) {
+            if (checkBoxChecked && !this.scriptLoaded()) {
                 this.loadScript();
             }
+        },
+
+        /**
+         * Before submit action for payment method.
+         */
+        beforeSubmit: function () {
+            $('#braintree_submit').trigger('click');
         },
 
         /**
@@ -97,16 +100,6 @@ define([
             try {
                 $('body').trigger('processStart');
 
-                var $iframeSelector =  $('[data-container="' + this.code + '-transparent-iframe"]');
-                var tmpl = this.hiddenFormTmpl({
-                    data: {
-                        target: $iframeSelector.attr('name'),
-                        id: this.selector
-                    }
-                });
-
-                var form = $(tmpl);
-                form.appendTo($iframeSelector);
                 this.braintree.setup(this.clientToken, 'custom', {
                     id: this.selector,
                     hostedFields: this.getHostedFields(),
@@ -132,11 +125,9 @@ define([
                      */
                     onError: function (response) {
                         this.processErrors(response.message);
+                        $('body').trigger('processStop');
                     }
                 });
-
-                //form.submit();
-                //$iframeSelector.html('');
             } catch (e) {
                 $('body').trigger('processStop');
                 this.processErrors(e.message);
@@ -150,7 +141,8 @@ define([
         getHostedFields: function () {
             var fields = {
                     number: {
-                        selector: '#card-number'
+                        selector: '#card-number',
+                        placeholder: $t('Credit card number')
                     },
                     expirationMonth: {
                         selector: '#expiration-month',
@@ -164,7 +156,8 @@ define([
 
             if (this.useCvv) {
                 fields.cvv = {
-                    selector: '#cvv'
+                    selector: '#cvv',
+                    placeholder: $t('Credit verification number')
                 };
             }
 
