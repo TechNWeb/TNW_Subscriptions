@@ -36,7 +36,13 @@ class ModifiedProducts extends Base
                         $this->getSession()->addSubQuote($result->getQuote());
                     }
                 } else {
-                    $this->getSession()->removeSubQuote($quoteId);
+                    try {
+                        $saveModel->getQuoteCreator()->getCartRepository()->get($quoteId);
+                    }
+                    catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                        //remove quote from session if quote does not exist.
+                        $this->getSession()->removeSubQuote($quoteId);
+                    }
                 }
             } else {
                 $this->errors[] = __('Object item id is not defined.');
