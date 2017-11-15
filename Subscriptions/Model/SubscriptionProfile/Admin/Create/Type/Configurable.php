@@ -33,11 +33,6 @@ class Configurable extends Base
                     throw new LocalizedException(__('Super attributes must be set'));
                 }
 
-                $frequency = $subscriptionPart['billing_frequency'];
-                $this->checkFrequencyExistanse(
-                    $frequency,
-                    [$mainProduct->getId(), $childProduct->getId()]
-                );
                 $requestValue = array_merge_recursive(
                     $requestValue,
                     [
@@ -61,16 +56,7 @@ class Configurable extends Base
      */
     public function getSubscriptionCustomPrice(ProductInterface $product, array $productData)
     {
-        $result = 0;
-        $superAttributes = !empty($productData['super_attribute']) ? $productData['super_attribute'] : [];
-        if ($superAttributes) {
-            $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
-            if ($childProduct) {
-                $result = $this->getCalculatedPrice($childProduct, $productData, true);
-            }
-        }
-
-        return $result;
+        return $this->getCalculatedPrice($product, $productData, true);
     }
 
     /**
@@ -78,15 +64,6 @@ class Configurable extends Base
      */
     public function getSubscriptionPrice(ProductInterface $product, array $productData)
     {
-        $result = 0;
-        $superAttributes = !empty($productData['super_attribute']) ? $productData['super_attribute'] : [];
-        if ($superAttributes) {
-            $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
-            if ($childProduct) {
-                $result = $this->getCalculatedPrice($childProduct, $productData);
-            }
-        }
-
-        return $result;
+        return $this->getCalculatedPrice($product, $productData);
     }
 }
