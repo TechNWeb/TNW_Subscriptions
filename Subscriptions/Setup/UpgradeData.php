@@ -576,7 +576,7 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
-        if (version_compare($context->getVersion(), "2.0.34", "<")) {
+        if (version_compare($context->getVersion(), "2.0.35", "<")) {
             //TODO add this attributes to main eav setup
             $this->updateApplyToForProductAttributes(
                 $eavSetup,
