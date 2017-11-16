@@ -51,7 +51,7 @@ class DataProvider extends AbstractDataProvider
 
         /* hide all such records if they are more than 2 months and status not complete */
 
-        $minDate = date('Y-m-d H:i:s', strtotime("-2 months"));
+        $minDate = date(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT, strtotime("-2 months"));
         $collection->addFieldToFilter(
             ['updated_at', 'status'],
             [

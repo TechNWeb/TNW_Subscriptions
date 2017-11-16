@@ -100,7 +100,11 @@ class SubscriptionDetails extends Template
      */
     public function getHideValue()
     {
-        return $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE 
-            && floatval($this->subscriptionProfile->getTotalValue()) === 0.0;
+        return
+            (
+                $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
+                && floatval($this->subscriptionProfile->getTotalValue()) === 0.0
+            )
+            || $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_CANCELED;
     }
 }

@@ -22,6 +22,7 @@ class ModifiedProducts extends Base
             $objectItemId = $this->getFieldValue($data, 'objectItemId', false);
             if ($objectItemId) {
                 $quote = $saveModel->getQuoteCreator()->getCartRepository()->get($objectId);
+                $quoteId = $quote->getId();
                 $item = $quote->getItemById($objectItemId);
                 $remove = $this->getFieldValue($data, 'remove', false);
                 $request = $this->getFieldValue($data, 'item_' . $objectItemId, false);
@@ -33,6 +34,14 @@ class ModifiedProducts extends Base
                         $this->errors[] = __('We can\'t add this item to your subscription shopping cart right now.');
                     } else {
                         $this->getSession()->addSubQuote($result->getQuote());
+                    }
+                } else {
+                    try {
+                        $saveModel->getQuoteCreator()->getCartRepository()->get($quoteId);
+                    }
+                    catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                        //remove quote from session if quote does not exist.
+                        $this->getSession()->removeSubQuote($quoteId);
                     }
                 }
             } else {

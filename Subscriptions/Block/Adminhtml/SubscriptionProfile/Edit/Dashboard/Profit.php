@@ -79,7 +79,11 @@ class Profit extends Template
      */
     public function getHideRemainingProfit()
     {
-        return $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
-            && floatval($this->profitCalculator->getRemainingProfit($this->subscriptionProfile)) === 0.0;
+        return
+            (
+                $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
+                && floatval($this->profitCalculator->getRemainingProfit($this->subscriptionProfile)) === 0.0
+            )
+            || $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_CANCELED;
     }
 }

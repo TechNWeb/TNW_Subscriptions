@@ -100,9 +100,9 @@ class ViewAction extends Column
     private function isNeedShowActions(array $item)
     {
         $needToShow = false;
-        $scheduledAt = $this->timezone->date($item['scheduled_at'])->format('Y-m-d H:i:s');
+        $scheduledAt = $this->timezone->date($item['scheduled_at'])->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         $dateTime = new DateTime();
-        $dateNow = $dateTime->strToTime($this->timezone->date()->format('Y-m-d H:i:s'));
+        $dateNow = $dateTime->strToTime($this->timezone->date()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
 
         if (
             ($dateNow > $dateTime->strToTime($scheduledAt))

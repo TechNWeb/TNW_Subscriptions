@@ -13,7 +13,7 @@ use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
  */
 class TrialLengthUnitType extends AbstractSource
 {
-    /**#@+
+    /**
      * Constants for unit type.
      */
     const MINUTES = 1;
@@ -22,8 +22,10 @@ class TrialLengthUnitType extends AbstractSource
     const WEEKS = 4;
     const MONTHS = 5;
     const YEARS = 6;
-    /**#@-*/
 
+    /**
+     * Plural prefix.
+     */
     const PLURAL = "s";
 
     /**
@@ -86,5 +88,25 @@ class TrialLengthUnitType extends AbstractSource
         }
 
         return $label;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFlatColumns()
+    {
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $type = \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER;
+        $columns[$attributeCode] = [
+            'type' => $type,
+            'length' => null,
+            'unsigned' => false,
+            'nullable' => true,
+            'default' => null,
+            'extra' => null,
+            'comment' => $attributeCode . ' column',
+        ];
+
+        return $columns;
     }
 }

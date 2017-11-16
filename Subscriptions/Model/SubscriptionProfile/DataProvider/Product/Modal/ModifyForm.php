@@ -498,6 +498,9 @@ class ModifyForm extends Form
      */
     protected function getEditButton()
     {
+        $additionalClasses = $this->getRemoveButtonVisibility() ? '': 'right';
+        $additionalClasses .= ' action-editor';
+
         return [
             'arguments' => [
                 'data' => [
@@ -506,7 +509,7 @@ class ModifyForm extends Form
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-editor',
+                        'additionalClasses' => $additionalClasses,
                         'title' => '',
                         'actions' => [
                             [
@@ -518,7 +521,8 @@ class ModifyForm extends Form
                                 'actionName' => 'toggleButtonPreviewMode',
                             ]
                         ],
-                        'provider' => null
+                        'provider' => null,
+                        'buttonVisibility' => $this->isEditButtonVisible(),
                     ]
                 ]
             ]
@@ -948,7 +952,7 @@ class ModifyForm extends Form
      */
     protected function getObjectItems(DataObject $object)
     {
-        return $object->getAllItems();
+        return $object->getAllVisibleItems();
     }
 
     /**
@@ -959,7 +963,7 @@ class ModifyForm extends Form
      */
     protected function getProductFromItem(DataObject $item)
     {
-        return $this->formContext->getProductRepository()->getById($item->getProduct()->getId());
+        return $item->getProduct();
     }
 
     /**
@@ -1028,7 +1032,7 @@ class ModifyForm extends Form
     {
         $result = [
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
-            'description_button' => $this->currentFormName . '.description_fieldset.left_container.edit_button',
+            'description_button' => $this->currentFormName . '.description_fieldset.middle_container.edit_button',
         ];
         if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
             $result['qty_button'] = $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button';

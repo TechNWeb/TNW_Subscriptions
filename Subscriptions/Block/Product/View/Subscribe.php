@@ -133,7 +133,8 @@ class Subscribe extends View
      */
     public function IsOnlySubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE);
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE)
+            && $this->getProduct()->getIsSalable();
     }
 
     /**
@@ -143,7 +144,8 @@ class Subscribe extends View
      */
     public function IsOneTimeAndSubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE);
+        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
+            && $this->getProduct()->getIsSalable();
     }
 
     /**

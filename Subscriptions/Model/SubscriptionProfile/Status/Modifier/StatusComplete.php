@@ -22,10 +22,10 @@ class StatusComplete extends Base
     {
         $select = $this->resource->getConnection()->select();
         $select->from(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            ['relation' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             []
         )->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+            ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
             'relation.subscription_profile_id = profile.entity_id',
             [
                 SubscriptionProfile::ID,

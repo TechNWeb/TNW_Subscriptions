@@ -239,7 +239,7 @@ class ShippingMethods
     public function canShowShippingMethodLabel()
     {
         $result = false;
-        $quoteItems = $this->quote->getAllItems();
+        $quoteItems = $this->quote->getAllVisibleItems();
         /** @var Item $quoteItem */
         foreach ($quoteItems as $quoteItem) {
             if (!in_array($quoteItem->getProductType(), $this::UNAVAILABLE_PRODUCT_TYPES, true)) {

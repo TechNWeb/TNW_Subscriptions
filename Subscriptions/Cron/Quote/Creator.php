@@ -166,7 +166,7 @@ class Creator extends Base
         $neededDates = [];
         $date = new \DateTime($profile->getStartDate());
         //Add to list start date.
-        $neededDates[] = $date->format('Y-m-d H:i:s');
+        $neededDates[] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
             //End date of current year
@@ -194,7 +194,7 @@ class Creator extends Base
                 $profile->getUnit(),
                 $profile->getFrequency()
             );
-            $neededDates[] = $date->format('Y-m-d H:i:s');
+            $neededDates[] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
         //get already generated dates
         $existDates = array_map(
@@ -205,7 +205,7 @@ class Creator extends Base
         );
         $neededDates = array_diff($neededDates, $existDates);
         //generate only future dates
-        $nowDate = (new \DateTime())->format('Y-m-d H:i:s');
+        $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         $resultDates = array_filter(
             $neededDates,
             function ($neededDate) use ($nowDate) {

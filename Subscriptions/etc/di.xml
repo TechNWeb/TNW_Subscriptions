@@ -346,9 +346,13 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusActive</item>
                     <item name="sortOrder" xsi:type="number">40</item>
                 </item>
+                <item name="trial" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusTrial</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
+                </item>
                 <item name="canceled" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier\StatusCanceled</item>
-                    <item name="sortOrder" xsi:type="number">50</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
                 </item>
             </argument>
         </arguments>
@@ -677,5 +681,18 @@
         <arguments>
             <argument name="createProfile" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile\Proxy</argument>
         </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Type\AbstractType">
+        <plugin name="tnw_subs_after_add_product_to_cart"
+                type="TNW\Subscriptions\Plugin\Quote\PrepareBuyRequest"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Quote\Config">
+        <plugin name="append_subscription_attributes_to_quote"
+                type="TNW\Subscriptions\Plugin\Quote\Item\QuoteConfigProductAttributes"
+                sortOrder="100"
+                disabled="false"/>
     </type>
 </config>
