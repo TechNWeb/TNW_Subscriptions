@@ -25,7 +25,7 @@ class Simple extends Base
             $request = $product->getCustomOption('info_buyRequest');
             if ($request) {
                 $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
-                $buyRequestValue = OptionValueResolver::decode($request->getValue());
+                $buyRequestValue = OptionValueResolver::getDecodedValue($request->getValue());
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
                 $price = $this->getSubscriptionPrice($product, $subscriptionPart);

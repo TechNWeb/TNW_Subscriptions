@@ -27,7 +27,7 @@ class Configurable extends Base
             $request = $mainProduct->getCustomOption('info_buyRequest');
             if ($request) {
                 $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
-                $requestValue = OptionValueResolver::decode($request->getValue());
+                $requestValue = OptionValueResolver::getDecodedValue($request->getValue());
                 $subscriptionPart = $requestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 if (!empty($requestValue['super_attribute'])) {
                     $subscriptionPart['super_attribute'] = $requestValue['super_attribute'];

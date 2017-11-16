@@ -48,7 +48,7 @@ class PrepareBuyRequest
             if ($firstItem) {
                 $buyRequest = $firstItem->getCustomOption('info_buyRequest');
                 if ($buyRequest) {
-                    $buyRequestValue = OptionValueResolver::decode($buyRequest->getValue());
+                    $buyRequestValue = OptionValueResolver::getDecodedValue($buyRequest->getValue());
                     if (!empty($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])) {
                         $type = $firstItem->getTypeId();
                         $this->productModifier->getBuyRequestModifier($type)
