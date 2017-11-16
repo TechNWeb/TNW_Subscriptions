@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 
 /**
  * Buy request modifier for simple, virtual and downloadable products.
@@ -23,7 +24,8 @@ class Simple extends Base
         foreach ($products as $product) {
             $request = $product->getCustomOption('info_buyRequest');
             if ($request) {
-                $buyRequestValue = unserialize($request->getValue());
+                $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
+                $buyRequestValue = OptionValueResolver::decode($request->getValue());
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
                 $price = $this->getSubscriptionPrice($product, $subscriptionPart);
@@ -37,7 +39,7 @@ class Simple extends Base
                         ],
                     ]
                 );
-                $request->setValue(serialize($result));
+                $request->setValue(OptionValueResolver::getEncodedValue($result, $valueFormat));
             }
         }
     }

@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 
 /**
  * Buy request modifier for configurable products.
@@ -25,7 +26,8 @@ class Configurable extends Base
             /** @var ProductInterface $mainProduct */
             $request = $mainProduct->getCustomOption('info_buyRequest');
             if ($request) {
-                $requestValue = unserialize($request->getValue());
+                $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
+                $requestValue = OptionValueResolver::decode($request->getValue());
                 $subscriptionPart = $requestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 if (!empty($requestValue['super_attribute'])) {
                     $subscriptionPart['super_attribute'] = $requestValue['super_attribute'];
@@ -46,7 +48,7 @@ class Configurable extends Base
                         ],
                     ]
                 );
-                $request->setValue(serialize($requestValue));
+                $request->setValue(OptionValueResolver::getEncodedValue($requestValue, $valueFormat));
             }
         }
     }
