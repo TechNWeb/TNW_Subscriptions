@@ -1,0 +1,52 @@
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="admin__fieldset-wrapper"
+     css="$data.additionalClasses"
+     attr="'data-level': $data.level, 'data-index': index"
+     data-bind="visible: $data.visible === undefined ? true: $data.visible">
+
+    <div class="admin__fieldset-wrapper-content"
+         css="'collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
+        <form id="co-transparent-form-braintree" class="admin__fieldset" method="post">
+            <div class="admin__field credit-card-number _required-number">
+                <label class="admin__field-label">
+                    <span>Credit Card Number</span>
+                </label>
+                <div class="admin__field-control">
+                    <div id="card-number" class="control-text" style="height: 33px;border: 1px solid #c2c2c2;padding: 0.6rem 1rem 0.6rem"></div>
+                </div>
+            </div>
+            <fieldset class="admin__field required">
+                <legend class="admin__field-label">
+                    <span>Expiration Date</span>
+                </legend>
+                <div class="admin__field-control field_without_legend _required-date admin__control-fields required">
+                    <div class="admin__field control-label-up select month _required" name="data.payment.payflowpro.additional.cc_exp_month">
+                        <div class="control">
+                            <div id="expiration-month" class="control-text" style="height: 33px;border: 1px solid #c2c2c2;padding: 0.6rem 1rem 0.6rem"></div>
+                        </div>
+                    </div>
+                    <div class="admin__field control-label-up select year _required" name="data.payment.payflowpro.additional.cc_exp_year">
+                        <div class="control">
+                            <div id="expiration-year" class="control-text" style="height: 33px;border: 1px solid #c2c2c2;padding: 0.6rem 1rem 0.6rem"></div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="admin__field payment-cvv _required" name="data.payment.payflowpro.additional.cc_cid" style="">
+                <label class="admin__field-label">
+                    <span>Card Verification Number</span>
+                </label>
+
+                <div class="admin__field-control">
+                    <div id="cvv" class="control-text" style="height: 33px;border: 1px solid #c2c2c2;padding: 0.6rem 1rem 0.6rem;width: 6rem;"></div>
+                </div>
+            </div>
+            <input id="braintree_submit" style="display:none" type="submit">
+        </form>
+    </div>
+</div>

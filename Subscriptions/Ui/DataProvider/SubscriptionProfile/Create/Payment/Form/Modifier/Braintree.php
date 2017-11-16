@@ -22,7 +22,7 @@ use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 /**
  * Braintree payment methods form modifier.
  */
-class Braintree extends Base
+class Braintree extends Base implements PaymentModifierInterface
 {
     const SORT_ORDER = 25;
 
@@ -103,26 +103,6 @@ class Braintree extends Base
     }
 
     /**
-     * @param array $data
-     * @return array
-     */
-    public function modifyData(array $data)
-    {
-        $data = parent::modifyData($data);
-
-        $additionalInfo = $this->getProfile()
-            ? $this->getProfile()->getDecodedPaymentAdditionalInfo()
-            : [];
-
-        if (!empty($additionalInfo['cc_type'])) {
-            $data['payment'][$this->getPaymentCode()]['additional']['cc_type']
-                = $additionalInfo['cc_type'];
-        }
-
-        return $data;
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getPaymentCode()
@@ -153,7 +133,6 @@ class Braintree extends Base
             'useCvv' => $this->hasVerification(),
             'options' => [
                 'orderSaveUrl' => $this->context->getEscaper()->escapeUrl($this->getOrderUrl()),
-                'expireYearLength' => $this->context->getEscaper()->escapeHtml($this->getMethodConfigData('cc_year_length')),
                 'formName' => $this->getPaymentFormName(),
             ],
             'imports' => [

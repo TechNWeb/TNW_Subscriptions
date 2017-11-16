@@ -6,10 +6,10 @@ define([
     'jquery',
     'mage/translate',
     'Magento_Ui/js/form/components/fieldset',
-    'mage/template',
+    'uiRegistry',
     'Magento_Ui/js/lib/spinner',
     'jquery/ui'
-], function ($, $t, fieldset, template) {
+], function ($, $t, fieldset, registry) {
     'use strict';
 
     return fieldset.extend({
@@ -41,18 +41,6 @@ define([
         },
 
         /**
-         * Initializes components' configuration.
-         *
-         * @returns {Fieldset} Chainable.
-         */
-        initConfig: function () {
-            this._super();
-            this.hiddenFormTmpl = template(this.hiddenFormTmpl);
-
-            return this;
-        },
-
-        /**
          * Change fieldset visibility and clear child elems values if fieldset was hidden
          *
          * @param {boolean} checkBoxChecked
@@ -71,6 +59,43 @@ define([
         },
 
         /**
+         * Trigger form saving.
+         */
+        saveBilling: function (value) {
+            var form,
+                temp = {},
+                postData = [];
+
+            if (value){
+                form = registry.get('index = ' + this.options.formName);
+                this.showLoader();
+                this.resetErrors();
+                //creating post data, this structure is needed to proper saving
+                postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {};
+                temp[this.code] = {
+                    method: '1'
+                };
+                postData.payment = temp;
+
+                $.ajax({
+                    url: form.source.process_url,
+                    type: 'post',
+                    context: this,
+                    data: postData,
+                    success: function (response) {
+                        if (response.error) {
+                            this.processErrors(response.error_messages);
+                        }
+                        this.hideLoader();
+                    },
+                    complete: function () {
+                        this.hideLoader();
+                    }
+                });
+            }
+        },
+
+        /**
          * Before submit action for payment method.
          */
         beforeSubmit: function () {
@@ -84,12 +109,12 @@ define([
             var self = this,
                 state = self.scriptLoaded;
 
-            $('body').trigger('processStart');
+            this.showLoader();
             require([this.sdkUrl], function (braintree) {
                 state(true);
                 self.braintree = braintree;
                 self.initBraintree();
-                $('body').trigger('processStop');
+                self.hideLoader();
             });
         },
 
@@ -97,8 +122,10 @@ define([
          * Setup Braintree SDK
          */
         initBraintree: function () {
+            var self = this;
+
             try {
-                $('body').trigger('processStart');
+                this.showLoader();
 
                 this.braintree.setup(this.clientToken, 'custom', {
                     id: this.selector,
@@ -108,7 +135,7 @@ define([
                      * Triggered when sdk was loaded
                      */
                     onReady: function () {
-                        $('body').trigger('processStop');
+                        self.hideLoader();
                     },
 
                     /**
@@ -124,12 +151,12 @@ define([
                      * @param {Object} response
                      */
                     onError: function (response) {
-                        this.processErrors(response.message);
-                        $('body').trigger('processStop');
+                        self.processErrors(response.message);
+                        self.hideLoader();
                     }
                 });
             } catch (e) {
-                $('body').trigger('processStop');
+                this.hideLoader();
                 this.processErrors(e.message);
             }
         },
@@ -157,7 +184,7 @@ define([
             if (this.useCvv) {
                 fields.cvv = {
                     selector: '#cvv',
-                    placeholder: $t('Credit verification number')
+                    placeholder: $t('CVV')
                 };
             }
 
@@ -176,6 +203,20 @@ define([
          */
         resetErrors:function () {
             this.set('payment_errors', '');
+        },
+
+        /**
+         * Shows form loader.
+         */
+        hideLoader: function () {
+            $('body').trigger('processStop');
+        },
+
+        /**
+         * Hides form loader.
+         */
+        showLoader: function () {
+            $('body').trigger('processStart');
         }
     });
 });
