@@ -397,7 +397,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getObjectItems(DataObject $object)
     {
-        return $object->getProducts();
+        return $object->getVisibleProducts();
     }
 
     /**

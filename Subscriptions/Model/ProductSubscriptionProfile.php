@@ -17,7 +17,8 @@ use Magento\Framework\Registry;
 /**
  * Product subscription profile model.
  */
-class ProductSubscriptionProfile extends AbstractModel
+class ProductSubscriptionProfile
+    extends AbstractModel
     implements ProductSubscriptionProfileInterface
 {
     /**
@@ -45,7 +46,6 @@ class ProductSubscriptionProfile extends AbstractModel
     private $magentoProduct;
 
     /**
-     * ProductSubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
      * @param ProductRepositoryInterface $productRepository
@@ -66,7 +66,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function _construct()
     {
@@ -74,7 +74,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getId()
     {
@@ -82,7 +82,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setId($id)
     {
@@ -90,7 +90,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSubscriptionProfileId()
     {
@@ -98,7 +98,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setSubscriptionProfileId($subscriptionProfileId)
     {
@@ -106,7 +106,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMagentoProductId()
     {
@@ -114,7 +114,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMagentoProductId($magentoProductId)
     {
@@ -122,7 +122,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMagentoProduct()
     {
@@ -137,7 +137,7 @@ class ProductSubscriptionProfile extends AbstractModel
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPrice()
     {
@@ -145,7 +145,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPrice($price)
     {
@@ -153,7 +153,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getInitialFee()
     {
@@ -161,7 +161,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setInitialFee($initialFee)
     {
@@ -169,7 +169,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getQty()
     {
@@ -177,7 +177,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setQty($qty)
     {
@@ -185,7 +185,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPurchaseType()
     {
@@ -193,7 +193,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPurchaseType($purchaseType)
     {
@@ -201,7 +201,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTrialStatus()
     {
@@ -209,7 +209,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTrialStatus($trialStatus)
     {
@@ -217,7 +217,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTrialPrice()
     {
@@ -225,7 +225,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTrialPrice($trialPrice)
     {
@@ -233,7 +233,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getLockProductPriceStatus()
     {
@@ -241,7 +241,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setLockProductPriceStatus($lockProductPriceStatus)
     {
@@ -249,7 +249,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getOfferFlatDiscountStatus()
     {
@@ -257,7 +257,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setOfferFlatDiscountStatus($offerFlatDiscountStatus)
     {
@@ -265,7 +265,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDiscountAmount()
     {
@@ -273,7 +273,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDiscountAmount($discountAmount)
     {
@@ -281,7 +281,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDiscountType()
     {
@@ -289,7 +289,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDiscountType($discountType)
     {
@@ -297,7 +297,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCreatedAt()
     {
@@ -305,7 +305,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCreatedAt($date)
     {
@@ -313,7 +313,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getUpdatedAt()
     {
@@ -321,7 +321,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUpdatedAt($date)
     {
@@ -345,9 +345,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Get product name
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getName()
     {
@@ -355,10 +353,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Set product name
-     *
-     * @param string $productName
-     * @return $this
+     * @inheritdoc
      */
     public function setName($productName)
     {
@@ -367,9 +362,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Get product sku
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getSku()
     {
@@ -377,10 +370,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Set product sku
-     *
-     * @param string $productSku
-     * @return $this
+     * @inheritdoc
      */
     public function setSku($productSku)
     {
@@ -389,9 +379,7 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Get product tnw_subscr_unlock_preset_qty
-     *
-     * @return int|null
+     * @inheritdoc
      */
     public function getTnwSubscrUnlockPresetQty()
     {
@@ -399,14 +387,62 @@ class ProductSubscriptionProfile extends AbstractModel
     }
 
     /**
-     * Set product tnw_subscr_unlock_preset_qty
-     *
-     * @param int $subscrUnlockPresetQty
-     * @return $this
+     * @inheritdoc
      */
     public function setTnwSubscrUnlockPresetQty($subscrUnlockPresetQty)
     {
         $this->setData(self::TNW_SUBSCR_UNLOCK_PRESET_QTY, $subscrUnlockPresetQty);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getParentId()
+    {
+        return $this->getData(self::PARENT_ID);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setParentId($parentId)
+    {
+        $this->setData(self::PARENT_ID, $parentId);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomOptions()
+    {
+        return $this->getData(self::CUSTOM_OPTIONS);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomOptions($customOptions)
+    {
+        $this->setData(self::CUSTOM_OPTIONS, $customOptions);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getChildren()
+    {
+        return $this->getData(self::CHILDREN) ?: [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setChildren($children)
+    {
+        $this->setData(self::CHILDREN, $children);
         return $this;
     }
 }

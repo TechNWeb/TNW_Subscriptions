@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Catalog\Model\Product;
 
+/**
+ * Interface for subscription profile products.
+ */
 interface ProductSubscriptionProfileInterface
 {
     /**
@@ -15,10 +18,11 @@ interface ProductSubscriptionProfileInterface
      */
     const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
 
-    /**#@+
+    /**
      * Constants for field names
      */
     const ID = 'entity_id';
+    const PARENT_ID = 'parent_id';
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const PRICE = 'price';
@@ -37,13 +41,17 @@ interface ProductSubscriptionProfileInterface
     const NAME = 'name';
     const SKU = 'sku';
     const TNW_SUBSCR_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
-    /**#@-*/
+    const CUSTOM_OPTIONS = 'custom_options';
 
-    /**#@+
+    /**
      * Constant for profile magento product
      */
     const MAGENTO_PRODUCT = 'magento_product';
-    /**#@-*/
+
+    /**
+     * Child products field name
+     */
+    const CHILDREN = 'children';
 
     /**
      * Gets id.
@@ -336,4 +344,49 @@ interface ProductSubscriptionProfileInterface
      * @return $this
      */
     public function setTnwSubscrUnlockPresetQty($subscrUnlockPresetQty);
+
+    /**
+     * Gets parent id.
+     *
+     * @return int|string|null
+     */
+    public function getParentId();
+
+    /**
+     * Sets parent id.
+     *
+     * @param int|string $parentId
+     * @return $this
+     */
+    public function setParentId($parentId);
+
+    /**
+     * Gets custom options.
+     *
+     * @return int|null
+     */
+    public function getCustomOptions();
+
+    /**
+     * Sets custom options.
+     *
+     * @param int $customOptions
+     * @return $this
+     */
+    public function setCustomOptions($customOptions);
+
+    /**
+     * Gets child products.
+     *
+     * @return array
+     */
+    public function getChildren();
+
+    /**
+     * Sets child products.
+     *
+     * @param array $children
+     * @return $this
+     */
+    public function setChildren(array $children);
 }
