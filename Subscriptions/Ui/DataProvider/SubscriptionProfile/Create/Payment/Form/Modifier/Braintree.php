@@ -121,6 +121,142 @@ class Braintree extends Base implements PaymentModifierInterface
     /**
      * {@inheritdoc}
      */
+    protected function getAdditionalFields()
+    {
+        $result = [
+            'credit_card_type' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Credit Card Type'),
+                            'componentType' => Field::NAME,
+                            'formElement' => Select::NAME,
+                            'dataScope' => 'cc_type',
+                            'dataType' => Text::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
+                            'dataContainer' => $this->getPaymentCode() . '-cc-type',
+                            'additionalClasses' => 'credit-card-type',
+                            'sortOrder' => 10,
+                            'options' => $this->getPaymentCcTypes(),
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ],
+                            'validation' => [
+                                'required-entry' => true,
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            'credit_card_number' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Credit Card Number'),
+                            'placeholder' => __('Credit card number'),
+                            'componentType' => Field::NAME,
+                            'formElement' => Input::NAME,
+                            'dataScope' => 'cc_number',
+                            'dataType' => Text::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'additionalClasses' => 'credit-card-number _required-number',
+                            'dataContainer' => $this->getPaymentCode() . '-cc-number',
+                            'sortOrder' => 20,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            'exp_date_container' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Expiration Date'),
+                            'component' => 'TNW_Subscriptions/js/components/group',
+                            'componentType' => Container::NAME,
+                            'title' => __('Expiration Date'),
+                            'additionalClasses' => 'field_without_legend _required-date',
+                            'dataScope' => '',
+                            'sortOrder' => 30,
+                            'required' => true,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ],
+                        ],
+                    ],
+                ],
+                'children' => [
+                    'exp_date_month' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'label' => false,
+                                    'componentType' => Field::NAME,
+                                    'formElement' => Input::NAME,
+                                    'dataScope' => 'cc_exp_month',
+                                    'dataType' => Text::NAME,
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'dataContainer' => $this->getPaymentCode() . '-cc-month',
+                                    'additionalClasses' => 'control-label-up select month',
+                                    'sortOrder' => 10
+                                ],
+                            ],
+                        ],
+                    ],
+                    'exp_date_year' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'label' => false,
+                                    'componentType' => Field::NAME,
+                                    'formElement' => Input::NAME,
+                                    'dataScope' => 'cc_exp_year',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'dataContainer' => $this->getPaymentCode() . '-cc-year',
+                                    'additionalClasses' => 'control-label-up select year',
+                                    'dataType' => Text::NAME,
+                                    'sortOrder' => 20
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            ]
+        ];
+
+        if ($this->hasVerification()) {
+            $result['credit_card_cvv'] = [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Card Verification Number'),
+                            'placeholder' => __('Credit verification number'),
+                            'name' => '',
+                            'componentType' => Field::NAME,
+                            'formElement' => Input::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'dataContainer' => $this->getPaymentCode() . '-cc-cvv',
+                            'dataScope' => 'cc_cid',
+                            'dataType' => Text::NAME,
+                            'additionalClasses' => 'payment-cvv',
+                            'sortOrder' => 40,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                            ]
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getAdditionalConfig()
     {
         return [
@@ -131,6 +267,8 @@ class Braintree extends Base implements PaymentModifierInterface
             'sdkUrl' => $this->braintreeConfig->getSdkUrl(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
+            'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),
+            'ccTypesMapper' => $this->braintreeConfig->getCcTypesMapper(),
             'options' => [
                 'orderSaveUrl' => $this->context->getEscaper()->escapeUrl($this->getOrderUrl()),
                 'formName' => $this->getPaymentFormName(),
@@ -208,7 +346,11 @@ class Braintree extends Base implements PaymentModifierInterface
      */
     private function getPaymentCcTypes()
     {
-        $result = [];
+        $result[] = [
+            'label' =>  __('Type'),
+            'value' => ''
+        ];
+
         $types = $this->paymentConfig->getCcTypes();
         $availableTypes = $this->braintreeConfig->getAvailableCardTypes();
 
@@ -223,48 +365,6 @@ class Braintree extends Base implements PaymentModifierInterface
                     ];
                 }
             }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves credit card expire months.
-     *
-     * @return array
-     */
-    private function getCcMonths()
-    {
-        $result[] = [
-            'label' => __('Month'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getMonths() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => $label
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves credit card expire years
-     *
-     * @return array
-     */
-    private function getCcYears()
-    {
-        $result[] = [
-            'label' => __('Year'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getYears() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => (string)$label
-            ];
         }
 
         return $result;
@@ -296,7 +396,7 @@ class Braintree extends Base implements PaymentModifierInterface
         }
 
         return $this->urlBuilder->getUrl(
-            'tnw_subscriptions/paypal/requestSecureToken',
+            'tnw_subscriptions/braintree/requestSecureToken',
             $routeParams
         );
     }

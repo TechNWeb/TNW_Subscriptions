@@ -68,7 +68,6 @@ define(
                         }
                         switch (code) {
                             case 'payflowpro':
-                            case 'braintree':
                                 if (fields.additional.cc_number) {
                                     fields.additional.cc_last_4 = fields.additional.cc_number.substr(-4);
                                     delete fields.additional.cc_number;

@@ -7,9 +7,10 @@ define([
     'mage/translate',
     'Magento_Ui/js/form/components/fieldset',
     'uiRegistry',
+    'Magento_Braintree/js/validator',
     'Magento_Ui/js/lib/spinner',
     'jquery/ui'
-], function ($, $t, fieldset, registry) {
+], function ($, $t, fieldset, registry, validator) {
     'use strict';
 
     return fieldset.extend({
@@ -37,6 +38,7 @@ define([
                     'payment_errors'
                 ]);
 
+            validator.setConfig(this);
             return this;
         },
 
@@ -143,7 +145,29 @@ define([
                      * @param {Object} response
                      */
                     onPaymentMethodReceived: function (response) {
-                        console.log(response);
+                        if (self.validateCardType()) {
+                            var form = registry.get('index = '+self.options.formName);
+                            form.source.data.payment.braintree.additional.cc_last_4 = response.details.lastFour;
+                            form.source.data.payment.braintree.additional.cc_exp_month = '';
+                            form.source.data.payment.braintree.additional.cc_exp_year = '';
+                            console.log(response);
+
+                            $.ajax({
+                                url: self.options.orderSaveUrl,
+                                type: 'post',
+                                data: {
+                                    nonce: response.nonce
+                                },
+                                dataType: 'json',
+                                success: function (response) {
+                                    if (response.success) {
+                                        form.triggerSave([]);
+                                    } else {
+                                        self.processErrors(response.error_messages);
+                                    }
+                                }
+                            });
+                        }
                     },
 
                     /**
@@ -166,29 +190,94 @@ define([
          * @returns {Object}
          */
         getHostedFields: function () {
-            var fields = {
+            var self = this,
+                fields = {
                     number: {
-                        selector: '#card-number',
+                        selector: self.getSelector('cc-number'),
                         placeholder: $t('Credit card number')
                     },
                     expirationMonth: {
-                        selector: '#expiration-month',
+                        selector: self.getSelector('cc-month'),
                         placeholder: $t('MM')
                     },
                     expirationYear: {
-                        selector: '#expiration-year',
+                        selector: self.getSelector('cc-year'),
                         placeholder: $t('YY')
+                    },
+
+                    /**
+                     * Triggered when hosted field is changed
+                     * @param {Object} event
+                     */
+                    onFieldEvent: function (event) {
+                        return self.fieldEventHandler(event);
                     }
                 };
 
             if (this.useCvv) {
                 fields.cvv = {
-                    selector: '#cvv',
+                    selector: self.getSelector('cc-cvv'),
                     placeholder: $t('CVV')
                 };
             }
 
             return fields;
+        },
+
+        /**
+         * Get jQuery selector
+         * @param {String} field
+         * @returns {String}
+         */
+        getSelector: function (field) {
+            return '[data-container="'+this.code + '-' + field+'"]';
+        },
+
+        /**
+         * Function to handle hosted fields events
+         * @param {Object} event
+         * @returns {Boolean}
+         */
+        fieldEventHandler: function (event) {
+            console.log(arguments);
+            if (event.type !== 'fieldStateChange') {
+
+                return false;
+            }
+
+            // Handle a change in validation or card type
+            if (event.target.fieldKey === 'number') {
+                this.selectedCardType(null);
+            }
+
+            if (event.card) {
+                this.selectedCardType(validator.getMageCardType(event.card.type, this.getCcAvailableTypes()));
+                //registry.get('index = credit_card_type').value = this.selectedCardType();
+                $(this.getSelector('cc-type')).val(this.selectedCardType());
+            }
+        },
+
+        /**
+         * Get list of currently available card types
+         * @returns {Array}
+         */
+        getCcAvailableTypes: function () {
+            var types = [],
+                $options = $(this.getSelector('cc-type')).find('option');
+
+            $.map($options, function (option) {
+                types.push($(option).val());
+            });
+
+            return types;
+        },
+
+        /**
+         * Validate current entered card type
+         * @returns {Boolean}
+         */
+        validateCardType: function () {
+            return this.selectedCardType();
         },
 
         /**
