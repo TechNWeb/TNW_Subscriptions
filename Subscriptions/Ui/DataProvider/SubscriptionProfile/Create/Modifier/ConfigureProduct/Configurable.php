@@ -10,15 +10,16 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 
 /**
- * \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm modifier,
- * is used for configurable products.
+ * DataProvider modifier on products configure form for configurable products.
  */
 class Configurable extends Base
 {
     /** Current product type */
-    const PRODUCT_TYPE = 'configurable';
+    const PRODUCT_TYPE = ConfigurableProduct::TYPE_CODE;
+
     /** Options container prefix */
     const CONTAINER_PREFIX = 'super_attribute';
 

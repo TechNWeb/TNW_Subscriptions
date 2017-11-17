@@ -10,7 +10,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
 
 /**
- * \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form base modifier.
+ * Base dataProvider modifier on add to subscription form.
  */
 class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
@@ -62,7 +62,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     protected function isUsedModifier()
     {
         if ($this->getProduct()) {
-            return $this->getProduct()->getTypeId() == $this::PRODUCT_TYPE;
+            return $this->getProduct()->getTypeId() === $this::PRODUCT_TYPE;
         }
 
         return false;

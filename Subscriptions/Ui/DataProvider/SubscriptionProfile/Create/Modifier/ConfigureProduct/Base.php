@@ -10,7 +10,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Registry;
 
 /**
- * \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm base modifier,
+ * Base dataProvider modifier on products configure form.
  */
 class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
@@ -59,7 +59,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     {
         $product = $this->getProduct();
 
-        return $product ? $product->getTypeId() == $this::PRODUCT_TYPE : false;
+        return $product ? $product->getTypeId() === $this::PRODUCT_TYPE : false;
     }
 
     /**

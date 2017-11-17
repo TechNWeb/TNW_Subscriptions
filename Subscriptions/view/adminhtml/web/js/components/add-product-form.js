@@ -19,7 +19,7 @@ define(
                 listens: {
                     responseStatus: 'processResponseStatus'
                 },
-                needConfigureTypes: ['configurable']
+                configureTypes: ['configurable']
             },
 
             /**
@@ -235,6 +235,9 @@ define(
 
             /**
              * Opens Configurable modal window and renders form
+             *
+             * @param {string|number} product_id
+             * @return {void}
              */
             openConfigurableModal: function (product_id) {
                 var configurableForm = registry.get('index=' + this.source.insertConfigurableForm),
@@ -288,7 +291,7 @@ define(
                         result = (
                             product.hasOwnProperty('tnw_subscr_unlock_preset_qty') &&
                             product.tnw_subscr_unlock_preset_qty == 1 &&
-                            this.needConfigureTypes.indexOf(product.type_id) == -1
+                            this.configureTypes.indexOf(product.type_id) == -1
                         );
                         break;
                     }

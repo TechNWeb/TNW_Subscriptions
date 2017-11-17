@@ -17,7 +17,7 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Configure profuct to add to subscription.
+ * Configure product to add to subscription.
  */
 class ConfigurableForm extends AbstractDataProvider
 {
@@ -40,17 +40,24 @@ class ConfigurableForm extends AbstractDataProvider
     const DEFAULT_QTY_VALUE = 1;
     /**#@-*/
 
+    /** @var string */
     protected $scopeName;
+
     /** @var [] */
     protected $loadedData;
+
     /** @var UrlInterface */
     protected $urlBuilder;
+
     /** @var StepPool */
     protected $stepPool;
+
     /** @var Registry */
     protected $registry;
+
     /** @var MagentoProduct */
     private $currentProduct;
+
     /** @var PoolInterface */
     private $pool;
 
@@ -191,7 +198,7 @@ class ConfigurableForm extends AbstractDataProvider
      */
     private function getCurrentProduct()
     {
-        if (!$this->currentProduct) {
+        if ($this->currentProduct == null) {
             $productId = $this->getProductId();
             $this->currentProduct = $this->formContext->getProductRepository()->getById($productId);
             $this->registry->register('product', $this->currentProduct);
