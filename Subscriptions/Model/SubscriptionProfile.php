@@ -583,7 +583,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     /**
      * @inheritdoc
      */
-    public function setVisibleProducts($products)
+    public function setVisibleProducts(array $products)
     {
         return $this->setData(self::PROFILE_VISIBLE_PRODUCTS, $products);
     }

@@ -440,7 +440,7 @@ class ProductSubscriptionProfile
     /**
      * @inheritdoc
      */
-    public function setChildren($children)
+    public function setChildren(array $children)
     {
         $this->setData(self::CHILDREN, $children);
         return $this;
