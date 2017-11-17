@@ -73,7 +73,7 @@ class Products extends BaseSummary
      */
     public function getItems()
     {
-        return $this->getSubscriptionProfile()->getProducts();
+        return $this->getSubscriptionProfile()->getVisibleProducts();
     }
 
     /**

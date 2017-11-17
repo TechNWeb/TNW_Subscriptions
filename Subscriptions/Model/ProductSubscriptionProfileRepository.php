@@ -8,35 +8,50 @@ namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileSearchResultsInterfaceFactory;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Reflection\DataObjectProcessor;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as ResourceProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory as ProductSubscriptionProfileCollectionFactory;
-use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * Repository for subscription profile products
+ */
 class ProductSubscriptionProfileRepository implements ProductSubscriptionProfileRepositoryInterface
 {
-
+    /**
+     * @var ResourceProductSubscriptionProfile
+     */
     private $resource;
 
+    /**
+     * @var ProductSubscriptionProfileFactory
+     */
     private $productSubscriptionProfileFactory;
 
+    /**
+     * @var ProductSubscriptionProfileCollectionFactory
+     */
     private $productSubscriptionProfileCollectionFactory;
 
+    /**
+     * @var ProductSubscriptionProfileSearchResultsInterfaceFactory
+     */
     private $searchResultsFactory;
 
+    /**
+     * @var DataObjectHelper
+     */
     private $dataObjectHelper;
 
-    private $dataObjectProcessor;
-
+    /**
+     * @var ProductSubscriptionProfileInterfaceFactory
+     */
     private $dataProductSubscriptionProfileFactory;
-
-    private $storeManager;
 
 
     /**
@@ -46,8 +61,6 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
      * @param ProductSubscriptionProfileCollectionFactory $productSubscriptionProfileCollectionFactory
      * @param ProductSubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param DataObjectProcessor $dataObjectProcessor
-     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         ResourceProductSubscriptionProfile $resource,
@@ -55,9 +68,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
         ProductSubscriptionProfileInterfaceFactory $dataProductSubscriptionProfileFactory,
         ProductSubscriptionProfileCollectionFactory $productSubscriptionProfileCollectionFactory,
         ProductSubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager
+        DataObjectHelper $dataObjectHelper
     ) {
         $this->resource = $resource;
         $this->productSubscriptionProfileFactory = $productSubscriptionProfileFactory;
@@ -65,20 +76,14 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
         $this->searchResultsFactory = $searchResultsFactory;
         $this->dataObjectHelper = $dataObjectHelper;
         $this->dataProductSubscriptionProfileFactory = $dataProductSubscriptionProfileFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(
         \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface $productSubscriptionProfile
     ) {
-        /* if (empty($productSubscriptionProfile->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $productSubscriptionProfile->setStoreId($storeId);
-        } */
         try {
             $this->resource->save($productSubscriptionProfile);
         } catch (\Exception $exception) {
@@ -91,7 +96,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById($productSubscriptionProfileId)
     {
@@ -101,11 +106,12 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
             throw new NoSuchEntityException(__('ProductSubscriptionProfile with id "%1" does not exist.',
                 $productSubscriptionProfileId));
         }
+        $this->addChildren($productSubscriptionProfile);
         return $productSubscriptionProfile;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getList(
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
@@ -146,6 +152,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                 $productSubscriptionProfileModel->getData(),
                 'TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface'
             );
+            $this->addChildren($productSubscriptionProfileData);
             $items[] = $productSubscriptionProfileData;
         }
         $searchResults->setItems($items);
@@ -153,7 +160,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(
         \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface $productSubscriptionProfile
@@ -170,10 +177,26 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById($productSubscriptionProfileId)
     {
         return $this->delete($this->getById($productSubscriptionProfileId));
+    }
+
+    /**
+     * Returns child products for profile product.
+     *
+     * @param ProductSubscriptionProfileInterface $productSubscriptionProfileData
+     */
+    private function addChildren($productSubscriptionProfileData)
+    {
+        $collection = $this->productSubscriptionProfileCollectionFactory->create();
+        /** @var ProductSubscriptionProfileInterface[] $items */
+        $items = $collection->addFieldToFilter(
+            ProductSubscriptionProfileInterface::PARENT_ID,
+            $productSubscriptionProfileData->getId()
+        )->getItems();
+        $productSubscriptionProfileData->setChildren($items);
     }
 }

@@ -823,7 +823,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-
         if (version_compare($context->getVersion(), "2.0.22", "<")) {
             $this->addCustomerQuote($setup);
         }
@@ -847,6 +846,29 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Cancel before next cycle',
                     'length' => 1,
                     'default' => '0'
+                ]
+            );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.36", "<")) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfileInterface::CUSTOM_OPTIONS,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'nullable'  => true,
+                    'comment'   => 'Custom Options'
+                ]
+            );
+            $setup->getConnection()->addColumn(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                ProductSubscriptionProfileInterface::PARENT_ID,
+                [
+                    'type' => Table::TYPE_INTEGER,
+                    'nullable'  => true,
+                    'comment'   => 'Parent id',
+                    'length'    => 10,
+                    'after'     => ProductSubscriptionProfileInterface::ID
                 ]
             );
         }

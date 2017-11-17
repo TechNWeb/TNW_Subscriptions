@@ -585,6 +585,36 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateUseInListingForProductAttributes($eavSetup, true);
         }
 
+        if (version_compare($context->getVersion(), '2.0.36', '<')) {
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::CUSTOM_OPTIONS,
+                [
+                    'type' => 'static',
+                    'label' => 'Custom options',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 290,
+                ]
+            );
+
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::PARENT_ID,
+                [
+                    'type' => 'static',
+                    'label' => 'Parent id',
+                    'input' => 'int',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 300,
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

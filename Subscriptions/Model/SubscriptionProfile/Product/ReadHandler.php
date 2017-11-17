@@ -61,7 +61,23 @@ class ReadHandler implements ExtensionInterface
 
         $products = $this->productProfileRepository->getList($searchCriteria)->getItems();
         $entity->setProducts($products);
-
+        $entity->setVisibleProducts($this->getVisibleProducts($products));
         return $entity;
+    }
+
+    /**
+     * Returns visible profile products.
+     *
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return ProductSubscriptionProfileInterface[]
+     */
+    private function getVisibleProducts($products)
+    {
+        return array_filter(
+            $products,
+            function (ProductSubscriptionProfileInterface $product) {
+                return !$product->getParentId();
+            }
+        );
     }
 }

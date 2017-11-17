@@ -14,7 +14,6 @@ use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
@@ -26,7 +25,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory 
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
 
 /**
- * Class SubscriptionProfileRepository
+ * Repository for subscription profiles.
  */
 class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInterface
 {
@@ -71,13 +70,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $resource;
 
     /**
-     * Data object processor for array serialization using class reflection.
-     *
-     * @var DataObjectProcessor
-     */
-    private $dataObjectProcessor;
-
-    /**
      * Entity Manager.
      *
      * @var EntityManager
@@ -107,17 +99,16 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $criteriaBuilder;
 
     /**
-     * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
      * @param SubscriptionProfileInterfaceFactory $dataSubscriptionProfileFactory
      * @param SubscriptionProfileCollectionFactory $subscriptionProfileCollectionFactory
      * @param SubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param DataObjectProcessor $dataObjectProcessor
      * @param EntityManager $entityManager
      * @param AddressRepository $addressRepository
      * @param ProductSubscriptionProfileRepository $productProfileRepository
+     * @param SearchCriteriaBuilder $criteriaBuilder
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -126,7 +117,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         SubscriptionProfileCollectionFactory $subscriptionProfileCollectionFactory,
         SubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
         EntityManager $entityManager,
         AddressRepository $addressRepository,
         ProductSubscriptionProfileRepository $productProfileRepository,
@@ -138,7 +128,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->searchResultsFactory = $searchResultsFactory;
         $this->dataObjectHelper = $dataObjectHelper;
         $this->dataSubscriptionProfileFactory = $dataSubscriptionProfileFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
         $this->entityManager = $entityManager;
         $this->addressRepository = $addressRepository;
         $this->productProfileRepository = $productProfileRepository;
@@ -146,7 +135,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function save(
         SubscriptionProfileInterface $subscriptionProfile
@@ -163,7 +152,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getById($subscriptionProfileId)
     {
@@ -177,7 +166,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getList(
         SearchCriteriaInterface $criteria
@@ -227,7 +216,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete(
         SubscriptionProfileInterface $subscriptionProfile
@@ -244,7 +233,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteById($subscriptionProfileId)
     {
@@ -276,5 +265,22 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $productSearchCriteria = $this->criteriaBuilder->create();
         $products = $this->productProfileRepository->getList($productSearchCriteria)->getItems();
         $subscriptionProfileModel->setProducts($products);
+        $subscriptionProfileModel->setVisibleProducts($this->getVisibleProducts($products));
+    }
+
+    /**
+     * Returns visible profile products.
+     *
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return ProductSubscriptionProfileInterface[]
+     */
+    private function getVisibleProducts($products)
+    {
+        return array_filter(
+            $products,
+            function (ProductSubscriptionProfileInterface $product) {
+                return !$product->getParentId();
+            }
+        );
     }
 }

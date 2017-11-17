@@ -6,11 +6,10 @@
 
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
-use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
@@ -31,20 +30,6 @@ class Manager
     private $profileProductFactory;
 
     /**
-     * Repository for retrieving products.
-     *
-     * @var ProductRepository
-     */
-    private $productRepository;
-
-    /**
-     * Subscription profile product.
-     *
-     * @var ProductSubscriptionProfileInterface
-     */
-    private $profileProduct;
-
-    /**
      * Core registry
      *
      * @var Registry
@@ -55,6 +40,13 @@ class Manager
      * @var MessageHistoryLogger
      */
     private $historyLogger;
+
+    /**
+     * Subscription profile product.
+     *
+     * @var ProductSubscriptionProfileInterface
+     */
+    private $profileProduct;
 
     /**
      * Mapper between subscription product and magento product attributes.
@@ -75,20 +67,16 @@ class Manager
     ];
 
     /**
-     * Manager constructor.
      * @param ProductSubscriptionProfileFactory $profileFactory
-     * @param ProductRepository $productRepository
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
-        ProductRepository $productRepository,
         Registry $coreRegistry,
         MessageHistoryLogger $historyLogger
     ) {
         $this->profileProductFactory = $profileFactory;
-        $this->productRepository = $productRepository;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
     }
@@ -117,7 +105,7 @@ class Manager
     /**
      * Sets profile product.
      *
-     * @param ProductSubscriptionProfile $profileProduct
+     * @param ProductSubscriptionProfileInterface $profileProduct
      */
     public function setProfileProduct(
         ProductSubscriptionProfileInterface $profileProduct
@@ -145,70 +133,94 @@ class Manager
         return $this->productAttributesMap;
     }
 
+
+    /**
+     * Returns list of main profile products created from quote items.
+     *
+     * @param Quote $quote
+     * @return array
+     */
+    public function populateProductsData($quote)
+    {
+        $items = $quote->getAllVisibleItems();
+        $profileProducts = [];
+        /** @var Item $item */
+        foreach ($items as $item) {
+            $profileProducts[] = $this->reset()
+                ->populateProductDataFromQuoteItem($item)
+                ->getProfileProduct();
+        }
+
+        return $profileProducts;
+    }
+
+    /**
+     * Returns list of profile child products created from quote items.
+     *
+     * @param Quote $quote
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return array
+     */
+    public function populateChildProductsData($quote, $products)
+    {
+        $childProducts = [];
+        $items = $quote->getAllVisibleItems();
+        /** @var Item $item */
+        foreach ($items as $item) {
+            switch ($item->getProductType()) {
+                case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+                case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+                case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                    break;
+                case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                    /** @var ProductSubscriptionProfileInterface $profileProduct */
+                    $profileProduct = $this->getItemProfileProduct($item, $products);
+                    if ($profileProduct){
+                        $childProducts = $this->getConfigurableProducts($item, $profileProduct);
+                    }
+                    break;
+                default:
+                    throw new \InvalidArgumentException(__('Unsupported product type -' . $item->getProductType()));
+                    break;
+            }
+        }
+
+        return $childProducts;
+    }
+
     /**
      * Sets to profile product data from quote item.
      *
      * @param Item $item
+     * @param DataObject $product
+     * @param bool $zeroPrices
      * @return $this
      */
-    public function populateProductDataFromQuoteItem(Item $item)
-    {
-        $product = $this->productRepository->getById(
-            $item->getProduct()->getId()
-        );
-
+    public function populateProductDataFromQuoteItem(
+        Item $item,
+        DataObject $product = null,
+        $zeroPrices = false
+    ) {
+        $product = $product ?: $item->getProduct();
         foreach ($this->getProductAttributesMap() as $profileProductField => $productField) {
-            $this->getProfileProduct()->setData(
-                $profileProductField,
-                $product->getData($productField)
-            );
+            $this->getProfileProduct()->setData($profileProductField, $product->getData($productField));
         }
-
-        $buyRequest = $item->getBuyRequest()->getDataByPath(
-            Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
-        );
-
+        $buyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
         if (!empty($buyRequest)) {
-            $this->getProfileProduct()->setInitialFee(
-                $this->getProductInitialFee(
-                    $product,
-                    $buyRequest[Create::UNIQUE]['billing_frequency']
-                )
-            );
+            $initialFee = !$zeroPrices ? $this->getInitialFeeFromItem($item) : 0;
+            $price = !$zeroPrices ? $item->getPrice() : 0;
+            $uniquePrice = !$zeroPrices ? $buyRequest[Create::NON_UNIQUE]['price'] : 0;
+            $this->getProfileProduct()->setInitialFee($initialFee);
             $this->getProfileProduct()->setTrialPrice(null);
-            $this->getProfileProduct()->setPrice($item->getPrice());
-
+            $this->getProfileProduct()->setPrice($price);
             if ($buyRequest[Create::UNIQUE]['is_trial']) {
-                $this->getProfileProduct()->setTrialPrice($item->getPrice());
-                $this->getProfileProduct()->setPrice($buyRequest[Create::NON_UNIQUE]['price']);
+                $this->getProfileProduct()->setTrialPrice($price);
+                $this->getProfileProduct()->setPrice($uniquePrice);
             }
         }
-
         $this->getProfileProduct()->setQty($item->getQty());
 
         return $this;
-    }
-
-    /**
-     * @param Product $product
-     * @param int $frequencyId
-     * @return null
-     */
-    private function getProductInitialFee($product, $frequencyId)
-    {
-        $initialFee = null;
-
-        if ($product->getData('recurring_options')){
-            /** @var ProductBillingFrequencyInterface $option */
-            foreach ($product->getData('recurring_options') as $option) {
-                if ($option->getBillingFrequencyId() === $frequencyId){
-                    $initialFee = $option->getInitialFee();
-                    break;
-                }
-            }
-        }
-
-        return $initialFee;
     }
 
     /**
@@ -237,12 +249,13 @@ class Manager
                         $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : [];
                         if ($remove) {
                             $product->delete();
-                            $this->historyLogger->log(__('Deleted product %1.', $product->getMagentoProduct()->getName()), $profileModel->getId());
+                            $this->historyLogger->log(__('Deleted product %1.',
+                                $product->getMagentoProduct()->getName()), $profileModel->getId());
                         } else {
-                            if (!empty($requestData['price'])){
+                            if (!empty($requestData['price'])) {
                                 $product->setPrice(number_format($requestData['price'], 4));
                             }
-                            if (!empty($requestData['qty'])){
+                            if (!empty($requestData['qty'])) {
                                 $product->setQty(number_format($requestData['qty'], 4));
                             }
                         }
@@ -272,5 +285,69 @@ class Manager
                 }
             }
         }
+    }
+
+    /**
+     * @param Item $item
+     * @param ProductSubscriptionProfileInterface $subscriptionProduct
+     * @return array
+     */
+    private function getConfigurableProducts(
+        Item $item,
+        ProductSubscriptionProfileInterface $subscriptionProduct
+    ) {
+        $products = [];
+        $confOptions = $item->getBuyRequest()->getDataByPath('super_attribute');
+        $subscriptionProduct->setCustomOptions(\Zend_Json::encode($confOptions));
+        $productObject = new DataObject($item->getProduct()->getData());
+        $productObject->setName($item->getName())->setSku($item->getSku());
+        foreach ($item->getChildren() as $child) {
+            $productObject->setEntityId($child->getProduct()->getId());
+            $product = $this->reset()
+                ->populateProductDataFromQuoteItem($child, $productObject, true)
+                ->getProfileProduct();
+            $product->setParentId($subscriptionProduct->getId());
+            $product->setCustomOptions(\Zend_Json::encode($confOptions));
+            $products[] = $product;
+        }
+
+        return $products;
+    }
+
+    /**
+     * Returns initial fee from item.
+     *
+     * @param Item $item
+     * @return int
+     */
+    private function getInitialFeeFromItem(Item $item)
+    {
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees) {
+            $initialFee = $initialFees->getSubsInitialFee();
+        }
+
+        return !empty($initialFee) ? $initialFee : 0;
+    }
+
+    /**
+     * Returns subscription product for quote item.
+     *
+     * @param Item $item
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return bool|ProductSubscriptionProfileInterface
+     */
+    private function getItemProfileProduct($item, $products)
+    {
+        $itemProductId = $item->getProduct()->getId();
+        $result = array_filter(
+            $products,
+            function (ProductSubscriptionProfileInterface $product) use ($itemProductId) {
+                return ($product->getMagentoProductId() == $itemProductId);
+            }
+        );
+        return $result ? reset($result) : false;
     }
 }

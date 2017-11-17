@@ -60,6 +60,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * Constant for subscription profile products
      */
     const PROFILE_PRODUCTS = 'profile_products';
+    const PROFILE_VISIBLE_PRODUCTS = 'profile_visible_products';
     /**#@-*/
 
     /**
@@ -246,6 +247,21 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setProducts($products);
+
+    /**
+     * Gets subscription profile visible products.
+     *
+     * @return ProductSubscriptionProfileInterface[]
+     */
+    public function getVisibleProducts();
+
+    /**
+     * Sets subscription profile visible products.
+     *
+     * @param ProductSubscriptionProfileInterface[] $products
+     * @return $this
+     */
+    public function setVisibleProducts($products);
 
     /**
      * Gets subscription profile shipping address.
