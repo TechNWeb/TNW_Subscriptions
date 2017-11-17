@@ -198,7 +198,7 @@ class ConfigurableForm extends AbstractDataProvider
      */
     private function getCurrentProduct()
     {
-        if ($this->currentProduct == null) {
+        if ($this->currentProduct === null) {
             $productId = $this->getProductId();
             $this->currentProduct = $this->formContext->getProductRepository()->getById($productId);
             $this->registry->register('product', $this->currentProduct);

@@ -124,7 +124,7 @@ class Configurable extends Base
     /**
      * Return selected attributes and their ids from request.
      *
-     * @return array|null
+     * @return mixed
      */
     private function getSuperAttributes()
     {

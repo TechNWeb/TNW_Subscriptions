@@ -89,7 +89,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * Return current product Id.
      *
-     * @return string|null
+     * @return mixed
      */
     private function getProductId()
     {
