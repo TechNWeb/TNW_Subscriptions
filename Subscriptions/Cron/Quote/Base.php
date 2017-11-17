@@ -242,6 +242,7 @@ abstract class Base implements ProcessInterface
      *
      * @param SubscriptionProfileInterface $profile
      * @param Quote $quote
+     * @return void
      */
     protected function addProductsToQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
