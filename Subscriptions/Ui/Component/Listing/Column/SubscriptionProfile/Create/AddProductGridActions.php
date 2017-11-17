@@ -44,9 +44,10 @@ class AddProductGridActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['entity_id'])) {
+                    $label = ($item['type_id'] == 'configurable') ? '[' . __('Configure & Add') . ']' : __('[Add]');
                     $item[$this->getData('name')] = [
                         'view' => [
-                            'label' => __('[Add]'),
+                            'label' => $label,
                             'callback' => [
                                 'provider' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM,
                                 'target' => 'setProductId'

@@ -29,6 +29,7 @@ class Configurable extends Base
                 $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
                 $requestValue = OptionValueResolver::getDecodedValue($request->getValue());
                 $subscriptionPart = $requestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
+                $subscriptionPart['qty'] = $requestValue['qty'];
                 if (!empty($requestValue['super_attribute'])) {
                     $subscriptionPart['super_attribute'] = $requestValue['super_attribute'];
                 } else {

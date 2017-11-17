@@ -12,6 +12,8 @@ use Magento\Framework\Api\Filter;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
@@ -86,12 +88,18 @@ class Form extends AbstractDataProvider
     protected $formContext;
 
     /**
+     * @var PoolInterface
+     */
+    private $pool;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param PriceCalculator $priceCalculator
      * @param SubscriptionContext $context
      * @param Context $formContext
+     * @param PoolInterface $pool
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -103,6 +111,7 @@ class Form extends AbstractDataProvider
         PriceCalculator $priceCalculator,
         SubscriptionContext $context,
         Context $formContext,
+        PoolInterface $pool,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -113,6 +122,7 @@ class Form extends AbstractDataProvider
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
         $this->trialPeriod = [];
         $this->productBillingFrequencies = [];
+        $this->pool = $pool;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -144,6 +154,11 @@ class Form extends AbstractDataProvider
             $this->getButtonsMetaData(),
             $this->getFieldsMetaData()
         );
+
+        /** @var ModifierInterface $modifier */
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $meta = $modifier->modifyMeta($meta);
+        }
 
         return $meta;
     }
