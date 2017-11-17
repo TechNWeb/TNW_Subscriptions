@@ -745,3 +745,22 @@ button.action-editor.active:before{
 }
 
 .tnw-subscriptions-subscriptionprofile-create [data-index="account"] label span:after { display: none !important; }
+.product-options .admin__field {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.product-options .admin__fieldset>.admin__field>.admin__field-label{
+  text-align: left;
+  width: calc( (100%) * .5 - 30px );
+}
+.product-options .admin__field .admin__field-control {
+  line-height: 3.2rem;
+}
+.product-options>.fieldset-wrapper-title {
+  border: none;
+  padding-bottom: 0.5rem;
+}
+.product-options .admin__fieldset {
+  padding-top: 0;
+  padding-bottom: 1.5rem;
+}

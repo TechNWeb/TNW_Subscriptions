@@ -668,9 +668,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="configurable" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Configurable</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form">
         <arguments>
             <argument name="formContext" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context\Proxy</argument>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form\Modifier\Pool</argument>
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Quote\Validator">

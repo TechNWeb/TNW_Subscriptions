@@ -301,7 +301,7 @@ class Product extends Create
      */
     private function loadProduct($productId)
     {
-        return $this->productRepository->getById($productId);;
+        return $this->productRepository->getById($productId);
     }
 
     /**
