@@ -274,7 +274,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param ProductSubscriptionProfileInterface[] $products
      * @return ProductSubscriptionProfileInterface[]
      */
-    private function getVisibleProducts($products)
+    private function getVisibleProducts(array $products)
     {
         return array_filter(
             $products,

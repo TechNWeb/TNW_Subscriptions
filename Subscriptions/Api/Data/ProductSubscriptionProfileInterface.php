@@ -52,6 +52,7 @@ interface ProductSubscriptionProfileInterface
      * Child products field name
      */
     const CHILDREN = 'children';
+
     /**
      * Gets id.
      *
@@ -387,5 +388,5 @@ interface ProductSubscriptionProfileInterface
      * @param array $children
      * @return $this
      */
-    public function setChildren($children);
+    public function setChildren(array $children);
 }

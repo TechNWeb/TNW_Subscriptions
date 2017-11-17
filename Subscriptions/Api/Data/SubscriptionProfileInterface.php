@@ -261,7 +261,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @param ProductSubscriptionProfileInterface[] $products
      * @return $this
      */
-    public function setVisibleProducts($products);
+    public function setVisibleProducts(array $products);
 
     /**
      * Gets subscription profile shipping address.

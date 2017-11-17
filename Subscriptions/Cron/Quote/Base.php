@@ -211,7 +211,7 @@ abstract class Base implements ProcessInterface
             $quote->assignCustomer($profile->getCustomer());
         }
         //Add products
-        $this->addProductsToquote($profile, $quote);
+        $this->addProductsToQuote($profile, $quote);
         //Set shipping address
         $quote->getShippingAddress()->addData(
             $profile->getShippingAddress()->getData()
@@ -238,10 +238,12 @@ abstract class Base implements ProcessInterface
     }
 
     /**
+     * Adds products to quote.
+     *
      * @param SubscriptionProfileInterface $profile
      * @param Quote $quote
      */
-    protected function addProductsToquote(SubscriptionProfileInterface $profile, Quote $quote)
+    protected function addProductsToQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $addRequest = $this->getProductAddRequest(
@@ -255,11 +257,12 @@ abstract class Base implements ProcessInterface
     }
 
     /**
-     * Add configurable options to buy request.
+     * Adds conf. options to buy request.
      *
      * @param SubscriptionProduct $profileProduct
      * @param array $data
      * @return array
+     * @throws \InvalidArgumentException
      */
     private function addConfigurableOptions(SubscriptionProduct $profileProduct, array $data)
     {

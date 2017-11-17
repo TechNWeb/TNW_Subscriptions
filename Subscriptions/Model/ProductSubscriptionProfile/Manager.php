@@ -140,7 +140,7 @@ class Manager
      * @param Quote $quote
      * @return array
      */
-    public function populateProductsData($quote)
+    public function populateProductsData(Quote $quote)
     {
         $items = $quote->getAllVisibleItems();
         $profileProducts = [];
@@ -161,7 +161,7 @@ class Manager
      * @param ProductSubscriptionProfileInterface[] $products
      * @return array
      */
-    public function populateChildProductsData($quote, $products)
+    public function populateChildProductsData(Quote $quote, array $products)
     {
         $childProducts = [];
         $items = $quote->getAllVisibleItems();
@@ -175,7 +175,7 @@ class Manager
                 case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
                     /** @var ProductSubscriptionProfileInterface $profileProduct */
                     $profileProduct = $this->getItemProfileProduct($item, $products);
-                    if ($profileProduct){
+                    if ($profileProduct) {
                         $childProducts = $this->getConfigurableProducts($item, $profileProduct);
                     }
                     break;

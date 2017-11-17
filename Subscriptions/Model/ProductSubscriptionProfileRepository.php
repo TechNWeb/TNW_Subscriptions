@@ -188,9 +188,11 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
      * Returns child products for profile product.
      *
      * @param ProductSubscriptionProfileInterface $productSubscriptionProfileData
+     * @return void
      */
-    private function addChildren($productSubscriptionProfileData)
-    {
+    private function addChildren(
+        ProductSubscriptionProfileInterface $productSubscriptionProfileData
+    ) {
         $collection = $this->productSubscriptionProfileCollectionFactory->create();
         /** @var ProductSubscriptionProfileInterface[] $items */
         $items = $collection->addFieldToFilter(
