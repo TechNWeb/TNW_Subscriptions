@@ -22,16 +22,17 @@ class StatusActive extends Base
      */
     protected function getIdsToModify(array $allIds)
     {
+        $currentDate = $this->resource->getConnection()->formatDate((new \DateTime()));
         $select = $this->resource->getConnection()->select();
         $select->from(
-            ['main_table' => Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE],
+            ['main_table' => $this->resource->getTableName(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE)],
             []
         )->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            ['relation' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             'main_table.profile_order_id = relation.id',
             [SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID]
         )->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+            ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
@@ -40,6 +41,8 @@ class StatusActive extends Base
             'main_table.status IN (?)', $this->getQueueStatuses()
         )->where(
             'profile.entity_id IN (?)', $allIds
+        )->where(
+            'profile.start_date < ?', $currentDate
         )->group(
             ['relation.subscription_profile_id']
         );

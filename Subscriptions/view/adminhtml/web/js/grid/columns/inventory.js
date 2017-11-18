@@ -57,8 +57,8 @@ define([
          * @returns {string}
          */
         getItemMessage: function (row) {
-            var qtyChanged = true;
-            var currentQty;
+            var qtyChanged = true,
+                currentQty;
             if (this.inputQties[row.entity_id]) {
                 if (row.input_qty) {
                     if ((row.input_qty * 1) == this.inputQties[row.entity_id]) {
@@ -95,49 +95,61 @@ define([
          * @returns {string}
          */
         resolveInputQty: function (row) {
-            var message = '';
-            var productId = row.entity_id;
-            var productStockData = this.stockData[productId];
-            var currentQty = this.defaultQty;
+            var message = '',
+                productId = row.entity_id,
+                productStockData = this.stockData[productId],
+                currentQty = this.defaultQty,
+                productType = row.type_id;
 
-            if (typeof row.input_qty != 'undefined' && row.input_qty) {
-                currentQty = row.input_qty * 1;
-            }
-
-            if (productStockData) {
-                if (productStockData.min_sale_qty && currentQty < productStockData.min_sale_qty) {
-                    message = $.mage.__(this.warningMessages['not_min_sale'])
-                        .replace('%1', productStockData.min_sale_qty);
-
-                    return message;
+            if (typeof productType != 'undefined' && productType != 'configurable') {
+                if (typeof row.input_qty != 'undefined' && row.input_qty) {
+                    currentQty = row.input_qty * 1;
                 }
 
-                if (productStockData.max_sale_qty && currentQty > productStockData.max_sale_qty) {
-                    message = $.mage.__(this.warningMessages['not_max_sale'])
-                        .replace('%1', productStockData.max_sale_qty);
+                if (productStockData) {
+                    if (productStockData.min_sale_qty && currentQty < productStockData.min_sale_qty) {
+                        message = $.mage.__(this.warningMessages['not_min_sale'])
+                            .replace('%1', productStockData.min_sale_qty);
 
-                    return message;
-                }
+                        return message;
+                    }
 
-                if (!productStockData.manage_stock) {
-                    return message;
-                }
+                    if (productStockData.max_sale_qty && currentQty > productStockData.max_sale_qty) {
+                        message = $.mage.__(this.warningMessages['not_max_sale'])
+                            .replace('%1', productStockData.max_sale_qty);
 
-                if (!productStockData.is_in_stock) {
-                    message = $.mage.__(this.warningMessages['not_in_stock']);
+                        return message;
+                    }
 
-                    return message;
-                }
+                    if (!productStockData.manage_stock) {
+                        return message;
+                    }
 
-                if ((productStockData.qty - productStockData.min_qty - currentQty < 0) && !productStockData.backorders) {
-                    message = $.mage.__(this.warningMessages['too_much'])
-                        .replace('%1', row.name);
+                    if (!productStockData.is_in_stock) {
+                        message = $.mage.__(this.warningMessages['not_in_stock']);
 
-                    return message;
+                        return message;
+                    }
+
+                    if ((productStockData.qty - productStockData.min_qty - currentQty < 0) && !productStockData.backorders) {
+                        message = $.mage.__(this.warningMessages['too_much'])
+                            .replace('%1', row.name);
+
+                        return message;
+                    }
                 }
             }
 
             return message;
+        },
+
+        /** @inheritDoc */
+        getLabel: function (record) {
+            if (record.type_id == 'configurable') {
+                return '';
+            }
+
+            return record[this.index];
         }
     });
 });

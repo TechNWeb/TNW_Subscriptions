@@ -186,7 +186,7 @@ class Grid extends ProductDataProvider
                 'max_sale_qty' => $stockItem->getMaxSaleQty(),
                 'manage_stock' => $stockItem->getManageStock(),
                 'min_qty' => $stockItem->getMinQty(),
-                'backorders' => $stockItem->getBackorders()
+                'backorders' => $stockItem->getBackorders(),
             ];
         }
 

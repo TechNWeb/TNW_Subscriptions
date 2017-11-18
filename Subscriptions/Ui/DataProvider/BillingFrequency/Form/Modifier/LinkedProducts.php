@@ -426,6 +426,11 @@ class LinkedProducts extends AbstractModifier
      */
     private function fillData(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
     {
+        $subscriptionUnlockPresetQty = $linkedProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $presetQty = $linkItem->getPresetQty();
+        if (!(int)$subscriptionUnlockPresetQty && !(int)$presetQty) {
+            $presetQty = null;
+        }
         return [
             'id' => $linkedProduct->getId(),
             'thumbnail' => $this->imageHelper->init($linkedProduct, 'product_listing_thumbnail')->getUrl(),
@@ -434,8 +439,8 @@ class LinkedProducts extends AbstractModifier
             'sku' => $linkedProduct->getSku(),
             'price' => $this->getPrice($linkedProduct, $linkItem),
             ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee(),
-            ProductBillingFrequencyInterface::PRESET_QTY => $linkItem->getPresetQty(),
-            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => $linkedProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY),
+            ProductBillingFrequencyInterface::PRESET_QTY => $presetQty,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => $subscriptionUnlockPresetQty,
             Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $linkedProduct->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
             Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $linkedProduct->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
             Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),

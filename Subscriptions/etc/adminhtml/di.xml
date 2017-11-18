@@ -273,4 +273,19 @@
             <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter</argument>
         </arguments>
     </type>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="configurable" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ConfigureProduct\Configurable</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm">
+        <arguments>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
 </config>

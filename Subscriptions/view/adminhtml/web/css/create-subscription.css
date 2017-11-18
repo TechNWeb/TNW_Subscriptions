@@ -521,11 +521,20 @@ button.action-editor:before {
 }
 
 button.action-editor {
-  float: right;
   background: none;
   border: none;
   padding: 1rem;
   margin: 0
+}
+
+.middle-container button.action-editor {
+  display: inline-block;
+  position: absolute;
+  right: 50px;
+  top: -10px;
+}
+.middle-container button.action-editor.active {
+  right: 0px;
 }
 
 /* "action-remove" button */
@@ -535,11 +544,14 @@ button.remove-button-icon:before {
   content: '\e630';
 }
 button.remove-button-icon {
-  float: right;
+  top: -10px;
   background: none;
   border: none;
   padding: 1rem;
-  margin: 0
+  margin: 0;
+  position: absolute;
+  right: 0px;
+  display: inline-block;
 }
 
 button.action-editor.active:before{
@@ -598,6 +610,9 @@ button.action-editor.active:before{
 .subscription-container .admin__fieldset {
   padding: 0;
 }
+.subscription-container .middle-container .admin__fieldset {
+  position: relative;
+}
 
 .subscription-container .subscription-item-form:not(:last-child) {
   border-bottom: 1px solid #ccc;
@@ -621,7 +636,7 @@ button.action-editor.active:before{
 .subscription-item-form .description-fieldset .field-name{
   font-size: 2.6rem;
   margin-bottom: 0;
-  float: left;
+  display: inline-block;
 }
 
 .subscription-item-form .description-fieldset .field-name .admin__field-control {
@@ -730,3 +745,22 @@ button.action-editor.active:before{
 }
 
 .tnw-subscriptions-subscriptionprofile-create [data-index="account"] label span:after { display: none !important; }
+.product-options .admin__field {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.product-options .admin__fieldset>.admin__field>.admin__field-label{
+  text-align: left;
+  width: calc( (100%) * .5 - 30px );
+}
+.product-options .admin__field .admin__field-control {
+  line-height: 3.2rem;
+}
+.product-options>.fieldset-wrapper-title {
+  border: none;
+  padding-bottom: 0.5rem;
+}
+.product-options .admin__fieldset {
+  padding-top: 0;
+  padding-bottom: 1.5rem;
+}

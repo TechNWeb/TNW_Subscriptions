@@ -21,7 +21,7 @@ interface QuoteCreateInterface
     /**
      * Returns repository for retrieving quotes.
      *
-     * @return CartRepositoryInterface
+     * @return \Magento\Quote\Api\CartRepositoryInterface
      */
     public function getCartRepository();
 }

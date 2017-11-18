@@ -81,12 +81,13 @@ define(
                 _.each(registry.filter('index = form'), function (form) {
                     if (form !== current) {
                         _.each(form.editButtons, function (item) {
-                                _.each(registry.filter('index = remove_button'), function (removeButton) {
-                                    removeButton.visible(!previewMode)
-                                });
-                                registry.get(item).visible(!previewMode);
+                                var editButton = registry.get(item);
+                                editButton.visible(editButton.buttonVisibility && !previewMode);
                             }
                         );
+                        _.each(registry.filter('index = remove_button'), function (removeButton) {
+                            removeButton.visible(!previewMode)
+                        });
                     }
                 });
             },

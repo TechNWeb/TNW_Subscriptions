@@ -23,22 +23,49 @@ use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Store\Model\StoreManagerInterface;
 
+/**
+ * Repository for product to billing frequency relations.
+ */
 class ProductBillingFrequencyRepository implements ProductBillingFrequencyRepositoryInterface
 {
+    /**
+     * @var DataObjectHelper
+     */
     private $dataObjectHelper;
 
+    /**
+     * @var ProductBillingFrequencySearchResultsInterfaceFactory
+     */
     private $searchResultsFactory;
 
+    /**
+     * @var ProductBillingFrequencyInterfaceFactory
+     */
     private $dataProductBillingFrequencyFactory;
 
+    /**
+     * @var ProductBillingFrequencyFactory
+     */
     private $productBillingFrequencyFactory;
 
+    /**
+     * @var ProductBillingFrequencyCollectionFactory
+     */
     private $productBillingFrequencyCollectionFactory;
 
+    /**
+     * @var StoreManagerInterface
+     */
     private $storeManager;
 
+    /**
+     * @var ResourceProductBillingFrequency
+     */
     private $resource;
 
+    /**
+     * @var DataObjectProcessor
+     */
     private $dataObjectProcessor;
 
     /**

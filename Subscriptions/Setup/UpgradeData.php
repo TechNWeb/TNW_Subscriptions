@@ -511,7 +511,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), "2.0.20", "<")) {
             //TODO add this attributes to main eav setup
-            $this->updateApplyToForProductAttributes($eavSetup);
+            $this->updateApplyToForProductAttributes(
+                $eavSetup,
+                ['simple','virtual','downloadable']
+            );
         }
 
         if (version_compare($context->getVersion(), '2.0.25', '<')) {
@@ -573,6 +576,45 @@ class UpgradeData implements UpgradeDataInterface
             );
         }
 
+        if (version_compare($context->getVersion(), "2.0.35", "<")) {
+            //TODO add this attributes to main eav setup
+            $this->updateApplyToForProductAttributes(
+                $eavSetup,
+                ['simple','virtual','downloadable', 'configurable']
+            );
+            $this->updateUseInListingForProductAttributes($eavSetup, true);
+        }
+
+        if (version_compare($context->getVersion(), '2.0.36', '<')) {
+            $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+            $profileProductEntityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::CUSTOM_OPTIONS,
+                [
+                    'type' => 'static',
+                    'label' => 'Custom options',
+                    'input' => 'text',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 290,
+                ]
+            );
+
+            $subscriptionSetup->addAttribute(
+                $profileProductEntityTypeId,
+                ProductSubscriptionProfile::PARENT_ID,
+                [
+                    'type' => 'static',
+                    'label' => 'Parent id',
+                    'input' => 'int',
+                    'required' => false,
+                    'visible' => false,
+                    'sort_order' => 300,
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 
@@ -609,81 +651,169 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
+     * Updates product attribute "apply_to" property.
+     *
      * @param EavSetup $eavSetup
+     * @param array $codes
+     * @return void
      */
-    private function updateApplyToForProductAttributes($eavSetup)
+    private function updateApplyToForProductAttributes(EavSetup $eavSetup, array $codes)
     {
+        $codes = implode(',', $codes);
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_TRIAL_STATUS,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_TRIAL_LENGTH,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_TRIAL_PRICE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_TRIAL_START_DATE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_START_DATE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
         );
         $eavSetup->updateAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             'apply_to',
-            'simple,virtual,downloadable'
+            $codes
+        );
+    }
+
+    /**
+     * Updates product attribute "used_in_product_listing" property.
+     *
+     * @param EavSetup $eavSetup
+     * @param bool $value
+     * @return void
+     */
+    private function updateUseInListingForProductAttributes(EavSetup $eavSetup, $value)
+    {
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_STATUS,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_PRICE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_START_DATE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_START_DATE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+            'used_in_product_listing',
+            $value
+        );
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            'used_in_product_listing',
+            $value
         );
     }
 }

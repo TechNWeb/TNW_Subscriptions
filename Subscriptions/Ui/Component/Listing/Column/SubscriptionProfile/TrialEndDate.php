@@ -23,7 +23,7 @@ class TrialEndDate extends Date
                     if (isset($this->getConfiguration()['timezone']) && !$this->getConfiguration()['timezone']) {
                         $date = new \DateTime($item[$this->getData('name')]);
                     }
-                    $item[$this->getData('name')] = $date->format('Y-m-d H:i:s');
+                    $item[$this->getData('name')] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
                     if (empty($item['trial_start_date'])){
                         $item[$this->getData('name')] = '';
                     }

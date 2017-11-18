@@ -496,8 +496,9 @@ class Manager
             $oldShippingDescription = $this->getProfile()->getShippingDescription();
             $this->getProfile()->setShippingDescription($shippingDescription);
 
-            if(strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
-                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription, $shippingDescription);
+            if (strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
+                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription,
+                    $shippingDescription);
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             }
         }
@@ -534,7 +535,7 @@ class Manager
     ) {
         if (!$date) {
             $date = new \DateTime();
-            $date = $date->format('Y-m-d H:i:s');
+            $date = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
 
         $relation = $this->orderRelationManager
@@ -556,14 +557,12 @@ class Manager
     public function populateProfileData(Quote $quote, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
-
         if (!empty($request)) {
             $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
             if (!$frequency || !$frequency->getId()) {
                 throw new \Exception(__('Can not create profile with empty frequency.'));
             }
         }
-
         if (isset($frequency)) {
             $startDate = $this->getFullStartDate($request['start_on'], $date);
             $this->getProfile()
@@ -585,19 +584,24 @@ class Manager
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
                 ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
-
+            $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            //set trial start date to profile
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
                 $this->getProfile()->setStartDate($this->calculateStartDate());
+            }
+            //set status "trial" if trial period starts immediately
+            if (strtotime($startDate) <= strtotime($nowDate)) {
                 $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
-
-            $this->getProfile()->setAddresses(
-                $this->populateAddressesData($quote)
-            );
-            $this->getProfile()->setProducts(
-                $this->populateProductsData($quote->getAllItems())
-            );
+            $this->getProfile()->setAddresses($this->populateAddressesData($quote));
+            $this->getProfile()->setProducts($this->productManager->populateProductsData($quote));
+            $this->saveProfile();
+            $products = $this->productManager->populateChildProductsData($quote, $this->getProfile()->getProducts());
+            if ($products) {
+                $this->getProfile()->setProducts($products);
+                $this->saveProfile();
+            }
         }
 
         return $this;
@@ -638,7 +642,7 @@ class Manager
     public function getNextQuote()
     {
         $quote = null;
-        $nextProfileRelation =  $this->getNextProfileRelation();
+        $nextProfileRelation = $this->getNextProfileRelation();
         if ($nextProfileRelation) {
             $quoteId = $nextProfileRelation->getMagentoQuoteId();
             $searchCriteria = $this->searchCriteriaBuilder
@@ -718,7 +722,7 @@ class Manager
     private function getUniqueBuyRequest(Quote $quote)
     {
         $result = null;
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
 
         if ($items) {
             /** @var Item $item */
@@ -729,25 +733,6 @@ class Manager
         }
 
         return $result;
-    }
-
-    /**
-     * Returns list of profile products created from quote items.
-     *
-     * @param Item[] $items
-     * @return array
-     */
-    private function populateProductsData($items)
-    {
-        $profileProducts = [];
-        /** @var Item $item */
-        foreach ($items as $item) {
-            $profileProducts[] = $this->productManager->reset()
-                ->populateProductDataFromQuoteItem($item)
-                ->getProfileProduct();
-        }
-
-        return $profileProducts;
     }
 
     /**
@@ -777,7 +762,7 @@ class Manager
 
             $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
             $result = $startDate->add(new \DateInterval($expression))
-                ->format('Y-m-d H:i:s');
+                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
 
         return $result;
@@ -796,12 +781,13 @@ class Manager
             $date = new \DateTime();
         }
         $startDate = new \DateTime($startOn);
-        $diff = $date->diff($startDate, true);
         //Add hours, minutes, and seconds to start date
-        $expression = 'PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S';
+        $expression = 'PT' . $date->format('H') . 'H'
+            . $date->format('i') . 'M'
+            . $date->format('s') . 'S';
         $startDate->add(new \DateInterval($expression));
 
-        return $startDate->format('Y-m-d H:i:s');
+        return $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**
@@ -813,7 +799,7 @@ class Manager
     public function getEngineFromRequestData(array $requestData)
     {
         $engine = null;
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] : [];
         foreach ($paymentPostData as $code => $methodData) {
             if ($methodData['method']) {
                 $engine = $code;
@@ -831,7 +817,7 @@ class Manager
      */
     public function getShippingMethodFromRequestData(array $requestData)
     {
-        $shippingMethodCode= isset($requestData['shipping_method_id'])
+        $shippingMethodCode = isset($requestData['shipping_method_id'])
             ? $requestData['shipping_method_id']
             : null;
         return $shippingMethodCode;

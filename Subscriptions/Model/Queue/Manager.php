@@ -22,11 +22,6 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 class Manager
 {
     /**
-     * Date format used on profile queue creating/processing.
-     */
-    const DATETIME_FORMAT = 'Y-m-d H:i:s';
-
-    /**
      * Factory for creating queue collection.
      *
      * @var CollectionFactory
@@ -290,7 +285,7 @@ class Manager
         $date = new \DateTime();
         $condition = 'P' . $this->config->getAttemptInterval() . 'D';
         $date->sub(new \DateInterval($condition));
-        return $date->format(self::DATETIME_FORMAT);
+        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**
@@ -301,7 +296,7 @@ class Manager
     private function getCurrentDate()
     {
         $date = new \DateTime();
-        return $date->format(self::DATETIME_FORMAT);
+        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**

@@ -248,7 +248,7 @@ class Quote extends Create implements QuoteCreateInterface
         if (!$session->getStore()->getId()) {
             throw new \Exception(__('Please select a store'));
         }
-        $items = $quote->getAllItems();
+        $items = $quote->getAllVisibleItems();
 
         if (count($items) == 0) {
             $errors[] = __('Please specify order items.');

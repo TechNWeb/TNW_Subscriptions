@@ -210,7 +210,7 @@ class CreateProfile extends BaseCreate
         $result = false;
         $this->setSubQuotes($this->getSession()->getSubQuotes());
         $this->productModifier->setData($productData);
-        $product = $this->productModifier->getPreparedProduct();
+        $product = $this->productModifier->getProduct();
         $quote = $this->getSubQuote();
         if ($this->canUpdateItemQty($quote, $product)) {
             $item = $quote->addProduct(
@@ -275,7 +275,7 @@ class CreateProfile extends BaseCreate
         /** @var ModelQuote $quote */
         $quote = $quoteItem->getQuote();
         $quoteItem->isDeleted(true);
-        if (!$quote->getAllItems()) {
+        if (!$quote->getAllVisibleItems()) {
             $this->quoteCreator->getCartRepository()->delete($quote);
             $result = false;
         } else {
@@ -318,7 +318,7 @@ class CreateProfile extends BaseCreate
     {
         $result = false;
 
-        $quoteItems = $subQuote->getAllItems();
+        $quoteItems = $subQuote->getAllVisibleItems();
         /** @var Item $item */
         $item = $quoteItems ? reset($quoteItems) : null;
 
@@ -526,37 +526,38 @@ class CreateProfile extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
             $this->quoteCreator->validate($subQuote);
-            //Current time
-            $date = new \DateTime();
             //Create new profile
-            $profile = $this->createProfile($subQuote, $basicPayment, $date);
+            $profile = $this->createProfile($subQuote, $basicPayment);
+            $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
             //Assign quote to new profile
-            $relation = $this->profileManager->assignQuoteToProfile(
-                $subQuote,
-                $profile,
-                $date->format('Y-m-d H:i:s')
-            );
-            //Add new relation to profile processing queue in "running" state.
-            $queueItemIds = $this->queueManager->insertItems(
-                [$relation->getId()],
-                true
-            );
-            try {
-                $order = $this->profileManager->processProfile($subQuote);
-            } catch (\Exception $e) {
-                $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                throw $e;
-            }
-            if (isset($order)) {
-                $this->profileManager->assignOrderToProfile($relation, $order);
-                $this->queueManager->makeCompleted($queueItemIds);
-                $this->eventManager->dispatch(
-                    'checkout_submit_all_after',
-                    ['order' => $order, 'quote' => $subQuote]
+            $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile, $startDate);
+            //Add new relation to profile processing queue in "pending" state.
+            $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
+            //Current time
+            $date = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            // if start date of profile in future do not create order
+            if (strtotime($startDate) <= strtotime($date)){
+                try {
+                    $this->queueManager->makeRunning($queueItemIds);
+                    $order = $this->profileManager->processProfile($subQuote);
+                } catch (\Exception $e) {
+                    $this->queueManager->makeError($queueItemIds, $e->getMessage());
+                    throw $e;
+                }
+                if (isset($order)) {
+                    $this->profileManager->assignOrderToProfile($relation, $order);
+                    $this->queueManager->makeCompleted($queueItemIds);
+                    $this->eventManager->dispatch(
+                        'checkout_submit_all_after',
+                        ['order' => $order, 'quote' => $subQuote]
+                    );
+                }
+                //Generate quote for next payment.
+                $this->quoteGenerator->generateProfileQuotes(
+                    $this->profileManager->loadProfile($profile->getId()),
+                    1
                 );
             }
-            //Generate quote for next payment.
-            $this->quoteGenerator->generateProfileQuotes($profile, 1);
             $profiles[] = $profile;
             //TODO add here email sending
         }
@@ -569,16 +570,14 @@ class CreateProfile extends BaseCreate
      *
      * @param ModelQuote $subQuote
      * @param Payment $payment
-     * @param null|\DateTime $date
      * @return SubscriptionProfileInterface
      */
     private function createProfile(
         ModelQuote $subQuote,
-        Payment $payment,
-        $date = null
+        Payment $payment
     ) {
         $profile = $this->profileManager->reset()
-            ->populateProfileData($subQuote, $date)
+            ->populateProfileData($subQuote)
             ->populatePaymentData($payment)
             ->saveProfile();
         //Add comment about profile creation.

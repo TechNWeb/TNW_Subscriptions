@@ -1,0 +1,62 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
+
+use Magento\Catalog\Api\Data\ProductInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
+
+/**
+ * Buy request modifier for simple, virtual and downloadable products.
+ */
+class Simple extends Base
+{
+    /**
+     * @inheritdoc
+     */
+    public function modifyBuyRequests(array $products)
+    {
+        /** @var ProductInterface $product */
+        foreach ($products as $product) {
+            $request = $product->getCustomOption('info_buyRequest');
+            if ($request) {
+                $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
+                $buyRequestValue = OptionValueResolver::getDecodedValue($request->getValue());
+                $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
+                $subscriptionPart['qty'] = $buyRequestValue['qty'];
+                $price = $this->getSubscriptionPrice($product, $subscriptionPart);
+                $result = array_merge_recursive(
+                    $buyRequestValue,
+                    [
+                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
+                            Create::NON_UNIQUE => [
+                                'price' => $price,
+                            ],
+                        ],
+                    ]
+                );
+                $request->setValue(OptionValueResolver::getEncodedValue($result, $valueFormat));
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubscriptionCustomPrice(ProductInterface $product, array $productData)
+    {
+        return $this->getCalculatedPrice($product, $productData, true);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubscriptionPrice(ProductInterface $product, array $productData)
+    {
+        return $this->getCalculatedPrice($product, $productData);
+    }
+}

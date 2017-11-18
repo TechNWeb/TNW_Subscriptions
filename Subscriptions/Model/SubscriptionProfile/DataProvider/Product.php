@@ -200,12 +200,12 @@ class Product extends AbstractDataProvider
             $fullSubscriptionData = null;
             $initialFee = 0;
 
-            if (empty($subQuote->getAllItems())) {
+            if (empty($subQuote->getAllVisibleItems())) {
                 continue;
             }
 
             /** @var Item $item */
-            foreach ($subQuote->getAllItems() as $item) {
+            foreach ($subQuote->getAllVisibleItems() as $item) {
                 $nonUniqueData = $item->getBuyRequest()->getDataByPath(
                     Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::NON_UNIQUE
                 );
