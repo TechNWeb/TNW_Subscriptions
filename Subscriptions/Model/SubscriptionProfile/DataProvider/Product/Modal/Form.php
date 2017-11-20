@@ -90,7 +90,7 @@ class Form extends AbstractDataProvider
     /**
      * @var PoolInterface
      */
-    private $pool;
+    protected $pool;
 
     /**
      * @param string $name

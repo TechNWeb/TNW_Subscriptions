@@ -98,7 +98,6 @@ class Configurable extends Base
                             'collapsible' => false,
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
-                            'additionalClasses' => 'product-options',
                             'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                             'sortOrder' => $iterator,
                             'value' => $attributeData['optionLabel'],

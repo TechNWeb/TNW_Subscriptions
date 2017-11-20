@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
@@ -64,6 +65,7 @@ class SummaryProductsForm extends ModifyForm
      * @param FormContext $formContext
      * @param PoolInterface $pool
      * @param Manager $profileManager
+     * @param Registry $registry
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -77,13 +79,14 @@ class SummaryProductsForm extends ModifyForm
         FormContext $formContext,
         PoolInterface $pool,
         Manager $profileManager,
+        Registry $registry,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->profileManager = $profileManager;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
-            $pool, $scope, $meta, $data);
+            $pool, $registry, $scope, $meta, $data);
     }
 
     /**
