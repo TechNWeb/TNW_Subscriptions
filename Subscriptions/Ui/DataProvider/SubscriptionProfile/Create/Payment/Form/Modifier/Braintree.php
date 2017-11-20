@@ -159,7 +159,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'dataScope' => 'cc_number',
                             'dataType' => Text::NAME,
                             'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
-                            'additionalClasses' => 'credit-card-number _required-number',
+                            'additionalClasses' => 'credit-card-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
@@ -177,7 +177,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'component' => 'TNW_Subscriptions/js/components/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
-                            'additionalClasses' => 'field_without_legend _required-date',
+                            'additionalClasses' => 'field_without_legend',
                             'dataScope' => '',
                             'sortOrder' => 30,
                             'required' => true,

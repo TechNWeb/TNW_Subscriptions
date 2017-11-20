@@ -22,7 +22,10 @@ define([
             checked: false,
             braintree: null,
             selectedCardType: null,
-            selector: 'co-transparent-form-braintree'
+            selector: 'co-transparent-form-braintree',
+            links: {
+                selectedCardType: 'dataContainer = braintree-cc-type:value'
+            }
         },
 
         /**
@@ -146,10 +149,6 @@ define([
                      */
                     onPaymentMethodReceived: function (response) {
                         if (self.validateCardType()) {
-                            var form = registry.get('index = '+self.options.formName);
-                            form.source.data.payment.braintree.additional.cc_last_4 = response.details.lastFour;
-                            form.source.data.payment.braintree.additional.cc_exp_month = '';
-                            form.source.data.payment.braintree.additional.cc_exp_year = '';
                             console.log(response);
 
                             $.ajax({
@@ -161,10 +160,15 @@ define([
                                 dataType: 'json',
                                 success: function (response) {
                                     if (response.success) {
-                                        form.triggerSave([]);
+                                        registry.get('index = '+self.options.formName).triggerSave([]);
                                     } else {
                                         self.processErrors(response.error_messages);
+                                        self.hideLoader();
                                     }
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    self.processErrors(errorThrown);
+                                    self.hideLoader();
                                 }
                             });
                         }
@@ -252,8 +256,8 @@ define([
 
             if (event.card) {
                 this.selectedCardType(validator.getMageCardType(event.card.type, this.getCcAvailableTypes()));
-                //registry.get('index = credit_card_type').value = this.selectedCardType();
-                $(this.getSelector('cc-type')).val(this.selectedCardType());
+                //registry.get('dataContainer = braintree-cc-type').value = this.selectedCardType();
+                //$(this.getSelector('cc-type')).val(this.selectedCardType());
             }
         },
 
