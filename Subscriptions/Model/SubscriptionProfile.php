@@ -174,7 +174,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function _construct()
     {
@@ -182,7 +182,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getCustomAttributesCodes()
     {
@@ -194,7 +194,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getId()
     {
@@ -202,7 +202,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setId($id)
     {
@@ -210,7 +210,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCustomerId()
     {
@@ -218,7 +218,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCustomerId($customerId)
     {
@@ -226,7 +226,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBillingFrequencyId()
     {
@@ -234,7 +234,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setBillingFrequencyId($billingFrequencyId)
     {
@@ -243,7 +243,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getLabel()
     {
@@ -251,7 +251,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getUnit()
     {
@@ -259,7 +259,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUnit($unit)
     {
@@ -267,7 +267,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getWebsiteId()
     {
@@ -275,7 +275,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setWebsiteId($websiteId)
     {
@@ -284,7 +284,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getWebsite()
     {
@@ -298,7 +298,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStatus()
     {
@@ -306,7 +306,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setStatus($status)
     {
@@ -314,7 +314,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getFrequency()
     {
@@ -322,7 +322,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setFrequency($frequency)
     {
@@ -330,7 +330,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getEngineCode()
     {
@@ -338,7 +338,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setEngineCode($engine)
     {
@@ -346,7 +346,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAddresses()
     {
@@ -354,7 +354,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setAddresses($addresses)
     {
@@ -362,7 +362,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getShippingAddress()
     {
@@ -379,7 +379,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBillingAddress()
     {
@@ -396,7 +396,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStartDate()
     {
@@ -413,7 +413,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTrialStartDate()
     {
@@ -421,7 +421,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTrialStartDate($trialStartDate)
     {
@@ -429,7 +429,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTerm()
     {
@@ -437,7 +437,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTerm($term)
     {
@@ -445,7 +445,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTotalBillingCycles()
     {
@@ -453,7 +453,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTotalBillingCycles($totalBillingCycles)
     {
@@ -461,7 +461,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getShippingMethod()
     {
@@ -469,7 +469,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setShippingMethod($shippingMethod)
     {
@@ -477,7 +477,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getShippingDescription()
     {
@@ -485,7 +485,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setShippingDescription($shippingDescription)
     {
@@ -493,7 +493,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getProfileCurrencyCode()
     {
@@ -501,7 +501,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setProfileCurrencyCode($profileCurrencyCode)
     {
@@ -509,7 +509,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTrialLength()
     {
@@ -517,7 +517,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTrialLength($trialLength)
     {
@@ -525,7 +525,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTrialLengthUnit()
     {
@@ -533,7 +533,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTrialLengthUnit($trialLengthUnit)
     {
@@ -541,7 +541,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getIsVirtual()
     {
@@ -549,7 +549,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setIsVirtual($isVirtual)
     {
@@ -557,7 +557,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getProducts()
     {
@@ -565,7 +565,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setProducts($products)
     {
@@ -573,7 +573,23 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     */
+    public function getVisibleProducts()
+    {
+        return $this->getData(self::PROFILE_VISIBLE_PRODUCTS);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setVisibleProducts(array $products)
+    {
+        return $this->setData(self::PROFILE_VISIBLE_PRODUCTS, $products);
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getCustomer()
     {
@@ -587,7 +603,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPaymentToken()
     {
@@ -597,7 +613,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPaymentToken($token)
     {
@@ -608,7 +624,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTokenHash()
     {
@@ -616,7 +632,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTokenHash($tokenHash)
     {
@@ -624,7 +640,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPaymentAdditionalInfo()
     {
@@ -632,7 +648,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPaymentAdditionalInfo($info)
     {
@@ -641,7 +657,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDecodedPaymentAdditionalInfo()
     {
@@ -656,7 +672,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setEncodedPaymentAdditionalInfo($info)
     {
@@ -667,7 +683,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getGenerateQuotesState()
     {
@@ -675,7 +691,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setGenerateQuotesState($state)
     {
@@ -683,7 +699,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCreatedAt()
     {
@@ -691,7 +707,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCreatedAt($date)
     {
@@ -699,7 +715,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getUpdatedAt()
     {
@@ -707,7 +723,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUpdatedAt($date)
     {

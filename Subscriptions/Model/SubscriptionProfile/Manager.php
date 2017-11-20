@@ -496,8 +496,9 @@ class Manager
             $oldShippingDescription = $this->getProfile()->getShippingDescription();
             $this->getProfile()->setShippingDescription($shippingDescription);
 
-            if(strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
-                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription, $shippingDescription);
+            if (strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
+                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription,
+                    $shippingDescription);
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             }
         }
@@ -556,14 +557,12 @@ class Manager
     public function populateProfileData(Quote $quote, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
-
         if (!empty($request)) {
             $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
             if (!$frequency || !$frequency->getId()) {
                 throw new \Exception(__('Can not create profile with empty frequency.'));
             }
         }
-
         if (isset($frequency)) {
             $startDate = $this->getFullStartDate($request['start_on'], $date);
             $this->getProfile()
@@ -592,15 +591,17 @@ class Manager
                 $this->getProfile()->setStartDate($this->calculateStartDate());
             }
             //set status "trial" if trial period starts immediately
-            if (strtotime($startDate) <= strtotime($nowDate)){
+            if (strtotime($startDate) <= strtotime($nowDate)) {
                 $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
-            $this->getProfile()->setAddresses(
-                $this->populateAddressesData($quote)
-            );
-            $this->getProfile()->setProducts(
-                $this->populateProductsData($quote->getAllVisibleItems())
-            );
+            $this->getProfile()->setAddresses($this->populateAddressesData($quote));
+            $this->getProfile()->setProducts($this->productManager->populateProductsData($quote));
+            $this->saveProfile();
+            $products = $this->productManager->populateChildProductsData($quote, $this->getProfile()->getProducts());
+            if ($products) {
+                $this->getProfile()->setProducts($products);
+                $this->saveProfile();
+            }
         }
 
         return $this;
@@ -732,25 +733,6 @@ class Manager
         }
 
         return $result;
-    }
-
-    /**
-     * Returns list of profile products created from quote items.
-     *
-     * @param Item[] $items
-     * @return array
-     */
-    private function populateProductsData($items)
-    {
-        $profileProducts = [];
-        /** @var Item $item */
-        foreach ($items as $item) {
-            $profileProducts[] = $this->productManager->reset()
-                ->populateProductDataFromQuoteItem($item)
-                ->getProfileProduct();
-        }
-
-        return $profileProducts;
     }
 
     /**

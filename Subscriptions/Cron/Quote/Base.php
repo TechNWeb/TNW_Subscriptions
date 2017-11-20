@@ -18,8 +18,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Base
@@ -76,7 +76,6 @@ abstract class Base implements ProcessInterface
     protected $relationManager;
 
     /**
-     * Base constructor.
      * @param SubscriptionProfileRepository $profileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param Context $context
@@ -168,6 +167,22 @@ abstract class Base implements ProcessInterface
             'custom_price' => $profileProduct->getPrice(),
             'qty' => $profileProduct->getQty()
         ];
+        $productType = $profileProduct->getMagentoProduct()->getTypeId();
+        switch ($productType) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $data = $this->addConfigurableOptions(
+                    $profileProduct,
+                    $data
+                );
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $productType));
+                break;
+        }
 
         return new DataObject($data);
     }
@@ -176,10 +191,10 @@ abstract class Base implements ProcessInterface
      * Updates quote for profile.
      *
      * @param SubscriptionProfileInterface $profile
-     * @param null|Quote $quote
+     * @param Quote $quote
      * @return Quote
      */
-    protected function processQuote(SubscriptionProfileInterface $profile, $quote)
+    protected function processQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
         //Deactivate quote
         $quote->setIsActive(false);
@@ -192,19 +207,11 @@ abstract class Base implements ProcessInterface
         //Set currency
         $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
         //Set customer
-        if (!$quote->getCustomerId()){
+        if (!$quote->getCustomerId()) {
             $quote->assignCustomer($profile->getCustomer());
         }
         //Add products
-        foreach ($profile->getProducts() as $profileProduct) {
-            $addRequest = $this->getProductAddRequest(
-                $profileProduct
-            );
-            $quote->addProduct(
-                $profileProduct->getMagentoProduct(),
-                $addRequest
-            );
-        }
+        $this->addProductsToQuote($profile, $quote);
         //Set shipping address
         $quote->getShippingAddress()->addData(
             $profile->getShippingAddress()->getData()
@@ -228,5 +235,51 @@ abstract class Base implements ProcessInterface
         $this->cartRepository->save($quote);
 
         return $quote;
+    }
+
+    /**
+     * Adds products to quote.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param Quote $quote
+     * @return void
+     */
+    protected function addProductsToQuote(SubscriptionProfileInterface $profile, Quote $quote)
+    {
+        foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $addRequest = $this->getProductAddRequest(
+                $profileProduct
+            );
+            $quote->addProduct(
+                $profileProduct->getMagentoProduct(),
+                $addRequest
+            );
+        }
+    }
+
+    /**
+     * Adds conf. options to buy request.
+     *
+     * @param SubscriptionProduct $profileProduct
+     * @param array $data
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function addConfigurableOptions(SubscriptionProduct $profileProduct, array $data)
+    {
+        $options = [];
+        /** @var SubscriptionProduct $child */
+        foreach ($profileProduct->getChildren() as $child) {
+            $options += array_replace(
+                $options,
+                \Zend_Json::decode($child->getCustomOptions()) ?: []
+            );
+        }
+        if (empty($options)) {
+            throw new \InvalidArgumentException(__('Custom options must be set.'));
+        }
+        $data['super_attribute'] = $options;
+
+        return $data;
     }
 }

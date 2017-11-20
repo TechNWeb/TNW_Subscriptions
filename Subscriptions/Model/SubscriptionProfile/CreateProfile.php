@@ -553,7 +553,10 @@ class CreateProfile extends BaseCreate
                     );
                 }
                 //Generate quote for next payment.
-                $this->quoteGenerator->generateProfileQuotes($profile, 1);
+                $this->quoteGenerator->generateProfileQuotes(
+                    $this->profileManager->loadProfile($profile->getId()),
+                    1
+                );
             }
             $profiles[] = $profile;
             //TODO add here email sending

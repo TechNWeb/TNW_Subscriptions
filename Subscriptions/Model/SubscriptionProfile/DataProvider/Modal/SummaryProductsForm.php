@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
@@ -61,6 +62,7 @@ class SummaryProductsForm extends ModifyForm
      * @param PriceCalculator $priceCalculator
      * @param Context $context
      * @param FormContext $formContext
+     * @param PoolInterface $pool
      * @param Manager $profileManager
      * @param string $scope
      * @param array $meta
@@ -73,14 +75,15 @@ class SummaryProductsForm extends ModifyForm
         PriceCalculator $priceCalculator,
         Context $context,
         FormContext $formContext,
+        PoolInterface $pool,
         Manager $profileManager,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context,
-            $formContext, $scope, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
+            $pool, $scope, $meta, $data);
     }
 
     /**
@@ -397,7 +400,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getObjectItems(DataObject $object)
     {
-        return $object->getProducts();
+        return $object->getVisibleProducts();
     }
 
     /**

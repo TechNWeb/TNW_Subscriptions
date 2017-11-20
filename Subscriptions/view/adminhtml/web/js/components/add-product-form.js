@@ -18,7 +18,8 @@ define(
                 },
                 listens: {
                     responseStatus: 'processResponseStatus'
-                }
+                },
+                configureTypes: ['configurable']
             },
 
             /**
@@ -107,7 +108,7 @@ define(
                 };
 
                 if (this.isConfigureRequired(id)) {
-                    this.openConfigurableModal();
+                    this.openConfigurableModal(id);
                 } else {
                     this.renderForm(this.getModalForm(), this.getModalForm().configurableData);
                 }
@@ -234,11 +235,15 @@ define(
 
             /**
              * Opens Configurable modal window and renders form
+             *
+             * @param {string|number} product_id
+             * @return {void}
              */
-            openConfigurableModal: function () {
-                var configurableForm = registry.get('index=' + this.source.insertConfigurableForm);
+            openConfigurableModal: function (product_id) {
+                var configurableForm = registry.get('index=' + this.source.insertConfigurableForm),
+                    params = {'product_id' : product_id};
                 this.getConfigurableModal().openModal();
-                this.renderForm(configurableForm, []);
+                this.renderForm(configurableForm, params);
             },
 
             /**
@@ -285,7 +290,8 @@ define(
                     if (product.hasOwnProperty('entity_id') && product.entity_id == productId) {
                         result = (
                             product.hasOwnProperty('tnw_subscr_unlock_preset_qty') &&
-                            product.tnw_subscr_unlock_preset_qty == 1
+                            product.tnw_subscr_unlock_preset_qty == 1 &&
+                            this.configureTypes.indexOf(product.type_id) == -1
                         );
                         break;
                     }

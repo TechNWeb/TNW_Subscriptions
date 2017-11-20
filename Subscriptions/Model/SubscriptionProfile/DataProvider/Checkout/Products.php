@@ -10,6 +10,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -59,6 +60,7 @@ class Products extends ModifyForm
      * @param PriceCalculator $priceCalculator
      * @param Context $context
      * @param FormContext $formContext
+     * @param PoolInterface $pool
      * @param DescriptionCreator $descriptionCreator
      * @param string $scope
      * @param array $meta
@@ -71,14 +73,15 @@ class Products extends ModifyForm
         PriceCalculator $priceCalculator,
         Context $context,
         FormContext $formContext,
+        PoolInterface $pool,
         DescriptionCreator $descriptionCreator,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context,
-            $formContext, $scope, $meta, $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
+            $pool, $scope, $meta, $data);
     }
 
     /**

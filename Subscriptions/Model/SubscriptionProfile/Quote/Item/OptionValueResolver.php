@@ -23,7 +23,7 @@ class OptionValueResolver
      * @param string $value
      * @return mixed
      */
-    public static function decode($value)
+    public static function getDecodedValue($value)
     {
         if (self::isJson($value)) {
             $result = \Zend_Json::decode($value);
