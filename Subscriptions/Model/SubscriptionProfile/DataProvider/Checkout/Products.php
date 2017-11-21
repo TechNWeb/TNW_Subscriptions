@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
@@ -62,6 +63,7 @@ class Products extends ModifyForm
      * @param FormContext $formContext
      * @param PoolInterface $pool
      * @param DescriptionCreator $descriptionCreator
+     * @param Registry $registry
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -75,13 +77,14 @@ class Products extends ModifyForm
         FormContext $formContext,
         PoolInterface $pool,
         DescriptionCreator $descriptionCreator,
+        Registry $registry,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
-            $pool, $scope, $meta, $data);
+            $pool, $registry, $scope, $meta, $data);
     }
 
     /**
