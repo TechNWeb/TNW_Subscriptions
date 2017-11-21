@@ -149,28 +149,9 @@ define([
                      */
                     onPaymentMethodReceived: function (response) {
                         if (self.validateCardType()) {
-                            console.log(response);
-
-                            $.ajax({
-                                url: self.options.orderSaveUrl,
-                                type: 'post',
-                                data: {
-                                    nonce: response.nonce
-                                },
-                                dataType: 'json',
-                                success: function (response) {
-                                    if (response.success) {
-                                        registry.get('index = '+self.options.formName).triggerSave([]);
-                                    } else {
-                                        self.processErrors(response.error_messages);
-                                        self.hideLoader();
-                                    }
-                                },
-                                error: function (jqXHR, textStatus, errorThrown) {
-                                    self.processErrors(errorThrown);
-                                    self.hideLoader();
-                                }
-                            });
+                            var form = registry.get('index = '+self.options.formName);
+                            form.source.data.payment.braintree.nonce = response.nonce;
+                            form.triggerSave([]);
                         }
                     },
 
@@ -243,9 +224,7 @@ define([
          * @returns {Boolean}
          */
         fieldEventHandler: function (event) {
-            console.log(arguments);
             if (event.type !== 'fieldStateChange') {
-
                 return false;
             }
 
@@ -256,8 +235,6 @@ define([
 
             if (event.card) {
                 this.selectedCardType(validator.getMageCardType(event.card.type, this.getCcAvailableTypes()));
-                //registry.get('dataContainer = braintree-cc-type').value = this.selectedCardType();
-                //$(this.getSelector('cc-type')).val(this.selectedCardType());
             }
         },
 

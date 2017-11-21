@@ -226,7 +226,9 @@ class Products extends BaseSummary
                 'term' => $profile->getTerm(),
             ],
             CreateProfile::NON_UNIQUE => [
-                'totalPrice' => $this->orderRepository->get($orderData['magento_order_id'])->getGrandTotal(),
+                'totalPrice' => isset($orderData['magento_order_id'])
+                    ? $this->orderRepository->get($orderData['magento_order_id'])->getGrandTotal()
+                    : 0,
                 'initialFee' => $initialFee > 0,
                 'price' => $price,
             ]

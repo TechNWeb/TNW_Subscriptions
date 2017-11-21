@@ -16,12 +16,33 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 class Braintree extends Base
 {
     /**
+     * @var \TNW\Subscriptions\Model\Payment\Braintree
+     */
+    private $braintree;
+
+    public function __construct(
+        \TNW\Subscriptions\Model\Config $config,
+        \TNW\Subscriptions\Model\Context $context,
+        \Magento\Quote\Api\CartManagementInterface $cartManagement,
+        \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $historyLogger,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\App\Request\DataPersistorInterface $persistor,
+        \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
+        \TNW\Subscriptions\Model\Payment\Braintree $braintree
+    ) {
+        parent::__construct($config, $context, $cartManagement, $historyLogger,
+            $registry, $persistor, $zeroTotalValidator);
+
+        $this->braintree = $braintree;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
         return [
-            'payment_token' => $payment->getAdditionalInformation(''),
+            'payment_token' => $payment->getAdditionalInformation('payment_token'),
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
@@ -51,7 +72,7 @@ class Braintree extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            'paymentMethodNonce' => ''
+            'payment_method_nonce' => $this->braintree->generateNonce($profile->getPaymentToken())
         ];
     }
 
@@ -60,10 +81,28 @@ class Braintree extends Base
      */
     public function processProfileByRequestData($requestData)
     {
-        $tokenHash = '';
-        //$requestData['nonce'];
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        foreach ($paymentPostData as $code => $methodData) {
+            if (!$methodData['method']) {
+                continue;
+            }
 
-        $this->getProfile()->setTokenHash($tokenHash);
+            /** @var \Braintree\CreditCard $paymentMethod */
+            $paymentMethod = $this->braintree->generatePaymentMethod(
+                $this->getProfile()->getCustomer(), $methodData['nonce']);
+
+            $this->getProfile()
+                ->setPaymentToken($paymentMethod->token)
+                ->setEncodedPaymentAdditionalInfo([
+                    OrderPaymentInterface::CC_TYPE => $methodData['additional']['cc_type'],
+                    OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
+                    OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
+                    OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear
+                ]);
+
+            break;
+        }
+
         return $this;
     }
 }
