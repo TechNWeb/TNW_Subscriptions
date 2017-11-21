@@ -4,7 +4,6 @@
  */
 define([
     'TNW_Subscriptions/js/components/edit-button'
-    // 'Magento_Ui/js/form/components/button'
 ], function (Button) {
     'use strict';
 
@@ -13,7 +12,9 @@ define([
             elementTmpl: 'TNW_Subscriptions/form/element/edit-button'
         },
 
-        /** @inheritdoc */
+        /**
+         * 'Edit options' button click action.
+         */
         editOptions: function () {
 
         }

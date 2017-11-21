@@ -12,7 +12,9 @@ define([
             elementTmpl: 'TNW_Subscriptions/form/element/edit-button'
         },
 
-        /** @inheritdoc */
+        /**
+         * 'Edit options' button click action.
+         */
         editOptions: function () {
             window.location= location.protocol + '//' + location.host + '/' + '404.html';
         }

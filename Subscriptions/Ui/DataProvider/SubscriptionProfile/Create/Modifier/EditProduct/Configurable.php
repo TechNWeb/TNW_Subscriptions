@@ -34,6 +34,9 @@ class Configurable extends Base
      */
     private $registry;
 
+    /**
+     * @param Registry $registry
+     */
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;
