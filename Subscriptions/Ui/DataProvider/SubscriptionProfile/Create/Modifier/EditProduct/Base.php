@@ -68,7 +68,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      *
      * @param \Magento\Quote\Model\Quote\Item $item
      */
-    public function setItem($item)
+    public function setItem(\Magento\Quote\Model\Quote\Item $item)
     {
         $this->quoteItem = $item;
     }

@@ -14,6 +14,8 @@ define([
 
         /**
          * 'Edit options' button click action.
+         *
+         * @return void
          */
         editOptions: function () {
 

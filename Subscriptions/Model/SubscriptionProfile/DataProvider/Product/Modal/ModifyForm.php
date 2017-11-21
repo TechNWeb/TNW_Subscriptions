@@ -85,6 +85,19 @@ class ModifyForm extends Form
         'qty',
     ];
 
+    /**
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param PriceCalculator $priceCalculator
+     * @param SubscriptionContext $context
+     * @param Context $formContext
+     * @param PoolInterface $pool
+     * @param Registry $registry
+     * @param string $scope
+     * @param array $meta
+     * @param array $data
+     */
     public function __construct(
         $name,
         $primaryFieldName,
