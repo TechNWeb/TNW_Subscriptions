@@ -135,7 +135,7 @@ class ProfileProcessor
      * @param \TNW\Subscriptions\Model\Queue $item
      * @return bool
      */
-    private function passWithoutProcessing($item)
+    private function passWithoutProcessing(\TNW\Subscriptions\Model\Queue $item)
     {
         $result =
             $item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE)
