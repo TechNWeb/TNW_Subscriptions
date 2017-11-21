@@ -66,9 +66,9 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * Set current quote item.
      *
-     * @param \Magento\Quote\Model\Quote\Item $item
+     * @param \Magento\Quote\Model\Quote\Item|\TNW\Subscriptions\Model\ProductSubscriptionProfile $item
      */
-    public function setItem(\Magento\Quote\Model\Quote\Item $item)
+    public function setItem($item)
     {
         $this->quoteItem = $item;
     }
@@ -76,7 +76,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * Return current quote item.
      *
-     * @return \Magento\Quote\Model\Quote\Item
+     * @return \Magento\Quote\Model\Quote\Item||\TNW\Subscriptions\Model\ProductSubscriptionProfile
      */
     protected function getItem()
     {
