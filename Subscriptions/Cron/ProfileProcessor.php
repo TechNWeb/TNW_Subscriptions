@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Cron;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
@@ -82,8 +83,7 @@ class ProfileProcessor
         /** @var \TNW\Subscriptions\Model\Queue $item */
         foreach ($itemsCollection as $item) {
             $profileIds[] = $item->getSubscriptionProfileId();
-            if ($item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE)) {
-                // Pass if current profile must be canceled in this cycle
+            if ($this->passWithoutProcessing($item)) {
                 continue;
             }
             try {
@@ -96,6 +96,7 @@ class ProfileProcessor
                 $this->queueManager->makeError($item->getId(), $e->getMessage());
             }
         }
+
         $this->queueManager->makeCompleted($successIds);
         if (!empty($profileIds)){
             $this->updateProfilesStatuses($profileIds);
@@ -125,5 +126,21 @@ class ProfileProcessor
     {
         $this->registry->unregister('profile_process_type');
         $this->registry->register('profile_process_type', MessageHistoryLogger::PROCESS_TYPE_AUTOMATED);
+    }
+
+    /**
+     * Check if queue item need to be passed without processing.
+     * This items later may be used to change their statuses.
+     *
+     * @param \TNW\Subscriptions\Model\Queue $item
+     * @return bool
+     */
+    private function passWithoutProcessing($item)
+    {
+        $result =
+            $item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE)
+            || $item->getData('profile_' . SubscriptionProfile::STATUS) == ProfileStatus::STATUS_HOLDED;
+
+        return $result;
     }
 }

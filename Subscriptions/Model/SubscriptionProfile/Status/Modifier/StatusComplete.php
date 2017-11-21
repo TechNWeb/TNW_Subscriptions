@@ -20,13 +20,28 @@ class StatusComplete extends Base
      */
     protected function getIdsToModify(array $allIds)
     {
+        $finished = $this->getIdsThatRunThroughAllCycles($allIds);
+        $onHold = $this->getIdsThatHeldAndRunThroughAllCycles($allIds);
+        $result = array_unique(array_merge($finished, $onHold));
+
+        return $result;
+    }
+
+    /**
+     * Get all profile IDs that finished all their cycles and therefore need to be completed.
+     *
+     * @param array $allIds
+     * @return array
+     */
+    private function getIdsThatRunThroughAllCycles(array $allIds)
+    {
         $select = $this->resource->getConnection()->select();
         $select->from(
-            ['relation' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+            ['orders' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             []
         )->join(
             ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
-            'relation.subscription_profile_id = profile.entity_id',
+            'orders.subscription_profile_id = profile.entity_id',
             [
                 SubscriptionProfile::ID,
                 SubscriptionProfile::TOTAL_BILLING_CYCLES,
@@ -39,11 +54,42 @@ class StatusComplete extends Base
         )->where(
             'profile.entity_id IN (?)', $allIds
         )->where(
-            'relation.magento_order_id IS NOT NULL'
+            'orders.magento_order_id IS NOT NULL'
         )->group(
-            ['relation.subscription_profile_id']
+            ['orders.subscription_profile_id']
         )->having(
-            'COUNT(relation.subscription_profile_id) = profile.total_billing_cycles + trial_cycle_count'
+            'COUNT(orders.subscription_profile_id) = profile.total_billing_cycles + trial_cycle_count'
+        );
+
+        return $this->resource->getConnection()->fetchCol($select);
+    }
+
+    /**
+     * Get all profile IDs that held and last cycle quote is expired.
+     *
+     * @param array $allIds
+     * @return array
+     */
+    private function getIdsThatHeldAndRunThroughAllCycles(array $allIds)
+    {
+        $select = $this->resource->getConnection()->select();
+        $select->from(
+            ['orders' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+            []
+        )->join(
+            ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+            'orders.subscription_profile_id = profile.entity_id',
+            [SubscriptionProfile::ID]
+        )->where(
+            'profile.term = ?', 0
+        )->where(
+            'profile.status = ?', ProfileStatus::STATUS_HOLDED
+        )->where(
+            'profile.entity_id IN (?)', $allIds
+        )->group(
+            ['orders.subscription_profile_id']
+        )->having(
+            'max(orders.scheduled_at) < ?', $this->resource->getConnection()->formatDate(new \DateTime())
         );
 
         return $this->resource->getConnection()->fetchCol($select);

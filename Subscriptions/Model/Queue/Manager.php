@@ -133,7 +133,6 @@ class Manager
                 'profile.status NOT IN (?)',
                 [
                     ProfileStatus::STATUS_CANCELED,
-                    ProfileStatus::STATUS_HOLDED,
                     ProfileStatus::STATUS_SUSPENDED,
                     ProfileStatus::STATUS_COMPLETE,
                 ]
@@ -324,20 +323,24 @@ class Manager
     {
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
-        $collection->getSelect()->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-            'main_table.profile_order_id = relation.id',
-            [
-                SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
-                SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
-                SubscriptionProfileOrderInterface::SCHEDULED_AT
-            ]
-        );
-        $collection->getSelect()->join(
-            ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
-            'relation.subscription_profile_id = profile.entity_id',
-            [SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE]
-        );
+        $collection->getSelect()
+            ->join(
+                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                'main_table.profile_order_id = relation.id',
+                [
+                    SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+                    SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
+                    SubscriptionProfileOrderInterface::SCHEDULED_AT,
+                ]
+            )
+            ->join(
+                ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+                'relation.subscription_profile_id = profile.entity_id',
+                [
+                    SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
+                    'profile_' . SubscriptionProfile::STATUS => SubscriptionProfile::STATUS,
+                ]
+            );
 
         return $collection;
     }
