@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -16,6 +17,13 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
  */
 class Products extends BaseSummary
 {
+    /**
+     * Product types that can be configured.
+     */
+    const CONFIGURE_TYPES = [
+        ConfigurableProduct::TYPE_CODE,
+    ];
+
     /**
      * @var \Magento\Catalog\Helper\ImageFactory
      */
@@ -243,5 +251,42 @@ class Products extends BaseSummary
     {
         $currency = $this->currency->getCurrency($this->getSubscriptionProfile()->getProfileCurrencyCode());
         return $currency->toCurrency(sprintf("%f", $value));
+    }
+
+    /**
+     * Check if product options can be shown.
+     * Depend on product type.
+     *
+     * @param \Magento\Catalog\Model\Product $product
+     * @return bool
+     */
+    public function canShowProductOptions(\Magento\Catalog\Model\Product $product)
+    {
+        return in_array($product->getTypeId(), self::CONFIGURE_TYPES);
+    }
+
+    /**
+     * Render item product options.
+     *
+     * @param ProductSubscriptionProfileInterface $item
+     * @return string
+     */
+    public function renderProductOptions(ProductSubscriptionProfileInterface $item)
+    {
+        $product = $this->getProductFromItem($item);
+
+        if ($product && $this->canShowProductOptions($product)) {
+            $productType = $product->getTypeId();
+
+            $childBlock = $this->getChildBlock($productType . '.product');
+
+            if ($childBlock && $childBlock instanceof \Magento\Framework\View\Element\Template) {
+                $childBlock->setItem($item);
+
+                return $childBlock->toHtml();
+            }
+        }
+
+        return '';
     }
 }

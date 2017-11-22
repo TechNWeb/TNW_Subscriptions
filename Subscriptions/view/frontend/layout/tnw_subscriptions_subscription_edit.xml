@@ -40,7 +40,11 @@
                 </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Summary\Products"
                        name="subscription.info.view.products" as="products"
-                       template="TNW_Subscriptions::subscription_profile/summary/products.phtml" />
+                       template="TNW_Subscriptions::subscription_profile/summary/products.phtml" >
+                    <block class="TNW\Subscriptions\Block\Subscription\Summary\Products\Configurable"
+                           name="subscription.info.view.products.configurable" as="configurable.product"
+                           template="TNW_Subscriptions::subscription_profile/summary/products/configurable.phtml" />
+                </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone"
                        name="subscription.info.view.danger_zone"
                        template="TNW_Subscriptions::subscription_profile/summary/overview/danger-zone.phtml"
