@@ -889,3 +889,13 @@ button.action-editor.active:before{
 .admin__field.shipping-methods-fieldset>.admin__field-control {
     width: calc(100%  - 30px );
 }
+
+#co-transparent-form-braintree .admin__control-text {
+    height: 33px;
+    border: 1px solid #c2c2c2;
+    padding: 0.6rem 1rem 0.6rem;
+}
+
+#co-transparent-form-braintree .payment-cvv .admin__control-text {
+    width: 6rem;
+}
