@@ -46,7 +46,7 @@ class Braintree
     /**
      * Create a customer, with a payment method
      *
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param \Magento\Customer\Api\Data\CustomerInterface|\Magento\Customer\Model\Customer $customer
      * @param string $nonce
      * @return \Braintree\CreditCard
      * @throws \Exception
