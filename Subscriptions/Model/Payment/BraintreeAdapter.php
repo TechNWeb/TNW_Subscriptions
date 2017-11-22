@@ -11,10 +11,10 @@ use Magento\Framework\Exception\PaymentException;
 class BraintreeAdapter
 {
     /**
-     * @param $merchantId
-     * @param $publicKey
-     * @param $privateKey
-     * @param $environment
+     * @param string $merchantId
+     * @param string $publicKey
+     * @param string $privateKey
+     * @param string $environment
      */
     public function __construct($merchantId, $publicKey, $privateKey, $environment)
     {
