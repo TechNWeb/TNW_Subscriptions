@@ -2,45 +2,31 @@
 namespace TNW\Subscriptions\Model\Payment;
 
 use Braintree\Configuration;
-use Magento\Braintree\Gateway\Config\Config;
 use Magento\Braintree\Model\Adminhtml\Source\Environment;
-use \Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Exception\PaymentException;
 
 /**
  * Braintree Adapter
  */
-class Braintree
+class BraintreeAdapter
 {
     /**
-     * @var Config
+     * @param $merchantId
+     * @param $publicKey
+     * @param $privateKey
+     * @param $environment
      */
-    private $config;
-
-    /**
-     * @param Config $config
-     */
-    public function __construct(Config $config)
+    public function __construct($merchantId, $publicKey, $privateKey, $environment)
     {
-        $this->config = $config;
-        $this->initCredentials();
-    }
-
-    /**
-     * Initializes credentials.
-     *
-     * @return void
-     */
-    protected function initCredentials()
-    {
-        if ($this->config->getValue(Config::KEY_ENVIRONMENT) == Environment::ENVIRONMENT_PRODUCTION) {
+        if ($environment == Environment::ENVIRONMENT_PRODUCTION) {
             Configuration::environment(Environment::ENVIRONMENT_PRODUCTION);
         } else {
             Configuration::environment(Environment::ENVIRONMENT_SANDBOX);
         }
 
-        Configuration::merchantId($this->config->getValue(Config::KEY_MERCHANT_ID));
-        Configuration::publicKey($this->config->getValue(Config::KEY_PUBLIC_KEY));
-        Configuration::privateKey($this->config->getValue(Config::KEY_PRIVATE_KEY));
+        Configuration::merchantId($merchantId);
+        Configuration::publicKey($publicKey);
+        Configuration::privateKey($privateKey);
     }
 
     /**
@@ -49,7 +35,7 @@ class Braintree
      * @param \Magento\Customer\Api\Data\CustomerInterface|\Magento\Customer\Model\Customer $customer
      * @param string $nonce
      * @return \Braintree\CreditCard
-     * @throws \Exception
+     * @throws PaymentException
      */
     public function generatePaymentMethod($customer, $nonce)
     {
@@ -88,7 +74,7 @@ class Braintree
      *
      * @param string $token
      * @return string
-     * @throws \Exception
+     * @throws PaymentException
      */
     public function generateNonce($token)
     {

@@ -12,22 +12,22 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profil
 class Braintree extends Base
 {
     /**
-     * @var \TNW\Subscriptions\Model\Payment\Braintree
+     * @var \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory
      */
-    private $braintree;
+    private $adapterFactory;
 
     /**
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
-     * @param \TNW\Subscriptions\Model\Payment\Braintree $braintree
+     * @param \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory $adapterFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\Payment\Braintree $braintree
+        \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory $adapterFactory
     ) {
         parent::__construct($createModel, $session);
-        $this->braintree = $braintree;
+        $this->adapterFactory = $adapterFactory;
     }
 
     /**
@@ -39,12 +39,14 @@ class Braintree extends Base
             return;
         }
 
+        $adapter = $this->adapterFactory->create();
+
         try {
             /** @var \Magento\Quote\Model\Quote[] $subQuotes */
             $subQuotes = $this->getSubCreateModel()->getSubQuotes();
 
             /** @var \Braintree\CreditCard $paymentMethod */
-            $paymentMethod = $this->braintree->generatePaymentMethod(
+            $paymentMethod = $adapter->generatePaymentMethod(
                 reset($subQuotes)->getCustomer(),
                 $data['payment']['braintree']['nonce']
             );
@@ -54,7 +56,7 @@ class Braintree extends Base
                 $subQuote->getPayment()
                     ->setAdditionalInformation(
                         'payment_method_nonce',
-                        $this->braintree->generateNonce($paymentMethod->token)
+                        $adapter->generateNonce($paymentMethod->token)
                     );
 
                 $subQuote->getPayment()->setAdditionalInformation('payment_token', $paymentMethod->token);

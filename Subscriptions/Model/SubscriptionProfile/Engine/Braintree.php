@@ -16,9 +16,9 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 class Braintree extends Base
 {
     /**
-     * @var \TNW\Subscriptions\Model\Payment\Braintree
+     * @var \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory
      */
-    private $braintree;
+    private $adapterFactory;
 
     /**
      * @param \TNW\Subscriptions\Model\Config $config
@@ -28,7 +28,7 @@ class Braintree extends Base
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
      * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \TNW\Subscriptions\Model\Payment\Braintree $braintree
+     * @param \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory $adapterFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -38,12 +38,12 @@ class Braintree extends Base
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \TNW\Subscriptions\Model\Payment\Braintree $braintree
+        \TNW\Subscriptions\Model\Payment\BraintreeAdapterFactory $adapterFactory
     ) {
         parent::__construct($config, $context, $cartManagement, $historyLogger,
             $registry, $persistor, $zeroTotalValidator);
 
-        $this->braintree = $braintree;
+        $this->adapterFactory = $adapterFactory;
     }
 
     /**
@@ -82,7 +82,7 @@ class Braintree extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            'payment_method_nonce' => $this->braintree->generateNonce($profile->getPaymentToken()),
+            'payment_method_nonce' => $this->adapterFactory->create()->generateNonce($profile->getPaymentToken()),
         ];
     }
 
@@ -98,7 +98,7 @@ class Braintree extends Base
             }
 
             /** @var \Braintree\CreditCard $paymentMethod */
-            $paymentMethod = $this->braintree->generatePaymentMethod(
+            $paymentMethod = $this->adapterFactory->create()->generatePaymentMethod(
                 $this->getProfile()->getCustomer(), $methodData['nonce']);
 
             $this->getProfile()
