@@ -59,7 +59,8 @@ class ChangeHistory extends ContentAbstract
             $collection = $this->messageHistoryCollectionFactory->create();
             $this->messagesCollection = $collection->getChangeHistoryCollection(
                 $this->getSubscriptionProfile()->getId()
-            );
+            )
+                ->addFieldToFilter('is_visible_on_front', 1);
         }
 
         return $this->messagesCollection;
