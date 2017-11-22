@@ -11,7 +11,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
- * Class Braintree
+ * Braintree Engine
  */
 class Braintree extends Base
 {
@@ -21,7 +21,6 @@ class Braintree extends Base
     private $braintree;
 
     /**
-     * Braintree constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -58,7 +57,7 @@ class Braintree extends Base
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
-                OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear()
+                OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear(),
             ]
         ];
     }
@@ -83,7 +82,7 @@ class Braintree extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            'payment_method_nonce' => $this->braintree->generateNonce($profile->getPaymentToken())
+            'payment_method_nonce' => $this->braintree->generateNonce($profile->getPaymentToken()),
         ];
     }
 
@@ -92,7 +91,7 @@ class Braintree extends Base
      */
     public function processProfileByRequestData($requestData)
     {
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
+        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] : [];
         foreach ($paymentPostData as $code => $methodData) {
             if (!$methodData['method']) {
                 continue;
@@ -108,7 +107,7 @@ class Braintree extends Base
                     OrderPaymentInterface::CC_TYPE => $methodData['additional']['cc_type'],
                     OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
                     OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                    OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear
+                    OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
                 ]);
 
             break;

@@ -54,7 +54,7 @@ class ActiveMethods extends Fieldset
         Checkmo::PAYMENT_METHOD_CHECKMO_CODE,
         Config::METHOD_PAYFLOWPRO,
         Config::METHOD_PAYMENT_PRO,
-        BraintreeConfigProvider::CODE
+        BraintreeConfigProvider::CODE,
     ];
 
     /**

@@ -1,29 +1,51 @@
 <?php
 namespace TNW\Subscriptions\Model\Payment;
 
+use Braintree\Configuration;
 use Magento\Braintree\Gateway\Config\Config;
 use Magento\Braintree\Model\Adminhtml\Source\Environment;
+use \Magento\Framework\Exception\PaymentException;
 
+/**
+ * Braintree Adapter
+ */
 class Braintree
 {
     /**
-     * Braintree constructor.
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param Config $config
      */
     public function __construct(Config $config)
     {
-        if ($config->getValue(Config::KEY_ENVIRONMENT) == Environment::ENVIRONMENT_PRODUCTION) {
-            \Braintree\Configuration::environment(Environment::ENVIRONMENT_PRODUCTION);
-        } else {
-            \Braintree\Configuration::environment(Environment::ENVIRONMENT_SANDBOX);
-        }
-
-        \Braintree\Configuration::merchantId($config->getValue(Config::KEY_MERCHANT_ID));
-        \Braintree\Configuration::publicKey($config->getValue(Config::KEY_PUBLIC_KEY));
-        \Braintree\Configuration::privateKey($config->getValue(Config::KEY_PRIVATE_KEY));
+        $this->config = $config;
+        $this->initCredentials();
     }
 
     /**
+     * Initializes credentials.
+     *
+     * @return void
+     */
+    protected function initCredentials()
+    {
+        if ($this->config->getValue(Config::KEY_ENVIRONMENT) == Environment::ENVIRONMENT_PRODUCTION) {
+            Configuration::environment(Environment::ENVIRONMENT_PRODUCTION);
+        } else {
+            Configuration::environment(Environment::ENVIRONMENT_SANDBOX);
+        }
+
+        Configuration::merchantId($this->config->getValue(Config::KEY_MERCHANT_ID));
+        Configuration::publicKey($this->config->getValue(Config::KEY_PUBLIC_KEY));
+        Configuration::privateKey($this->config->getValue(Config::KEY_PRIVATE_KEY));
+    }
+
+    /**
+     * Create a customer, with a payment method
+     *
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @param string $nonce
      * @return \Braintree\CreditCard
@@ -55,13 +77,15 @@ class Braintree
                 $errors[] = "{$error->code}: {$error->message}";
             }
 
-            throw new \Exception(implode("\n ", $errors));
+            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
         }
 
         return $result->customer->paymentMethods[0];
     }
 
     /**
+     * Create a payment method nonce
+     *
      * @param string $token
      * @return string
      * @throws \Exception
@@ -76,7 +100,7 @@ class Braintree
                 $errors[] = "{$error->code}: {$error->message}";
             }
 
-            throw new \Exception(implode("\n ", $errors));
+            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
         }
 
         return $result->paymentMethodNonce->nonce;

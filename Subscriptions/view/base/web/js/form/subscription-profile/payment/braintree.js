@@ -23,6 +23,9 @@ define([
             braintree: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
+            sdkUrl: null,
+            clientToken: null,
+            useCvv: true,
             links: {
                 selectedCardType: 'dataContainer = braintree-cc-type:value'
             }
@@ -54,7 +57,6 @@ define([
         changeVisibility: function(checkBoxChecked) {
             if (checkBoxChecked && !this.clientToken) {
                 this.processErrors($.mage.__('This payment is not available'));
-
                 return;
             }
 
@@ -65,13 +67,15 @@ define([
 
         /**
          * Trigger form saving.
+         * @param {boolean} value
+         * @return void
          */
         saveBilling: function (value) {
             var form,
                 temp = {},
                 postData = [];
 
-            if (value){
+            if (value) {
                 form = registry.get('index = ' + this.options.formName);
                 this.showLoader();
                 this.resetErrors();
@@ -91,7 +95,6 @@ define([
                         if (response.error) {
                             this.processErrors(response.error_messages);
                         }
-                        this.hideLoader();
                     },
                     complete: function () {
                         this.hideLoader();
@@ -102,6 +105,7 @@ define([
 
         /**
          * Before submit action for payment method.
+         * @return void
          */
         beforeSubmit: function () {
             $('#braintree_submit').trigger('click');
@@ -109,6 +113,7 @@ define([
 
         /**
          * Load external Braintree SDK
+         * @return void
          */
         loadScript: function () {
             var self = this,
@@ -125,6 +130,7 @@ define([
 
         /**
          * Setup Braintree SDK
+         * @return void
          */
         initBraintree: function () {
             var self = this;
@@ -263,6 +269,7 @@ define([
 
         /**
          * Processing errors
+         * @return void
          */
         processErrors: function (errors) {
             this.set('payment_errors', [errors]);
@@ -270,6 +277,7 @@ define([
 
         /**
          * Resets payment errors.
+         * @return void
          */
         resetErrors:function () {
             this.set('payment_errors', '');
@@ -277,6 +285,7 @@ define([
 
         /**
          * Shows form loader.
+         * @return void
          */
         hideLoader: function () {
             $('body').trigger('processStop');
@@ -284,6 +293,7 @@ define([
 
         /**
          * Hides form loader.
+         * @return void
          */
         showLoader: function () {
             $('body').trigger('processStart');

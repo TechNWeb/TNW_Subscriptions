@@ -67,7 +67,6 @@ class Braintree extends Base implements PaymentModifierInterface
     private $clientToken = '';
 
     /**
-     * Braintree constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
@@ -139,7 +138,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'sortOrder' => 10,
                             'options' => $this->getPaymentCcTypes(),
                             'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
                             ],
                             'validation' => [
                                 'required-entry' => true,
@@ -163,7 +162,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
                             ]
                         ],
                     ],
@@ -182,7 +181,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'sortOrder' => 30,
                             'required' => true,
                             'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
                             ],
                         ],
                     ],
@@ -200,7 +199,7 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
-                                    'sortOrder' => 10
+                                    'sortOrder' => 10,
                                 ],
                             ],
                         ],
@@ -217,7 +216,7 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
-                                    'sortOrder' => 20
+                                    'sortOrder' => 20,
                                 ],
                             ],
                         ],
@@ -243,7 +242,7 @@ class Braintree extends Base implements PaymentModifierInterface
                             'additionalClasses' => 'payment-cvv',
                             'sortOrder' => 40,
                             'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
                             ]
                         ],
                     ],
@@ -274,7 +273,7 @@ class Braintree extends Base implements PaymentModifierInterface
                 'formName' => $this->getPaymentFormName(),
             ],
             'imports' => [
-                'changeVisibility' => "{$this->getFieldsetName()}.method:checked"
+                'changeVisibility' => "{$this->getFieldsetName()}.method:checked",
             ],
         ];
     }
@@ -306,10 +305,10 @@ class Braintree extends Base implements PaymentModifierInterface
                         'collapsible' => false,
                         'opened' => true,
                         'imports' => [
-                            'changeVisibility' => $checkBoxName . ':checked'
+                            'changeVisibility' => $checkBoxName . ':checked',
                         ],
                         'exports' => [
-                            'visible' => $fieldsetName . ':checked'
+                            'visible' => $fieldsetName . ':checked',
                         ],
                     ],
                 ],
@@ -361,7 +360,7 @@ class Braintree extends Base implements PaymentModifierInterface
                 } else {
                     $result[] = [
                         'value' => $code,
-                        'label' => $name
+                        'label' => $name,
                     ];
                 }
             }

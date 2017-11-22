@@ -17,7 +17,6 @@ class Braintree extends Base
     private $braintree;
 
     /**
-     * Braintree constructor.
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \TNW\Subscriptions\Model\Payment\Braintree $braintree
@@ -46,15 +45,19 @@ class Braintree extends Base
 
             /** @var \Braintree\CreditCard $paymentMethod */
             $paymentMethod = $this->braintree->generatePaymentMethod(
-                reset($subQuotes)->getCustomer(), $data['payment']['braintree']['nonce']);
+                reset($subQuotes)->getCustomer(),
+                $data['payment']['braintree']['nonce']
+            );
 
             /** @var \Magento\Quote\Model\Quote $subQuote */
             foreach ($subQuotes as $subQuote) {
-                $subQuote->getPayment()->setAdditionalInformation(
-                    'payment_method_nonce', $this->braintree->generateNonce($paymentMethod->token));
-                $subQuote->getPayment()->setAdditionalInformation(
-                    'payment_token', $paymentMethod->token);
+                $subQuote->getPayment()
+                    ->setAdditionalInformation(
+                        'payment_method_nonce',
+                        $this->braintree->generateNonce($paymentMethod->token)
+                    );
 
+                $subQuote->getPayment()->setAdditionalInformation('payment_token', $paymentMethod->token);
                 $subQuote->getPayment()->setCcType($data['payment']['braintree']['additional']['cc_type']);
                 $subQuote->getPayment()->setCcLast4($paymentMethod->last4);
                 $subQuote->getPayment()->setCcExpMonth($paymentMethod->expirationMonth);
