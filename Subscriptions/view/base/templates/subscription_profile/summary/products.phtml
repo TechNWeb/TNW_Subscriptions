@@ -21,6 +21,7 @@
                         <dt class="qty"><?php echo __('Qty') ?></dt>
                         <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
+                    <?php echo $block->renderProductOptions($item);?>
                 </div>
                 <div class="additional">
                     <dl>

@@ -1,0 +1,14 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products\Configurable $block */ ?>
+<?php $options = $block->getItemOptions()?>
+<?php foreach ($options as $option) : ?>
+    <div class="config-item-options">
+        <label><?php echo $block->escapeHtml($option['attributeLabel']) ?>:</label>
+        <div class="control"><?php echo $block->escapeHtml($option['optionLabel'])?></div>
+    </div>
+<?php endforeach; ?>
