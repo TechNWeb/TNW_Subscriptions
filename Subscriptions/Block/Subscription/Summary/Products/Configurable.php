@@ -36,7 +36,9 @@ class Configurable extends Template
             $productSuperAttributes = $this->getProductSuperAttributes($magentoProduct);
             $storeId = $magentoProduct->getStoreId();
 
-            if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE && is_array($productSuperAttributes)) {
+            if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE
+                && $productSuperAttributes->getSize() > 0)
+            {
                 //We have to get custom options from child items
                 foreach ($itemChildren as $itemChild) {
                     $customOptions = $itemChild->getCustomOptions();
@@ -88,7 +90,7 @@ class Configurable extends Template
     /**
      * Return current product super attributes.
      *
-     * @return \Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute[]
+     * @return \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute\Collection
      */
     private function getProductSuperAttributes($product)
     {
