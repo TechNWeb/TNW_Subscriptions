@@ -265,10 +265,12 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Removes product from subscription.
+     * Removes product from subscription (quoteItem from parent quote).
+     * It also recalculate parent quote shipping rates.
+     * If $quoteItem is the last item in parent quote whole quote will be removed.
      *
      * @param Item $quoteItem
-     * @return ModelQuote|bool
+     * @return ModelQuote|bool Returns parent quote for $quoteItem or false if quote was removed.
      */
     public function removeSubscriptions(Item $quoteItem)
     {
