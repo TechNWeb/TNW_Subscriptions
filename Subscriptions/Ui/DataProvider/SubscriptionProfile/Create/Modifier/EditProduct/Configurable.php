@@ -44,6 +44,7 @@ class Configurable extends Base
 
     /**
      * @param Registry $registry
+     * @param UrlFactory $urlFactory
      */
     public function __construct(
         Registry $registry,
@@ -195,7 +196,7 @@ class Configurable extends Base
                                         'actionName' => 'editOptions',
                                     ],
                                 ],
-                                'configureUrl' => $this->getConfigureUrl()
+                                'configureUrl' => $this->getConfigureUrl(),
                             ],
                         ],
                     ],

@@ -11,7 +11,11 @@ use Magento\Framework\App\Action\Context;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Magento\Framework\Controller\ResultFactory;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Configure product's options in subscription cart.
+ */
 class Configure extends \Magento\Framework\App\Action\Action
     implements \Magento\Catalog\Controller\Product\View\ViewInterface
 {
@@ -25,12 +29,25 @@ class Configure extends \Magento\Framework\App\Action\Action
      */
     private $quoteRepository;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param Context $context
+     * @param ItemFactory $quoteItemFactory
+     * @param CartRepositoryInterface $quoteRepository
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         Context $context,
         ItemFactory $quoteItemFactory,
-        CartRepositoryInterface $quoteRepository
+        CartRepositoryInterface $quoteRepository,
+        LoggerInterface $logger
     ) {
         parent::__construct($context);
+        $this->logger = $logger;
         $this->quoteItemFactory = $quoteItemFactory;
         $this->quoteRepository = $quoteRepository;
     }
@@ -54,7 +71,7 @@ class Configure extends \Magento\Framework\App\Action\Action
         }
 
         try {
-            if (!$quoteItem || $productId != $quoteItem->getProduct()->getId()) {
+            if (!$quoteItem || $productId != $quoteItem->getProductId()) {
                 $this->messageManager->addError(__("We can't find the subscription item."));
 
                 return $this->goBack();
@@ -69,7 +86,7 @@ class Configure extends \Magento\Framework\App\Action\Action
             $this->_objectManager->get(\Magento\Catalog\Helper\Product\View::class)
                 ->prepareAndRender(
                     $resultPage,
-                    $quoteItem->getProduct()->getId(),
+                    $quoteItem->getProductId(),
                     $this,
                     $params
                 );
@@ -77,7 +94,7 @@ class Configure extends \Magento\Framework\App\Action\Action
             return $resultPage;
         } catch (\Exception $e) {
             $this->messageManager->addError(__('We cannot configure the product.'));
-            $this->_objectManager->get(\Psr\Log\LoggerInterface::class)->critical($e);
+            $this->logger->critical($e);
 
             return $this->goBack();
         }
