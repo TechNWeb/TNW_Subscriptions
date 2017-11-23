@@ -123,7 +123,10 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        return $this->config->isSubscriptionsActiveCurrent() && count($this->getProductBillingFrequencies());
+        return
+            $this->config->isSubscriptionsActiveCurrent()
+            && count($this->getProductBillingFrequencies())
+            && $this->getRequest()->getRouteName() != 'checkout';
     }
 
     /**

@@ -9,7 +9,8 @@ define([
 
     return Button.extend({
         defaults: {
-            elementTmpl: 'TNW_Subscriptions/form/element/edit-button'
+            elementTmpl: 'TNW_Subscriptions/form/element/edit-button',
+            configureUrl: ''
         },
 
         /**
@@ -18,7 +19,7 @@ define([
          * @return void
          */
         editOptions: function () {
-            window.location= location.protocol + '//' + location.host + '/' + '404.html';
+            window.location = this.configureUrl;
         }
     });
 });
