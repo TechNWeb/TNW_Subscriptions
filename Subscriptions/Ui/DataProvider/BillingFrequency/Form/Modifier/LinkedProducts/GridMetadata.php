@@ -272,6 +272,9 @@ class GridMetadata
             [
                 'currencySymbol' => $this->getCurrencySymbol(),
                 'customAddAfter' => __('ea.'),
+            ],
+            [
+                'validate-zero-or-greater' => true,
             ]
         );
 
