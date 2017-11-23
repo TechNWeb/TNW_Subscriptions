@@ -13,7 +13,8 @@ use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
-
+use Magento\Framework\UrlFactory;
+use Magento\Framework\UrlInterface;
 /**
  * DataProvider modifier on add to subscription form for configurable products.
  */
@@ -35,11 +36,22 @@ class Configurable extends Base
     private $registry;
 
     /**
-     * @param Registry $registry
+     * URL instance
+     *
+     * @var UrlFactory
      */
-    public function __construct(Registry $registry)
-    {
+    private $urlFactory;
+
+    /**
+     * @param Registry $registry
+     * @param UrlFactory $urlFactory
+     */
+    public function __construct(
+        Registry $registry,
+        UrlFactory $urlFactory
+    ) {
         $this->registry = $registry;
+        $this->urlFactory = $urlFactory;
     }
 
     /**
@@ -184,6 +196,7 @@ class Configurable extends Base
                                         'actionName' => 'editOptions',
                                     ],
                                 ],
+                                'configureUrl' => $this->getConfigureUrl(),
                             ],
                         ],
                     ],
@@ -210,5 +223,24 @@ class Configurable extends Base
     private function getSuperAttributes()
     {
         return $this->getItem()->getBuyRequest()->getSuperAttribute();
+    }
+
+    /**
+     * Return Url for Edit configurable product's options page.
+     *
+     * @return string
+     */
+    private function getConfigureUrl()
+    {
+        /** @var UrlInterface $url */
+        $url = $this->urlFactory->create();
+
+        return $url->getUrl(
+            'tnw_subscriptions/cart/configure',
+            [
+                'id' => $this->getItem()->getId(),
+                'product_id' => $this->getItem()->getProduct()->getId(),
+            ]
+        );
     }
 }

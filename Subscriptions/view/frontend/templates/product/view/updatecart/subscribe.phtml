@@ -1,0 +1,146 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+?>
+<div class="subscribe-container"
+     data-mage-init='{"tnwSubscribeContainer":{
+        "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
+        "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
+        "canShowSubscribePriceBlock" : "true"
+    }}'
+>
+    <div class="fieldset">
+        <div class="field required">
+            <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
+            <div class="control">
+                <div class="options-list nested">
+                <?php foreach ($block->getFrequencyOptions() as $option): ?>
+                    <div class="field choice required">
+                        <input type="radio"
+                               class="radio required"
+                               name="billing_frequency"
+                               id="billing_frequency_<?php echo $option['value'] ?>"
+                               value="<?php echo $option['value'] ?>"
+                               aria-required="true"
+                            <?php if ($option['is_default']): ?>
+                               checked="checked"
+                            <?php endif ?>
+                            <?php if (isset($option['preset_qty'])): ?>
+                                data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
+                            <?php endif ?>
+                        />
+                        <label class="label"
+                               for="billing_frequency_<?php echo $option['value'] ?>">
+                            <span><?php echo $option['label'] ?></span>
+                        </label>
+                    </div>
+                <?php endforeach ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fieldset">
+        <div class="field term required">
+            <label class="label"><span><?php echo __('Term') ?>:</span></label>
+            <div class="control">
+                <input type="checkbox"
+                       class="checkbox"
+                       name="term"
+                       id="term"
+                       value="1"
+                    <?php if ($block->getDefaultUntilCancelled()): ?>
+                       checked="checked"
+                    <?php endif ?>
+                />
+                <label class="label" for="term">
+                    <span><?php echo __('Until canceled') ?></span>
+                </label>
+            </div>
+        </div>
+        <div class="field required period" id="period-field"
+             <?php if ($block->getDefaultUntilCancelled()): ?>style="display:none"<?php endif ?>
+        >
+            <div class="control">
+                <label for="period"><span><?php echo __('& bill') ?></span></label>
+                <input type="number"
+                       name="period"
+                       id="period"
+                       class="input-text qty"
+                       data-validate='{"required-number":true}'
+                       value="<?php echo $block->getDefaultPeriod() ?>"
+                >
+                <label for="period" class="after-input"><span><?php echo __('times') ?></span></label>
+            </div>
+        </div>
+    </div>
+    <?php if ($block->getIsVisibleStartOn()): ?>
+    <div class="fieldset">
+        <div class="field date required">
+            <label class="label" for="start_at"><span><?php echo __('Start On') ?>:</span></label>
+            <div class="control">
+                <input type="text"
+                       name="start_on"
+                       id="start_at"
+                       class="required"
+                       value="<?php echo $block->getDefaultStartOn() ?>"
+                />
+            </div>
+        </div>
+    </div>
+    <?php endif ?>
+    <div class="fieldset">
+        <div class="field required">
+            <label class="label" for="subscribe_qty"><span><?php echo __('Qty') ?>:</span></label>
+            <div class="control">
+                <input type="number"
+                       name="subscribe_qty"
+                       id="subscribe_qty"
+                       maxlength="12"
+                       value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
+                       class="input-text qty"
+                       data-validate='<?php echo $block->escapeHtml(json_encode($block->getQtyValidators())) ?>'
+                    <?php if (!$block->getAllowEditSubscribeQty()): ?>
+                       disabled="disabled"
+                    <?php endif ?>
+                />
+                <?php if (!$block->getAllowEditSubscribeQty()): ?>
+                    <input type="hidden"
+                           name="subscribe_qty"
+                           id="subscribe_qty_hidden"
+                           value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
+                    />
+                <?php endif ?>
+
+            </div>
+        </div>
+    </div>
+    <button type="button"
+            id="product-subscribe-button"
+            title="<?php echo $block->escapeHtml(__('Subscribe')) ?>"
+            class="action primary subscribe"
+            >
+        <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Modify Cart') ?></span>
+    </button>
+</div>
+
+<?php if ($block->getIsVisibleStartOn()): ?>
+<script type="text/javascript">
+    require([
+        "jquery",
+        "mage/calendar"
+    ], function($) {
+        $("#start_at").calendar({
+            showsTime: false,
+            dateFormat: "<?php echo $block->getDateFormat() ?>",
+            buttonImage: "<?php echo $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
+            buttonText: "<?php echo __('Select Date') ?>",
+            minDate: "<?php echo $block->getMinStartOn() ?>"
+        });
+    });
+</script>
+<?php endif ?>
