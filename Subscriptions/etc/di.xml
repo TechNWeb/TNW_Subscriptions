@@ -640,9 +640,13 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AdditionalPayment</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="braintree_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Braintree</item>
+                    <item name="sortOrder" xsi:type="number">15</item>
+                </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </arguments>
@@ -663,6 +667,10 @@
                 <item name="payflowpro" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="braintree" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Braintree</item>
+                    <item name="sortOrder" xsi:type="number">25</item>
                 </item>
             </argument>
         </arguments>

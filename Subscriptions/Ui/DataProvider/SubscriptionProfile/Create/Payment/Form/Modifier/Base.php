@@ -205,7 +205,7 @@ class Base implements ModifierInterface
      *
      * @return array
      */
-    private function getField()
+    protected function getField()
     {
         return [
             'arguments' => [
@@ -238,7 +238,7 @@ class Base implements ModifierInterface
      *
      * @return array
      */
-    private function getChildren()
+    protected function getChildren()
     {
         $result = [
             'method' => $this->getField(),
