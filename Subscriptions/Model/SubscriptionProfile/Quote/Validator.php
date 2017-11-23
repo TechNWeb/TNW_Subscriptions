@@ -10,6 +10,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
@@ -86,18 +87,29 @@ class Validator
             if ($this->isBillingFrequencyExists($quote)) {
                 /** @var Item $item */
                 foreach ($quote->getAllVisibleItems() as $item) {
-                    $currentRequest = $this->getCurrentBuyRequest($item);
-                    list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
-                    if ($currentRequest != $newRequest) {
+                    $productCanBeSubscribed = $this->productCanBeSubscribed($item);
+                    if ($productCanBeSubscribed) {
+                        $currentRequest = $this->getCurrentBuyRequest($item);
+                        list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
+                        if ($currentRequest != $newRequest) {
+                            // Remove quote item
+                            if (!$this->createProfile->removeSubscriptions($item)) {
+                                $result = $this->filterResult($result, $quote);
+                            };
+                            // Add updated quote item if buy request was changed
+                            $this->createProfile->setSubQuotes($result);
+                            $newItem = $this->createProfile->addToSubscription($productsData);
+                            if ($newItem) {
+                                $newQuote = $newItem->getQuote();
+                                $result = $this->addQuoteToResult($result, $newQuote);
+                            }
+
+                        }
+                    } else {
+                        // Remove quote item
                         if (!$this->createProfile->removeSubscriptions($item)) {
                             $result = $this->filterResult($result, $quote);
                         };
-                        $this->createProfile->setSubQuotes($result);
-                        $newItem = $this->createProfile->addToSubscription($productsData);
-                        if ($newItem) {
-                            $newQuote = $newItem->getQuote();
-                            $result = $this->addQuoteToResult($result, $newQuote);
-                        }
                     }
                 }
             } else {
@@ -110,7 +122,30 @@ class Validator
     }
 
     /**
-     * Returns new subscription item buy request, depends for old one.
+     * Check if product can be subscribed.
+     * Product can be subscribed if it is "in stock" and is NOT "One time purchase.
+     *
+     * @param Item $item
+     * @return bool
+     */
+    private function productCanBeSubscribed($item)
+    {
+        $result = false;
+        /** @var \Magento\Catalog\Model\Product $product */
+        $product = $item->getProduct();
+        if ($product) {
+            $purchaseType = $product->getData(\TNW\Subscriptions\Model\Product\Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+            $result =
+                $product
+                && $product->getIsSalable() // Use because of TNW\Subscriptions\Block\Product\View\Subscribe (line 148)
+                && $purchaseType != PurchaseType::ONE_TIME_PURCHASE_TYPE;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns new buy request for quote item, depends on old one.
      *
      * @param Item $item
      * @param array $currentRequest
@@ -146,7 +181,7 @@ class Validator
     }
 
     /**
-     * Returns current subscription item buy request.
+     * Returns current buy request for quote item.
      *
      * @param Item $item
      * @return mixed
@@ -195,7 +230,7 @@ class Validator
     }
 
     /**
-     * Filters result quotes.
+     * Filters result quotes. It removes given $quote from $result array.
      *
      * @param Quote[] $result
      * @param Quote $quote
