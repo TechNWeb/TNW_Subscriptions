@@ -16,6 +16,12 @@ class Billing extends Base
      */
     public function process(array $data)
     {
+        if (!$this->getSession()->getFirstQuote()) {
+            $this->errors = [[__('Quote is no longer exist.'), 'needReload' => true]];
+
+            return;
+        }
+
         $address = isset($data['billing_address']) ? $data['billing_address'] : [];
         $info = isset($data['billing_info']) ? $data['billing_info'] : [];
         $billing = array_merge($address, $info);

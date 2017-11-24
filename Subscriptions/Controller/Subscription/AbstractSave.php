@@ -62,9 +62,24 @@ abstract class AbstractSave extends Action\Action
     {
         $result = ['data' => [], 'error' => false];
         if (!empty($errors)) {
+            $errorMessages = [];
+            $needReload = false;
+            foreach ($errors as $error) {
+                if (!empty($error)) {
+                    if (is_array($error)) {
+                        $errorMessages[] = reset($error);
+                        if (isset($error['needReload'])) {
+                            $needReload = $error['needReload'] ? true : false;
+                        }
+                    } else {
+                        $errorMessages[] = $error;
+                    }
+                }
+            }
             $result = [
-                'error_messages' => $errors,
-                'error' => true
+                'error_messages' => $errorMessages,
+                'error' => true,
+                'needReload' => $needReload,
             ];
         }
 

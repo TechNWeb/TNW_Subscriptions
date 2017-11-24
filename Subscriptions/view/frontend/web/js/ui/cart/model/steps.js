@@ -183,7 +183,14 @@ define([
                     stepNavigator.navigateNext();
                 } else {
                     this.showError(data.error_messages);
+                    if (data.needReload) {
+                        this.reloadPage();
+                    }
                 }
+            },
+
+            reloadPage: function () {
+                location.reload();
             },
 
             /**
