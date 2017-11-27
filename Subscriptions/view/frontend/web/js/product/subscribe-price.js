@@ -12,7 +12,10 @@ define([
         options: {
             subscriptionPricesData: {},
             subscriptionPriceContainerSelector: '.price-subscription_price',
-            billingFrequencyOptionsSelector: "input[name='billing_frequency']"
+            billingFrequencyOptionsSelector: "input[name='billing_frequency']",
+            subBillingFrequencyId: {
+                value : 0
+            }
         },
 
         /**
@@ -27,7 +30,12 @@ define([
          * First initialization.
          */
         _initialize: function () {
-            var currentFrequency = $j(this.options.billingFrequencyOptionsSelector+ ':checked').get(0);
+            var currentFrequency = this.options.subBillingFrequencyId;
+
+            if (typeof currentFrequency == 'undefined' || currentFrequency.value == 0) {
+                currentFrequency = $j(this.options.billingFrequencyOptionsSelector+ ':checked').get(0);
+            }
+
             if (currentFrequency !== undefined) {
                 this._insertPriseBox(currentFrequency.value);
             }

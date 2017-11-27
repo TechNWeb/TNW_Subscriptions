@@ -15,6 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
  * Saves modified subscription profile.
@@ -41,6 +42,11 @@ class Save extends AbstractSave
     private $responseProcessor;
 
     /**
+     * @var DataPersistorInterface
+     */
+    private $dataPersistor;
+
+    /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param RequestProcessor $saveProcessor
@@ -54,11 +60,13 @@ class Save extends AbstractSave
         RequestProcessor $saveProcessor,
         ProfileManager $profileManager,
         Registry $coreRegistry,
-        ResponseProcessor $responseProcessor
+        ResponseProcessor $responseProcessor,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->profileManager = $profileManager;
         $this->coreRegistry = $coreRegistry;
         $this->responseProcessor = $responseProcessor;
+        $this->dataPersistor = $dataPersistor;
         parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
@@ -118,8 +126,13 @@ class Save extends AbstractSave
     private function initProfile()
     {
         $result = false;
+
         /** @var SubscriptionProfile $model */
         $model = $this->profileManager->loadProfileFromRequest('entity_id');
+
+        if ($this->dataPersistor->get('editProfileId')) {
+            $model = $this->profileManager->loadProfile($this->dataPersistor->get('editProfileId'));
+        }
         if ($model) {
             $result = true;
             $this->coreRegistry->register('tnw_subscription_profile', $model, true);

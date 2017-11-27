@@ -18,6 +18,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Class for subscription_price rendering
@@ -60,6 +61,11 @@ class SubscriptionPriceBox extends BasePriceBox
     private $descriptionCreator;
 
     /**
+     * @var ProfileManager;
+     */
+    private $profileManager;
+
+    /**
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -83,6 +89,7 @@ class SubscriptionPriceBox extends BasePriceBox
         PriceCurrencyInterface $priceCurrency,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         DescriptionCreator $descriptionCreator,
+        ProfileManager $profileManager,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -93,6 +100,7 @@ class SubscriptionPriceBox extends BasePriceBox
         $this->priceCurrency = $priceCurrency;
         $this->jsonHelper = $jsonHelper;
         $this->descriptionCreator = $descriptionCreator;
+        $this->profileManager = $profileManager;
     }
 
 
@@ -256,5 +264,20 @@ class SubscriptionPriceBox extends BasePriceBox
         }
 
         return $this->jsonHelper->jsonEncode($result);
+    }
+
+    /**
+     * If Subscription data has billing frequency id we add it to array to use in js.
+     *
+     * @return string
+     */
+    public function addBillingFrequencyId()
+    {
+        $value = 0;
+        if ($this->profileManager->getProfile()->getId()) {
+            $value = $this->profileManager->getProfile()->getBillingFrequencyId();
+        }
+
+     return $this->jsonHelper->jsonEncode(['value' => $value]);
     }
 }

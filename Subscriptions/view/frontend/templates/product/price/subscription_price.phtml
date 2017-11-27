@@ -33,7 +33,8 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
 {
     "*": {
         "tnwSubscribePrice": {
-            "subscriptionPricesData" : <?php echo $data ?>
+            "subscriptionPricesData" : <?php echo $data ?>,
+            "subBillingFrequencyId" : <?php echo $block->addBillingFrequencyId() ?>
         }
     }
 }
