@@ -19,9 +19,9 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     const PRODUCT_TYPE = '';
 
     /**
-     * @var \Magento\Quote\Model\Quote\Item
+     * @var \Magento\Quote\Model\Quote\Item|\TNW\Subscriptions\Model\ProductSubscriptionProfile
      */
-    private $quoteItem;
+    private $item;
 
     /**
      * @inheritdoc
@@ -60,7 +60,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      */
     public function getProduct()
     {
-        return $this->quoteItem->getProduct();
+        return $this->getItem()->getProduct();
     }
 
     /**
@@ -70,7 +70,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      */
     public function setItem($item)
     {
-        $this->quoteItem = $item;
+        $this->item = $item;
     }
 
     /**
@@ -80,6 +80,6 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      */
     protected function getItem()
     {
-        return $this->quoteItem;
+        return $this->item;
     }
 }

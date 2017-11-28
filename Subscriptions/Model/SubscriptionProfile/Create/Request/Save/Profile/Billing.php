@@ -30,7 +30,7 @@ class Billing extends Base
             // Save billing address "Same As Shipping" flag state.
             if (isset($info['same_as_shipping'])) {
                 if (!$this->getSession()->getFirstQuote()) {
-                    $this->errors = [[__('Quote is no longer exist.'), 'needReload' => true]];
+                    $this->errors = [[__('Quote no longer exists.'), 'needReload' => true]];
 
                     return;
                 }
