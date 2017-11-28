@@ -143,7 +143,7 @@ class ManagerConfigurable
      * @param array $request
      * @return SubscriptionProfile|string
      */
-    public function processProfileUpdade(array $request)
+    public function processProfileUpdate(array $request)
     {
         $profileChanged = false;
         if (isset($request['sub_product_id'])) {

@@ -268,11 +268,11 @@ class SubscriptionPriceBox extends BasePriceBox
     }
 
     /**
-     * If Subscription data has billing frequency id we add it to array to use in js.
+     * Get encoded billing frequency Id.
      *
      * @return string
      */
-    public function addBillingFrequencyId()
+    public function getBillingFrequencyId()
     {
         $value = 0;
         if ($this->profileManager->getProfile()->getId()) {

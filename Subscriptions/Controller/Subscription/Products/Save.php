@@ -68,6 +68,7 @@ class Save extends Action
      * Execute save profile data on edit configurable product super attributes page.
      *
      * @return \Magento\Framework\Controller\Result\Json
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
@@ -77,14 +78,16 @@ class Save extends Action
 
         if ($subProduct) {
             try {
-                $this->currentProfile = $this->configurableManager->processProfileUpdade($request);
-                if (is_string($this->currentProfile)) {
-                    throw new \Magento\Framework\Exception\LocalizedException(__($this->currentProfile));
+                $this->currentProfile = $this->configurableManager->processProfileUpdate($request);
+
+                if ($this->currentProfile instanceof SubscriptionProfile) {
+                    if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
+                        $this->currentProfile->setNeedRecollect(true);
+                    }
+                    $this->profileManager->saveProfile();
+                } elseif ( is_string($this->currentProfile)) {
+                    $errors[] = __($this->currentProfile);
                 }
-                if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
-                    $this->currentProfile->setNeedRecollect(true);
-                }
-                $this->profileManager->saveProfile();
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
             }
