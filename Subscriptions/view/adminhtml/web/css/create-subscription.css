@@ -751,7 +751,13 @@ button.action-editor.active:before{
 }
 .product-options .admin__fieldset>.admin__field>.admin__field-label{
   text-align: left;
-  width: calc( (100%) * .5 - 30px );
+  width: calc( (100%) * .5 - 30px ) !important;
+}
+.product-options .admin__fieldset>.admin__field.edit-product>.admin__field-label{
+  width: auto !important;
+}
+.product-options .admin__fieldset>.admin__field.edit-product {
+  margin-left: -20px;
 }
 .product-options .admin__field .admin__field-control {
   line-height: 3.2rem;
@@ -763,4 +769,7 @@ button.action-editor.active:before{
 .product-options .admin__fieldset {
   padding-top: 0;
   padding-bottom: 1.5rem;
+}
+.product-options .fieldset-wrapper-title strong {
+  font-size: 2rem;
 }

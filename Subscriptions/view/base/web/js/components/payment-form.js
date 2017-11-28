@@ -32,8 +32,10 @@ define(
                     if (fields.method === "1") {
                         switch (code) {
                             case 'payflowpro':
+                            case 'braintree':
                                 registry.get('index = ' + code).beforeSubmit();
                                 break;
+
                             case 'checkmo':
                             default:
                                 current.save();

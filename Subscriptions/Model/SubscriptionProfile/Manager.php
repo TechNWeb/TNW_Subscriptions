@@ -589,10 +589,10 @@ class Manager
             if ($request['is_trial']) {
                 $this->getProfile()->setTrialStartDate($startDate);
                 $this->getProfile()->setStartDate($this->calculateStartDate());
-            }
-            //set status "trial" if trial period starts immediately
-            if (strtotime($startDate) <= strtotime($nowDate)) {
-                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+                //set status "trial" if trial period starts immediately
+                if (strtotime($startDate) <= strtotime($nowDate)) {
+                    $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+                }
             }
             $this->getProfile()->setAddresses($this->populateAddressesData($quote));
             $this->getProfile()->setProducts($this->productManager->populateProductsData($quote));

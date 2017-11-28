@@ -271,11 +271,9 @@ class Base implements EngineInterface
     {
         /** @var Payment $payment */
         $payment = $quote->getPayment();
-        //if quote payment is not initialised set profile payment method as default.
-        if (!$payment->getMethod()){
-            $payment->importData($this->getPaymentInfo($this->getProfile()));
-            $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
-        }
+        $payment->importData($this->getPaymentInfo($this->getProfile()));
+        $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
+
         // check quote total
         if (!$this->zeroTotalValidator->isApplicable($payment->getMethodInstance(), $quote)) {
             $payment->importData(['method' => Free::PAYMENT_METHOD_FREE_CODE]);

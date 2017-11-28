@@ -8,10 +8,15 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\DataObject;
+use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 
@@ -64,6 +69,11 @@ class ModifyForm extends Form
     protected $currentItem;
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+    /**
      * @var array
      */
     protected $requestFields = [
@@ -74,6 +84,47 @@ class ModifyForm extends Form
         'start_on',
         'qty',
     ];
+
+    /**
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param PriceCalculator $priceCalculator
+     * @param SubscriptionContext $context
+     * @param Context $formContext
+     * @param PoolInterface $pool
+     * @param Registry $registry
+     * @param string $scope
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
+        PriceCalculator $priceCalculator,
+        SubscriptionContext $context,
+        Context $formContext,
+        PoolInterface $pool,
+        Registry $registry,
+        $scope = '',
+        array $meta = [],
+        array $data = []
+    ) {
+        $this->registry = $registry;
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $priceCalculator,
+            $context,
+            $formContext,
+            $pool,
+            $scope,
+            $meta,
+            $data
+        );
+    }
 
     /**
      * @inheritdoc
@@ -174,7 +225,7 @@ class ModifyForm extends Form
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
-            $result[self::CONTAINER_ITEM_PREFIX . $itemId] = [
+            $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId)
                 ],
@@ -191,6 +242,14 @@ class ModifyForm extends Form
                     ],
                 ]
             ];
+
+            /** @var ModifierInterface $modifier */
+            foreach ($this->pool->getModifiersInstances() as $modifier) {
+                $modifier->setItem($this->currentItem);
+                $itemMeta = $modifier->modifyMeta($itemMeta);
+            }
+
+            $result[self::CONTAINER_ITEM_PREFIX . $itemId] = $itemMeta;
         }
 
         return !empty($result) ? $result : [];
@@ -247,8 +306,12 @@ class ModifyForm extends Form
      */
     protected function getFormFullName($container, $containerItem)
     {
-        return $this::DATA_SCOPE_MODAL_FORM . '.' . $this::DATA_SCOPE_MODAL_FORM . '.' . $this::CONTAINER_PREFIX
-            . $container . '.' . $this::CONTAINER_ITEM_PREFIX . $containerItem . '.form';
+        $formFullName = $this::DATA_SCOPE_MODAL_FORM . '.' . $this::DATA_SCOPE_MODAL_FORM . '.'
+            . $this::CONTAINER_PREFIX . $container . '.' . $this::CONTAINER_ITEM_PREFIX . $containerItem . '.form';
+        $this->registry->unregister('form_full_name');
+        $this->registry->register('form_full_name', $formFullName);
+
+        return $formFullName;
     }
 
     /**

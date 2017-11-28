@@ -52,6 +52,8 @@ abstract class AbstractSave extends SubscriptionProfile
     }
 
     /**
+     * Create processing response as JSON object.
+     *
      * @param array $errors
      * @return array
      */
@@ -59,12 +61,47 @@ abstract class AbstractSave extends SubscriptionProfile
     {
         $result = ['data' => [], 'error' => false];
         if (!empty($errors)) {
+            $errorMessages = [];
+            $needReload = false;
+            foreach ($errors as $error) {
+                if (!empty($error)) {
+                    if (is_array($error)) {
+                        $errorMessages[] = reset($error);
+                        if (isset($error['needReload'])) {
+                            $needReload = $error['needReload'] ? true : false;
+                        }
+                    } else {
+                        $errorMessages[] = $error;
+                    }
+                }
+            }
             $result = [
-                'error_messages' => $errors,
-                'error' => true
+                'error_messages' => $errorMessages,
+                'error' => true,
+                'needReload' => $needReload,
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * Add processing errors to message manager to show them in message block on page.
+     *
+     * @param $errors
+     * @return void
+     */
+    protected function addErrorsToMessageManager($errors)
+    {
+        foreach ($errors as $error) {
+            if (!empty($error)) {
+                if (is_array($error)) {
+                    $this->messageManager->addErrorMessage(reset($error));
+                } else {
+                    $this->messageManager->addErrorMessage($error);
+                }
+            }
+
+        }
     }
 }

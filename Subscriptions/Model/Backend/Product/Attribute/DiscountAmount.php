@@ -46,7 +46,12 @@ class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Pr
      */
     private function checkDiscountLessProductPrice($object, $attrCode)
     {
-        $offerFlatDiscount = $object->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT);
+        $offerFlatDiscount =
+            $object->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) !=
+                \TNW\Subscriptions\Model\Config\Source\PurchaseType::ONE_TIME_PURCHASE_TYPE
+            && $object->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
+            && $object->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT);
+
         if ($offerFlatDiscount) {
             $valueWithDiscount = 0;
             $discountAmountValue = $this->localeFormat->getNumber($object->getData($attrCode));

@@ -265,10 +265,12 @@ class CreateProfile extends BaseCreate
     }
 
     /**
-     * Removes product from subscription.
+     * Removes product from subscription (quoteItem from parent quote).
+     * It also recalculate parent quote shipping rates.
+     * If $quoteItem is the last item in parent quote whole quote will be removed.
      *
      * @param Item $quoteItem
-     * @return ModelQuote|bool
+     * @return ModelQuote|bool Returns parent quote for $quoteItem or false if quote was removed.
      */
     public function removeSubscriptions(Item $quoteItem)
     {
@@ -533,31 +535,27 @@ class CreateProfile extends BaseCreate
             $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile, $startDate);
             //Add new relation to profile processing queue in "pending" state.
             $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
-            //Current time
-            $date = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-            // if start date of profile in future do not create order
-            if (strtotime($startDate) <= strtotime($date)){
-                try {
-                    $this->queueManager->makeRunning($queueItemIds);
-                    $order = $this->profileManager->processProfile($subQuote);
-                } catch (\Exception $e) {
-                    $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                    throw $e;
-                }
-                if (isset($order)) {
-                    $this->profileManager->assignOrderToProfile($relation, $order);
-                    $this->queueManager->makeCompleted($queueItemIds);
-                    $this->eventManager->dispatch(
-                        'checkout_submit_all_after',
-                        ['order' => $order, 'quote' => $subQuote]
-                    );
-                }
-                //Generate quote for next payment.
-                $this->quoteGenerator->generateProfileQuotes(
-                    $this->profileManager->loadProfile($profile->getId()),
-                    1
+            try {
+                $this->queueManager->makeRunning($queueItemIds);
+                $order = $this->profileManager->processProfile($subQuote);
+            } catch (\Exception $e) {
+                $this->queueManager->makeError($queueItemIds, $e->getMessage());
+                throw $e;
+            }
+            if (isset($order)) {
+                $this->profileManager->assignOrderToProfile($relation, $order);
+                $this->queueManager->makeCompleted($queueItemIds);
+                $this->eventManager->dispatch(
+                    'checkout_submit_all_after',
+                    ['order' => $order, 'quote' => $subQuote]
                 );
             }
+            //Generate quote for next payment.
+            $this->quoteGenerator->generateProfileQuotes(
+                $this->profileManager->loadProfile($profile->getId()),
+                1
+            );
+
             $profiles[] = $profile;
             //TODO add here email sending
         }
