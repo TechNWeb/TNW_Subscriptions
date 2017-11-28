@@ -134,7 +134,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     /**
      * Return subscription profile from subscription product.
      *
-     * @return SubscriptionProfileInterface
+     * @return SubscriptionProfileInterface|bool
      */
     private function getSubscriptionProfile()
     {

@@ -97,7 +97,6 @@ class Edit extends \Magento\Framework\App\Action\Action
         }
 
         try {
-            $this->coreRegistry->unregister('tnw_subscription_product');
             $this->coreRegistry->register('tnw_subscription_product', $subscriprionProduct);
             $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
             $this->_objectManager->get(\Magento\Catalog\Helper\Product\View::class)
@@ -109,7 +108,7 @@ class Edit extends \Magento\Framework\App\Action\Action
                 );
 
             return $resultPage;
-        } catch (\Exception $e) {
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->messageManager->addError(__('We cannot configure the product.'));
             $this->logger->critical($e);
             if ($subscriptionProfile->getId()) {
@@ -121,8 +120,10 @@ class Edit extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Set back redirect url to response
+     * Set back redirect url to response.
      *
+     * @param string $path
+     * @param int $subscriptionId
      * @return \Magento\Framework\Controller\Result\Redirect
      */
     private function goBack($path, $subscriptionId = 0)

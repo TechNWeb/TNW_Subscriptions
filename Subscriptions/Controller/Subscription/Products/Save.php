@@ -82,7 +82,7 @@ class Save extends Action
                     throw new \Magento\Framework\Exception\LocalizedException(__($this->currentProfile));
                 }
                 if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
-                    $this->currentProfile->setNeedRecollect('1');
+                    $this->currentProfile->setNeedRecollect(true);
                 }
                 $this->profileManager->saveProfile();
             } catch (\Exception $e) {

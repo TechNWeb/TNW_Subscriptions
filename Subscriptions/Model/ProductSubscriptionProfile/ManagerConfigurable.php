@@ -129,7 +129,7 @@ class ManagerConfigurable
     /**
      * Return current product super attributes.
      *
-     * @oaram \Magento\Catalog\Model\Product $product
+     * @param \Magento\Catalog\Model\Product $product
      * @return \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute\Collection
      */
     private function getProductSuperAttributes(\Magento\Catalog\Model\Product $product)
