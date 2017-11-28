@@ -77,8 +77,10 @@ class Save extends Action
 
         if ($subProduct) {
             try {
-
                 $this->currentProfile = $this->configurableManager->processProfileUpdade($request);
+                if (is_string($this->currentProfile)) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__($this->currentProfile));
+                }
                 if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
                     $this->currentProfile->setNeedRecollect('1');
                 }
@@ -86,7 +88,6 @@ class Save extends Action
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
             }
-
         } else {
             $errors[] = __('Subscription profile item wasn\'t loaded');
         }
@@ -100,10 +101,10 @@ class Save extends Action
     /**
      * Return subscription product.
      *
-     * @param $request
+     * @param array $request
      * @return bool|\TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
      */
-    private function getSubProduct($request)
+    private function getSubProduct(array $request)
     {
         $subProduct = false;
 

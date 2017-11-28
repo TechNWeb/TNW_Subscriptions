@@ -2,7 +2,6 @@
 /**
  *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
- *
  */
 
 namespace TNW\Subscriptions\Block\Subscription\Product;
@@ -139,7 +138,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      */
     private function getSubscriptionProfile()
     {
-        if ($this->subscriptionProfile == null) {
+        if ($this->subscriptionProfile === null) {
             $subProduct = $this->getSubscriptionProduct();
             $profileId = $subProduct ? $subProduct->getSubscriptionProfileId() : 0;
             $this->subscriptionProfile = false;
@@ -161,7 +160,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         return $this->getSubscriptionProfile()
             ? $this->getSubscriptionProfile()->getBillingFrequencyId()
             : false;
-
     }
 
     /**
@@ -169,14 +167,15 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      *
      * @return array
      */
-    public function getCurrentFrequencyData() {
+    public function getCurrentFrequencyData()
+    {
         $data = [];
         $subFrequencyId = $this->getBillingFrequencyId();
         $frequencyOptions = $this->getFrequencyOptions();
 
         foreach ($frequencyOptions as $option) {
             if (!$subFrequencyId) {
-                $subFrequencyId = ((int)$option['is_default'] == 1) ? $option['value'] : 0;
+                $subFrequencyId = ((int)$option['is_default'] === 1) ? $option['value'] : 0;
             }
             if ($subFrequencyId && $subFrequencyId == $option['value']) {
                 $data = $option;
@@ -199,6 +198,8 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         if ($profile) {
             if ($profile->getTerm()) {
                 $label = __('Until canceled');
+            } elseif ((int)$profile->getTotalBillingCycles() === 1) {
+                $label = __('Bill once');
             } else {
                 $label = __('Bill %1 times', $profile->getTotalBillingCycles());
             }
@@ -208,7 +209,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     }
 
     /**
-     * Return subscription pprofile start date.
+     * Return subscription profile start date.
      *
      * @return string
      */
@@ -221,13 +222,18 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
             $startOn = isset($trialStartDate) ? $trialStartDate : $profile->getStartDate();
         }
 
-        return (new \DateTime($startOn))->format('Y-m-d');
+        return $this->_localeDate->formatDate(new \DateTime($startOn), \IntlDateFormatter::SHORT);
     }
 
+    /**
+     * Return subscription product qty.
+     *
+     * @return int
+     */
     public function getSubProductQty()
     {
         return $this->getSubscriptionProduct()
-            ? $this->getSubscriptionProduct()->getQty()
+            ? $this->getSubscriptionProduct()->getQty() * 1
             : $this->getDefaultSubscribeQty();
     }
 }

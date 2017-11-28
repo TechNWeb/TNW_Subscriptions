@@ -33,7 +33,7 @@ define([
             var currentFrequency = this.options.subBillingFrequencyId;
 
             if (typeof currentFrequency == 'undefined' || currentFrequency.value == 0) {
-                currentFrequency = $j(this.options.billingFrequencyOptionsSelector+ ':checked').get(0);
+                currentFrequency = $j(this.options.billingFrequencyOptionsSelector + ':checked').get(0);
             }
 
             if (currentFrequency !== undefined) {

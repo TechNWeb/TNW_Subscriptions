@@ -114,7 +114,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
             'tnw_subscriptions/subscription_products/edit',
             [
                 'id' => $this->getItem()->getId(),
-                'product_id' => $this->getItem()->getMagentoProduct()->getId(),
+                'product_id' => $this->getItem()->getMagentoProductId(),
             ]
         );
     }

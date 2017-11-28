@@ -36,7 +36,7 @@ class Configurable extends Base
                         'arguments' => [
                             'data' => [
                                 'config' => [
-                                    'label' => __('Product options'),
+                                    'label' => __('Product Options'),
                                     'collapsible' => false,
                                     'componentType' => Fieldset::NAME,
                                     'template' => 'TNW_Subscriptions/form/element/template/fieldset',

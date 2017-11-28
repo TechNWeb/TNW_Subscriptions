@@ -53,6 +53,7 @@ class Save extends AbstractSave
      * @param ProfileManager $profileManager
      * @param Registry $coreRegistry
      * @param ResponseProcessor $responseProcessor
+     * @param DataPersistorInterface $dataPersistor
      */
     public function __construct(
         Context $context,

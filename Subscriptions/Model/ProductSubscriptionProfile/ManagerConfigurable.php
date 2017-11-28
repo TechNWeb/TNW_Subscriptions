@@ -68,36 +68,39 @@ class ManagerConfigurable
 
         if ($itemChildren) {
             $magentoProduct = $this->getProductFromItem($item);
-            $productSuperAttributes = $this->getProductSuperAttributes($magentoProduct);
-            $storeId = $magentoProduct->getStoreId();
 
-            if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE
-                && $productSuperAttributes->getSize() > 0)
-            {
-                //We have to get custom options from child items
-                foreach ($itemChildren as $itemChild) {
-                    $customOptions = $itemChild->getCustomOptions();
+            if ($magentoProduct !== null) {
+                $productSuperAttributes = $this->getProductSuperAttributes($magentoProduct);
+                $storeId = $magentoProduct->getStoreId();
 
-                    if ($customOptions) {
-                        $decodedOptions = \Zend_Json::decode($customOptions);
+                if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE
+                    && $productSuperAttributes->getSize() > 0)
+                {
+                    //We have to get custom options from child items
+                    foreach ($itemChildren as $itemChild) {
+                        $customOptions = $itemChild->getCustomOptions();
 
-                        foreach ($productSuperAttributes as $attribute) {
-                            $productAttribute = $attribute->getProductAttribute();
-                            $attributeId = $productAttribute->getId();
+                        if ($customOptions) {
+                            $decodedOptions = \Zend_Json::decode($customOptions);
 
-                            if (isset($decodedOptions[$attributeId])) {
-                                foreach ($attribute->getOptions() as $option) {
-                                    if ($option['value_index'] == $decodedOptions[$attributeId]) {
-                                        $optionLabel = $option['store_label'];
-                                        break;
+                            foreach ($productSuperAttributes as $attribute) {
+                                $productAttribute = $attribute->getProductAttribute();
+                                $attributeId = $productAttribute->getId();
+
+                                if (isset($decodedOptions[$attributeId])) {
+                                    foreach ($attribute->getOptions() as $option) {
+                                        if ($option['value_index'] == $decodedOptions[$attributeId]) {
+                                            $optionLabel = $option['store_label'];
+                                            break;
+                                        }
                                     }
-                                }
 
-                                $result[] = [
-                                    'attributeId' => $attributeId,
-                                    'attributeLabel' => $productAttribute->getStoreLabel($storeId),
-                                    'optionLabel' => $optionLabel,
-                                ];
+                                    $result[] = [
+                                        'attributeId' => $attributeId,
+                                        'attributeLabel' => $productAttribute->getStoreLabel($storeId),
+                                        'optionLabel' => $optionLabel,
+                                    ];
+                                }
                             }
                         }
                     }
@@ -126,9 +129,10 @@ class ManagerConfigurable
     /**
      * Return current product super attributes.
      *
+     * @oaram \Magento\Catalog\Model\Product $product
      * @return \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute\Collection
      */
-    private function getProductSuperAttributes($product)
+    private function getProductSuperAttributes(\Magento\Catalog\Model\Product $product)
     {
         return $product->getTypeInstance()->getConfigurableAttributes($product);
     }
@@ -137,7 +141,7 @@ class ManagerConfigurable
      * Process update profile with configurable product's data.
      *
      * @param array $request
-     * @return SubscriptionProfile
+     * @return SubscriptionProfile|string
      */
     public function processProfileUpdade(array $request)
     {
@@ -169,23 +173,28 @@ class ManagerConfigurable
                 $candidates =  $magentoProduct->getTypeInstance()
                     ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
 
+                /**
+                 * Error message
+                 */
+                if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
+                    return strval($candidates);
+                }
+
                 foreach ($candidates as $candidate) {
                     if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
                         $updatedSubProduct->setDataChanges(false);
                         $updatedSubProduct->setQty($candidate->getQty());
                         $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
-                    } else {
-                        if ($magentoProduct->getTypeId() === Configurable::TYPE_CODE) {
-                            foreach ($profileProducts as $profileProduct) {
-                                if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
-                                    $profileProduct->setMagentoProductId($candidate->getId())
-                                        ->setSku($candidate->getSku())
-                                        ->setName($candidate->getName())
-                                        ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
-                                        ->setQty($candidate->getQty());
-                                    $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
-                                    break;
-                                }
+                    } elseif ($magentoProduct->getTypeId() === Configurable::TYPE_CODE) {
+                        foreach ($profileProducts as $profileProduct) {
+                            if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
+                                $profileProduct->setMagentoProductId($candidate->getId())
+                                    ->setSku($candidate->getSku())
+                                    ->setName($candidate->getName())
+                                    ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
+                                    ->setQty($candidate->getQty());
+                                $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
+                                break;
                             }
                         }
                     }

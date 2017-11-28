@@ -2,7 +2,6 @@
 /**
  *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
- *
  */
 namespace TNW\Subscriptions\Controller\Subscription\Products;
 
@@ -91,12 +90,15 @@ class Edit extends \Magento\Framework\App\Action\Action
             $subscriprionProduct = $this->productSubscriptionRepository->getById($subscriprionProductId);
             $subscriptionProfile = $this->profileManager->loadProfile($subscriprionProduct->getSubscriptionProfileId());
         } else {
-            $this->messageManager->addError(__('We cannot find current subscription product.'));
+            $this->messageManager->addError(
+                __('Product with ID %1 could not be found. Cannot Edit the product on the Subscription Profile.', $productId)
+            );
             return $this->goBack('customer/account');
         }
 
         try {
-            $this->coreRegistry->register('tnw_subscription_product', $subscriprionProduct, true);
+            $this->coreRegistry->unregister('tnw_subscription_product');
+            $this->coreRegistry->register('tnw_subscription_product', $subscriprionProduct);
             $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
             $this->_objectManager->get(\Magento\Catalog\Helper\Product\View::class)
                 ->prepareAndRender(
@@ -115,7 +117,6 @@ class Edit extends \Magento\Framework\App\Action\Action
             } else {
                 return $this->goBack('customer/account/');
             }
-
         }
     }
 

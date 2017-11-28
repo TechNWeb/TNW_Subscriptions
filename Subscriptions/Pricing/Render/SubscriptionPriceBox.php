@@ -76,6 +76,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
+     * @param ProfileManager $profileManager
      * @param array $data
      */
     public function __construct(
@@ -278,6 +279,6 @@ class SubscriptionPriceBox extends BasePriceBox
             $value = $this->profileManager->getProfile()->getBillingFrequencyId();
         }
 
-     return $this->jsonHelper->jsonEncode(['value' => $value]);
+        return $this->jsonHelper->jsonEncode(['value' => $value]);
     }
 }
