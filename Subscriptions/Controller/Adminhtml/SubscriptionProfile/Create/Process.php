@@ -79,9 +79,7 @@ class Process extends AbstractSave
             $result->setData($this->getJsonResponse($errors));
         } else {
             if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    $this->messageManager->addErrorMessage($error);
-                }
+                $this->addErrorsToMessageManager($errors);
                 $currentStep = $this->stepPool->setCurrentStep($currentStep)->getPrevStep();
             }
             $redirectParams = [StepPool::STEP_PARAM_NAME => $currentStep];
