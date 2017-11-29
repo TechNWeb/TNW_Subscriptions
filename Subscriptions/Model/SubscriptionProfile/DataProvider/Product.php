@@ -222,12 +222,20 @@ class Product extends AbstractDataProvider
                     $item->getProduct(),
                     $this::LISTING_IMAGE_ID
                 );
+                $confOptions = [];
+                $options = $item->getProduct()->getTypeInstance(true)->getOrderOptions($item->getProduct());
+                if (isset($options['attributes_info']) && is_array($options['attributes_info'])) {
+                    foreach ($options['attributes_info'] as $confOption) {
+                        $confOptions[] = ucfirst($confOption['label']) . ': ' . $confOption['value'];
+                    }
+                }
                 $products[] = [
                     'thumbnail_alt' => $imageHelper->getLabel(),
                     'thumbnail_src' => $imageHelper->getUrl(),
                     'qty' => '(x' . $item->getQty() . ')',
                     'name' => $item->getName(),
-                    'conf_options' => [], //TODO add here configurable options
+                    'conf_options' => $confOptions,
+                    'id' => $item->getId(),
                 ];
 
                 $initialFee += $this->getItemInitialFee($item);
