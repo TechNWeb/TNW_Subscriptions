@@ -18,6 +18,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Class for subscription_price rendering
@@ -60,6 +61,11 @@ class SubscriptionPriceBox extends BasePriceBox
     private $descriptionCreator;
 
     /**
+     * @var ProfileManager;
+     */
+    private $profileManager;
+
+    /**
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -70,6 +76,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
+     * @param ProfileManager $profileManager
      * @param array $data
      */
     public function __construct(
@@ -83,6 +90,7 @@ class SubscriptionPriceBox extends BasePriceBox
         PriceCurrencyInterface $priceCurrency,
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         DescriptionCreator $descriptionCreator,
+        ProfileManager $profileManager,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -93,6 +101,7 @@ class SubscriptionPriceBox extends BasePriceBox
         $this->priceCurrency = $priceCurrency;
         $this->jsonHelper = $jsonHelper;
         $this->descriptionCreator = $descriptionCreator;
+        $this->profileManager = $profileManager;
     }
 
 
@@ -256,5 +265,20 @@ class SubscriptionPriceBox extends BasePriceBox
         }
 
         return $this->jsonHelper->jsonEncode($result);
+    }
+
+    /**
+     * Get encoded billing frequency Id.
+     *
+     * @return string
+     */
+    public function getBillingFrequencyId()
+    {
+        $value = 0;
+        if ($this->profileManager->getProfile()->getId()) {
+            $value = $this->profileManager->getProfile()->getBillingFrequencyId();
+        }
+
+        return $this->jsonHelper->jsonEncode(['value' => $value]);
     }
 }

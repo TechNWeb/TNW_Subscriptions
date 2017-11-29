@@ -725,4 +725,19 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\EditProduct\Modal\Form\Modifier\Pool</argument>
         </arguments>
     </type>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="configurable" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Configurable</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm">
+        <arguments>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
 </config>

@@ -184,7 +184,7 @@ define([
                 } else {
                     this.showError(data.error_messages);
                     if (data.needReload) {
-                        this.reloadPage();
+                        setTimeout(this.reloadPage, 5000);
                     }
                 }
             },
