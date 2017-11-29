@@ -66,6 +66,13 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     protected $quoteValidator;
 
     /**
+     * Session errors.
+     *
+     * @var array
+     */
+    protected $errors = [];
+
+    /**
      * @param Http $request
      * @param SidResolverInterface $sidResolver
      * @param ConfigInterface $sessionConfig
@@ -391,5 +398,31 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
         foreach ($this->quotes as $quote) {
             $quote->setIsSuperMode(true);
         }
+    }
+
+    /**
+     * Get session errors.
+     *
+     * @param bool $clear
+     * @return array
+     */
+    public function getErrors($clear = false)
+    {
+        return $this->getData('quote_errors', $clear);
+    }
+
+    /**
+     * Add session error.
+     *
+     * @param string|array $error
+     * @return $this
+     */
+    public function addError($error)
+    {
+        $errors = $this->getErrors();
+        $errors[] = $error;
+        $this->storage->setQuoteErrors($errors);
+
+        return $this;
     }
 }
