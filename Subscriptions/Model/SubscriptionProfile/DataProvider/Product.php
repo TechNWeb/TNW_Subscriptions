@@ -235,7 +235,7 @@ class Product extends AbstractDataProvider
                     'qty' => '(x' . $item->getQty() . ')',
                     'name' => $item->getName(),
                     'conf_options' => $confOptions,
-                    'id' => $item->getId()
+                    'id' => $item->getId(),
                 ];
 
                 $initialFee += $this->getItemInitialFee($item);

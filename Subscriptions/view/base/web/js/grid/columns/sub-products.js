@@ -30,8 +30,8 @@ define([
                 lastProduct;
 
             products = row[this.index];
-            lastProduct = products[products.length - 1];
-            return products.length > 1 && lastProduct.id !== product.id;
+            lastProduct = products.length ? products[products.length - 1] : null;
+            return lastProduct && lastProduct.id !== product.id;
         }
     });
 });
