@@ -31,8 +31,7 @@ define([
 
             products = row[this.index];
             lastProduct = products[products.length - 1];
-
-            return products.length > 1 && lastProduct.name !== product.name;
+            return products.length > 1 && lastProduct.id !== product.id;
         }
     });
 });
