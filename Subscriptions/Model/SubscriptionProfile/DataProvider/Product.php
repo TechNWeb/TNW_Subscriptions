@@ -225,7 +225,7 @@ class Product extends AbstractDataProvider
                 $confOptions = [];
                 $options = $item->getProduct()->getTypeInstance(true)->getOrderOptions($item->getProduct());
                 if (isset($options['attributes_info']) && is_array($options['attributes_info'])) {
-                    foreach ($options['attributes_info'] as $confOption){
+                    foreach ($options['attributes_info'] as $confOption) {
                         $confOptions[] = ucfirst($confOption['label']) . ': ' . $confOption['value'];
                     }
                 }
