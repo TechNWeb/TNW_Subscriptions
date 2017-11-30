@@ -210,7 +210,7 @@ class Configurable extends Base
                                         'targetName' => $leftContainerName . '.edit_options',
                                         'actionName' => 'editOptions',
                                         'params' =>  [
-                                            $this->getItem()->getProduct()->getId(), //product id
+                                            $this->getItem()->getProductId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getQuoteId(),  // quote id
                                         ],

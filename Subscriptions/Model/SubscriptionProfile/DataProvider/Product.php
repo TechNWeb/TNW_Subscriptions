@@ -729,7 +729,7 @@ class Product extends AbstractDataProvider
                 ],
             ],
             'children' => [
-                self::DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this->getEditProductOptionsForm()
+                self::DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this->getEditProductOptionsForm(),
             ]
         ];
     }
@@ -756,7 +756,7 @@ class Product extends AbstractDataProvider
                             [
                                 'handle' => self::EDIT_PRODUCT_OPTIONS_FORM_HANDLE,
                                 'buttons' => 1,
-                                EditProductOptions::FORM_DATA_KEY => EditProductOptions::FORM_DATA_VALUE
+                                EditProductOptions::FORM_DATA_KEY => EditProductOptions::FORM_DATA_VALUE,
                             ]
                         ),
                         'autoRender' => false,

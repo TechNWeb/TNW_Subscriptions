@@ -74,7 +74,6 @@ class EditProductOptions extends AbstractDataProvider
         $this->formContext = $formContext;
     }
 
-
     /**
      * @inheritdoc
      */

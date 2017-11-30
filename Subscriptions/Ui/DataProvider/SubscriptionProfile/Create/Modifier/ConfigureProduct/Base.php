@@ -87,7 +87,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
         if (!$this->product) {
             $this->product = $this->registry->registry('product');
 
-            if (!$this->product) {
+            if (null === $this->product) {
                 $productId = (int)$this->formContext->getRequest()->getParam('product_id', 0);
 
                 if ($productId) {

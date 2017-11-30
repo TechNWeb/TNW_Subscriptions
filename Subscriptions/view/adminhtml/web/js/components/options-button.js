@@ -35,9 +35,9 @@ define([
         openConfigurableModal: function (productId, itemId, quoteId) {
             var editOptionsForm = registry.get('index=' + this.source.insertEditOptionsForm),
                 params = {
-                    'product_id' : productId,
-                    'item_id' : itemId,
-                    'quote_id' : quoteId
+                    'product_id': productId,
+                    'item_id': itemId,
+                    'quote_id': quoteId
                 };
             this.getConfigureModal().openModal();
             this.renderForm(editOptionsForm, params);
@@ -47,7 +47,7 @@ define([
          * Finds and returns in uiRegistry Configure options modal window
          */
         getConfigureModal: function () {
-            if (!this.editOptionsModal){
+            if (!this.editOptionsModal) {
                 this.editOptionsModal = registry.get('index=' + this.source.editOptionsModal);
             }
 
@@ -56,6 +56,9 @@ define([
 
         /**
          * Render form data.
+         *
+         * @param {Object} form
+         * @param {Object} params
          */
         renderForm: function (form, params) {
             form.set('visible', true);

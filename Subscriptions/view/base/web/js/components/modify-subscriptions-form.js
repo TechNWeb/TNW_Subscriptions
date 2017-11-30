@@ -183,13 +183,13 @@ define(
                 ) {
                     itemId = productOptionsData.item_data.item_id;
 
-                    if (itemId) {
+                    if (itemId && typeof this.source.data['item_' + itemId] != 'undefined') {
                         currentItemData = this.source.data['item_' + itemId];
                         currentItemData['super_attribute'] = productOptionsData.super_attribute;
 
                         data = {
-                            'objectId' : productOptionsData.item_data.quote_id,
-                            'objectItemId' :itemId
+                            'objectId': productOptionsData.item_data.quote_id,
+                            'objectItemId': itemId
                         };
                     }
                     this.save('', data);
