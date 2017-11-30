@@ -25,7 +25,6 @@ define(
             renderMessages: function () {
                 var messages = this.source.messages;
                 messageList.clear();
-                debugger;
                 if (!_.isEmpty(messages['error'])) {
                     _.each(messages['error'], function (message) {
                         messageList.getErrorMessages().push(message);
