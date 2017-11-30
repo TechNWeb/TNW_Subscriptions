@@ -392,4 +392,30 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
             $quote->setIsSuperMode(true);
         }
     }
+
+    /**
+     * Get session errors.
+     *
+     * @param bool $clear
+     * @return array
+     */
+    public function getErrors($clear = false)
+    {
+        return $this->getData('quote_errors', $clear);
+    }
+
+    /**
+     * Add session error.
+     *
+     * @param string|array $error
+     * @return $this
+     */
+    public function addError($error)
+    {
+        $errors = $this->getErrors();
+        $errors[] = $error;
+        $this->storage->setQuoteErrors($errors);
+
+        return $this;
+    }
 }

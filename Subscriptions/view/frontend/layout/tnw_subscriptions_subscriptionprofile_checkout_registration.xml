@@ -9,5 +9,6 @@
     <update handle="tnw_subscriptions_cart_default"/>
     <referenceContainer name="content">
         <uiComponent name="tnw_subscriptionprofile_checkout_registration_form"/>
+        <uiComponent name="tnw_subscriptionprofile_checkout_messages"/>
     </referenceContainer>
 </page>

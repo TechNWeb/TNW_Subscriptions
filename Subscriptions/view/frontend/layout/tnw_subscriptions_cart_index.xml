@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-
+<!--
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <update handle="tnw_subscriptions_cart_default"/>
@@ -36,6 +41,10 @@
                                                             <item name="type" xsi:type="string">form</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
                                                         </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
+                                                        </item>
                                                     </item>
                                                     <item name="requestFieldName" xsi:type="string">modify_form_data</item>
                                                     <item name="requestFieldValue" xsi:type="string">new_subscription</item>
@@ -49,6 +58,10 @@
                                                         <item name="content" xsi:type="array">
                                                             <item name="type" xsi:type="string">form</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
+                                                        </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
                                                         </item>
                                                     </item>
                                                     <item name="title" xsi:type="string" translate="true">Registration</item>
@@ -65,6 +78,10 @@
                                                         <item name="right" xsi:type="array">
                                                             <item name="type" xsi:type="string">listing</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
+                                                        </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
                                                         </item>
                                                     </item>
                                                     <item name="requestFieldName" xsi:type="string">account_form_data</item>
@@ -90,6 +107,10 @@
                                                             <item name="type" xsi:type="string">listing</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
                                                         </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
+                                                        </item>
                                                     </item>
                                                     <item name="requestFieldName" xsi:type="string">billing_form_data</item>
                                                     <item name="requestFieldValue" xsi:type="string">new_subscription</item>
@@ -114,6 +135,10 @@
                                                             <item name="type" xsi:type="string">listing</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
                                                         </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
+                                                        </item>
                                                     </item>
                                                     <item name="stepActions" xsi:type="array">
                                                         <item name="0" xsi:type="array">
@@ -132,6 +157,10 @@
                                                         <item name="content" xsi:type="array">
                                                             <item name="type" xsi:type="string">form</item>
                                                             <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_thankyoupage_form</item>
+                                                        </item>
+                                                        <item name="messages" xsi:type="array">
+                                                            <item name="type" xsi:type="string">form</item>
+                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
                                                         </item>
                                                     </item>
                                                     <item name="stepActions" xsi:type="array">
@@ -168,6 +197,13 @@
                                         <item name="deps" xsi:type="string">cart.data_source</item>
                                         <item name="handle" xsi:type="string">tnw_subscriptions_subscriptionprofile_checkout</item>
                                         <item name="children" xsi:type="array">
+                                            <item name="insert_form_messages" xsi:type="array">
+                                                <item name="displayArea" xsi:type="string">insert_form</item>
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
+                                                <item name="autoRender" xsi:type="boolean">false</item>
+                                                <item name="formSubmitType" xsi:type="string">ajax</item>
+                                                <item name="cssPrefix" xsi:type="string">checkout_content</item>
+                                            </item>
                                             <item name="insert_form_content" xsi:type="array">
                                                 <item name="displayArea" xsi:type="string">insert_form</item>
                                                 <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
