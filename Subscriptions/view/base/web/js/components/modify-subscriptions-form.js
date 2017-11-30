@@ -16,7 +16,7 @@ define(
                 editButtons: {},
                 requestFields: {},
                 additionalData: {},
-                productsFormName: null,
+                productsFormName: 'modify_modal_form',
                 listens: {
                     responseStatus: 'processResponseStatus'
                 }
@@ -166,6 +166,34 @@ define(
                 }
 
                 return this;
+            },
+
+            /**
+             * update product options on current form and save form.
+             */
+            updateProductOptions: function() {
+                var data,
+                    itemId,
+                    productOptionsData = registry.get('index=' + this.source.editOptionsForm).source.data,
+                    currentItemData;
+
+                if (typeof productOptionsData != 'undefined'
+                    && typeof productOptionsData.super_attribute != 'undefined'
+                    && typeof productOptionsData.item_data != 'undefined'
+                ) {
+                    itemId = productOptionsData.item_data.item_id;
+
+                    if (itemId && typeof this.source.data['item_' + itemId] != 'undefined') {
+                        currentItemData = this.source.data['item_' + itemId];
+                        currentItemData['super_attribute'] = productOptionsData.super_attribute;
+
+                        data = {
+                            'objectId': productOptionsData.item_data.quote_id,
+                            'objectItemId': itemId
+                        };
+                    }
+                    this.save('', data);
+                }
             }
         });
     }

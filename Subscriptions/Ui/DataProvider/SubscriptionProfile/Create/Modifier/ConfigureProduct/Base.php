@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\
 
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Registry;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\ItemFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
 
 /**
  * Base dataProvider modifier on products configure form.
@@ -23,14 +26,26 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     private $registry;
 
     /**
+     * Data providers form context.
+     *
+     * @var Context
+     */
+    private $formContext;
+
+    /**
      * @var MagentoProduct
      */
     private $product;
 
     /**
      * @param Registry $registry
+     * @param Context $context
      */
-    public function __construct(Registry $registry) {
+    public function __construct(
+        Registry $registry,
+        Context $context
+    ) {
+        $this->formContext = $context;
         $this->registry = $registry;
     }
 
@@ -71,6 +86,14 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     {
         if (!$this->product) {
             $this->product = $this->registry->registry('product');
+
+            if (null === $this->product) {
+                $productId = (int)$this->formContext->getRequest()->getParam('product_id', 0);
+
+                if ($productId) {
+                    $this->product = $this->formContext->getProductRepository()->getById($productId);
+                }
+            }
         }
 
         return $this->product;
