@@ -27,6 +27,7 @@ use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\Source\CurrencySelect;
@@ -58,6 +59,7 @@ class Product extends AbstractDataProvider
     const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'add_product_modal_form';
     const DATA_SCOPE_ADD_MODIFY_FORM = 'modify_modal_form';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
+    const DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'add_product_modal_edit_product_options_form';
     /**#@-*/
 
     /**#@+
@@ -66,6 +68,7 @@ class Product extends AbstractDataProvider
     const FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product';
     const CONFIGURABLE_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product_configurable';
     const MODIFY_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_modify_subscriptions';
+    const EDIT_PRODUCT_OPTIONS_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_create_add_product_edit_options';
     /**#@-*/
 
     /**#@+
@@ -446,6 +449,7 @@ class Product extends AbstractDataProvider
                         'addProductsModal' => $this->getModal(),
                         'modifyModal' => $this->getModifyModal(),
                         'configurableModal' => $this->getConfigurableModal(),
+                        'editOptionsModal' => $this->getEditOptionsModal(),
                     ],
                     'arguments' => [
                         'data' => [
@@ -700,6 +704,68 @@ class Product extends AbstractDataProvider
             ],
             'children' => [
                 self::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM => $this->getConfigurableForm()
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for edit product options modal window.
+     *
+     * @return array
+     */
+    private function getEditOptionsModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'options' => [
+                            'title' => 'Configure product options',
+                            'modalClass' => 'subscriptions-add-product-edit-options-modal',
+                        ]
+                    ],
+                ],
+            ],
+            'children' => [
+                self::DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this->getEditProductOptionsForm()
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for edit product options form.
+     *
+     * @return array
+     */
+    private function getEditProductOptionsForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => true,
+                        'label' => '',
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'dataScope' => '',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => self::EDIT_PRODUCT_OPTIONS_FORM_HANDLE,
+                                'buttons' => 1,
+                                EditProductOptions::FORM_DATA_KEY => EditProductOptions::FORM_DATA_VALUE
+                            ]
+                        ),
+                        'autoRender' => false,
+                        'ns' => '' . EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
+                        'externalProvider' => EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
+                            . '.' . EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM . '_data_source',
+                        'toolbarContainer' => '${ $.parentName }',
+                    ],
+                ],
             ]
         ];
     }
