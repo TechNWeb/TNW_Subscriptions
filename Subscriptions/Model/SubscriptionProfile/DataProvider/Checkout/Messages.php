@@ -23,6 +23,7 @@ class Messages extends AbstractDataProvider
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
+     * @param QuoteSessionInterface $quoteSession
      * @param array $meta
      * @param array $data
      */
@@ -69,7 +70,7 @@ class Messages extends AbstractDataProvider
      * @param array $errors
      * @return array
      */
-    private function retrieveQuoteSessionMessages($errors)
+    private function retrieveQuoteSessionMessages(array $errors)
     {
         $messages = [];
         $needReload = false;

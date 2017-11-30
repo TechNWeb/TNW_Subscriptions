@@ -66,13 +66,6 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     protected $quoteValidator;
 
     /**
-     * Session errors.
-     *
-     * @var array
-     */
-    protected $errors = [];
-
-    /**
      * @param Http $request
      * @param SidResolverInterface $sidResolver
      * @param ConfigInterface $sessionConfig

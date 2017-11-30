@@ -36,6 +36,7 @@ class Request
     /**
      * @param Context $context
      * @param PoolInterface $requestSaveProcessorsPool
+     * @param QuoteSessionInterface $session
      */
     public function __construct(
         Context $context,

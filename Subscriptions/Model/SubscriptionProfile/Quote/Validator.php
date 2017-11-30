@@ -136,6 +136,7 @@ class Validator
      * It adds to quote session.
      *
      * @param string|array $error
+     * @return void
      */
     private function addError($error)
     {

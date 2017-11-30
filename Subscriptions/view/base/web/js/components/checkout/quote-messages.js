@@ -4,13 +4,11 @@
  */
 define(
     [
-        'jquery',
         'TNW_Subscriptions/js/components/subscriptions-form',
-        'uiRegistry',
         'Magento_Ui/js/model/messageList',
         'underscore'
     ],
-    function ($, Component, registry, messageList, _) {
+    function (Component, messageList, _) {
         'use strict';
 
         return Component.extend({
@@ -43,6 +41,10 @@ define(
                 }
             },
 
+            /**
+             * Reload current page to redirect to empty cart page
+             * in case of quote removal.
+             */
             reloadPage: function () {
                 location.reload();
             }
