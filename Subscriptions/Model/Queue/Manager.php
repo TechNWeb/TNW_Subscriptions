@@ -5,6 +5,7 @@ namespace TNW\Subscriptions\Model\Queue;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Quote\Api\CartRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
@@ -15,6 +16,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
 
 /**
  * Class Manager
@@ -71,7 +73,20 @@ class Manager
     private $profileRepository;
 
     /**
-     * Manager constructor.
+     * Subscription profile order repository.
+     *
+     * @var SubscriptionProfileOrderRepositoryInterface
+     */
+    private $profileOrderRepository;
+
+    /**
+     * Subscription profile status history manager.
+     *
+     * @var HistoryManager
+     */
+    private $statusHistoryManager;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param DateTime $date
      * @param Config $config
@@ -79,6 +94,8 @@ class Manager
      * @param RelationManager $relationManager
      * @param CartRepositoryInterface $cartRepository
      * @param SubscriptionProfileRepository $profileRepository
+     * @param SubscriptionProfileOrderRepositoryInterface $profileOrderRepository
+     * @param HistoryManager $statusHistoryManager
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -87,7 +104,9 @@ class Manager
         ProfileManager $profileManager,
         RelationManager $relationManager,
         CartRepositoryInterface $cartRepository,
-        SubscriptionProfileRepository $profileRepository
+        SubscriptionProfileRepository $profileRepository,
+        SubscriptionProfileOrderRepositoryInterface $profileOrderRepository,
+        HistoryManager $statusHistoryManager
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->date = $date;
@@ -96,6 +115,8 @@ class Manager
         $this->relationManager = $relationManager;
         $this->cartRepository = $cartRepository;
         $this->profileRepository = $profileRepository;
+        $this->profileOrderRepository = $profileOrderRepository;
+        $this->statusHistoryManager = $statusHistoryManager;
     }
 
     /**
@@ -300,18 +321,51 @@ class Manager
 
     /**
      * Processes queue item and add order to profile relation.
+     * Return true if queue item need to be post-processed.
      *
      * @param Queue $item
+     * @return bool
      */
     public function processItem(Queue $item)
     {
+        $result = false;
         $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
         $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-        $order = $this->profileManager->setProfile($profile)
-            ->processProfile($quote);
-        $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
-            ->setMagentoOrderId($order->getId());
-        $this->relationManager->saveRelation($relation);
+        if (!$this->itemOnHold($item)) {
+            $order = $this->profileManager->setProfile($profile)
+                ->processProfile($quote);
+            $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
+                ->setMagentoOrderId($order->getId());
+            $this->relationManager->saveRelation($relation);
+            $result = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check if queue item subscription profile was on hold for order item schedule time.
+     *
+     * @param Queue $item
+     * @return bool
+     */
+    private function itemOnHold(Queue $item)
+    {
+        $result = false;
+        $status = $this->statusHistoryManager->getStatusForTime(
+            $item->getSubscriptionProfileId(),
+            $item->getScheduledAt()
+        );
+        if ($status == ProfileStatus::STATUS_HOLDED) {
+            // Remove profile order (and corresponding queue item cascade)
+            $this->profileOrderRepository->deleteById($item->getProfileOrderId());
+            // Remove corresponding magento quote
+            $quote = $this->cartRepository->get($item->getMagentoQuoteId());
+            $this->cartRepository->delete($quote);
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**

@@ -48,7 +48,6 @@ class ProfileProcessor
     private $statusProcessorsPool;
 
     /**
-     * ProfileProcessor constructor.
      * @param Context $context
      * @param Manager $queueManager
      * @param Registry $registry
@@ -87,8 +86,9 @@ class ProfileProcessor
                 continue;
             }
             try {
-                $this->queueManager->processItem($item);
-                $successIds[] = $item->getId();
+                if ($this->queueManager->processItem($item)) {
+                    $successIds[] = $item->getId();
+                }
             } catch (\Exception $e) {
                 $this->context->log(
                     'Error on processing profile: ' . $e->getMessage()
@@ -138,8 +138,7 @@ class ProfileProcessor
     private function passWithoutProcessing(\TNW\Subscriptions\Model\Queue $item)
     {
         $result =
-            $item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE)
-            || $item->getData('profile_' . SubscriptionProfile::STATUS) == ProfileStatus::STATUS_HOLDED;
+            $item->getData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE);
 
         return $result;
     }
