@@ -9,15 +9,20 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote\Item;
+use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -39,6 +44,17 @@ class SummaryProductsForm extends ModifyForm
     const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_summary_products_form';
 
     /**
+     * Data scope for child element
+     */
+    const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'edit_modal_edit_product_options_form';
+
+    /**#@+
+     * Layout handle for form
+     */
+    const EDIT_PRODUCT_OPTIONS_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_edit_product_edit_options';
+    /**#@-*/
+
+    /**
      * Form request values
      */
     const FORM_DATA_KEY = 'modify_form_data';
@@ -55,6 +71,11 @@ class SummaryProductsForm extends ModifyForm
      * @var Manager
      */
     protected $profileManager;
+
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
 
     /**
      * @param string $name
@@ -80,11 +101,13 @@ class SummaryProductsForm extends ModifyForm
         PoolInterface $pool,
         Manager $profileManager,
         Registry $registry,
+        UrlInterface $urlBuilder,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->profileManager = $profileManager;
+        $this->urlBuilder = $urlBuilder;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
             $pool, $registry, $scope, $meta, $data);
     }
@@ -134,26 +157,93 @@ class SummaryProductsForm extends ModifyForm
         $result = [];
         foreach ($this->getObjects() as $subQuote) {
             $iterator++;
-            $result[self::CONTAINER_PREFIX . $subQuote->getId()] = [
-                'children' => $this->getChildren($subQuote),
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'label' => __('Products'),
-                            'collapsible' => false,
-                            'componentType' => UiForm\Fieldset::NAME,
-                            'additionalClasses' => 'subscription-container',
-                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
-                            'dataScope' => '',
-                            'sortOrder' => $iterator
+            $result = [
+                self::CONTAINER_PREFIX . $subQuote->getId() => [
+                    'children' => $this->getChildren($subQuote),
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => __('Products'),
+                                'collapsible' => false,
+                                'componentType' => UiForm\Fieldset::NAME,
+                                'additionalClasses' => 'subscription-container',
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                                'dataScope' => '',
+                                'sortOrder' => $iterator
+                            ]
                         ]
                     ]
-                ]
+                ],
+                'editOptionsModal' => $this->getEditOptionsModal(),
             ];
         }
 
         return $result;
     }
+
+    /**
+     * Returns meta data for edit product options modal window.
+     *
+     * @return array
+     */
+    private function getEditOptionsModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'component' => 'TNW_Subscriptions/js/modal/update-product-options-modal',
+                        'options' => [
+                            'title' => 'Configure product options',
+                            'modalClass' => 'subscriptions-add-product-edit-options-modal',
+                        ]
+                    ],
+                ],
+            ],
+            'children' => [
+                self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this->getEditProductOptionsForm(),
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for edit product options form.
+     *
+     * @return array
+     */
+    private function getEditProductOptionsForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => true,
+                        'label' => '',
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'dataScope' => '',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => self::EDIT_PRODUCT_OPTIONS_FORM_HANDLE,
+                                'buttons' => 1,
+                                EditSubscriptionProductOptions::FORM_DATA_KEY => EditSubscriptionProductOptions::FORM_DATA_VALUE,
+                            ]
+                        ),
+                        'autoRender' => false,
+                        'ns' => '' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
+                        'externalProvider' => EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
+                            . '.' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM . '_data_source',
+                        'toolbarContainer' => '${ $.parentName }',
+                    ],
+                ],
+            ]
+        ];
+    }
+
 
     /**
      * @inheritdoc
@@ -499,5 +589,27 @@ class SummaryProductsForm extends ModifyForm
         }
 
         return $canEdit;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getConfigData()
+    {
+        return array_merge(parent::getConfigData(), $this->getAdditionalConfig());
+    }
+
+    /**
+     * Returns additional list of Ui component names.
+     *
+     * @return array
+     */
+    private function getAdditionalConfig()
+    {
+        return [
+            'editOptionsModal' => 'editOptionsModal',
+            'editOptionsForm' => EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
+            'insertEditOptionsForm' => Product::DATA_SCOPE_EDIT_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM,
+        ];
     }
 }
