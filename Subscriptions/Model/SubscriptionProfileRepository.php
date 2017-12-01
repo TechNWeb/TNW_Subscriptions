@@ -23,7 +23,7 @@ use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
-use TNW\Subscriptions\Model\SubscriptionProfile\HistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 
 /**
  * Repository for subscription profiles.

@@ -874,7 +874,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        if (version_compare($context->getVersion(), "2.0.38", "<")) {
+        if (version_compare($context->getVersion(), "2.0.39", "<")) {
             #region Subscription profile status history table
             $tableName = SubscriptionProfileStatusHistory::TABLE;
             if (!$setup->tableExists($setup->getTable($tableName))) {

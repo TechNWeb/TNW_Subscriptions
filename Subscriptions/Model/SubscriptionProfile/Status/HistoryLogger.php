@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile;
+namespace TNW\Subscriptions\Model\SubscriptionProfile\Status;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterfaceFactory;
