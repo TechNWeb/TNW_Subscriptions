@@ -18,6 +18,8 @@ interface SubscriptionProfileStatusHistoryInterface
     const SUBSCRIPTION_PROFILE_ID = 'subscription_profile_id';
     const STATUS_OLD = 'status_old';
     const STATUS_NEW = 'status_new';
+    const USER_ID = 'user_id';
+    const CUSTOMER_ID = 'customer_id';
     const CHANGED_AT = 'changed_at';
     /**#@-*/
 
@@ -80,6 +82,36 @@ interface SubscriptionProfileStatusHistoryInterface
      * @return $this
      */
     public function setStatusNew($status);
+
+    /**
+     * Gets admin user id.
+     *
+     * @return string|null
+     */
+    public function getUserId();
+
+    /**
+     * Sets admin user id.
+     *
+     * @param string $id
+     * @return $this
+     */
+    public function setUserId($id);
+
+    /**
+     * Gets customer id.
+     *
+     * @return string|null
+     */
+    public function getCustomerId();
+
+    /**
+     * Sets customer id.
+     *
+     * @param string $id
+     * @return $this
+     */
+    public function setCustomerId($id);
 
     /**
      * Gets changed at date.

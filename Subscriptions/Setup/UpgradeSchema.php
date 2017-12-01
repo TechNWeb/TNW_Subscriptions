@@ -875,6 +875,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (version_compare($context->getVersion(), "2.0.38", "<")) {
+            #region Subscription profile status history table
             $tableName = SubscriptionProfileStatusHistory::TABLE;
             if (!$setup->tableExists($setup->getTable($tableName))) {
                 $tableTnwSubscriptionProfileStatusHistory = $setup->getConnection()
@@ -914,6 +915,28 @@ class UpgradeSchema implements UpgradeSchemaInterface
                         'New status'
                     )
                     ->addColumn(
+                        SubscriptionProfileStatusHistory::USER_ID,
+                        \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'nullable' => true,
+                            'unsigned' => true,
+                            'default' => null
+                        ],
+                        'User id who changed status'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::CUSTOMER_ID,
+                        \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'nullable' => true,
+                            'unsigned' => true,
+                            'default' => null
+                        ],
+                        'Customer id who changed status'
+                    )
+                    ->addColumn(
                         SubscriptionProfileStatusHistory::CHANGED_AT,
                         Table::TYPE_DATETIME,
                         null,
@@ -945,6 +968,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     ->addIndex(
                         $setup->getIdxName(
                             SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::USER_ID]
+                        ),
+                        SubscriptionProfileStatusHistory::USER_ID
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::CUSTOMER_ID]
+                        ),
+                        SubscriptionProfileStatusHistory::CUSTOMER_ID
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
                             [SubscriptionProfileStatusHistory::CHANGED_AT]
                         ),
                         SubscriptionProfileStatusHistory::CHANGED_AT
@@ -964,6 +1001,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
                 $setup->getConnection()->createTable($tableTnwSubscriptionProfileStatusHistory);
             }
+            #endregion Subscription profile status history table
         }
 
         $setup->endSetup();

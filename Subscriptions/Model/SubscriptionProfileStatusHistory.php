@@ -98,6 +98,38 @@ class SubscriptionProfileStatusHistory extends AbstractModel
     /**
      * {@inheritdoc}
      */
+    public function getUserId()
+    {
+        return $this->getData(static::USER_ID);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setUserId($id)
+    {
+        return $this->setData(self::USER_ID, $id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCustomerId()
+    {
+        return $this->getData(static::CUSTOMER_ID);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCustomerId($id)
+    {
+        return $this->setData(self::CUSTOMER_ID, $id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getChangedAt()
     {
         return $this->getData(static::CHANGED_AT);
