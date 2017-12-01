@@ -19,11 +19,6 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
      */
     public function getButtonData()
     {
-        $editOptionsModal = Product::DATA_SCOPE_SUBSCRIPTION_LISTING . '.'
-            . Product::DATA_SCOPE_SUBSCRIPTION_LISTING
-            . '.' . Product::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS
-            . '.editOptionsModal';
-
         return [
             'label' => __('Ok'),
             'class' => 'primary',
@@ -32,12 +27,11 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => $editOptionsModal,
+                                'targetName' => $this->getEditOptionsModalName(),
                                 'actionName' => 'toggleModal',
                             ],
                             [
-                                'targetName' => Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM
-                                    . '.' . Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM,
+                                'targetName' => $this->getFormName(),
                                 'actionName' => 'updateProductOptions',
                             ]
                         ]
@@ -47,5 +41,28 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
             'on_click' => '',
             'sort_order' => 10
         ];
+    }
+
+    /**
+     * Return edit options modal name.
+     *
+     * @return string
+     */
+    protected function getEditOptionsModalName()
+    {
+        return Product::DATA_SCOPE_SUBSCRIPTION_LISTING . '.'
+        . Product::DATA_SCOPE_SUBSCRIPTION_LISTING
+        . '.' . Product::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS
+        . '.editOptionsModal';
+    }
+
+    /**
+     * Return target name for action.
+     *
+     * @return string
+     */
+    protected function getFormName()
+    {
+        return Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM . '.' . Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM;
     }
 }

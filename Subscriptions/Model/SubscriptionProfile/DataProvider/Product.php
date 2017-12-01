@@ -60,6 +60,7 @@ class Product extends AbstractDataProvider
     const DATA_SCOPE_ADD_MODIFY_FORM = 'modify_modal_form';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
     const DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'add_product_modal_edit_product_options_form';
+    const DATA_SCOPE_EDIT_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'edit_modal_edit_product_options_form';
     /**#@-*/
 
     /**#@+
