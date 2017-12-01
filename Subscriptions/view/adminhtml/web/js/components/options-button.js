@@ -64,6 +64,15 @@ define([
             form.set('visible', true);
             form.destroyInserted();
             form.render(params);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        applyAction: function (action) {
+            var params = Object.assign([], action.params);
+            this._super(action);
+            action.params = Object.assign([], params);
         }
     });
 });
