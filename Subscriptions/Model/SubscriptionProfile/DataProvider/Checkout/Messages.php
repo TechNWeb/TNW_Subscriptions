@@ -67,10 +67,10 @@ class Messages extends AbstractDataProvider
     /**
      * Retrieve messages from quote session.
      *
-     * @param array $errors
+     * @param array|null $errors
      * @return array
      */
-    private function retrieveQuoteSessionMessages(array $errors)
+    private function retrieveQuoteSessionMessages($errors)
     {
         $messages = [];
         $needReload = false;

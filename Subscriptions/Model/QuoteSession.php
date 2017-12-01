@@ -397,7 +397,7 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
      * Get session errors.
      *
      * @param bool $clear
-     * @return array
+     * @return array|null
      */
     public function getErrors($clear = false)
     {
