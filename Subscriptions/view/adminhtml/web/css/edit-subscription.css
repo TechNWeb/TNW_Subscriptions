@@ -899,3 +899,19 @@ button.action-editor.active:before{
 #co-transparent-form-braintree .payment-cvv .admin__control-text {
     width: 6rem;
 }
+.product-options {
+    margin-top: 1.5rem;
+}
+
+.product-options .admin__fieldset>.admin__field.edit-product {
+    margin-top: 0;
+}
+
+.product-options .admin__fieldset>.admin__field.edit-product >.admin__field-label{
+    margin-left: 18px;
+    width: auto !important;
+}
+.product-options .edit-product div.admin__field-control {
+    margin-left: 13px;
+    line-height: 3.2rem;
+}
