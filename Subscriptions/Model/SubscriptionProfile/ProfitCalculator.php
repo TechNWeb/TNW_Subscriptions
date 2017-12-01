@@ -14,6 +14,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Calculate "total" profit, "remaining" profit and "as of today" profit for given subscription profile.
@@ -50,6 +51,7 @@ class ProfitCalculator
      * @var float|int
      */
     private $asOfTodayProfit;
+
     /**
      * @var Currency
      */
@@ -93,7 +95,11 @@ class ProfitCalculator
      */
     public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
     {
-        $profit = $this->getTotalProfit($subscriptionProfile);
+        if ($subscriptionProfile->getStatus() === ProfileStatus::STATUS_CANCELED) {
+            $profit = $this->getTotalProfit($subscriptionProfile);
+        } else {
+            $profit = $this->getAsOfTodayProfit($subscriptionProfile);
+        }
         return $this->renderPrice($profit, $subscriptionProfile, $addContainer);
     }
 
