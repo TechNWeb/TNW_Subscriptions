@@ -27,11 +27,11 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => $this->getEditOptionsModal(),
+                                'targetName' => $this->getEditOptionsModalName(),
                                 'actionName' => 'toggleModal',
                             ],
                             [
-                                'targetName' => $this->getTargetName(),
+                                'targetName' => $this->getFormName(),
                                 'actionName' => 'updateProductOptions',
                             ]
                         ]
@@ -48,7 +48,7 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
      *
      * @return string
      */
-    protected function getEditOptionsModal()
+    protected function getEditOptionsModalName()
     {
         return Product::DATA_SCOPE_SUBSCRIPTION_LISTING . '.'
         . Product::DATA_SCOPE_SUBSCRIPTION_LISTING
@@ -61,7 +61,7 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
      *
      * @return string
      */
-    protected function getTargetName()
+    protected function getFormName()
     {
         return Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM . '.' . Product\Modal\ModifyForm::DATA_SCOPE_MODAL_FORM;
     }

@@ -48,11 +48,10 @@ class SummaryProductsForm extends ModifyForm
      */
     const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'edit_modal_edit_product_options_form';
 
-    /**#@+
+    /**
      * Layout handle for form
      */
     const EDIT_PRODUCT_OPTIONS_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_edit_product_edit_options';
-    /**#@-*/
 
     /**
      * Form request values
@@ -87,6 +86,7 @@ class SummaryProductsForm extends ModifyForm
      * @param PoolInterface $pool
      * @param Manager $profileManager
      * @param Registry $registry
+     * @param UrlInterface $urlBuilder
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -108,8 +108,19 @@ class SummaryProductsForm extends ModifyForm
     ) {
         $this->profileManager = $profileManager;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
-            $pool, $registry, $scope, $meta, $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $priceCalculator,
+            $context,
+            $formContext,
+            $pool,
+            $registry,
+            $scope,
+            $meta,
+            $data
+        );
     }
 
     /**
@@ -240,10 +251,9 @@ class SummaryProductsForm extends ModifyForm
                         'toolbarContainer' => '${ $.parentName }',
                     ],
                 ],
-            ]
+            ],
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -290,7 +300,7 @@ class SummaryProductsForm extends ModifyForm
                         'componentType' => UiForm\Fieldset::NAME,
                         'additionalClasses' => 'edit-fieldset',
                         'template' => 'TNW_Subscriptions/form/element/template/fieldset',
-                        'dataScope' => ''
+                        'dataScope' => '',
                     ],
                 ],
             ],

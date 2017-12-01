@@ -14,16 +14,14 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
  */
 class EditSubscriptionProductOptions extends EditProductOptions
 {
-    /**#@+
+    /**
      * Form request values
      */
     const FORM_DATA_KEY = 'edit_modal_edit_product_options_form_data';
     const FORM_DATA_VALUE = 'new_subscription';
-    /**#@-*/
 
-    /**#@+
+    /**
      * Form data scope
      */
     const DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM = 'tnw_subscriptionprofile_edit_modal_edit_product_options_form';
-    /**#@-*/
 }

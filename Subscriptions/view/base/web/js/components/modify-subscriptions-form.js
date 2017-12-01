@@ -23,7 +23,7 @@ define(
             },
 
             /** @inheritdoc */
-            initObservable: function () {debugger;
+            initObservable: function () {
                 return this._super()
                     .observe(['previewMode', 'buttonPreviewMode']);
             },

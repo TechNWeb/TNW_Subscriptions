@@ -18,7 +18,7 @@ class SubEditUpdateOptionsButton extends UpdateOptionsButton
     /**
      * @inheritdoc
      */
-    protected function getEditOptionsModal()
+    protected function getEditOptionsModalName()
     {
         return SummaryProductsForm::DATA_SCOPE_MODAL_FORM . '.'
         . SummaryProductsForm::DATA_SCOPE_MODAL_FORM
@@ -28,7 +28,7 @@ class SubEditUpdateOptionsButton extends UpdateOptionsButton
     /**
      * @inheritdoc
      */
-    protected function getTargetName()
+    protected function getFormName()
     {
         return $this->getEditOptionsModal();
     }

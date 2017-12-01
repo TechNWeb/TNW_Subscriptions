@@ -20,8 +20,7 @@ define([
                 formName,
                 currentItemData,
                 form,
-                productOptionsData = registry.get('index=' + this.source.editOptionsForm).source.data
-                ;
+                productOptionsData = registry.get('index=' + this.source.editOptionsForm).source.data;
 
             if (typeof productOptionsData != 'undefined'
                 && typeof productOptionsData.super_attribute != 'undefined'

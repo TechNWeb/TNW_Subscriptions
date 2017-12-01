@@ -186,19 +186,19 @@ class ManagerConfigurable
                     $candidates =  $magentoProduct->getTypeInstance()
                         ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
 
-                    /**
-                     * Error message
-                     */
+                    /** $candidates is error message */
                     if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
                         return strval($candidates);
                     }
 
                     foreach ($candidates as $candidate) {
                         if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
+                            //if $candidate is current updated product
                             $updatedSubProduct->setDataChanges(false);
                             $updatedSubProduct->setQty($candidate->getQty());
                             $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
-                        } elseif ($magentoProduct->getTypeId() === Configurable::TYPE_CODE) {
+                        } else {
+                            //if $candidate is a configurable child product.
                             foreach ($profileProducts as $profileProduct) {
                                 if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
                                     $profileProduct->setMagentoProductId($candidate->getId())
