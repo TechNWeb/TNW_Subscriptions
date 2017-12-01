@@ -30,6 +30,6 @@ class SubEditUpdateOptionsButton extends UpdateOptionsButton
      */
     protected function getFormName()
     {
-        return $this->getEditOptionsModal();
+        return $this->getEditOptionsModalName();
     }
 }
