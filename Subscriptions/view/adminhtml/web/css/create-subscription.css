@@ -168,6 +168,9 @@
   font-size: 16px;
   font-weight: bold;
 }
+.sub-data-grid .sub-data-conf-options {
+  margin-top: 8px;
+}
 
 .sub-data-grid .sub-product-shipping-method{
   padding: 0 0 2rem 0;

@@ -10,5 +10,6 @@
     <referenceContainer name="content">
         <uiComponent name="tnw_subscriptionprofile_checkout_billing_form"/>
         <uiComponent name="tnw_subscriptionprofile_checkout_product_listing"/>
+        <uiComponent name="tnw_subscriptionprofile_checkout_messages"/>
     </referenceContainer>
 </page>

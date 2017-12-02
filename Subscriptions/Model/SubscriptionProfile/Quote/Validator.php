@@ -103,22 +103,46 @@ class Validator
                                 $newQuote = $newItem->getQuote();
                                 $result = $this->addQuoteToResult($result, $newQuote);
                             }
-
                         }
                     } else {
                         // Remove quote item
+                        $this->addError(
+                            __('Quote item was removed because of product cannot be subscribed anymore.')
+                        );
                         if (!$this->createProfile->removeSubscriptions($item)) {
                             $result = $this->filterResult($result, $quote);
+                            $this->addError([
+                                __('Quote was removed because of last item removal.'),
+                                'needReload' => true,
+                            ]);
                         };
                     }
                 }
             } else {
                 $result = $this->filterResult($result, $quote);
                 $this->createProfile->getQuoteCreator()->getCartRepository()->delete($quote);
+                $this->addError([
+                    __('Quote was removed because of billing frequency removal.'),
+                    'needReload' => true,
+                ]);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Add error.
+     * It adds to quote session.
+     *
+     * @param string|array $error
+     * @return void
+     */
+    private function addError($error)
+    {
+        if (!empty($error)) {
+            $this->getSession()->addError($error);
+        }
     }
 
     /**
@@ -244,6 +268,7 @@ class Validator
                 return ($subQuote->getId() !== $quote->getId());
             }
         );
+
         return $result;
     }
 
@@ -265,6 +290,7 @@ class Validator
         if ($needAddQuote) {
             $result[] = $newQuote;
         }
+
         return $result;
     }
 }
