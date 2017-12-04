@@ -99,7 +99,7 @@ class HistoryManager
     private function getHistoryItems($subscriptionProfileId)
     {
         $this->criteriaBuilder->addFilter(
-            SubscriptionProfileStatusHistoryInterface::ID,
+            SubscriptionProfileStatusHistoryInterface::SUBSCRIPTION_PROFILE_ID,
             $subscriptionProfileId
         );
         $sortOrder = $this->sortOrderBuilder

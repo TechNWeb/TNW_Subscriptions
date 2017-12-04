@@ -145,12 +145,23 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
-     * @inheritdoc
+     * Save subscription profile and log status changes if there is.
+     *
+     * @param SubscriptionProfileInterface $subscriptionProfile
+     * @return SubscriptionProfileInterface
+     * @throws CouldNotSaveException
      */
     public function save(
         SubscriptionProfileInterface $subscriptionProfile
     ) {
-        $oldStatus = $subscriptionProfile->getOrigData(SubscriptionProfileInterface::STATUS);
+        $origData = $subscriptionProfile->getOrigData();
+        $storedData = $subscriptionProfile->getStoredData();
+        $oldStatus = null;
+        if (isset($origData[SubscriptionProfileInterface::STATUS])) {
+            $oldStatus = $origData[SubscriptionProfileInterface::STATUS];
+        } else if (isset($storedData[SubscriptionProfileInterface::STATUS])) {
+            $oldStatus = $storedData[SubscriptionProfileInterface::STATUS];
+        }
         $newStatus = $subscriptionProfile->getStatus();
 
         try {
