@@ -146,6 +146,7 @@ class ManagerConfigurable
     public function processProfileUpdate(array $request)
     {
         $profileChanged = false;
+        $profile = $this->profileManager->getProfile();
         if (isset($request['sub_product_id'])) {
             $subProductId = $request['sub_product_id'];
             $itemIndex = 'item_' . $subProductId;
@@ -153,8 +154,6 @@ class ManagerConfigurable
             if (isset($request[$itemIndex])) {
                 $request = $request[$itemIndex];
             }
-
-            $profile = $this->profileManager->getProfile();
 
             if (!$profile->getId()) {
                 $subProduct = $this->subproductRepository->getById($subProductId);
@@ -214,9 +213,8 @@ class ManagerConfigurable
                     }
                 }
             }
+            $profile->setDataChanges($profileChanged);
         }
-
-        $profile->setDataChanges($profileChanged);
 
         return $profile;
     }
