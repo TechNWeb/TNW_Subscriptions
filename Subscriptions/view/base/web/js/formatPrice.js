@@ -32,7 +32,9 @@ define([
         if (typeof format == 'undefined') {
             format = priceFormat;
         }
-
+        if (typeof amount === 'string') {
+            amount = amount.replace(',', '.');
+        }
         return priceUtils.formatPrice(amount, format);
     };
 
