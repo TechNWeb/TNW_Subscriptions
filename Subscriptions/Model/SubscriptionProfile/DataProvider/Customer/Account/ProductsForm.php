@@ -159,7 +159,6 @@ class ProductsForm extends SummaryProductsForm
     {
         return [
             'form_button' => $this->getCurrentFormName() . '.edit_fieldset.edit_button',
-            'description_button' => $this->getCurrentFormName() . '.description_fieldset.middle_container.edit_button',
         ];
     }
 
