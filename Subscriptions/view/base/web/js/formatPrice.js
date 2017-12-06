@@ -69,7 +69,7 @@ define([
             returnNumber = returnNumber.split(groupSymbol).join('');
         }
 
-        returnNumber = returnNumber + decimalSymbol + fraction;
+        returnNumber = returnNumber + '.' + fraction;
 
         return returnNumber;
     }
