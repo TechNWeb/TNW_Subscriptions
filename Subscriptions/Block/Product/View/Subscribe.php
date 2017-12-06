@@ -10,6 +10,7 @@ namespace TNW\Subscriptions\Block\Product\View;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
+use Magento\Catalog\Block\Product\View;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
@@ -19,7 +20,6 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
-use Magento\Catalog\Block\Product\View;
 
 /**
  * Subscribe product block instance
@@ -104,15 +104,30 @@ class Subscribe extends View
     }
 
     /**
+     * Retrieve old quote item id
+     *
+     * @return string|null
+     */
+    private function getOldQuoteItemId()
+    {
+        return $this->_coreRegistry->registry('old_quote_item_id');
+    }
+
+    /**
      * Get subscribe url
      *
      * @return string
      */
     public function getSubscribeUrl()
     {
+        $oldQuoteItemId = $this->getOldQuoteItemId();
+        $params = ['product_id' => $this->getProduct()->getId()];
+        if ($oldQuoteItemId) {
+            $params['old_quote_item_id'] = $oldQuoteItemId;
+        }
         return $this->_urlBuilder->getUrl(
             'tnw_subscriptions/cart/add',
-            ['product_id' => $this->getProduct()->getId()]
+            $params
         );
     }
 
