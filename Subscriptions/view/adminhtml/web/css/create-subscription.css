@@ -776,3 +776,11 @@ button.action-editor.active:before{
 .product-options .fieldset-wrapper-title strong {
   font-size: 2rem;
 }
+#co-transparent-form-braintree .admin__control-text {
+  height: 33px;
+  border: 1px solid #c2c2c2;
+  padding: 0.6rem 1rem 0.6rem;
+}
+#co-transparent-form-braintree .payment-cvv .admin__control-text {
+  width: 6rem;
+}
