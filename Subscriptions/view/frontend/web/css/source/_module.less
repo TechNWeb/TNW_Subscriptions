@@ -2283,3 +2283,107 @@ div.shipping-details-content {
     width: 100%;
   }
 }
+
+.product-item-actions {
+  .actions-primary {
+    display: block;
+    float: left;
+  }
+  .actions-secondary {
+    line-height: 3.5rem;
+  }
+  .product-subscribe-button {
+    float:left;
+    .subscribe {
+      border-radius: 0;
+      font-size: 1.3rem;
+      line-height: 1;
+      padding-bottom: 10px;
+      padding-top: 10px;
+      width: 100%;
+    }
+  }
+  .product-addtocart-button-hidden {
+    display: none;
+    width: 100%;
+    &.active {
+      display: block;
+      button {
+        width: 100%;
+        margin-top: 1px;
+        background: none;
+        color: #41362f;
+        font-weight: normal;
+
+        &:hover {
+          background-color: #e3e3e3;
+        }
+      }
+    }
+  }
+  .product-subscribe-addtocart-buttons-container {
+    .product-subscribe-button-dropdown {
+      float: left;
+      button {
+        padding-right: 4rem;
+        bottom: 0;
+        padding-left: 0;
+        height: 35px;
+        position: relative;
+        right: 0;
+        top: 0;
+        background-color: #1979c3;
+        color: #fff;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+        border: 1px solid #1979c3;
+        border-radius: 0;
+        display: inline-block;
+        font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+        font-weight: 600;
+        line-height: 1.36;
+        text-align: center;
+        vertical-align: baseline;
+        border-left-color: rgba(0,0,0,0.2);
+        span {
+          clip: rect(0, 0, 0, 0);
+          overflow: hidden;
+          position: absolute;
+          display: none;
+          visibility: hidden;
+        }
+
+        &:after {
+          border-color: #fff transparent transparent transparent;
+          border-width: .9rem .6rem 0 .6rem;
+          margin-top: -0.3rem;
+          right: 1.4rem;
+          border-style: solid;
+          content: '';
+          height: 0;
+          position: absolute;
+          top: 50%;
+          transition: all .2s linear;
+          width: 0;
+        }
+
+        &:hover {
+          background: #006bb4;
+          border: 1px solid #006bb4;
+          color: #fff;
+        }
+
+        &.active {
+          background: #006bb4;
+          border: 1px solid #006bb4;
+          &:after {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}
+
+.product-item-description {
+  clear: both;
+}

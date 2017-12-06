@@ -322,6 +322,11 @@ class Subscribe extends View
         );
     }
 
+    /**
+     * Return subscription purchase type.
+     *
+     * @return int|null
+     */
     private function getProductSubscriptionPurchaseType()
     {
         return $this->getProduct()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);

@@ -1,0 +1,79 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+use Magento\Framework\App\Action\Action;
+
+/* @var $block \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons */
+$_product = $block->getCurrentProduct();
+$pos = $block->getCurrentPosForActions();
+$viewMode = $block->getCurrentViewMode();
+$position = $block->getCurrentPosition();
+?>
+
+<div class="actions-primary"<?php echo strpos($pos, $viewMode . '-primary') ? $position : ''; ?>>
+    <?php if ($_product->isSaleable()): ?>
+        <?php if ($block->isSubscribeAvailable($_product)): ?>
+            <?php if ($block->isOnlySubscribePurchase($_product)): ?>
+                <div class="product-subscribe-button">
+                    <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl(); ?>">
+                        <button type="button" title="Subscribe" class="action primary subscribe">
+                            <span data-role="button-text">Subscribe</span>
+                        </button>
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="product-subscribe-addtocart-buttons-container">
+                    <div class="product-subscribe-button">
+                        <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl(); ?>">
+                            <button type="button" title="Subscribe" class="action primary subscribe">
+                                <span data-role="button-text">Subscribe</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="product-subscribe-button-dropdown">
+                        <button title="<?php /* @escapeNotVerified */ echo __('Add to Cart') ?>"
+                                class="action-toggle primary add"
+                                data-toggle="dropdown"
+                                data-product-id="<?php echo $_product->getId(); ?>">
+                            <span>Select</span>
+                        </button>
+                    </div>
+                    <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?php echo $_product->getId(); ?>">
+                        <?php $postParams = $block->getCurrentPostParams(); ?>
+                        <form data-role="tocart-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
+                            <input type="hidden" name="product" value="<?php /* @escapeNotVerified */ echo $postParams['data']['product']; ?>">
+                            <input type="hidden" name="<?php /* @escapeNotVerified */ echo Action::PARAM_NAME_URL_ENCODED; ?>" value="<?php /* @escapeNotVerified */ echo $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                            <?php echo $block->getBlockHtml('formkey')?>
+                            <button type="submit"
+                                    title="<?php echo $block->escapeHtml(__('Add to Cart')); ?>"
+                                    class="action tocart primary">
+                                <span><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+                <?php $postParams = $block->getCurrentPostParams(); ?>
+                <form data-role="tocart-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
+                    <input type="hidden" name="product" value="<?php /* @escapeNotVerified */ echo $postParams['data']['product']; ?>">
+                    <input type="hidden" name="<?php /* @escapeNotVerified */ echo Action::PARAM_NAME_URL_ENCODED; ?>" value="<?php /* @escapeNotVerified */ echo $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                    <?php echo $block->getBlockHtml('formkey')?>
+                    <button type="submit"
+                            title="<?php echo $block->escapeHtml(__('Add to Cart')); ?>"
+                            class="action tocart primary">
+                        <span><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
+                    </button>
+                </form>
+        <?php endif; ?>
+    <?php else: ?>
+        <?php if ($_product->getIsSalable()): ?>
+            <div class="stock available"><span><?php /* @escapeNotVerified */ echo __('In stock') ?></span></div>
+        <?php else: ?>
+            <div class="stock unavailable"><span><?php /* @escapeNotVerified */ echo __('Out of stock') ?></span></div>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
