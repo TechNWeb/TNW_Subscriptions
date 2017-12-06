@@ -32,8 +32,9 @@ define([
         if (typeof format == 'undefined') {
             format = priceFormat;
         }
+        var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol;
         if (typeof amount === 'string') {
-            amount = amount.replace(',', '.');
+            amount = amount.replace(decimalSymbol, '.');
         }
         return priceUtils.formatPrice(amount, format);
     };
