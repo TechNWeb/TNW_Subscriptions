@@ -106,7 +106,7 @@ class Subscribe extends View
     /**
      * Retrieve old quote item id
      *
-     * @return string|null
+     * @return mixed
      */
     private function getOldQuoteItemId()
     {
