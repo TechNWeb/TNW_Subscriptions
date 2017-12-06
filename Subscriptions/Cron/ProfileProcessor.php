@@ -86,9 +86,8 @@ class ProfileProcessor
                 continue;
             }
             try {
-                if ($this->queueManager->processItem($item)) {
-                    $successIds[] = $item->getId();
-                }
+                $this->queueManager->processItem($item);
+                $successIds[] = $item->getId();
             } catch (\Exception $e) {
                 $this->context->log(
                     'Error on processing profile: ' . $e->getMessage()

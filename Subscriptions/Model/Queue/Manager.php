@@ -357,8 +357,10 @@ class Manager
             $item->getScheduledAt()
         );
         if ($status == ProfileStatus::STATUS_HOLDED) {
-            // Remove profile order (and corresponding queue item cascade)
-            $this->profileOrderRepository->deleteById($item->getProfileOrderId());
+            // Set subscription profile order quote ID field to null
+            $order = $this->relationManager->getRelationById($item->getProfileOrderId());
+            $order->setMagentoQuoteId(null);
+            $this->relationManager->saveRelation($order);
             // Remove corresponding magento quote
             $quote = $this->cartRepository->get($item->getMagentoQuoteId());
             $this->cartRepository->delete($quote);
@@ -380,7 +382,7 @@ class Manager
         $collection->getSelect()
             ->join(
                 ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
-                'main_table.profile_order_id = relation.id',
+                'main_table.profile_order_id = relation.id AND relation.magento_quote_id IS NOT NULL',
                 [
                     SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
                     SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,

@@ -20,9 +20,7 @@ class StatusComplete extends Base
      */
     protected function getIdsToModify(array $allIds)
     {
-        $finished = $this->getIdsThatRunThroughAllCycles($allIds);
-        $onHold = $this->getIdsThatHeldAndRunThroughAllCycles($allIds);
-        $result = array_unique(array_merge($finished, $onHold));
+        $result = $this->getIdsThatRunThroughAllCycles($allIds);
 
         return $result;
     }
@@ -54,42 +52,12 @@ class StatusComplete extends Base
         )->where(
             'profile.entity_id IN (?)', $allIds
         )->where(
-            'orders.magento_order_id IS NOT NULL'
+            // We take in account items which order is created or quote was deleted (ex. in "hold" status)
+            'orders.magento_order_id IS NOT NULL OR orders.magento_quote_id IS NULL'
         )->group(
             ['orders.subscription_profile_id']
         )->having(
             'COUNT(orders.subscription_profile_id) = profile.total_billing_cycles + trial_cycle_count'
-        );
-
-        return $this->resource->getConnection()->fetchCol($select);
-    }
-
-    /**
-     * Get all profile IDs that held and last cycle quote is expired.
-     *
-     * @param array $allIds
-     * @return array
-     */
-    private function getIdsThatHeldAndRunThroughAllCycles(array $allIds)
-    {
-        $select = $this->resource->getConnection()->select();
-        $select->from(
-            ['orders' => $this->resource->getTableName(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-            []
-        )->join(
-            ['profile' => $this->resource->getTableName(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
-            'orders.subscription_profile_id = profile.entity_id',
-            [SubscriptionProfile::ID]
-        )->where(
-            'profile.term = ?', 0
-        )->where(
-            'profile.status = ?', ProfileStatus::STATUS_HOLDED
-        )->where(
-            'profile.entity_id IN (?)', $allIds
-        )->group(
-            ['orders.subscription_profile_id']
-        )->having(
-            'max(orders.scheduled_at) < ?', $this->resource->getConnection()->formatDate(new \DateTime())
         );
 
         return $this->resource->getConnection()->fetchCol($select);
@@ -110,7 +78,6 @@ class StatusComplete extends Base
     {
         return [
             ProfileStatus::STATUS_COMPLETE,
-            ProfileStatus::STATUS_HOLDED,
             ProfileStatus::STATUS_CANCELED,
             ProfileStatus::STATUS_SUSPENDED
         ];

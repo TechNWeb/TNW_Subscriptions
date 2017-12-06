@@ -6,11 +6,13 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Status;
 
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileStatusHistoryRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrderBuilder;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterfaceFactory;
 
 /**
  * Subscription profile status history manager.
@@ -39,18 +41,28 @@ class HistoryManager
     private $sortOrderBuilder;
 
     /**
+     * Subscription profile factory.
+     *
+     * @var SubscriptionProfileInterfaceFactory
+     */
+    private $profileFactory;
+
+    /**
      * @param SubscriptionProfileStatusHistoryRepositoryInterface $statusHistoryRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SortOrderBuilder $sortOrderBuilder
+     * @param SubscriptionProfileInterfaceFactory $profileFactory
      */
     public function __construct(
         SubscriptionProfileStatusHistoryRepositoryInterface $statusHistoryRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        SortOrderBuilder $sortOrderBuilder
+        SortOrderBuilder $sortOrderBuilder,
+        SubscriptionProfileInterfaceFactory $profileFactory
     ) {
         $this->statusHistoryRepository = $statusHistoryRepository;
         $this->criteriaBuilder = $searchCriteriaBuilder;
         $this->sortOrderBuilder = $sortOrderBuilder;
+        $this->profileFactory = $profileFactory;
     }
 
     /**
@@ -110,6 +122,55 @@ class HistoryManager
         /** @var SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->criteriaBuilder->create();
         $result = $this->statusHistoryRepository->getList($searchCriteria)->getItems();
+
+        return $result;
+    }
+
+    /**
+     * Get old status from profile.
+     *
+     * It try to get from origData, storedData and finally from DB.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @return int|null
+     */
+    public function getProfileOldStatus(SubscriptionProfileInterface $profile)
+    {
+        $result = null;
+        if ($profile) {
+            $origData = $profile->getOrigData();
+            $storedData = $profile->getStoredData();
+            if (isset($origData[SubscriptionProfileInterface::STATUS])) {
+                $result = $origData[SubscriptionProfileInterface::STATUS];
+            } else {
+                if (isset($storedData[SubscriptionProfileInterface::STATUS])) {
+                    $result = $storedData[SubscriptionProfileInterface::STATUS];
+                } else {
+                    $result = $this->getProfileStatusFromDb($profile->getId());
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get subscription profile current status from DB.
+     *
+     * @param int|string $profileId
+     * @return null|string
+     */
+    private function getProfileStatusFromDb($profileId)
+    {
+        $result = null;
+        if ($profileId) {
+            /** @var SubscriptionProfileInterface $profile */
+            $profile = $this->profileFactory->create();
+            $profile->load($profileId);
+            if ($profile->getStatus()) {
+                $result = $profile->getStatus();
+            }
+        }
 
         return $result;
     }
