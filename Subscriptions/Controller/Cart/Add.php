@@ -207,7 +207,7 @@ class Add extends Action
      *
      * @param bool $error
      * @param string $message
-     * @param $redirectUrl
+     * @param string|null $redirectUrl
      * @param \Magento\Catalog\Model\Product $product
      * @return void
      */
