@@ -39,10 +39,6 @@ define([
             if (self.subscriptionCart().itemsCount === 0) {
                 if (!this.dialog) {
                     this.createDialog();
-                    if (this.dialog.dropdownDialog("isOpen")) {
-                        this.dialog.dropdownDialog('close');
-                    }
-
                     this.dialog.dropdownDialog('open');
                     $('body').on('click.outsideDropdown', function() {
                         if(!self.dialog.dropdownDialog("isOpen") && !$(event.target).closest('.ui-dialog').length) {
@@ -51,15 +47,11 @@ define([
                     }.bind(this));
                 }
             } else {
-                if (self.dialog !== null){
+                if (self.dialog !== null) {
+                    $(this.cartLink).off();
                     self.dialog.dropdownDialog('destroy');
                     self.dialog = null;
-                    $(this.cartLink).off();
-
-                    setTimeout(function(){
-                        $('img.tnw-subscriptions-minicart').click();
-                    }, 200)
-
+                    $('img.tnw-subscriptions-minicart').click();
                 }
 
                 result = true;
@@ -83,15 +75,15 @@ define([
         createDialog: function() {
             this.dialog = $('.tnw-subscriptions-cart-empty');
             this.dialog.dropdownDialog({
-                "appendTo":"[data-role=tnw-subscriptions-cart-link]",
+                "appendTo": "[data-role=tnw-subscriptions-cart-link]",
                 "triggerEvent":"click",
                 "triggerTarget": this.cartLink,
                 "timeout": "2000",
                 "closeOnMouseLeave": false,
                 "closeOnEscape": true,
-                "triggerClass":"active",
-                "parentClass":"active",
-                "buttons":[]
+                "triggerClass": "active",
+                "parentClass": "active",
+                "buttons": []
             });
         }
     });
