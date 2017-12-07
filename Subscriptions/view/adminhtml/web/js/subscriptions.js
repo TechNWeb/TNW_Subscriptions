@@ -3,4 +3,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-require(["prototype"]);
+require([
+    "prototype",
+    "TNW_Subscriptions/js/loader"
+]);

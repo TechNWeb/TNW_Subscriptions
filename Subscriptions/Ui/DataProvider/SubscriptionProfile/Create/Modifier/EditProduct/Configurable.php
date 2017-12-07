@@ -28,7 +28,7 @@ class Configurable extends Base
     /**
      * Options container prefix
      */
-    const CONTAINER_PREFIX = 'super_attribute';
+    const CONTAINER_PREFIX = 'super_attributes';
 
     /**
      * @var Registry
@@ -52,6 +52,18 @@ class Configurable extends Base
     ) {
         $this->registry = $registry;
         $this->urlFactory = $urlFactory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyData(array $data)
+    {
+        if ($this->isUsedModifier()) {
+            $data['super_attribute'] = $this->getItem()->getBuyRequest()->getSuperAttribute();
+        }
+
+        return $data;
     }
 
     /**
@@ -155,9 +167,12 @@ class Configurable extends Base
                             'componentType' => Field::NAME,
                             'formElement' => Input::NAME,
                             'additionalClasses' => 'edit-product',
-                            'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                            'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                             'sortOrder' => $iterator,
                             'value' => $attributeData['optionLabel'],
+                            'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                            'showPreview' => true,
+                            'dataScope' => $attribute->getAttributeId(),
                         ],
                     ],
                 ],
@@ -194,6 +209,11 @@ class Configurable extends Base
                                     [
                                         'targetName' => $leftContainerName . '.edit_options',
                                         'actionName' => 'editOptions',
+                                        'params' =>  [
+                                            $this->getItem()->getProductId(), //product id
+                                            $this->getItem()->getId(),  //subscription item id
+                                            $this->getItem()->getQuoteId(),  // quote id
+                                        ],
                                     ],
                                 ],
                                 'configureUrl' => $this->getConfigureUrl(),

@@ -146,13 +146,23 @@ class ManagerConfigurable
     public function processProfileUpdate(array $request)
     {
         $profileChanged = false;
+        $profile = $this->profileManager->getProfile();
         if (isset($request['sub_product_id'])) {
             $subProductId = $request['sub_product_id'];
-            $subProduct = $this->subproductRepository->getById($subProductId);
-            $profileId = $subProduct->getSubscriptionProfileId();
-            /** @var SubscriptionProfile $profile */
-            $profile = $this->profileManager->loadProfile($profileId);
-            $profile->setDataChanges(false);
+            $itemIndex = 'item_' . $subProductId;
+
+            if (isset($request[$itemIndex])) {
+                $request = $request[$itemIndex];
+            }
+
+            if (!$profile->getId()) {
+                $subProduct = $this->subproductRepository->getById($subProductId);
+                $profileId = $subProduct->getSubscriptionProfileId();
+                /** @var SubscriptionProfile $profile */
+                $profile = $this->profileManager->loadProfile($profileId);
+                $profile->setDataChanges(false);
+            }
+
             $profileVisibleProducts = $profile->getVisibleProducts();
             $profileProducts = $profile->getProducts();
             $updatedSubProduct = '';
@@ -166,43 +176,45 @@ class ManagerConfigurable
 
             if ($updatedSubProduct) {
                 $magentoProduct = $updatedSubProduct->getMagentoProduct();
-                if (isset($request['subscribe_qty'])) {
-                    $request['qty'] = $request['subscribe_qty'];
-                }
-                $request = $this->objectFactory->create($request);
-                $candidates =  $magentoProduct->getTypeInstance()
-                    ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
 
-                /**
-                 * Error message
-                 */
-                if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
-                    return strval($candidates);
-                }
+                if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE) {
+                    if (isset($request['subscribe_qty'])) {
+                        $request['qty'] = $request['subscribe_qty'];
+                    }
+                    $request = $this->objectFactory->create($request);
+                    $candidates =  $magentoProduct->getTypeInstance()
+                        ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
 
-                foreach ($candidates as $candidate) {
-                    if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
-                        $updatedSubProduct->setDataChanges(false);
-                        $updatedSubProduct->setQty($candidate->getQty());
-                        $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
-                    } elseif ($magentoProduct->getTypeId() === Configurable::TYPE_CODE) {
-                        foreach ($profileProducts as $profileProduct) {
-                            if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
-                                $profileProduct->setMagentoProductId($candidate->getId())
-                                    ->setSku($candidate->getSku())
-                                    ->setName($candidate->getName())
-                                    ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
-                                    ->setQty($candidate->getQty());
-                                $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
-                                break;
+                    /** $candidates is error message */
+                    if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
+                        return strval($candidates);
+                    }
+
+                    foreach ($candidates as $candidate) {
+                        if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
+                            //if $candidate is current updated product
+                            $updatedSubProduct->setDataChanges(false);
+                            $updatedSubProduct->setQty($candidate->getQty());
+                            $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
+                        } else {
+                            //if $candidate is a configurable child product.
+                            foreach ($profileProducts as $profileProduct) {
+                                if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
+                                    $profileProduct->setMagentoProductId($candidate->getId())
+                                        ->setSku($candidate->getSku())
+                                        ->setName($candidate->getName())
+                                        ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
+                                        ->setQty($candidate->getQty());
+                                    $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
+            $profile->setDataChanges($profileChanged);
         }
-
-        $profile->setDataChanges($profileChanged);
 
         return $profile;
     }

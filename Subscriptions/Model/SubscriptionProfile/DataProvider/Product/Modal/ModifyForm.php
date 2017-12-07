@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 /**
  * Class ModifyForm
@@ -83,6 +84,7 @@ class ModifyForm extends Form
         'period',
         'start_on',
         'qty',
+        'super_attribute',
     ];
 
     /**
@@ -143,7 +145,7 @@ class ModifyForm extends Form
                     $subBuyRequest[Create::NON_UNIQUE]['price'],
                     $item
                 );
-                $data[self::FORM_DATA_VALUE]['item_' . $item->getId()] = [
+                $itemData = [
                     'price' => $itemPrice,
                     'initial_fee' => $this->getInitialFeeFromItem($item),
                     'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
@@ -162,6 +164,14 @@ class ModifyForm extends Form
                         'price' => $itemPrice
                     ]
                 ];
+
+                /** @var ModifierInterface $modifier */
+                foreach ($this->pool->getModifiersInstances() as $modifier) {
+                    $modifier->setItem($item);
+                    $itemData = $modifier->modifyData($itemData);
+                }
+
+                $data[self::FORM_DATA_VALUE]['item_' . $item->getId()] = $itemData;
             }
         }
 
@@ -406,7 +416,6 @@ class ModifyForm extends Form
             'children' => [
                 'name' => $this->getTextFieldDefenition('name'),
                 'remove_button' => $this->getRemoveButton(),
-                'edit_button' => $this->getEditButton(),
                 'description' => $this->getTextFieldDefenition('description'),
                 'qty_container' => $this->getQtyContainerDefinition(),
                 'update_button' => $this->getUpdateButton()
@@ -1095,12 +1104,34 @@ class ModifyForm extends Form
     {
         $result = [
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
-            'description_button' => $this->currentFormName . '.description_fieldset.middle_container.edit_button',
         ];
         if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
-            $result['qty_button'] = $this->currentFormName . '.description_fieldset.middle_container.qty_container.qty_edit_button';
+            $result['qty_button'] = $this->currentFormName
+                . '.description_fieldset.middle_container.qty_container.qty_edit_button';
         }
 
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getConfigData()
+    {
+        return array_merge(parent::getConfigData(), $this->getAdditionalConfig());
+    }
+
+    /**
+     * Returns additional list of Ui component names.
+     *
+     * @return array
+     */
+    private function getAdditionalConfig()
+    {
+        return [
+            'editOptionsModal' => 'editOptionsModal',
+            'editOptionsForm' => EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
+            'insertEditOptionsForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM,
+        ];
     }
 }

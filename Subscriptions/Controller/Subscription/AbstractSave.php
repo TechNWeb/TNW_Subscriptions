@@ -69,7 +69,7 @@ abstract class AbstractSave extends Action\Action
                     if (is_array($error)) {
                         $errorMessages[] = reset($error);
                         if (isset($error['needReload'])) {
-                            $needReload = $error['needReload'] ? true : false;
+                            $needReload = $needReload || ($error['needReload'] ? true : false);
                         }
                     } else {
                         $errorMessages[] = $error;

@@ -740,4 +740,9 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm\Modifier\Pool</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm">
+        <arguments>
+            <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm\Modifier\Pool</argument>
+        </arguments>
+    </type>
 </config>

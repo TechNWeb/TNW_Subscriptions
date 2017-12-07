@@ -32,7 +32,10 @@ define([
         if (typeof format == 'undefined') {
             format = priceFormat;
         }
-
+        if (typeof amount === 'string') {
+            var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol;
+            amount = amount.replace(decimalSymbol, '.');
+        }
         return priceUtils.formatPrice(amount, format);
     };
 
@@ -67,7 +70,7 @@ define([
             returnNumber = returnNumber.split(groupSymbol).join('');
         }
 
-        returnNumber = returnNumber + decimalSymbol + fraction;
+        returnNumber = returnNumber + '.' + fraction;
 
         return returnNumber;
     }
