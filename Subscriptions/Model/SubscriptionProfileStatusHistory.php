@@ -142,4 +142,20 @@ class SubscriptionProfileStatusHistory extends AbstractModel
     {
         return $this->setData(self::CHANGED_AT, $changedAt);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChangedAtMicro()
+    {
+        return $this->getData(static::CHANGED_AT_MICRO);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChangedAtMicro($changedAt)
+    {
+        return $this->setData(self::CHANGED_AT_MICRO, $changedAt);
+    }
 }

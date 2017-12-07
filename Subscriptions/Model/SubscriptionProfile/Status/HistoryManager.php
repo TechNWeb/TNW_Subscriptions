@@ -114,11 +114,16 @@ class HistoryManager
             SubscriptionProfileStatusHistoryInterface::SUBSCRIPTION_PROFILE_ID,
             $subscriptionProfileId
         );
-        $sortOrder = $this->sortOrderBuilder
+        $sortOrderTime = $this->sortOrderBuilder
             ->setField(SubscriptionProfileStatusHistoryInterface::CHANGED_AT)
             ->setAscendingDirection()
             ->create();
-        $this->criteriaBuilder->addSortOrder($sortOrder);
+        $sortOrderMicro = $this->sortOrderBuilder
+            ->setField(SubscriptionProfileStatusHistoryInterface::CHANGED_AT_MICRO)
+            ->setAscendingDirection()
+            ->create();
+        $this->criteriaBuilder->addSortOrder($sortOrderTime);
+        $this->criteriaBuilder->addSortOrder($sortOrderMicro);
         /** @var SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->criteriaBuilder->create();
         $result = $this->statusHistoryRepository->getList($searchCriteria)->getItems();

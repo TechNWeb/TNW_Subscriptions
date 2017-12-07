@@ -943,6 +943,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
                         ['nullable' => false],
                         'Changed at'
                     )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::CHANGED_AT_MICRO,
+                        Table::TYPE_BIGINT,
+                        null,
+                        [
+                            'nullable' => false,
+                            'unsigned' => true,
+                            'default' => 0,
+                        ],
+                        'Changed at microseconds'
+                    )
                     ->addIndex(
                         $setup->getIdxName(
                             SubscriptionProfileStatusHistory::TABLE,
@@ -985,6 +996,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
                             [SubscriptionProfileStatusHistory::CHANGED_AT]
                         ),
                         SubscriptionProfileStatusHistory::CHANGED_AT
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::CHANGED_AT_MICRO]
+                        ),
+                        SubscriptionProfileStatusHistory::CHANGED_AT_MICRO
                     )
                     ->addForeignKey(
                         $setup->getConnection()->getForeignKeyName(

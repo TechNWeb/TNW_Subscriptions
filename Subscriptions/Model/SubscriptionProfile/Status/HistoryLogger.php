@@ -82,6 +82,9 @@ class HistoryLogger
         $statusNew
     ) {
         $changedAt = $this->date->gmtTimestamp();
+        list($usec, $sec) = explode(" ", microtime());
+        list($whole, $decimal) = explode('.', $usec);
+        $changedAtMicro = str_pad(substr($decimal, 0, 6), 6, '0', STR_PAD_RIGHT);
 
         /** @var SubscriptionProfileStatusHistoryInterface $historyItem */
         $historyItem = $this->statusHistoryFactory->create();
@@ -89,20 +92,21 @@ class HistoryLogger
             ->setSubscriptionProfileId($subscriptionProfileId)
             ->setStatusOld($statusOld)
             ->setStatusNew($statusNew)
-            ->setChangedAt($changedAt);
+            ->setChangedAt($changedAt)
+            ->setChangedAtMicro($changedAtMicro);
 
-            $authSession = $this->authSessionFactory->create();
-            $user = $authSession->getUser();
-            if ($user) {
-                $historyItem->setUserId($user->getId());
-            }
+        $authSession = $this->authSessionFactory->create();
+        $user = $authSession->getUser();
+        if ($user) {
+            $historyItem->setUserId($user->getId());
+        }
 
-            $customerId = $this->customerSessionFactory->create()
-                ->getCustomerId();
+        $customerId = $this->customerSessionFactory->create()
+            ->getCustomerId();
 
-            if ($customerId) {
-                $historyItem->setCustomerId($customerId);
-            }
+        if ($customerId) {
+            $historyItem->setCustomerId($customerId);
+        }
 
         $this->statusHistoryRepository->save($historyItem);
     }

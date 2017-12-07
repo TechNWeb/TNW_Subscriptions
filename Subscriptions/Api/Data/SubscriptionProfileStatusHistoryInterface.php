@@ -21,6 +21,7 @@ interface SubscriptionProfileStatusHistoryInterface
     const USER_ID = 'user_id';
     const CUSTOMER_ID = 'customer_id';
     const CHANGED_AT = 'changed_at';
+    const CHANGED_AT_MICRO = 'changed_at_micro';
     /**#@-*/
 
     /**
@@ -127,4 +128,19 @@ interface SubscriptionProfileStatusHistoryInterface
      * @return $this
      */
     public function setChangedAt($changedAt);
+
+    /**
+     * Gets changed at microseconds.
+     *
+     * @return string|null
+     */
+    public function getChangedAtMicro();
+
+    /**
+     * Sets changed at microseconds.
+     *
+     * @param string $changedAt
+     * @return $this
+     */
+    public function setChangedAtMicro($changedAt);
 }
