@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Block\Subscription\Product;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
@@ -18,16 +17,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Subscribe product block instance on edit product additional data page.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
  */
 class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
 {
-    /**
-     * Core registry
-     *
-     * @var Registry
-     */
-    private $coreRegistry;
-
     /**
      * Subscription profile manager
      *
@@ -54,9 +49,10 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
-     * @param Registry $registry
      * @param ProfileManager $profileManager
      * @param array $data
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Context $context,
@@ -72,7 +68,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
-        Registry $registry,
         ProfileManager $profileManager,
         array $data = []
     ) {
@@ -92,7 +87,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
             $frequencyRepository,
             $data
         );
-        $this->coreRegistry = $registry;
         $this->profileManager = $profileManager;
     }
 
@@ -128,7 +122,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      */
     public function getSubscriptionProduct()
     {
-        return $this->coreRegistry->registry('tnw_subscription_product');
+        return $this->_coreRegistry->registry('tnw_subscription_product');
     }
 
     /**

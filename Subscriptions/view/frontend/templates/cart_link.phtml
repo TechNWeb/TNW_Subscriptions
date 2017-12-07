@@ -6,20 +6,38 @@
 
 /* @var $block \TNW\Subscriptions\Block\Cart\Link */
 
-// @codingStandardsIgnoreFile
 ?>
-<div data-role="tnw-subscriptions-cart-link"  data-bind="scope: 'subscriptionCart'" class="tnw-subscriptions-cart-link__container">
-    <a class="tnw-subscriptions-cart-link no-display"
+<div data-role="tnw-subscriptions-cart-link"
+     data-bind="scope: 'subscriptionCart'"
+     class="tnw-subscriptions-cart-link__container"
+>
+    <a class="tnw-subscriptions-cart-link"
        href="<?php echo $block->escapeUrl($block->getCartUrl()) ?>"
        title="<?php /* @noEscape */ echo __('Subscription Cart') ?>"
-       data-bind="css: {'no-display': !subscriptionCart().itemsCount}"
+       data-bind="attr: {href: subscriptionCart().href}, click: showPopup"
     >
-
-    <img src="<?php /* @noEscape */ echo $block->getViewFileUrl('TNW_Subscriptions/images/cart-link.svg'); ?>"
-             width="24"
-             height="24">
-        <span data-bind="text: subscriptionCart().itemsCount"></span>
+        <img src="<?php /* @noEscape */ echo $block->getViewFileUrl('TNW_Subscriptions/images/cart-link.svg'); ?>"
+            width="24"
+            height="24"
+            class="tnw-subscriptions-minicart"
+        >
+        <span class="no-display"
+              data-bind="text: subscriptionCart().itemsCount, css: {'no-display': !subscriptionCart().itemsCount}">
+        </span>
     </a>
+    <div class="tnw-subscriptions-cart-empty no-display">
+        <div id="subscription-minicart-content-wrapper">
+            <div class="block-content">
+                <button type="button"
+                    id="btn-subscriptions-cart-close"
+                    class="action close"
+                    data-action="close"
+                    data-bind="attr: { title: $t('Close') }, , click: hidePopup">
+                </button>
+                <span><?php /* @noEscape */ echo __('You have no items in your subscription cart.') ?></span>
+            </div>
+        </div>
+    </div>
 </div>
 <script type="text/x-magento-init">
     {
