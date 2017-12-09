@@ -6,11 +6,11 @@
  */
 namespace TNW\Subscriptions\Controller\Cart;
 
-use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Registry;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\ItemFactory;
-use Magento\Framework\Controller\ResultFactory;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -35,21 +35,29 @@ class Configure extends \Magento\Framework\App\Action\Action
     private $logger;
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+    /**
      * @param Context $context
      * @param ItemFactory $quoteItemFactory
      * @param CartRepositoryInterface $quoteRepository
      * @param LoggerInterface $logger
+     * @param Registry $registry
      */
     public function __construct(
         Context $context,
         ItemFactory $quoteItemFactory,
         CartRepositoryInterface $quoteRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Registry $registry
     ) {
         parent::__construct($context);
         $this->logger = $logger;
         $this->quoteItemFactory = $quoteItemFactory;
         $this->quoteRepository = $quoteRepository;
+        $this->registry = $registry;
     }
 
     /**
@@ -68,6 +76,7 @@ class Configure extends \Magento\Framework\App\Action\Action
             $quoteItem = $this->quoteItemFactory->create()->load($quoteItemId);
             $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
             $quoteItem->setQuote($quote);
+            $this->registry->register('old_quote_item_id', $quoteItemId);
         }
 
         try {

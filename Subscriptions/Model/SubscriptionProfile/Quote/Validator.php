@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Quote;
 
+use Magento\Framework\App\State;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
@@ -41,15 +42,23 @@ class Validator
     private $session;
 
     /**
+     * @var State
+     */
+    private $state;
+
+    /**
      * @param CreateProfile $createProfile
      * @param BillingFrequencyRepositoryInterface $frequencyRepository
+     * @param State $state
      */
     public function __construct(
         CreateProfile $createProfile,
-        BillingFrequencyRepositoryInterface $frequencyRepository
+        BillingFrequencyRepositoryInterface $frequencyRepository,
+        State $state
     ) {
         $this->createProfile = $createProfile;
         $this->frequencyRepository = $frequencyRepository;
+        $this->state = $state;
     }
 
     /**
@@ -200,6 +209,15 @@ class Validator
         $result = $productModifier->getPreparedBuyRequest(true)->getData(
             CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
         );
+        if ($this->state->getAreaCode() !== \Magento\Framework\App\Area::AREA_FRONTEND) {
+            unset($result[CreateProfile::NON_UNIQUE]);
+        } else {
+            //round current price to 2 signs after point
+            if (isset($result[CreateProfile::NON_UNIQUE]['current_price'])) {
+                $result[CreateProfile::NON_UNIQUE]['current_price'] =
+                    round($result[CreateProfile::NON_UNIQUE]['current_price'], 2);
+            }
+        }
 
         return [$result, $productsData];
     }
@@ -215,12 +233,16 @@ class Validator
         $request = $item->getBuyRequest()->getData(
             CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
         );
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        $fee = $initialFees ? $initialFees->getSubsInitialFee() : 0;
-        $request[CreateProfile::NON_UNIQUE]['current_price'] = (float)$item->getPrice();
-        $request[CreateProfile::NON_UNIQUE]['initial_fee'] = $fee;
+        if ($this->state->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND) {
+            $initialFees = $item->getExtensionAttributes()
+                ? $item->getExtensionAttributes()->getSubsInitialFees()
+                : null;
+            $fee = $initialFees ? $initialFees->getSubsInitialFee() : 0;
+            $request[CreateProfile::NON_UNIQUE]['current_price'] = (float)$item->getPrice();
+            $request[CreateProfile::NON_UNIQUE]['initial_fee'] = $fee;
+        } else {
+            unset($request[CreateProfile::NON_UNIQUE]);
+        }
 
         return $request;
     }

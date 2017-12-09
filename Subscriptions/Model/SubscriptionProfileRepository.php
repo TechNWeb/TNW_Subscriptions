@@ -23,6 +23,8 @@ use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
 
 /**
  * Repository for subscription profiles.
@@ -99,6 +101,20 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $criteriaBuilder;
 
     /**
+     * Status history manager.
+     *
+     * @var HistoryManager
+     */
+    private $statusHistoryManager;
+
+    /**
+     * Status history logger.
+     *
+     * @var HistoryLogger
+     */
+    private $statusHistoryLogger;
+
+    /**
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
      * @param SubscriptionProfileInterfaceFactory $dataSubscriptionProfileFactory
@@ -109,6 +125,8 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param AddressRepository $addressRepository
      * @param ProductSubscriptionProfileRepository $productProfileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param HistoryManager $statusHistoryManager
+     * @param HistoryLogger $statusHistoryLogger
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -120,7 +138,9 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         EntityManager $entityManager,
         AddressRepository $addressRepository,
         ProductSubscriptionProfileRepository $productProfileRepository,
-        SearchCriteriaBuilder $criteriaBuilder
+        SearchCriteriaBuilder $criteriaBuilder,
+        HistoryManager $statusHistoryManager,
+        HistoryLogger $statusHistoryLogger
     ) {
         $this->resource = $resource;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -132,14 +152,22 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->addressRepository = $addressRepository;
         $this->productProfileRepository = $productProfileRepository;
         $this->criteriaBuilder = $criteriaBuilder;
+        $this->statusHistoryManager = $statusHistoryManager;
+        $this->statusHistoryLogger = $statusHistoryLogger;
     }
 
     /**
-     * @inheritdoc
+     * Save subscription profile and log status changes if there is.
+     *
+     * @param SubscriptionProfileInterface $subscriptionProfile
+     * @return SubscriptionProfileInterface
+     * @throws CouldNotSaveException
      */
     public function save(
         SubscriptionProfileInterface $subscriptionProfile
     ) {
+        $oldStatus = $this->statusHistoryManager->getProfileOldStatus($subscriptionProfile);
+
         try {
             $this->entityManager->save($subscriptionProfile);
         } catch (\Exception $exception) {
@@ -148,6 +176,26 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 $exception->getMessage()
             ));
         }
+
+        $newStatus = $subscriptionProfile->getStatus();
+
+        // Log status history
+        if ($oldStatus != $newStatus) {
+            try {
+                $this->statusHistoryLogger->log(
+                    $subscriptionProfile->getId(),
+                    $oldStatus,
+                    $newStatus
+                );
+            } catch (\Exception $exception) {
+                throw new CouldNotSaveException(__(
+                    'Could not save the subscription profile (ID=%1) status history entry: %2',
+                    $subscriptionProfile->getId(),
+                    $exception->getMessage()
+                ));
+            }
+        }
+
         return $subscriptionProfile;
     }
 

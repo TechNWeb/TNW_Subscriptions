@@ -416,7 +416,6 @@ class ModifyForm extends Form
             'children' => [
                 'name' => $this->getTextFieldDefenition('name'),
                 'remove_button' => $this->getRemoveButton(),
-                'edit_button' => $this->getEditButton(),
                 'description' => $this->getTextFieldDefenition('description'),
                 'qty_container' => $this->getQtyContainerDefinition(),
                 'update_button' => $this->getUpdateButton()
@@ -1105,7 +1104,6 @@ class ModifyForm extends Form
     {
         $result = [
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
-            'description_button' => $this->currentFormName . '.description_fieldset.middle_container.edit_button',
         ];
         if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
             $result['qty_button'] = $this->currentFormName
