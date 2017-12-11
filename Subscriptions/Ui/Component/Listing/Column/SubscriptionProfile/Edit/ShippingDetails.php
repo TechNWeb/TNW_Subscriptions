@@ -71,6 +71,8 @@ class ShippingDetails extends Column
                             $shippingPrice
                         ]
                     );
+                } else {
+                    $item[$fieldName] = 'N/A';
                 }
             }
         }
