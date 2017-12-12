@@ -12,7 +12,18 @@ define([
         defaults: {
             imports: {
                 updateValidation: 'index = tnw_subscr_unlock_preset_qty:checked',
-                disabled: '!index = tnw_subscr_unlock_preset_qty:checked'
+                disabled: '!index = tnw_subscr_unlock_preset_qty:checked',
+                updateDisabledField: 'index = tnw_subscr_unlock_preset_qty:checked',
+            }
+        },
+        oldPresetQtyValue : '',
+        updateDisabledField: function (isEditable) {
+            var value = this.getInitialValue();
+            if (value == 0 && this.disabled() && !isEditable) {
+                this.oldPresetQtyValue = value;
+                this.value('');
+            } else if (this.value() == '') {
+                this.value(this.oldPresetQtyValue);
             }
         },
 
