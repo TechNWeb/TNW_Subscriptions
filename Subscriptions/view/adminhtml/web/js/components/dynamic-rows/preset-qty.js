@@ -21,7 +21,7 @@ define([
          * If field "Preset qty" is disabled and equals 0 - hide 0
          * else if value is empty set old value
          *
-         * @param isEditable bool
+         * @param {boolean} isEditable
          */
         updateDisabledField: function (isEditable) {
             var value = this.getInitialValue();
