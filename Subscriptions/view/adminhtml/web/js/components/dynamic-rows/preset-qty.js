@@ -14,9 +14,15 @@ define([
                 updateValidation: 'index = tnw_subscr_unlock_preset_qty:checked',
                 disabled: '!index = tnw_subscr_unlock_preset_qty:checked',
                 updateDisabledField: 'index = tnw_subscr_unlock_preset_qty:checked',
-            }
+            },
+            oldPresetQtyValue : ''
         },
-        oldPresetQtyValue : '',
+        /**
+         * If field "Preset qty" is disabled and equals 0 - hide 0
+         * else if value is empty set old value
+         *
+         * @param isEditable bool
+         */
         updateDisabledField: function (isEditable) {
             var value = this.getInitialValue();
             if (value == 0 && this.disabled() && !isEditable) {
