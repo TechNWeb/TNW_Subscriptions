@@ -169,9 +169,8 @@ class Creator extends Base
         $neededDates[] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
-            //End date of current year
-            $endDate = new \DateTime();
-            $endDate->setDate($endDate->format('Y'), 12, 31);
+            //Generate quotes for the year ahead
+            $endDate = (new \DateTime($profile->getStartDate()))->add(new \DateInterval('P1Y'));
             switch ($profile->getUnit()) {
                 case BillingFrequencyUnitType::DAYS:
                     $cyclesCount = floor($date->diff($endDate, true)->days / $profile->getFrequency());
