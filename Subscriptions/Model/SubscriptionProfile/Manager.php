@@ -18,6 +18,7 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -602,6 +603,14 @@ class Manager
                 $this->getProfile()->setProducts($products);
                 $this->saveProfile();
             }
+
+            $visibleProducts = array_filter(
+                $this->getProfile()->getProducts(),
+                function (ProductSubscriptionProfileInterface $product) {
+                    return !$product->getParentId();
+                }
+            );
+            $this->getProfile()->setVisibleProducts($visibleProducts);
         }
 
         return $this;
