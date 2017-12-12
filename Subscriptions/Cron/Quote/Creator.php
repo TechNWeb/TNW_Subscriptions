@@ -170,7 +170,7 @@ class Creator extends Base
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
             //Generate quotes for the year ahead
-            $endDate = (new \DateTime($profile->getStartDate()))->add(new \DateInterval('P1Y'));
+            $endDate = (new \DateTime())->add(new \DateInterval('P1Y'));
             switch ($profile->getUnit()) {
                 case BillingFrequencyUnitType::DAYS:
                     $cyclesCount = floor($date->diff($endDate, true)->days / $profile->getFrequency());
