@@ -161,7 +161,7 @@ class DataProvider extends AbstractDataProvider
 
         $formatedEtityId = str_pad($qoute->getId(), 8, '0', STR_PAD_LEFT);
 
-        $shippingDetails = 'N/A';
+        $shippingDetails = __('N/A');
         if ($qoute->getShippingDetails()) {
             $shippingDetails = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
         }

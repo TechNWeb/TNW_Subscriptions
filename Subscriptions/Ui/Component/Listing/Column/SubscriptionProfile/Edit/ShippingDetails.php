@@ -72,7 +72,7 @@ class ShippingDetails extends Column
                         ]
                     );
                 } else {
-                    $item[$fieldName] = 'N/A';
+                    $item[$fieldName] = __('N/A');
                 }
             }
         }
