@@ -164,20 +164,28 @@ class Creator extends Base
     private function getBillingCycles(SubscriptionProfileInterface $profile, $count)
     {
         $neededDates = [];
-        $date = new \DateTime($profile->getStartDate());
+        $nowDate = new \DateTime();
+        $formattedNowDate = $this->format($nowDate);
+        $startDate = new \DateTime($profile->getStartDate());
+        $formattedStartDate = $this->format($startDate);
         //Add to list start date.
-        $neededDates[] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        $neededDates[] = $formattedStartDate;
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
-            //End date of current year
-            $endDate = new \DateTime();
-            $endDate->setDate($endDate->format('Y'), 12, 31);
+            //Generate quotes for the year ahead
+            $endDate = new \DateTime($formattedNowDate);
+            if (strtotime($formattedStartDate) > strtotime($formattedNowDate)) {
+                $endDate = new \DateTime($formattedStartDate);
+            }
+            $endDate->add(new \DateInterval('P1Y'));
+            $dateDiff = $startDate->diff($endDate, true);
             switch ($profile->getUnit()) {
                 case BillingFrequencyUnitType::DAYS:
-                    $cyclesCount = floor($date->diff($endDate, true)->days / $profile->getFrequency());
+                    $cyclesCount = floor($dateDiff->days / $profile->getFrequency());
                     break;
                 case BillingFrequencyUnitType::MONTHS:
-                    $cyclesCount = floor($date->diff($endDate, true)->m / $profile->getFrequency());
+                    $months = $dateDiff->y * 12 + $dateDiff->m;
+                    $cyclesCount = floor($months / $profile->getFrequency());
                     break;
                 default:
                     throw new \Exception('Undefined length unit type.');
@@ -190,11 +198,11 @@ class Creator extends Base
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
             $date = $this->calculateScheduledDate(
-                $date,
+                $startDate,
                 $profile->getUnit(),
                 $profile->getFrequency()
             );
-            $neededDates[] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            $neededDates[] = $this->format($date);
         }
         //get already generated dates
         $existDates = array_map(
@@ -205,11 +213,10 @@ class Creator extends Base
         );
         $neededDates = array_diff($neededDates, $existDates);
         //generate only future dates
-        $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         $resultDates = array_filter(
             $neededDates,
-            function ($neededDate) use ($nowDate) {
-                return (strtotime($neededDate) > strtotime($nowDate));
+            function ($neededDate) use ($formattedNowDate) {
+                return (strtotime($neededDate) > strtotime($formattedNowDate));
             }
         );
         $resultDates = array_slice($resultDates, 0, $count);
@@ -341,5 +348,16 @@ class Creator extends Base
     public function getErrors()
     {
         return [];
+    }
+
+    /**
+     * Returns formatted date.
+     *
+     * @param \DateTime $date
+     * @return string
+     */
+    private function format(\DateTime $date)
+    {
+        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 }

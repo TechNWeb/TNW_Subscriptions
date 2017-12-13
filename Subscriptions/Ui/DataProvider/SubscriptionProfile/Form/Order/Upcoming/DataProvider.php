@@ -161,11 +161,16 @@ class DataProvider extends AbstractDataProvider
 
         $formatedEtityId = str_pad($qoute->getId(), 8, '0', STR_PAD_LEFT);
 
+        $shippingDetails = __('N/A');
+        if ($qoute->getShippingDetails()) {
+            $shippingDetails = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
+        }
+
         $quoteData['entity_id'] = $formatedEtityId;
         $quoteData['billing_name'] = $qoute->getBillingFirstname() . ' ' . $qoute->getBillingLastname();
         $quoteData['shipping_name'] = $qoute->getShippingFirstname() . ' ' . $qoute->getShippingLastname();
         $quoteData['scheduled_at'] = $qoute->getScheduledAt();
-        $quoteData['shipping_details'] = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
+        $quoteData['shipping_details'] = $shippingDetails;
         $quoteData['scheduled_at'] = $qoute->getScheduledAt();
         $quoteData['grand_total'] = $grandTotal;
 

@@ -18,6 +18,7 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -595,11 +596,15 @@ class Manager
                 }
             }
             $this->getProfile()->setAddresses($this->populateAddressesData($quote));
-            $this->getProfile()->setProducts($this->productManager->populateProductsData($quote));
+            $profileProducts = $this->productManager->populateProductsData($quote);
+            $this->getProfile()->setProducts($profileProducts);
+            $this->getProfile()->setVisibleProducts($profileProducts);
             $this->saveProfile();
-            $products = $this->productManager->populateChildProductsData($quote, $this->getProfile()->getProducts());
-            if ($products) {
-                $this->getProfile()->setProducts($products);
+            $profileChildProducts = $this->productManager->populateChildProductsData($quote, $profileProducts);
+            if ($profileChildProducts) {
+                $this->getProfile()->setProducts(
+                    array_merge($profileProducts, $profileChildProducts)
+                );
                 $this->saveProfile();
             }
         }

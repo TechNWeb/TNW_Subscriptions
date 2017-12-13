@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\CustomerData;
 
 use Magento\Customer\CustomerData\SectionSourceInterface;
+use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
@@ -20,11 +21,22 @@ class SubscriptionCart implements SectionSourceInterface
     private $session;
 
     /**
-     * @param QuoteSessionInterface $session
+     * Url Builder
+     *
+     * @var UrlInterface
      */
-    public function __construct(QuoteSessionInterface $session)
-    {
+    private $urlBuilder;
+
+    /**
+     * @param QuoteSessionInterface $session
+     * @param UrlInterface $urlBuilder
+     */
+    public function __construct(
+        QuoteSessionInterface $session,
+        UrlInterface $urlBuilder
+    ) {
         $this->session = $session;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -33,12 +45,20 @@ class SubscriptionCart implements SectionSourceInterface
     public function getSectionData()
     {
         $itemsQty = 0;
+        $href = 'javascript:';
         $subQuotes = $this->session->getSubQuotes();
 
         foreach ($subQuotes as $quote) {
             $itemsQty += (int)$quote->getItemsQty();
         }
 
-        return ['itemsCount' => $itemsQty];
+        if ($itemsQty > 0) {
+            $href = $this->urlBuilder->getUrl('tnw_subscriptions/cart/index');
+        }
+
+        return [
+            'itemsCount' => $itemsQty,
+            'href' => $href,
+        ];
     }
 }
