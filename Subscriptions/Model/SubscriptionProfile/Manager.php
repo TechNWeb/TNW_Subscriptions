@@ -596,21 +596,17 @@ class Manager
                 }
             }
             $this->getProfile()->setAddresses($this->populateAddressesData($quote));
-            $this->getProfile()->setProducts($this->productManager->populateProductsData($quote));
+            $profileProducts = $this->productManager->populateProductsData($quote);
+            $this->getProfile()->setProducts($profileProducts);
+            $this->getProfile()->setVisibleProducts($profileProducts);
             $this->saveProfile();
-            $products = $this->productManager->populateChildProductsData($quote, $this->getProfile()->getProducts());
-            if ($products) {
-                $this->getProfile()->setProducts($products);
+            $profileChildProducts = $this->productManager->populateChildProductsData($quote, $profileProducts);
+            if ($profileChildProducts) {
+                $this->getProfile()->setProducts(
+                    array_merge($profileProducts, $profileChildProducts)
+                );
                 $this->saveProfile();
             }
-
-            $visibleProducts = array_filter(
-                $this->getProfile()->getProducts(),
-                function (ProductSubscriptionProfileInterface $product) {
-                    return !$product->getParentId();
-                }
-            );
-            $this->getProfile()->setVisibleProducts($visibleProducts);
         }
 
         return $this;
