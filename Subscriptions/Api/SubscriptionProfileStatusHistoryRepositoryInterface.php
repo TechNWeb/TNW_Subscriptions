@@ -43,7 +43,7 @@ interface SubscriptionProfileStatusHistoryRepositoryInterface
      * Delete SubscriptionProfileStatusHistory
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface $model
      * @return bool true on success
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
      */
     public function delete(
         \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface $model
@@ -54,7 +54,7 @@ interface SubscriptionProfileStatusHistoryRepositoryInterface
      * @param string $id
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
      */
     public function deleteById($id);
 }
