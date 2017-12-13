@@ -177,7 +177,7 @@ class Manager
                     $profileProduct = $this->getItemProfileProduct($item, $products);
                     if ($profileProduct) {
                         $configurableProducts = $this->getConfigurableProducts($item, $profileProduct);
-                        if (!empty($configurableProducts)){
+                        if (!empty($configurableProducts)) {
                             $profileProduct->setChildren($configurableProducts);
                             $childProducts = array_merge($childProducts, $configurableProducts);
                         }
