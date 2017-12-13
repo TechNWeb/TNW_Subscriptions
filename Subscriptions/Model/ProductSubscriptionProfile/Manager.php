@@ -176,10 +176,11 @@ class Manager
                     /** @var ProductSubscriptionProfileInterface $profileProduct */
                     $profileProduct = $this->getItemProfileProduct($item, $products);
                     if ($profileProduct) {
-                        $childProducts = array_merge(
-                            $childProducts,
-                            $this->getConfigurableProducts($item, $profileProduct)
-                        );
+                        $configurableProducts = $this->getConfigurableProducts($item, $profileProduct);
+                        if (!empty($configurableProducts)){
+                            $profileProduct->setChildren($configurableProducts);
+                            $childProducts = array_merge($childProducts, $configurableProducts);
+                        }
                     }
                     break;
                 default:
