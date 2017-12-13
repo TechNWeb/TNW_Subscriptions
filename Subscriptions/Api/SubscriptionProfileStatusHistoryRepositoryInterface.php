@@ -6,8 +6,6 @@
 
 namespace TNW\Subscriptions\Api;
 
-use Magento\Framework\Api\SearchCriteriaInterface;
-
 /**
  * Interface for subscription profile status history repository.
  */
@@ -17,7 +15,7 @@ interface SubscriptionProfileStatusHistoryRepositoryInterface
      * Save SubscriptionProfileStatusHistory
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface $model
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(
         \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface $model
@@ -27,7 +25,7 @@ interface SubscriptionProfileStatusHistoryRepositoryInterface
      * Retrieve SubscriptionProfileStatusHistory
      * @param string $id
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 

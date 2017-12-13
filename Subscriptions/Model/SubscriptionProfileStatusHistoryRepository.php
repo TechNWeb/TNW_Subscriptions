@@ -57,11 +57,6 @@ class SubscriptionProfileStatusHistoryRepository implements SubscriptionProfileS
     private $dataObjectHelper;
 
     /**
-     * @var DataObjectProcessor
-     */
-    private $dataObjectProcessor;
-
-    /**
      * SubscriptionProfileStatusHistoryRepository constructor.
      * @param ResourceSubscriptionProfileStatusHistory $resource
      * @param SubscriptionProfileStatusHistoryFactory $modelFactory
@@ -69,7 +64,6 @@ class SubscriptionProfileStatusHistoryRepository implements SubscriptionProfileS
      * @param SubscriptionProfileStatusHistoryCollectionFactory $collectionFactory
      * @param SubscriptionProfileStatusHistorySearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param DataObjectProcessor $dataObjectProcessor
      */
     public function __construct(
         ResourceSubscriptionProfileStatusHistory $resource,
@@ -77,8 +71,7 @@ class SubscriptionProfileStatusHistoryRepository implements SubscriptionProfileS
         SubscriptionProfileStatusHistoryInterfaceFactory $modelInterfaceFactory,
         SubscriptionProfileStatusHistoryCollectionFactory $collectionFactory,
         SubscriptionProfileStatusHistorySearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor
+        DataObjectHelper $dataObjectHelper
     ) {
         $this->resource = $resource;
         $this->modelFactory = $modelFactory;
@@ -86,7 +79,6 @@ class SubscriptionProfileStatusHistoryRepository implements SubscriptionProfileS
         $this->collectionFactory = $collectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataObjectProcessor = $dataObjectProcessor;
     }
 
     /**
