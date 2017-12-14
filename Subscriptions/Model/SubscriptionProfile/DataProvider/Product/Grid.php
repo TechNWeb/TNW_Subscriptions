@@ -14,7 +14,7 @@ use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 /**
- * Class Grid
+ * Data provider for "Add product" modal product grid.
  */
 class Grid extends ProductDataProvider
 {

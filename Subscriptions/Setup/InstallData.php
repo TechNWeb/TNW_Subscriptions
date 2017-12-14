@@ -51,7 +51,6 @@ class InstallData implements InstallDataInterface
     ) {
         /** @var EavSetup $eavSetup */
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
-
         $this->addProductAttributes($eavSetup);
         $this->addEntitiesAndAttributeGroups($setup);
     }
@@ -73,7 +72,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Available For',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\PurchaseType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\PurchaseType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -102,7 +101,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Is trial offered',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -160,7 +159,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Trial length Unit',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -204,7 +203,7 @@ class InstallData implements InstallDataInterface
                 'system' => 1,
                 'group' => 'Subscription options',
                 'backend_type' => 'decimal',
-                'backend' => 'Magento\Catalog\Model\Product\Attribute\Backend\Price',
+                'backend' => \Magento\Catalog\Model\Product\Attribute\Backend\Price::class,
                 'frontend_input' => 'price',
                 'sort_order' => 50,
             ]
@@ -235,7 +234,7 @@ class InstallData implements InstallDataInterface
                 'system' => 1,
                 'group' => 'Subscription options',
                 'backend_type' => 'decimal',
-                'backend' => 'TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount',
+                'backend' => \TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount::class,
                 'frontend_input' => 'price',
                 'frontend_class' => 'discount-less-then-price',
                 'sort_order' => 100,
@@ -252,7 +251,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Trial start date',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -281,7 +280,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Start date',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -310,7 +309,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Lock product price',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -339,7 +338,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Offer flat discount',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -368,7 +367,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Discount type',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\DiscountType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\DiscountType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -397,7 +396,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Unlock preset qty',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -421,6 +420,7 @@ class InstallData implements InstallDataInterface
      * Creates new eav entities and attribute groups.
      *
      * @param ModuleDataSetupInterface $setup
+     * @return void
      */
     private function addEntitiesAndAttributeGroups(ModuleDataSetupInterface $setup)
     {
