@@ -184,7 +184,6 @@ class InstallData implements InstallDataInterface
             Attribute::SUBSCRIPTION_TRIAL_PRICE,
             [
                 'type' => 'varchar',
-                'backend' => '',
                 'frontend' => '',
                 'label' => 'Trial price',
                 'input' => 'text',
@@ -205,7 +204,7 @@ class InstallData implements InstallDataInterface
                 'system' => 1,
                 'group' => 'Subscription options',
                 'backend_type' => 'decimal',
-                'backend_model' => 'Magento\Catalog\Model\Product\Attribute\Backend\Price',
+                'backend' => 'Magento\Catalog\Model\Product\Attribute\Backend\Price',
                 'frontend_input' => 'price',
                 'sort_order' => 50,
             ]
@@ -216,7 +215,6 @@ class InstallData implements InstallDataInterface
             Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
             [
                 'type' => 'varchar',
-                'backend' => '',
                 'frontend' => '',
                 'label' => 'Discount amount',
                 'input' => 'text',
@@ -226,7 +224,7 @@ class InstallData implements InstallDataInterface
                 'visible' => true,
                 'required' => true,
                 'user_defined' => true,
-                'default' => null,
+                'default' => '10',
                 'searchable' => false,
                 'filterable' => false,
                 'comparable' => false,
@@ -237,7 +235,7 @@ class InstallData implements InstallDataInterface
                 'system' => 1,
                 'group' => 'Subscription options',
                 'backend_type' => 'decimal',
-                'backend_model' => 'TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount',
+                'backend' => 'TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount',
                 'frontend_input' => 'price',
                 'frontend_class' => 'discount-less-then-price',
                 'sort_order' => 100,
