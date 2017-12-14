@@ -20,6 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileStatusHistory;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -871,6 +872,154 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'after'     => ProductSubscriptionProfileInterface::ID
                 ]
             );
+        }
+
+        if (version_compare($context->getVersion(), "2.0.39", "<")) {
+            #region Subscription profile status history table
+            $tableName = SubscriptionProfileStatusHistory::TABLE;
+            if (!$setup->tableExists($setup->getTable($tableName))) {
+                $tableTnwSubscriptionProfileStatusHistory = $setup->getConnection()
+                    ->newTable($setup->getTable($tableName))
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::ID,
+                        Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'identity' => true,
+                            'unsigned' => true,
+                            'primary' => true,
+                            'nullable' => false
+                        ]
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::SUBSCRIPTION_PROFILE_ID,
+                        Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'unsigned' => true,
+                            'nullable' => false
+                        ]
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::STATUS_OLD,
+                        Table::TYPE_SMALLINT,
+                        null,
+                        ['nullable' => true],
+                        'Old status'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::STATUS_NEW,
+                        Table::TYPE_SMALLINT,
+                        null,
+                        ['nullable' => false],
+                        'New status'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::USER_ID,
+                        \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'nullable' => true,
+                            'unsigned' => true,
+                            'default' => null
+                        ],
+                        'User id who changed status'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::CUSTOMER_ID,
+                        \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                        null,
+                        [
+                            'nullable' => true,
+                            'unsigned' => true,
+                            'default' => null
+                        ],
+                        'Customer id who changed status'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::CHANGED_AT,
+                        Table::TYPE_DATETIME,
+                        null,
+                        ['nullable' => false],
+                        'Changed at'
+                    )
+                    ->addColumn(
+                        SubscriptionProfileStatusHistory::CHANGED_AT_MICRO,
+                        Table::TYPE_BIGINT,
+                        null,
+                        [
+                            'nullable' => false,
+                            'unsigned' => true,
+                            'default' => 0,
+                        ],
+                        'Changed at microseconds'
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::SUBSCRIPTION_PROFILE_ID],
+                            AdapterInterface::INDEX_TYPE_UNIQUE
+                        ),
+                        SubscriptionProfileStatusHistory::SUBSCRIPTION_PROFILE_ID
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::STATUS_OLD]
+                        ),
+                        SubscriptionProfileStatusHistory::STATUS_OLD
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::STATUS_NEW]
+                        ),
+                        SubscriptionProfileStatusHistory::STATUS_NEW
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::USER_ID]
+                        ),
+                        SubscriptionProfileStatusHistory::USER_ID
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::CUSTOMER_ID]
+                        ),
+                        SubscriptionProfileStatusHistory::CUSTOMER_ID
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::CHANGED_AT]
+                        ),
+                        SubscriptionProfileStatusHistory::CHANGED_AT
+                    )
+                    ->addIndex(
+                        $setup->getIdxName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            [SubscriptionProfileStatusHistory::CHANGED_AT_MICRO]
+                        ),
+                        SubscriptionProfileStatusHistory::CHANGED_AT_MICRO
+                    )
+                    ->addForeignKey(
+                        $setup->getConnection()->getForeignKeyName(
+                            SubscriptionProfileStatusHistory::TABLE,
+                            SubscriptionProfileStatusHistory::SUBSCRIPTION_PROFILE_ID,
+                            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                            SubscriptionProfile::ID
+                        ),
+                        SubscriptionProfileStatusHistory::SUBSCRIPTION_PROFILE_ID,
+                        SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                        SubscriptionProfile::ID,
+                        AdapterInterface::FK_ACTION_CASCADE
+                    );
+
+                $setup->getConnection()->createTable($tableTnwSubscriptionProfileStatusHistory);
+            }
+            #endregion Subscription profile status history table
         }
 
         $setup->endSetup();

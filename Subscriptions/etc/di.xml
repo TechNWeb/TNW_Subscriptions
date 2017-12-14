@@ -101,6 +101,13 @@
                 type="TNW\Subscriptions\Model\Backend\UrlBuilder" />
     <preference for="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatterInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter" />
+    <preference for="TNW\Subscriptions\Api\SubscriptionProfileStatusHistoryRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfileStatusHistoryRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfileStatusHistory"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistorySearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
