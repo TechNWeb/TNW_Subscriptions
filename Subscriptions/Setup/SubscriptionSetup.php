@@ -8,6 +8,7 @@
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Eav\Setup\EavSetup;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -27,89 +28,191 @@ class SubscriptionSetup extends EavSetup
                 'entity_model' => \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile::class,
                 'table' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
                 'attributes' => [
-                    'customer_id' => [
+                    SubscriptionProfile::CUSTOMER_ID => [
                         'type' => 'static',
                         'label' => 'Customer Id',
                         'required' => false,
                         'sort_order' => 10,
                         'visible' => true,
                     ],
-                    'billing_frequency_id' => [
+                    SubscriptionProfile::BILLING_FREQUENCY_ID => [
                         'type' => 'static',
                         'label' => 'Billing Frequency Id',
                         'required' => false,
                         'sort_order' => 20,
                         'visible' => true,
                     ],
-                    'label' => [
-                        'type' => 'static',
-                        'label' => 'Label',
-                        'required' => false,
-                        'sort_order' => 30,
-                        'visible' => true,
-                    ],
-                    'unit' => [
+                    SubscriptionProfile::UNIT => [
                         'type' => 'static',
                         'label' => 'Unit',
                         'required' => false,
                         'sort_order' => 30,
                         'visible' => true,
                     ],
-                    'website_id' => [
+                    SubscriptionProfile::WEBSITE_ID => [
                         'type' => 'static',
                         'label' => 'Website Id',
                         'required' => false,
-                        'sort_order' => 30,
+                        'sort_order' => 40,
                         'visible' => true,
                     ],
-                    'status' => [
+                    SubscriptionProfile::STATUS => [
                         'type' => 'static',
                         'label' => 'Status',
                         'required' => false,
-                        'sort_order' => 30,
+                        'sort_order' => 50,
                         'visible' => true,
                     ],
-                    'frequency' => [
+                    SubscriptionProfile::FREQUENCY => [
                         'type' => 'static',
                         'label' => 'Frequency',
                         'required' => false,
-                        'sort_order' => 30,
+                        'sort_order' => 60,
                         'visible' => true,
                     ],
-                    'engine_code' => [
+                    SubscriptionProfile::ENGINE_CODE => [
                         'type' => 'static',
                         'label' => 'Engine Code',
                         'required' => false,
-                        'sort_order' => 30,
+                        'sort_order' => 70,
                         'visible' => true,
                     ],
-                    'shipping_address_id' => [
+                    SubscriptionProfile::START_DATE => [
                         'type' => 'static',
-                        'label' => 'Shipping Address Id',
+                        'label' => 'Start Date',
+                        'input' => 'date',
                         'required' => false,
-                        'sort_order' => 30,
                         'visible' => true,
+                        'sort_order' => 80
                     ],
-                    'billing_address_id' => [
+                    SubscriptionProfile::TRIAL_START_DATE => [
                         'type' => 'static',
-                        'label' => 'Billing Address Id',
+                        'label' => 'Trial Start Date',
+                        'input' => 'date',
                         'required' => false,
-                        'sort_order' => 30,
                         'visible' => true,
+                        'sort_order' => 90,
                     ],
-                    'created_at' => [
+                    SubscriptionProfile::TRIAL_LENGTH => [
+                        'type' => 'static',
+                        'label' => 'Trial Length',
+                        'input' => 'text',
+                        'required' => false,
+                        'frontend_class' => 'validate-number',
+                        'sort_order' => 100,
+                    ],
+                    SubscriptionProfile::TRIAL_LENGTH_UNIT => [
+                        'type' => 'static',
+                        'label' => 'Trial Length Unit',
+                        'input' => 'select',
+                        'required' => false,
+                        'source' => \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::class,
+                        'sort_order' => 110,
+                    ],
+                    SubscriptionProfile::TERM => [
+                        'type' => 'static',
+                        'label' => 'Term',
+                        'input' => 'text',
+                        'required' => false,
+                        'frontend_class' => 'validate-number',
+                        'sort_order' => 120,
+                    ],
+                    SubscriptionProfile::TOTAL_BILLING_CYCLES => [
+                        'type' => 'static',
+                        'label' => 'Total billing cycles',
+                        'input' => 'text',
+                        'required' => false,
+                        'frontend_class' => 'validate-number',
+                        'sort_order' => 130,
+                    ],
+                    SubscriptionProfile::SHIPPING_METHOD => [
+                        'type' => 'static',
+                        'label' => 'Shipping Method',
+                        'input' => 'text',
+                        'required' => true,
+                        'frontend_class' => 'validate-length maximum-length-40',
+                        'sort_order' => 140,
+                    ],
+                    SubscriptionProfile::SHIPPING_DESCRIPTION => [
+                        'type' => 'static',
+                        'label' => 'Shipping Description',
+                        'input' => 'text',
+                        'required' => false,
+                        'frontend_class' => 'validate-length maximum-length-255',
+                        'sort_order' => 150,
+                    ],
+                    SubscriptionProfile::PROFILE_CURRENCY_CODE => [
+                        'type' => 'static',
+                        'label' => 'Profile currency code',
+                        'input' => 'text',
+                        'required' => true,
+                        'frontend_class' => 'validate-length maximum-length-255',
+                        'sort_order' => 160,
+                    ],
+                    SubscriptionProfile::IS_VIRTUAL => [
+                        'type' => 'static',
+                        'label' => 'Is virtual',
+                        'sort_order' => 170,
+                        'input' => 'select',
+                        'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                        'required' => true,
+                    ],
+                    SubscriptionProfile::TOKEN_HASH => [
+                        'type' => 'static',
+                        'label' => 'Token hash',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 180
+                    ],
+                    SubscriptionProfile::PAYMENT_ADDITIONAL_INFO => [
+                        'type' => 'static',
+                        'label' => 'Payment Additional Info',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 190
+                    ],
+                    SubscriptionProfile::GENERATE_QUOTES_STATE => [
+                        'type' => 'static',
+                        'label' => 'Generate quotes state',
+                        'sort_order' => 200,
+                        'input' => 'select',
+                        'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                        'required' => true,
+                    ],
+                    SubscriptionProfile::NEED_RECOLLECT => [
+                        'type' => 'static',
+                        'label' => 'Need Recollect',
+                        'sort_order' => 210,
+                        'input' => 'select',
+                        'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                        'required' => true,
+                    ],
+                    SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE => [
+                        'type' => 'static',
+                        'label' => 'Cancel before next billing cycle',
+                        'sort_order' => 220,
+                        'input' => 'bool',
+                        'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                        'required' => false,
+                        'default' => 0,
+                    ],
+                    SubscriptionProfile::CREATED_AT => [
                         'type' => 'static',
                         'label' => 'Created At',
+                        'input' => 'date',
                         'required' => false,
-                        'sort_order' => 30,
-                        'visible' => true,
+                        'sort_order' => 230,
+                        'visible' => false,
                     ],
-                    'updated_at' => [
+                    SubscriptionProfile::UPDATED_AT => [
                         'type' => 'static',
                         'label' => 'Updated At',
+                        'input' => 'date',
                         'required' => false,
-                        'sort_order' => 30,
-                        'visible' => true,
+                        'sort_order' => 240,
+                        'visible' => false,
                     ],
                 ],
             ],
@@ -117,118 +220,162 @@ class SubscriptionSetup extends EavSetup
                 'entity_model' => \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class,
                 'table' => \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY_TABLE,
                 'attributes' => [
-                    'price' => [
+                    ProductSubscriptionProfile::PARENT_ID => [
+                        'type' => 'static',
+                        'label' => 'Parent id',
+                        'input' => 'int',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 10,
+                    ],
+                    ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID => [
+                        'type' => 'static',
+                        'label' => 'Subscription Profile Id',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 20,
+                    ],
+                    ProductSubscriptionProfile::MAGENTO_PRODUCT_ID => [
+                        'type' => 'static',
+                        'label' => 'Magento Product Id',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 30,
+                    ],
+                    ProductSubscriptionProfile::NAME => [
+                        'type' => 'static',
+                        'label' => 'Magento Product Name',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 40,
+                    ],
+                    ProductSubscriptionProfile::SKU => [
+                        'type' => 'static',
+                        'label' => 'Magento Product SKU',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 50,
+                    ],
+                    ProductSubscriptionProfile::TNW_SUBSCR_UNLOCK_PRESET_QTY => [
+                        'type' => 'static',
+                        'label' => 'Magento Product subscr unlock preset qty',
+                        'input' => 'int',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 60,
+                    ],
+                    ProductSubscriptionProfile::PRICE => [
                         'type' => 'static',
                         'label' => 'Price',
                         'input' => 'price',
                         'required' => true,
                         'frontend_class' => 'validate-number',
-                        'sort_order' => 10,
+                        'sort_order' => 70,
                     ],
-                    'initial_fee' => [
+                    ProductSubscriptionProfile::INITIAL_FEE => [
                         'type' => 'static',
                         'label' => 'Initial Fee',
                         'input' => 'price',
                         'required' => true,
                         'frontend_class' => 'validate-number',
-                        'sort_order' => 20,
+                        'sort_order' => 80,
                     ],
-                    'qty' => [
+                    ProductSubscriptionProfile::QTY => [
                         'type' => 'static',
                         'label' => 'Qty',
                         'input' => 'text',
                         'required' => true,
                         'frontend_class' => 'validate-number',
-                        'sort_order' => 30,
+                        'sort_order' => 90,
                     ],
-                    'purchase_type' => [
+                    ProductSubscriptionProfile::PURCHASE_TYPE => [
                         'type' => 'static',
                         'label' => 'Purchase Type',
                         'input' => 'select',
                         'source' => \TNW\Subscriptions\Model\Config\Source\PurchaseType::class,
                         'required' => true,
-                        'sort_order' => 40,
+                        'sort_order' => 100,
                     ],
-                    'trial_status' => [
+                    ProductSubscriptionProfile::TRIAL_STATUS => [
                         'type' => 'static',
                         'label' => 'Trial Status',
                         'input' => 'select',
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => false,
-                        'sort_order' => 50,
+                        'sort_order' => 110,
                     ],
-                    'trial_length' => [
-                        'type' => 'static',
-                        'label' => 'Trial Length',
-                        'input' => 'text',
-                        'required' => false,
-                        'frontend_class' => 'validate-number',
-                        'sort_order' => 60,
-                    ],
-                    'trial_length_unit' => [
-                        'type' => 'static',
-                        'label' => 'Trial Length Unit',
-                        'input' => 'select',
-                        'required' => false,
-                        'source' => \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::class,
-                        'sort_order' => 70,
-                    ],
-                    'trial_price' => [
+                    ProductSubscriptionProfile::TRIAL_PRICE => [
                         'type' => 'static',
                         'label' => 'Trial Price',
                         'input' => 'price',
                         'required' => false,
                         'frontend_class' => 'validate-number',
-                        'sort_order' => 80,
+                        'sort_order' => 120,
                     ],
-                    'trial_start_date' => [
-                        'type' => 'static',
-                        'label' => 'Trial Start Date',
-                        'input' => 'select',
-                        'required' => false,
-                        'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
-                        'sort_order' => 90,
-                    ],
-                    'start_date' => [
-                        'type' => 'static',
-                        'label' => 'Start Date',
-                        'input' => 'select',
-                        'required' => false,
-                        'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
-                        'sort_order' => 100,
-                    ],
-                    'lock_product_price_status' => [
+                    ProductSubscriptionProfile::LOCK_PRODUCT_PRICE_STATUS => [
                         'type' => 'static',
                         'label' => 'Lock product price',
                         'input' => 'select',
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => true,
-                        'sort_order' => 110,
+                        'sort_order' => 130,
                     ],
-                    'offer_flat_discount_status' => [
+                    ProductSubscriptionProfile::OFFER_FLAT_DISCOUNT_STATUS => [
                         'type' => 'static',
                         'label' => 'Offer flat discount',
                         'input' => 'select',
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => true,
-                        'sort_order' => 110,
+                        'sort_order' => 140,
                     ],
-                    'discount_amount' => [
+                    ProductSubscriptionProfile::DISCOUNT_AMOUNT => [
                         'type' => 'static',
                         'label' => 'Discount amount',
                         'input' => 'price',
                         'required' => false,
                         'frontend_class' => 'validate-number',
-                        'sort_order' => 120,
+                        'sort_order' => 150,
                     ],
-                    'discount_type' => [
+                    ProductSubscriptionProfile::DISCOUNT_TYPE => [
                         'type' => 'static',
                         'label' => 'Discount type',
                         'input' => 'select',
                         'required' => false,
                         'source' => \TNW\Subscriptions\Model\Config\Source\DiscountType::class,
-                        'sort_order' => 130,
+                        'sort_order' => 160,
                     ],
+                    ProductSubscriptionProfile::NEED_RECOLLECT => [
+                        'type' => 'static',
+                        'label' => 'Need Recollect',
+                        'sort_order' => 170,
+                        'input' => 'select',
+                        'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                        'required' => true,
+                    ],
+                    ProductSubscriptionProfile::CUSTOM_OPTIONS => [
+                        'type' => 'static',
+                        'label' => 'Custom options',
+                        'input' => 'text',
+                        'required' => false,
+                        'visible' => false,
+                        'sort_order' => 180,
+                    ],
+                    ProductSubscriptionProfile::CREATED_AT => [
+                        'type' => 'static',
+                        'input' => 'date',
+                        'sort_order' => 190,
+                        'visible' => false
+                    ],
+                    ProductSubscriptionProfile::UPDATED_AT => [
+                        'type' => 'static',
+                        'input' => 'date',
+                        'sort_order' => 200,
+                        'visible' => false
+                    ]
                 ],
             ],
         ];

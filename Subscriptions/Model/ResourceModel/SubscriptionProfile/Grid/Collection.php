@@ -93,19 +93,20 @@ class Collection extends SearchResult
         );
 
         $this->getSelect()->join(
-            ['frequency' => BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE],
+            ['frequency' =>
+                $this->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
             'main_table.billing_frequency_id = frequency.id',
             ['frequency_label' => 'frequency.label']
         )->joinLeft(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
             ['next_billing_cycle_date' => 'relation.scheduled_at']
         )->joinLeft(
-            ['quotes' => 'quote'],
+            ['quotes' => $this->getTable('quote')],
             'quotes.entity_id = relation.magento_quote_id',
             ['grand_total' => 'quotes.grand_total']
         )->join(
-            ['customer' => $connection->getTableName('customer_entity')],
+            ['customer' => $this->getTable('customer_entity')],
             'customer.entity_id = main_table.customer_id',
             [
                 'customer_name' => $connection->getConcatSql(
@@ -131,7 +132,7 @@ class Collection extends SearchResult
     {
         $result = $this->getConnection()->select();
         $result->from(
-            [SubscriptionProfileOrderInterface::MAIN_TABLE],
+            [$this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             [SubscriptionProfileOrderInterface::ID]
         )->where(
             'main_table.entity_id=' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID

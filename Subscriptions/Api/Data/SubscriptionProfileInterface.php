@@ -37,10 +37,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const IS_VIRTUAL = 'is_virtual';
     const TOKEN_HASH = 'token_hash';
     const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
-    /**
-     * @deprecated use GENERATE_QUOTES_STATE
-     */
-    const NEED_GENERATE_QUOTES = 'need_generate_quotes';
     const GENERATE_QUOTES_STATE = 'generate_quotes_state';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';

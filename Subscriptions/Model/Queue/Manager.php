@@ -208,7 +208,7 @@ class Manager
             /** @var Collection $collection */
             $collection = $this->collectionFactory->create();
             $collection->getConnection()->insertOnDuplicate(
-                Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                $collection->getTable(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE),
                 $fields,
                 [Queue::MESSAGE, Queue::CREATED_AT, Queue::UPDATED_AT]
             );
@@ -399,7 +399,7 @@ class Manager
                 ]
             )
             ->join(
-                ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+                ['profile' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
                 'relation.subscription_profile_id = profile.entity_id',
                 [
                     SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,

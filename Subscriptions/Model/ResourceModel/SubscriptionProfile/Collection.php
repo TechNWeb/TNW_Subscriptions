@@ -44,7 +44,7 @@ class Collection extends AbstractCollection
                     'total' => new \Zend_Db_Expr('sum(sales_order.' . OrderInterface::GRAND_TOTAL . ')'),
                 ]
             )->join(
-                $this->getTable('sales_order'),
+                ['sales_order' => $this->getTable('sales_order')],
                 'sales_order.entity_id = profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                 []
             )->where('profile_order.' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . ' in (?)', $ids)

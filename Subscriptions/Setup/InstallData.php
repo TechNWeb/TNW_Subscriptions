@@ -14,6 +14,8 @@ use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Catalog\Model\Product;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 class InstallData implements InstallDataInterface
 {
@@ -23,17 +25,25 @@ class InstallData implements InstallDataInterface
     private $eavSetupFactory;
 
     /**
-     * Constructor
-     *
-     * @param \Magento\Eav\Setup\EavSetupFactory $eavSetupFactory
+     * @var SubscriptionSetupFactory
      */
-    public function __construct(EavSetupFactory $eavSetupFactory)
-    {
+    private $subscriptionSetupFactory;
+
+    /**
+     * InstallData constructor.
+     * @param EavSetupFactory $eavSetupFactory
+     * @param SubscriptionSetupFactory $subscriptionSetupFactory
+     */
+    public function __construct(
+        EavSetupFactory $eavSetupFactory,
+        SubscriptionSetupFactory $subscriptionSetupFactory
+    ) {
         $this->eavSetupFactory = $eavSetupFactory;
+        $this->subscriptionSetupFactory = $subscriptionSetupFactory;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function install(
         ModuleDataSetupInterface $setup,
@@ -41,7 +51,18 @@ class InstallData implements InstallDataInterface
     ) {
         /** @var EavSetup $eavSetup */
         $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
+        $this->addProductAttributes($eavSetup);
+        $this->addEntitiesAndAttributeGroups($setup);
+    }
 
+    /**
+     * Adds new products attributes.
+     *
+     * @param $eavSetup
+     * @return void
+     */
+    private function addProductAttributes($eavSetup)
+    {
         $eavSetup->addAttribute(
             Product::ENTITY,
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
@@ -52,7 +73,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Available For',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\PurchaseType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\PurchaseType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -62,9 +83,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 10,
@@ -81,7 +102,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Is trial offered',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -91,9 +112,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 20,
@@ -120,9 +141,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 30,
@@ -139,7 +160,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Trial length Unit',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -149,9 +170,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 40,
@@ -163,7 +184,6 @@ class InstallData implements InstallDataInterface
             Attribute::SUBSCRIPTION_TRIAL_PRICE,
             [
                 'type' => 'varchar',
-                'backend' => '',
                 'frontend' => '',
                 'label' => 'Trial price',
                 'input' => 'text',
@@ -171,19 +191,54 @@ class InstallData implements InstallDataInterface
                 'source' => '',
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
-                'required' => true,
+                'required' => false,
                 'user_defined' => true,
                 'default' => null,
                 'searchable' => false,
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
+                'backend_type' => 'decimal',
+                'backend' => \Magento\Catalog\Model\Product\Attribute\Backend\Price::class,
+                'frontend_input' => 'price',
                 'sort_order' => 50,
+            ]
+        );
+
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            [
+                'type' => 'varchar',
+                'frontend' => '',
+                'label' => 'Discount amount',
+                'input' => 'text',
+                'class' => '',
+                'source' => '',
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => true,
+                'user_defined' => true,
+                'default' => '10',
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => true,
+                'unique' => false,
+                'apply_to' => 'simple,virtual,downloadable,configurable',
+                'system' => 1,
+                'group' => 'Subscription options',
+                'backend_type' => 'decimal',
+                'backend' => \TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount::class,
+                'frontend_input' => 'price',
+                'frontend_class' => 'discount-less-then-price',
+                'sort_order' => 100,
             ]
         );
 
@@ -197,7 +252,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Trial start date',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -207,9 +262,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 60,
@@ -226,7 +281,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Start date',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\StartDateType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\StartDateType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -236,9 +291,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 70,
@@ -255,7 +310,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Lock product price',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -265,9 +320,9 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 80,
@@ -284,7 +339,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Offer flat discount',
                 'input' => 'boolean',
                 'class' => '',
-                'source' => 'Magento\Eav\Model\Entity\Attribute\Source\Boolean',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -294,41 +349,12 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 90,
-            ]
-        );
-
-        $eavSetup->addAttribute(
-            Product::ENTITY,
-            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
-            [
-                'type' => 'varchar',
-                'backend' => '',
-                'frontend' => '',
-                'label' => 'Discount amount',
-                'input' => 'text',
-                'class' => '',
-                'source' => '',
-                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
-                'visible' => true,
-                'required' => true,
-                'user_defined' => true,
-                'default' => null,
-                'searchable' => false,
-                'filterable' => false,
-                'comparable' => false,
-                'visible_on_front' => false,
-                'used_in_product_listing' => false,
-                'unique' => false,
-                'apply_to' => '',
-                'system' => 1,
-                'group' => 'Subscription options',
-                'sort_order' => 100,
             ]
         );
 
@@ -342,7 +368,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Discount type',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'TNW\Subscriptions\Model\Config\Source\DiscountType',
+                'source' => \TNW\Subscriptions\Model\Config\Source\DiscountType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
                 'required' => true,
@@ -352,14 +378,65 @@ class InstallData implements InstallDataInterface
                 'filterable' => false,
                 'comparable' => false,
                 'visible_on_front' => false,
-                'used_in_product_listing' => false,
+                'used_in_product_listing' => true,
                 'unique' => false,
-                'apply_to' => '',
+                'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 110,
             ]
         );
 
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Unlock preset qty',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => true,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => true,
+                'unique' => false,
+                'apply_to' => 'simple,virtual,downloadable,configurable',
+                'system' => 1,
+                'group' => 'Subscription options',
+                'sort_order' => 120,
+            ]
+        );
+    }
+
+    /**
+     * Creates new eav entities and attribute groups.
+     *
+     * @param ModuleDataSetupInterface $setup
+     * @return void
+     */
+    private function addEntitiesAndAttributeGroups(ModuleDataSetupInterface $setup)
+    {
+        /** @var SubscriptionSetup $subscriptionSetup */
+        $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+        $subscriptionSetup->installEntities();
+        $subscriptionSetup->addAttributeGroup(
+            SubscriptionProfile::ENTITY,
+            'Default',
+            'Additional information'
+        );
+        $subscriptionSetup->addAttributeGroup(
+            ProductSubscriptionProfile::ENTITY,
+            'Default',
+            'Additional information'
+        );
     }
 }

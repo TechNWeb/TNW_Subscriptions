@@ -54,7 +54,7 @@ class DataProvider extends AbstractDataProvider
         if ($profileId) {
             $this->getCollection()->addFieldToFilter('relation.subscription_profile_id', $profileId);
             $this->getCollection()->getSelect()->join(
-                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                ['relation' => $this->getCollection()->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                 []
             );

@@ -260,7 +260,7 @@ class ProfitCalculator
             )->where(SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . '= ?', $subscriptionProfile->getId());
         if ($type === self::AS_OF_TODAY) {
             $sql->join(
-                'sales_order', 'sales_order.entity_id = '
+                ['sales_order' => $resource->getTable('sales_order')], 'sales_order.entity_id = '
                 . $resource->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)
                 . '.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                 []
