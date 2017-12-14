@@ -17,7 +17,7 @@ use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Class SubscriptionProductView config.
+ * Class subscription product view config is available subscription.
  */
 class SubscriptionProductView
 {
@@ -63,7 +63,7 @@ class SubscriptionProductView
     /**
      * Get "Enable Subscriptions" config value for current website
      *
-     * @param $product
+     * @param ProductInterface $product
      * @return bool
      */
     public function isSubscribeAvailable($product)
@@ -92,7 +92,7 @@ class SubscriptionProductView
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return bool
      */
     public function isOnlySubscribePurchase(ProductInterface $product)
@@ -125,7 +125,7 @@ class SubscriptionProductView
     /**
      * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return bool
      */
     public function IsOneTimeAndSubscribePurchase(ProductInterface $product)
@@ -158,7 +158,7 @@ class SubscriptionProductView
     /**
      * Return subscription purchase type.
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return int|null
      */
     private function getProductSubscriptionPurchaseType(ProductInterface $product)
@@ -175,25 +175,22 @@ class SubscriptionProductView
     private function getProductSubscriptionPurchaseTypeByIds(array $productsIds)
     {
         $result = [];
-
         $productsCollection = $this->productCollectionFactory->create();
         $productsCollection->addAttributeToSelect(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
         $productsCollection->addFieldToFilter('entity_id', ['in' => $productsIds]);
-
         foreach ($productsCollection as $product) {
             $result[$product->getId()] = [
                 'is_salable' => $product->getIsSalable(),
                 Attribute::SUBSCRIPTION_PURCHASE_TYPE => $this->getProductSubscriptionPurchaseType($product)
             ];
         }
-
         return $result;
     }
 
     /**
      * Returns list of product billing frequencies.
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return array
      */
     private function getProductBillingFrequencies(ProductInterface $product)

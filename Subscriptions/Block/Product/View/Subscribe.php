@@ -100,7 +100,7 @@ class Subscribe extends View
     /**
      * Retrieve current product model.
      *
-     * @return ProductInterface|Product
+     * @return ProductInterface
      */
     public function getProduct()
     {

@@ -12,7 +12,7 @@ use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 
 /**
- *  Subscription Product list.
+ *  Subscription product list action buttons.
  */
 class ListProductButtons extends Template
 {
@@ -40,11 +40,11 @@ class ListProductButtons extends Template
     /**
      * Retrieve current product.
      *
-     * @return ProductInterface|Product|null
+     * @return ProductInterface|null
      */
     public function getCurrentProduct()
     {
-        return $this->getProduct() ? $this->getProduct() : null;
+        return $this->getProduct() ?: null;
     }
 
     /**
@@ -54,7 +54,7 @@ class ListProductButtons extends Template
      */
     public function getCurrentPosForActions()
     {
-        return $this->getPos() ? $this->getPos() : null;
+        return $this->getPos() ?: null;
     }
 
     /**
@@ -64,7 +64,7 @@ class ListProductButtons extends Template
      */
     public function getCurrentViewMode()
     {
-        return $this->getViewMode() ? $this->getViewMode() : "";
+        return $this->getViewMode() ?: "";
     }
 
     /**
@@ -74,7 +74,7 @@ class ListProductButtons extends Template
      */
     public function getCurrentPosition()
     {
-        return $this->getPosition() ? $this->getPosition() : "";
+        return $this->getPosition() ?: "";
     }
 
     /**
@@ -84,13 +84,13 @@ class ListProductButtons extends Template
      */
     public function getCurrentPostParams()
     {
-        return $this->getPostParams() ? $this->getPostParams() : [];
+        return $this->getPostParams() ?: [];
     }
 
     /**
      * Get "Enable Subscriptions" config value for current website.
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return bool
      */
     public function isSubscribeAvailable(ProductInterface $product)
@@ -101,7 +101,7 @@ class ListProductButtons extends Template
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
-     * @param ProductInterface|Product $product
+     * @param ProductInterface $product
      * @return bool
      */
     public function isOnlySubscribePurchase(ProductInterface $product)

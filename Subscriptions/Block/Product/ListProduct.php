@@ -27,7 +27,8 @@ class ListProduct extends OrigListProduct
      * @param String $pos
      * @param String $viewMode
      * @param String $position
-     * @param [] $postParams
+     * @param array $postParams
+     * @return void
      */
     public function prepareParamsToButtonsBlock($product, $pos, $viewMode, $position, $postParams)
     {
@@ -50,7 +51,7 @@ class ListProduct extends OrigListProduct
     public function getButtonsHtml()
     {
         $buyButtonsBlock = $this->getLayout()->createBlock(
-            'TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons',
+            \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons::class,
             'category.products.list_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
             $this->postParamsToButtonsBlock
         )->setTemplate('TNW_Subscriptions::product/list/buttons.phtml');
