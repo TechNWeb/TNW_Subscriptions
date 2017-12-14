@@ -1,0 +1,233 @@
+<?php
+/**
+ *  Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ *  See TNW_LICENSE.txt for license details.
+ *
+ */
+
+namespace TNW\Subscriptions\Model\Config\Product;
+
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Framework\App\RequestInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
+use TNW\Subscriptions\Model\Product\Attribute;
+
+/**
+ * Class SubscriptionProductView config.
+ */
+class SubscriptionProductView
+{
+    /**
+     * Subscription module config
+     *
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * Modal form for adding single product to subscription
+     *
+     * @var FrequencyOptionRepository
+     */
+    private $frequencyOptionRepository;
+
+    /**
+     * Product collection.
+     *
+     * @var ProductCollectionFactory
+     */
+    private $productCollectionFactory;
+
+    /**
+     * @param Config $config
+     * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param RequestInterface $request
+     * @param ProductCollectionFactory $productCollectionFactory
+     */
+    public function __construct(
+        Config $config,
+        FrequencyOptionRepository $frequencyOptionRepository,
+        RequestInterface $request,
+        ProductCollectionFactory $productCollectionFactory
+    ) {
+        $this->config = $config;
+        $this->frequencyOptionRepository = $frequencyOptionRepository;
+        $this->request = $request;
+        $this->productCollectionFactory = $productCollectionFactory;
+    }
+
+    /**
+     * Get "Enable Subscriptions" config value for current website
+     *
+     * @param $product
+     * @return bool
+     */
+    public function isSubscribeAvailable($product)
+    {
+        return
+            $this->config->isSubscriptionsActiveCurrent()
+            && !empty($this->getProductBillingFrequencies($product))
+            && $this->getRequest()->getRouteName() !== 'checkout';
+    }
+
+    /**
+     * Get "Enable Subscriptions" config value for current website by product id.
+     *
+     * @param int $productId
+     * @return bool
+     */
+    public function isSubscribeAvailableById($productId)
+    {
+        return
+            $this->config->isSubscriptionsActiveCurrent()
+            && !empty($this->getProductBillingFrequenciesById($productId))
+            && $this->getRequest()->getRouteName() !== 'checkout';
+    }
+
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" only.
+     *
+     * @param ProductInterface|Product $product
+     * @return bool
+     */
+    public function isOnlySubscribePurchase(ProductInterface $product)
+    {
+        return ($this->getProductSubscriptionPurchaseType($product) == PurchaseType::RECURRING_PURCHASE_TYPE)
+            && $product->getIsSalable();
+    }
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" only for products ids.
+     * Retrieve array like product_id => boolean
+     *
+     * @param array $productPreset
+     * @return array
+     */
+    public function isOnlySubscribePurchaseByIds(array $productPreset)
+    {
+        $result = [];
+        $productIds = array_keys($productPreset);
+        foreach ($this->getProductSubscriptionPurchaseTypeByIds($productIds) as $key => $element) {
+            $result[$key] = false;
+            if ($element[Attribute::SUBSCRIPTION_PURCHASE_TYPE] == PurchaseType::RECURRING_PURCHASE_TYPE
+                && $element['is_salable']) {
+                $result[$key] = true;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
+     *
+     * @param ProductInterface|Product $product
+     * @return bool
+     */
+    public function IsOneTimeAndSubscribePurchase(ProductInterface $product)
+    {
+        return ($this->getProductSubscriptionPurchaseType($product) == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
+            && $product->getIsSalable();
+    }
+
+    /**
+     * Check if subscription purchase type is "Recurring purchase" and "One time purchase" by product ids.
+     * Retrieve array like product_id => boolean
+     *
+     * @param array $productPreset
+     * @return array
+     */
+    public function IsOneTimeAndSubscribePurchaseByIds(array $productPreset)
+    {
+        $result = [];
+        $productIds = array_keys($productPreset);
+        foreach ($this->getProductSubscriptionPurchaseTypeByIds($productIds) as $key => $element) {
+            $result[$key] = false;
+            if ($element[Attribute::SUBSCRIPTION_PURCHASE_TYPE] == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
+                && $element['is_salable']) {
+                $result[$key] = true;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Return subscription purchase type.
+     *
+     * @param ProductInterface|Product $product
+     * @return int|null
+     */
+    private function getProductSubscriptionPurchaseType(ProductInterface $product)
+    {
+        return $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+    }
+
+    /**
+     * Return subscription purchase types array by product ids.
+     *
+     * @param array $productsIds
+     * @return array
+     */
+    private function getProductSubscriptionPurchaseTypeByIds(array $productsIds)
+    {
+        $result = [];
+
+        $productsCollection = $this->productCollectionFactory->create();
+        $productsCollection->addAttributeToSelect(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+        $productsCollection->addFieldToFilter('entity_id', ['in' => $productsIds]);
+
+        foreach ($productsCollection as $product) {
+            $result[$product->getId()] = [
+                'is_salable' => $product->getIsSalable(),
+                Attribute::SUBSCRIPTION_PURCHASE_TYPE => $this->getProductSubscriptionPurchaseType($product)
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns list of product billing frequencies.
+     *
+     * @param ProductInterface|Product $product
+     * @return array
+     */
+    private function getProductBillingFrequencies(ProductInterface $product)
+    {
+        $productId = $product->getId();
+        $productBillingFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productId)
+            ->getItems();
+
+        return $productBillingFrequencies;
+    }
+
+    /**
+     * Returns list of product billing frequencies by product id.
+     *
+     * @param int $productId
+     * @return array
+     */
+    private function getProductBillingFrequenciesById($productId)
+    {
+        $productBillingFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productId)
+            ->getItems();
+
+        return $productBillingFrequencies;
+    }
+
+    /**
+     * Get request
+     *
+     * @return \Magento\Framework\App\RequestInterface
+     */
+    private function getRequest()
+    {
+        return $this->request;
+    }
+}

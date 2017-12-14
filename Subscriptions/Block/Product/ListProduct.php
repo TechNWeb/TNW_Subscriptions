@@ -14,11 +14,6 @@ use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
 class ListProduct extends OrigListProduct
 {
     /**
-     * Product list buy buttons block name in layout.
-     */
-    const PRODUCT_LIST_BUTTON_BLOCK_NAME = 'product_list_buttons';
-
-    /**
      * Params witch added to button block.
      *
      * @var array

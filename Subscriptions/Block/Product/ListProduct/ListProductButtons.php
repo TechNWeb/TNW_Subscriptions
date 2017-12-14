@@ -6,11 +6,10 @@
 
 namespace TNW\Subscriptions\Block\Product\ListProduct;
 
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Template;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Config\Source\PurchaseType;
-use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 
 /**
  *  Subscription Product list.
@@ -18,40 +17,30 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as Frequenc
 class ListProductButtons extends Template
 {
     /**
-     * Subscription module config
+     * Subscription Product View Config model.
      *
-     * @var Config
+     * @var SubscriptionProductView
      */
-    private $config;
-
-    /**
-     * Modal form for adding single product to subscription
-     *
-     * @var FrequencyOptionRepository
-     */
-    private $frequencyOptionRepository;
+    private $subscriptionProductViewConfig;
 
     /**
      * @param Template\Context $context
-     * @param Config $config
-     * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        Config $config,
-        FrequencyOptionRepository $frequencyOptionRepository,
+        SubscriptionProductView $subscriptionProductViewConfig,
         array $data = []
     ) {
-        $this->config = $config;
-        $this->frequencyOptionRepository = $frequencyOptionRepository;
+        $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
         parent::__construct($context, $data);
     }
 
     /**
      * Retrieve current product.
      *
-     * @return \Magento\Catalog\Model\Product|null
+     * @return ProductInterface|Product|null
      */
     public function getCurrentProduct()
     {
@@ -99,52 +88,24 @@ class ListProductButtons extends Template
     }
 
     /**
-     * Get "Enable Subscriptions" config value for current website
+     * Get "Enable Subscriptions" config value for current website.
      *
+     * @param ProductInterface|Product $product
      * @return bool
      */
-    public function isSubscribeAvailable($product)
+    public function isSubscribeAvailable(ProductInterface $product)
     {
-        return
-            $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequencies($product))
-            && $this->getRequest()->getRouteName() !== 'checkout';
+        return $this->subscriptionProductViewConfig->isSubscribeAvailable($product);
     }
 
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
+     * @param ProductInterface|Product $product
      * @return bool
      */
-    public function isOnlySubscribePurchase($product)
+    public function isOnlySubscribePurchase(ProductInterface $product)
     {
-        return ($this->getProductSubscriptionPurchaseType($product) == PurchaseType::RECURRING_PURCHASE_TYPE)
-            && $product->getIsSalable();
-    }
-
-    /**
-     * Return subscription purchase type.
-     *
-     * @param $product
-     * @return int|null
-     */
-    private function getProductSubscriptionPurchaseType($product)
-    {
-        return $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
-    }
-
-    /**
-     * Returns list of product billing frequencies.
-     *
-     * @return array
-     */
-    private function getProductBillingFrequencies($product)
-    {
-            $productId = $product->getId();
-            $productBillingFrequencies = $this->frequencyOptionRepository
-                ->getListByProductId($productId)
-                ->getItems();
-
-        return $productBillingFrequencies;
+        return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($product);
     }
 }

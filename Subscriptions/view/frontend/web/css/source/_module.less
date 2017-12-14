@@ -2303,7 +2303,7 @@ div.shipping-details-content {
       button {
         width: 100%;
         margin-top: 1px;
-        background: none;
+        background: white;
         color: #41362f;
         font-weight: normal;
 
@@ -2378,4 +2378,31 @@ div.shipping-details-content {
 
 .product-item-description {
   clear: both;
+}
+
+.block-wishlist {
+  .product-item-actions {
+    .actions-primary {
+      float: none;
+    }
+    .product-subscribe-addtocart-buttons-container {
+      height: 35px;
+      .product-subscribe-button-dropdown {
+        button {
+          padding: 7px 15px;
+          &:after {
+            right: 1rem;
+          }
+        }
+      }
+    }
+    .product-addtocart-button-hidden {
+      &.active {
+        float: left;
+        button {
+          width: 12.5rem;
+        }
+      }
+    }
+  }
 }

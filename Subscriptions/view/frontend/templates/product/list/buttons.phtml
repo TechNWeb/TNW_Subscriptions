@@ -20,7 +20,7 @@ $position = $block->getCurrentPosition();
                 <div class="product-subscribe-button">
                     <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl(); ?>">
                         <button type="button" title="Subscribe" class="action primary subscribe">
-                            <span data-role="button-text">Subscribe</span>
+                            <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></span>
                         </button>
                     </a>
                 </div>
@@ -29,7 +29,7 @@ $position = $block->getCurrentPosition();
                     <div class="product-subscribe-button">
                         <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl(); ?>">
                             <button type="button" title="Subscribe" class="action primary subscribe">
-                                <span data-role="button-text">Subscribe</span>
+                                <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></span>
                             </button>
                         </a>
                     </div>
@@ -38,7 +38,7 @@ $position = $block->getCurrentPosition();
                                 class="action-toggle primary add"
                                 data-toggle="dropdown"
                                 data-product-id="<?php echo $_product->getId(); ?>">
-                            <span>Select</span>
+                            <span><?php /* @escapeNotVerified */ echo __('Select') ?></span>
                         </button>
                     </div>
                     <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?php echo $_product->getId(); ?>">

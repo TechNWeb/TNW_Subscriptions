@@ -17,9 +17,9 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyReposi
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 
 /**
  * Subscribe product block instance
@@ -48,6 +48,13 @@ class Subscribe extends View
     private $frequencyRepository;
 
     /**
+     * Subscription Product View Config model.
+     *
+     * @var SubscriptionProductView
+     */
+    private $subscriptionProductViewConfig;
+
+    /**
      * Subscribe constructor.
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
@@ -59,6 +66,7 @@ class Subscribe extends View
      * @param \Magento\Customer\Model\Session $customerSession
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCurrencyInterface $priceCurrency
+     * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
@@ -75,11 +83,13 @@ class Subscribe extends View
         \Magento\Customer\Model\Session $customerSession,
         ProductRepositoryInterface $productRepository,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        SubscriptionProductView $subscriptionProductViewConfig,
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         array $data = []
     ) {
+        $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
@@ -87,9 +97,8 @@ class Subscribe extends View
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
 
-
     /**
-     * Retrieve current product model
+     * Retrieve current product model.
      *
      * @return ProductInterface|Product
      */
@@ -114,7 +123,7 @@ class Subscribe extends View
     }
 
     /**
-     * Get subscribe url
+     * Get subscribe url.
      *
      * @return string
      */
@@ -132,16 +141,14 @@ class Subscribe extends View
     }
 
     /**
-     * Get "Enable Subscriptions" config value for current website
+     * Get "Enable Subscriptions" config value for current website.
      *
      * @return bool
      */
     public function isSubscribeAvailable()
     {
-        return
-            $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequencies())
-            && $this->getRequest()->getRouteName() !== 'checkout';
+        return $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
+
     }
 
     /**
@@ -151,8 +158,7 @@ class Subscribe extends View
      */
     public function IsOnlySubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::RECURRING_PURCHASE_TYPE)
-            && $this->getProduct()->getIsSalable();
+        return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($this->getProduct());
     }
 
     /**
@@ -162,8 +168,7 @@ class Subscribe extends View
      */
     public function IsOneTimeAndSubscribePurchase()
     {
-        return ($this->getProductSubscriptionPurchaseType() == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
-            && $this->getProduct()->getIsSalable();
+        return $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
     }
 
     /**
@@ -335,16 +340,6 @@ class Subscribe extends View
             $currentStore->getId(),
             $currentStore->getCurrentCurrencyCode()
         );
-    }
-
-    /**
-     * Return subscription purchase type.
-     *
-     * @return int|null
-     */
-    private function getProductSubscriptionPurchaseType()
-    {
-        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
     }
 
     /**

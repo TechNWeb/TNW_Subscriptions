@@ -13,7 +13,8 @@ define([
             subscriptionDropdownBlock: '.product-subscribe-button-dropdown',
             subscriptionDropdownButtonSelector: '.product-subscribe-button-dropdown button',
             subscriptionDropdownButtonsActive: '.product-addtocart-button-hidden',
-            currentSubscriptionDropdownButtonsActive: '.subscription-dropdown-hidden-'
+            currentSubscriptionDropdownButtonsActive: '.subscription-dropdown-hidden-',
+            wishlistSubscriptionDropDownActive: '.wishlist-subscription-dropdown-hidden-'
         },
 
         /**
@@ -28,11 +29,13 @@ define([
          */
         _bind: function () {
             var widget = this;
-
-            $j(this.options.subscriptionDropdownButtonSelector).on('click', function () {
+            $j(this.options.subscriptionDropdownButtonSelector).on('click', function() {
                 widget._showDropdownContainer(this);
             });
 
+            $j(".block-wishlist").on("click",this.options.subscriptionDropdownButtonSelector, function() {
+                widget._showDropdownContainerWishlist(this);
+            });
         },
 
         /**
@@ -48,6 +51,22 @@ define([
             } else {
                 jElem.removeClass('active');
                 $j(this.options.currentSubscriptionDropdownButtonsActive + prodId).removeClass('active');
+            }
+        },
+
+        /**
+         * Show drop down container wishlist block.
+         */
+        _showDropdownContainerWishlist: function (elem) {
+            var jElem = $j(elem);
+            var itemId = jElem.data('wishlist-item-counter');
+            if (!jElem.hasClass('active')) {
+                jElem.addClass('active');
+
+                $j(this.options.wishlistSubscriptionDropDownActive + itemId).addClass('active');
+            } else {
+                jElem.removeClass('active');
+                $j(this.options.wishlistSubscriptionDropDownActive + itemId).removeClass('active');
             }
         }
     });
