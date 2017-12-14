@@ -34,7 +34,7 @@ class CleanExpiredQuotes extends Cron
             /** @var $quotes \Magento\Quote\Model\ResourceModel\Quote\Collection */
             $quotes = $this->quoteCollectionFactory->create();
             $quotes->getSelect()->joinLeft(
-                ['sub_quotes' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                ['sub_quotes' => $quotes->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 'main_table.entity_id != sub_quotes.' . SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
                 []
             );

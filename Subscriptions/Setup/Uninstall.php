@@ -14,17 +14,28 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UninstallInterface;
+use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Model\CustomerQuote;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\Address;
+use TNW\Subscriptions\Model\SubscriptionProfileStatusHistory;
 
+/**
+ * Class Uninstall
+ */
 class Uninstall implements UninstallInterface
 {
-
+    /**
+     * @var EavSetupFactory
+     */
     private $eavSetupFactory;
 
     /**
-     * Constructor
-     *
      * @param EavSetupFactory $eavSetupFactory
      */
     public function __construct(EavSetupFactory $eavSetupFactory)
@@ -44,11 +55,8 @@ class Uninstall implements UninstallInterface
         $setup->startSetup();
 
         $this->dropTables($setup);
-
         $this->removeProductAttributes();
-
         $this->removeConfig($setup);
-
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
 
@@ -56,16 +64,24 @@ class Uninstall implements UninstallInterface
     }
 
     /**
+     * Removes subscription tables.
+     *
      * @param SchemaSetupInterface $setup
      * @return $this
      */
     protected function dropTables(SchemaSetupInterface $setup)
     {
         $tnwTables = [
-            'tnw_subscriptions_product_billing_frequency',
-            'tnw_subscriptions_subscription_profile_order',
-            'tnw_subscriptions_product_subscription_profile',
-            'tnw_subscriptions_billing_frequency',
+            ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE,
+            SubscriptionProfileOrderInterface::MAIN_TABLE,
+            BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE,
+            CustomerQuote::CUSTOMER_QUOTE_TABLE,
+            SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
+            SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE,
+            Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE,
+            'tnw_subscriptions_subscription_profile_message_history',
+            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+            SubscriptionProfileStatusHistory::TABLE,
             SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_varchar',
             SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_text',
             SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_int',
@@ -120,6 +136,8 @@ class Uninstall implements UninstallInterface
     }
 
     /**
+     * Removes subscription config.
+     *
      * @param SchemaSetupInterface $setup
      * @return $this
      */

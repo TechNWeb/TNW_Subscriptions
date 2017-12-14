@@ -61,7 +61,7 @@ class DataProvider extends AbstractDataProvider
         );
 
         $collection->getSelect()->join(
-            ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+            ['relation' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.' . SubscriptionProfileOrderInterface::ID,
             [
                 SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,

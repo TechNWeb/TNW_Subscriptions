@@ -57,7 +57,7 @@ class OrderHistory extends ContentAbstract
         if (!$this->orders) {
             $this->orders = $this->orderCollectionFactory->create()
                 ->join(
-                    ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                    ['relation' => $this->orders->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                     'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                     []
                 )

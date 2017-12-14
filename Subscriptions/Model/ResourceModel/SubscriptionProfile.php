@@ -63,7 +63,7 @@ class SubscriptionProfile extends AbstractEntity
                 ['profile_order' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 ['total' => new \Zend_Db_Expr('sum(sales_order.' . OrderInterface::GRAND_TOTAL . ')')]
             )->join(
-            $this->getTable('sales_order'),
+                ['sales_order' => $this->getTable('sales_order')],
             'sales_order.entity_id = profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
             []
         )->where('profile_order.' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . ' = ?', $id)
@@ -87,7 +87,7 @@ class SubscriptionProfile extends AbstractEntity
                 ['profile_order' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 ['total' => new \Zend_Db_Expr('sum(quote.' . OrderInterface::GRAND_TOTAL . ')')]
             )->join(
-                $this->getTable('quote'),
+                ['quote' => $this->getTable('quote')],
                 'quote.entity_id = profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
                 []
             )->where('profile_order.' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . ' = ?', $id)
