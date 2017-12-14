@@ -391,7 +391,6 @@ class InstallSchema implements InstallSchemaInterface
         $tableName = $setup->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE);
 
         if (!$setup->tableExists($tableName)) {
-
             $tableTnwSubscriptionProfileOrder = $setup->getConnection()->newTable($tableName)
                 ->addColumn(
                     SubscriptionProfileOrderInterface::ID,
@@ -901,8 +900,7 @@ class InstallSchema implements InstallSchemaInterface
                     null,
                     ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
                     'Creation Time'
-                )
-                ->addColumn(
+                )->addColumn(
                     Queue::UPDATED_AT,
                     Table::TYPE_TIMESTAMP,
                     null,

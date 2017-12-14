@@ -59,6 +59,7 @@ class InstallData implements InstallDataInterface
      * Adds new products attributes.
      *
      * @param $eavSetup
+     * @return void
      */
     private function addProductAttributes($eavSetup)
     {
