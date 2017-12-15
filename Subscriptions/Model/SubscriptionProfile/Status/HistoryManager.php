@@ -31,7 +31,7 @@ class HistoryManager
      *
      * @var SearchCriteriaBuilder
      */
-    protected $criteriaBuilder;
+    private $criteriaBuilder;
 
     /**
      * Sort order builder for search criteria.
@@ -147,12 +147,10 @@ class HistoryManager
             $storedData = $profile->getStoredData();
             if (isset($origData[SubscriptionProfileInterface::STATUS])) {
                 $result = $origData[SubscriptionProfileInterface::STATUS];
+            } elseif (isset($storedData[SubscriptionProfileInterface::STATUS])) {
+                $result = $storedData[SubscriptionProfileInterface::STATUS];
             } else {
-                if (isset($storedData[SubscriptionProfileInterface::STATUS])) {
-                    $result = $storedData[SubscriptionProfileInterface::STATUS];
-                } else {
-                    $result = $this->getProfileStatusFromDb($profile->getId());
-                }
+                $result = $this->getProfileStatusFromDb($profile->getId());
             }
         }
 

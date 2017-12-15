@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as SubscriptionProfileOrderResource;
 
 /**
  * Class Manager
@@ -87,6 +88,11 @@ class Manager
     private $statusHistoryManager;
 
     /**
+     * @var SubscriptionProfileOrderResource;
+     */
+    private $profileOrderResource;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param DateTime $date
      * @param Config $config
@@ -96,6 +102,7 @@ class Manager
      * @param SubscriptionProfileRepository $profileRepository
      * @param SubscriptionProfileOrderRepositoryInterface $profileOrderRepository
      * @param HistoryManager $statusHistoryManager
+     * @param SubscriptionProfileOrderResource $profileOrderResource
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -106,7 +113,8 @@ class Manager
         CartRepositoryInterface $cartRepository,
         SubscriptionProfileRepository $profileRepository,
         SubscriptionProfileOrderRepositoryInterface $profileOrderRepository,
-        HistoryManager $statusHistoryManager
+        HistoryManager $statusHistoryManager,
+        SubscriptionProfileOrderResource $profileOrderResource
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->date = $date;
@@ -117,6 +125,7 @@ class Manager
         $this->profileRepository = $profileRepository;
         $this->profileOrderRepository = $profileOrderRepository;
         $this->statusHistoryManager = $statusHistoryManager;
+        $this->profileOrderResource = $profileOrderResource;
     }
 
     /**
@@ -199,7 +208,7 @@ class Manager
             /** @var Collection $collection */
             $collection = $this->collectionFactory->create();
             $collection->getConnection()->insertOnDuplicate(
-                Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
+                $collection->getTable(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE),
                 $fields,
                 [Queue::MESSAGE, Queue::CREATED_AT, Queue::UPDATED_AT]
             );
@@ -381,7 +390,7 @@ class Manager
         $collection = $this->collectionFactory->create();
         $collection->getSelect()
             ->join(
-                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                ['relation' => $this->profileOrderResource->getMainTable()],
                 'main_table.profile_order_id = relation.id AND relation.magento_quote_id IS NOT NULL',
                 [
                     SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
@@ -390,7 +399,7 @@ class Manager
                 ]
             )
             ->join(
-                ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
+                ['profile' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
                 'relation.subscription_profile_id = profile.entity_id',
                 [
                     SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,

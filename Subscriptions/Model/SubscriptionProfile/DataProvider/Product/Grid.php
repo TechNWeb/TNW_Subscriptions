@@ -13,7 +13,9 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
-
+/**
+ * Data provider for "Add product" modal product grid.
+ */
 class Grid extends ProductDataProvider
 {
     /**#@+
@@ -40,7 +42,6 @@ class Grid extends ProductDataProvider
     private $stockItemRepository;
 
     /**
-     * Grid constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -97,12 +98,14 @@ class Grid extends ProductDataProvider
             $this->getCollection()
                 ->getSelect()
                 ->join(
-                    ['sub_table' => ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE],
+                    ['sub_table' =>
+                        $this->getCollection()->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)],
                     'e.entity_id = sub_table.' . ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
                     []
                 )
                 ->join(
-                    ['sub_frequency_table' => BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE],
+                    ['sub_frequency_table' =>
+                        $this->getCollection()->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
                     'sub_frequency_table.' . BillingFrequencyInterface::ID.' = sub_table.'
                     . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID
                     . ' AND sub_frequency_table.'. BillingFrequencyInterface::STATUS .' = 1',

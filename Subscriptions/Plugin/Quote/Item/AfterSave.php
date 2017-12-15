@@ -28,7 +28,7 @@ class AfterSave
         if ($initialFees && $initialFees->getBaseSubsInitialFee() > 0 && $initialFees->getSubsInitialFee() > 0){
             $result->getResource()->getConnection()
                 ->insertOnDuplicate(
-                    SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
+                    $result->getResource()->getTable(SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE),
                     [
                         SalesExtensionAttributesInterface::MAGENTO_ITEM_ID =>
                             $result->getItemId(),

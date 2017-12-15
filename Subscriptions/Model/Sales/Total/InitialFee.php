@@ -32,20 +32,20 @@ class InitialFee extends AbstractTotal
         ShippingAssignmentInterface $shippingAssignment,
         Total $total
     ) {
-        $address = $shippingAssignment->getShipping()->getAddress();
-        $quoteItems = $quote->getAllVisibleItems();
+        $items = $shippingAssignment->getItems();
+        if (!count($items) || !$quote->getId()) {
+            return $this;
+        }
         $totalInitialFee = 0;
         $baseTotalInitialFee = 0;
-        if ($quote->getItemsCount() > 0 && $quote->getId() && $address->getAddressType() === 'shipping') {
-            /** @var Item $item */
-            foreach ($quoteItems as $item) {
-                list($initialFee, $baseInitialFee) = $this->getItemInitialFees($item);
-                $totalInitialFee += $initialFee;
-                $baseTotalInitialFee += $baseInitialFee;
-            }
-            $total->setTotalAmount($this->getCode(), $totalInitialFee);
-            $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
+        /** @var Item $item */
+        foreach ($items as $item) {
+            list($initialFee, $baseInitialFee) = $this->getItemInitialFees($item);
+            $totalInitialFee += $initialFee;
+            $baseTotalInitialFee += $baseInitialFee;
         }
+        $total->setTotalAmount($this->getCode(), $totalInitialFee);
+        $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
 
         return $this;
     }
@@ -63,7 +63,7 @@ class InitialFee extends AbstractTotal
         $initialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
-        if ($initialFees){
+        if ($initialFees) {
             $initialFee = $initialFees->getSubsInitialFee();
             $baseInitialFee = $initialFees->getBaseSubsInitialFee();
         }

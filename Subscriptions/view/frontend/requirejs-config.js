@@ -10,7 +10,8 @@ var config = {
             tnwSubscribePrice: 'TNW_Subscriptions/js/product/subscribe-price',
             tnwSubscribeShipment: 'TNW_Subscriptions/js/subscription-profile/shipment',
             tnwSubscribeShipmentDetails: 'TNW_Subscriptions/js/subscription-profile/shipment-details',
-            tnwSubscribeBilling: 'TNW_Subscriptions/js/subscription-profile/billing'
+            tnwSubscribeBilling: 'TNW_Subscriptions/js/subscription-profile/billing',
+            tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons'
         }
     }
 };

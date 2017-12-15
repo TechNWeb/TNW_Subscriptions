@@ -23,5 +23,10 @@
                 </arguments>
             </block>
         </referenceContainer>
+        <referenceBlock name="wishlist_sidebar">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::wishlist/sidebar.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>

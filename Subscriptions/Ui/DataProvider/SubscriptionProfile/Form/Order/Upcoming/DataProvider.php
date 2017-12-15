@@ -98,15 +98,15 @@ class DataProvider extends AbstractDataProvider
 
             $this->getCollection()->addFieldToFilter('relation.subscription_profile_id', $profileId);
             $this->getCollection()->getSelect()->join(
-                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+                ['relation' => $this->getCollection()->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
                 []
             )->join(
-                ['shipping_address_table' => self::MAGENTO_QUOTE_ADDRESS_TABLE],
+                ['shipping_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
                 'main_table.entity_id=shipping_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND shipping_address_table.address_type = \'shipping\'',
                 []
             )->join(
-                ['billing_address_table' => self::MAGENTO_QUOTE_ADDRESS_TABLE],
+                ['billing_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
                 'main_table.entity_id=billing_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND billing_address_table.address_type = \'billing\'',
                 []
             )->where(
@@ -161,11 +161,16 @@ class DataProvider extends AbstractDataProvider
 
         $formatedEtityId = str_pad($qoute->getId(), 8, '0', STR_PAD_LEFT);
 
+        $shippingDetails = __('N/A');
+        if ($qoute->getShippingDetails()) {
+            $shippingDetails = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
+        }
+
         $quoteData['entity_id'] = $formatedEtityId;
         $quoteData['billing_name'] = $qoute->getBillingFirstname() . ' ' . $qoute->getBillingLastname();
         $quoteData['shipping_name'] = $qoute->getShippingFirstname() . ' ' . $qoute->getShippingLastname();
         $quoteData['scheduled_at'] = $qoute->getScheduledAt();
-        $quoteData['shipping_details'] = $qoute->getShippingDetails() . self::SHIPPING_DETAILS_SEPARATOR . $shippingPrice;
+        $quoteData['shipping_details'] = $shippingDetails;
         $quoteData['scheduled_at'] = $qoute->getScheduledAt();
         $quoteData['grand_total'] = $grandTotal;
 

@@ -120,7 +120,7 @@ abstract class Base implements ProcessInterface
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
         $collection->joinTable(
-            ['products' => SubscriptionProduct::ENTITY_TABLE],
+            ['products' => $collection->getTable(SubscriptionProduct::ENTITY_TABLE)],
             SubscriptionProduct::SUBSCRIPTION_PROFILE_ID . ' = ' . SubscriptionProfileInterface::ID,
             ['products_need_recollect' => SubscriptionProduct::NEED_RECOLLECT]
         )->groupByAttribute(

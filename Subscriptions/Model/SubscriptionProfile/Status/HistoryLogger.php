@@ -72,9 +72,9 @@ class HistoryLogger
     /**
      * Log subscription profile status changes.
      *
-     * @param $subscriptionProfileId
-     * @param $statusOld
-     * @param $statusNew
+     * @param int|string $subscriptionProfileId
+     * @param int|string $statusOld
+     * @param int|string $statusNew
      */
     public function log(
         $subscriptionProfileId,

@@ -64,4 +64,10 @@
             <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
         </arguments>
     </type>
+    <type name="Magento\Wishlist\CustomerData\Wishlist">
+        <plugin name="subscriptions_reordered_products"
+                type="TNW\Subscriptions\Plugin\CustomerData\Wishlist"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
 </config>
