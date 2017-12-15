@@ -13,6 +13,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyReposi
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -46,6 +47,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param \Magento\Customer\Model\Session $customerSession
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCurrencyInterface $priceCurrency
+     * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
@@ -65,29 +67,18 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         \Magento\Customer\Model\Session $customerSession,
         ProductRepositoryInterface $productRepository,
         PriceCurrencyInterface $priceCurrency,
+        SubscriptionProductView $subscriptionProductViewConfig,
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         ProfileManager $profileManager,
         array $data = []
     ) {
-        parent::__construct(
-            $context,
-            $urlEncoder,
-            $jsonEncoder,
-            $string,
-            $productHelper,
-            $productTypeConfig,
-            $localeFormat,
-            $customerSession,
-            $productRepository,
-            $priceCurrency,
-            $config,
-            $frequencyOptionRepository,
-            $frequencyRepository,
-            $data
-        );
         $this->profileManager = $profileManager;
+        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
+            $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
+            $config, $frequencyOptionRepository, $frequencyRepository, $data
+        );
     }
 
     /**
