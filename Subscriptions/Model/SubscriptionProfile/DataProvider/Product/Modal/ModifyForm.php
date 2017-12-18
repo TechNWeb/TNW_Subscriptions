@@ -18,7 +18,7 @@ use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
@@ -98,6 +98,7 @@ class ModifyForm extends Form
      * @param Context $formContext
      * @param PoolInterface $pool
      * @param Registry $registry
+     * @param ProductTypeFactoryResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -111,7 +112,7 @@ class ModifyForm extends Form
         Context $formContext,
         PoolInterface $pool,
         Registry $registry,
-        Manager $productManager,
+        ProductTypeFactoryResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -125,7 +126,7 @@ class ModifyForm extends Form
             $context,
             $formContext,
             $pool,
-            $productManager,
+            $productTypeResolver,
             $scope,
             $meta,
             $data
@@ -192,7 +193,7 @@ class ModifyForm extends Form
     {
         $product = $this->getProductFromItem($item);
 
-        return $this->productManager
+        return $this->productTypeResolver
             ->getProductManagerByType($product->getTypeId())
             ->getAdditionalData($item);
     }

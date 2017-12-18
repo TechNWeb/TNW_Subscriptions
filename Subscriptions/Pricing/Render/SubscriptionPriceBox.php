@@ -19,7 +19,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -68,9 +68,9 @@ class SubscriptionPriceBox extends BasePriceBox
     private $profileManager;
 
     /**
-     * @var Manager
+     * @var ProductTypeFactoryResolver
      */
-    private $productManager;
+    private $productTypeResolver;
 
     /**
      * @param Template\Context $context
@@ -84,7 +84,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
      * @param ProfileManager $profileManager
-     * @param Manager $productManager
+     * @param ProductTypeFactoryResolver $productTypeResolver
      * @param array $data
      */
     public function __construct(
@@ -99,7 +99,7 @@ class SubscriptionPriceBox extends BasePriceBox
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         DescriptionCreator $descriptionCreator,
         ProfileManager $profileManager,
-        Manager $productManager,
+        ProductTypeFactoryResolver $productTypeResolver,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -111,7 +111,7 @@ class SubscriptionPriceBox extends BasePriceBox
         $this->jsonHelper = $jsonHelper;
         $this->descriptionCreator = $descriptionCreator;
         $this->profileManager = $profileManager;
-        $this->productManager = $productManager;
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     /**
@@ -171,13 +171,14 @@ class SubscriptionPriceBox extends BasePriceBox
                 ->getListByProductId($product->getId())
                 ->getItems();
 
+            /** @var \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $billingFrequency */
             foreach ($productBillingFrequencies as $billingFrequency) {
                 $billingFrequencyId = $billingFrequency->getBillingFrequencyId();
 
                 $existFrequency = true;
 
                 if ($product->getId() != $product->getChildProductId()) {
-                    $existFrequency = $this->productManager
+                    $existFrequency = $this->productTypeResolver
                         ->getProductManagerByType($product->getTypeId())
                         ->checkFrequencyExistanse($billingFrequencyId, [$product->getData('child_product_id')]);
                 }
@@ -199,18 +200,15 @@ class SubscriptionPriceBox extends BasePriceBox
                         $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
 
                         $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
-                        $bottomMessage = __('then %1 / every %2',
-                            $this->formatCurrency($price, false), $frequencyUnit);
+                        $bottomMessage = __('then %1 / every %2', $this->formatCurrency($price, false), $frequencyUnit);
                         $price = $trialPrice + $initialFee;
-                    } else {
-                        if ($initialFee) {
+                    } elseif ($initialFee) {
                             $customPrice = $this->formatCurrency($price, false);
                             $topMessage = __('Initial charge');
                             $price = (float)$price + $initialFee;
                             $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);
-                        } else {
-                            $frequencyUnitMessage = __(' / every %1', $frequencyUnit);
-                        }
+                    } else {
+                        $frequencyUnitMessage = __(' / every %1', $frequencyUnit);
                     }
 
                     $result[$billingFrequencyId] = [
@@ -274,7 +272,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param AmountInterface $amount
      * @param SaleableInterface $product
      * @param array $arguments
-     * @return string
+     * @return []
      */
     public function renderSubscriptionAmounts(
         AmountInterface $amount,
@@ -285,7 +283,7 @@ class SubscriptionPriceBox extends BasePriceBox
         if ($product === null) {
             $product = $this->getProduct();
         }
-        $productData = $this->productManager
+        $productData = $this->productTypeResolver
             ->getProductManagerByType($product->getTypeId())
             ->getProductDataObject($product, $arguments);
         foreach ($this->getProductBillingFrequencies($productData) as $key => $billingFrequencyData) {

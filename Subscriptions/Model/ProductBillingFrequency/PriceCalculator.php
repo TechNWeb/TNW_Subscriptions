@@ -102,7 +102,7 @@ class PriceCalculator
      *    If "Discount amount type" = "Percent" then:
      *        "Discount amount" = "Price"(product) * "Discount amount"(product).
      *
-     * @param int|Product $product
+     * @param int|DataObject $product
      * @param int $billingFrequencyId
      * @param float|string $productPrice
      * @param bool $useTrial
@@ -118,7 +118,7 @@ class PriceCalculator
         $price = 0;
         if ($product && $billingFrequencyId) {
             $productPrice = $this->localeFormat->getNumber($productPrice);
-            if (!$product instanceof DataObject) {
+            if (!($product instanceof DataObject)) {
                 /** @var Product $product */
                 $product = $this->productRepository->getById($product);
             }
@@ -127,18 +127,16 @@ class PriceCalculator
             if ($trialOffered && $useTrial) {
                 $trialPrice = $this->getTrialPrice($product);
                 $price = $trialPrice ?: 0;
+            } elseif ($lockProductPrice) {
+                $discountAmount = $this->getDiscountAmount($product, $productPrice);
+                $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
+                $price = isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
             } else {
-                if ($lockProductPrice) {
-                    $discountAmount = $this->getDiscountAmount($product, $productPrice);
-                    $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
-                    $price = isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
-                } else {
-                    $billingFrequencyPrice = $this->getBillingFrequencyPrice(
-                        $billingFrequencyId,
-                        $product->getChildProductId())
-                    ;
-                    $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
-                }
+                $billingFrequencyPrice = $this->getBillingFrequencyPrice(
+                    $billingFrequencyId,
+                    $product->getChildProductId())
+                ;
+                $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
             }
         }
 
@@ -177,12 +175,12 @@ class PriceCalculator
     /**
      * Get trial price value for product.
      *
-     * @param Product $product
+     * @param DataObject $product
      * @return float
      */
-    private function getTrialPrice(Product $product)
+    private function getTrialPrice(DataObject $product)
     {
-        $price = $product->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE)
+        $price = $product->hasData(Attribute::SUBSCRIPTION_TRIAL_PRICE)
             ? (float)$product->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE)
             : 0;
 
@@ -192,12 +190,12 @@ class PriceCalculator
     /**
      * Get lock product price status.
      *
-     * @param Product $product
+     * @param DataObject $product
      * @return bool
      */
     private function getProductLockPriceSatus(DataObject $product)
     {
-        return $product->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
+        return $product->hasData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
             ? (bool)$product->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
             : false;
     }
@@ -205,12 +203,12 @@ class PriceCalculator
     /**
      * Get offer flat discount status.
      *
-     * @param Product $product
+     * @param DataObject $product
      * @return bool
      */
-    private function getOfferFlatDiscount(Product $product)
+    private function getOfferFlatDiscount(DataObject $product)
     {
-        return $product->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT)
+        return $product->hasData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT)
             ? (bool)$product->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT)
             : false;
     }
@@ -218,22 +216,22 @@ class PriceCalculator
     /**
      * Get product discount amount considering discount type.
      *
-     * @param Product $product
+     * @param DataObject $product
      * @param null|float $processPrice
      * @return float
      */
-    private function getDiscountAmount(Product $product, $processPrice = null)
+    private function getDiscountAmount(DataObject $product, $processPrice = null)
     {
         if ($processPrice === null) {
             $processPrice = $product->getData('price');
         }
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {
-            $discountType = $product->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)
+            $discountType = $product->hasData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)
                 ? $product->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE)
                 : 0;
             if ($discountType) {
-                $discountAmount = $product->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)
+                $discountAmount = $product->hasData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)
                     ? $product->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT)
                     : 0;
                 if ($discountType == DiscountAmount::PERCENT_DISCOUNT && $discountAmount) {

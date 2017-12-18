@@ -14,10 +14,7 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\ConfigurableFactory;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\SimpleFactory;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\TypeInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -61,9 +58,9 @@ class Product extends Create
     private $extensionManager;
 
     /**
-     * @var Manager
+     * @var ProductTypeFactoryResolver
      */
-    private $productManager;
+    private $productTypeResolver;
 
     /**
      * Current used product.
@@ -78,6 +75,7 @@ class Product extends Create
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      * @param ExtensionManager $extensionManager
+     * @param ProductTypeFactoryResolver $productTypeResolver
      */
     public function __construct(
         Context $context,
@@ -85,12 +83,12 @@ class Product extends Create
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
         ExtensionManager $extensionManager,
-        Manager $productManager
+        ProductTypeFactoryResolver $productTypeResolver
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
-        $this->productManager = $productManager;
+        $this->productTypeResolver = $productTypeResolver;
 
         parent::__construct($context, $session);
     }
@@ -225,7 +223,7 @@ class Product extends Create
      * @param bool $convert
      * @return float
      */
-    private function getInitialFee($requestData, $convert)
+    private function getInitialFee(array $requestData, $convert)
     {
         return $this->priceCalculator->getInitialFee(
             $requestData['billing_frequency'],
@@ -310,7 +308,7 @@ class Product extends Create
      */
     private function getCustomPrice(MagentoProduct $product, array $productData)
     {
-        return $this->productManager->getProductManagerByType($product->getTypeId())
+        return $this->productTypeResolver->getProductManagerByType($product->getTypeId())
             ->getSubscriptionCustomPrice($product, $productData);
     }
 
@@ -323,7 +321,7 @@ class Product extends Create
      */
     private function getPrice(MagentoProduct $product, array $productData)
     {
-        return $this->productManager->getProductManagerByType($product->getTypeId())
+        return $this->productTypeResolver->getProductManagerByType($product->getTypeId())
             ->getSubscriptionPrice($product, $productData);
     }
 }

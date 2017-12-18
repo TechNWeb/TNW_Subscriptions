@@ -10,6 +10,7 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
+use Magento\Paypal\Model\Payflow\Pro;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Container as UiContainer;
@@ -26,7 +27,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditS
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
 
 /**
  * Subscription items form data provider for subscription admin edit page.
@@ -88,7 +89,7 @@ class SummaryProductsForm extends ModifyForm
      * @param Manager $profileManager
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
-     * @param ProductManager $productManager
+     * @param ProductTypeFactoryResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -104,7 +105,7 @@ class SummaryProductsForm extends ModifyForm
         Manager $profileManager,
         Registry $registry,
         UrlInterface $urlBuilder,
-        ProductManager $productManager,
+        ProductTypeFactoryResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -120,7 +121,7 @@ class SummaryProductsForm extends ModifyForm
             $formContext,
             $pool,
             $registry,
-            $productManager,
+            $productTypeResolver,
             $scope,
             $meta,
             $data

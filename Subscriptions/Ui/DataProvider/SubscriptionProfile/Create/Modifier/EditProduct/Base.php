@@ -74,13 +74,13 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * Return current product.
      *
-     * @return MagentoProduct
+     * @return MagentoProduct|null
      */
     public function getProduct()
     {
         $currentItem = $this->getItem();
         $product = $currentItem->getProduct();
-        if (!$product) {
+        if (null === $product) {
             $productId = $currentItem->getProductId();
             if ($productId) {
                 $product = $this->formContext

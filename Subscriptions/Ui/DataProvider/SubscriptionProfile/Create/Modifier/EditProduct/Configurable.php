@@ -50,9 +50,9 @@ class Configurable extends Base
      * @param FormContext $formContext
      */
     public function __construct(
+        FormContext $formContext,
         Registry $registry,
-        UrlFactory $urlFactory,
-        FormContext $formContext
+        UrlFactory $urlFactory
     ) {
         $this->registry = $registry;
         $this->urlFactory = $urlFactory;

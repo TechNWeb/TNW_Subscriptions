@@ -83,7 +83,6 @@ class Configurable extends Base
                     $childProduct = $product;
                 }
             }
-
         }
 
         if ($childProduct) {
@@ -113,9 +112,10 @@ class Configurable extends Base
         );
         /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->searchCriteriaBuilder->create();
-        $relations = $this->productFrequencyRepository->getList($searchCriteria)->getItems();
+        $relationsCount = $this->productFrequencyRepository->getList($searchCriteria)->getTotalCount();
 
-        return !empty($relations);
+        return 0 !== $relationsCount ;
+
     }
 
     /**

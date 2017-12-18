@@ -19,7 +19,7 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 /**
@@ -96,9 +96,9 @@ class Form extends AbstractDataProvider
     /**
      * Subscriptions product manager.
      *
-     * @var Manager
+     * @var ProductTypeFactoryResolver
      */
-    protected $productManager;
+    protected $productTypeResolver;
 
     /**
      * @param string $name
@@ -108,7 +108,7 @@ class Form extends AbstractDataProvider
      * @param SubscriptionContext $context
      * @param Context $formContext
      * @param PoolInterface $pool
-     * @param Manager $productManager
+     * @param ProductTypeFactoryResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -121,7 +121,7 @@ class Form extends AbstractDataProvider
         SubscriptionContext $context,
         Context $formContext,
         PoolInterface $pool,
-        Manager $productManager,
+        ProductTypeFactoryResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -133,7 +133,7 @@ class Form extends AbstractDataProvider
         $this->trialPeriod = [];
         $this->productBillingFrequencies = [];
         $this->pool = $pool;
-        $this->productManager = $productManager;
+        $this->productTypeResolver = $productTypeResolver;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -159,7 +159,7 @@ class Form extends AbstractDataProvider
     private function getAdditionalData()
     {
         return [
-            'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute')
+            'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute'),
         ];
     }
 
@@ -509,14 +509,15 @@ class Form extends AbstractDataProvider
      *
      * @param string $billingFrequencyId
      * @param int|string|null $productId
+     * @param []|null $additionalData
      * @return string
      */
-    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productId, $additionalData)
+    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productId, array $additionalData = null)
     {
         $productId = $productId ?: $this->getRequestProductId();
         $product = $this->formContext->getProductRepository()->getById($productId);
         $additionalData['billing_frequency'] = $billingFrequencyId;
-        $productDataObject = $this->productManager
+        $productDataObject = $this->productTypeResolver
             ->getProductManagerByType($product->getTypeId())
             ->getProductDataObject($product, $additionalData);
 
@@ -651,7 +652,7 @@ class Form extends AbstractDataProvider
      *
      * @param bool $needProductValues
      * @param string|null $productId
-     * @param array $additionalData
+     * @param array|null $additionalData
      * @return array
      */
     protected function getFrequenciesData($needProductValues, $productId, array $additionalData = null)
@@ -664,13 +665,11 @@ class Form extends AbstractDataProvider
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $data['product_frequencies'][$billingFrequencyId] =
                 $this->getBillingFrequencyData($productId, $frequency, $additionalData);
-            if ($needProductValues) {
-                if ($frequency->getDefaultBillingFrequency() || !$addedDefault) {
-                    $data['billing_frequency'] = $billingFrequencyId;
-                    $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
-                    $data['preset_qty'] = $frequency->getPresetQty();
-                    $addedDefault = true;
-                }
+            if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
+                $data['billing_frequency'] = $billingFrequencyId;
+                $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
+                $data['preset_qty'] = $frequency->getPresetQty();
+                $addedDefault = true;
             }
         }
 
@@ -716,7 +715,7 @@ class Form extends AbstractDataProvider
      *
      * @param int $productId
      * @param ProductBillingFrequencyInterface $frequency
-     * @param $additionalData
+     * @param array|null $additionalData
      * @return array
      */
     protected function getBillingFrequencyData(

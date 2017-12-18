@@ -5,9 +5,11 @@
  */
 
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
+
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Product manager interface.
@@ -19,6 +21,7 @@ interface TypeInterface
      *
      * @param \Magento\Catalog\Api\Data\ProductInterface[] $products
      * @return array
+     * @throws LocalizedException
      */
     public function modifyBuyRequests(array $products);
 

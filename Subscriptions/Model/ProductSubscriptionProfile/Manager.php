@@ -104,7 +104,6 @@ class Manager
         $this->configurableFactory = $configurableFactory;
     }
 
-
     public function reset()
     {
         $this->profileProduct = null;
@@ -375,31 +374,5 @@ class Manager
             }
         );
         return $result ? reset($result) : false;
-    }
-
-    /**
-     * Returns product manager by product type.
-     *
-     * @param string $type
-     * @return TypeInterface
-     * @throws \InvalidArgumentException
-     */
-    public function getProductManagerByType($type)
-    {
-        switch ($type) {
-            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
-            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
-                $result = $this->simpleFactory->create();
-                break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                $result = $this->configurableFactory->create();
-                break;
-            default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
-                break;
-        }
-
-        return $result;
     }
 }

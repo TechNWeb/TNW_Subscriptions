@@ -23,7 +23,7 @@ $finalPriceModel = $block->getPriceType('final_price');
 $idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
 $schema = ($block->getZone() == 'item_view') ? true : false;
 ?>
-<?php /* @escapeNotVerified */
+<?php
     $data = $block->renderSubscriptionAmounts(
         $finalPriceModel->getAmount(),
         $block->getProduct(),
@@ -40,8 +40,8 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
 {
     "*": {
         "tnwSubscribePrice": {
-            "subscriptionPricesData" : <?php echo $data ?>,
-            "subBillingFrequencyId" : <?php echo $block->getBillingFrequencyId() ?>
+            "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
+            "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>
         }
     }
 }

@@ -24,7 +24,6 @@ define([
             this._super();
             this.formatSuperAttributesData();
             this.setupChangeEvents();
-
         },
 
         /**
@@ -52,20 +51,17 @@ define([
                     widget._insertPriseBox()
                 });
             }));
-
-
         },
 
         /**
          * Return selected configurable child id.
          *
-         * @return int|null
+         * @return {int|null}
          */
         getSelectedProduct: function() {
             var productAttributesData = this.options.formattedProductAttributesData,
                 childrenValues = [],
                 selectedProduct = null;
-
 
             $.each($(this.options.childrenSelector), function (index, element) {
                 var elementName = element.name,
@@ -113,12 +109,11 @@ define([
                 selectedProduct = 'config';
             }
 
-            if (typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined') {
-                if (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined') {
-                    priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
-                } else {
-                    priceHtml = this.options.subscriptionPricesData['config'][optionIndex];
-                }
+            if (
+                (typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
+                && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')
+            ) {
+                priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
             } else {
                 priceHtml = this.options.subscriptionPricesData['config'][optionIndex];
             }
