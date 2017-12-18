@@ -47,6 +47,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param \Magento\Customer\Model\Session $customerSession
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCurrencyInterface $priceCurrency
+     * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
@@ -73,24 +74,11 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         ProfileManager $profileManager,
         array $data = []
     ) {
-        parent::__construct(
-            $context,
-            $urlEncoder,
-            $jsonEncoder,
-            $string,
-            $productHelper,
-            $productTypeConfig,
-            $localeFormat,
-            $customerSession,
-            $productRepository,
-            $priceCurrency,
-            $subscriptionProductViewConfig,
-            $config,
-            $frequencyOptionRepository,
-            $frequencyRepository,
-            $data
-        );
         $this->profileManager = $profileManager;
+        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
+            $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
+            $config, $frequencyOptionRepository, $frequencyRepository, $data
+        );
     }
 
     /**
