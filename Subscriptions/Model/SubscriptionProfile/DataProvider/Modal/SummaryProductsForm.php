@@ -26,6 +26,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditS
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 
 /**
  * Subscription items form data provider for subscription admin edit page.
@@ -87,6 +88,7 @@ class SummaryProductsForm extends ModifyForm
      * @param Manager $profileManager
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
+     * @param ProductManager $productManager
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -102,6 +104,7 @@ class SummaryProductsForm extends ModifyForm
         Manager $profileManager,
         Registry $registry,
         UrlInterface $urlBuilder,
+        ProductManager $productManager,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -117,6 +120,7 @@ class SummaryProductsForm extends ModifyForm
             $formContext,
             $pool,
             $registry,
+            $productManager,
             $scope,
             $meta,
             $data

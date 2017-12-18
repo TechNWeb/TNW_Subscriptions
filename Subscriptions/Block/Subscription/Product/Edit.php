@@ -13,6 +13,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyReposi
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -65,6 +66,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         \Magento\Customer\Model\Session $customerSession,
         ProductRepositoryInterface $productRepository,
         PriceCurrencyInterface $priceCurrency,
+        SubscriptionProductView $subscriptionProductViewConfig,
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
@@ -82,6 +84,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
             $customerSession,
             $productRepository,
             $priceCurrency,
+            $subscriptionProductViewConfig,
             $config,
             $frequencyOptionRepository,
             $frequencyRepository,

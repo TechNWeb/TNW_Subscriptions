@@ -4,7 +4,7 @@
  */
 
 define([
-    'jquery',
+    'jquery'
 ], function ($j) {
     'use strict';
 

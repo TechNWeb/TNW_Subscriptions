@@ -13,6 +13,9 @@ use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\ConfigurableFactory;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\SimpleFactory;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\TypeInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
@@ -49,6 +52,20 @@ class Manager
     private $profileProduct;
 
     /**
+     * Factory for creating product manager for simple product types.
+     *
+     * @var SimpleFactory
+     */
+    private $simpleFactory;
+
+    /**
+     * Factory for creating product manager for configurable product type.
+     *
+     * @var ConfigurableFactory
+     */
+    private $configurableFactory;
+
+    /**
      * Mapper between subscription product and magento product attributes.
      *
      * @var array
@@ -70,15 +87,21 @@ class Manager
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
+     * @param SimpleFactory $simpleFactory
+     * @param ConfigurableFactory $configurableFactory
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
-        MessageHistoryLogger $historyLogger
+        MessageHistoryLogger $historyLogger,
+        SimpleFactory $simpleFactory,
+        ConfigurableFactory $configurableFactory
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
+        $this->simpleFactory = $simpleFactory;
+        $this->configurableFactory = $configurableFactory;
     }
 
 
@@ -132,7 +155,6 @@ class Manager
     {
         return $this->productAttributesMap;
     }
-
 
     /**
      * Returns list of main profile products created from quote items.
@@ -353,5 +375,31 @@ class Manager
             }
         );
         return $result ? reset($result) : false;
+    }
+
+    /**
+     * Returns product manager by product type.
+     *
+     * @param string $type
+     * @return TypeInterface
+     * @throws \InvalidArgumentException
+     */
+    public function getProductManagerByType($type)
+    {
+        switch ($type) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $result = $this->simpleFactory->create();
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $result = $this->configurableFactory->create();
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
+                break;
+        }
+
+        return $result;
     }
 }

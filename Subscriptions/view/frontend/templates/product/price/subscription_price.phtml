@@ -23,12 +23,19 @@ $finalPriceModel = $block->getPriceType('final_price');
 $idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
 $schema = ($block->getZone() == 'item_view') ? true : false;
 ?>
-<?php /* @escapeNotVerified */ $data = $block->renderSubscriptionAmounts($finalPriceModel->getAmount(), [
-    'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
-    'price_type'        => 'finalPrice',
-    'include_container' => true,
-    'schema' => $schema,
-]); ?>
+<?php /* @escapeNotVerified */
+    $data = $block->renderSubscriptionAmounts(
+        $finalPriceModel->getAmount(),
+        $block->getProduct(),
+        [
+            'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+            'price_type'        => 'finalPrice',
+            'include_container' => true,
+            'schema' => $schema,
+        ]
+    );
+    $data = $block->getEncodedData($data);
+?>
 <script type="text/x-magento-init">
 {
     "*": {

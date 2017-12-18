@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
@@ -17,9 +18,10 @@ use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 
 /**
  * Class ModifyForm
@@ -109,6 +111,7 @@ class ModifyForm extends Form
         Context $formContext,
         PoolInterface $pool,
         Registry $registry,
+        Manager $productManager,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -122,6 +125,7 @@ class ModifyForm extends Form
             $context,
             $formContext,
             $pool,
+            $productManager,
             $scope,
             $meta,
             $data
@@ -158,7 +162,7 @@ class ModifyForm extends Form
                     'qty' => $item->getQty(),
                     'product_price' => $product->getPrice(),
                     'unlock_preset_qty' => $presetQty,
-                    'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
+                    'frequency_data' => $this->getFrequenciesData(false, $product->getId(), $this->getAdditionalDataForProduct($item)),
                     'initial_values' => [
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
@@ -176,6 +180,21 @@ class ModifyForm extends Form
         }
 
         return $data;
+    }
+
+    /**
+     * Return additional data from CartItemInterface.
+     *
+     * @param CartItemInterface $item
+     * @return array
+     */
+    private function getAdditionalDataForProduct(CartItemInterface $item)
+    {
+        $product = $this->getProductFromItem($item);
+
+        return $this->productManager
+            ->getProductManagerByType($product->getTypeId())
+            ->getAdditionalData($item);
     }
 
     /**

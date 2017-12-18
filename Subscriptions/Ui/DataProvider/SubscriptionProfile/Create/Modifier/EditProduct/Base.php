@@ -7,6 +7,9 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 /**
  * Base dataProvider modifier on add to subscription form for modify subscription data.
@@ -19,9 +22,24 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     const PRODUCT_TYPE = '';
 
     /**
-     * @var \Magento\Quote\Model\Quote\Item|\TNW\Subscriptions\Model\ProductSubscriptionProfile
+     * @var Item|ProductSubscriptionProfile
      */
     private $item;
+
+    /**
+     * Data providers form context.
+     *
+     * @var FormContext
+     */
+    private $formContext;
+
+    /**
+     * @param FormContext $formContext
+     */
+    public function __construct(FormContext $formContext)
+    {
+        $this->formContext = $formContext;
+    }
 
     /**
      * @inheritdoc
@@ -60,13 +78,24 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      */
     public function getProduct()
     {
-        return $this->getItem()->getProduct();
+        $currentItem = $this->getItem();
+        $product = $currentItem->getProduct();
+        if (!$product) {
+            $productId = $currentItem->getProductId();
+            if ($productId) {
+                $product = $this->formContext
+                    ->getProductRepository()
+                    ->getById($productId, false, $currentItem->getStoreId());
+            }
+        }
+
+        return $product;
     }
 
     /**
      * Set current quote item.
      *
-     * @param \Magento\Quote\Model\Quote\Item|\TNW\Subscriptions\Model\ProductSubscriptionProfile $item
+     * @param Item|ProductSubscriptionProfile $item
      */
     public function setItem($item)
     {
@@ -76,7 +105,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * Return current quote item.
      *
-     * @return \Magento\Quote\Model\Quote\Item||\TNW\Subscriptions\Model\ProductSubscriptionProfile
+     * @return Item|ProductSubscriptionProfile
      */
     protected function getItem()
     {

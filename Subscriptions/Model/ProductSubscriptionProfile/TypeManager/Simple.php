@@ -4,14 +4,15 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type;
+namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\Pricing\SaleableInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 
 /**
- * Buy request modifier for simple, virtual and downloadable products.
+ * Simple product manager.
  */
 class Simple extends Base
 {
@@ -47,16 +48,16 @@ class Simple extends Base
     /**
      * @inheritdoc
      */
-    public function getSubscriptionCustomPrice(ProductInterface $product, array $productData)
+    public function getProductDataObject(SaleableInterface $product, array $arguments = null)
     {
-        return $this->getCalculatedPrice($product, $productData, true);
-    }
+        $productData = parent::getProductDataObject($product, $arguments);
 
-    /**
-     * @inheritdoc
-     */
-    public function getSubscriptionPrice(ProductInterface $product, array $productData)
-    {
-        return $this->getCalculatedPrice($product, $productData);
+        $data = [
+            'child_product_id' => $product->getId(),
+            'child_product_price' => $product->getOrigData('price'),
+        ];
+        $productData->addData($data);
+
+        return $productData;
     }
 }
