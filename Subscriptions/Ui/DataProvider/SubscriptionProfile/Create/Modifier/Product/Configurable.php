@@ -7,10 +7,10 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 
 /**
  * DataProvider modifier on add to subscription form for configurable products.

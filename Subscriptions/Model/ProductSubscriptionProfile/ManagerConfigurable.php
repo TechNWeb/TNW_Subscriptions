@@ -6,12 +6,16 @@
 
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\DataObject;
 use Magento\Framework\DataObject\Factory as DataObjectFactory;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Configurable as ConfigurableTypeManager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -41,18 +45,42 @@ class ManagerConfigurable
     private $objectFactory;
 
     /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var ProductFrequencyRepository
+     */
+    private $productFrequencyRepository;
+
+    /**
+     * @var ConfigurableTypeManager
+     */
+    private $configurableTypeManager;
+
+    /**
      * @param ProfileManager $profileManager
      * @param ProductSubscriptionProfileRepository $subproductRepository
      * @param DataObjectFactory $objectFactory
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductFrequencyRepository $productFrequencyRepository
+     * @param ConfigurableTypeManager $configurableTypeManager
      */
     public function __construct(
         ProfileManager $profileManager,
         ProductSubscriptionProfileRepository $subproductRepository,
-        DataObjectFactory $objectFactory
+        DataObjectFactory $objectFactory,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductFrequencyRepository $productFrequencyRepository,
+        ConfigurableTypeManager $configurableTypeManager
     ) {
         $this->profileManager = $profileManager;
         $this->subproductRepository = $subproductRepository;
         $this->objectFactory = $objectFactory;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->productFrequencyRepository = $productFrequencyRepository;
+        $this->configurableTypeManager = $configurableTypeManager;
     }
 
     /**
@@ -190,11 +218,15 @@ class ManagerConfigurable
                         return strval($candidates);
                     }
 
+                    $price = $this->getSubscriptionItemPrice($request, $profile, $magentoProduct);
+
                     foreach ($candidates as $candidate) {
                         if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
                             //if $candidate is current updated product
-                            $updatedSubProduct->setDataChanges(false);
-                            $updatedSubProduct->setQty($candidate->getQty());
+                            $updatedSubProduct
+                                ->setDataChanges(false)
+                                ->setQty($candidate->getQty())
+                                ->setPrice($price);
                             $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
                         } else {
                             //if $candidate is a configurable child product.
@@ -217,5 +249,29 @@ class ManagerConfigurable
         }
 
         return $profile;
+    }
+
+    /**
+     * Return calculated price for subscription item.
+     *
+     * @param DataObject $request
+     * @param SubscriptionProfile $profile
+     * @param Product $magentoProduct
+     * @return float|string
+     */
+    private function getSubscriptionItemPrice(
+        DataObject $request,
+        SubscriptionProfile $profile,
+        Product $magentoProduct
+    ) {
+        $requestData = $request->getData();
+        $requestData['billing_frequency'] = $profile->getBillingFrequencyId();
+        if (isset($requestData['price'])) {
+            unset($requestData['price']);
+        }
+
+        $price = $this->configurableTypeManager->getSubscriptionPrice($magentoProduct, $requestData);
+
+        return $price;
     }
 }

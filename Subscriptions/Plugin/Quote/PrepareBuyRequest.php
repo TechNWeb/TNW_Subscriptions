@@ -8,7 +8,8 @@ namespace TNW\Subscriptions\Plugin\Quote;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Type\AbstractType;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 
@@ -18,19 +19,17 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 class PrepareBuyRequest
 {
     /**
-     * Subscriptions product modifier.
+     * Subscriptions product manager.
      *
-     * @var Product
+     * @var ProductTypeManagerResolver
      */
-    private $productModifier;
+    private $productTypeResolver;
 
     /**
-     * @param Product $productModifier
+     * @param ProductTypeManagerResolver $productTypeResolver
      */
-    public function __construct(
-        Product $productModifier
-    ) {
-        $this->productModifier = $productModifier;
+    public function __construct(ProductTypeManagerResolver $productTypeResolver) {
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     /**
@@ -51,7 +50,7 @@ class PrepareBuyRequest
                     $buyRequestValue = OptionValueResolver::getDecodedValue($buyRequest->getValue());
                     if (!empty($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])) {
                         $type = $firstItem->getTypeId();
-                        $this->productModifier->getBuyRequestModifier($type)
+                        $this->productTypeResolver->resolve($type)
                             ->modifyBuyRequests($result);
                     }
                 }

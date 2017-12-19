@@ -81,7 +81,6 @@ class Manager
         $this->historyLogger = $historyLogger;
     }
 
-
     public function reset()
     {
         $this->profileProduct = null;
@@ -132,7 +131,6 @@ class Manager
     {
         return $this->productAttributesMap;
     }
-
 
     /**
      * Returns list of main profile products created from quote items.
