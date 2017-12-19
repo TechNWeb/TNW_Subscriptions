@@ -146,7 +146,7 @@ class PriceCalculator
     /**
      * Get trial offered status.
      *
-     * @param Product $product
+     * @param DataObject $product
      * @return bool
      */
     private function getTrialOfferedStatus(DataObject $product)
