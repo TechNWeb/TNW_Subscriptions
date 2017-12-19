@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -58,7 +58,7 @@ class Product extends Create
     private $extensionManager;
 
     /**
-     * @var ProductTypeFactoryResolver
+     * @var ProductTypeManagerResolver
      */
     private $productTypeResolver;
 
@@ -75,7 +75,7 @@ class Product extends Create
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      * @param ExtensionManager $extensionManager
-     * @param ProductTypeFactoryResolver $productTypeResolver
+     * @param ProductTypeManagerResolver $productTypeResolver
      */
     public function __construct(
         Context $context,
@@ -83,7 +83,7 @@ class Product extends Create
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
         ExtensionManager $extensionManager,
-        ProductTypeFactoryResolver $productTypeResolver
+        ProductTypeManagerResolver $productTypeResolver
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
@@ -308,7 +308,7 @@ class Product extends Create
      */
     private function getCustomPrice(MagentoProduct $product, array $productData)
     {
-        return $this->productTypeResolver->getProductManagerByType($product->getTypeId())
+        return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionCustomPrice($product, $productData);
     }
 
@@ -321,7 +321,7 @@ class Product extends Create
      */
     private function getPrice(MagentoProduct $product, array $productData)
     {
-        return $this->productTypeResolver->getProductManagerByType($product->getTypeId())
+        return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionPrice($product, $productData);
     }
 }

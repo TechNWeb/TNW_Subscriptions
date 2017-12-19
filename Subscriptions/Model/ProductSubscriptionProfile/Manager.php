@@ -52,20 +52,6 @@ class Manager
     private $profileProduct;
 
     /**
-     * Factory for creating product manager for simple product types.
-     *
-     * @var SimpleFactory
-     */
-    private $simpleFactory;
-
-    /**
-     * Factory for creating product manager for configurable product type.
-     *
-     * @var ConfigurableFactory
-     */
-    private $configurableFactory;
-
-    /**
      * Mapper between subscription product and magento product attributes.
      *
      * @var array
@@ -87,21 +73,15 @@ class Manager
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
-     * @param SimpleFactory $simpleFactory
-     * @param ConfigurableFactory $configurableFactory
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
-        MessageHistoryLogger $historyLogger,
-        SimpleFactory $simpleFactory,
-        ConfigurableFactory $configurableFactory
+        MessageHistoryLogger $historyLogger
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
-        $this->simpleFactory = $simpleFactory;
-        $this->configurableFactory = $configurableFactory;
     }
 
     public function reset()

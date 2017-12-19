@@ -19,7 +19,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -68,7 +68,7 @@ class SubscriptionPriceBox extends BasePriceBox
     private $profileManager;
 
     /**
-     * @var ProductTypeFactoryResolver
+     * @var ProductTypeManagerResolver
      */
     private $productTypeResolver;
 
@@ -84,7 +84,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
      * @param ProfileManager $profileManager
-     * @param ProductTypeFactoryResolver $productTypeResolver
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param array $data
      */
     public function __construct(
@@ -99,7 +99,7 @@ class SubscriptionPriceBox extends BasePriceBox
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         DescriptionCreator $descriptionCreator,
         ProfileManager $profileManager,
-        ProductTypeFactoryResolver $productTypeResolver,
+        ProductTypeManagerResolver $productTypeResolver,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -179,7 +179,7 @@ class SubscriptionPriceBox extends BasePriceBox
 
                 if ($product->getId() != $product->getChildProductId()) {
                     $existFrequency = $this->productTypeResolver
-                        ->getProductManagerByType($product->getTypeId())
+                        ->resolve($product->getTypeId())
                         ->checkFrequencyExistanse($billingFrequencyId, [$product->getData('child_product_id')]);
                 }
 
@@ -284,7 +284,7 @@ class SubscriptionPriceBox extends BasePriceBox
             $product = $this->getProduct();
         }
         $productData = $this->productTypeResolver
-            ->getProductManagerByType($product->getTypeId())
+            ->resolve($product->getTypeId())
             ->getProductDataObject($product, $arguments);
         foreach ($this->getProductBillingFrequencies($productData) as $key => $billingFrequencyData) {
             $currentArguments['billing_frequency'] = array_replace($billingFrequencyData, $arguments);

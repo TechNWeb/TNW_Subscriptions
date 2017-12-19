@@ -13,7 +13,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\TypeInterface
 /**
  * Resolve product type factory
  */
-class ProductTypeFactoryResolver
+class ProductTypeManagerResolver
 {
     /**
      * Factory for creating product manager for simple product types.
@@ -28,7 +28,6 @@ class ProductTypeFactoryResolver
      * @var ConfigurableFactory
      */
     private $configurableFactory;
-
 
     /**
      * @param SimpleFactory $simpleFactory
@@ -49,7 +48,7 @@ class ProductTypeFactoryResolver
      * @return TypeInterface
      * @throws \InvalidArgumentException
      */
-    public function getProductManagerByType($type)
+    public function resolve($type)
     {
         switch ($type) {
             case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:

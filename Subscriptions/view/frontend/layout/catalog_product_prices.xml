@@ -21,7 +21,7 @@
             <argument name="configurable" xsi:type="array">
                 <item name="prices" xsi:type="array">
                     <item name="subscription_price" xsi:type="array">
-                        <item name="render_class" xsi:type="string">TNW\Subscriptions\Pricing\Render\SubConfigurablePriceBox</item>
+                        <item name="render_class" xsi:type="string">TNW\Subscriptions\Pricing\Render\SubcsriptionConfigurablePriceBox</item>
                         <item name="render_template" xsi:type="string">TNW_Subscriptions::product/price/sub_configurable_price.phtml</item>
                         <item name="amount_render_template" xsi:type="string">TNW_Subscriptions::product/price/amount/default.phtml</item>
                         <item name="amount_render_class" xsi:type="string">TNW\Subscriptions\Pricing\Render\SubscriptionAmount</item>

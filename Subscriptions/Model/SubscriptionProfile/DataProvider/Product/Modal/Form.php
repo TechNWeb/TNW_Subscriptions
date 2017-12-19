@@ -19,7 +19,7 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 /**
@@ -96,7 +96,7 @@ class Form extends AbstractDataProvider
     /**
      * Subscriptions product manager.
      *
-     * @var ProductTypeFactoryResolver
+     * @var ProductTypeManagerResolver
      */
     protected $productTypeResolver;
 
@@ -108,7 +108,7 @@ class Form extends AbstractDataProvider
      * @param SubscriptionContext $context
      * @param Context $formContext
      * @param PoolInterface $pool
-     * @param ProductTypeFactoryResolver $productTypeResolver
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -121,7 +121,7 @@ class Form extends AbstractDataProvider
         SubscriptionContext $context,
         Context $formContext,
         PoolInterface $pool,
-        ProductTypeFactoryResolver $productTypeResolver,
+        ProductTypeManagerResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -518,7 +518,7 @@ class Form extends AbstractDataProvider
         $product = $this->formContext->getProductRepository()->getById($productId);
         $additionalData['billing_frequency'] = $billingFrequencyId;
         $productDataObject = $this->productTypeResolver
-            ->getProductManagerByType($product->getTypeId())
+            ->resolve($product->getTypeId())
             ->getProductDataObject($product, $additionalData);
 
         return $this->priceCalculator->getUnitPrice($productDataObject, $billingFrequencyId, null, false);

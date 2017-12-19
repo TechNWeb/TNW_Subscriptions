@@ -151,7 +151,7 @@ class PriceCalculator
      */
     private function getTrialOfferedStatus(DataObject $product)
     {
-        return $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)
+        return $product->hasData(Attribute::SUBSCRIPTION_TRIAL_STATUS)
             ? (bool)$product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)
             : false;
     }

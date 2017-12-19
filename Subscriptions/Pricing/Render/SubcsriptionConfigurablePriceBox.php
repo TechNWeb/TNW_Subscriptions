@@ -19,12 +19,12 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
  * Class for subscription_price rendering for configurable products.
  */
-class SubConfigurablePriceBox extends SubscriptionPriceBox
+class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
 {
     /**
      * @var HelperProduct
@@ -58,7 +58,7 @@ class SubConfigurablePriceBox extends SubscriptionPriceBox
         \Magento\Framework\Json\Helper\Data $jsonHelper,
         DescriptionCreator $descriptionCreator,
         ProfileManager $profileManager,
-        ProductTypeFactoryResolver $productTypeResolver,
+        ProductTypeManagerResolver $productTypeResolver,
         HelperProduct $helperProduct,
         array $data = []
     ) {

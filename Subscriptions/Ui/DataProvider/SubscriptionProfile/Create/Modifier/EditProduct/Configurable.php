@@ -45,9 +45,9 @@ class Configurable extends Base
     private $urlFactory;
 
     /**
+     * @param FormContext $formContext
      * @param Registry $registry
      * @param UrlFactory $urlFactory
-     * @param FormContext $formContext
      */
     public function __construct(
         FormContext $formContext,

@@ -20,7 +20,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeFactoryResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
  * DataProvider to show products on subscription checkout.
@@ -68,7 +68,7 @@ class Products extends ModifyForm
      * @param PoolInterface $pool
      * @param DescriptionCreator $descriptionCreator
      * @param Registry $registry
-     * @param ProductTypeFactoryResolver $productTypeResolver
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -83,7 +83,7 @@ class Products extends ModifyForm
         PoolInterface $pool,
         DescriptionCreator $descriptionCreator,
         Registry $registry,
-        ProductTypeFactoryResolver $productTypeResolver,
+        ProductTypeManagerResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
