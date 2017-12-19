@@ -91,6 +91,7 @@ define([
          */
         _insertPriseBox: function (optionIndex) {
             var selectedProduct = this.getSelectedProduct(),
+                subscriptionPriceContainer = $(this.options.subscriptionPriceContainerSelector),
                 priceHtml,
                 currentFrequency;
             if (!optionIndex) {
@@ -109,8 +110,7 @@ define([
                 selectedProduct = 'config';
             }
 
-            if (
-                (typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
+            if ((typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
                 && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')
             ) {
                 priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
@@ -118,8 +118,7 @@ define([
                 priceHtml = this.options.subscriptionPricesData['config'][optionIndex];
             }
 
-            var subscriptionPriceContainer = $(this.options.subscriptionPriceContainerSelector);
-            $(subscriptionPriceContainer).html(priceHtml);
+            subscriptionPriceContainer.html(priceHtml);
         }
     });
 

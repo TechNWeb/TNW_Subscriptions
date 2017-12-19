@@ -115,7 +115,6 @@ class Configurable extends Base
         $relationsCount = $this->productFrequencyRepository->getList($searchCriteria)->getTotalCount();
 
         return 0 !== $relationsCount;
-
     }
 
     /**

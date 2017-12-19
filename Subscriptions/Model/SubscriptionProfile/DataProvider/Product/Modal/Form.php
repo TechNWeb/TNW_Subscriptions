@@ -509,7 +509,7 @@ class Form extends AbstractDataProvider
      *
      * @param string $billingFrequencyId
      * @param int|string|null $productId
-     * @param []|null $additionalData
+     * @param array|null $additionalData
      * @return string
      */
     private function getBillingFrequencyUnitPrice($billingFrequencyId, $productId, array $additionalData = null)

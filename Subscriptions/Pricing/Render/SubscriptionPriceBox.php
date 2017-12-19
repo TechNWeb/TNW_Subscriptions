@@ -272,7 +272,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param AmountInterface $amount
      * @param SaleableInterface $product
      * @param array $arguments
-     * @return []
+     * @return array
      */
     public function renderSubscriptionAmounts(
         AmountInterface $amount,

@@ -22,7 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
- * Class for subscription_price rendering for configurable products.
+ * Class for subscription price rendering for configurable products.
  */
 class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
 {

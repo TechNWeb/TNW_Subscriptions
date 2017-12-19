@@ -76,10 +76,6 @@ abstract class Base implements TypeInterface
      */
     public function getProductDataObject(SaleableInterface $product, array $arguments = null)
     {
-        if (!$product) {
-            $product = $this->getProduct();
-        }
-
         $data = [
             'price' => $product->getOrigData('price'),
             'id' => $product->getId(),
