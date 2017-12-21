@@ -365,7 +365,7 @@ class Manager
      */
     protected function getProductPrice(Item $item, $zeroPrices, array $buyRequest)
     {
-        $price = $buyRequest[Create::NON_UNIQUE]['use_preset_qty']
+        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
             ? $item->getRowTotal()
             : $item->getPrice();
 
@@ -381,7 +381,7 @@ class Manager
      */
     protected function getProductSubscribedPrice($zeroPrices, array $buyRequest)
     {
-        $price = $buyRequest[Create::NON_UNIQUE]['use_preset_qty']
+        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
             ? $buyRequest[Create::NON_UNIQUE]['preset_qty_price']
             : $buyRequest[Create::NON_UNIQUE]['price'];
 
