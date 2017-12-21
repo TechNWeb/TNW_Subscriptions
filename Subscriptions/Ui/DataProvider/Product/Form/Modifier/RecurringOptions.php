@@ -599,7 +599,6 @@ class RecurringOptions extends BaseModifier
      */
     private function getInitialFeeFieldConfig($sortOrder)
     {
-        $a = 1;
         return [
             'arguments' => [
                 'data' => [
