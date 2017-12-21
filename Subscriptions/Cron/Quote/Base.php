@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -164,8 +165,17 @@ abstract class Base implements ProcessInterface
         SubscriptionProduct $profileProduct
     ) {
         $data = [
-            'custom_price' => $profileProduct->getPrice(),
-            'qty' => $profileProduct->getQty()
+            'custom_price' => $profileProduct->getUnitPrice(),
+            'qty' => $profileProduct->getQty(),
+            Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
+                Create::UNIQUE => [
+                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty()
+                ],
+                Create::NON_UNIQUE => [
+                    'current_preset_qty_price' => $profileProduct->getPrice()
+                ],
+                Create::FULL_REQUEST_PARAM_NAME => false
+            ]
         ];
         $productType = $profileProduct->getMagentoProduct()->getTypeId();
         switch ($productType) {
@@ -247,13 +257,8 @@ abstract class Base implements ProcessInterface
     protected function addProductsToQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
         foreach ($profile->getVisibleProducts() as $profileProduct) {
-            $addRequest = $this->getProductAddRequest(
-                $profileProduct
-            );
-            $quote->addProduct(
-                $profileProduct->getMagentoProduct(),
-                $addRequest
-            );
+            $addRequest = $this->getProductAddRequest($profileProduct);
+            $quote->addProduct($profileProduct->getMagentoProduct(), $addRequest);
         }
     }
 

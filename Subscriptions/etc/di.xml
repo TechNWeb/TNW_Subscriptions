@@ -752,4 +752,16 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\ProductsForm\Modifier\Pool</argument>
         </arguments>
     </type>
+    <type name="Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector">
+        <plugin name="tnw_subscriptions_common_tax_collector"
+                type="TNW\Subscriptions\Plugin\Quote\CommonTaxCollector"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <preference for="Magento\Tax\Model\Calculation\RowBaseCalculator"
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\RowBaseCalculator"/>
+    <preference for="Magento\Tax\Model\Calculation\TotalBaseCalculator"
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\TotalBaseCalculator"/>
+    <preference for="Magento\Tax\Model\Calculation\UnitBaseCalculator"
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\TotalBaseCalculator"/>
 </config>

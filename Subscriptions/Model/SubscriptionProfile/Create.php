@@ -33,6 +33,15 @@ class Create
     const NON_UNIQUE = 'non_unique';
 
     /**
+     * Param to check if we need to create full subscription request.
+     *
+     * Using on quote generation. In this case we don't need full request to create quote for profile.
+     * true - if we creating subscription profile (its our first quote).
+     * false - if its quote creation/updating for already existing profile (cron task).
+     */
+    const FULL_REQUEST_PARAM_NAME = 'full_request';
+
+    /**
      * @var Context
      */
     private $context;

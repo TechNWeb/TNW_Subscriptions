@@ -141,7 +141,25 @@ class ProductSubscriptionProfile
      */
     public function getPrice()
     {
-        return $this->getData(self::PRICE);
+        $result = $this->getData(self::PRICE);
+        if (!$this->getTnwSubscrUnlockPresetQty()){
+            $result *= $this->getQty();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUnitPrice()
+    {
+        $result = $this->getData(self::PRICE);
+        if ($this->getTnwSubscrUnlockPresetQty()){
+            $result = round($result / $this->getQty());
+        }
+
+        return $result;
     }
 
     /**

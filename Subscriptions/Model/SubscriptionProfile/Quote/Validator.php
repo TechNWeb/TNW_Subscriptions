@@ -218,6 +218,10 @@ class Validator
                     round($result[CreateProfile::NON_UNIQUE]['current_price'], 2);
             }
         }
+        //unset from request full request flag, for validation we don't need it
+        unset($result[CreateProfile::FULL_REQUEST_PARAM_NAME]);
+        //unset from request preset qty price, for validation we need only current preset qty price
+        unset($result[CreateProfile::NON_UNIQUE]['preset_qty_price']);
 
         return [$result, $productsData];
     }
@@ -240,9 +244,14 @@ class Validator
             $fee = $initialFees ? $initialFees->getSubsInitialFee() : 0;
             $request[CreateProfile::NON_UNIQUE]['current_price'] = (float)$item->getPrice();
             $request[CreateProfile::NON_UNIQUE]['initial_fee'] = $fee;
+            $request[CreateProfile::NON_UNIQUE]['current_preset_qty_price'] = $item->getRowTotal();
+            //unset from request preset qty price, for validation we need only current preset qty price
+            unset($request[CreateProfile::NON_UNIQUE]['preset_qty_price']);
         } else {
             unset($request[CreateProfile::NON_UNIQUE]);
         }
+        //unset from request full request flag, for validation we don't need it
+        unset($request[CreateProfile::FULL_REQUEST_PARAM_NAME]);
 
         return $request;
     }

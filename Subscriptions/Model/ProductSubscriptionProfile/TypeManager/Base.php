@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\SaleableInterface;
@@ -74,6 +73,36 @@ abstract class Base implements TypeInterface
     /**
      * @inheritdoc
      */
+    public function getSubscriptionCurrentPresetQtyPrice(ProductInterface $product, array $productData)
+    {
+        $productObjectData = $this->getProductDataObject($product, $productData);
+
+        return $this->getCalculatedPrice(
+            $productObjectData,
+            $productData,
+            true,
+            true
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubscriptionPresetQtyPrice(ProductInterface $product, array $productData)
+    {
+        $productObjectData = $this->getProductDataObject($product, $productData);
+
+        return $this->getCalculatedPrice(
+            $productObjectData,
+            $productData,
+            false,
+            true
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getProductDataObject(SaleableInterface $product, array $arguments = null)
     {
         $data = [
@@ -95,7 +124,7 @@ abstract class Base implements TypeInterface
             SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE),
             SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT =>
-                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT),
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT)
         ];
         $productData = new DataObject();
         $productData->addData($data);
@@ -111,9 +140,13 @@ abstract class Base implements TypeInterface
      * @param bool $full
      * @return float|string
      */
-    protected function getCalculatedPrice(DataObject $product, array $productData, $full = false)
-    {
-        $usePresetQty = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+    protected function getCalculatedPrice(
+        DataObject $product,
+        array $productData,
+        $full = false,
+        $rowPrice = false
+    ) {
+        $usePresetQty = $productData['use_preset_qty'] && $productData['qty'] !== 0;
         //Calculate product Price
         $price = $this->priceCalculator->getUnitPrice(
             $product,
@@ -122,8 +155,10 @@ abstract class Base implements TypeInterface
             $full
         );
 
-        if ($usePresetQty && $productData['qty'] !== 0) {
+        if (!$rowPrice && $usePresetQty){
             $price = round($price / $productData['qty'], 4);
+        } elseif ($rowPrice && !$usePresetQty) {
+            $price *= $productData['qty'];
         }
 
         return $price;

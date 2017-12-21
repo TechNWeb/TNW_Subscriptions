@@ -121,6 +121,13 @@ interface ProductSubscriptionProfileInterface
     public function setPrice($price);
 
     /**
+     * Gets price.
+     *
+     * @return string|null
+     */
+    public function getUnitPrice();
+
+    /**
      * Gets initial fee.
      *
      * @return string|null
