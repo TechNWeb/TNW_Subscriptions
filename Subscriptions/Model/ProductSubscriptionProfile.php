@@ -142,7 +142,7 @@ class ProductSubscriptionProfile
     public function getPrice()
     {
         $result = $this->getData(self::PRICE);
-        if (!$this->getTnwSubscrUnlockPresetQty()){
+        if (!$this->getTnwSubscrUnlockPresetQty()) {
             $result *= $this->getQty();
         }
 
@@ -155,8 +155,8 @@ class ProductSubscriptionProfile
     public function getUnitPrice()
     {
         $result = $this->getData(self::PRICE);
-        if ($this->getTnwSubscrUnlockPresetQty()){
-            $result = round($result / $this->getQty());
+        if ($this->getTnwSubscrUnlockPresetQty()) {
+            $result =  $this->getQty() ? round($result / $this->getQty()) : 0;
         }
 
         return $result;

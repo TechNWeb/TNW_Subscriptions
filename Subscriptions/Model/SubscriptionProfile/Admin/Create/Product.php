@@ -185,7 +185,7 @@ class Product extends Create
                         'trial_unit_id' => $trialUnitId,
                         'use_preset_qty' => $productData['use_preset_qty'],
                     ],
-                    static::FULL_REQUEST_PARAM_NAME => true
+                    static::FULL_REQUEST_PARAM_NAME => true,
                 ],
             ];
             if ($fullRequest) {
@@ -297,7 +297,7 @@ class Product extends Create
                         'initial_fee' =>  (float)$initialFee,
                         'price' => $this->getPrice($this->getProduct(), $productData),
                         'current_preset_qty_price' => $this->getCurrentPresetQtyPrice($this->getProduct(), $productData),
-                        'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData)
+                        'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData),
                     ]
                 ],
             ]

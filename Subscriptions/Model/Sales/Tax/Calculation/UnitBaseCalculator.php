@@ -44,7 +44,7 @@ class UnitBaseCalculator extends MagentoUnitCalculator
         $discountAmount = $item->getDiscountAmount();
         if ($applyTaxAfterDiscount) {
             //TODO: handle originalDiscountAmount
-            $unitDiscountAmount = $discountAmount / $quantity;
+            $unitDiscountAmount = $quantity ? $discountAmount / $quantity : 0;
             $taxableAmount = max($priceInclTax - $unitDiscountAmount, 0);
             $unitTaxAfterDiscount = $this->calculationTool->calcTaxAmount(
                 $taxableAmount,
@@ -205,7 +205,7 @@ class UnitBaseCalculator extends MagentoUnitCalculator
             //Handle discount
             if ($applyTaxAfterDiscount) {
                 //TODO: handle originalDiscountAmount
-                $unitDiscountAmount = $discountAmount / $quantity;
+                $unitDiscountAmount = $quantity ? $discountAmount / $quantity : 0;
                 $taxableAmount = max($price - $unitDiscountAmount, 0);
                 $unitTaxAfterDiscount = $this->calculationTool->calcTaxAmount(
                     $taxableAmount,

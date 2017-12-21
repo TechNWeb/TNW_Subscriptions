@@ -759,9 +759,9 @@
                 disabled="false"/>
     </type>
     <preference for="Magento\Tax\Model\Calculation\RowBaseCalculator"
-                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\RowBaseCalculator"/>
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\RowAndTotalBaseCalculator"/>
     <preference for="Magento\Tax\Model\Calculation\TotalBaseCalculator"
-                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\TotalBaseCalculator"/>
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\RowAndTotalBaseCalculator"/>
     <preference for="Magento\Tax\Model\Calculation\UnitBaseCalculator"
-                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\TotalBaseCalculator"/>
+                type="TNW\Subscriptions\Model\Sales\Tax\Calculation\UnitBaseCalculator"/>
 </config>

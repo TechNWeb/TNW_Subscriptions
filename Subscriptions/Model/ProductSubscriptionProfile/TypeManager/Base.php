@@ -146,7 +146,8 @@ abstract class Base implements TypeInterface
         $full = false,
         $rowPrice = false
     ) {
-        $usePresetQty = $productData['use_preset_qty'] && $productData['qty'] !== 0;
+        $productQty = (isset($productData['qty']) && $productData['qty'] > 0) ? $productData['qty'] : 0;
+            $usePresetQty = $productData['use_preset_qty'] && $productQty;
         //Calculate product Price
         $price = $this->priceCalculator->getUnitPrice(
             $product,
@@ -156,7 +157,7 @@ abstract class Base implements TypeInterface
         );
 
         if (!$rowPrice && $usePresetQty){
-            $price = round($price / $productData['qty'], 4);
+            $price = $productQty ? round($price / $productQty, 4) : 0;
         } elseif ($rowPrice && !$usePresetQty) {
             $price *= $productData['qty'];
         }

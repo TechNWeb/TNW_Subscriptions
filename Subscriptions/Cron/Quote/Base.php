@@ -169,12 +169,12 @@ abstract class Base implements ProcessInterface
             'qty' => $profileProduct->getQty(),
             Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                 Create::UNIQUE => [
-                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty()
+                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty(),
                 ],
                 Create::NON_UNIQUE => [
-                    'current_preset_qty_price' => $profileProduct->getPrice()
+                    'current_preset_qty_price' => $profileProduct->getPrice(),
                 ],
-                Create::FULL_REQUEST_PARAM_NAME => false
+                Create::FULL_REQUEST_PARAM_NAME => false,
             ]
         ];
         $productType = $profileProduct->getMagentoProduct()->getTypeId();

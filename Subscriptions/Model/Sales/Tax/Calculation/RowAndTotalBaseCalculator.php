@@ -6,12 +6,12 @@
 namespace TNW\Subscriptions\Model\Sales\Tax\Calculation;
 
 use Magento\Tax\Api\Data\QuoteDetailsItemInterface;
-use Magento\Tax\Model\Calculation\TotalBaseCalculator as MagentoTotalCalculator;
+use Magento\Tax\Model\Calculation\RowBaseCalculator as MagentoRowCalculator;
 
 /**
- * Subscription total base tax calculator.
+ * Subscription row base tax calculator.
  */
-class TotalBaseCalculator extends MagentoTotalCalculator
+class RowAndTotalBaseCalculator extends MagentoRowCalculator
 {
     /**
      * {@inheritdoc}
@@ -58,7 +58,7 @@ class TotalBaseCalculator extends MagentoTotalCalculator
         $rowTax = $this->roundAmount($rowTaxExact, $rate, true, $deltaRoundingType, $round, $item);
 
         $rowTotal = $rowTotalInclTax - $rowTax;
-        $price = $rowTotal / $quantity;
+        $price = $quantity ? $rowTotal / $quantity : 0;
 
         //Add logic for preset qty for subscription products
         if ($item->getData('subscription_use_preset_qty') && $item->getData('subscription_preset_qty_price')) {
@@ -181,7 +181,7 @@ class TotalBaseCalculator extends MagentoTotalCalculator
         $rowTax = array_sum($rowTaxes);
         $rowTaxBeforeDiscount = array_sum($rowTaxesBeforeDiscount);
         $rowTotalInclTax = $rowTotal + $rowTaxBeforeDiscount;
-        $priceInclTax = $rowTotalInclTax / $quantity;
+        $priceInclTax = $quantity ? $rowTotalInclTax / $quantity : 0;
         if ($round) {
             $priceInclTax = $this->calculationTool->round($priceInclTax);
         }
