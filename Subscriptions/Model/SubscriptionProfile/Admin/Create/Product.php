@@ -160,6 +160,9 @@ class Product extends Create
     {
         if (!$this->buyRequest) {
             $productData = $this->getData();
+            // add preset qty param to product request array
+            $productData['use_preset_qty'] = (bool) $this->getProduct()
+                ->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
             $product = $this->getProduct();
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
@@ -180,7 +183,9 @@ class Product extends Create
                         'start_on' => $this->getStartOnDate($startOn),
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
+                        'use_preset_qty' => $productData['use_preset_qty'],
                     ],
+                    static::FULL_REQUEST_PARAM_NAME => true,
                 ],
             ];
             if ($fullRequest) {
@@ -291,6 +296,8 @@ class Product extends Create
                         'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
                         'initial_fee' =>  (float)$initialFee,
                         'price' => $this->getPrice($this->getProduct(), $productData),
+                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice($this->getProduct(), $productData),
+                        'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData),
                     ]
                 ],
             ]
@@ -323,5 +330,33 @@ class Product extends Create
     {
         return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionPrice($product, $productData);
+    }
+
+    /**
+     * Returns product subscription preset qty price.
+     * Used for products with preset qty and returns the price for the whole quantity.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getPresetQtyPrice(MagentoProduct $product, array $productData)
+    {
+        return $this->productTypeResolver->resolve($product->getTypeId())
+            ->getSubscriptionPresetQtyPrice($product, $productData);
+    }
+
+    /**
+     * Returns product subscription trial preset qty price.
+     * Used for products with preset qty and returns the price for the whole quantity.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getCurrentPresetQtyPrice(MagentoProduct $product, array $productData)
+    {
+        return $this->productTypeResolver->resolve($product->getTypeId())
+            ->getSubscriptionCurrentPresetQtyPrice($product, $productData);
     }
 }

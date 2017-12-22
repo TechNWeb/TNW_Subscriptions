@@ -27,6 +27,7 @@ interface TypeInterface
 
     /**
      * Returns full product subscription price.
+     * Full means with trial and initial fee options.
      *
      * @param \Magento\Catalog\Api\Data\ProductInterface $product
      * @param array $productData
@@ -45,6 +46,32 @@ interface TypeInterface
      * @return float|string
      */
     public function getSubscriptionPrice(
+        \Magento\Catalog\Api\Data\ProductInterface $product,
+        array $productData
+    );
+
+    /**
+     * Returns product subscription current preset qty price. Used for products with preset qty.
+     * If product does not have preset qty the price will be the same as getSubscriptionCustomPrice
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $productData
+     * @return float|string
+     */
+    public function getSubscriptionCurrentPresetQtyPrice(
+        \Magento\Catalog\Api\Data\ProductInterface $product,
+        array $productData
+    );
+
+    /**
+     * Returns product subscription preset qty price. Used for products with preset qty.
+     * If product does not have preset qty the price will be the same as getSubscriptionPrice
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param array $productData
+     * @return float|string
+     */
+    public function getSubscriptionPresetQtyPrice(
         \Magento\Catalog\Api\Data\ProductInterface $product,
         array $productData
     );

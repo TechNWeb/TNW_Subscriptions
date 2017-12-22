@@ -48,6 +48,8 @@ class Configurable extends Base
                                     $mainProduct,
                                     $subscriptionPart
                                 ),
+                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($mainProduct, $subscriptionPart),
+                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($mainProduct, $subscriptionPart),
                             ],
                         ],
                     ]

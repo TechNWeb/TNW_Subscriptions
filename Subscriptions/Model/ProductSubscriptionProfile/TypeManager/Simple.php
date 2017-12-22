@@ -29,13 +29,14 @@ class Simple extends Base
                 $buyRequestValue = OptionValueResolver::getDecodedValue($request->getValue());
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
-                $price = $this->getSubscriptionPrice($product, $subscriptionPart);
                 $result = array_merge_recursive(
                     $buyRequestValue,
                     [
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                             Create::NON_UNIQUE => [
-                                'price' => $price,
+                                'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
+                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
+                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
                             ],
                         ],
                     ]

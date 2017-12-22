@@ -187,8 +187,8 @@ class Products extends BaseSummary
         $presetQty = (int)$item->getTnwSubscrUnlockPresetQty();
 
         return $presetQty
-            ? $item->getPrice() * $item->getQty()
-            : $item->getPrice();
+            ? $item->getPrice()
+            : $item->getPrice() * $item->getQty();
     }
 
     /**

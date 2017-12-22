@@ -210,14 +210,15 @@ class Manager
         $buyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
         if (!empty($buyRequest)) {
             $initialFee = !$zeroPrices ? $this->getInitialFeeFromItem($item) : 0;
-            $price = !$zeroPrices ? $item->getPrice() : 0;
-            $uniquePrice = !$zeroPrices ? $buyRequest[Create::NON_UNIQUE]['price'] : 0;
+            $price = $this->getProductPrice($item, $zeroPrices, $buyRequest);
+            $subscribedPrice = $this->getProductSubscribedPrice($zeroPrices, $buyRequest);
             $this->getProfileProduct()->setInitialFee($initialFee);
+            //if subscription has trial period then current item price is trial price
             $this->getProfileProduct()->setTrialPrice(null);
             $this->getProfileProduct()->setPrice($price);
             if ($buyRequest[Create::UNIQUE]['is_trial']) {
                 $this->getProfileProduct()->setTrialPrice($price);
-                $this->getProfileProduct()->setPrice($uniquePrice);
+                $this->getProfileProduct()->setPrice($subscribedPrice);
             }
         }
         $this->getProfileProduct()->setQty($item->getQty());
@@ -351,5 +352,39 @@ class Manager
             }
         );
         return $result ? reset($result) : false;
+    }
+
+    /**
+     * Returns product subscription full price.
+     * Full means with trial and initial fee options.
+     *
+     * @param Item $item
+     * @param bool $zeroPrices
+     * @param array $buyRequest
+     * @return float|int|null
+     */
+    protected function getProductPrice(Item $item, $zeroPrices, array $buyRequest)
+    {
+        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+            ? $item->getRowTotal()
+            : $item->getPrice();
+
+        return !$zeroPrices ? $price : 0;
+    }
+
+    /**
+     * Returns product subscription price.
+     *
+     * @param bool $zeroPrices
+     * @param array $buyRequest
+     * @return int|string|float
+     */
+    protected function getProductSubscribedPrice($zeroPrices, array $buyRequest)
+    {
+        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+            ? $buyRequest[Create::NON_UNIQUE]['preset_qty_price']
+            : $buyRequest[Create::NON_UNIQUE]['price'];
+
+        return !$zeroPrices ? $price : 0;
     }
 }

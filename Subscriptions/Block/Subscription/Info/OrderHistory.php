@@ -3,6 +3,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -55,12 +56,12 @@ class OrderHistory extends ContentAbstract
         }
 
         if (!$this->orders) {
-            $this->orders = $this->orderCollectionFactory->create()
-                ->join(
-                    ['relation' => $this->orders->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-                    'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
-                    []
-                )
+            $this->orders = $this->orderCollectionFactory->create();
+            $this->orders->join(
+                ['relation' => $this->orders->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+                'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                []
+            )
                 ->addFieldToFilter('relation.subscription_profile_id', $profileId);
         }
 

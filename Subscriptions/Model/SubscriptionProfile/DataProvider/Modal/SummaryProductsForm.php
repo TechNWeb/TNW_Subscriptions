@@ -141,7 +141,7 @@ class SummaryProductsForm extends ModifyForm
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
                 $presetQty = (int)$item->getTnwSubscrUnlockPresetQty();
-                $itemPrice = $presetQty ? $item->getPrice() * $item->getQty() : $item->getPrice();
+                $itemPrice = $item->getPrice();
                 $term = !empty($subQuote->getTerm()) ? 1 : 0;
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
