@@ -381,9 +381,15 @@ class Manager
      */
     protected function getProductSubscribedPrice($zeroPrices, array $buyRequest)
     {
-        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+        $presetQtyPrice = !empty($buyRequest[Create::NON_UNIQUE]['preset_qty_price'])
             ? $buyRequest[Create::NON_UNIQUE]['preset_qty_price']
-            : $buyRequest[Create::NON_UNIQUE]['price'];
+            : 0;
+        $productPrice = !empty($buyRequest[Create::NON_UNIQUE]['price'])
+            ? $buyRequest[Create::NON_UNIQUE]['price']
+            : 0;
+        $price = !empty($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+            ? $presetQtyPrice
+            : $productPrice;
 
         return !$zeroPrices ? $price : 0;
     }
