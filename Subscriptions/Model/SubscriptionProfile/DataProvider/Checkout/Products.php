@@ -20,8 +20,11 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
-
+/**
+ * DataProvider to show products on subscription checkout.
+ */
 class Products extends ModifyForm
 {
     /**#@+
@@ -52,6 +55,7 @@ class Products extends ModifyForm
         'period',
         'start_on',
         'qty',
+        'super_attribute',
     ];
 
     /**
@@ -64,6 +68,7 @@ class Products extends ModifyForm
      * @param PoolInterface $pool
      * @param DescriptionCreator $descriptionCreator
      * @param Registry $registry
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -78,13 +83,26 @@ class Products extends ModifyForm
         PoolInterface $pool,
         DescriptionCreator $descriptionCreator,
         Registry $registry,
+        ProductTypeManagerResolver $productTypeResolver,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $priceCalculator, $context, $formContext,
-            $pool, $registry, $scope, $meta, $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $priceCalculator,
+            $context,
+            $formContext,
+            $pool,
+            $registry,
+            $productTypeResolver,
+            $scope,
+            $meta,
+            $data
+        );
     }
 
     /**
@@ -303,9 +321,10 @@ class Products extends ModifyForm
      */
     protected function getBillingFrequencyData(
         $productId,
-        ProductBillingFrequencyInterface $frequency
+        ProductBillingFrequencyInterface $frequency,
+        array $additionalData = null
     ) {
-        $data = parent::getBillingFrequencyData($productId, $frequency);
+        $data = parent::getBillingFrequencyData($productId, $frequency, $additionalData);
         $billingFrequencyId = $frequency->getBillingFrequencyId();
         /** @var MagentoProduct $product */
         $product = $this->formContext->getProductRepository()->getById($productId);

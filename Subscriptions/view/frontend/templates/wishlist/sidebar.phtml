@@ -9,7 +9,7 @@
 /* @var $block \Magento\Wishlist\Block\Customer\Sidebar */
 ?>
 <?php
-$wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
+$wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
 ?>
 <?php if ($wishlistHelper->isAllow()) : ?>
     <div class="block block-wishlist" data-bind="scope: 'wishlist'">
@@ -126,4 +126,16 @@ $wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
         }
     }
 </script>
+    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+        <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form], .form.map.checkout": {
+                "catalogAddToCart": {}
+            },
+            "*": {
+                "tnwSubscribeListButtons": {}
+            }
+        }
+        </script>
+    <?php endif; ?>
 <?php endif ?>

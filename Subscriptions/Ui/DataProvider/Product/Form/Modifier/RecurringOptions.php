@@ -605,6 +605,8 @@ class RecurringOptions extends BaseModifier
                     'config' => [
                         'label' => __('Initial Fee'),
                         'componentType' => Field::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/initial-fee-price',
+                        'priceFormat' => $this->getPriceFormatData(),
                         'formElement' => Input::NAME,
                         'dataScope' => static::FIELD_INITIAL_FEE_NAME,
                         'dataType' => Number::NAME,
@@ -700,7 +702,7 @@ class RecurringOptions extends BaseModifier
                         'dataType' => Number::NAME,
                         'sortOrder' => $sortOrder,
                         'validation' => [
-                            'validate-zero-or-greater' => true
+                            'validate-greater-than-zero' => true
                         ],
                     ],
                 ],

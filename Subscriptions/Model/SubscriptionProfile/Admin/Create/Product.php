@@ -14,12 +14,10 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\TypeInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\SimpleFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Type\ConfigurableFactory;
 
 /**
  * Class Product
@@ -60,18 +58,9 @@ class Product extends Create
     private $extensionManager;
 
     /**
-     * Factory for creating buy request modifier for simple product types.
-     *
-     * @var SimpleFactory
+     * @var ProductTypeManagerResolver
      */
-    private $simpleFactory;
-
-    /**
-     * Factory for creating buy request modifier for configurable product type.
-     *
-     * @var ConfigurableFactory
-     */
-    private $configurableFactory;
+    private $productTypeResolver;
 
     /**
      * Current used product.
@@ -86,8 +75,7 @@ class Product extends Create
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      * @param ExtensionManager $extensionManager
-     * @param SimpleFactory $simpleFactory
-     * @param ConfigurableFactory $configurableFactory
+     * @param ProductTypeManagerResolver $productTypeResolver
      */
     public function __construct(
         Context $context,
@@ -95,14 +83,13 @@ class Product extends Create
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
         ExtensionManager $extensionManager,
-        SimpleFactory $simpleFactory,
-        ConfigurableFactory $configurableFactory
+        ProductTypeManagerResolver $productTypeResolver
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
-        $this->simpleFactory = $simpleFactory;
-        $this->configurableFactory = $configurableFactory;
+        $this->productTypeResolver = $productTypeResolver;
+
         parent::__construct($context, $session);
     }
 
@@ -173,6 +160,9 @@ class Product extends Create
     {
         if (!$this->buyRequest) {
             $productData = $this->getData();
+            // add preset qty param to product request array
+            $productData['use_preset_qty'] = (bool) $this->getProduct()
+                ->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
             $product = $this->getProduct();
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
@@ -193,7 +183,9 @@ class Product extends Create
                         'start_on' => $this->getStartOnDate($startOn),
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
+                        'use_preset_qty' => $productData['use_preset_qty'],
                     ],
+                    static::FULL_REQUEST_PARAM_NAME => true,
                 ],
             ];
             if ($fullRequest) {
@@ -208,32 +200,6 @@ class Product extends Create
     }
 
     /**
-     * Returns buy request modifier by product type.
-     *
-     * @param string $type
-     * @return TypeInterface
-     * @throws \InvalidArgumentException
-     */
-    public function getBuyRequestModifier($type)
-    {
-        switch ($type) {
-            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
-            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
-                $result = $this->simpleFactory->create();
-                break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                $result = $this->configurableFactory->create();
-                break;
-            default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
-                break;
-        }
-
-        return $result;
-    }
-
-    /**
      * Sets initial fee to quote item.
      *
      * @param Item $item
@@ -242,16 +208,8 @@ class Product extends Create
     public function setInitialFeeToItem(Item $item)
     {
         $requestData = $this->getData();
-        $origInitialFee = $this->priceCalculator->getInitialFee(
-            $requestData['billing_frequency'],
-            $requestData['product_id'],
-            false
-        );
-        $initialFee = $this->priceCalculator->getInitialFee(
-            $requestData['billing_frequency'],
-            $requestData['product_id'],
-            true
-        );
+        $origInitialFee = $this->getInitialFee($requestData, false);
+        $initialFee = $this->getInitialFee($requestData, true);
         if ($origInitialFee > 0 && $initialFee > 0) {
             $quoteItemAttribute = $this->extensionManager->getEmptyQuoteItemAttribute()
                 ->setBaseSubsInitialFee($origInitialFee)
@@ -261,6 +219,22 @@ class Product extends Create
             $extensionAttributes->setSubsInitialFees($quoteItemAttribute);
             $item->setExtensionAttributes($extensionAttributes);
         }
+    }
+
+    /**
+     * Return product initial fee.
+     *
+     * @param array $requestData
+     * @param bool $convert
+     * @return float
+     */
+    private function getInitialFee(array $requestData, $convert)
+    {
+        return $this->priceCalculator->getInitialFee(
+            $requestData['billing_frequency'],
+            $requestData['product_id'],
+            $convert
+        );
     }
 
     /**
@@ -313,10 +287,7 @@ class Product extends Create
      */
     private function addPricesToRequest(array $data, array $productData)
     {
-        $initialFee = $this->priceCalculator->getInitialFee(
-            $productData['billing_frequency'],
-            $this->getProduct()->getId()
-        );
+        $initialFee = $this->getInitialFee($productData, true);
         $data = array_merge_recursive(
             $data,
             [
@@ -325,6 +296,8 @@ class Product extends Create
                         'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
                         'initial_fee' =>  (float)$initialFee,
                         'price' => $this->getPrice($this->getProduct(), $productData),
+                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice($this->getProduct(), $productData),
+                        'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData),
                     ]
                 ],
             ]
@@ -342,7 +315,7 @@ class Product extends Create
      */
     private function getCustomPrice(MagentoProduct $product, array $productData)
     {
-        return $this->getBuyRequestModifier($product->getTypeId())
+        return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionCustomPrice($product, $productData);
     }
 
@@ -355,7 +328,35 @@ class Product extends Create
      */
     private function getPrice(MagentoProduct $product, array $productData)
     {
-        return $this->getBuyRequestModifier($product->getTypeId())
+        return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionPrice($product, $productData);
+    }
+
+    /**
+     * Returns product subscription preset qty price.
+     * Used for products with preset qty and returns the price for the whole quantity.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getPresetQtyPrice(MagentoProduct $product, array $productData)
+    {
+        return $this->productTypeResolver->resolve($product->getTypeId())
+            ->getSubscriptionPresetQtyPrice($product, $productData);
+    }
+
+    /**
+     * Returns product subscription trial preset qty price.
+     * Used for products with preset qty and returns the price for the whole quantity.
+     *
+     * @param MagentoProduct $product
+     * @param array $productData
+     * @return string
+     */
+    private function getCurrentPresetQtyPrice(MagentoProduct $product, array $productData)
+    {
+        return $this->productTypeResolver->resolve($product->getTypeId())
+            ->getSubscriptionCurrentPresetQtyPrice($product, $productData);
     }
 }

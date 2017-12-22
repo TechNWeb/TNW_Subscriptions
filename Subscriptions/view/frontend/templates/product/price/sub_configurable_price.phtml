@@ -9,19 +9,14 @@
 ?>
 
 <?php
-/** @var \TNW\Subscriptions\Pricing\Render\SubscriptionPriceBox $block */
+/** @var \TNW\Subscriptions\Pricing\Render\SubcsriptionConfigurablePriceBox $block */
 
 $productId = $block->getSaleableItem()->getId();
 
-/** ex: \Magento\Catalog\Pricing\Price\RegularPrice */
-/** @var \Magento\Framework\Pricing\Price\PriceInterface $priceModel */
-$priceModel = $block->getPriceType('regular_price');
-
-/** ex: \Magento\Catalog\Pricing\Price\FinalPrice */
 /** @var \Magento\Framework\Pricing\Price\PriceInterface $finalPriceModel */
 $finalPriceModel = $block->getPriceType('final_price');
 $idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
-$schema = ($block->getZone() == 'item_view') ? true : false;
+$schema = ($block->getZone() === 'item_view') ? true : false;
 ?>
 <?php
     $data = $block->renderSubscriptionAmounts(
@@ -33,14 +28,15 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
             'include_container' => true,
             'schema' => $schema,
         ]
-    );
-    $data = $block->getEncodedData($data);
+);
+$data = $block->getEncodedData($data);
 ?>
 <script type="text/x-magento-init">
 {
     "*": {
-        "tnwSubscribePrice": {
+        "tnwSubConfigurablePrice": {
             "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
+            "productAttributesData" : <?php /* @noEscape */ echo $block->getEncodedData($block->getOptions())?>,
             "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>
         }
     }

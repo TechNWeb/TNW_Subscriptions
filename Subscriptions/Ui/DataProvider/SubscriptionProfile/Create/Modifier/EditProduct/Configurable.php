@@ -9,12 +9,14 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
+use Magento\Framework\UrlFactory;
+use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
-use Magento\Framework\UrlFactory;
-use Magento\Framework\UrlInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+
 /**
  * DataProvider modifier on add to subscription form for configurable products.
  */
@@ -43,15 +45,19 @@ class Configurable extends Base
     private $urlFactory;
 
     /**
+     * @param FormContext $formContext
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      */
     public function __construct(
+        FormContext $formContext,
         Registry $registry,
         UrlFactory $urlFactory
     ) {
         $this->registry = $registry;
         $this->urlFactory = $urlFactory;
+
+        parent::__construct($formContext);
     }
 
     /**
