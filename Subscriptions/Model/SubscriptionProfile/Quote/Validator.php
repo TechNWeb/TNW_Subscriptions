@@ -218,10 +218,12 @@ class Validator
                     round($result[CreateProfile::NON_UNIQUE]['current_price'], 2);
             }
         }
-        //unset from request full request flag, for validation we don't need it
-        unset($result[CreateProfile::FULL_REQUEST_PARAM_NAME]);
-        //unset from request preset qty price, for validation we need only current preset qty price
-        unset($result[CreateProfile::NON_UNIQUE]['preset_qty_price']);
+        //unset from request full request flag (for validation we don't need it)
+        // and preset qty price (validation we need only current preset qty price)
+        unset(
+            $result[CreateProfile::FULL_REQUEST_PARAM_NAME],
+            $result[CreateProfile::NON_UNIQUE]['preset_qty_price']
+        );
 
         return [$result, $productsData];
     }

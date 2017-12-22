@@ -52,7 +52,7 @@ class PrepareBuyRequest
                         ? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME] : [];
                     //check if we need to update request.
                     // True - if in buy request exists subscription part and we need to create full request
-                    if (!empty($subscriptionPart) && $subscriptionPart[Create::FULL_REQUEST_PARAM_NAME]) {
+                    if (!empty($subscriptionPart[Create::FULL_REQUEST_PARAM_NAME])) {
                         $type = $firstItem->getTypeId();
                         $this->productTypeResolver->resolve($type)
                             ->modifyBuyRequests($result);

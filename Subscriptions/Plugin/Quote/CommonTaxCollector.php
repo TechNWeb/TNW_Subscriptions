@@ -47,11 +47,17 @@ class CommonTaxCollector
         );
         $subsData = $item->getBuyRequest()->getData(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME) ?: [];
         if ($subsData) {
-            $presetPrice = $subsData[Create::NON_UNIQUE]['current_preset_qty_price'];
-            $usePresetQty = $subsData[Create::UNIQUE]['use_preset_qty'];
-            $result->setData('subscription_use_preset_qty', $usePresetQty);
-            $result->setData('subscription_preset_qty_price', $presetPrice);
-            $result->setData('store_id', $item->getQuote()->getStoreId());
+            $presetPrice = !empty($subsData[Create::NON_UNIQUE]['current_preset_qty_price'])
+                ? $subsData[Create::NON_UNIQUE]['current_preset_qty_price']
+                : 0;
+            $usePresetQty =  !empty($subsData[Create::UNIQUE]['use_preset_qty'])
+                ? $subsData[Create::UNIQUE]['use_preset_qty']
+                : 0;
+            if ($presetPrice && $usePresetQty) {
+                $result->setData('subscription_use_preset_qty', $usePresetQty);
+                $result->setData('subscription_preset_qty_price', $presetPrice);
+                $result->setData('store_id', $item->getQuote()->getStoreId());
+            }
         }
 
         return $result;
