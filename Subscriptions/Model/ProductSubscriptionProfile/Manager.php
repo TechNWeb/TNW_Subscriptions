@@ -365,7 +365,7 @@ class Manager
      */
     protected function getProductPrice(Item $item, $zeroPrices, array $buyRequest)
     {
-        $price = isset($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+        $price = isset($buyRequest[Create::UNIQUE]['use_preset_qty'])
             ? $item->getRowTotal()
             : $item->getPrice();
 
@@ -387,7 +387,7 @@ class Manager
         $productPrice = !empty($buyRequest[Create::NON_UNIQUE]['price'])
             ? $buyRequest[Create::NON_UNIQUE]['price']
             : 0;
-        $price = !empty($buyRequest[Create::NON_UNIQUE]['use_preset_qty'])
+        $price = !empty($buyRequest[Create::UNIQUE]['use_preset_qty'])
             ? $presetQtyPrice
             : $productPrice;
 
