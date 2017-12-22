@@ -6,15 +6,15 @@
 namespace TNW\Subscriptions\Model\Sales\Tax\Calculation;
 
 use Magento\Tax\Api\Data\QuoteDetailsItemInterface;
-use Magento\Tax\Model\Calculation\RowBaseCalculator as MagentoRowCalculator;
+use Magento\Tax\Model\Calculation\TotalBaseCalculator as MagentoTotalCalculator;
 
 /**
- * Subscription row base tax calculator.
+ * Subscription total base tax calculator.
  */
-class RowAndTotalBaseCalculator extends MagentoRowCalculator
+class TotalBaseCalculator extends MagentoTotalCalculator implements CalculatorInterface
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function calculateWithTaxInPrice(QuoteDetailsItemInterface $item, $quantity, $round = true)
     {
@@ -113,7 +113,7 @@ class RowAndTotalBaseCalculator extends MagentoRowCalculator
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function calculateWithTaxNotInPrice(QuoteDetailsItemInterface $item, $quantity, $round = true)
     {
@@ -198,5 +198,22 @@ class RowAndTotalBaseCalculator extends MagentoRowCalculator
             ->setAssociatedItemCode($item->getAssociatedItemCode())
             ->setTaxPercent($rate)
             ->setAppliedTaxes($appliedTaxes);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function subscriptionCalculate(
+        QuoteDetailsItemInterface $item,
+        $quantity,
+        $round = true
+    ) {
+        if ($item->getIsTaxIncluded()) {
+            $result = $this->calculateWithTaxInPrice($item, $quantity, $round);
+        } else {
+            $result = $this->calculateWithTaxNotInPrice($item, $quantity, $round);
+        }
+
+        return $result;
     }
 }

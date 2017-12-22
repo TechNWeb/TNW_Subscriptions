@@ -51,6 +51,7 @@ class CommonTaxCollector
             $usePresetQty = $subsData[Create::UNIQUE]['use_preset_qty'];
             $result->setData('subscription_use_preset_qty', $usePresetQty);
             $result->setData('subscription_preset_qty_price', $presetPrice);
+            $result->setData('store_id', $item->getQuote()->getStoreId());
         }
 
         return $result;

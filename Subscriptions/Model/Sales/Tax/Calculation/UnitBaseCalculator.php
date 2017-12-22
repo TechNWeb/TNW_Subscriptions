@@ -11,10 +11,10 @@ use Magento\Tax\Model\Calculation\UnitBaseCalculator as MagentoUnitCalculator;
 /**
  * Subscription unit base tax calculator.
  */
-class UnitBaseCalculator extends MagentoUnitCalculator
+class UnitBaseCalculator extends MagentoUnitCalculator implements CalculatorInterface
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function calculateWithTaxInPrice(QuoteDetailsItemInterface $item, $quantity, $round = true)
     {
@@ -112,7 +112,7 @@ class UnitBaseCalculator extends MagentoUnitCalculator
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function calculateWithTaxNotInPrice(QuoteDetailsItemInterface $item, $quantity, $round = true)
     {
@@ -124,6 +124,18 @@ class UnitBaseCalculator extends MagentoUnitCalculator
         $discountTaxCompensationAmount = 0;
         // Calculate $price
         $price = $this->calculationTool->round($item->getUnitPrice());
+        // default logic
+        list($unitTaxes, $unitTaxesBeforeDiscount, $appliedTaxes) = $this->applyTaxes(
+            $item,
+            $quantity,
+            $round,
+            $appliedRates,
+            $price
+        );
+        $unitTax = array_sum($unitTaxes);
+        $unitTaxBeforeDiscount = array_sum($unitTaxesBeforeDiscount);
+        $rowTax = $unitTax * $quantity;
+        $priceInclTax = $price + $unitTaxBeforeDiscount;
         //Add logic for preset qty for subscription products
         if ($item->getData('subscription_use_preset_qty') && $item->getData('subscription_preset_qty_price')) {
             $rowTotal = $this->calculationTool->round($item->getData('subscription_preset_qty_price'));
@@ -136,19 +148,6 @@ class UnitBaseCalculator extends MagentoUnitCalculator
             );
             $rowTax = array_sum($rowUnitTaxes);
             $rowTotalInclTax = $rowTotal + array_sum($rowUnitTaxesBeforeDiscount);
-        } else {
-            // default logic
-            list($unitTaxes, $unitTaxesBeforeDiscount, $appliedTaxes) = $this->applyTaxes(
-                $item,
-                $quantity,
-                $round,
-                $appliedRates,
-                $price
-            );
-            $unitTax = array_sum($unitTaxes);
-            $unitTaxBeforeDiscount = array_sum($unitTaxesBeforeDiscount);
-            $rowTax = $unitTax * $quantity;
-            $priceInclTax = $price + $unitTaxBeforeDiscount;
         }
 
         $rowTotal = isset($rowTotal) ? $rowTotal : $price * $quantity;
@@ -232,5 +231,22 @@ class UnitBaseCalculator extends MagentoUnitCalculator
         }
 
         return array($unitTaxes, $unitTaxesBeforeDiscount, $appliedTaxes);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function subscriptionCalculate(
+        QuoteDetailsItemInterface $item,
+        $quantity,
+        $round = true
+    ) {
+        if ($item->getIsTaxIncluded()) {
+            $result = $this->calculateWithTaxInPrice($item, $quantity, $round);
+        } else {
+            $result = $this->calculateWithTaxNotInPrice($item, $quantity, $round);
+        }
+
+        return $result;
     }
 }
