@@ -39,7 +39,8 @@ class CommonTaxCollector
         $parentCode = null
     ) {
         /** @var QuoteDetailsItemInterface $result */
-        $result = $proceed($itemDataObjectFactory,
+        $result = $proceed(
+            $itemDataObjectFactory,
             $item,
             $priceIncludesTax,
             $useBaseCurrency,

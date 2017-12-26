@@ -57,7 +57,7 @@ class AbstractCalculator
      * @param MagentoCalculator $subject
      * @param \Closure $proceed
      * @param QuoteDetailsItemInterface $item
-     * @param $quantity
+     * @param int $quantity
      * @param bool $round
      * @return \Magento\Tax\Api\Data\TaxDetailsItemInterface
      */
@@ -72,7 +72,7 @@ class AbstractCalculator
             && $item->getData('subscription_preset_qty_price')
         ) {
             $result = $this->calculateForSubscription($subject, $item, $quantity, $round);
-            if (!$result) {
+            if (false !== $result) {
                 $result = $proceed($item, $quantity, $round);
             }
         } else {
@@ -91,8 +91,12 @@ class AbstractCalculator
      * @param bool $round
      * @return bool|\Magento\Tax\Api\Data\TaxDetailsItemInterface
      */
-    private function calculateForSubscription($subject, $item, $quantity, $round)
-    {
+    private function calculateForSubscription(
+        MagentoCalculator $subject,
+        QuoteDetailsItemInterface $item,
+        $quantity,
+        $round
+    ) {
         $result = false;
         $calculator = false;
         $params = ['storeId' => $item->getData('store_id')];
