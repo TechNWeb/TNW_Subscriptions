@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container as UiContainer;
@@ -269,7 +270,8 @@ class Products extends ModifyForm
             'form_button' => $this->getCurrentFormName() . '.edit_button',
         ];
         if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
-            $result['qty_button'] = $this->getCurrentFormName() . '.description_fieldset.middle_container.qty_container.qty_edit_button';
+            $result['qty_button'] = $this->getCurrentFormName()
+                . '.description_fieldset.middle_container.qty_container.qty_edit_button';
         }
 
         return $result;
@@ -320,25 +322,18 @@ class Products extends ModifyForm
      * @inheritdoc
      */
     protected function getBillingFrequencyData(
-        $productId,
-        ProductBillingFrequencyInterface $frequency,
-        array $additionalData = null
+        DataObject $productDataObject,
+        ProductBillingFrequencyInterface $frequency
     ) {
-        $data = parent::getBillingFrequencyData($productId, $frequency, $additionalData);
+        $data = parent::getBillingFrequencyData($productDataObject, $frequency);
         $billingFrequencyId = $frequency->getBillingFrequencyId();
-        /** @var MagentoProduct $product */
-        $product = $this->formContext->getProductRepository()->getById($productId);
-        $data['is_trial'] = $this->getProductCustomAttribute(
-            $product,
-            Attribute::SUBSCRIPTION_TRIAL_STATUS,
-            0
+        $data['is_trial'] = $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ?: 0;
+
+        $data['no_format_initial_fee'] = $this->getNotFormattedInitialFee(
+            $billingFrequencyId,
+            $productDataObject->getChildProductId()
         );
-        $data['no_format_initial_fee'] = $this->getNotFormattedInitialFee($billingFrequencyId, $productId);
-        $data['trial_price'] = $this->getProductCustomAttribute(
-            $product,
-            Attribute::SUBSCRIPTION_TRIAL_PRICE,
-            0
-        );
+        $data['trial_price'] = $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE) ?: 0;
         $data['frequency_unit'] = $this->descriptionCreator->getFrequencyWithUnit($billingFrequencyId);
 
         return $data;
