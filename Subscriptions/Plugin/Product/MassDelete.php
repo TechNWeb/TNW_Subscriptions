@@ -27,8 +27,6 @@ class MassDelete
     private $resultFactory;
 
     /**
-     *
-     *
      * @var Manager
      */
     private $manager;
