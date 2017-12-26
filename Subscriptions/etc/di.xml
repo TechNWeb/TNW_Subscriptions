@@ -122,6 +122,11 @@
                 type="TNW\Subscriptions\Plugin\Product\Product"
                 sortOrder="100"
                 disabled="false"/>
+    </type>    <type name="Magento\Catalog\Model\ResourceModel\Product">
+        <plugin name="subscriptions_product"
+                type="TNW\Subscriptions\Plugin\Product\ResourceModel\Product"
+                sortOrder="100"
+                disabled="false"/>
     </type>
     <type name="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper">
         <plugin name="subscriptions_product_initialization"
