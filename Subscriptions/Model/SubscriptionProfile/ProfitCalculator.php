@@ -226,7 +226,7 @@ class ProfitCalculator
         $quoteItemCollection->getSelect()->group('product_id');
         $amount = $connection->fetchOne($quoteItemCollection->getSelect());
 
-        return $amount ?: 0;
+        return (int) $amount;
     }
 
     /**
