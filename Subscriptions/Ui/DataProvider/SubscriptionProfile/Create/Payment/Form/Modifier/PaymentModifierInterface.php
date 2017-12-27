@@ -25,4 +25,12 @@ interface PaymentModifierInterface
      * @return string
      */
     public function getPaymentFormName();
+
+    /**
+     * Updates form config data.
+     *
+     * @param array $configData
+     * @return array
+     */
+    public function modifyConfigData(array $configData);
 }

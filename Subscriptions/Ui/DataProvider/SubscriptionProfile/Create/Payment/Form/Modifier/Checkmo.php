@@ -10,6 +10,8 @@ use Magento\OfflinePayments\Model\Checkmo as CheckmoPayment;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Form modifier to display payment method Checkmo.
@@ -35,26 +37,25 @@ class Checkmo extends Base implements PaymentModifierInterface
     private $checkmoPayment;
 
     /**
-     * Checkmo constructor.
-     * @param Context $context
      * @param Config $config
      * @param QuoteSessionInterface $session
-     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param Context $context
      * @param CheckmoPayment $checkmoPayment
      */
     public function __construct(
-        Context $context,
         Config $config,
         QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
+        SubscriptionProfileRepository $profileRepository,
+        OrderRelationManager $relationManager,
+        Context $context,
         CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
-
-        parent::__construct($config, $session, $profileRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager);
     }
-
 
     /**
      * {@inheritdoc}

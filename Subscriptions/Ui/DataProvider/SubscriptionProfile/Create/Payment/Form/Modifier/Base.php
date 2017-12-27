@@ -6,13 +6,16 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Form\Element\Checkbox;
-use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Field;
+use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 
 /**
  * Base form modifier to display payment method.
@@ -72,6 +75,11 @@ class Base implements ModifierInterface
     private $profileRepository;
 
     /**
+     * @var OrderRelationManager
+     */
+    private $relationManager;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param QuoteSessionInterface $session
@@ -79,7 +87,8 @@ class Base implements ModifierInterface
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
+        OrderRelationManager $relationManager
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -88,6 +97,7 @@ class Base implements ModifierInterface
             'checked' => 'saveBilling'
         ];
         $this->profileRepository = $profileRepository;
+        $this->relationManager = $relationManager;
     }
 
     /**
@@ -96,6 +106,14 @@ class Base implements ModifierInterface
     public function modifyData(array $data)
     {
         return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyConfigData(array $configData)
+    {
+        return $configData;
     }
 
     /**
@@ -377,5 +395,49 @@ class Base implements ModifierInterface
             $this->getPaymentCode(),
             $this->session->getStoreId()
         );
+    }
+
+    /**
+     * Returns start on date of profile or max start on date of profile quotes.
+     * @return \DateTime
+     */
+    protected function getValidationDate()
+    {
+        $nowDate = (new \DateTime())->format('Y-m-d');
+        if ($this->getProfile()) {
+            $startDates = [
+                $nowDate,
+                $this->getProfile()->getStartDate(),
+            ];
+            if ($this->getProfile()->getTrialStartDate()) {
+                $startDates[] = $this->getProfile()->getTrialStartDate();
+            }
+            $nextProfileRelation = $this->relationManager->getNextProfileRelation(
+                $this->getProfile()
+            );
+            if ($nextProfileRelation) {
+                $startDates[] = $nextProfileRelation->getScheduledAt();
+            }
+        } else {
+            $startDates[] = $nowDate;
+            foreach ($this->session->getSubQuotes() as $quote) {
+                $items = $quote->getAllVisibleItems();
+                $item = $items ? reset($items) : false;
+                /** @var Item $item */
+                if ($item) {
+                    $startOnPath = Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
+                        . DIRECTORY_SEPARATOR . Create::UNIQUE
+                        . DIRECTORY_SEPARATOR . 'start_on';
+
+                    $startOn = $item->getBuyRequest()->getDataByPath($startOnPath);
+                    if ($startOn) {
+                        $startDates[] = $startOn;
+                    }
+                }
+            }
+        }
+        $startDate = max(array_map('strtotime', $startDates));
+
+        return (new \DateTime())->setTimestamp($startDate);
     }
 }

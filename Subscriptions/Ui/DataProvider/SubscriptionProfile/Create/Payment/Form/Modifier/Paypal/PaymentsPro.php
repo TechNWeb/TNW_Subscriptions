@@ -16,6 +16,8 @@ use Magento\Ui\Component\Form\Field;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Base;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 use Magento\Framework\View\Asset\Repository;
@@ -62,11 +64,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     private $urlBuilder;
 
     /**
-     * PaymentsPro constructor.
-     * @param Context $context
      * @param SubscriptionConfig $config
      * @param QuoteSessionInterface $session
-     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param Context $context
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
      * @param Repository $assetRepository
@@ -74,10 +76,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
-        Context $context,
         SubscriptionConfig $config,
         QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
+        SubscriptionProfileRepository $profileRepository,
+        OrderRelationManager $relationManager,
+        Context $context,
         Transparent $paymentPro,
         Config $paymentConfig,
         Repository $assetRepository,
@@ -90,8 +93,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-
-        parent::__construct($config, $session, $profileRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager);
     }
 
     /**
@@ -193,9 +195,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                         'config' => [
                             'label' => __('Expiration Date'),
                             'component' => 'TNW_Subscriptions/js/components/group',
+                            'template' => 'TNW_Subscriptions/form/element/group',
                             'componentType' => Container::NAME,
                             'title' => __('Expiration Date'),
                             'additionalClasses' => 'field_without_legend _required-date',
+                            'validateWholeGroup' => true,
                             'dataScope' => '',
                             'sortOrder' => 30,
                             'required' => true,
@@ -221,11 +225,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 10,
                                     'options' => $this->getCcMonths(),
                                     'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                        'visible' => $this->getFieldsetName() . '.additional_fields.exp_date_container:visible',
                                     ],
                                     'validation' => [
                                         'required-entry' => true,
-                                        'validate-cc-exp' => $this->getPaymentCode() . '_expiration_yr'
+                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
                                     ]
                                 ],
                             ],
@@ -246,10 +250,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                                     'sortOrder' => 20,
                                     'options' => $this->getCcYears(),
                                     'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                        'visible' => $this->getFieldsetName() . '.additional_fields.exp_date_container:visible',
                                     ],
                                     'validation' => [
-                                        'required-entry' => true
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
                                     ]
                                 ],
                             ],
@@ -343,6 +348,21 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyConfigData(array $configData)
+    {
+        $date = $this->getValidationDate();
+        return array_merge(
+            $configData,
+            [
+                $this->getPaymentCode() . '_start_on_month' => $date->format('m'),
+                $this->getPaymentCode() . '_start_on_year' => $date->format('Y'),
+            ]
+        );
     }
 
     /**
