@@ -218,10 +218,12 @@ class ProfitCalculator
     {
         $amount = 0;
         $quoteItemCollection = $this->quoteItemCollectionFactory->create();
+        $connection = $quoteItemCollection->getConnection();
         $quoteItemCollection->addFieldToFilter('quote_id', ['in' => $quoteIds]);
         $quoteItemCollection->addFieldToFilter('product_id', ['eq' => $productId]);
-        foreach ($quoteItemCollection->getItems() as $item) {
-            $amount += $item->getQty();
+        $data = $connection->fetchAll($quoteItemCollection->getSelect());
+        foreach ($data as $item) {
+            $amount += $item['qty'];
         }
 
         return $amount;
