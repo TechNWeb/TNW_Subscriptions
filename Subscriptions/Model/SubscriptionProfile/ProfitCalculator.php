@@ -216,15 +216,17 @@ class ProfitCalculator
      */
     private function getRequestedProductAmount($quoteIds, $productId)
     {
-        $amount = 0;
         $quoteItemCollection = $this->quoteItemCollectionFactory->create();
+        $connection = $quoteItemCollection->getConnection();
         $quoteItemCollection->addFieldToFilter('quote_id', ['in' => $quoteIds]);
         $quoteItemCollection->addFieldToFilter('product_id', ['eq' => $productId]);
-        foreach ($quoteItemCollection->getItems() as $item) {
-            $amount += $item->getQty();
-        }
+        $quoteItemCollection->getSelect()
+            ->reset(\Zend_Db_Select::COLUMNS)
+            ->columns(new \Zend_Db_Expr('SUM(qty)'));
+        $quoteItemCollection->getSelect()->group('product_id');
+        $amount = $connection->fetchOne($quoteItemCollection->getSelect());
 
-        return $amount;
+        return (int) $amount;
     }
 
     /**
