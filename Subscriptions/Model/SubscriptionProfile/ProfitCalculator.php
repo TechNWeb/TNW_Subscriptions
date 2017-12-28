@@ -12,6 +12,7 @@ use Magento\Directory\Model\Currency;
 use Magento\Reports\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
@@ -238,8 +239,12 @@ class ProfitCalculator
     private function getProductIds(SubscriptionProfile $subscriptionProfile)
     {
         $productIds = [];
+        /** @var ProductSubscriptionProfileInterface $profileProduct */
         foreach ($subscriptionProfile->getProducts() as $profileProduct) {
-            $productIds = $profileProduct->getMagentoProductId();
+            if ($profileProduct->getChildren()) {
+                continue;
+            }
+            $productIds[] = $profileProduct->getMagentoProductId();
         }
 
         return $productIds;
