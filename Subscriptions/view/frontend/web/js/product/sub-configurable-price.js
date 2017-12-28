@@ -20,9 +20,10 @@ define([
         /**
          * Initialize widget.
          */
-        _create: function() {
-            this._super();
+        _create: function() {debugger;
             this.formatSuperAttributesData();
+            this._super();
+
             this.setupChangeEvents();
         },
 

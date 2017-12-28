@@ -13,6 +13,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Psr\Log\LoggerInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
@@ -104,7 +105,7 @@ class Edit extends \Magento\Framework\App\Action\Action
                     $resultPage,
                     $productId,
                     $this,
-                    []
+                    $this->getProductParams($subscriprionProduct)
                 );
 
             return $resultPage;
@@ -136,5 +137,40 @@ class Edit extends \Magento\Framework\App\Action\Action
                     'entity_id' => $subscriptionId,
                 ]
             );
+    }
+
+    private function getProductParams(ProductSubscriptionProfileInterface $subscriprionProduct)
+    {
+        $params = new \Magento\Framework\DataObject();
+        $attributesData = $subscriprionProduct->getCustomOptions();
+
+        if (self::isJson($attributesData)) {
+            $buyRequest = new \Magento\Framework\DataObject();
+            $attributesData = \Zend_Json::decode($attributesData);
+            $buyRequest->setSuperAttribute($attributesData);
+            $params->setBuyRequest($buyRequest);
+        }
+
+        return $params;
+    }
+
+    /**
+     * Checks if value is in json format.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private static function isJson($value)
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        \json_decode($value);
+        if (\json_last_error()) {
+            return false;
+        }
+
+        return true;
     }
 }

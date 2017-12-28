@@ -109,13 +109,39 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     {
         /** @var UrlInterface $url */
         $url = $this->urlFactory->create();
+        $attributes = [];
+        $attributesData = $this->getItem()->getCustomOptions();
 
-        return $url->getUrl(
-            'tnw_subscriptions/subscription_products/edit',
-            [
-                'id' => $this->getItem()->getId(),
-                'product_id' => $this->getItem()->getMagentoProductId(),
-            ]
-        );
+        if (self::isJson($attributesData)) {
+            $attributes = \Zend_Json::decode($attributesData);
+        }
+
+        $params = [
+            'id' => $this->getItem()->getId(),
+            'product_id' => $this->getItem()->getMagentoProductId(),
+            'attributes' => $attributes,
+        ];
+
+        return $url->getUrl('tnw_subscriptions/subscription_products/edit'). '?' . http_build_query($params);
+    }
+
+    /**
+     * Checks if value is in json format.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private static function isJson($value)
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        \json_decode($value);
+        if (\json_last_error()) {
+            return false;
+        }
+
+        return true;
     }
 }

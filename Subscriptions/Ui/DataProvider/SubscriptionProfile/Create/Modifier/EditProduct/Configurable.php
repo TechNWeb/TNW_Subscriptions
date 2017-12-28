@@ -261,12 +261,13 @@ class Configurable extends Base
         /** @var UrlInterface $url */
         $url = $this->urlFactory->create();
 
-        return $url->getUrl(
-            'tnw_subscriptions/cart/configure',
-            [
-                'id' => $this->getItem()->getId(),
-                'product_id' => $this->getItem()->getProduct()->getId(),
-            ]
-        );
+        $params =  [
+            'id' => $this->getItem()->getId(),
+            'product_id' => $this->getItem()->getProduct()->getId(),
+            'attributes' => $this->getItem()->getBuyRequest()->getSuperAttribute(),
+        ];
+
+        return $url->getUrl('tnw_subscriptions/cart/configure')
+            . '?' . http_build_query($params);
     }
 }
