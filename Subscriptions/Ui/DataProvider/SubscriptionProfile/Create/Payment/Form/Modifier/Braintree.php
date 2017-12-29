@@ -63,6 +63,18 @@ class Braintree extends Base implements PaymentModifierInterface
      */
     private $clientToken = '';
 
+    /**
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param QuoteSessionInterface $session
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
+     * @param \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter
+     * @param Context $context
+     * @param Config $paymentConfig
+     * @param RequestInterface $request
+     * @param UrlInterface $urlBuilder
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,

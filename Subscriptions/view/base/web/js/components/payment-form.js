@@ -133,7 +133,7 @@ define(
                     yearValue = yearComponent.value();
                 }
                 if (monthValue && yearValue) {
-                    var minMonth = this.source[paymentCode + '_start_on_month'];
+                    var minMonth = this.source[paymentCode + '_start_on_month'] + 1;
                     var minYear = this.source[paymentCode + '_start_on_year'];
                     var isValid = this.source.params.invalid;
                     container.error(true);
