@@ -10,7 +10,14 @@
         <group name="totals">
             <item name="subs_initial_fee"
                   instance="TNW\Subscriptions\Model\Sales\Total\InitialFee"
-                  sort_order="549"/>
+                  sort_order="449"/>
+        </group>
+    </section>
+    <section name="order_invoice">
+        <group name="totals">
+            <item name="subs_initial_fee"
+                  instance="TNW\Subscriptions\Model\Sales\Total\Invoice\InitialFee"
+                  sort_order="349"/>
         </group>
     </section>
 </config>

@@ -158,6 +158,20 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getConfigData()
+    {
+        $configData = parent::getConfigData();
+
+        foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            $configData = $modifier->modifyConfigData($configData);
+        }
+
+        return $configData;
+    }
+
+    /**
      * Returns current subscription profile id from registry
      *
      * @return null|string

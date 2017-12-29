@@ -9,6 +9,22 @@ define([
     'use strict';
 
     return Collection.extend({
+        defaults: {
+            groupError: ''
+        },
+        /**
+         * Calls initObservable of parent class.
+         * Defines observable properties of instance.
+         *
+         * @return {Object} - reference to instance
+         */
+        initObservable: function () {
+            this._super()
+                .observe(['groupError', 'error']);
+
+            return this;
+        },
+
         /**
          * Extends 'additionalClasses' object.
          *

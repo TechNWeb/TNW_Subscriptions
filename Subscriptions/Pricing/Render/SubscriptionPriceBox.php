@@ -14,12 +14,14 @@ use Magento\Framework\Pricing\Render\PriceBox as BasePriceBox;
 use Magento\Framework\Pricing\Render\RendererPool;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\TypeInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -164,6 +166,8 @@ class SubscriptionPriceBox extends BasePriceBox
         $result = [];
 
         if ($product) {
+            /** @var TypeInterface $productTypeManager */
+            $productTypeManager = $this->productTypeResolver->resolve($product->getTypeId());
 
             $trialPriceStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
 
@@ -171,16 +175,15 @@ class SubscriptionPriceBox extends BasePriceBox
                 ->getListByProductId($product->getId())
                 ->getItems();
 
-            /** @var \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $billingFrequency */
+            /** @var ProductBillingFrequencyInterface $billingFrequency */
             foreach ($productBillingFrequencies as $billingFrequency) {
                 $billingFrequencyId = $billingFrequency->getBillingFrequencyId();
 
                 $existFrequency = true;
 
                 if ($product->getId() != $product->getChildProductId()) {
-                    $existFrequency = $this->productTypeResolver
-                        ->resolve($product->getTypeId())
-                        ->checkFrequencyExistanse($billingFrequencyId, [$product->getData('child_product_id')]);
+                    $existFrequency = $productTypeManager
+                        ->checkFrequencyExistanse($billingFrequencyId, $product->getData('child_product_id'));
                 }
 
                 if ($existFrequency) {
@@ -193,7 +196,7 @@ class SubscriptionPriceBox extends BasePriceBox
                     $frequencyUnitMessage = '';
 
                     $isDefault = $billingFrequency->getDefaultBillingFrequency();
-                    $initialFee = (float)$billingFrequency->getInitialFee() ?: 0;
+                    $initialFee = $this->getInitialFee($billingFrequency, $product);
                     if ($trialPriceStatus) {
                         $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
                         $trialPeriod = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH);
@@ -224,6 +227,22 @@ class SubscriptionPriceBox extends BasePriceBox
         }
 
         return $result;
+    }
+
+    /**
+     * Return product initial fee.
+     *
+     * @param ProductBillingFrequencyInterface $billingFrequency
+     * @param DataObject $product
+     * @return float
+     */
+    private function getInitialFee(ProductBillingFrequencyInterface $billingFrequency, DataObject $product)
+    {
+        return $this->priceCalculator->getInitialFee(
+            $billingFrequency->getBillingFrequencyId(),
+            $product->getChildProductId(),
+            false
+        );
     }
 
     /**

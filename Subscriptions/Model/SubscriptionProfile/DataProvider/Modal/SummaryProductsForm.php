@@ -564,7 +564,7 @@ class SummaryProductsForm extends ModifyForm
         /** @var SubscriptionProfile $currentProfile */
         $currentProfile = $this->getCurrentProfile();
 
-        if ($currentProfile && count($currentProfile->getProfileProducts()) > 1) {
+        if ($currentProfile && count($currentProfile->getVisibleProducts()) > 1) {
             $result = true;
         }
 

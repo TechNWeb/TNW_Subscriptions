@@ -72,7 +72,7 @@ class AbstractCalculator
             && $item->getData('subscription_preset_qty_price')
         ) {
             $result = $this->calculateForSubscription($subject, $item, $quantity, $round);
-            if (false !== $result) {
+            if (false === $result) {
                 $result = $proceed($item, $quantity, $round);
             }
         } else {

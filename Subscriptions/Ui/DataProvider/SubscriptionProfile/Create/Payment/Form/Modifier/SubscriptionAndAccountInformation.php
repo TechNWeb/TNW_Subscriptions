@@ -168,4 +168,12 @@ class SubscriptionAndAccountInformation implements ModifierInterface
     {
         return $this->session->getFirstQuote();
     }
+
+    /**
+     * Returns modified form config.
+     */
+    public function modifyConfigData(array $configData)
+    {
+        return $configData;
+    }
 }
