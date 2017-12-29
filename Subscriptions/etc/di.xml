@@ -296,6 +296,13 @@
                 disabled="false"/>
     </type>
 
+    <type name="Magento\Sales\Model\Convert\Order">
+        <plugin name="tnw_subscriptions_copy_data_to_invoice_item"
+                type="TNW\Subscriptions\Plugin\Sales\Order\Converter"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
     <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
         <plugin name="tnw_subs_order_item_save"
                 type="TNW\Subscriptions\Plugin\Sales\Order\Item\AfterSave"
@@ -306,6 +313,20 @@
     <type name="Magento\Sales\Api\Data\OrderInterface">
         <plugin name="tnw_subs_order_item_collection"
                 type="TNW\Subscriptions\Plugin\Sales\Order\ItemCollection"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Model\ResourceModel\Order\Invoice\Item">
+        <plugin name="tnw_subs_invoice_item_save"
+                type="TNW\Subscriptions\Plugin\Sales\Invoice\Item\Save"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Sales\Api\Data\InvoiceInterface">
+        <plugin name="tnw_subs_invoice_item_collection"
+                type="TNW\Subscriptions\Plugin\Sales\Invoice\ItemCollection"
                 sortOrder="100"
                 disabled="false"/>
     </type>

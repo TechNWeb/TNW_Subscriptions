@@ -9,6 +9,8 @@ namespace TNW\Subscriptions\Model\Sales\ExtensionAttributes;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Quote\Api\Data\CartItemExtension;
 use Magento\Quote\Api\Data\CartItemExtensionFactory;
+use Magento\Sales\Api\Data\InvoiceItemExtension;
+use Magento\Sales\Api\Data\InvoiceItemExtensionFactory;
 use Magento\Sales\Api\Data\OrderItemExtension;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
@@ -33,6 +35,13 @@ class ExtensionManager
     private $quoteItemFactory;
 
     /**
+     * Factory for creating subscription invoice item extension attributes.
+     *
+     * @var InvoiceItemFactory
+     */
+    private $invoiceItemFactory;
+
+    /**
      * Factory for creating cart item extension attributes object.
      *
      * @var CartItemExtensionFactory
@@ -47,32 +56,43 @@ class ExtensionManager
     private $orderItemExtensionFactory;
 
     /**
+     * Factory for creating invoice item extension attributes object.
+     *
+     * @var OrderItemExtensionFactory
+     */
+    private $invoiceItemExtensionFactory;
+
+    /**
      * Data object helper.
      *
      * @var DataObjectHelper
      */
     protected $dataObjectHelper;
 
-
     /**
-     * ExtensionManager constructor.
      * @param OrderItemFactory $orderItemFactory
      * @param QuoteItemFactory $quoteItemFactory
+     * @param InvoiceItemFactory $invoiceItemFactory
      * @param CartItemExtensionFactory $cartItemExtensionFactory
      * @param OrderItemExtensionFactory $orderItemExtensionFactory
+     * @param InvoiceItemExtensionFactory $invoiceItemExtensionFactory
      * @param DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         OrderItemFactory $orderItemFactory,
         QuoteItemFactory $quoteItemFactory,
+        InvoiceItemFactory $invoiceItemFactory,
         CartItemExtensionFactory $cartItemExtensionFactory,
         OrderItemExtensionFactory $orderItemExtensionFactory,
+        InvoiceItemExtensionFactory $invoiceItemExtensionFactory,
         DataObjectHelper $dataObjectHelper
     ) {
         $this->orderItemFactory = $orderItemFactory;
         $this->quoteItemFactory = $quoteItemFactory;
+        $this->invoiceItemFactory = $invoiceItemFactory;
         $this->cartItemExtensionFactory = $cartItemExtensionFactory;
         $this->orderItemExtensionFactory = $orderItemExtensionFactory;
+        $this->invoiceItemExtensionFactory = $invoiceItemExtensionFactory;
         $this->dataObjectHelper = $dataObjectHelper;
     }
 
@@ -97,6 +117,16 @@ class ExtensionManager
     }
 
     /**
+     * Returns empty subscription invoice item extension attribute object.
+     *
+     * @return InvoiceItem
+     */
+    public function getEmptyInvoiceItemAttribute()
+    {
+        return $this->invoiceItemFactory->create();
+    }
+
+    /**
      * Returns empty cart item extension attributes object.
      *
      * @return CartItemExtension
@@ -114,6 +144,16 @@ class ExtensionManager
     public function getEmptyOrderItemExtension()
     {
         return $this->orderItemExtensionFactory->create();
+    }
+
+    /**
+     * Returns empty invoice item extension attributes object.
+     *
+     * @return InvoiceItemExtension
+     */
+    public function getEmptyInvoiceItemExtension()
+    {
+        return $this->invoiceItemExtensionFactory->create();
     }
 
     /**
@@ -150,5 +190,23 @@ class ExtensionManager
         );
 
         return $quoteItem;
+    }
+
+    /**
+     * Converts order item extension attribute to invoice item extension attribute.
+     *
+     * @param OrderItem $item
+     * @return InvoiceItem
+     */
+    public function convertOrderItemToInvoiceItem(OrderItem $item)
+    {
+        $invoiceItem = $this->getEmptyInvoiceItemAttribute();
+        $this->dataObjectHelper->populateWithArray(
+            $invoiceItem,
+            $item->getData(),
+            SalesExtensionAttributesInterface::class
+        );
+
+        return $invoiceItem;
     }
 }
