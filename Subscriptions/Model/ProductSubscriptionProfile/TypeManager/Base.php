@@ -168,7 +168,7 @@ abstract class Base implements TypeInterface
     /**
      * @inheritdoc
      */
-    public function checkFrequencyExistanse($billingFrequency, array $productIds)
+    public function checkFrequencyExistanse($billingFrequency, $productId)
     {
         return true;
     }
