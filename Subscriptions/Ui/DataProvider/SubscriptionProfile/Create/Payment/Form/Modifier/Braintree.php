@@ -196,10 +196,6 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
-                                    ]
                                 ],
                             ],
                         ],
@@ -217,10 +213,6 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
                                     'sortOrder' => 20,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
-                                    ]
                                 ],
                             ],
                         ],
