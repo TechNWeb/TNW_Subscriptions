@@ -19,6 +19,7 @@
             <item name="ajaxSaveType" xsi:type="string">simple</item>
             <item name="ajaxSave" xsi:type="boolean">true</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/payment-form</item>
+            <item name="addPaymentValidation" xsi:type="boolean">true</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
         </item>
         <item name="template" xsi:type="string">templates/form/subs_collapsible</item>

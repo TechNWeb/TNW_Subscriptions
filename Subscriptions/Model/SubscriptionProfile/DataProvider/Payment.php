@@ -90,10 +90,13 @@ class Payment extends AbstractDataProvider
     {
         $configData = parent::getConfigData();
 
+        foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
+            $configData = $modifier->modifyConfigData($configData);
+        }
+
         $configData['submit_url'] = $this->urlBuilder->getUrl(
             '*/subscriptionprofile/save'
         );
-
         $configData['process_url'] = $this->urlBuilder->getUrl(
             '*/subscriptionprofile_create/process'
         );

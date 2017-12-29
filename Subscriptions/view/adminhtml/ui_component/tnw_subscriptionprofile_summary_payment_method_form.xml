@@ -17,6 +17,8 @@
             <item name="ajaxSaveType" xsi:type="string">simple</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-summary-form</item>
             <item name="insertFormName" xsi:type="string">payment_method_insert_form</item>
+            <item name="paymentContainer" xsi:type="string">payment_method</item>
+            <item name="addPaymentValidation" xsi:type="boolean">true</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_summary_payment_method_form</item>
         </item>
         <item name="template" xsi:type="string">templates/form/subs_collapsible</item>

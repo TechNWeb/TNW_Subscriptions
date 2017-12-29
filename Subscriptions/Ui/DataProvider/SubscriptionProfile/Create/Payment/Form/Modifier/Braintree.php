@@ -13,9 +13,11 @@ use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
 use TNW\Subscriptions\Model\Context;
-use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\UrlInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 
@@ -42,11 +44,6 @@ class Braintree extends Base implements PaymentModifierInterface
     private $braintreeConfig;
 
     /**
-     * @var Repository
-     */
-    private $assetRepository;
-
-    /**
      * @var RequestInterface
      */
     private $request;
@@ -68,38 +65,37 @@ class Braintree extends Base implements PaymentModifierInterface
 
     /**
      * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
-     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param QuoteSessionInterface $session
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
      * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
      * @param \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter
      * @param Context $context
      * @param Config $paymentConfig
-     * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
+        QuoteSessionInterface $session,
+        SubscriptionProfileRepository $profileRepository,
+        OrderRelationManager $relationManager,
         \Magento\Braintree\Gateway\Config\Config $braintreeConfig,
         \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter,
         Context $context,
         Config $paymentConfig,
-        Repository $assetRepository,
         RequestInterface $request,
         UrlInterface $urlBuilder
     ) {
-        parent::__construct($config, $session, $profileRepository);
-
         $this->context = $context;
         $this->braintreeConfig = $braintreeConfig;
         $this->braintreeAdapter = $braintreeAdapter;
         $this->paymentConfig = $paymentConfig;
-        $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
+        parent::__construct($config, $session, $profileRepository, $relationManager);
     }
+
 
     /**
      * {@inheritdoc}
@@ -200,6 +196,10 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
+                                    ]
                                 ],
                             ],
                         ],
@@ -217,6 +217,10 @@ class Braintree extends Base implements PaymentModifierInterface
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Text::NAME,
                                     'sortOrder' => 20,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
+                                    ]
                                 ],
                             ],
                         ],
@@ -367,6 +371,21 @@ class Braintree extends Base implements PaymentModifierInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyConfigData(array $configData)
+    {
+        $date = $this->getValidationDate();
+        return array_merge(
+            $configData,
+            [
+                $this->getPaymentCode() . '_start_on_month' => $date->format('m'),
+                $this->getPaymentCode() . '_start_on_year' => $date->format('Y'),
+            ]
+        );
     }
 
     /**
