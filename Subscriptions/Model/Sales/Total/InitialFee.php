@@ -8,9 +8,10 @@ namespace TNW\Subscriptions\Model\Sales\Total;
 
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
-use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 
 /**
  * Subscription initial fee totals collector.
@@ -18,8 +19,15 @@ use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
 class InitialFee extends AbstractTotal
 {
     /**
+     * Constants for subscription initial fee tax object.
+     */
+    const ITEM_TYPE = 'subs_initial_fee';
+    const ITEM_CODE = 'subs_initial_fee';
+
+    /**
      * Subscription initial fee totals collector.
      * Adds initial fee to grand total amount (without taxes).
+     * Taxes calculated as separated tax object.
      * Initial fee is quote item extension attribute.
      *
      * @param Quote $quote
@@ -40,10 +48,21 @@ class InitialFee extends AbstractTotal
         $baseTotalInitialFee = 0;
         /** @var Item $item */
         foreach ($items as $item) {
+            $associatedTaxables = $item->getAssociatedTaxables();
             list($initialFee, $baseInitialFee) = $this->getItemInitialFees($item);
             $totalInitialFee += $initialFee;
             $baseTotalInitialFee += $baseInitialFee;
+            $associatedTaxables[] = [
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => self::ITEM_TYPE,
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_CODE => self::ITEM_TYPE,
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $initialFee,
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $baseInitialFee,
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_QUANTITY => 1,
+                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TAX_CLASS_ID => $item->getProduct()->getTaxClassId(),
+            ];
+            $item->setAssociatedTaxables($associatedTaxables);
         }
+
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
         $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
 
