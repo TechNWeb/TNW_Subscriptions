@@ -135,6 +135,10 @@ define(
                 if (monthValue && yearValue) {
                     var minMonth = this.source[paymentCode + '_start_on_month'] + 1;
                     var minYear = this.source[paymentCode + '_start_on_year'];
+                    if (minMonth > 12) {
+                        minMonth = 1;
+                        minYear = minYear +1;
+                    }
                     var isValid = this.source.params.invalid;
                     container.error(true);
                     container.groupError($.mage.__('Incorrect credit card expiration date.'));
