@@ -5,6 +5,9 @@
  */
 
 /* @var $block \TNW\Subscriptions\Block\Subscription\Info\OrderHistory */
+/**
+ *
+ */
 ?>
 <?php $_orderHistory = $block->getOrderHistory(); ?>
 <?php if ($_orderHistory && count($_orderHistory)): ?>
@@ -31,7 +34,7 @@
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Created On')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->formatDate($_order->getCreatedAt()) ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Tax Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getTaxAmount()); ?></td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getShippingAmount()); ?></td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Shipping Fee')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $block->getShippingFeeByOrder($_order); ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Grand Total')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_order->formatPrice($_order->getGrandTotal()) ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_order->getStatusLabel() ?></td>
                 </tr>

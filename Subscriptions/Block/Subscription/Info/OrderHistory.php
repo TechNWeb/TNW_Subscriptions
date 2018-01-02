@@ -101,4 +101,19 @@ class OrderHistory extends ContentAbstract
     {
         return $this->getUrl('sales/order/view', ['order_id' => $order->getId()]);
     }
+
+    /**
+     * Get shipping fee by order
+     *
+     * @param $order \Magento\Sales\Model\Order
+     * @return string
+     */
+    public function getShippingFeeByOrder($order)
+    {
+        $result = 'N/A';
+        if ((float)$order->getShippingAmount()) {
+            $result = $order->formatPrice($order->getShippingAmount());
+        }
+        return $result;
+    }
 }
