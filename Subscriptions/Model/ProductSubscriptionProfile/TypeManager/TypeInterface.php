@@ -89,10 +89,10 @@ interface TypeInterface
      * Check if billing frequency exist for products.
      *
      * @param string|int $billingFrequency
-     * @param array $productIds
+     * @param string $productId
      * @return bool
      */
-    public function checkFrequencyExistanse($billingFrequency, array $productIds);
+    public function checkFrequencyExistanse($billingFrequency, $productId);
 
     /**
      * Return additional data from CartItemInterface.

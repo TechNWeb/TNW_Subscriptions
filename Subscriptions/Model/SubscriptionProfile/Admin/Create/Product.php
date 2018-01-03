@@ -70,6 +70,13 @@ class Product extends Create
     private $product;
 
     /**
+     * Current used product DataObject.
+     *
+     * @var DataObject
+     */
+    private $productDataObject;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
@@ -151,6 +158,23 @@ class Product extends Create
     }
 
     /**
+     * Returns product DataObject from MagentoProduct.
+     *
+     * @return DataObject
+     */
+    public function getProductDataObject()
+    {
+        if (null === $this->productDataObject) {
+            $requestData = $this->getData();
+            $product = $this->getProduct();
+            $this->productDataObject = $this->productTypeResolver->resolve($product->getTypeId())
+                ->getProductDataObject($product, $requestData);
+        }
+
+        return $this->productDataObject;
+    }
+
+    /**
      * Returns prepared product buy request.
      *
      * @param bool $fullRequest
@@ -192,7 +216,12 @@ class Product extends Create
                 $data = $this->addPricesToRequest($data, $productData);
             }
             //unset already unused fields
-            unset($productData['billing_frequency'], $productData['term'], $productData['period'], $productData['start_on']);
+            unset(
+                $productData['billing_frequency'],
+                $productData['term'],
+                $productData['period'],
+                $productData['start_on']
+            );
             $this->buyRequest = new DataObject(array_merge($data, $productData));
         }
 
@@ -230,9 +259,11 @@ class Product extends Create
      */
     private function getInitialFee(array $requestData, $convert)
     {
+        $productDataObject = $this->getProductDataObject();
+
         return $this->priceCalculator->getInitialFee(
             $requestData['billing_frequency'],
-            $requestData['product_id'],
+            $productDataObject->getChildProductId(),
             $convert
         );
     }

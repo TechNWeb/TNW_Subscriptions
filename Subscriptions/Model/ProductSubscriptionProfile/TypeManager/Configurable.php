@@ -102,15 +102,14 @@ class Configurable extends Base
     /**
      * @inheritdoc
      */
-    public function checkFrequencyExistanse($billingFrequency, array $productIds)
+    public function checkFrequencyExistanse($billingFrequency, $productId)
     {
         $this->searchCriteriaBuilder->addFilter(
             ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
             $billingFrequency
         )->addFilter(
             ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-            $productIds,
-            'in'
+            $productId
         );
         /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->searchCriteriaBuilder->create();

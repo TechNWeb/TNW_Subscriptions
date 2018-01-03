@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -508,19 +509,11 @@ class Form extends AbstractDataProvider
      * Get calculated product price for billing frequency.
      *
      * @param string $billingFrequencyId
-     * @param int|string|null $productId
-     * @param array|null $additionalData
+     * @param DataObject $productDataObject
      * @return string
      */
-    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productId, array $additionalData = null)
+    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject)
     {
-        $productId = $productId ?: $this->getRequestProductId();
-        $product = $this->formContext->getProductRepository()->getById($productId);
-        $additionalData['billing_frequency'] = $billingFrequencyId;
-        $productDataObject = $this->productTypeResolver
-            ->resolve($product->getTypeId())
-            ->getProductDataObject($product, $additionalData);
-
         return $this->priceCalculator->getUnitPrice($productDataObject, $billingFrequencyId, null, false);
     }
 
@@ -663,8 +656,10 @@ class Form extends AbstractDataProvider
         /** @var ProductBillingFrequencyInterface $frequency */
         foreach ($this->getProductBillingFrequencies($productId) as $frequency) {
             $billingFrequencyId = $frequency->getBillingFrequencyId();
+            $additionalData['billing_frequency'] = $billingFrequencyId;
+            $productDataObject = $this->getProductObjectData($productId, $additionalData);
             $data['product_frequencies'][$billingFrequencyId] =
-                $this->getBillingFrequencyData($productId, $frequency, $additionalData);
+                $this->getBillingFrequencyData($productDataObject, $frequency, $additionalData);
             if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
                 $data['billing_frequency'] = $billingFrequencyId;
                 $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
@@ -682,6 +677,21 @@ class Form extends AbstractDataProvider
         return $data;
     }
 
+    /**
+     * Return product DataObject from productId.
+     *
+     * @param string $productId
+     * @param array|null $additionalData
+     * @return DataObject
+     */
+    private function getProductObjectData($productId, $additionalData = null)
+    {
+        $product = $this->formContext->getProductRepository()->getById($productId);
+
+        return $this->productTypeResolver
+            ->resolve($product->getTypeId())
+            ->getProductDataObject($product, $additionalData);
+    }
     /**
      * Returns product id from request.
      *
@@ -713,22 +723,20 @@ class Form extends AbstractDataProvider
     /**
      * Return item billing frequency data.
      *
-     * @param int $productId
+     * @param DataObject $productDataObject
      * @param ProductBillingFrequencyInterface $frequency
-     * @param array|null $additionalData
      * @return array
      */
     protected function getBillingFrequencyData(
-        $productId,
-        ProductBillingFrequencyInterface $frequency,
-        array $additionalData = null
+        DataObject $productDataObject,
+        ProductBillingFrequencyInterface $frequency
     ) {
         $billingFrequencyId = $frequency->getBillingFrequencyId();
 
         return [
-            'price' => $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productId, $additionalData),
+            'price' => $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject),
             'preset_qty' => $frequency->getPresetQty(),
-            'initial_fee' => $this->getInitialFee($billingFrequencyId, $productId),
+            'initial_fee' => $this->getInitialFee($billingFrequencyId, $productDataObject->getChildProductId()),
         ];
    }
 }

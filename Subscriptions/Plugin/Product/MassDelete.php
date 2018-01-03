@@ -10,7 +10,6 @@ namespace TNW\Subscriptions\Plugin\Product;
 use Magento\Catalog\Controller\Adminhtml\Product\MassDelete as ControllerMassDelete;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Message\Manager;
-use Magento\Framework\Exception\CouldNotDeleteException;
 
 /**
  * Plugin for mass delete product
@@ -28,8 +27,6 @@ class MassDelete
     private $resultFactory;
 
     /**
-     *
-     *
      * @var Manager
      */
     private $manager;
