@@ -179,6 +179,7 @@ class Configurable extends Base
                                             $this->getProduct()->getId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
+                                            $this->getItem()->getCustomOptions() //super attributes data
                                         ],
                                     ],
                                 ],
@@ -189,5 +190,43 @@ class Configurable extends Base
                 ],
             ],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getUrlParams()
+    {
+        $params = parent::getUrlParams();
+        $attributes = [];
+        $attributesData = $this->getItem()->getCustomOptions();
+
+        if (self::isJson($attributesData)) {
+            $attributes = \Zend_Json::decode($attributesData);
+        }
+
+        $params['attributes'] = $attributes;
+
+        return $params;
+    }
+
+    /**
+     * Checks if value is in json format.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private static function isJson($value)
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        \json_decode($value);
+        if (\json_last_error()) {
+            return false;
+        }
+
+        return true;
     }
 }

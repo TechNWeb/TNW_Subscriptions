@@ -139,15 +139,21 @@ class Edit extends \Magento\Framework\App\Action\Action
             );
     }
 
+    /**
+     * Return custom data from subscription product.
+     *
+     * @param ProductSubscriptionProfileInterface $subscriprionProduct
+     * @return \Magento\Framework\DataObject
+     */
     private function getProductParams(ProductSubscriptionProfileInterface $subscriprionProduct)
     {
         $params = new \Magento\Framework\DataObject();
-        $attributesData = $subscriprionProduct->getCustomOptions();
+        $customData = $subscriprionProduct->getCustomOptions();
 
-        if (self::isJson($attributesData)) {
+        if (self::isJson($customData)) {
             $buyRequest = new \Magento\Framework\DataObject();
-            $attributesData = \Zend_Json::decode($attributesData);
-            $buyRequest->setSuperAttribute($attributesData);
+            $customData = \Zend_Json::decode($customData);
+            $buyRequest->setSuperAttribute($customData);
             $params->setBuyRequest($buyRequest);
         }
 

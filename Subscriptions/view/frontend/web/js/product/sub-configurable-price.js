@@ -20,10 +20,9 @@ define([
         /**
          * Initialize widget.
          */
-        _create: function() {debugger;
+        _create: function() {
             this.formatSuperAttributesData();
             this._super();
-
             this.setupChangeEvents();
         },
 
@@ -47,11 +46,15 @@ define([
          */
         setupChangeEvents: function () {
             var widget = this;
-            $.each($(this.options.childrenSelector), $.proxy(function (index, element) {
-                $(element).on('change', function() {
-                    widget._insertPriseBox()
-                });
-            }));
+            if ($(widget.options.childrenSelector).length) {
+                $.each($(widget.options.childrenSelector), $.proxy(function (index, element) {
+                    $(element).on('change', function () {
+                        widget._insertPriseBox()
+                    });
+                }));
+            } else {
+                setTimeout(this.setupChangeEvents.bind(this), 500);
+            }
         },
 
         /**
@@ -91,35 +94,41 @@ define([
          * @param {string|null} optionIndex
          */
         _insertPriseBox: function (optionIndex) {
-            var selectedProduct = this.getSelectedProduct(),
-                subscriptionPriceContainer = $(this.options.subscriptionPriceContainerSelector),
-                priceHtml,
-                currentFrequency;
-            if (!optionIndex) {
-                currentFrequency = $(this.options.billingFrequencyOptionsSelector + ':checked').get(0);
-                if (typeof currentFrequency !== 'undefined') {
-                    optionIndex = currentFrequency.value;
-                } else {
-                    optionIndex = this.options.subBillingFrequencyId.value;
-                }
+            var widget = this;
+            if ($(widget.options.childrenSelector).length) {
+                var selectedProduct = this.getSelectedProduct(),
+                    subscriptionPriceContainer = $(this.options.subscriptionPriceContainerSelector),
+                    priceHtml,
+                    currentFrequency;
                 if (!optionIndex) {
-                    return;
+                    currentFrequency = $(this.options.billingFrequencyOptionsSelector + ':checked').get(0);
+                    if (typeof currentFrequency !== 'undefined') {
+                        optionIndex = currentFrequency.value;
+                    } else {
+                        optionIndex = this.options.subBillingFrequencyId.value;
+                    }
+                    if (!optionIndex) {
+                        return;
+                    }
                 }
-            }
 
-            if (!selectedProduct) {
-                selectedProduct = 'config';
-            }
+                if (!selectedProduct) {
+                    selectedProduct = 'config';
+                }
 
-            if ((typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
-                && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')
-            ) {
-                priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
+                if ((typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
+                    && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')
+                ) {
+                    priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
+                } else {
+                    priceHtml = this.options.subscriptionPricesData['config'][optionIndex];
+                }
+
+                subscriptionPriceContainer.html(priceHtml);
             } else {
-                priceHtml = this.options.subscriptionPricesData['config'][optionIndex];
+                setTimeout(this._insertPriseBox.bind(this), 500);
             }
 
-            subscriptionPriceContainer.html(priceHtml);
         }
     });
 

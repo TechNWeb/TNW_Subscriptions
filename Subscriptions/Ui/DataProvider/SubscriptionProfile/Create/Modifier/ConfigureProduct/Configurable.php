@@ -11,6 +11,7 @@ use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions;
 
 /**
  * DataProvider modifier on products configure form for configurable products.
@@ -22,6 +23,29 @@ class Configurable extends Base
 
     /** Options container prefix */
     const CONTAINER_PREFIX = 'super_attribute';
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyData(array $data)
+    {
+        if ($this->isUsedModifier()) {
+            $options = $this->getOptions();
+            $optionsData = [];
+
+            if (is_array($options)) {
+                foreach ($options as $attributeId => $option) {
+                    $key = $attributeId;
+                    $optionsData[$key] = $option;
+                }
+            }
+
+            $data[EditProductOptions::FORM_DATA_VALUE][self::CONTAINER_PREFIX] = $optionsData;
+        }
+
+        return $data;
+    }
+
 
     /**
      * @inheritdoc
@@ -91,7 +115,7 @@ class Configurable extends Base
                             'collapsible' => false,
                             'componentType' => Field::NAME,
                             'formElement' => Select::NAME,
-                            'dataScope' => $attributeData['attributeId'],
+                            'dataScope' => $attribute->getAttributeId(),
                             'sortOrder' => $iterator,
                             'options' => $attributeData['options'],
                         ],
@@ -111,5 +135,15 @@ class Configurable extends Base
     private function getAllowAttributes()
     {
         return $this->getProduct()->getTypeInstance()->getConfigurableAttributes($this->getProduct());
+    }
+
+    /**
+     * Return product options from request.
+     *
+     * @return mixed
+     */
+    private function getOptions()
+    {
+        return $this->formContext->getRequest()->getParam('options', []);
     }
 }

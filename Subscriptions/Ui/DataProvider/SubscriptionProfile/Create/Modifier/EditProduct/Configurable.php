@@ -197,6 +197,7 @@ class Configurable extends Base
     {
         $currentFormName = $this->registry->registry('form_full_name');
         $leftContainerName = $currentFormName . '.description_fieldset.left_container';
+        $encodedAttributes = \Zend_Json::encode($this->getItem()->getBuyRequest()->getSuperAttribute());
 
         return [
             'children' => [
@@ -219,6 +220,7 @@ class Configurable extends Base
                                             $this->getItem()->getProductId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getQuoteId(),  // quote id
+                                            $encodedAttributes // encoded params
                                         ],
                                     ],
                                 ],
