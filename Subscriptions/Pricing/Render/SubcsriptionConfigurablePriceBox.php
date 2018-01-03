@@ -90,20 +90,41 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         array $arguments = []
     ) {
         $result = [];
+        $mappedResult = [];
+        $priceMap = [];
+        $arguments['configurable_mapping'] = true;
         if ($currentProduct->getTypeId() === Configurable::TYPE_CODE) {
-            $result['config'] = parent::renderSubscriptionAmounts($amount, $currentProduct, $arguments);
+            $mappedResult['config'] = parent::renderSubscriptionAmounts($amount, $currentProduct, $arguments);
 
             foreach ($this->getAllowProducts() as $product) {
                 /** @var \Magento\Framework\Pricing\Price\PriceInterface $simpleProductAmount */
                 $simpleProductAmount = $product->getPriceInfo()->getPrice('final_price');
                 $arguments['child_product'] = $product;
-                $result[$product->getId()] = parent::renderSubscriptionAmounts(
+                $mappedResult[$product->getId()] = parent::renderSubscriptionAmounts(
                     $simpleProductAmount->getAmount(),
                     $currentProduct,
                     $arguments
                 );
             }
         }
+
+        foreach ($mappedResult as $key => $productsAmount) {
+            if (!empty($productsAmount)) {
+                foreach ($productsAmount as $frequencyId => $data) {
+                    $priceMap[$frequencyId][$key] = $data['frequency_price'];
+                    $result[$key][$frequencyId] = $data['amount'];
+                }
+            } else {
+                $result[$key] = [];
+            }
+        }
+
+        $configurableDefaults = [];
+        foreach ($priceMap as $frequencyId => $productPrices) {
+            $minPrices = array_keys($productPrices, min($productPrices));
+            $configurableDefaults[$frequencyId] = reset($minPrices);
+        }
+        $result['default'] = $configurableDefaults;
 
         return $result;
     }

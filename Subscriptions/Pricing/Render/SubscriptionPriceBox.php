@@ -307,7 +307,14 @@ class SubscriptionPriceBox extends BasePriceBox
             ->getProductDataObject($product, $arguments);
         foreach ($this->getProductBillingFrequencies($productData) as $key => $billingFrequencyData) {
             $currentArguments['billing_frequency'] = array_replace($billingFrequencyData, $arguments);
-            $result[$key] = parent::renderAmount($amount, $currentArguments);
+            $resultAmount = parent::renderAmount($amount, $currentArguments);
+            $result[$key] = $resultAmount;
+            if (!empty($arguments['configurable_mapping'])) {
+                $result[$key] = [
+                    'amount' => $resultAmount,
+                    'frequency_price' => $billingFrequencyData['price'],
+                ];
+            }
         }
 
         return $result;
