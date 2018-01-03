@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use Magento\Sales\Model\Order;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
 /**
@@ -105,12 +106,12 @@ class OrderHistory extends ContentAbstract
     /**
      * Get shipping fee by order
      *
-     * @param $order \Magento\Sales\Model\Order
+     * @param Order $order
      * @return string
      */
-    public function getShippingFeeByOrder($order)
+    public function getShippingFeeByOrder(Order $order)
     {
-        $result = 'N/A';
+        $result = __('N/A');
         if ((float)$order->getShippingAmount()) {
             $result = $order->formatPrice($order->getShippingAmount());
         }
