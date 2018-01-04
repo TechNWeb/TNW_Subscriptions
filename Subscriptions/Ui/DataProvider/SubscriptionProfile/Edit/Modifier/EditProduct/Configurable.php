@@ -14,6 +14,7 @@ use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 
 /**
@@ -42,17 +43,25 @@ class Configurable extends Base
     private $managerConfigurable;
 
     /**
+     * @var Context
+     */
+    private $contextModel;
+
+    /**
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      * @param ManagerConfigurable $managerConfigurable
+     * @param Context $contextModel
      */
     public function __construct(
         Registry $registry,
         UrlFactory $urlFactory,
-        ManagerConfigurable $managerConfigurable
+        ManagerConfigurable $managerConfigurable,
+        Context $contextModel
     ) {
         $this->registry = $registry;
         $this->managerConfigurable = $managerConfigurable;
+        $this->contextModel = $contextModel;
         parent::__construct($urlFactory);
     }
 
@@ -201,32 +210,12 @@ class Configurable extends Base
         $attributes = [];
         $attributesData = $this->getItem()->getCustomOptions();
 
-        if (self::isJson($attributesData)) {
+        if ($this->contextModel->isJson($attributesData)) {
             $attributes = \Zend_Json::decode($attributesData);
         }
 
         $params['attributes'] = $attributes;
 
         return $params;
-    }
-
-    /**
-     * Checks if value is in json format.
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private static function isJson($value)
-    {
-        if ($value === '') {
-            return false;
-        }
-
-        \json_decode($value);
-        if (\json_last_error()) {
-            return false;
-        }
-
-        return true;
     }
 }

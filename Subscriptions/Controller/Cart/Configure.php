@@ -134,10 +134,10 @@ class Configure extends \Magento\Framework\App\Action\Action
     /**
      * Return additional params for quoteIem.
      *
-     * @param $quoteItem
+     * @param Item $quoteItem
      * @return \Magento\Framework\DataObject
      */
-    private function getParams($quoteItem)
+    private function getParams(Item $quoteItem)
     {
         $params = new \Magento\Framework\DataObject();
         $params->setCategoryId(false);

@@ -14,6 +14,7 @@ use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Context as ContextModel;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
@@ -53,12 +54,18 @@ class Edit extends \Magento\Framework\App\Action\Action
     private $logger;
 
     /**
+     * @var ContextModel
+     */
+    private $contextModel;
+
+    /**
      * @param Context $context
      * @param ProductSubscriptionProfileRepository $productSubscriptionRepository
      * @param DataPersistorInterface $dataPersistor
      * @param Registry $registry
      * @param ProfileManager $profileManager
      * @param LoggerInterface $logger
+     * @param ContextModel $contextModel
      */
     public function __construct(
         Context $context,
@@ -66,7 +73,8 @@ class Edit extends \Magento\Framework\App\Action\Action
         DataPersistorInterface $dataPersistor,
         Registry $registry,
         ProfileManager $profileManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ContextModel $contextModel
     ) {
         parent::__construct($context);
         $this->productSubscriptionRepository = $productSubscriptionRepository;
@@ -74,6 +82,7 @@ class Edit extends \Magento\Framework\App\Action\Action
         $this->coreRegistry = $registry;
         $this->profileManager = $profileManager;
         $this->logger = $logger;
+        $this->contextModel = $contextModel;
     }
 
     /**
@@ -150,7 +159,7 @@ class Edit extends \Magento\Framework\App\Action\Action
         $params = new \Magento\Framework\DataObject();
         $customData = $subscriprionProduct->getCustomOptions();
 
-        if (self::isJson($customData)) {
+        if ($this->contextModel->isJson($customData)) {
             $buyRequest = new \Magento\Framework\DataObject();
             $customData = \Zend_Json::decode($customData);
             $buyRequest->setSuperAttribute($customData);
@@ -158,25 +167,5 @@ class Edit extends \Magento\Framework\App\Action\Action
         }
 
         return $params;
-    }
-
-    /**
-     * Checks if value is in json format.
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private static function isJson($value)
-    {
-        if ($value === '') {
-            return false;
-        }
-
-        \json_decode($value);
-        if (\json_last_error()) {
-            return false;
-        }
-
-        return true;
     }
 }

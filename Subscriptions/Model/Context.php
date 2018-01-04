@@ -198,4 +198,24 @@ class Context
         );
         return $result;
     }
+
+    /**
+     * Checks if value is in json format.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public function isJson($value)
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        \json_decode($value);
+        if (\json_last_error()) {
+            return false;
+        }
+
+        return true;
+    }
 }
