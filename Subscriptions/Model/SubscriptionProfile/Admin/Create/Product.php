@@ -109,6 +109,7 @@ class Product extends Create
     {
         $this->buyRequest = null;
         $this->data = [];
+        $this->productDataObject = null;
     }
 
     /**
@@ -120,6 +121,7 @@ class Product extends Create
         $this->data = $data;
         $this->buyRequest = null;
         $this->product = null;
+        $this->productDataObject = null;
     }
 
     /**

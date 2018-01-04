@@ -112,9 +112,9 @@ define([
                     }
                 }
 
-                if (!selectedProduct) {
-                    selectedProduct = 'config';
-                }
+            if (!selectedProduct) {
+                selectedProduct = this.options.subscriptionPricesData['default'][optionIndex];
+            }
 
                 if ((typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
                     && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')

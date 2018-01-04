@@ -41,7 +41,7 @@ class AddInitialFee
         $result = $this->context->arrayInsertBefore(
             $result,
             'total',
-            ['tnw_subscriptions_initial_fee' => __('Subscription Initial Fee')]
+            ['tnw_subscriptions_initial_fee' => __('Initial Fee')]
         );
 
         return $result;
