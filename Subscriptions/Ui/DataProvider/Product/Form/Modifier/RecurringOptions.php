@@ -155,7 +155,10 @@ class RecurringOptions extends BaseModifier
 
             /** @var ProductBillingFrequencyInterface $option */
             foreach ($productOptions as $option) {
-                $options[] = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $option->getData());
+                $optionArray = $option->getData();
+                $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
+                $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
+                $options[] = $optionArray;
             }
 
             $data =  array_replace_recursive(
