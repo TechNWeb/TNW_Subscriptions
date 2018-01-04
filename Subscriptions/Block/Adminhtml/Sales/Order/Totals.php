@@ -41,7 +41,7 @@ class Totals extends Template
             $total = new DataObject(
                 [
                     'code' => $this->getNameInLayout(),
-                    'label' => __('Subscription Initial Fee'),
+                    'label' => __('Initial Fee'),
                     'value' => $initialFeeTotal,
                     'base_value' => $initialFeeBaseTotal
                 ]
