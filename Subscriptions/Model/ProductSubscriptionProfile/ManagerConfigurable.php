@@ -226,6 +226,7 @@ class ManagerConfigurable
                             $updatedSubProduct
                                 ->setDataChanges(false)
                                 ->setQty($candidate->getQty())
+                                ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
                                 ->setPrice($price);
                             $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
                         } else {

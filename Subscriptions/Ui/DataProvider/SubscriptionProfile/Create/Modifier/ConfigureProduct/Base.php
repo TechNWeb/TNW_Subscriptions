@@ -8,8 +8,6 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\
 
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Registry;
-use Magento\Quote\Model\Quote\Item;
-use Magento\Quote\Model\Quote\ItemFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
 
 /**
@@ -30,7 +28,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
      *
      * @var Context
      */
-    private $formContext;
+    protected $formContext;
 
     /**
      * @var MagentoProduct

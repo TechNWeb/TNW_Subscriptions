@@ -20,9 +20,10 @@ define([
          * @param {string|number} productId
          * @param {string|number} itemId
          * @param {string|number} quoteId
+         * @param {string} options
          */
-        editOptions: function (productId, itemId, quoteId) {
-            this.openConfigurableModal(productId, itemId, quoteId);
+        editOptions: function (productId, itemId, quoteId, options) {
+            this.openConfigurableModal(productId, itemId, quoteId, options);
         },
 
         /**
@@ -31,13 +32,15 @@ define([
          * @param {string|number} productId
          * @param {string|number} itemId
          * @param {string|number} quoteId
+         * @param {string} options
          */
-        openConfigurableModal: function (productId, itemId, quoteId) {
+        openConfigurableModal: function (productId, itemId, quoteId, options) {
             var editOptionsForm = registry.get('index=' + this.source.insertEditOptionsForm),
                 params = {
                     'product_id': productId,
                     'item_id': itemId,
-                    'quote_id': quoteId
+                    'quote_id': quoteId,
+                    'options': options = JSON.parse(options)
                 };
             this.getConfigureModal().openModal();
             this.renderForm(editOptionsForm, params);

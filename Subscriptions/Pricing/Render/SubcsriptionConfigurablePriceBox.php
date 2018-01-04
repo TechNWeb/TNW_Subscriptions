@@ -43,6 +43,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
      * @param ProfileManager $profileManager
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param HelperProduct $helperProduct
      * @param array $data
      */

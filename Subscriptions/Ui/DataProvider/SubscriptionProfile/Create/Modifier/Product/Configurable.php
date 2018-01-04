@@ -87,24 +87,24 @@ class Configurable extends Base
                     'attributeLabel' => $productAttribute->getStoreLabel($storeId),
                     'optionLabel' => $optionLabel,
                 ];
-            }
 
-            $iterator++;
-            $result[self::CONTAINER_PREFIX . $attribute->getAttributeId()] = [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'label' => $attributeData['attributeLabel'],
-                            'collapsible' => false,
-                            'componentType' => Field::NAME,
-                            'formElement' => Input::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
-                            'sortOrder' => $iterator,
-                            'value' => $attributeData['optionLabel'],
+                $iterator++;
+                $result[self::CONTAINER_PREFIX . $attribute->getAttributeId()] = [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => $attributeData['attributeLabel'],
+                                'collapsible' => false,
+                                'componentType' => Field::NAME,
+                                'formElement' => Input::NAME,
+                                'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                                'sortOrder' => $iterator,
+                                'value' => $attributeData['optionLabel'],
+                            ],
                         ],
                     ],
-                ],
-            ];
+                ];
+            }
         }
 
         return $result;
