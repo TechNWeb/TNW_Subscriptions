@@ -30,15 +30,49 @@ $schema = ($block->getZone() === 'item_view') ? true : false;
         ]
 );
 $data = $block->getEncodedData($data);
+$optionsData = $block->getEncodedData($block->getOptions());
 ?>
 <script type="text/x-magento-init">
 {
     "*": {
         "tnwSubConfigurablePrice": {
             "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
-            "productAttributesData" : <?php /* @noEscape */ echo $block->getEncodedData($block->getOptions())?>,
+            "productAttributesData" : <?php /* @noEscape */ echo $optionsData?>,
             "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>
         }
     }
 }
 </script>
+
+<?php if ($block->productHasSwatch()):?>
+<script>
+    require([
+        'jquery',
+        'Magento_ConfigurableProduct/js/options-updater'
+    ], function($, Updater) {
+        var selectors = {
+                formSelector: '#product_addtocart_form',
+                swatchSelector: '.swatch-opt'
+            },
+            swatchWidgetName = 'mageSwatchRenderer',
+            widgetInitEvent = 'swatch.initialized',
+            clickEventName = 'emulateClick',
+            swatchOptions = <?php /* @escapeNotVerified */ echo $optionsData ?>
+
+            /**
+             * Sets default configurable swatch attribute's selected
+             */
+            selectDefaultSwatchOptions = function () {
+                var swatchWidget = $(selectors.swatchSelector).data(swatchWidgetName);
+
+                if (!swatchWidget || !swatchWidget._EmulateSelectedByAttributeId) {
+                    return;
+                }
+                swatchWidget._EmulateSelectedByAttributeId(swatchOptions.defaultValues, clickEventName);
+            },
+
+            updater = new Updater(widgetInitEvent, selectDefaultSwatchOptions);
+            updater.listen();
+    });
+</script>
+<?php endif;?>
