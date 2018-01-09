@@ -69,7 +69,6 @@ class Braintree extends Base implements PaymentModifierInterface
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
-     * @param \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter
      * @param Context $context
      * @param Config $paymentConfig
      * @param RequestInterface $request
@@ -81,7 +80,6 @@ class Braintree extends Base implements PaymentModifierInterface
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Braintree\Gateway\Config\Config $braintreeConfig,
-        \Magento\Braintree\Model\Adapter\BraintreeAdapter $braintreeAdapter,
         Context $context,
         Config $paymentConfig,
         RequestInterface $request,
@@ -89,13 +87,30 @@ class Braintree extends Base implements PaymentModifierInterface
     ) {
         $this->context = $context;
         $this->braintreeConfig = $braintreeConfig;
-        $this->braintreeAdapter = $braintreeAdapter;
         $this->paymentConfig = $paymentConfig;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
         parent::__construct($config, $session, $profileRepository, $relationManager);
     }
 
+
+    /**
+     * Fix adapter initialization for magento version 2.2.2
+     *
+     * @return \Magento\Braintree\Model\Adapter\BraintreeAdapter
+     */
+    public function getBraintreeAdapter()
+    {
+        if (!$this->braintreeAdapter) {
+            $factoryClassName = 'Magento\Braintree\Model\Adapter\BraintreeAdapterFactory';
+            if (class_exists($factoryClassName)) {
+                $this->braintreeAdapter = \Magento\Framework\App\ObjectManager::getInstance()->get($factoryClassName)->create();
+            } else {
+                $this->braintreeAdapter = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Braintree\Model\Adapter\BraintreeAdapter::class);
+            }
+        }
+        return $this->braintreeAdapter;
+    }
 
     /**
      * {@inheritdoc}
@@ -328,7 +343,7 @@ class Braintree extends Base implements PaymentModifierInterface
                 $params[\Magento\Braintree\Gateway\Request\PaymentDataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
             }
 
-            $this->clientToken = $this->braintreeAdapter->generate($params);
+            $this->clientToken = $this->getBraintreeAdapter()->generate($params);
         }
 
         return $this->clientToken;

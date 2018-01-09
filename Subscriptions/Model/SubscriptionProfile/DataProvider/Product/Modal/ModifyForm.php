@@ -55,7 +55,7 @@ class ModifyForm extends Form
      *
      * @var string
      */
-    private $currentFormName;
+    protected $currentFormName;
 
     /**
      * Product for current item.
@@ -63,6 +63,13 @@ class ModifyForm extends Form
      * @var \Magento\Catalog\Api\Data\ProductInterface
      */
     protected $currentProduct;
+
+    /**
+     * Initialized image helper for product.
+     *
+     * @var
+     */
+    protected $imageHelper;
 
     /**
      * Current item.
@@ -255,6 +262,7 @@ class ModifyForm extends Form
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
+            $this->imageHelper = $this->context->getImageHelperForQuoteItem($item, 'category_page_grid');
             $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId)
@@ -515,14 +523,7 @@ class ModifyForm extends Form
      */
     protected function getImageHelper()
     {
-        $imageHelper = $this->formContext->getImageHelper();
-        if (isset($this->currentProduct)) {
-            $imageHelper = $imageHelper->init($this->currentProduct, 'category_page_grid',
-                ['type' => 'small_image', 'width' => '240', 'height' => '240']
-            );
-        }
-
-        return $imageHelper;
+        return $this->imageHelper;
     }
 
     /**

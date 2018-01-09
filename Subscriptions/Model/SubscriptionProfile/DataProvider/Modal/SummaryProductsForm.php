@@ -627,4 +627,49 @@ class SummaryProductsForm extends ModifyForm
             'insertEditOptionsForm' => Product::DATA_SCOPE_EDIT_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM,
         ];
     }
+
+    /**
+     * Returns item children definition.
+     *
+     * @param $subQuote
+     * @return array
+     */
+    protected function getChildren($subQuote)
+    {
+        foreach ($this->getObjectItems($subQuote) as $item) {
+            $itemId = $item->getId();
+            $objectId = $subQuote->getId();
+            $this->currentFormName = $this->getFormFullName($objectId, $itemId);
+            $this->currentProduct = $this->getProductFromItem($item);
+            $this->currentItem = $item;
+            $this->imageHelper = $this->context->getImageHelperForSubscriptionProduct($item, 'category_page_grid');
+            $itemMeta = [
+                'children' => [
+                    'form' => $this->getForm($objectId, $itemId)
+                ],
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => false,
+                            'collapsible' => false,
+                            'componentType' => UiForm\Fieldset::NAME,
+                            'dataScope' => 'item_' . $itemId,
+                            'additionalClasses' => 'subscription-item-form',
+                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                        ],
+                    ],
+                ]
+            ];
+
+            /** @var ModifierInterface $modifier */
+            foreach ($this->pool->getModifiersInstances() as $modifier) {
+                $modifier->setItem($this->currentItem);
+                $itemMeta = $modifier->modifyMeta($itemMeta);
+            }
+
+            $result[self::CONTAINER_ITEM_PREFIX . $itemId] = $itemMeta;
+        }
+
+        return !empty($result) ? $result : [];
+    }
 }
