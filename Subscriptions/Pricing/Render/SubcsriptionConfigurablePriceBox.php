@@ -55,6 +55,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param HelperProduct $helperProduct
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Swatches\Helper\Data $swatchHelper
      * @param array $data
      */
     public function __construct(

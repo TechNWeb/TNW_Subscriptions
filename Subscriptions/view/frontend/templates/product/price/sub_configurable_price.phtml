@@ -57,7 +57,7 @@ $optionsData = $block->getEncodedData($block->getOptions());
             swatchWidgetName = 'mageSwatchRenderer',
             widgetInitEvent = 'swatch.initialized',
             clickEventName = 'emulateClick',
-            swatchOptions = <?php /* @escapeNotVerified */ echo $optionsData ?>
+            swatchOptions = <?php /* @noEscape */ echo $optionsData ?>;
 
             /**
              * Sets default configurable swatch attribute's selected
@@ -69,7 +69,7 @@ $optionsData = $block->getEncodedData($block->getOptions());
                     return;
                 }
                 swatchWidget._EmulateSelectedByAttributeId(swatchOptions.defaultValues, clickEventName);
-            },
+            };
 
             updater = new Updater(widgetInitEvent, selectDefaultSwatchOptions);
             updater.listen();
