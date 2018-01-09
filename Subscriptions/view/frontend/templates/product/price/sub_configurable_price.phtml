@@ -50,10 +50,7 @@ $optionsData = $block->getEncodedData($block->getOptions());
         'jquery',
         'Magento_ConfigurableProduct/js/options-updater'
     ], function($, Updater) {
-        var selectors = {
-                formSelector: '#product_addtocart_form',
-                swatchSelector: '.swatch-opt'
-            },
+        var swatchSelector = '.swatch-opt',
             swatchWidgetName = 'mageSwatchRenderer',
             widgetInitEvent = 'swatch.initialized',
             clickEventName = 'emulateClick',
@@ -63,7 +60,7 @@ $optionsData = $block->getEncodedData($block->getOptions());
              * Sets default configurable swatch attribute's selected
              */
             selectDefaultSwatchOptions = function () {
-                var swatchWidget = $(selectors.swatchSelector).data(swatchWidgetName);
+                var swatchWidget = $(swatchSelector).data(swatchWidgetName);
 
                 if (!swatchWidget || !swatchWidget._EmulateSelectedByAttributeId) {
                     return;
