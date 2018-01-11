@@ -14,7 +14,7 @@ require(['prototype'], function() {
     /**
      * Adds subscription initial fee bindings for submit button
      *
-     * @param id
+     * @param {String} id
      */
     function unblockSubmit(id) {
         $(id).observe('focus', function(event) {

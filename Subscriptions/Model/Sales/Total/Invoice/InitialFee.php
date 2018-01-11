@@ -103,7 +103,6 @@ class InitialFee extends AbstractTotal
             $item->getExtensionAttributes()->getSubsInitialFees()
                 ->setSubsInitialFee($fee)
                 ->setBaseSubsInitialFee($baseFee);
-
         }
     }
 }
