@@ -107,7 +107,7 @@ class Braintree extends Base implements PaymentModifierInterface
     /**
      * Fix adapter initialization for magento version 2.2.2
      *
-     * @return \Magento\Braintree\Model\Adapter\BraintreeAdapter
+     * @return BraintreeAdapter
      */
     public function getBraintreeAdapter()
     {
