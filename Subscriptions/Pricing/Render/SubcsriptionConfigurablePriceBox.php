@@ -32,6 +32,16 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
     private $helperProduct;
 
     /**
+     * @var \Magento\Framework\Module\Manager
+     */
+    private $moduleManager;
+
+    /**
+     * @var \Magento\Swatches\Helper\Data
+     */
+    private $swatchHelper;
+
+    /**
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -45,6 +55,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param HelperProduct $helperProduct
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Swatches\Helper\Data $swatchHelper
      * @param array $data
      */
     public function __construct(
@@ -61,6 +73,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         ProfileManager $profileManager,
         ProductTypeManagerResolver $productTypeResolver,
         HelperProduct $helperProduct,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Swatches\Helper\Data $swatchHelper,
         array $data = []
     ) {
         parent::__construct(
@@ -80,6 +94,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         );
 
         $this->helperProduct = $helperProduct;
+        $this->moduleManager = $moduleManager;
+        $this->swatchHelper = $swatchHelper;
     }
 
     /**
@@ -174,6 +190,30 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
             }
         }
 
+        $defaultValues = $this->getRequest()->getParam('attributes');
+
+        if (!empty($defaultValues) && is_array($defaultValues)) {
+            $options['defaultValues'] = $defaultValues;
+        }
+
         return $options;
+    }
+
+    /**
+     * Check if swatch attributes will be shown.
+     *
+     * @return bool
+     */
+    public function productHasSwatch()
+    {
+        $result = false;
+
+        if ($this->moduleManager->isOutputEnabled('Magento_Swatches')) {
+            $product = $this->getProduct();
+
+            $result = $this->swatchHelper->isProductHasSwatch($product);
+        }
+
+        return $result;
     }
 }
