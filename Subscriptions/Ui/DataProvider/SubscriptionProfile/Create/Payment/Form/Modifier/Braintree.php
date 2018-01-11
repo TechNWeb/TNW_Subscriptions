@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Braintree\Model\Adapter\BraintreeAdapter;
+use Magento\Braintree\Model\Adapter\BraintreeAdapterFactory;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Element\DataType\Text;
@@ -54,7 +56,12 @@ class Braintree extends Base implements PaymentModifierInterface
     private $urlBuilder;
 
     /**
-     * @var \Magento\Braintree\Model\Adapter\BraintreeAdapter
+     * @var BraintreeAdapterFactory
+     */
+    private $braintreeAdapterFactory;
+
+    /**
+     * @var BraintreeAdapter
      */
     private $braintreeAdapter;
 
@@ -73,6 +80,7 @@ class Braintree extends Base implements PaymentModifierInterface
      * @param Config $paymentConfig
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
+     * @param BraintreeAdapterFactory $braintreeAdapter
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -83,10 +91,12 @@ class Braintree extends Base implements PaymentModifierInterface
         Context $context,
         Config $paymentConfig,
         RequestInterface $request,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        BraintreeAdapterFactory $braintreeAdapterFactory
     ) {
         $this->context = $context;
         $this->braintreeConfig = $braintreeConfig;
+        $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
@@ -102,12 +112,7 @@ class Braintree extends Base implements PaymentModifierInterface
     public function getBraintreeAdapter()
     {
         if (!$this->braintreeAdapter) {
-            $factoryClassName = 'Magento\Braintree\Model\Adapter\BraintreeAdapterFactory';
-            if (class_exists($factoryClassName)) {
-                $this->braintreeAdapter = \Magento\Framework\App\ObjectManager::getInstance()->get($factoryClassName)->create();
-            } else {
-                $this->braintreeAdapter = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Braintree\Model\Adapter\BraintreeAdapter::class);
-            }
+            $this->braintreeAdapter = $this->braintreeAdapterFactory->create();
         }
         return $this->braintreeAdapter;
     }
