@@ -32,17 +32,27 @@ class InitialFee extends AbstractTotal
         foreach ($invoice->getAllItems() as $item) {
             /** @var OrderItem $orderItem */
             $orderItem = $item->getOrderItem();
-            if ($orderItem->isDummy()) {
+            $orderItemQty = $orderItem->getQtyOrdered();
+
+            if ($orderItem->isDummy() || $item->getQty() < 0) {
                 continue;
             }
-            list($initialFee, $baseInitialFee) = $this->getItemInitialFees($orderItem);
-            $totalInitialFee += $initialFee;
-            $baseTotalInitialFee += $baseInitialFee;
+
+            list($currentFee, $baseCurrentFee) = $this->getItemCurrentInitialFees($orderItem);
+
+            if ($currentFee && $orderItemQty) {
+                if (!$item->isLast()) {
+                    $ratio = $item->getQty() / ($orderItemQty - $orderItem->getQtyInvoiced());
+                    $currentFee = $invoice->roundPrice($currentFee * $ratio);
+                    $baseCurrentFee = $invoice->roundPrice($baseCurrentFee * $ratio, 'base');
+                }
+
+                $this->setItemInitialFees($item, $currentFee, $baseCurrentFee);
+                $totalInitialFee += $currentFee;
+                $baseTotalInitialFee += $baseCurrentFee;
+            }
         }
-        // in our case we don't need to check is this invoice is last because subscription can be
-        // created only with credit payment method and in this case we will have only one invoice
-        $invoice->setSubtotal($invoice->getSubtotal() + $totalInitialFee);
-        $invoice->setBaseSubtotal($invoice->getBaseSubtotal()  + $baseTotalInitialFee);
+
         $invoice->setGrandTotal($invoice->getGrandTotal() + $totalInitialFee);
         $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal() + $baseTotalInitialFee);
 
@@ -55,18 +65,42 @@ class InitialFee extends AbstractTotal
      * @param OrderItem $item
      * @return array
      */
-    private function getItemInitialFees(OrderItem $item)
+    private function getItemCurrentInitialFees(OrderItem $item)
     {
         $initialFee = 0;
         $baseInitialFee = 0;
+        $initialFeeInvoiced = 0;
+        $baseInitialFeeInvoiced = 0;
         $initialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
+
         if ($initialFees) {
             $initialFee = $initialFees->getSubsInitialFee();
             $baseInitialFee = $initialFees->getBaseSubsInitialFee();
+            $initialFeeInvoiced = $initialFees->getSubsInitialFeeInvoiced();
+            $baseInitialFeeInvoiced = $initialFees->getBaseSubsInitialFeeInvoiced();
         }
 
-        return [$initialFee, $baseInitialFee];
+        return [$initialFee - $initialFeeInvoiced, $baseInitialFee - $baseInitialFeeInvoiced];
+    }
+
+    /**
+     * Sets to invoice item subscription initial fee.
+     *
+     * @param InvoiceItem $item
+     * @param float $fee
+     * @param float $baseFee
+     * @return void
+     */
+    private function setItemInitialFees(InvoiceItem $item, $fee, $baseFee)
+    {
+        if ($item->getExtensionAttributes()) {
+            if ($item->getExtensionAttributes()->getSubsInitialFees()) {
+                $item->getExtensionAttributes()->getSubsInitialFees()
+                    ->setSubsInitialFee($fee)
+                    ->setBaseSubsInitialFee($baseFee);
+            }
+        }
     }
 }
