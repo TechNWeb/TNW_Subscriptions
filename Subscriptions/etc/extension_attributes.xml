@@ -23,4 +23,7 @@
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceItemInterface">
         <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\InvoiceItem"/>
     </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\CreditmemoItemInterface">
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\CreditmemoItem"/>
+    </extension_attributes>
 </config>

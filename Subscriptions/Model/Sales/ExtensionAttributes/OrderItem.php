@@ -7,13 +7,13 @@
 namespace TNW\Subscriptions\Model\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\AbstractModel;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 use TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\OrderItem as Resource;
 
 /**
  * Class for order item extension attribute.
  */
-class OrderItem extends AbstractModel implements SalesExtensionAttributesInterface
+class OrderItem extends AbstractModel implements OrderItemExtensionAttributesInterface
 {
     /**
      * @return void
@@ -69,5 +69,69 @@ class OrderItem extends AbstractModel implements SalesExtensionAttributesInterfa
     public function setBaseSubsInitialFee($baseInitialFee)
     {
         return $this->setData(self::EXT_ATTRIBUTE_BASE_INITIAL_FEE, $baseInitialFee);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseSubsInitialFeeInvoiced()
+    {
+        return $this->getData(static::EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBaseSubsInitialFeeInvoiced($baseInitialFeeInvoiced)
+    {
+        return $this->setData(self::EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED, $baseInitialFeeInvoiced);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubsInitialFeeInvoiced()
+    {
+        return $this->getData(static::EXT_ATTRIBUTE_INITIAL_FEE_INVOICED);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSubsInitialFeeInvoiced($initialFeeInvoiced)
+    {
+        return $this->setData(self::EXT_ATTRIBUTE_INITIAL_FEE_INVOICED, $initialFeeInvoiced);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubsInitialFeeRefunded()
+    {
+        return $this->getData(static::EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSubsInitialFeeRefunded($initialFeeRefunded)
+    {
+        return $this->setData(self::EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED, $initialFeeRefunded);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseSubsInitialFeeRefunded()
+    {
+        return $this->getData(static::EXT_ATTRIBUTE_BASE_INITIAL_FEE_REFUNDED);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setBaseSubsInitialFeeRefunded($baseInitialFeeRefunded)
+    {
+        return $this->setData(self::EXT_ATTRIBUTE_BASE_INITIAL_FEE_REFUNDED, $baseInitialFeeRefunded);
     }
 }

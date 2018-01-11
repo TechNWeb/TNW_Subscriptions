@@ -13,6 +13,8 @@ use Magento\Sales\Api\Data\InvoiceItemExtension;
 use Magento\Sales\Api\Data\InvoiceItemExtensionFactory;
 use Magento\Sales\Api\Data\OrderItemExtension;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
+use Magento\Sales\Api\Data\CreditmemoItemExtension;
+use Magento\Sales\Api\Data\CreditmemoItemExtensionFactory;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 
 /**
@@ -42,6 +44,13 @@ class ExtensionManager
     private $invoiceItemFactory;
 
     /**
+     * Factory for creating subscription credit memo item extension attributes.
+     *
+     * @var CreditmemoItemFactory
+     */
+    private $creditmemoItemFactory;
+
+    /**
      * Factory for creating cart item extension attributes object.
      *
      * @var CartItemExtensionFactory
@@ -63,6 +72,13 @@ class ExtensionManager
     private $invoiceItemExtensionFactory;
 
     /**
+     * Factory for creating credit memo item extension attributes object.
+     *
+     * @var CreditmemoItemExtensionFactory
+     */
+    private $creditmemoItemExtensionFactory;
+
+    /**
      * Data object helper.
      *
      * @var DataObjectHelper
@@ -73,26 +89,32 @@ class ExtensionManager
      * @param OrderItemFactory $orderItemFactory
      * @param QuoteItemFactory $quoteItemFactory
      * @param InvoiceItemFactory $invoiceItemFactory
+     * @param CreditmemoItemFactory $creditmemoItemFactory
      * @param CartItemExtensionFactory $cartItemExtensionFactory
      * @param OrderItemExtensionFactory $orderItemExtensionFactory
      * @param InvoiceItemExtensionFactory $invoiceItemExtensionFactory
+     * @param CreditmemoItemExtensionFactory $creditmemoItemExtensionFactory
      * @param DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         OrderItemFactory $orderItemFactory,
         QuoteItemFactory $quoteItemFactory,
         InvoiceItemFactory $invoiceItemFactory,
+        CreditmemoItemFactory $creditmemoItemFactory,
         CartItemExtensionFactory $cartItemExtensionFactory,
         OrderItemExtensionFactory $orderItemExtensionFactory,
         InvoiceItemExtensionFactory $invoiceItemExtensionFactory,
+        CreditmemoItemExtensionFactory $creditmemoItemExtensionFactory,
         DataObjectHelper $dataObjectHelper
     ) {
         $this->orderItemFactory = $orderItemFactory;
         $this->quoteItemFactory = $quoteItemFactory;
         $this->invoiceItemFactory = $invoiceItemFactory;
+        $this->creditmemoItemFactory = $creditmemoItemFactory;
         $this->cartItemExtensionFactory = $cartItemExtensionFactory;
         $this->orderItemExtensionFactory = $orderItemExtensionFactory;
         $this->invoiceItemExtensionFactory = $invoiceItemExtensionFactory;
+        $this->creditmemoItemExtensionFactory = $creditmemoItemExtensionFactory;
         $this->dataObjectHelper = $dataObjectHelper;
     }
 
@@ -127,6 +149,16 @@ class ExtensionManager
     }
 
     /**
+     * Returns empty subscription credit memo item extension attribute object.
+     *
+     * @return CreditmemoItem
+     */
+    public function getEmptyCreditmemoItemAttribute()
+    {
+        return $this->creditmemoItemFactory->create();
+    }
+
+    /**
      * Returns empty cart item extension attributes object.
      *
      * @return CartItemExtension
@@ -154,6 +186,16 @@ class ExtensionManager
     public function getEmptyInvoiceItemExtension()
     {
         return $this->invoiceItemExtensionFactory->create();
+    }
+
+    /**
+     * Returns empty credit memo item extension attributes object.
+     *
+     * @return CreditmemoItemExtension
+     */
+    public function getEmptyCreditmemoItemExtension()
+    {
+        return $this->creditmemoItemExtensionFactory->create();
     }
 
     /**

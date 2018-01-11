@@ -20,4 +20,11 @@
                   sort_order="349"/>
         </group>
     </section>
+    <section name="order_creditmemo">
+        <group name="totals">
+            <item name="subs_initial_fee"
+                  instance="TNW\Subscriptions\Model\Sales\Total\Creditmemo\InitialFee"
+                  sort_order="399"/>
+        </group>
+    </section>
 </config>
