@@ -94,13 +94,13 @@ class Item
     /**
      * Returns credit memo item initial fee extension attribute.
      *
-     * @param CreditmemoItem $orderItem
+     * @param CreditmemoItem $creditmemoItem
      * @return null|CreditmemoInitialFees
      */
-    private function getCreditmemoItemInitialFees(CreditmemoItem $orderItem)
+    private function getCreditmemoItemInitialFees(CreditmemoItem $creditmemoItem)
     {
-        return $orderItem->getExtensionAttributes()
-            ? $orderItem->getExtensionAttributes()->getSubsInitialFees()
+        return $creditmemoItem->getExtensionAttributes()
+            ? $creditmemoItem->getExtensionAttributes()->getSubsInitialFees()
             : null;
     }
 }

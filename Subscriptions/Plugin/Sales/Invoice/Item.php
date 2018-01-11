@@ -94,13 +94,13 @@ class Item
     /**
      * Returns invoice item initial fee extension attribute.
      *
-     * @param InvoiceItem $orderItem
+     * @param InvoiceItem $invoiceItem
      * @return null|InvoiceInitialFees
      */
-    private function getInvoiceItemInitialFees(InvoiceItem $orderItem)
+    private function getInvoiceItemInitialFees(InvoiceItem $invoiceItem)
     {
-        return $orderItem->getExtensionAttributes()
-            ? $orderItem->getExtensionAttributes()->getSubsInitialFees()
+        return $invoiceItem->getExtensionAttributes()
+            ? $invoiceItem->getExtensionAttributes()->getSubsInitialFees()
             : null;
     }
 }

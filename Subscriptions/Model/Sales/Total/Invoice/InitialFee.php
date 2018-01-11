@@ -42,7 +42,9 @@ class InitialFee extends AbstractTotal
 
             if ($currentFee && $orderItemQty) {
                 if (!$item->isLast()) {
-                    $ratio = $item->getQty() / ($orderItemQty - $orderItem->getQtyInvoiced());
+                    $ratio = ($orderItemQty - $orderItem->getQtyInvoiced() > 0)
+                        ? $item->getQty() / ($orderItemQty - $orderItem->getQtyInvoiced())
+                        : 0;
                     $currentFee = $invoice->roundPrice($currentFee * $ratio);
                     $baseCurrentFee = $invoice->roundPrice($baseCurrentFee * $ratio, 'base');
                 }
@@ -95,12 +97,13 @@ class InitialFee extends AbstractTotal
      */
     private function setItemInitialFees(InvoiceItem $item, $fee, $baseFee)
     {
-        if ($item->getExtensionAttributes()) {
-            if ($item->getExtensionAttributes()->getSubsInitialFees()) {
-                $item->getExtensionAttributes()->getSubsInitialFees()
-                    ->setSubsInitialFee($fee)
-                    ->setBaseSubsInitialFee($baseFee);
-            }
+        if ($item->getExtensionAttributes()
+            && $item->getExtensionAttributes()->getSubsInitialFees()
+        ) {
+            $item->getExtensionAttributes()->getSubsInitialFees()
+                ->setSubsInitialFee($fee)
+                ->setBaseSubsInitialFee($baseFee);
+
         }
     }
 }

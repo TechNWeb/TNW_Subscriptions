@@ -6,6 +6,9 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="TNW_Subscriptions::js/order/creditmemo/initial_fee.js"/>
+    </head>
     <body>
         <referenceBlock name="creditmemo_totals">
             <block class="TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo\InitialFee"

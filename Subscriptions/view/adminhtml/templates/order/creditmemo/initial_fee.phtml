@@ -14,24 +14,6 @@
                    value="<?php /* @escapeNotVerified */ echo $block->getBaseInitialFee()*1 ?>"
                    class="input-text admin__control-text not-negative-amount"
                    id="subscription_initial_fee"/>
-            <script>
-                require(['prototype'], function(){
-                    //<![CDATA[
-                    if ($('subscription_initial_fee')) {
-                        $('subscription_initial_fee').advaiceContainer = $('subscription_initial_fee_adv');
-                        unblockSubmit('subscription_initial_fee');
-                    }
-
-                    function unblockSubmit(id) {
-                        $(id).observe('focus', function(event) {
-                            if ($$('button[class="scalable update-button disabled"]').size() > 0) {
-                                enableElements('submit-button');
-                            }
-                        });
-                    }
-                    //]]>
-                });
-            </script>
         </td>
     </tr>
 

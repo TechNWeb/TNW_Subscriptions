@@ -28,11 +28,11 @@ class InitialFee extends \Magento\Backend\Block\Template
     public function initTotals()
     {
         $parent = $this->getParentBlock();
-        $this->_source = $parent->getSource();
+        $this->source = $parent->getSource();
         $total = new \Magento\Framework\DataObject(
             [
                 'code' => 'tnw_subs_initial_fee',
-                'block_name' => $this->getNameInLayout()
+                'block_name' => $this->getNameInLayout(),
             ]
         );
         $parent->addTotal($total, 'agjustments');

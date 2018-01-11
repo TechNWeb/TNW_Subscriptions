@@ -85,7 +85,7 @@ class InitialFee extends AbstractTotal
                     $summaryInitialFee = ($summaryInitialFee >= $currentFee)
                         ? $summaryInitialFee - $currentFee
                         : 0;
-                } elseif ($baseRequestedFee === '0') {
+                } elseif ($baseRequestedFee === 0) {
                     //case when we create credit memo but there is no initial fee to refund
                     $currentFee = 0;
                     $baseCurrentFee = 0;
@@ -129,11 +129,11 @@ class InitialFee extends AbstractTotal
         $baseInitialFeeRefunded = 0;
         $ratio = 1;
         $initialFees = $this->getOrderItemInitialFees($item->getOrderItem());
+        if ($requestedFee && $summaryInitialFee) {
+            $ratio = $requestedFee / $summaryInitialFee;
+        }
 
         if ($initialFees) {
-            if ($requestedFee && $summaryInitialFee) {
-                $ratio = $requestedFee / $summaryInitialFee;
-            }
             $initialFee = $initialFees->getSubsInitialFee();
             $baseInitialFee = $initialFees->getBaseSubsInitialFee();
             $initialFeeRefunded = $initialFees->getSubsInitialFeeRefunded();
@@ -161,12 +161,12 @@ class InitialFee extends AbstractTotal
      */
     private function setItemInitialFees(CreditmemoItem $item, $fee, $baseFee)
     {
-        if ($item->getExtensionAttributes()) {
-            if ($item->getExtensionAttributes()->getSubsInitialFees()) {
-                $item->getExtensionAttributes()->getSubsInitialFees()
-                    ->setSubsInitialFee($fee)
-                    ->setBaseSubsInitialFee($baseFee);
-            }
+        if ($item->getExtensionAttributes()
+            && $item->getExtensionAttributes()->getSubsInitialFees()
+        ) {
+            $item->getExtensionAttributes()->getSubsInitialFees()
+                ->setSubsInitialFee($fee)
+                ->setBaseSubsInitialFee($baseFee);
         }
     }
 
@@ -203,7 +203,10 @@ class InitialFee extends AbstractTotal
         $result = false;
 
         if (isset($requestMemo['subscription_initial_fee'])) {
-            $result = $creditmemo->roundPrice($requestMemo['subscription_initial_fee'], 'base');
+            $result = 0;
+            if ($requestMemo['subscription_initial_fee'] > 0) {
+                $result = $creditmemo->roundPrice($requestMemo['subscription_initial_fee'], 'base');
+            }
         }
 
         return $result;
