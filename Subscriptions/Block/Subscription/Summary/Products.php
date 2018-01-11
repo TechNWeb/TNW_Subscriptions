@@ -99,10 +99,10 @@ class Products extends BaseSummary
      * @param ProductSubscriptionProfileInterface $item
      * @return string
      */
-    public function getImageUrl($item)
+    public function getImageUrl(ProductSubscriptionProfileInterface $item)
     {
-        $imageHelper = $this->subscriptionContext->getImageHelperForSubscriptionProduct($item,'product_small_image');
-        return $imageHelper->getUrl();
+        $imageHelper = $this->subscriptionContext->getImageHelperForSubscriptionProduct($item, 'product_small_image');
+        return ($imageHelper) ? $imageHelper->getUrl() : '';
     }
 
     /**

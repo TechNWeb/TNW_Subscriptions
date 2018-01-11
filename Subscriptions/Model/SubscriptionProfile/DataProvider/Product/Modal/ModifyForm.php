@@ -67,9 +67,9 @@ class ModifyForm extends Form
     /**
      * Initialized image helper for product.
      *
-     * @var
+     * @var ImageHelper
      */
-    protected $imageHelper;
+    private $imageHelper;
 
     /**
      * Current item.
@@ -251,10 +251,10 @@ class ModifyForm extends Form
     /**
      * Returns item children definition.
      *
-     * @param $subQuote
+     * @param DataObject $subQuote
      * @return array
      */
-    protected function getChildren($subQuote)
+    protected function getChildren(DataObject $subQuote)
     {
         foreach ($this->getObjectItems($subQuote) as $item) {
             $itemId = $item->getId();

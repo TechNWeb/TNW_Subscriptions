@@ -10,14 +10,19 @@ namespace TNW\Subscriptions\Model;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\Locale\Format;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Locale\CurrencyInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
+/**
+ * Class subscription context.
+ */
 class Context
 {
     /**
@@ -56,18 +61,11 @@ class Context
     private $currencyInterface;
 
     /**
-     * Initialized image helper for product.
-     *
-     * @var
-     */
-    protected $imageHelper;
-
-    /**
      * Data providers form context.
      *
      * @var FormContext
      */
-    protected $formContext;
+    private $formContext;
 
     /**
      * Context constructor.
@@ -240,11 +238,12 @@ class Context
     /**
      * Retrieve image helper from quote item.
      *
-     * @param $quoteItem
-     * @param String $imageId
+     * @param CartItemInterface $quoteItem
+     * @param string $imageId
      * @return ImageHelper|null
+     * @throw \InvalidArgumentException
      */
-    public function getImageHelperForQuoteItem($quoteItem, $imageId = '')
+    public function getImageHelperForQuoteItem(CartItemInterface $quoteItem, $imageId = '')
     {
         $imageHelper = $this->formContext->getImageHelper();
         $currentProduct = null;
@@ -263,7 +262,9 @@ class Context
                 break;
         }
 
-        $imageHelper = $imageHelper->init($currentProduct, $imageId,
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
             ['type' => 'small_image', 'width' => '240', 'height' => '240']
         );
         return $imageHelper;
@@ -272,11 +273,12 @@ class Context
     /**
      * Retrieve image helper from subscription product.
      *
-     * @param $item
-     * @param String $imageId
+     * @param ProductSubscriptionProfileInterface $item
+     * @param string $imageId
      * @return ImageHelper|null
+     * @throw \InvalidArgumentException
      */
-    public function getImageHelperForSubscriptionProduct($item, $imageId = 'category_page_grid')
+    public function getImageHelperForSubscriptionProduct(ProductSubscriptionProfileInterface $item, $imageId = 'category_page_grid')
     {
         $imageHelper = $this->formContext->getImageHelper();
         $currentProduct = null;
@@ -295,7 +297,9 @@ class Context
                 break;
         }
 
-        $imageHelper = $imageHelper->init($currentProduct, $imageId,
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
             ['type' => 'small_image', 'width' => '240', 'height' => '240']
         );
         return $imageHelper;

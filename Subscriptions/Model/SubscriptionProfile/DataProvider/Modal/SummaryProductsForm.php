@@ -6,16 +6,17 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Paypal\Model\Payflow\Pro;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\Component\Modal;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
@@ -77,6 +78,13 @@ class SummaryProductsForm extends ModifyForm
      * @var UrlInterface
      */
     private $urlBuilder;
+
+    /**
+     * Initialized image helper for product.
+     *
+     * @var ImageHelper
+     */
+    private $imageHelper;
 
     /**
      * @param string $name
@@ -631,10 +639,10 @@ class SummaryProductsForm extends ModifyForm
     /**
      * Returns item children definition.
      *
-     * @param $subQuote
+     * @param DataObject $subQuote
      * @return array
      */
-    protected function getChildren($subQuote)
+    protected function getChildren(DataObject $subQuote)
     {
         foreach ($this->getObjectItems($subQuote) as $item) {
             $itemId = $item->getId();
@@ -645,7 +653,7 @@ class SummaryProductsForm extends ModifyForm
             $this->imageHelper = $this->context->getImageHelperForSubscriptionProduct($item, 'category_page_grid');
             $itemMeta = [
                 'children' => [
-                    'form' => $this->getForm($objectId, $itemId)
+                    'form' => $this->getForm($objectId, $itemId),
                 ],
                 'arguments' => [
                     'data' => [
