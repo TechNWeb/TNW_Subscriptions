@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
+use TNW\Subscriptions\Model\Context as SubscriptionContext;
 
 /**
  * Class Products
@@ -50,6 +51,11 @@ class Products extends BaseSummary
     private $descriptionCreator;
 
     /**
+     * @var SubscriptionContext
+     */
+    private $subscriptionContext;
+
+    /**
      * Products constructor.
      * @param Template\Context $context
      * @param \Magento\Catalog\Helper\ImageFactory $imageFactory
@@ -57,6 +63,7 @@ class Products extends BaseSummary
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+     * @param SubscriptionContext $subscriptionContext
      * @param array $data
      */
     public function __construct(
@@ -66,6 +73,7 @@ class Products extends BaseSummary
         \Magento\Framework\Locale\CurrencyInterface $currency,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
+        SubscriptionContext $subscriptionContext,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -74,6 +82,7 @@ class Products extends BaseSummary
         $this->currency = $currency;
         $this->orderRepository = $orderRepository;
         $this->descriptionCreator = $descriptionCreator;
+        $this->subscriptionContext = $subscriptionContext;
     }
 
     /**
@@ -90,16 +99,10 @@ class Products extends BaseSummary
      * @param ProductSubscriptionProfileInterface $item
      * @return string
      */
-    public function getImageUrl($item)
+    public function getImageUrl(ProductSubscriptionProfileInterface $item)
     {
-        $product = $this->getProductFromItem($item);
-        if (null === $product) {
-            return '';
-        }
-
-        return $this->imageFactory->create()
-            ->init($product, 'product_small_image')
-            ->getUrl();
+        $imageHelper = $this->subscriptionContext->getImageHelperForSubscriptionProduct($item, 'product_small_image');
+        return ($imageHelper) ? $imageHelper->getUrl() : '';
     }
 
     /**

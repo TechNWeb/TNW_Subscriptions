@@ -7,15 +7,22 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\Locale\Format;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Locale\CurrencyInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
+/**
+ * Class subscription context.
+ */
 class Context
 {
     /**
@@ -54,6 +61,13 @@ class Context
     private $currencyInterface;
 
     /**
+     * Data providers form context.
+     *
+     * @var FormContext
+     */
+    private $formContext;
+
+    /**
      * Context constructor.
      * @param ManagerInterface $messageManager
      * @param LoggerInterface $logger
@@ -63,6 +77,7 @@ class Context
      * @param Escaper $escaper
      * @param Format $localeFormat
      * @param CurrencyInterface $currencyInterface
+     * @param FormContext $formcontext
      */
     public function __construct(
         ManagerInterface $messageManager,
@@ -72,9 +87,9 @@ class Context
         TimezoneInterface $localeDate,
         Escaper $escaper,
         Format $localeFormat,
-        CurrencyInterface $currencyInterface
+        CurrencyInterface $currencyInterface,
+        FormContext $formcontext
     ) {
-
         $this->messageManager = $messageManager;
         $this->config = $config;
         $this->logger = $logger;
@@ -83,6 +98,7 @@ class Context
         $this->escaper = $escaper;
         $this->localeFormat = $localeFormat;
         $this->currencyInterface = $currencyInterface;
+        $this->formContext = $formcontext;
     }
 
     /**
@@ -217,5 +233,75 @@ class Context
         }
 
         return true;
+    }
+
+    /**
+     * Retrieve image helper from quote item.
+     *
+     * @param CartItemInterface $quoteItem
+     * @param string $imageId
+     * @return ImageHelper|null
+     * @throws \InvalidArgumentException
+     */
+    public function getImageHelperForQuoteItem(CartItemInterface $quoteItem, $imageId = '')
+    {
+        $imageHelper = $this->formContext->getImageHelper();
+        $currentProduct = null;
+        switch ($quoteItem->getProductType()) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $currentProduct = $quoteItem->getProduct();
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $quoteItemChildrens = $quoteItem->getChildren();
+                $currentProduct = reset($quoteItemChildrens)->getProduct();
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $quoteItem->getProductType()));
+                break;
+        }
+
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
+            ['type' => 'small_image', 'width' => '240', 'height' => '240']
+        );
+        return $imageHelper;
+    }
+
+    /**
+     * Retrieve image helper from subscription product.
+     *
+     * @param ProductSubscriptionProfileInterface $item
+     * @param string $imageId
+     * @return ImageHelper|null
+     * @throws \InvalidArgumentException
+     */
+    public function getImageHelperForSubscriptionProduct(ProductSubscriptionProfileInterface $item, $imageId = 'category_page_grid')
+    {
+        $imageHelper = $this->formContext->getImageHelper();
+        $currentProduct = null;
+        switch ($item->getMagentoProduct()->getTypeId()) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $currentProduct = $item->getMagentoProduct();
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $quoteItemChildrens = $item->getChildren();
+                $currentProduct = reset($quoteItemChildrens)->getMagentoProduct();
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $item->getTypeId()));
+                break;
+        }
+
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
+            ['type' => 'small_image', 'width' => '240', 'height' => '240']
+        );
+        return $imageHelper;
     }
 }

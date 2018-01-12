@@ -222,10 +222,7 @@ class Product extends AbstractDataProvider
                 $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
                     isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $item->getQty(): 0;
 
-                $imageHelper = $this->imageHelper->init(
-                    $item->getProduct(),
-                    $this::LISTING_IMAGE_ID
-                );
+                $imageHelper = $this->context->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
                 $confOptions = [];
                 $options = $item->getProduct()->getTypeInstance(true)->getOrderOptions($item->getProduct());
                 if (isset($options['attributes_info']) && is_array($options['attributes_info'])) {
