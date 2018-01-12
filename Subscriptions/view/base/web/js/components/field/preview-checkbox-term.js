@@ -10,7 +10,8 @@ define([
     return Abstract.extend({
         defaults: {
             periodPreviewLabel: '',
-            default: "1"
+            default: "1",
+            visibleOnEdit: true
         },
 
         /**
@@ -37,6 +38,22 @@ define([
             }
 
             return result;
+        },
+
+        /**
+         * Resets value if "showPreview" property changed.
+         *
+         * @param value
+         */
+        onShowPreviewChanged: function (value) {
+            if (value){
+                this.visible(true);
+                if (this.initialValue && this.value() !== this.initialValue){
+                    this.reset();
+                }
+            } else {
+                this.visibleOnEdit ? this.visible(true) : this.visible(false);
+            }
         }
     });
 });

@@ -127,6 +127,8 @@ abstract class Base implements TypeInterface
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY),
             SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION),
+            SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS),
         ];
         $productData = new DataObject();
         $productData->addData($data);

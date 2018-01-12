@@ -53,7 +53,12 @@
         <div class="field term required">
             <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
-                <input type="checkbox"
+                <input
+                    <?php if ($block->getIsInfiniteSubscriptions()): ?>
+                       type="hidden"
+                    <?php else: ?>
+                       type="checkbox"
+                    <?php endif;?>
                        class="checkbox"
                        name="term"
                        id="term"

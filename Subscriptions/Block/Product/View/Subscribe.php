@@ -263,8 +263,19 @@ class Subscribe extends View
      */
     public function getDefaultUntilCancelled()
     {
-        return $this->config->isUntilCanceledChecked();
+        return $this->getIsInfiniteSubscriptions() ?: $this->config->isUntilCanceledChecked();
     }
+
+    /**
+     * Get is only infinite subscriptions available.
+     *
+     * @return string
+     */
+    public function getIsInfiniteSubscriptions()
+    {
+        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+    }
+
 
     /**
      * Get default period value

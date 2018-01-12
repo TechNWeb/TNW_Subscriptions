@@ -224,9 +224,7 @@ class Form extends AbstractDataProvider
                     'term' => [
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'value' => $this->context->getConfig()->isUntilCanceledChecked(),
-                                ],
+                                'config' => $this->getFieldTermConfig(),
                             ],
                         ],
                     ],
@@ -758,4 +756,29 @@ class Form extends AbstractDataProvider
             'initial_fee' => $this->getInitialFee($billingFrequencyId, $productDataObject->getChildProductId()),
         ];
    }
+
+    /**
+     * Returns field term config.
+     *
+     * @return array
+     */
+    protected function getFieldTermConfig($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        $result = [
+            'value' => $this->context->getConfig()->isUntilCanceledChecked(),
+        ];
+
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            if ($isInfiniteSubscriptions) {
+                $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
+                $result['value'] = 1;
+            }
+        }
+
+        return $result;
+    }
 }

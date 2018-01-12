@@ -50,10 +50,19 @@ class UpgradeData implements UpgradeDataInterface
             $this->addSavingsCalculatorProductAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.6", "<")) {
+            $this->addInfiniteSubscriptionsProductAttributes($eavSetup);
+        }
+
 
         $setup->endSetup();
     }
 
+    /**
+     * Adds 'savings calculator type' product attribute.
+     *
+     * @param EavSetup $eavSetup
+     */
     private function addSavingsCalculatorProductAttributes(EavSetup $eavSetup)
     {
         $eavSetup->addAttribute(
@@ -82,6 +91,43 @@ class UpgradeData implements UpgradeDataInterface
                 'system' => 1,
                 'group' => 'Subscription options',
                 'sort_order' => 130,
+            ]
+        );
+    }
+
+    /**
+     * Adds 'infinite subscriptions' product attribute.
+     *
+     * @param EavSetup $eavSetup
+     */
+    private function addInfiniteSubscriptionsProductAttributes(EavSetup $eavSetup)
+    {
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Infinite subscriptions',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => true,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => true,
+                'unique' => false,
+                'apply_to' => 'simple,virtual,downloadable,configurable',
+                'system' => 1,
+                'group' => 'Subscription options',
+                'sort_order' => 140,
             ]
         );
     }

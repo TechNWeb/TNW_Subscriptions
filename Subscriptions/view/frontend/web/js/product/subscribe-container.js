@@ -133,7 +133,6 @@ define([
          * Update frequency label depends from qty.
          */
         _updateFrequencyLabel: function () {
-            debugger;
             var frequencies = $(this.options.frequencyInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
