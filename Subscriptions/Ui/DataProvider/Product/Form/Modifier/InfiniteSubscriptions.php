@@ -12,9 +12,9 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Data provider for "Savings calculation" switcher.
+ * Data provider for "Infinite subscriptions" switcher.
  */
-class SavingsCalculation extends AbstractModifier
+class InfiniteSubscriptions extends AbstractModifier
 {
     /**
      * Subscriptions config.
@@ -41,24 +41,24 @@ class SavingsCalculation extends AbstractModifier
     }
 
     /**
-     * Set config value as default value for "Savings calculation" on product page.
+     * Set config value as default value for "Infinite subscriptions" on product page.
      *
      * @param array $meta
      * @return array
      */
     public function modifyMeta(array $meta)
     {
-        $value = $this->config->getSavingsCalculation();
+        $value = $this->config->getIsInfiniteSubscriptions();
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
-                Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
+                Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
                 $meta,
                 null,
                 'children'
             ) . static::META_CONFIG_PATH,
             $meta,
             [
-                'notice' =>  __('Product is a service that my customers use on daily basis.'),
+                'notice' =>  __('For product can be created only infinite subscriptions.'),
             ]
         );
 

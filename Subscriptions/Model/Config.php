@@ -30,6 +30,7 @@ class Config
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
     private $xmlUnlockPresetQty = 'tnw_subscriptions_product/general/unlock_preset_qty_status';
     private $xmlSavingsCalculation = 'tnw_subscriptions_product/general/savings_calculation';
+    private $xmlInfiniteSubscriptions = 'tnw_subscriptions_product/general/infinite_subscriptions';
     /**#@-*/
 
     /**#@+
@@ -347,6 +348,17 @@ class Config
     public function getSavingsCalculation($websiteId = null)
     {
         return $this->getStoreConfig($this->xmlSavingsCalculation, $websiteId);
+    }
+
+    /**
+     * Get "infinite subscriptions" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getIsInfiniteSubscriptions($websiteId = null)
+    {
+        return $this->getStoreConfig($this->xmlInfiniteSubscriptions, $websiteId);
     }
 
     /**

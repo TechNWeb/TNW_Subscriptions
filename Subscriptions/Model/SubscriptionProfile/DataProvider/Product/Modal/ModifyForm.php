@@ -725,6 +725,10 @@ class ModifyForm extends Form
      */
     protected function getTermDefinition()
     {
+        $infiniteSubscriptions = $this->currentProduct->getData(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        );
+
         return [
             'arguments' => [
                 'data' => [
@@ -742,9 +746,10 @@ class ModifyForm extends Form
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'visibleOnEdit' => !$infiniteSubscriptions,
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                        ],
                     ]
                 ]
             ]

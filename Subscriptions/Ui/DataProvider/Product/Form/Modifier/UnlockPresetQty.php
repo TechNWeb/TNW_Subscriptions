@@ -31,9 +31,8 @@ class UnlockPresetQty extends AbstractModifier
     private $arrayManager;
 
     /**
-     * SetByMerchant constructor.
-     *
      * @param Config $config
+     * @param ArrayManager $arrayManager
      */
     public function __construct(Config $config, ArrayManager $arrayManager)
     {

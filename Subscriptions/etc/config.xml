@@ -30,6 +30,7 @@
                 <lock_product_price_status>0</lock_product_price_status> <!--Off-->
                 <unlock_preset_qty_status>0</unlock_preset_qty_status> <!--Off-->
                 <savings_calculation>0</savings_calculation> <!--Off-->
+                <infinite_subscriptions>0</infinite_subscriptions> <!--Off-->
             </general>
             <trial>
                 <trial_status>0</trial_status> <!--Off-->

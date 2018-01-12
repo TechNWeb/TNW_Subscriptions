@@ -119,6 +119,12 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product is a service that my customers use on daily basis.</comment>
                 </field>
+                <field id="infinite_subscriptions" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Infinite Subscriptions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>For product can be created only infinite subscriptions.</comment>
+                </field>
             </group>
 
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">

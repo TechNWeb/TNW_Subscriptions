@@ -319,14 +319,14 @@
 
     <type name="Magento\Sales\Model\ResourceModel\Order\Invoice\Item">
         <plugin name="tnw_subs_invoice_resource_item_save"
-                type="TNW\Subscriptions\Plugin\Sales\Invoice\Item\Resource\Save"
+                type="TNW\Subscriptions\Plugin\Sales\Invoice\Item\ResourceSave"
                 sortOrder="100"
                 disabled="false"/>
     </type>
 
     <type name="Magento\Sales\Model\ResourceModel\Order\Creditmemo\Item">
         <plugin name="tnw_subs_creditmemo_resource_item_save"
-                type="TNW\Subscriptions\Plugin\Sales\Creditmemo\Item\Resource\Save"
+                type="TNW\Subscriptions\Plugin\Sales\Creditmemo\Item\ResourceSave"
                 sortOrder="100"
                 disabled="false"/>
     </type>
