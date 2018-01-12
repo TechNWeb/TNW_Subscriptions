@@ -144,9 +144,11 @@ class Manager
         $profileProducts = [];
         /** @var Item $item */
         foreach ($items as $item) {
-            $profileProducts[] = $this->reset()
+            $product = $this->reset()
                 ->populateProductDataFromQuoteItem($item)
                 ->getProfileProduct();
+            $product->setQuoteItemId($item->getId());
+            $profileProducts[] = $product;
         }
 
         return $profileProducts;
@@ -344,13 +346,14 @@ class Manager
      */
     private function getItemProfileProduct($item, $products)
     {
-        $itemProductId = $item->getProduct()->getId();
+        $itemId = $item->getId();
         $result = array_filter(
             $products,
-            function (ProductSubscriptionProfileInterface $product) use ($itemProductId) {
-                return ($product->getMagentoProductId() == $itemProductId);
+            function (ProductSubscriptionProfileInterface $product) use ($itemId) {
+                return ($product->getQuoteItemId() == $itemId);
             }
         );
+
         return $result ? reset($result) : false;
     }
 
