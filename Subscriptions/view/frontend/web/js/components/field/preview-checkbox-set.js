@@ -200,9 +200,9 @@ define([
 
                 productQty = frequencyData[optionValue]['preset_qty'] ? 1 : productQty;
                 if (this.getSavingsCalculationType()) {
-                    discount = productPrice * productQty - currentFrequencyPrice;
+                    discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
                 } else {
-                    discount = (productPrice - currentFrequencyPrice) * productQty;
+                    discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
                 }
 
                 if (discount > 0) {
@@ -366,6 +366,8 @@ define([
          * @return void
          */
         changeItemPriceLabel: function() {
+            this.setDiscountLabel('all');
+
             var priceLabel = '',
                 parentForm = registry.get(this.parentForm),
                 priceComponent = registry.get('dataScope = ' + parentForm.dataScope +'.price'),

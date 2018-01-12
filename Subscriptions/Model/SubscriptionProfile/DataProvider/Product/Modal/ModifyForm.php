@@ -707,6 +707,7 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
+                            'onQtyUpdate' => $this->currentFormName . ':previewMode',
                             'onPriceUpdate' => '${ $.parentName}.price:value'
                         ],
                         'parentForm' => $this->currentFormName,

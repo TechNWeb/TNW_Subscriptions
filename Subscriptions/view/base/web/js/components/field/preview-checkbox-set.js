@@ -66,6 +66,16 @@ define([
         },
 
         /**
+         * Change current grid item price label.
+         *
+         * @return void
+         */
+        changeItemPriceLabel: function(value) {
+            this.setDiscountLabel('all');
+        },
+
+
+        /**
          * Return options labels.
          *
          * @return {Object}
@@ -186,8 +196,8 @@ define([
                 frequencyLabel = this.getLabelForOption(optionValue),
                 frequencyData = this.getFrequencyData(),
                 discount = 0,
-                productPrice = this.getProductPrice(),
                 priceFormat = this.getPriceFormat(),
+                productPrice = this.getProductPrice(),
                 productQty = this.getProductQty(),
                 currentFrequencyPrice;
 
@@ -199,9 +209,9 @@ define([
 
                 productQty = frequencyData[optionValue]['preset_qty'] ? 1 : productQty;
                 if (this.getSavingsCalculationType()) {
-                    discount = productPrice * productQty - currentFrequencyPrice;
+                    discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
                 } else {
-                    discount = (productPrice - currentFrequencyPrice) * productQty;
+                    discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
                 }
 
                 if (discount > 0) {
