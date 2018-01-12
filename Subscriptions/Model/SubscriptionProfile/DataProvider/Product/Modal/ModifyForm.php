@@ -748,7 +748,7 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'visibleOnEdit' => !$infiniteSubscriptions,
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
+                            'showPreview' => $this->currentFormName . ':previewMode',
                         ],
                     ]
                 ]

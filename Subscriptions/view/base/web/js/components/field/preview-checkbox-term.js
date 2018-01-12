@@ -18,8 +18,7 @@ define([
          * @inheritdoc
          */
         initObservable: function () {
-            this._super().
-            observe('showPreview periodPreviewLabel');
+            this._super().observe('showPreview periodPreviewLabel');
 
             return this;
         },
@@ -31,9 +30,9 @@ define([
          */
         getPreviewLabel: function () {
             var result;
-            if (this.checked()){
+            if (this.checked()) {
                 result = this.previewLabel;
-            }else {
+            } else {
                 result = this.periodPreviewLabel;
             }
 
@@ -46,13 +45,13 @@ define([
          * @param value
          */
         onShowPreviewChanged: function (value) {
-            if (value){
+            if (value) {
                 this.visible(true);
-                if (this.initialValue && this.value() !== this.initialValue){
+                if (this.initialValue && this.value() !== this.initialValue) {
                     this.reset();
                 }
             } else {
-                this.visibleOnEdit ? this.visible(true) : this.visible(false);
+                this.visible(this.visibleOnEdit);
             }
         }
     });

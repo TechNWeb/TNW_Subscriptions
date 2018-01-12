@@ -118,7 +118,6 @@ class RecurringOptions extends BaseModifier
     ];
 
     /**
-     * RecurringOptions constructor.
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
      * @param ArrayManager $arrayManager

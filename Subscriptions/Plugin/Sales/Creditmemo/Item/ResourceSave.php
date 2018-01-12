@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Plugin\Sales\Creditmemo\Item\Resource;
+namespace TNW\Subscriptions\Plugin\Sales\Creditmemo\Item;
 
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Item as ItemResource;
@@ -13,7 +13,7 @@ use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 /**
  * Credit memo item save plugin.
  */
-class Save
+class ResourceSave
 {
     /**
      * Plugin around save credit memo item that saves subscription initial fees extension attribute.

@@ -62,6 +62,7 @@ class UpgradeData implements UpgradeDataInterface
      * Adds 'savings calculator type' product attribute.
      *
      * @param EavSetup $eavSetup
+     * @return void
      */
     private function addSavingsCalculatorProductAttributes(EavSetup $eavSetup)
     {
@@ -99,6 +100,7 @@ class UpgradeData implements UpgradeDataInterface
      * Adds 'infinite subscriptions' product attribute.
      *
      * @param EavSetup $eavSetup
+     * @return void
      */
     private function addInfiniteSubscriptionsProductAttributes(EavSetup $eavSetup)
     {

@@ -760,6 +760,7 @@ class Form extends AbstractDataProvider
     /**
      * Returns field term config.
      *
+     * @param int|string|null $productId
      * @return array
      */
     protected function getFieldTermConfig($productId = null)

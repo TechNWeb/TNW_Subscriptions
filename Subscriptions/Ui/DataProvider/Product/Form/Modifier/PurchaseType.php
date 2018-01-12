@@ -37,7 +37,6 @@ class PurchaseType extends BaseModifier
     protected $locator;
 
     /**
-     * Trial constructor.
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
