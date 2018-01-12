@@ -80,13 +80,6 @@ class SummaryProductsForm extends ModifyForm
     private $urlBuilder;
 
     /**
-     * Initialized image helper for product.
-     *
-     * @var ImageHelper
-     */
-    private $imageHelper;
-
-    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -650,7 +643,7 @@ class SummaryProductsForm extends ModifyForm
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
-            $this->imageHelper = $this->formContext->getImageHelperForSubscriptionProduct($item, 'category_page_grid');
+            $this->imageHelper = $this->formContext->getImageHelperForSubscriptionProduct($item);
             $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId),

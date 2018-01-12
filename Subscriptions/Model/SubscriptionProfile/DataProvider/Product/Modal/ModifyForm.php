@@ -69,7 +69,7 @@ class ModifyForm extends Form
      *
      * @var ImageHelper
      */
-    private $imageHelper;
+    protected $imageHelper;
 
     /**
      * Current item.
