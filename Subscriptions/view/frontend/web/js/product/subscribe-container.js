@@ -6,8 +6,9 @@
 define([
     'jquery',
     'mage/translate',
+    'Magento_Catalog/js/price-utils',
     'mage/validation'
-], function ($, $t) {
+], function ($, $t, utils) {
     'use strict';
 
     $.widget('mage.tnwSubscribeContainer', {
@@ -33,7 +34,9 @@ define([
             subscribePriceBlockSelector: 'div.price-subscription_price',
             addToCartTabSelector: '#addtocart-tab-head',
             addToCartPriceBlockSelector: 'div.price-final_price',
-            canShowSubscribePriceBlock: false
+            canShowSubscribePriceBlock: false,
+            savingsCalculationType: 0,
+            productPrice: 0
         },
 
         containers: {
@@ -56,6 +59,7 @@ define([
          * First initialization.
          */
         _initialize: function () {
+            this._updateFrequencyLabel();
             this.containers.addToCartPriceBox.show();
             this.containers.subscriptionPriceBox.hide();
 
@@ -82,7 +86,8 @@ define([
             var widget = this,
                 button = $(this.options.subscribeButtonSelector),
                 untilCancelledInput = $(this.options.untilCancelledInputSelector),
-                frequencyInput = $(this.options.frequencyInputSelector);
+                frequencyInput = $(this.options.frequencyInputSelector),
+                qtyInput = $(this.options.qtyInputSelector);
 
             button.on('click', $.proxy(function() {
                 widget._submitForm();
@@ -107,6 +112,10 @@ define([
                 widget.containers.subscriptionPriceBox.hide();
                 widget.containers.addToCartPriceBox.show();
             }, this));
+
+            qtyInput.on('change', $.proxy(function () {
+                widget._updateFrequencyLabel();
+            }, this));
         },
 
         /**
@@ -118,6 +127,38 @@ define([
                 qtyInputHidden = $(this.options.qtyInputSelectorHidden);
             qtyInput.val(Number(currentFrequency.data('preset-qty')));
             qtyInputHidden.val(Number(currentFrequency.data('preset-qty')));
+        },
+
+        /**
+         * Update frequency label depends from qty.
+         */
+        _updateFrequencyLabel: function () {
+            debugger;
+            var frequencies = $(this.options.frequencyInputSelector),
+                qtyInput = $(this.options.qtyInputSelector),
+                qtyValue = qtyInput.val(),
+                savingsCalculationType = this.options.savingsCalculationType,
+                productPrice = this.options.productPrice;
+
+            $.each(frequencies, function (key, option) {
+                var currentFrequencyPrice =  $(option).data('frequency-price');
+                $.each(option.labels, function (key, label) {
+                    var resultLabel = $(label).data('default-label'),
+                        discount = 0;
+
+                    if (savingsCalculationType) {
+                        discount = productPrice * qtyValue - currentFrequencyPrice;
+                    } else {
+                        discount = (productPrice - currentFrequencyPrice) * qtyValue;
+                    }
+
+                    if (discount){
+                        resultLabel += '  ' + $t('(SAVE %s)').replace('%s', utils.formatPrice(discount, {}));
+                    }
+
+                    label.innerText = resultLabel;
+                });
+            });
         },
 
         /**

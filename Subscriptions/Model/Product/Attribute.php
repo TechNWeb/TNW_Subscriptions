@@ -26,5 +26,6 @@ class Attribute
     const SUBSCRIPTION_TRIAL_START_DATE = 'tnw_subscr_trial_start_date';
     const SUBSCRIPTION_START_DATE = 'tnw_subscr_start_date';
     const SUBSCRIPTION_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
+    const SUBSCRIPTION_SAVINGS_CALCULATION = 'tnw_subscr_savings_calculation';
     /**#@-*/
 }
