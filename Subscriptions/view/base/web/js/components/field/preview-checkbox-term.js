@@ -42,7 +42,7 @@ define([
         /**
          * Resets value if "showPreview" property changed.
          *
-         * @param value
+         * @param {bool} value
          */
         onShowPreviewChanged: function (value) {
             if (value) {
