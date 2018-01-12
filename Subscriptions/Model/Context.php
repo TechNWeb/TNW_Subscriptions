@@ -241,7 +241,7 @@ class Context
      * @param CartItemInterface $quoteItem
      * @param string $imageId
      * @return ImageHelper|null
-     * @throw \InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getImageHelperForQuoteItem(CartItemInterface $quoteItem, $imageId = '')
     {
@@ -276,7 +276,7 @@ class Context
      * @param ProductSubscriptionProfileInterface $item
      * @param string $imageId
      * @return ImageHelper|null
-     * @throw \InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getImageHelperForSubscriptionProduct(ProductSubscriptionProfileInterface $item, $imageId = 'category_page_grid')
     {
