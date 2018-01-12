@@ -28,6 +28,8 @@
                 <purchase_type>3</purchase_type> <!--One-Time and Recurring-->
                 <start_date_type>1</start_date_type> <!--Moment of purchase-->
                 <lock_product_price_status>0</lock_product_price_status> <!--Off-->
+                <unlock_preset_qty_status>0</unlock_preset_qty_status> <!--Off-->
+                <savings_calculation>0</savings_calculation> <!--Off-->
             </general>
             <trial>
                 <trial_status>0</trial_status> <!--Off-->

@@ -67,6 +67,7 @@ class ProductDefaultAttributes
             Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT => $this->config->getTrialLengthUnit($websiteId),
             Attribute::SUBSCRIPTION_TRIAL_PRICE => $this->config->getTrialPrice($websiteId),
             Attribute::SUBSCRIPTION_TRIAL_START_DATE => $this->config->getTrialStartDateType($websiteId),
+            Attribute::SUBSCRIPTION_SAVINGS_CALCULATION => $this->config->getSavingsCalculation($websiteId),
         ];
 
         return $dataDefault;

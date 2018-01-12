@@ -29,6 +29,7 @@ class Config
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
     private $xmlUnlockPresetQty = 'tnw_subscriptions_product/general/unlock_preset_qty_status';
+    private $xmlSavingsCalculation = 'tnw_subscriptions_product/general/savings_calculation';
     /**#@-*/
 
     /**#@+
@@ -335,6 +336,17 @@ class Config
     public function getTrialStartDateType($websiteId = null)
     {
         return $this->getStoreConfig($this->xmlTrialStartDateType, $websiteId);
+    }
+
+    /**
+     * Get "savings calculation" config value.
+     *
+     * @param null|bool|int|string|WebsiteInterface $websiteId
+     * @return null|string
+     */
+    public function getSavingsCalculation($websiteId = null)
+    {
+        return $this->getStoreConfig($this->xmlSavingsCalculation, $websiteId);
     }
 
     /**

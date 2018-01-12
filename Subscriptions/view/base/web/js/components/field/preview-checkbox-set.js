@@ -188,15 +188,21 @@ define([
                 discount = 0,
                 productPrice = this.getProductPrice(),
                 priceFormat = this.getPriceFormat(),
+                productQty = this.getProductQty(),
                 currentFrequencyPrice;
 
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
-                    currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
+                currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
                 if (changeType != 'all') {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
 
-                discount = productPrice - currentFrequencyPrice;
+                productQty = frequencyData[optionValue]['preset_qty'] ? 1 : productQty;
+                if (this.getSavingsCalculationType()) {
+                    discount = productPrice * productQty - currentFrequencyPrice;
+                } else {
+                    discount = (productPrice - currentFrequencyPrice) * productQty;
+                }
 
                 if (discount > 0) {
                     discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
@@ -205,6 +211,36 @@ define([
 
                 return frequencyLabel;
             }
+        },
+
+        /**
+         * Returns algorithm type for savings calculation.
+         *
+         * @returns {boolean}
+         */
+        getSavingsCalculationType: function () {
+            var type = 0,
+                currentItemData = this.getCurrentItemData();
+            if (currentItemData.savings_calculation) {
+                type = currentItemData.savings_calculation;
+            }
+
+            return type;
+        },
+
+        /**
+         * Returns product qty.
+         *
+         * @returns {number}
+         */
+        getProductQty: function () {
+            var qty = 0,
+                currentItemData = this.getCurrentItemData();
+            if (currentItemData.qty) {
+                qty = currentItemData.qty;
+            }
+
+            return qty;
         },
 
         /**
