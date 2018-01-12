@@ -650,7 +650,7 @@ class SummaryProductsForm extends ModifyForm
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
-            $this->imageHelper = $this->context->getImageHelperForSubscriptionProduct($item, 'category_page_grid');
+            $this->imageHelper = $this->formContext->getImageHelperForSubscriptionProduct($item, 'category_page_grid');
             $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId),

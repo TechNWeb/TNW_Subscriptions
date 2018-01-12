@@ -16,6 +16,8 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 
 /**
  * Data providers form context.
@@ -206,5 +208,75 @@ class Context implements ContextInterface
     public function getUnitType()
     {
         return $this->unitType;
+    }
+
+    /**
+     * Retrieve image helper from quote item.
+     *
+     * @param CartItemInterface $quoteItem
+     * @param string $imageId
+     * @return ImageHelper|null
+     * @throws \InvalidArgumentException
+     */
+    public function getImageHelperForQuoteItem(CartItemInterface $quoteItem, $imageId = '')
+    {
+        $imageHelper = $this->getImageHelper();
+        $currentProduct = null;
+        switch ($quoteItem->getProductType()) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $currentProduct = $quoteItem->getProduct();
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $quoteItemChildrens = $quoteItem->getChildren();
+                $currentProduct = reset($quoteItemChildrens)->getProduct();
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $quoteItem->getProductType()));
+                break;
+        }
+
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
+            ['type' => 'small_image', 'width' => '240', 'height' => '240']
+        );
+        return $imageHelper;
+    }
+
+    /**
+     * Retrieve image helper from subscription product.
+     *
+     * @param ProductSubscriptionProfileInterface $item
+     * @param string $imageId
+     * @return ImageHelper|null
+     * @throws \InvalidArgumentException
+     */
+    public function getImageHelperForSubscriptionProduct(ProductSubscriptionProfileInterface $item, $imageId = 'category_page_grid')
+    {
+        $imageHelper = $this->getImageHelper();
+        $currentProduct = null;
+        switch ($item->getMagentoProduct()->getTypeId()) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                $currentProduct = $item->getMagentoProduct();
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $quoteItemChildrens = $item->getChildren();
+                $currentProduct = reset($quoteItemChildrens)->getMagentoProduct();
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $item->getTypeId()));
+                break;
+        }
+
+        $imageHelper = $imageHelper->init(
+            $currentProduct,
+            $imageId,
+            ['type' => 'small_image', 'width' => '240', 'height' => '240']
+        );
+        return $imageHelper;
     }
 }

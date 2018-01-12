@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
-use Magento\Catalog\Helper\Image;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\UrlInterface;
@@ -17,9 +16,7 @@ use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
-use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -31,6 +28,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditP
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\Source\CurrencySelect;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 class Product extends AbstractDataProvider
 {
@@ -102,24 +100,9 @@ class Product extends AbstractDataProvider
     private $session;
 
     /**
-     * @var Image
-     */
-    private $imageHelper;
-
-    /**
      * @var Context
      */
     private $context;
-
-    /**
-     * @var BillingFrequencyRepository
-     */
-    private $frequencyRepository;
-
-    /**
-     * @var BillingFrequencyUnitType
-     */
-    private $frequencyUnitType;
 
     /**
      * @var ShippingMethods
@@ -137,20 +120,22 @@ class Product extends AbstractDataProvider
     private $currencySelect;
 
     /**
-     * Product constructor.
+     * @var FormContext
+     */
+    private $formContext;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
      * @param QuoteSessionInterface $session
-     * @param Image $imageHelper
      * @param Context $context
-     * @param BillingFrequencyRepository $frequencyRepository
-     * @param BillingFrequencyUnitType $frequencyUnitType
      * @param CurrencySelect $currencySelect
      * @param ShippingMethods $shippingMethods
      * @param DescriptionCreator $frequencyDescriptionCreator
+     * @param FormContext $formContext
      * @param array $meta
      * @param array $data
      * @param string $scopeName
@@ -162,13 +147,11 @@ class Product extends AbstractDataProvider
         UrlInterface $urlBuilder,
         StepPool $stepPool,
         QuoteSessionInterface $session,
-        Image $imageHelper,
         Context $context,
-        BillingFrequencyRepository $frequencyRepository,
-        BillingFrequencyUnitType $frequencyUnitType,
         CurrencySelect $currencySelect,
         ShippingMethods $shippingMethods,
         DescriptionCreator $frequencyDescriptionCreator,
+        FormContext $formContext,
         array $meta = [],
         array $data = [],
         $scopeName = ''
@@ -176,13 +159,11 @@ class Product extends AbstractDataProvider
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->session = $session;
-        $this->imageHelper = $imageHelper;
         $this->context = $context;
-        $this->frequencyUnitType = $frequencyUnitType;
-        $this->frequencyRepository = $frequencyRepository;
         $this->currencySelect = $currencySelect;
         $this->shippingMethods = $shippingMethods;
         $this->frequencyDescriptionCreator = $frequencyDescriptionCreator;
+        $this->formContext = $formContext;
         $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
             $data);
@@ -222,7 +203,8 @@ class Product extends AbstractDataProvider
                 $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
                     isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $item->getQty(): 0;
 
-                $imageHelper = $this->context->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
+                $imageHelper = $this->formContext->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
+
                 $confOptions = [];
                 $options = $item->getProduct()->getTypeInstance(true)->getOrderOptions($item->getProduct());
                 if (isset($options['attributes_info']) && is_array($options['attributes_info'])) {

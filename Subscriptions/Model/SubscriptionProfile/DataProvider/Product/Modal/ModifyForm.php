@@ -263,7 +263,7 @@ class ModifyForm extends Form
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
-            $this->imageHelper = $this->context->getImageHelperForQuoteItem($item, 'category_page_grid');
+            $this->imageHelper = $this->formContext->getImageHelperForQuoteItem($item, 'category_page_grid');
             $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId)
