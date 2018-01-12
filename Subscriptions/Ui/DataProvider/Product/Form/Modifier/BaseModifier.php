@@ -11,6 +11,9 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Locale\CurrencyInterface;
 use TNW\Subscriptions\Model\Context;
 
+/**
+ * Base class for product edit page modifiers.
+ */
 class BaseModifier extends AbstractModifier
 {
     /**
@@ -29,7 +32,6 @@ class BaseModifier extends AbstractModifier
     protected $context;
 
     /**
-     * BaseModifier constructor.
      * @param StoreManagerInterface $storeManager
      * @param Context $context
      */

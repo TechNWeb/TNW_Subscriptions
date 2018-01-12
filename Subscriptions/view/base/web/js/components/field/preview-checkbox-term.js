@@ -10,15 +10,15 @@ define([
     return Abstract.extend({
         defaults: {
             periodPreviewLabel: '',
-            default: "1"
+            default: "1",
+            visibleOnEdit: true
         },
 
         /**
          * @inheritdoc
          */
         initObservable: function () {
-            this._super().
-            observe('showPreview periodPreviewLabel');
+            this._super().observe('showPreview periodPreviewLabel');
 
             return this;
         },
@@ -30,13 +30,29 @@ define([
          */
         getPreviewLabel: function () {
             var result;
-            if (this.checked()){
+            if (this.checked()) {
                 result = this.previewLabel;
-            }else {
+            } else {
                 result = this.periodPreviewLabel;
             }
 
             return result;
+        },
+
+        /**
+         * Resets value if "showPreview" property changed.
+         *
+         * @param {bool} value
+         */
+        onShowPreviewChanged: function (value) {
+            if (value) {
+                this.visible(true);
+                if (this.initialValue && this.value() !== this.initialValue) {
+                    this.reset();
+                }
+            } else {
+                this.visible(this.visibleOnEdit);
+            }
         }
     });
 });

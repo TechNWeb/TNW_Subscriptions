@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Plugin\Sales\Order\Item;
 
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Model\Order\ItemRepository;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 
 /**
  * Quote item save plugin.
@@ -31,14 +31,22 @@ class AfterSave
         if ($initialFees && $initialFees->getBaseSubsInitialFee() > 0 && $initialFees->getSubsInitialFee() > 0) {
             $item->getResource()->getConnection()
                 ->insertOnDuplicate(
-                    $item->getResource()->getTable(SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
+                    $item->getResource()->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
                     [
-                        SalesExtensionAttributesInterface::MAGENTO_ITEM_ID =>
+                        OrderItemExtensionAttributesInterface::MAGENTO_ITEM_ID =>
                             $item->getItemId(),
-                        SalesExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE =>
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE =>
                             $initialFees->getSubsInitialFee(),
-                        SalesExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE =>
-                            $initialFees->getBaseSubsInitialFee()
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE =>
+                            $initialFees->getBaseSubsInitialFee(),
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE_INVOICED =>
+                            $initialFees->getSubsInitialFeeInvoiced() ?: 0,
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED =>
+                            $initialFees->getBaseSubsInitialFeeInvoiced() ?: 0,
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED =>
+                            $initialFees->getSubsInitialFeeRefunded() ?: 0,
+                        OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE_REFUNDED =>
+                            $initialFees->getBaseSubsInitialFeeRefunded() ?: 0,
                     ]
                 );
         }

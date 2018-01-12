@@ -11,15 +11,14 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View;
-use Magento\Catalog\Model\Product;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 
 /**
  * Subscribe product block instance
@@ -28,14 +27,14 @@ class Subscribe extends View
 {
     /**
      * Subscription module config
-     * 
+     *
      * @var Config
      */
     private $config;
 
     /**
      * Modal form for adding single product to subscription
-     * 
+     *
      * @var FrequencyOptionRepository
      */
     private $frequencyOptionRepository;
@@ -153,7 +152,7 @@ class Subscribe extends View
 
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
-     * 
+     *
      * @return bool
      */
     public function IsOnlySubscribePurchase()
@@ -173,29 +172,21 @@ class Subscribe extends View
 
     /**
      * Returns product billing frequencies as array.
-     * 
+     *
      * @return array
      */
     public function getFrequencyOptions()
     {
         $result = [];
-        $product = $this->getProduct();
-        $productPrice = (int)$product->getPrice();
-
         /** @var ProductBillingFrequencyInterface $productFrequency */
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
             $label = $frequency->getLabel();
             $frequencyPrice = (int)$productFrequency->getPrice();
-
-            if ($productPrice > $frequencyPrice) {
-                $savings = $this->formatPrice($productPrice - $frequencyPrice);
-                $label .= '  '. sprintf(__('(SAVE %s)'), $savings) ;
-            }
-
-             $data = [
+            $data = [
                 'label' => $label,
                 'value' => $productFrequency->getBillingFrequencyId(),
+                'frequency_price' => $frequencyPrice,
                 'is_default' => $productFrequency->getDefaultBillingFrequency(),
             ];
 
@@ -239,6 +230,16 @@ class Subscribe extends View
     }
 
     /**
+     * Returns product savings calculation type.
+     *
+     * @return int
+     */
+    public function getSavingCalculationType()
+    {
+        return (int) $this->getProduct()->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+    }
+
+    /**
      * Get default value for Subscribe Qty
      *
      * @return int
@@ -257,17 +258,28 @@ class Subscribe extends View
 
     /**
      * Get is need check until canceled by default
-     * 
+     *
      * @return string
      */
     public function getDefaultUntilCancelled()
     {
-        return $this->config->isUntilCanceledChecked();
+        return $this->getIsInfiniteSubscriptions() ?: $this->config->isUntilCanceledChecked();
     }
 
     /**
+     * Get is only infinite subscriptions available.
+     *
+     * @return string
+     */
+    public function getIsInfiniteSubscriptions()
+    {
+        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+    }
+
+
+    /**
      * Get default period value
-     * 
+     *
      * @return string
      */
     public function getDefaultPeriod()
@@ -277,8 +289,8 @@ class Subscribe extends View
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @return bool
      */
     public function getIsVisibleStartOn()
@@ -295,7 +307,7 @@ class Subscribe extends View
 
     /**
      * Get default value for Start on
-     * 
+     *
      * @return string
      */
     public function getDefaultStartOn()
@@ -315,7 +327,7 @@ class Subscribe extends View
 
     /**
      * Get input date format
-     * 
+     *
      * @return string
      */
     public function getDateFormat()
@@ -358,7 +370,7 @@ class Subscribe extends View
             $this->getProduct()->getStore()->getWebsiteId()
         );
 
-        $params['minAllowed']  = max((float)$stockItem->getQtyMinAllowed(), 1);
+        $params['minAllowed'] = max((float)$stockItem->getQtyMinAllowed(), 1);
         if ($stockItem->getQtyMaxAllowed()) {
             $params['maxAllowed'] = $stockItem->getQtyMaxAllowed();
         }

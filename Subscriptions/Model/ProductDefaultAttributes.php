@@ -57,6 +57,8 @@ class ProductDefaultAttributes
             Attribute::SUBSCRIPTION_PURCHASE_TYPE => $this->config->getPurchaseType($websiteId),
             Attribute::SUBSCRIPTION_START_DATE => $this->config->getStartDateType($websiteId),
             Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $this->config->getUnlockPresetQtyStatus($websiteId) ? '1' : '0',
+            Attribute::SUBSCRIPTION_SAVINGS_CALCULATION => $this->config->getSavingsCalculation($websiteId),
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS => $this->config->getIsInfiniteSubscriptions($websiteId),
             // Discount
             Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $this->config->getOfferFlatDiscountStatus($websiteId) ? '1' : '0',
             Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $this->config->getDiscountAmount($websiteId),

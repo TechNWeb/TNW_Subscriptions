@@ -11,6 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 /**
  * Class Products
@@ -23,11 +24,6 @@ class Products extends BaseSummary
     const CONFIGURE_TYPES = [
         ConfigurableProduct::TYPE_CODE,
     ];
-
-    /**
-     * @var \Magento\Catalog\Helper\ImageFactory
-     */
-    private $imageFactory;
 
     /**
      * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
@@ -50,9 +46,12 @@ class Products extends BaseSummary
     private $descriptionCreator;
 
     /**
-     * Products constructor.
+     * @var FormContext
+     */
+    private $formContext;
+
+    /**
      * @param Template\Context $context
-     * @param \Magento\Catalog\Helper\ImageFactory $imageFactory
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
@@ -61,19 +60,19 @@ class Products extends BaseSummary
      */
     public function __construct(
         Template\Context $context,
-        \Magento\Catalog\Helper\ImageFactory $imageFactory,
         \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository,
         \Magento\Framework\Locale\CurrencyInterface $currency,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
+        FormContext $formContext,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->imageFactory = $imageFactory;
         $this->frequencyRepository = $frequencyRepository;
         $this->currency = $currency;
         $this->orderRepository = $orderRepository;
         $this->descriptionCreator = $descriptionCreator;
+        $this->formContext = $formContext;
     }
 
     /**
@@ -90,16 +89,10 @@ class Products extends BaseSummary
      * @param ProductSubscriptionProfileInterface $item
      * @return string
      */
-    public function getImageUrl($item)
+    public function getImageUrl(ProductSubscriptionProfileInterface $item)
     {
-        $product = $this->getProductFromItem($item);
-        if (null === $product) {
-            return '';
-        }
-
-        return $this->imageFactory->create()
-            ->init($product, 'product_small_image')
-            ->getUrl();
+        $imageHelper = $this->formContext->getImageHelperForSubscriptionProduct($item, 'product_small_image');
+        return ($imageHelper) ? $imageHelper->getUrl() : '';
     }
 
     /**

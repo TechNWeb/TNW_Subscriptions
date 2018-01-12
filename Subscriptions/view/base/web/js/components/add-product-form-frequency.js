@@ -3,8 +3,9 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'TNW_Subscriptions/js/components/field/preview-checkbox-set'
-], function (Abstract) {
+    'TNW_Subscriptions/js/components/field/preview-checkbox-set',
+    'uiRegistry'
+], function (Abstract, registry) {
     'use strict';
 
     return Abstract.extend({
@@ -35,6 +36,20 @@ define([
          */
         getCurrentFrequencyPrice: function(frequencyData, optionValue) {
             return frequencyData[optionValue]['price']
+        },
+
+        /**
+         * @inheritdoc
+         */
+        getProductQty: function () {
+            var qty = 0,
+                mainForm = registry.get('index=' + this.ns).getModalForm();
+
+            if (mainForm && mainForm.configurableData && mainForm.configurableData.qty) {
+                qty = mainForm.configurableData.qty;
+            }
+
+            return qty;
         }
     })
 });

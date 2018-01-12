@@ -16,6 +16,9 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Locale\CurrencyInterface;
 
+/**
+ * Class subscription context.
+ */
 class Context
 {
     /**
@@ -74,7 +77,6 @@ class Context
         Format $localeFormat,
         CurrencyInterface $currencyInterface
     ) {
-
         $this->messageManager = $messageManager;
         $this->config = $config;
         $this->logger = $logger;
@@ -197,5 +199,25 @@ class Context
             array_slice($result, $pos)
         );
         return $result;
+    }
+
+    /**
+     * Checks if value is in json format.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public function isJson($value)
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        \json_decode($value);
+        if (\json_last_error()) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -14,6 +14,7 @@ use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 
 /**
@@ -42,17 +43,25 @@ class Configurable extends Base
     private $managerConfigurable;
 
     /**
+     * @var Context
+     */
+    private $contextModel;
+
+    /**
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      * @param ManagerConfigurable $managerConfigurable
+     * @param Context $contextModel
      */
     public function __construct(
         Registry $registry,
         UrlFactory $urlFactory,
-        ManagerConfigurable $managerConfigurable
+        ManagerConfigurable $managerConfigurable,
+        Context $contextModel
     ) {
         $this->registry = $registry;
         $this->managerConfigurable = $managerConfigurable;
+        $this->contextModel = $contextModel;
         parent::__construct($urlFactory);
     }
 
@@ -179,6 +188,7 @@ class Configurable extends Base
                                             $this->getProduct()->getId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
+                                            $this->getItem()->getCustomOptions() //super attributes data
                                         ],
                                     ],
                                 ],
@@ -189,5 +199,23 @@ class Configurable extends Base
                 ],
             ],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getUrlParams()
+    {
+        $params = parent::getUrlParams();
+        $attributes = [];
+        $attributesData = $this->getItem()->getCustomOptions();
+
+        if ($this->contextModel->isJson($attributesData)) {
+            $attributes = \Zend_Json::decode($attributesData);
+        }
+
+        $params['attributes'] = $attributes;
+
+        return $params;
     }
 }

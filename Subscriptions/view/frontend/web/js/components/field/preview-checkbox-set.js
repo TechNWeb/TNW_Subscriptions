@@ -189,6 +189,7 @@ define([
                 discount = 0,
                 productPrice = this.getProductPrice(),
                 priceFormat = this.getPriceFormat(),
+                productQty = this.getProductQty(),
                 currentFrequencyPrice;
 
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
@@ -197,7 +198,12 @@ define([
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
 
-                discount = productPrice - currentFrequencyPrice;
+                productQty = frequencyData[optionValue]['preset_qty'] ? 1 : productQty;
+                if (this.getSavingsCalculationType()) {
+                    discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
+                } else {
+                    discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
+                }
 
                 if (discount > 0) {
                     discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
@@ -206,6 +212,36 @@ define([
 
                 return frequencyLabel;
             }
+        },
+
+        /**
+         * Returns algorithm type for savings calculation.
+         *
+         * @returns {boolean}
+         */
+        getSavingsCalculationType: function () {
+            var type = 0,
+                currentItemData = this.getCurrentItemData();
+            if (currentItemData.savings_calculation) {
+                type = parseInt(currentItemData.savings_calculation);
+            }
+
+            return type;
+        },
+
+        /**
+         * Returns product qty.
+         *
+         * @returns {number}
+         */
+        getProductQty: function () {
+            var qty = 0,
+                currentItemData = this.getCurrentItemData();
+            if (currentItemData.qty) {
+                qty = currentItemData.qty;
+            }
+
+            return qty;
         },
 
         /**
@@ -330,6 +366,8 @@ define([
          * @return void
          */
         changeItemPriceLabel: function() {
+            this.setDiscountLabel('all');
+
             var priceLabel = '',
                 parentForm = registry.get(this.parentForm),
                 priceComponent = registry.get('dataScope = ' + parentForm.dataScope +'.price'),
@@ -380,8 +418,8 @@ define([
                     lastPhrase = $.mage.__('trial');
                 } else {
                     if (noFormatInitialFee) {
-                        middlePhrase = $.mage.__('for');
-                        lastPhrase = $.mage.__('initial fee');
+                        middlePhrase = $.mage.__('initial');
+                        lastPhrase = $.mage.__('payment');
                     }
                 }
 

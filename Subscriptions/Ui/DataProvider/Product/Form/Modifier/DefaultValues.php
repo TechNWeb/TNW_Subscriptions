@@ -12,7 +12,7 @@ use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\ProductDefaultAttributes;
 
 /**
- * Data provider for advanced inventory form
+ * Data provider for subscription product attributes default values.
  */
 class DefaultValues extends AbstractModifier
 {
@@ -20,12 +20,6 @@ class DefaultValues extends AbstractModifier
      * @var LocatorInterface
      */
     private $locator;
-
-    /**
-     * @var ArrayManager
-     */
-    private $arrayManager;
-
 
     /**
      * Product default attributes helper.
@@ -36,16 +30,13 @@ class DefaultValues extends AbstractModifier
 
     /**
      * @param LocatorInterface $locator
-     * @param ArrayManager $arrayManager
      * @param ProductDefaultAttributes $productDefaultAttributes
      */
     public function __construct(
         LocatorInterface $locator,
-        ArrayManager $arrayManager,
         ProductDefaultAttributes $productDefaultAttributes
     ) {
         $this->locator = $locator;
-        $this->arrayManager = $arrayManager;
         $this->productDefaultAttributes = $productDefaultAttributes;
     }
 

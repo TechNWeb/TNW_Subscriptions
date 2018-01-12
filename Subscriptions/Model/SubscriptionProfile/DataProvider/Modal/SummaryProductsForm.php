@@ -6,16 +6,17 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Paypal\Model\Payflow\Pro;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\Component\Modal;
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
@@ -626,5 +627,50 @@ class SummaryProductsForm extends ModifyForm
             'editOptionsForm' => EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
             'insertEditOptionsForm' => Product::DATA_SCOPE_EDIT_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM,
         ];
+    }
+
+    /**
+     * Returns item children definition.
+     *
+     * @param DataObject $subQuote
+     * @return array
+     */
+    protected function getChildren(DataObject $subQuote)
+    {
+        foreach ($this->getObjectItems($subQuote) as $item) {
+            $itemId = $item->getId();
+            $objectId = $subQuote->getId();
+            $this->currentFormName = $this->getFormFullName($objectId, $itemId);
+            $this->currentProduct = $this->getProductFromItem($item);
+            $this->currentItem = $item;
+            $this->imageHelper = $this->formContext->getImageHelperForSubscriptionProduct($item);
+            $itemMeta = [
+                'children' => [
+                    'form' => $this->getForm($objectId, $itemId),
+                ],
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => false,
+                            'collapsible' => false,
+                            'componentType' => UiForm\Fieldset::NAME,
+                            'dataScope' => 'item_' . $itemId,
+                            'additionalClasses' => 'subscription-item-form',
+                            'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                        ],
+                    ],
+                ]
+            ];
+
+            /** @var ModifierInterface $modifier */
+            foreach ($this->pool->getModifiersInstances() as $modifier) {
+                $modifier->setItem($this->currentItem);
+                $itemMeta = $modifier->modifyMeta($itemMeta);
+            }
+
+            $result[self::CONTAINER_ITEM_PREFIX . $itemId] = $itemMeta;
+        }
+
+        return !empty($result) ? $result : [];
     }
 }

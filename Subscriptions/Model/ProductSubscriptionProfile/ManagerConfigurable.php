@@ -9,11 +9,10 @@ namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObject\Factory as DataObjectFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Configurable as ConfigurableTypeManager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
@@ -45,16 +44,6 @@ class ManagerConfigurable
     private $objectFactory;
 
     /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var ProductFrequencyRepository
-     */
-    private $productFrequencyRepository;
-
-    /**
      * @var ConfigurableTypeManager
      */
     private $configurableTypeManager;
@@ -63,23 +52,17 @@ class ManagerConfigurable
      * @param ProfileManager $profileManager
      * @param ProductSubscriptionProfileRepository $subproductRepository
      * @param DataObjectFactory $objectFactory
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ProductFrequencyRepository $productFrequencyRepository
      * @param ConfigurableTypeManager $configurableTypeManager
      */
     public function __construct(
         ProfileManager $profileManager,
         ProductSubscriptionProfileRepository $subproductRepository,
         DataObjectFactory $objectFactory,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductFrequencyRepository $productFrequencyRepository,
         ConfigurableTypeManager $configurableTypeManager
     ) {
         $this->profileManager = $profileManager;
         $this->subproductRepository = $subproductRepository;
         $this->objectFactory = $objectFactory;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->productFrequencyRepository = $productFrequencyRepository;
         $this->configurableTypeManager = $configurableTypeManager;
     }
 
@@ -226,6 +209,7 @@ class ManagerConfigurable
                             $updatedSubProduct
                                 ->setDataChanges(false)
                                 ->setQty($candidate->getQty())
+                                ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
                                 ->setPrice($price);
                             $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
                         } else {

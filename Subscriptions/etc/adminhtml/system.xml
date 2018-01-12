@@ -113,6 +113,18 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product quantity is preset for the customer and cannot be changed.</comment>
                 </field>
+                <field id="savings_calculation" translate="label comment" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Savings Calculation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Product is a service that my customers use on daily basis.</comment>
+                </field>
+                <field id="infinite_subscriptions" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Infinite Subscriptions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>For product can be created only infinite subscriptions.</comment>
+                </field>
             </group>
 
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">

@@ -10,7 +10,9 @@
      data-mage-init='{"tnwSubscribeContainer":{
         "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
         "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
-        "canShowSubscribePriceBlock" : "true"
+        "canShowSubscribePriceBlock" : "true",
+        "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
+        "productPrice" : "<?php echo $block->getProduct()->getPrice() ?>"
     }}'
 >
     <div class="fieldset">
@@ -32,9 +34,13 @@
                             <?php if (isset($option['preset_qty'])): ?>
                                 data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
                             <?php endif ?>
+                            <?php if (isset($option['frequency_price'])): ?>
+                                data-frequency-price="<?php echo $option['frequency_price'] * 1 ?>"
+                            <?php endif ?>
                         />
                         <label class="label"
-                               for="billing_frequency_<?php echo $option['value'] ?>">
+                               for="billing_frequency_<?php echo $option['value'] ?>"
+                               data-default-label="<?php echo $option['label'] ?>">
                             <span><?php echo $option['label'] ?></span>
                         </label>
                     </div>
@@ -47,7 +53,12 @@
         <div class="field term required">
             <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
-                <input type="checkbox"
+                <input
+                    <?php if ($block->getIsInfiniteSubscriptions()): ?>
+                       type="hidden"
+                    <?php else: ?>
+                       type="checkbox"
+                    <?php endif;?>
                        class="checkbox"
                        name="term"
                        id="term"

@@ -123,8 +123,12 @@ abstract class Base implements TypeInterface
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
             SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE),
-            SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT =>
-                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT)
+            SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY),
+            SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION),
+            SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS),
         ];
         $productData = new DataObject();
         $productData->addData($data);

@@ -10,7 +10,9 @@
      data-mage-init='{"tnwSubscribeContainer":{
         "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
         "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
-        "canShowSubscribePriceBlock" : "true"
+        "canShowSubscribePriceBlock" : "true",
+        "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
+        "productPrice" : "<?php echo $block->getProduct()->getPrice() ?>"
     }}'
 >
     <input type="hidden" name="sub_product_id" value="<?php echo $block->getSubscriptionProductId()?>" />

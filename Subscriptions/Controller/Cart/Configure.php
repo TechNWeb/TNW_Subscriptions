@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Registry;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Psr\Log\LoggerInterface;
 
@@ -72,11 +73,7 @@ class Configure extends \Magento\Framework\App\Action\Action
         $productId = (int)$this->getRequest()->getParam('product_id');
         $quoteItem = null;
         if ($quoteItemId) {
-            /** @var \Magento\Quote\Model\Quote\Item $quoteItem */
-            $quoteItem = $this->quoteItemFactory->create()->load($quoteItemId);
-            $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
-            $quoteItem->setQuote($quote);
-            $this->registry->register('old_quote_item_id', $quoteItemId);
+            $quoteItem = $this->initQuoteItem($quoteItemId);
         }
 
         try {
@@ -86,11 +83,7 @@ class Configure extends \Magento\Framework\App\Action\Action
                 return $this->goBack();
             }
 
-            $params = new \Magento\Framework\DataObject();
-            $params->setCategoryId(false);
-            $params->setConfigureMode(true);
-            $params->setBuyRequest($quoteItem->getBuyRequest());
-
+            $params = $this->getParams($quoteItem);
             $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
             $this->_objectManager->get(\Magento\Catalog\Helper\Product\View::class)
                 ->prepareAndRender(
@@ -119,5 +112,44 @@ class Configure extends \Magento\Framework\App\Action\Action
         return $this->resultFactory
             ->create(ResultFactory::TYPE_REDIRECT)
             ->setPath('tnw_subscriptions/cart/index');
+    }
+
+    /**
+     * Init Quote item from itemId.
+     *
+     * @param int $quoteItemId
+     * @return Item
+     */
+    private function initQuoteItem($quoteItemId)
+    {
+        /** @var Item $quoteItem */
+        $quoteItem = $this->quoteItemFactory->create()->load($quoteItemId);
+        $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
+        $quoteItem->setQuote($quote);
+        $this->registry->register('old_quote_item_id', $quoteItemId);
+
+        return $quoteItem;
+    }
+
+    /**
+     * Return additional params for quoteIem.
+     *
+     * @param Item $quoteItem
+     * @return \Magento\Framework\DataObject
+     */
+    private function getParams(Item $quoteItem)
+    {
+        $params = new \Magento\Framework\DataObject();
+        $params->setCategoryId(false);
+        $params->setConfigureMode(true);
+        $buyRequest = $quoteItem->getBuyRequest();
+        $attributes = $this->getRequest()->getParam('attributes');
+
+        if (!empty($attributes) && is_array($attributes)) {
+            $buyRequest->setSuperAttribute($attributes);
+        }
+        $params->setBuyRequest($buyRequest);
+
+        return $params;
     }
 }

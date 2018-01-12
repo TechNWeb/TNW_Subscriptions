@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php $_source  = $block->getSource() ?>
+<?php if ($_source): ?>
+    <tr>
+        <td class="label"><?php /* @escapeNotVerified */ echo __('Initial Fee') ?><div id="subscription_initial_fee_adv"></div></td>
+        <td>
+            <input type="text"
+                   name="creditmemo[subscription_initial_fee]"
+                   value="<?php /* @escapeNotVerified */ echo $block->getBaseInitialFee()*1 ?>"
+                   class="input-text admin__control-text not-negative-amount"
+                   id="subscription_initial_fee"/>
+        </td>
+    </tr>
+<?php endif; ?>

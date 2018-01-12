@@ -28,13 +28,12 @@ class Discount extends BaseModifier
     private $locator;
 
     /**
-     * Discount constructor.
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
      * @param Context $context
      */
-    function __construct(
+    public function __construct(
         LocatorInterface $locator,
         ArrayManager $arrayManager,
         StoreManagerInterface $storeManager,

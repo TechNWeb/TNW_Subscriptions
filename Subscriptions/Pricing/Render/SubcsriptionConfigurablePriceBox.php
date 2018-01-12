@@ -32,6 +32,16 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
     private $helperProduct;
 
     /**
+     * @var \Magento\Framework\Module\Manager
+     */
+    private $moduleManager;
+
+    /**
+     * @var \Magento\Swatches\Helper\Data
+     */
+    private $swatchHelper;
+
+    /**
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -43,7 +53,10 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param DescriptionCreator $descriptionCreator
      * @param ProfileManager $profileManager
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param HelperProduct $helperProduct
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Swatches\Helper\Data $swatchHelper
      * @param array $data
      */
     public function __construct(
@@ -60,6 +73,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         ProfileManager $profileManager,
         ProductTypeManagerResolver $productTypeResolver,
         HelperProduct $helperProduct,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Swatches\Helper\Data $swatchHelper,
         array $data = []
     ) {
         parent::__construct(
@@ -79,6 +94,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         );
 
         $this->helperProduct = $helperProduct;
+        $this->moduleManager = $moduleManager;
+        $this->swatchHelper = $swatchHelper;
     }
 
     /**
@@ -90,20 +107,41 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         array $arguments = []
     ) {
         $result = [];
+        $mappedResult = [];
+        $priceMap = [];
+        $arguments['configurable_mapping'] = true;
         if ($currentProduct->getTypeId() === Configurable::TYPE_CODE) {
-            $result['config'] = parent::renderSubscriptionAmounts($amount, $currentProduct, $arguments);
+            $mappedResult['config'] = parent::renderSubscriptionAmounts($amount, $currentProduct, $arguments);
 
             foreach ($this->getAllowProducts() as $product) {
                 /** @var \Magento\Framework\Pricing\Price\PriceInterface $simpleProductAmount */
                 $simpleProductAmount = $product->getPriceInfo()->getPrice('final_price');
                 $arguments['child_product'] = $product;
-                $result[$product->getId()] = parent::renderSubscriptionAmounts(
+                $mappedResult[$product->getId()] = parent::renderSubscriptionAmounts(
                     $simpleProductAmount->getAmount(),
                     $currentProduct,
                     $arguments
                 );
             }
         }
+
+        foreach ($mappedResult as $key => $productsAmount) {
+            if (!empty($productsAmount)) {
+                foreach ($productsAmount as $frequencyId => $data) {
+                    $priceMap[$frequencyId][$key] = $data['frequency_price'];
+                    $result[$key][$frequencyId] = $data['amount'];
+                }
+            } else {
+                $result[$key] = [];
+            }
+        }
+
+        $configurableDefaults = [];
+        foreach ($priceMap as $frequencyId => $productPrices) {
+            $minPrices = array_keys($productPrices, min($productPrices));
+            $configurableDefaults[$frequencyId] = reset($minPrices);
+        }
+        $result['default'] = $configurableDefaults;
 
         return $result;
     }
@@ -152,6 +190,30 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
             }
         }
 
+        $defaultValues = $this->getRequest()->getParam('attributes');
+
+        if (!empty($defaultValues) && is_array($defaultValues)) {
+            $options['defaultValues'] = $defaultValues;
+        }
+
         return $options;
+    }
+
+    /**
+     * Check if swatch attributes will be shown.
+     *
+     * @return bool
+     */
+    public function productHasSwatch()
+    {
+        $result = false;
+
+        if ($this->moduleManager->isOutputEnabled('Magento_Swatches')) {
+            $product = $this->getProduct();
+
+            $result = $this->swatchHelper->isProductHasSwatch($product);
+        }
+
+        return $result;
     }
 }

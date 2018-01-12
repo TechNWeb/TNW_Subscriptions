@@ -224,20 +224,14 @@ class Form extends AbstractDataProvider
                     'term' => [
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'value' => $this->context->getConfig()->isUntilCanceledChecked(),
-                                ],
+                                'config' => $this->getFieldTermConfig(),
                             ],
                         ],
                     ],
                     'period' => [
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'imports' => [
-                                        'visible' => '!ns = ${ $.ns }, index = term:checked',
-                                    ],
-                                ],
+                                'config' => $this->getFieldPeriodConfig(),
                             ],
 
                         ],
@@ -641,6 +635,24 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns price for current product.
+     *
+     * @param int|string|null $productId
+     * @return string
+     */
+    protected function getSavingsCalculation($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $productPrice = $product->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+        }
+
+        return $productPrice;
+    }
+
+    /**
      * Returns frequencies data for product.
      *
      * @param bool $needProductValues
@@ -672,6 +684,7 @@ class Form extends AbstractDataProvider
             $data['trial_period'] = $this->getTrialPeriod($productId);
             $data['product_price'] = $this->getProductPrice($productId);
             $data['period'] = self::DEFAULT_PERIOD_VALUE;
+            $data['savings_calculation'] = $this->getSavingsCalculation($productId);
         }
 
         return $data;
@@ -739,4 +752,57 @@ class Form extends AbstractDataProvider
             'initial_fee' => $this->getInitialFee($billingFrequencyId, $productDataObject->getChildProductId()),
         ];
    }
+
+    /**
+     * Returns field term config.
+     *
+     * @param int|string|null $productId
+     * @return array
+     */
+    protected function getFieldTermConfig($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        $result = [
+            'value' => $this->context->getConfig()->isUntilCanceledChecked(),
+        ];
+
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            if ($isInfiniteSubscriptions) {
+                $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
+                $result['value'] = 1;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns field period config.
+     *
+     * @param int|string|null $productId
+     * @return array
+     */
+    protected function getFieldPeriodConfig($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        $result = [
+            'imports' => [
+                'visible' => '!ns = ${ $.ns }, index = term:checked',
+            ],
+        ];
+
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            if ($isInfiniteSubscriptions) {
+                $result = ['visible' => false];
+            }
+        }
+
+        return $result;
+    }
 }

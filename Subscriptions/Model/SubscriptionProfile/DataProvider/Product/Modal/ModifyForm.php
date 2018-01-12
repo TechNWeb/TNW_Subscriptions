@@ -55,7 +55,7 @@ class ModifyForm extends Form
      *
      * @var string
      */
-    private $currentFormName;
+    protected $currentFormName;
 
     /**
      * Product for current item.
@@ -63,6 +63,13 @@ class ModifyForm extends Form
      * @var \Magento\Catalog\Api\Data\ProductInterface
      */
     protected $currentProduct;
+
+    /**
+     * Initialized image helper for product.
+     *
+     * @var ImageHelper
+     */
+    protected $imageHelper;
 
     /**
      * Current item.
@@ -167,7 +174,8 @@ class ModifyForm extends Form
                     'initial_values' => [
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
-                    ]
+                    ],
+                    'savings_calculation' => $product->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION),
                 ];
 
                 /** @var ModifierInterface $modifier */
@@ -244,10 +252,10 @@ class ModifyForm extends Form
     /**
      * Returns item children definition.
      *
-     * @param $subQuote
+     * @param DataObject $subQuote
      * @return array
      */
-    protected function getChildren($subQuote)
+    protected function getChildren(DataObject $subQuote)
     {
         foreach ($this->getObjectItems($subQuote) as $item) {
             $itemId = $item->getId();
@@ -255,6 +263,7 @@ class ModifyForm extends Form
             $this->currentFormName = $this->getFormFullName($objectId, $itemId);
             $this->currentProduct = $this->getProductFromItem($item);
             $this->currentItem = $item;
+            $this->imageHelper = $this->formContext->getImageHelperForQuoteItem($item, 'category_page_grid');
             $itemMeta = [
                 'children' => [
                     'form' => $this->getForm($objectId, $itemId)
@@ -515,14 +524,7 @@ class ModifyForm extends Form
      */
     protected function getImageHelper()
     {
-        $imageHelper = $this->formContext->getImageHelper();
-        if (isset($this->currentProduct)) {
-            $imageHelper = $imageHelper->init($this->currentProduct, 'category_page_grid',
-                ['type' => 'small_image', 'width' => '240', 'height' => '240']
-            );
-        }
-
-        return $imageHelper;
+        return $this->imageHelper;
     }
 
     /**
@@ -705,6 +707,7 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
+                            'onQtyUpdate' => $this->currentFormName . ':previewMode',
                             'onPriceUpdate' => '${ $.parentName}.price:value'
                         ],
                         'parentForm' => $this->currentFormName,
@@ -723,6 +726,10 @@ class ModifyForm extends Form
      */
     protected function getTermDefinition()
     {
+        $infiniteSubscriptions = $this->currentProduct->getData(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        );
+
         return [
             'arguments' => [
                 'data' => [
@@ -740,9 +747,10 @@ class ModifyForm extends Form
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'visibleOnEdit' => !$infiniteSubscriptions,
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
+                            'showPreview' => $this->currentFormName . ':previewMode',
+                        ],
                     ]
                 ]
             ]

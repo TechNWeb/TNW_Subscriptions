@@ -109,13 +109,21 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     {
         /** @var UrlInterface $url */
         $url = $this->urlFactory->create();
+        $params = $this->getUrlParams();
 
-        return $url->getUrl(
-            'tnw_subscriptions/subscription_products/edit',
-            [
+        return $url->getUrl('tnw_subscriptions/subscription_products/edit'). '?' . http_build_query($params);
+    }
+
+    /**
+     * Generate url params.
+     *
+     * @return array
+     */
+    protected function getUrlParams()
+    {
+        return [
                 'id' => $this->getItem()->getId(),
                 'product_id' => $this->getItem()->getMagentoProductId(),
-            ]
-        );
+        ];
     }
 }

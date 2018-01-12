@@ -156,7 +156,7 @@ class EditProductOptions extends AbstractDataProvider
      */
     public function getData()
     {
-        return $data = [
+        $data = [
             self::FORM_DATA_VALUE => [
                 'item_data' => [
                     'product_id' => $this->getProductId(),
@@ -165,6 +165,13 @@ class EditProductOptions extends AbstractDataProvider
                 ],
             ],
         ];
+
+        /** @var ModifierInterface $modifier */
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $data = $modifier->modifyData($data);
+        }
+
+        return $data;
     }
 
     /**
