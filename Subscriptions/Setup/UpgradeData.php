@@ -90,7 +90,7 @@ class UpgradeData implements UpgradeDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 130,
             ]
         );
@@ -128,7 +128,7 @@ class UpgradeData implements UpgradeDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 140,
             ]
         );

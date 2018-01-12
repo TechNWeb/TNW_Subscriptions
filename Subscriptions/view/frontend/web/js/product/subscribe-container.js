@@ -136,7 +136,7 @@ define([
             var frequencies = $(this.options.frequencyInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
-                savingsCalculationType = this.options.savingsCalculationType,
+                savingsCalculationType = parseInt(this.options.savingsCalculationType),
                 productPrice = this.options.productPrice;
 
             $.each(frequencies, function (key, option) {
@@ -146,9 +146,9 @@ define([
                         discount = 0;
 
                     if (savingsCalculationType) {
-                        discount = productPrice * qtyValue - currentFrequencyPrice;
+                        discount = parseFloat(productPrice) * qtyValue - parseFloat(currentFrequencyPrice);
                     } else {
-                        discount = (productPrice - currentFrequencyPrice) * qtyValue;
+                        discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * qtyValue;
                     }
 
                     if (discount){

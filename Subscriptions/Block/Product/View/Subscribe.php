@@ -236,7 +236,7 @@ class Subscribe extends View
      */
     public function getSavingCalculationType()
     {
-        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+        return (int) $this->getProduct()->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
     }
 
     /**

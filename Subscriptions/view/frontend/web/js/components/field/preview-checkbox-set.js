@@ -223,7 +223,7 @@ define([
             var type = 0,
                 currentItemData = this.getCurrentItemData();
             if (currentItemData.savings_calculation) {
-                type = currentItemData.savings_calculation;
+                type = parseInt(currentItemData.savings_calculation);
             }
 
             return type;
@@ -418,8 +418,8 @@ define([
                     lastPhrase = $.mage.__('trial');
                 } else {
                     if (noFormatInitialFee) {
-                        middlePhrase = $.mage.__('for');
-                        lastPhrase = $.mage.__('initial fee');
+                        middlePhrase = $.mage.__('initial');
+                        lastPhrase = $.mage.__('payment');
                     }
                 }
 

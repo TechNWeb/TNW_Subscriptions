@@ -13,6 +13,7 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -33,6 +34,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), "2.0.4", "<")) {
             $this->addCreditmemoItemExtensionAttributeTable($setup);
             $this->addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.6", "<")) {
+            $this->removeUniqueProductEntityKey($setup);
         }
 
         $setup->endSetup();
@@ -130,6 +135,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
     }
 
+    /**
+     * Add new columns to 'tnw_subscriptions_order_item_extension_entity' table.
+     *
+     * @param SchemaSetupInterface $setup
+     * @return void
+     */
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
     ) {
@@ -176,6 +187,26 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'default' => '0.0000',
                 'comment' => 'Base refunded initial fee'
             ]
+        );
+    }
+
+    /**
+     * Removes unique key from 'tnw_subscriptions_product_subscription_profile_entity' table.
+     *
+     * @param SchemaSetupInterface $setup
+     * @return void
+     */
+    private function removeUniqueProductEntityKey(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->dropIndex(
+            $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+            $setup->getIdxName(
+                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                [
+                    ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID,
+                    ProductSubscriptionProfile::MAGENTO_PRODUCT_ID
+                ]
+            )
         );
     }
 }

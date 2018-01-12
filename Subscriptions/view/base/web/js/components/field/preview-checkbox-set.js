@@ -232,7 +232,7 @@ define([
             var type = 0,
                 currentItemData = this.getCurrentItemData();
             if (currentItemData.savings_calculation) {
-                type = currentItemData.savings_calculation;
+                type = parseInt(currentItemData.savings_calculation);
             }
 
             return type;

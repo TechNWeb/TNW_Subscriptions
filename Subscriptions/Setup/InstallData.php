@@ -87,7 +87,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 10,
             ]
         );
@@ -116,7 +116,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 20,
             ]
         );
@@ -145,7 +145,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 30,
             ]
         );
@@ -174,7 +174,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 40,
             ]
         );
@@ -202,7 +202,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'backend_type' => 'decimal',
                 'backend' => \Magento\Catalog\Model\Product\Attribute\Backend\Price::class,
                 'frontend_input' => 'price',
@@ -233,7 +233,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'backend_type' => 'decimal',
                 'backend' => \TNW\Subscriptions\Model\Backend\Product\Attribute\DiscountAmount::class,
                 'frontend_input' => 'price',
@@ -266,7 +266,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 60,
             ]
         );
@@ -295,7 +295,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 70,
             ]
         );
@@ -324,7 +324,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 80,
             ]
         );
@@ -353,7 +353,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 90,
             ]
         );
@@ -382,7 +382,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 110,
             ]
         );
@@ -411,7 +411,7 @@ class InstallData implements InstallDataInterface
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'system' => 1,
-                'group' => 'Subscription options',
+                'group' => 'Subscription Options',
                 'sort_order' => 120,
             ]
         );

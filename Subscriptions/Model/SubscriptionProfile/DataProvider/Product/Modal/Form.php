@@ -231,11 +231,7 @@ class Form extends AbstractDataProvider
                     'period' => [
                         'arguments' => [
                             'data' => [
-                                'config' => [
-                                    'imports' => [
-                                        'visible' => '!ns = ${ $.ns }, index = term:checked',
-                                    ],
-                                ],
+                                'config' => $this->getFieldPeriodConfig(),
                             ],
 
                         ],
@@ -777,6 +773,33 @@ class Form extends AbstractDataProvider
             if ($isInfiniteSubscriptions) {
                 $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
                 $result['value'] = 1;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns field period config.
+     *
+     * @param int|string|null $productId
+     * @return array
+     */
+    protected function getFieldPeriodConfig($productId = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        $result = [
+            'imports' => [
+                'visible' => '!ns = ${ $.ns }, index = term:checked',
+            ],
+        ];
+
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            if ($isInfiniteSubscriptions) {
+                $result = ['visible' => false];
             }
         }
 
