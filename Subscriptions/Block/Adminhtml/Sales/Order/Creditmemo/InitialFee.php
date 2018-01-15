@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo;
 
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 
 /**
