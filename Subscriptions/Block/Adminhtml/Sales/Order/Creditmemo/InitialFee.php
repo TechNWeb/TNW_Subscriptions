@@ -7,6 +7,8 @@
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo;
 
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 
 /**
  * Subscription initial fee block for credit memo.
@@ -74,5 +76,33 @@ class InitialFee extends \Magento\Backend\Block\Template
         }
 
         return $result;
+    }
+
+    /**
+     * Returns total initial fee available to refund.
+     *
+     * @return float|int
+     */
+    public function getInitialFeeTotalValue()
+    {
+        $result = 0;
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->getSource()->getOrder();
+        /** @var OrderItemInterface $item */
+        foreach ($order->getAllItems() as $item) {
+            $initialFees = $item->getExtensionAttributes()
+                ? $item->getExtensionAttributes()->getSubsInitialFees()
+                : null;
+            if ($initialFees) {
+                $baseFee = (float)$initialFees->getBaseSubsInitialFee();
+                $baseFeeRefunded = (float)$initialFees->getBaseSubsInitialFeeRefunded();
+                $itemFee = $baseFee - $baseFeeRefunded;
+                if ($itemFee > 0) {
+                    $result += $itemFee;
+                }
+            }
+        }
+
+        return __('Total: ') . $order->formatBasePrice($result);
     }
 }
