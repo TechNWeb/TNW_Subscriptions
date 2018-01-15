@@ -111,7 +111,7 @@ class UpgradeData implements UpgradeDataInterface
                 'type' => 'int',
                 'backend' => '',
                 'frontend' => '',
-                'label' => 'Infinite subscriptions',
+                'label' => 'Infinite Subscriptions',
                 'input' => 'boolean',
                 'class' => '',
                 'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,

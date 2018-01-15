@@ -45,6 +45,7 @@ class Composite extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $meta = $this->updateSubscriptionsTab($meta);
         foreach ($this->modifiers as $bundleClass) {
             /** @var ModifierInterface $bundleModifier */
             $bundleModifier = $this->objectManager->get($bundleClass);
@@ -76,5 +77,21 @@ class Composite extends AbstractModifier
         }
 
         return $data;
+    }
+
+    /**
+     * Updates meta for subscription tab.
+     *
+     * @param array $meta
+     * @return array
+     */
+    private function updateSubscriptionsTab(array $meta)
+    {
+        $config = $meta['subscription-options']['arguments']['data']['config'];
+        $config['label'] = __('Subscription Options');
+        $config['additionalClasses'] = 'tnw-subscriptions-tab';
+        $meta['subscription-options']['arguments']['data']['config'] = $config;
+
+        return $meta;
     }
 }
