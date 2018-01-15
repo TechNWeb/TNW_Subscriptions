@@ -58,7 +58,7 @@ class SavingsCalculation extends AbstractModifier
             ) . static::META_CONFIG_PATH,
             $meta,
             [
-                'notice' =>  __('Product is a service that my customers use on daily basis.'),
+                'notice' =>  __('Product is a service and customers use it on daily basis.'),
             ]
         );
 

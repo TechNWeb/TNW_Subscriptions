@@ -123,7 +123,7 @@
                        showInWebsite="1">
                     <label>Infinite Subscriptions</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>For product can be created only infinite subscriptions.</comment>
+                    <comment>Products in the catalog will be configured for infinite subscription only.</comment>
                 </field>
             </group>
 
