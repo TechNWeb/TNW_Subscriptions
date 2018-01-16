@@ -58,7 +58,7 @@ class InfiniteSubscriptions extends AbstractModifier
             ) . static::META_CONFIG_PATH,
             $meta,
             [
-                'notice' =>  __('For product can be created only infinite subscriptions.'),
+                'notice' =>  __('Subscription to this product will be infinite.'),
             ]
         );
 
