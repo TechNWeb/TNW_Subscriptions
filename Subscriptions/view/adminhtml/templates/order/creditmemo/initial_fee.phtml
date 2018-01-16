@@ -5,7 +5,8 @@
  */
 ?>
 <?php /** @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo\InitialFee $block */
-$_source = $block->getSource() ?>
+$_source = $block->getSource();
+$baseInitialFee = $block->getBaseInitialFee() * 1; ?>
 <?php if ($_source): ?>
     <tr class="initial-fee-container">
         <td class="label">
@@ -18,7 +19,10 @@ $_source = $block->getSource() ?>
             </div>
             <input type="text"
                    name="creditmemo[subscription_initial_fee]"
-                   value="<?php /* @escapeNotVerified */ echo $block->getBaseInitialFee() * 1 ?>"
+                    <?php if (!$baseInitialFee):?>
+                        <?php echo ' disabled="disabled"'; ?>
+                    <?php endif;?>
+                   value="<?php /* @escapeNotVerified */ echo $baseInitialFee ?>"
                    class="input-text admin__control-text not-negative-amount"
                    id="subscription_initial_fee"/>
         </td>

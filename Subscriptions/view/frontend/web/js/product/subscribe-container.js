@@ -151,7 +151,7 @@ define([
                         discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * qtyValue;
                     }
 
-                    if (discount){
+                    if (discount > 0){
                         resultLabel += '  ' + $t('(SAVE %s)').replace('%s', utils.formatPrice(discount, {}));
                     }
 
