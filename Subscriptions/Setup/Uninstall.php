@@ -78,6 +78,7 @@ class Uninstall implements UninstallInterface
             CustomerQuote::CUSTOMER_QUOTE_TABLE,
             SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
             SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE,
+            SalesExtensionAttributesInterface::CREDITMEMO_ITEM_EXTENSION_TABLE,
             Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE,
             'tnw_subscriptions_subscription_profile_message_history',
             Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
@@ -123,6 +124,8 @@ class Uninstall implements UninstallInterface
             'tnw_subscr_discount_amount',
             'tnw_subscr_discount_type',
             'tnw_subscr_unlock_preset_qty',
+            'tnw_subscr_savings_calculation',
+            'tnw_subscr_inf_subscriptions',
         ];
 
         /** @var EavSetup $eavSetup */

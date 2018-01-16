@@ -181,7 +181,7 @@ class InitialFee extends AbstractTotal
         $totalInitialFees = 0;
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemInitialFees = $this->getOrderItemInitialFees($item->getOrderItem());
-            if (!$item->getOrderItem()->isDummy() && $item->getQty() > 0) {
+            if ($orderItemInitialFees && !$item->getOrderItem()->isDummy() && $item->getQty() > 0) {
                 $baseItemFee = (float)$orderItemInitialFees->getBaseSubsInitialFee();
                 $baseFeeRefunded = (float)$orderItemInitialFees->getBaseSubsInitialFeeRefunded();
                 $totalInitialFees += $baseItemFee - $baseFeeRefunded;

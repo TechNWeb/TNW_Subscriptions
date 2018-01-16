@@ -7,3 +7,6 @@
 .container_tnw_subscr_all .admin__fieldset {
     padding-top: 0;
 }
+.tnw-subscriptions-tab .admin__field .admin__field-label {
+    text-transform: capitalize;
+}
