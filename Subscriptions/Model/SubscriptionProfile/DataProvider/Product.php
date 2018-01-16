@@ -19,7 +19,6 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
@@ -95,11 +94,6 @@ class Product extends AbstractDataProvider
     private $stepPool;
 
     /**
-     * @var QuoteSessionInterface
-     */
-    private $session;
-
-    /**
      * @var Context
      */
     private $context;
@@ -130,7 +124,6 @@ class Product extends AbstractDataProvider
      * @param string $requestFieldName
      * @param UrlInterface $urlBuilder
      * @param StepPool $stepPool
-     * @param QuoteSessionInterface $session
      * @param Context $context
      * @param CurrencySelect $currencySelect
      * @param ShippingMethods $shippingMethods
@@ -146,7 +139,6 @@ class Product extends AbstractDataProvider
         $requestFieldName,
         UrlInterface $urlBuilder,
         StepPool $stepPool,
-        QuoteSessionInterface $session,
         Context $context,
         CurrencySelect $currencySelect,
         ShippingMethods $shippingMethods,
@@ -158,7 +150,6 @@ class Product extends AbstractDataProvider
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
-        $this->session = $session;
         $this->context = $context;
         $this->currencySelect = $currencySelect;
         $this->shippingMethods = $shippingMethods;
@@ -178,7 +169,7 @@ class Product extends AbstractDataProvider
     {
         $items = $products = [];
         $estimatedPayment = 0;
-        $subQuotes = $this->session->getSubQuotes();
+        $subQuotes = $this->formContext->getSession()->getSubQuotes();
         $counter = 1;
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
@@ -256,8 +247,8 @@ class Product extends AbstractDataProvider
             $price,
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION,
-            $this->session->getStoreId(),
-            $this->session->getCurrencyId()
+            $this->formContext->getSession()->getStoreId(),
+            $this->formContext->getSession()->getCurrencyId()
         );
     }
 
@@ -376,7 +367,7 @@ class Product extends AbstractDataProvider
                                         'componentType' => Container::NAME,
                                         'component' => 'TNW_Subscriptions/js/components/primary-button',
                                         'template' => 'TNW_Subscriptions/form/element/primary-button',
-                                        'displayPrimary' => empty($this->session->getSubQuoteIds()),
+                                        'displayPrimary' => empty($this->formContext->getSession()->getSubQuoteIds()),
                                         'subButtonLeft' => true,
                                         'title' => __('Add Products'),
                                         'actions' => [
@@ -404,7 +395,7 @@ class Product extends AbstractDataProvider
                                         'template' => 'TNW_Subscriptions/form/element/primary-button',
                                         'displayPrimary' => false,
                                         'subButtonRight' => true,
-                                        'visible' => !empty($this->session->getSubQuoteIds()),
+                                        'visible' => !empty($this->formContext->getSession()->getSubQuoteIds()),
                                         'title' => __('Modify Subscription(s)'),
                                         'actions' => [
                                             [
