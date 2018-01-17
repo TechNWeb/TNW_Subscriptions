@@ -21,7 +21,7 @@
             <item name="ajaxSave" xsi:type="boolean">true</item>
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/checkout/quote-messages</item>
         </item>
-        <!--<item name="template" xsi:type="string">templates/checkout/messages</item>-->
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_checkout_messages_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
@@ -37,4 +37,3 @@
         </argument>
     </dataSource>
 </form>
-
