@@ -123,6 +123,8 @@ abstract class Base implements TypeInterface
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
             SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE),
+            SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT),
             SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_UNLOCK_PRESET_QTY),
             SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION =>
@@ -183,5 +185,24 @@ abstract class Base implements TypeInterface
     public function getAdditionalData(CartItemInterface $item)
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDiscountFields(SaleableInterface $product)
+    {
+        $data = [
+            SubscriptionProductAttributes::SUBSCRIPTION_OFFER_FLAT_DISCOUNT =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
+            SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_TYPE),
+            SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_DISCOUNT_AMOUNT),
+            SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
+        ];
+
+        return $data;
     }
 }

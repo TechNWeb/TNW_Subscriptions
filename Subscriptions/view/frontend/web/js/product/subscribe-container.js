@@ -36,7 +36,9 @@ define([
             addToCartPriceBlockSelector: 'div.price-final_price',
             canShowSubscribePriceBlock: false,
             savingsCalculationType: 0,
-            productPrice: 0
+            product: {},
+            selectSimpleProduct: '[name="selected_configurable_option"]',
+            childrenSelector: '.super-attribute-select'
         },
 
         containers: {
@@ -87,7 +89,8 @@ define([
                 button = $(this.options.subscribeButtonSelector),
                 untilCancelledInput = $(this.options.untilCancelledInputSelector),
                 frequencyInput = $(this.options.frequencyInputSelector),
-                qtyInput = $(this.options.qtyInputSelector);
+                qtyInput = $(this.options.qtyInputSelector),
+                childrenSelect = $(this.options.childrenSelector);
 
             button.on('click', $.proxy(function() {
                 widget._submitForm();
@@ -116,6 +119,12 @@ define([
             qtyInput.on('change', $.proxy(function () {
                 widget._updateFrequencyLabel();
             }, this));
+
+            if (childrenSelect) {
+                childrenSelect.on('change', $.proxy(function () {
+                    widget._updateFrequencyLabel();
+                }, this));
+            }
         },
 
         /**
@@ -137,11 +146,11 @@ define([
                 frequencies = $(this.options.frequencyInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
-                savingsCalculationType = parseInt(this.options.savingsCalculationType),
-                productPrice = this.options.productPrice;
+                savingsCalculationType = parseInt(this.options.savingsCalculationType);
 
             $.each(frequencies, function (key, option) {
-                var currentFrequencyPrice =  $(option).data('frequency-price'),
+                var currentFrequencyPrice = widget.getFrequencyPrice(parseInt($(option).val())),
+                    productPrice = widget.getProductPrice(),
                     frequencyUnit = $(option).data('frequency-unit'),
                     frequencyUnitType = $(option).data('frequency-unit-type'),
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
@@ -165,6 +174,64 @@ define([
                     label.innerText = resultLabel;
                 });
             });
+        },
+
+        /**
+         * Returns product price.
+         *
+         * @returns {number}
+         */
+        getProductPrice: function () {
+            var product = this.options.product,
+                selectedProduct,
+                selectedValue,
+                result = 0;
+
+            if (product.type == 'simple') {
+                result = product.product_price;
+            } else if (product.type == 'configurable') {
+                selectedProduct = $(this.options.selectSimpleProduct).val();
+                selectedValue = $(this.options.childrenSelector).val();
+
+                if (selectedProduct && selectedValue) {
+                    result = product.children[selectedProduct].product_price;
+                }
+            }
+
+            return result;
+        },
+
+        /**
+         * Returns product frequency price.
+         *
+         * @param optionValue
+         * @returns {number}
+         */
+        getFrequencyPrice: function (optionValue) {
+            var product = this.options.product,
+                result = 0,
+                selectedProduct,
+                selectedValue,
+                frequencyData,
+                frequencyPrice;
+
+            if (product.type == 'simple') {
+                result = product.frequency_data[optionValue];
+            } else if (product.type == 'configurable') {
+                selectedProduct = parseInt($(this.options.selectSimpleProduct).val());
+                selectedValue = $(this.options.childrenSelector).val();
+                if (selectedProduct && selectedValue) {
+                    frequencyData = product.children[selectedProduct].frequency_data;
+                    if (frequencyData) {
+                        frequencyPrice = product.children[selectedProduct].frequency_data[optionValue];
+                        if (frequencyPrice) {
+                            result = frequencyPrice;
+                        }
+                    }
+                }
+            }
+
+            return result;
         },
 
         /**

@@ -100,4 +100,12 @@ interface TypeInterface
      * @return mixed
      */
     public function getAdditionalData(CartItemInterface $item);
+
+    /**
+     * Returns product discount fields as array.
+     *
+     * @param SaleableInterface $product
+     * @return array
+     */
+    public function getDiscountFields(SaleableInterface $product);
 }
