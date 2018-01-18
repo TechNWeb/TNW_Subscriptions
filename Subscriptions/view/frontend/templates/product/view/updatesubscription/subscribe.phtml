@@ -12,7 +12,7 @@
         "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
         "canShowSubscribePriceBlock" : "true",
         "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
-        "productPrice" : "<?php echo $block->getProduct()->getPrice() ?>"
+         "product" : <?php echo $block->getProductDataArray() ?>
     }}'
 >
     <input type="hidden" name="sub_product_id" value="<?php echo $block->getSubscriptionProductId()?>" />
