@@ -11,6 +11,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View;
+use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -19,6 +20,9 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
  * Subscribe product block instance
@@ -54,7 +58,27 @@ class Subscribe extends View
     private $subscriptionProductViewConfig;
 
     /**
-     * Subscribe constructor.
+     * Savings calculation manager.
+     *
+     * @var SavingsCalculation
+     */
+    private $savingsCalculation;
+
+    /**
+     * Product type resolver.
+     *
+     * @var ProductTypeManagerResolver
+     */
+    private $subscriptionTypeResolver;
+
+    /**
+     * Subscription price calculator.
+     *
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+    /**
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
@@ -69,6 +93,8 @@ class Subscribe extends View
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
+     * @param SavingsCalculation $savingsCalculation
+     * @param ProductTypeManagerResolver $subscriptionTypeResolver
      * @param array $data
      */
     public function __construct(
@@ -86,12 +112,18 @@ class Subscribe extends View
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
+        SavingsCalculation $savingsCalculation,
+        ProductTypeManagerResolver $subscriptionTypeResolver,
+        PriceCalculator $priceCalculator,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
+        $this->savingsCalculation = $savingsCalculation;
+        $this->subscriptionTypeResolver = $subscriptionTypeResolver;
+        $this->priceCalculator = $priceCalculator;
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
@@ -182,11 +214,11 @@ class Subscribe extends View
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
             $label = $frequency->getLabel();
-            $frequencyPrice = (int)$productFrequency->getPrice();
             $data = [
                 'label' => $label,
                 'value' => $productFrequency->getBillingFrequencyId(),
-                'frequency_price' => $frequencyPrice,
+                'frequency_unit' => $frequency->getFrequency(),
+                'frequency_unit_type' => $frequency->getUnit(),
                 'is_default' => $productFrequency->getDefaultBillingFrequency(),
             ];
 
@@ -236,7 +268,7 @@ class Subscribe extends View
      */
     public function getSavingCalculationType()
     {
-        return (int) $this->getProduct()->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+        return $this->savingsCalculation->getSavingsCalculationType($this->getProduct());
     }
 
     /**
@@ -336,25 +368,6 @@ class Subscribe extends View
     }
 
     /**
-     * Format price according to locale settings.
-     *
-     * @param $price
-     * @return float
-     */
-    private function formatPrice($price)
-    {
-        $currentStore = $this->_storeManager->getStore();
-
-        return $this->priceCurrency->format(
-            $price,
-            false,
-            PriceCurrencyInterface::DEFAULT_PRECISION,
-            $currentStore->getId(),
-            $currentStore->getCurrentCurrencyCode()
-        );
-    }
-
-    /**
      * Returns validators for qty field. Depends on product settings
      *
      * @return array
@@ -380,5 +393,78 @@ class Subscribe extends View
         $validators['validate-item-quantity'] = $params;
 
         return $validators;
+    }
+
+    /**
+     * Returns product data array to display subscription form
+     *
+     * @return string
+     */
+    public function getProductDataArray()
+    {
+        $type = $this->getProduct()->getTypeId();
+        $subsProductType = $this->subscriptionTypeResolver->resolve($type);
+
+        $result = [
+            'type' => $type,
+            'product_price' => $this->getProduct()->getFinalPrice(),
+            'frequency_data' => $this->getFrequencyPricesByProduct(
+                $subsProductType->getProductDataObject($this->getProduct())
+            ),
+        ];
+
+        switch ($type) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                break;
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $childProducts = $this->getProduct()
+                    ->getTypeInstance()
+                    ->getSalableUsedProducts($this->getProduct(), null);
+                $childArray = [];
+
+                foreach ($childProducts as $childProduct) {
+                    $childArray[$childProduct->getId()]['product_price'] = $childProduct->getFinalPrice();
+                    $productDataObject = $subsProductType->getProductDataObject(
+                        $this->getProduct(),
+                        ['child_product' => $childProduct]
+                    );
+                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getFrequencyPricesByProduct(
+                        $productDataObject
+                    );
+                }
+
+                $result['children'] = $childArray;
+                break;
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
+                break;
+        }
+
+        return $this->_jsonEncoder->encode($result);
+    }
+
+    /**
+     * Returns array of product dilling frequency prices.
+     *
+     * @param DataObject $productDataObject
+     * @return array
+     */
+    protected function getFrequencyPricesByProduct(DataObject $productDataObject)
+    {
+        $result = [];
+        $productBillingFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productDataObject->getId())
+            ->getItems();
+        foreach ($productBillingFrequencies as $productFrequency) {
+            $frequencyPrice = $this->priceCalculator->getUnitPrice(
+                $productDataObject,
+                $productFrequency->getBillingFrequencyId()
+            );
+            $result[$productFrequency->getBillingFrequencyId()] = $frequencyPrice;
+        }
+
+        return $result;
     }
 }

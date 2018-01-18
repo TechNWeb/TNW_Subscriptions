@@ -13,6 +13,7 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Configurable product manager.
@@ -66,6 +67,7 @@ class Configurable extends Base
     {
         $productData = parent::getProductDataObject($product, $arguments);
         $childProduct = $product;
+        $discountFields = [];
 
         if (!empty($arguments['child_product'])) {
             $childProduct = $arguments['child_product'];
@@ -83,10 +85,17 @@ class Configurable extends Base
                 }
                 if (!$existFrequency) {
                     $childProduct = $product;
+
+                    $discountFields = $this->getDiscountFields($product);
+
+                    if (!$discountFields[Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT]) {
+                        $discountFields = $this->getDiscountFields($childProduct);;
+                    }
                 }
             }
         }
 
+        $data = [];
         if ($childProduct) {
             $data = [
                 'child_product_id' => $childProduct->getId(),
@@ -94,7 +103,7 @@ class Configurable extends Base
             ];
         }
 
-        $productData->addData($data);
+        $productData->addData(array_merge($data, $discountFields));
 
         return $productData;
     }

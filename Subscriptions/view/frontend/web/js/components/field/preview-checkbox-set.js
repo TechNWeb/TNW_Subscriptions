@@ -40,8 +40,7 @@ define([
          * @inheritdoc
          */
         initObservable: function () {
-            this._super().
-            observe(['showPreview','options']);
+            this._super().observe(['showPreview', 'options']);
 
             return this;
         },
@@ -62,7 +61,7 @@ define([
          *
          * @return void
          */
-        onPriceUpdate: function(priceValue) {
+        onPriceUpdate: function (priceValue) {
             this.setDiscountLabel(priceValue);
         },
 
@@ -71,12 +70,12 @@ define([
          *
          * @return {Object}
          */
-        getLabelsForOptions: function() {
+        getLabelsForOptions: function () {
             if (Object.keys(this.labelsForOptions).length == 0) {
                 var options = this.options(),
                     labelsForOptions = {};
 
-                options.forEach(function(option, index, arr) {
+                options.forEach(function (option, index, arr) {
                     labelsForOptions[option.value] = option.label;
                 });
 
@@ -92,7 +91,7 @@ define([
          * @param {string|integer} value
          * @return string
          */
-        getLabelForOption: function(value) {
+        getLabelForOption: function (value) {
             var labels = this.getLabelsForOptions();
 
             return labels[value];
@@ -106,7 +105,7 @@ define([
         getPreviewLabel: function () {
             var label = this.getLabelForOption(this.value());
 
-            return label ? label: '';
+            return label ? label : '';
         },
 
         /**
@@ -116,7 +115,7 @@ define([
          * @return void
          */
         onShowPreviewChanged: function (value) {
-            if (value && this.initialValue && this.value() !== this.initialValue){
+            if (value && this.initialValue && this.value() !== this.initialValue) {
                 this.reset();
             }
         },
@@ -137,7 +136,7 @@ define([
          * @param value
          * @returns {*}
          */
-        getOption: function(value) {
+        getOption: function (value) {
             var optionIndex = _.findIndex(this.options(), {value: value});
 
             return this.options()[optionIndex];
@@ -156,9 +155,9 @@ define([
                 optionsToShow = options,
                 self = this;
 
-            if (frequencyData){
+            if (frequencyData) {
                 if (value == 'all') {
-                    options.forEach(function(option, index, arr) {
+                    options.forEach(function (option, index, arr) {
                         optionsToShow[index]['label'] = self.changeOptionLabel(option, index, value);
                     });
                 } else {
@@ -182,7 +181,7 @@ define([
          * @param changeType
          * @returns {*}
          */
-        changeOptionLabel: function(option, optionIndex, changeType) {
+        changeOptionLabel: function (option, optionIndex, changeType) {
             var optionValue = option.value,
                 frequencyLabel = this.getLabelForOption(optionValue),
                 frequencyData = this.getFrequencyData(),
@@ -190,28 +189,57 @@ define([
                 productPrice = this.getProductPrice(),
                 priceFormat = this.getPriceFormat(),
                 productQty = this.getProductQty(),
-                currentFrequencyPrice;
+                currentFrequencyPrice,
+                saveString = '(SAVE %s)';
 
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
-                    currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
+                var frequencyUnit = frequencyData[optionValue].frequency_unit,
+                    frequencyUnitType = frequencyData[optionValue].frequency_unit_type,
+                    calculatedUnit = this.getCalculatedUnit(frequencyUnit, frequencyUnitType);
+
+                currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
                 if (changeType != 'all') {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
 
-                productQty = frequencyData[optionValue]['preset_qty'] ? 1 : productQty;
-                if (this.getSavingsCalculationType()) {
+                if (this.getSavingsCalculationType() == 2) {
+                    discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * productQty;
+                } else if (this.getSavingsCalculationType() == 1) {
                     discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
                 } else {
                     discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
                 }
 
                 if (discount > 0) {
+                    if (frequencyUnitType == 5) {
+                        saveString = '(SAVE ~ %s)'
+                    }
                     discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
-                    frequencyLabel += '  ' + $.mage.__('(SAVE %s)').replace('%s', discount);
+                    frequencyLabel += '  ' + $.mage.__(saveString).replace('%s', discount);
                 }
 
                 return frequencyLabel;
             }
+        },
+
+        /**
+         * Returns calculated frequency unit.
+         *
+         * @param {number} frequencyUnit
+         * @param {number} frequencyUnitType
+         * @returns {number}
+         */
+        getCalculatedUnit: function (frequencyUnit, frequencyUnitType) {
+            var result = 0;
+            if (frequencyUnitType == 3) {
+                //type day
+                result = frequencyUnit;
+            } else if (frequencyUnitType == 5) {
+                //type month
+                result = frequencyUnit * 30;
+            }
+
+            return result;
         },
 
         /**
@@ -249,7 +277,7 @@ define([
          *
          * @returns {*}
          */
-        getFrequencyData: function() {
+        getFrequencyData: function () {
             var result,
                 currentItemData = this.getCurrentItemData();
 
@@ -265,9 +293,9 @@ define([
          *
          * @returns {*}
          */
-        getProductPrice: function() {
+        getProductPrice: function () {
             var result,
-            currentItemData = this.getCurrentItemData();
+                currentItemData = this.getCurrentItemData();
 
             if (currentItemData) {
                 result = currentItemData.product_price;
@@ -283,7 +311,7 @@ define([
          * @param optionValue
          * @returns bool|number
          */
-        issetFrequencyPrice: function(frequencyData, optionValue) {
+        issetFrequencyPrice: function (frequencyData, optionValue) {
             var currentItemData = this.getCurrentItemData(),
                 issetFrequencyPrice;
 
@@ -303,7 +331,7 @@ define([
          * @param optionValue
          * @returns number|string
          */
-        getCurrentFrequencyPrice: function(frequencyData, optionValue) {
+        getCurrentFrequencyPrice: function (frequencyData, optionValue) {
             var price,
                 currentItemData = this.getCurrentItemData();
 
@@ -323,7 +351,7 @@ define([
          * @param currentItemData
          * @returns {boolean}
          */
-        frequencyIsInitial: function(optionValue, currentItemData) {
+        frequencyIsInitial: function (optionValue, currentItemData) {
             var initialFrequencyId = currentItemData.billing_frequency;
 
             return (initialFrequencyId * 1 == optionValue * 1);
@@ -334,7 +362,7 @@ define([
          *
          * @returns {Array}
          */
-        getCurrentItemData: function() {
+        getCurrentItemData: function () {
             var result = [];
             if (this.parentForm) {
                 var parent = registry.get(this.parentForm);
@@ -351,7 +379,7 @@ define([
          *
          * @returns {*}
          */
-        getPriceFormat: function() {
+        getPriceFormat: function () {
             var priceFormat = null;
             if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
                 priceFormat = $.parseJSON(this.priceFormat);
@@ -365,12 +393,12 @@ define([
          *
          * @return void
          */
-        changeItemPriceLabel: function() {
+        changeItemPriceLabel: function () {
             this.setDiscountLabel('all');
 
             var priceLabel = '',
                 parentForm = registry.get(this.parentForm),
-                priceComponent = registry.get('dataScope = ' + parentForm.dataScope +'.price'),
+                priceComponent = registry.get('dataScope = ' + parentForm.dataScope + '.price'),
                 priceFormat = this.getPriceFormat(),
                 currentItemData = this.getCurrentItemData(),
                 frequencyData = this.getFrequencyData(),
@@ -401,7 +429,7 @@ define([
                 noFormatInitialFee = Number(currentItemFrequencyData.no_format_initial_fee);
                 price = Number(currentItemFrequencyData.price);
                 trialPrice = Number(currentItemFrequencyData.trial_price);
-                frequencyUnit = currentItemFrequencyData.frequency_unit;
+                frequencyUnit = currentItemFrequencyData.frequency_unit_string;
 
                 startSum = isTrial ? trialPrice : price;
                 startSum = presetQty ? startSum : startSum * qty;
@@ -458,7 +486,7 @@ define([
          * @param {string} className
          * @returns {string}
          */
-        addContainer: function(text, className) {
+        addContainer: function (text, className) {
             return '<span class="' + className + '">' + text + '</span>';
         }
     });

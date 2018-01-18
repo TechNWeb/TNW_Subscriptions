@@ -208,7 +208,7 @@ class Configurable extends Base
                                 'formElement' => UiContainer::NAME,
                                 'componentType' => UiContainer::NAME,
                                 'component' => 'TNW_Subscriptions/js/components/options-button',
-                                'additionalClasses' => 'edit-options-button action-advanced',
+                                'additionalClasses' => 'edit-options-button action-advanced action-additional',
                                 'additionalForGroup' => true,
                                 'displayAsLink' => true,
                                 'title' => '[' . __('Edit options') . ']',

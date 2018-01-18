@@ -6,13 +6,14 @@
 
 /* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
 ?>
+<?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container"
      data-mage-init='{"tnwSubscribeContainer":{
         "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
         "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
         "canShowSubscribePriceBlock" : "true",
         "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
-        "productPrice" : "<?php echo $block->getProduct()->getPrice() ?>"
+        "product" : <?php echo $block->getProductDataArray() ?>
     }}'
 >
     <div class="fieldset">
@@ -34,8 +35,11 @@
                             <?php if (isset($option['preset_qty'])): ?>
                                 data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
                             <?php endif ?>
-                            <?php if (isset($option['frequency_price'])): ?>
-                                data-frequency-price="<?php echo $option['frequency_price'] * 1 ?>"
+                            <?php if (isset($option['frequency_unit'])): ?>
+                                data-frequency-unit="<?php echo $option['frequency_unit'] * 1 ?>"
+                            <?php endif ?>
+                            <?php if (isset($option['frequency_unit_type'])): ?>
+                                data-frequency-unit-type="<?php echo $option['frequency_unit_type'] * 1 ?>"
                             <?php endif ?>
                         />
                         <label class="label"
