@@ -217,6 +217,7 @@ class Form extends AbstractDataProvider
                                     'priceFormat' => $this->getPriceFormatData(),
                                     'addbefore' => $this->getCurrentCurrencySymbol(),
                                     'template' => 'TNW_Subscriptions/form/subscription-profile/checkbox-set',
+                                    'currencySymbol' => $this->getCurrentCurrencySymbol(),
                                 ],
                             ],
                         ],
@@ -642,14 +643,14 @@ class Form extends AbstractDataProvider
      */
     protected function getSavingsCalculation($productId = null)
     {
-        $productPrice = null;
+        $result = null;
         $productId = $productId ?: $this->getRequestProductId();
         if ($productId) {
             $product = $this->formContext->getProductRepository()->getById($productId);
-            $productPrice = $product->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+            $result = $this->getSavingsCalculationType($product);
         }
 
-        return $productPrice;
+        return $result;
     }
 
     /**
@@ -745,12 +746,23 @@ class Form extends AbstractDataProvider
         ProductBillingFrequencyInterface $frequency
     ) {
         $billingFrequencyId = $frequency->getBillingFrequencyId();
-
-        return [
+        $result = [
             'price' => $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject),
             'preset_qty' => $frequency->getPresetQty(),
             'initial_fee' => $this->getInitialFee($billingFrequencyId, $productDataObject->getChildProductId()),
         ];
+
+        $frequencyData = [];
+        $billingFrequency = $this->formContext->getFrequencyRepository()->getById($billingFrequencyId);
+
+        if ($billingFrequency) {
+            $frequencyData = [
+                'frequency_unit' => $billingFrequency->getFrequency(),
+                'frequency_unit_type' => $billingFrequency->getUnit(),
+            ];
+        }
+
+        return array_merge($result, $frequencyData);
    }
 
     /**
@@ -804,5 +816,17 @@ class Form extends AbstractDataProvider
         }
 
         return $result;
+    }
+
+    /**
+     * Returns product savings calculation type.
+     *
+     * @param MagentoProduct $product
+     * @return int
+     */
+    protected  function getSavingsCalculationType(MagentoProduct $product)
+    {
+        return $this->formContext->getSavingsCalculation()
+            ->getSavingsCalculationType($product);
     }
 }

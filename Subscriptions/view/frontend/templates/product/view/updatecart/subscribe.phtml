@@ -37,6 +37,12 @@
                             <?php if (isset($option['frequency_price'])): ?>
                                 data-frequency-price="<?php echo $option['frequency_price'] * 1 ?>"
                             <?php endif ?>
+                            <?php if (isset($option['frequency_unit'])): ?>
+                                data-frequency-unit="<?php echo $option['frequency_unit'] * 1 ?>"
+                            <?php endif ?>
+                            <?php if (isset($option['frequency_unit_type'])): ?>
+                                data-frequency-unit-type="<?php echo $option['frequency_unit_type'] * 1 ?>"
+                            <?php endif ?>
                         />
                         <label class="label"
                                for="billing_frequency_<?php echo $option['value'] ?>"
