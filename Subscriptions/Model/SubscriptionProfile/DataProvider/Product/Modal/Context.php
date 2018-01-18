@@ -17,6 +17,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
@@ -88,6 +89,13 @@ class Context implements ContextInterface
     private $unitType;
 
     /**
+     * Product savings calculation type manager.
+     *
+     * @var SavingsCalculation
+     */
+    private $savingsCalculation;
+
+    /**
      * @param ProductRepositoryInterface $productRepository
      * @param RecurringOptionRepository $repository
      * @param BillingFrequencyRepository $frequencyRepository
@@ -97,6 +105,7 @@ class Context implements ContextInterface
      * @param CurrencyFactory $currencyFactory
      * @param ImageHelper $imageHelper
      * @param TrialLengthUnitType $unitType
+     * @param SavingsCalculation $savingsCalculation
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -107,7 +116,8 @@ class Context implements ContextInterface
         QuoteSessionInterface $sessionQuote,
         CurrencyFactory $currencyFactory,
         ImageHelper $imageHelper,
-        TrialLengthUnitType $unitType
+        TrialLengthUnitType $unitType,
+        SavingsCalculation $savingsCalculation
     ) {
         $this->productRepository = $productRepository;
         $this->recurringOptionRepository = $repository;
@@ -118,6 +128,7 @@ class Context implements ContextInterface
         $this->currencyFactory = $currencyFactory;
         $this->imageHelper = $imageHelper;
         $this->unitType = $unitType;
+        $this->savingsCalculation = $savingsCalculation;
     }
 
     /**
@@ -293,7 +304,7 @@ class Context implements ContextInterface
                     ['type' => 'small_image', 'width' => '240', 'height' => '240']
                 );
 
-                if ($imageHelper->getUrl()  == $imageHelper->getDefaultPlaceholderUrl()) {
+                if ($imageHelper->getUrl() == $imageHelper->getDefaultPlaceholderUrl()) {
                     $imageHelper->init(
                         $item->getMagentoProduct(),
                         $imageId,
@@ -308,5 +319,15 @@ class Context implements ContextInterface
         }
 
         return $imageHelper;
+    }
+
+    /**
+     * Returns savings calculation type manager.
+     *
+     * @return SavingsCalculation
+     */
+    public function getSavingsCalculation()
+    {
+        return $this->savingsCalculation;
     }
 }

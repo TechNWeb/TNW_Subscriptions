@@ -50,6 +50,13 @@ define([
             }
 
             return qty;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        getSavingsCalculationType: function () {
+            return  this.source.data.savings_calculation;
         }
     })
 });

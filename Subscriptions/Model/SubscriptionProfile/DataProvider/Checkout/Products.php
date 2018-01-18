@@ -334,7 +334,7 @@ class Products extends ModifyForm
             $productDataObject->getChildProductId()
         );
         $data['trial_price'] = $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE) ?: 0;
-        $data['frequency_unit'] = $this->descriptionCreator->getFrequencyWithUnit($billingFrequencyId);
+        $data['frequency_unit_string'] = $this->descriptionCreator->getFrequencyWithUnit($billingFrequencyId);
 
         return $data;
     }

@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 
 /**
  * Subscribe product block instance
@@ -54,7 +55,13 @@ class Subscribe extends View
     private $subscriptionProductViewConfig;
 
     /**
-     * Subscribe constructor.
+     * Savings calculation manager.
+     *
+     * @var SavingsCalculation
+     */
+    private $savingsCalculation;
+
+    /**
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
@@ -69,6 +76,7 @@ class Subscribe extends View
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
+     * @param SavingsCalculation $savingsCalculation
      * @param array $data
      */
     public function __construct(
@@ -86,12 +94,14 @@ class Subscribe extends View
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
+        SavingsCalculation $savingsCalculation,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
+        $this->savingsCalculation = $savingsCalculation;
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
@@ -182,11 +192,13 @@ class Subscribe extends View
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
             $label = $frequency->getLabel();
-            $frequencyPrice = (int)$productFrequency->getPrice();
+            $frequencyPrice = $productFrequency->getPrice();
             $data = [
                 'label' => $label,
                 'value' => $productFrequency->getBillingFrequencyId(),
                 'frequency_price' => $frequencyPrice,
+                'frequency_unit' => $frequency->getFrequency(),
+                'frequency_unit_type' => $frequency->getUnit(),
                 'is_default' => $productFrequency->getDefaultBillingFrequency(),
             ];
 
@@ -236,7 +248,7 @@ class Subscribe extends View
      */
     public function getSavingCalculationType()
     {
-        return (int) $this->getProduct()->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION);
+        return $this->savingsCalculation->getSavingsCalculationType($this->getProduct());
     }
 
     /**

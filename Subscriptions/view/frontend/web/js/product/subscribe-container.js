@@ -133,31 +133,58 @@ define([
          * Update frequency label depends from qty.
          */
         _updateFrequencyLabel: function () {
-            var frequencies = $(this.options.frequencyInputSelector),
+            var widget = this,
+                frequencies = $(this.options.frequencyInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
                 savingsCalculationType = parseInt(this.options.savingsCalculationType),
                 productPrice = this.options.productPrice;
 
             $.each(frequencies, function (key, option) {
-                var currentFrequencyPrice =  $(option).data('frequency-price');
+                var currentFrequencyPrice =  $(option).data('frequency-price'),
+                    frequencyUnit = $(option).data('frequency-unit'),
+                    frequencyUnitType = $(option).data('frequency-unit-type'),
+                    calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
+                    saveString = frequencyUnitType === 5 ? '(SAVE ~%s)' : '(SAVE %s)';
                 $.each(option.labels, function (key, label) {
                     var resultLabel = $(label).data('default-label'),
                         discount = 0;
 
-                    if (savingsCalculationType) {
+                    if (savingsCalculationType === 2) {
+                        discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * qtyValue;
+                    } else if (savingsCalculationType === 1) {
                         discount = parseFloat(productPrice) * qtyValue - parseFloat(currentFrequencyPrice);
                     } else {
                         discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * qtyValue;
                     }
 
                     if (discount > 0){
-                        resultLabel += '  ' + $t('(SAVE %s)').replace('%s', utils.formatPrice(discount, {}));
+                        resultLabel += '  ' + $t(saveString).replace('%s', utils.formatPrice(discount, {}));
                     }
 
                     label.innerText = resultLabel;
                 });
             });
+        },
+
+        /**
+         * Returns calculated frequency unit.
+         *
+         * @param {number} frequencyUnit
+         * @param {number} frequencyUnitType
+         * @returns {number}
+         */
+        getCalculatedUnit: function (frequencyUnit, frequencyUnitType) {
+            var result = 0;
+            if (frequencyUnitType === 3) {
+                //type day
+                result = frequencyUnit;
+            }else if (frequencyUnitType === 5) {
+                //type month
+                result = frequencyUnit * 30;
+            }
+
+            return result;
         },
 
         /**

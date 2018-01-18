@@ -175,7 +175,7 @@ class ModifyForm extends Form
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
                     ],
-                    'savings_calculation' => $product->getData(Attribute::SUBSCRIPTION_SAVINGS_CALCULATION),
+                    'savings_calculation' => $this->getSavingsCalculationType($product),
                 ];
 
                 /** @var ModifierInterface $modifier */
