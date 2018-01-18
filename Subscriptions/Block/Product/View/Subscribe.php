@@ -11,6 +11,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View;
+use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -447,10 +448,10 @@ class Subscribe extends View
     /**
      * Returns array of product dilling frequency prices.
      *
-     * @param array$productDataObject
+     * @param DataObject $productDataObject
      * @return array
      */
-    protected function getFrequencyPricesByProduct(array $productDataObject)
+    protected function getFrequencyPricesByProduct(DataObject $productDataObject)
     {
         $result = [];
         $productBillingFrequencies = $this->frequencyOptionRepository
