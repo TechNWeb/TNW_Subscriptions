@@ -14,6 +14,9 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
@@ -51,10 +54,11 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
+     * @param SavingsCalculation $savingsCalculation
+     * @param ProductTypeManagerResolver $subscriptionTypeResolver
+     * @param PriceCalculator $priceCalculator
      * @param ProfileManager $profileManager
      * @param array $data
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Context $context,
@@ -71,14 +75,17 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
+        SavingsCalculation $savingsCalculation,
+        ProductTypeManagerResolver $subscriptionTypeResolver,
+        PriceCalculator $priceCalculator,
         ProfileManager $profileManager,
         array $data = []
     ) {
         $this->profileManager = $profileManager;
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
-            $config, $frequencyOptionRepository, $frequencyRepository, $data
-        );
+            $config, $frequencyOptionRepository, $frequencyRepository, $savingsCalculation, $subscriptionTypeResolver,
+            $priceCalculator, $data);
     }
 
     /**
@@ -103,7 +110,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     {
         $subProduct = $this->getSubscriptionProduct();
 
-        return $subProduct ? $subProduct->getId()  : '';
+        return $subProduct ? $subProduct->getId() : '';
     }
 
     /**
