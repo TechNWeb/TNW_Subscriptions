@@ -9,6 +9,7 @@ namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Data provider for "Subscription Options" tab
@@ -29,15 +30,26 @@ class Composite extends AbstractModifier
     protected $objectManager;
 
     /**
+     * Subscriptions config model.
+     *
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * Composite constructor.
      * @param ObjectManagerInterface $objectManager
+     * @param Config $config
      * @param array $modifiers
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
+        Config $config,
         array $modifiers = []
     ) {
         $this->objectManager = $objectManager;
         $this->modifiers = $modifiers;
+        $this->config = $config;
     }
 
     /**
@@ -45,16 +57,20 @@ class Composite extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        $meta = $this->updateSubscriptionsTab($meta);
-        foreach ($this->modifiers as $bundleClass) {
-            /** @var ModifierInterface $bundleModifier */
-            $bundleModifier = $this->objectManager->get($bundleClass);
-            if (!$bundleModifier instanceof ModifierInterface) {
-                throw new \InvalidArgumentException(
-                    'Type "' . $bundleClass . '" is not an instance of ' . ModifierInterface::class
-                );
+        if ($this->config->isSubscriptionsActive()) {
+            $meta = $this->updateSubscriptionsTab($meta);
+            foreach ($this->modifiers as $bundleClass) {
+                /** @var ModifierInterface $bundleModifier */
+                $bundleModifier = $this->objectManager->get($bundleClass);
+                if (!$bundleModifier instanceof ModifierInterface) {
+                    throw new \InvalidArgumentException(
+                        'Type "' . $bundleClass . '" is not an instance of ' . ModifierInterface::class
+                    );
+                }
+                $meta = $bundleModifier->modifyMeta($meta);
             }
-            $meta = $bundleModifier->modifyMeta($meta);
+        } else {
+            unset($meta['subscription-options']);
         }
 
         return $meta;
@@ -65,15 +81,17 @@ class Composite extends AbstractModifier
      */
     public function modifyData(array $data)
     {
-        foreach ($this->modifiers as $bundleClass) {
-            /** @var ModifierInterface $bundleModifier */
-            $bundleModifier = $this->objectManager->get($bundleClass);
-            if (!$bundleModifier instanceof ModifierInterface) {
-                throw new \InvalidArgumentException(
-                    'Type "' . $bundleClass . '" is not an instance of ' . ModifierInterface::class
-                );
+        if ($this->config->isSubscriptionsActive()) {
+            foreach ($this->modifiers as $bundleClass) {
+                /** @var ModifierInterface $bundleModifier */
+                $bundleModifier = $this->objectManager->get($bundleClass);
+                if (!$bundleModifier instanceof ModifierInterface) {
+                    throw new \InvalidArgumentException(
+                        'Type "' . $bundleClass . '" is not an instance of ' . ModifierInterface::class
+                    );
+                }
+                $data = $bundleModifier->modifyData($data);
             }
-            $data = $bundleModifier->modifyData($data);
         }
 
         return $data;
