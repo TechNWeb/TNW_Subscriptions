@@ -152,6 +152,7 @@ define([
                 var currentFrequencyPrice = widget.getFrequencyPrice(parseInt($(option).val())),
                     productPrice = widget.getProductPrice(),
                     frequencyUnit = $(option).data('frequency-unit'),
+                    presetQty = $(option).data('preset-qty'),
                     frequencyUnitType = $(option).data('frequency-unit-type'),
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
                     saveString = '(SAVE %s)';
@@ -159,6 +160,7 @@ define([
                     var resultLabel = $(label).data('default-label'),
                         discount = 0;
 
+                    qtyValue = presetQty ? presetQty : qtyValue;
                     if (savingsCalculationType === 2) {
                         if (frequencyUnitType == 5) {
                             saveString = '(SAVE ~ %s)'
