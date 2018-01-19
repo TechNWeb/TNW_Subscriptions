@@ -97,7 +97,10 @@
   }
 
   .registration-fieldset .fieldset {
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
     display: inline-flex;
+    width: -moz-available;
     width: -webkit-fill-available;
     margin-bottom: 5%;
 
@@ -114,8 +117,15 @@
       border: 1px solid #ccc;
       margin-right: 6%;
 
-      .control-spaces {
+      .block-content {
+        margin-top: 10%;
+      }
+
+      .control {
         margin-top: 5%;
+      }
+
+      .control-spaces {
         margin-left: 5%;
         margin-right: 5%;
       }
@@ -125,7 +135,7 @@
       }
 
       .action.primary {
-        margin-left: 25%;
+        left: 25%;
         width: 50%;
         height: 45px;
         position: absolute;
@@ -136,6 +146,14 @@
         float: right;
         text-decoration: underline;
         margin-top: 3%;
+      }
+    }
+
+    .new-customer {
+      .control-spaces {
+        margin-top: 5%;
+        margin-left: 5%;
+        margin-right: 5%;
       }
     }
   }
@@ -413,6 +431,12 @@
   .fieldset-wrapper-content {
     position: relative;
     height: 100%;
+
+    .middle-container {
+      .fieldset-wrapper-content {
+        position: static;
+      }
+    }
   }
 
   /* "action-editor" button */
@@ -482,7 +506,10 @@
     padding: 2rem 0;
 
     .fieldset {
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
       display: inline-flex;
+      width: -moz-available;
       width: -webkit-fill-available;
       height: 100%;
     }
@@ -767,7 +794,7 @@
         font-size: 16px;
         position: absolute;
         bottom: 0;
-        right: 0;
+        right: 1.5rem;
       }
     }
 
@@ -1283,7 +1310,10 @@
           height: 100%;
 
           .fieldset {
+            display: -webkit-inline-flex;
+            display: -ms-inline-flexbox;
             display: inline-flex;
+            width: -moz-available;
             width: -webkit-fill-available;
 
             .middle-container {
@@ -1498,6 +1528,19 @@
           cursor: pointer;
         }
       }
+    }
+
+    .action-additional {
+      line-height: 1.36;
+      padding: 0;
+      color: #007bdb;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      display: inline;
+      font-weight: 400;
+      border-radius: 0;
+      box-shadow: none;
     }
   }
 
