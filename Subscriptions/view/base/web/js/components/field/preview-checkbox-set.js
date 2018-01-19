@@ -215,6 +215,9 @@ define([
 
                 productQty = presetQty ? presetQty : productQty;
                 if (this.getSavingsCalculationType() === 2) {
+                    if (frequencyUnitType == 5) {
+                        saveString = '(SAVE ~ %s)'
+                    }
                     discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * productQty;
                 } else if (this.getSavingsCalculationType() === 1) {
                     discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
@@ -223,9 +226,6 @@ define([
                 }
 
                 if (discount > 0) {
-                    if (frequencyUnitType == 5) {
-                        saveString = '(SAVE ~ %s)'
-                    }
                     discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
                     frequencyLabel += '  ' + $.mage.__(saveString).replace('%s', discount);
                 }

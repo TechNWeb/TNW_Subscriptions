@@ -8,26 +8,41 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Backend\Block\Widget\Context;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\Config;
 
+/**
+ * Base class for buttons.
+ */
 abstract class GenericButton
 {
-    /** @var Context */
+    /**
+     * @var Context
+     */
     protected $context;
-    /** @var StepPool */
+
+    /**
+     * @var StepPool
+     */
     protected $stepPool;
 
     /**
-     * GenericButton constructor.
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * @param Context $context
      * @param StepPool $stepPool
+     * @param Config $config
      */
     public function __construct(
         Context $context,
-        StepPool $stepPool
-    )
-    {
+        StepPool $stepPool,
+        Config $config
+    ) {
         $this->context = $context;
         $this->stepPool = $stepPool;
+        $this->config = $config;
     }
 
     /**

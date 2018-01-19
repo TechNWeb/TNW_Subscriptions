@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
+use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
@@ -57,7 +58,8 @@ class ChangeHistory extends BaseFormModifier
                         'data' => [
                             'config' => [
                                 'autoRender' => true,
-                                'componentType' => 'insertListing',
+                                'componentType' => Container::NAME,
+                                'component' => 'TNW_Subscriptions/js/grid/history-listing',
                                 'dataScope' => 'change_history_listing',
                                 'externalProvider' => self::CHANGE_HISTORY_LISTING . '.' . self::CHANGE_HISTORY_LISTING . '_data_source',
                                 'selectionsProvider' => self::CHANGE_HISTORY_LISTING . '.'.self::CHANGE_HISTORY_LISTING . 'tnw_subscriptionprofile_change_history_columns.entity_id',
@@ -73,7 +75,7 @@ class ChangeHistory extends BaseFormModifier
                                     'profileId' => '${ $.externalProvider }:params.subscription_profile_id'
                                 ],
                                 'listens' => [
-                                    'tnw_subscriptionprofile_form.areas.change_history:active' => 'reload',
+                                    'tnw_subscriptionprofile_form.areas.change_history:active' => 'forceRender',
                                 ]
                             ],
                         ],
