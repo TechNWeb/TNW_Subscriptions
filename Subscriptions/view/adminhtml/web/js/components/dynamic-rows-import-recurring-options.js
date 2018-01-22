@@ -143,15 +143,6 @@ define([
         },
 
         /**
-         * {inheritdoc}
-         */
-        deleteRecord: function (index, recordId) {
-            this._super();
-            this.hidePager();
-            this.checkAddingBillingFrequency(index);
-        },
-
-        /**
          * Hide pager if there are no items in grid.
          */
         hidePager: function() {
@@ -184,6 +175,63 @@ define([
             if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
                 button.set('disabled', true);
             }
+        },
+
+        /**
+         * Rewrite whole method, because in magento version (EE 2.2.0) method is updated
+         * and not suitable for our component
+         *
+         * {inheritdoc}
+         */
+        deleteRecord: function (index, recordId) {
+            var recordInstance,
+                lastRecord,
+                recordsData,
+                childs;
+
+            if (this.deleteProperty) {
+                recordInstance = _.find(this.elems(), function (elem) {
+                    return elem.index === index;
+                });
+                recordInstance.destroy();
+                this.elems([]);
+                this._updateCollection();
+                this.removeMaxPosition();
+                this.recordData()[recordInstance.index][this.deleteProperty] = this.deleteValue;
+                this.recordData.valueHasMutated();
+                childs = this.getChildItems();
+
+                if (childs.length > this.elems().length) {
+                    this.addChild(false, childs[childs.length - 1][this.identificationProperty], false);
+                }
+            } else {
+                this.update = true;
+
+                if (~~this.currentPage() === this.pages()) {
+                    lastRecord =
+                        _.findWhere(this.elems(), {
+                            index: this.startIndex + this.getChildItems().length - 1
+                        }) ||
+                        _.findWhere(this.elems(), {
+                            index: (this.startIndex + this.getChildItems().length - 1).toString()
+                        });
+
+                    lastRecord.destroy();
+                }
+
+                this.removeMaxPosition();
+                recordsData = this._getDataByProp(recordId);
+                this._updateData(recordsData);
+                this.update = false;
+            }
+
+            if (this.pages() < ~~this.currentPage()) {
+                this.currentPage(this.pages());
+            }
+
+            this._sort();
+            this.hidePager();
+            this.checkAddingBillingFrequency(index);
         }
     });
 });
