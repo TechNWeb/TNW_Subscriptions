@@ -18,7 +18,10 @@ define(
         return Component.extend({
             defaults: {
                 addPaymentValidation: false,
-                paymentContainer: ''
+                paymentContainer: '',
+                listens: {
+                    responseData: 'processResponseData'
+                },
             },
 
             /** @inheritdoc */
@@ -46,6 +49,11 @@ define(
                 return this;
             },
 
+            /**
+             * Sends request to payment gateway.
+             *
+             * @returns {boolean}
+             */
             beforeSubmit: function () {
                 var current = this,
                     needShowRequiredError = true,
@@ -56,8 +64,6 @@ define(
                     validForm = false;
                     return validForm;
                 }
-
-
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
                         switch (code) {
@@ -83,9 +89,18 @@ define(
                     }
                 }
 
+                if (validForm) {
+                    this.updateButtons(true);
+                }
+
                 return validForm;
             },
 
+            /**
+             * Saves payment step form after response from gateways.
+             *
+             * @param {array} errors
+             */
             triggerSave: function (errors) {
                 var current = this;
                 _.each(this.source.data.payment, function (fields, code) {
@@ -93,6 +108,7 @@ define(
                         if (errors && errors.length > 0) {
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
+                            this.updateButtons(false);
                             current.hideLoader();
                             return;
                         }
@@ -109,6 +125,27 @@ define(
                         current.hideLoader();
                     }
                 });
+            },
+
+            /**
+             * Enables/disables checkout buttons.
+             *
+             * @param {bool} flag
+             */
+            updateButtons:function (flag) {
+                registry.get('index = next_step').disabled(flag);
+                registry.get('index = bottom_next_step').disabled(flag);
+            },
+
+            /**
+             * Processes response data.
+             *
+             * @param {Object} data
+             */
+            processResponseData: function (data) {
+                if (data.error) {
+                    this.updateButtons(false);
+                }
             },
 
             /**
