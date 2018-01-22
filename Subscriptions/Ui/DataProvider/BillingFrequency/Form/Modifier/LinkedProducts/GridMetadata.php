@@ -416,6 +416,6 @@ class GridMetadata
     {
         $url = $this->urlFactory->create();
 
-        return $url->getUrl('catalog/product/edit', ['id' => '?']);
+        return $url->getUrl('catalog/product/edit', ['id' => 'linked_id']);
     }
 }
