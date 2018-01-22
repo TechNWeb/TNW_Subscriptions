@@ -31,7 +31,7 @@ define([
             var productId = uiRegistry.get('index = linked').source.data.links.linked[rowIndex].id;
 
             this.url = typeof this.imports.url == "undefined"
-                ? '': this.imports.url.replace('?', productId);
+                ? '': this.imports.url.replace('linked_id', productId);
 
             return this;
         }
