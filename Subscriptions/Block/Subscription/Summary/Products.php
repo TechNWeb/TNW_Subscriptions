@@ -232,6 +232,7 @@ class Products extends BaseSummary
                     : 0,
                 'initialFee' => $initialFee > 0,
                 'price' => $price,
+                'isVirtual' => $profile->getIsVirtual(),
             ]
         ]);
     }
