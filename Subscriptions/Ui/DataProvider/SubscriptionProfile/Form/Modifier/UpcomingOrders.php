@@ -94,7 +94,7 @@ class UpcomingOrders extends BaseFormModifier
 
         $profile = $this->getProfile();
         if ($profile && $profile->getGenerateQuotesState() == SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE) {
-            $messages[] = __('We are finalizing the subscription profile. Note, some information from the dashboard may not give the final representation of the customer profile.');
+            $messages[] = __('We are finalizing the subscription profile. NOTE: Not all upcoming order are displayed, check back later to see more date on this tab.');
         }
         if ($profile && $profile->getProductNeedRecollect()) {
             $messages[] = $profile->getShippingBillingChangesMadeMessageForUpcomingOrders();
