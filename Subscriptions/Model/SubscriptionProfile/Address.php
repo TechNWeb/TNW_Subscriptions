@@ -438,7 +438,7 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
                 $this->setOrigData($field, implode("\n", $this->getOrigData($field)));
             }
 
-            if (!$this->dataHasChangedFor($field) || !$this->getOrigData($field)) {
+            if (!$this->dataHasChangedFor($field)) {
                 continue;
             }
 
@@ -448,8 +448,13 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
             $oldValue = (string)$this->getOrigData($field);
             $newValue = (string)$this->getData($field);
 
-            $message = __('%1 %2 changed from  <b>%3</b> to <b>%4</b>',
-                $type, $fieldName, $oldValue, $newValue);
+            if (!$this->getOrigData($field)) {
+                $message = __('%1 %2 changed to <b>%3</b>',
+                    $type, $fieldName, $newValue);
+            } else {
+                $message = __('%1 %2 changed from  <b>%3</b> to <b>%4</b>',
+                    $type, $fieldName, $oldValue, $newValue);
+            }
 
             $this->historyLogger->log($message, $this->getProfileId());
         }
