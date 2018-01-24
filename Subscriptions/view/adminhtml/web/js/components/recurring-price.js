@@ -60,6 +60,12 @@ define([
             var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount');
             var discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
 
+            //if price field is disabled - don't display discount fields
+            if (!productPriceComponent || productPriceComponent.disabled()) {
+                offerDiscountComponent.checked(false);
+                offerDiscountComponent.visible(false);
+            }
+
             if (lockPriceComponent.checked()) {         // Product price is locked
                 recurringPrice = productPrice;
 
