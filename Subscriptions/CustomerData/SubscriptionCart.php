@@ -49,7 +49,7 @@ class SubscriptionCart implements SectionSourceInterface
         $subQuotes = $this->session->getSubQuotes();
 
         foreach ($subQuotes as $quote) {
-            $itemsQty += (int)$quote->getItemsQty();
+            $itemsQty += (int)$quote->getAllVisibleItems();
         }
 
         if ($itemsQty > 0) {
