@@ -354,6 +354,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Returns shipping info block html.
+     *
      * @return string
      */
     public function getShippingInfoHtml()
@@ -370,6 +372,18 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Check if it necessary to show shipping details block.
+     *
+     * @return bool
+     */
+    public function canShowShippingDetailsBlock()
+    {
+        return !(bool)$this->getSubscriptionProfile()->getIsVirtual();
+    }
+
+    /**
+     * Returns billing info block html.
+     *
      * @return string
      */
     public function getBillingInfoHtml()
@@ -378,6 +392,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Returns payment details block html.
+     *
      * @return string
      */
     public function getPaymentDetailsHtml()
@@ -386,6 +402,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Returns products block html.
+     *
      * @return string
      */
     public function getProductsHtml()
@@ -409,6 +427,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Returns danger zone block html.
+     *
      * @return string
      */
     public function getDangerZoneHtml()
@@ -417,6 +437,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
+     * Returns subscription messages pool.
+     *
      * @return MessagePool
      */
     public function getMessagePool()

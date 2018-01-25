@@ -22,12 +22,16 @@
     <?php echo $block->getTabMessagesHtml(); ?>
     <div class="grid-row">
         <div class="shipping-info-content grid-col2-lg">
-            <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
-            <div id="shipping-info-edit" class="hidden"><?php echo $block->getShippingInfoEditHtml() ?></div>
+            <?php if ($block->canShowShippingAddressBlock()):?>
+                <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
+                <div id="shipping-info-edit" class="hidden"><?php echo $block->getShippingInfoEditHtml() ?></div>
+            <?php endif;?>
         </div>
         <div class="shipping-details-content grid-col2-lg">
-            <?php echo $block->getShippingDetailsViewHtml() ?>
-            <div id="shipping-details-edit" class="hidden"><?php echo $block->getShippingDetailsEditHtml() ?></div>
+            <?php if ($block->canShowShippingDetailsBlock()):?>
+                <?php echo $block->getShippingDetailsViewHtml() ?>
+                <div id="shipping-details-edit" class="hidden"><?php echo $block->getShippingDetailsEditHtml() ?></div>
+            <?php endif;?>
         </div>
     </div>
 </div>

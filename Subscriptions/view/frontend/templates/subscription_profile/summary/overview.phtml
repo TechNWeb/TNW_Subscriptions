@@ -15,7 +15,11 @@
         </div>
     </div>
     <div class="summary-item subscription-ship-info"><?php echo $block->getShippingInfoHtml() ?></div>
-    <div class="summary-item subscription-ship-details"><?php echo $block->getShippingDetailsHtml() ?></div>
+    <?php if ($block->canShowShippingDetailsBlock()):?>
+        <div class="summary-item subscription-ship-details">
+        <?php echo $block->getShippingDetailsHtml() ?>
+    </div>
+    <?php endif;?>
     <div class="clear"></div>
     <div class="summary-item subscription-bill-info"><?php echo $block->getBillingInfoHtml() ?></div>
     <div class="summary-item subscription-payment-details"><?php echo $block->getPaymentDetailsHtml() ?></div>

@@ -133,8 +133,16 @@ define(
              * @param {bool} flag
              */
             updateButtons:function (flag) {
-                registry.get('index = next_step').disabled(flag);
-                registry.get('index = bottom_next_step').disabled(flag);
+                var button = registry.get('index = next_step'),
+                    bottomButton = registry.get('index = bottom_next_step');
+
+                if (button) {
+                    button.disabled(flag);
+                }
+
+                if (bottomButton) {
+                    bottomButton.disabled(flag);
+                }
             },
 
             /**
