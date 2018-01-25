@@ -195,8 +195,13 @@ class Product extends Create
             $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
-            $startOn = isset($productData['start_on']) ?
-                $productData['start_on'] : $product->getData(Attribute::SUBSCRIPTION_START_DATE);
+            $startOn = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
+            if (isset($productData['start_on'])) {
+                $startOn = $productData['start_on'];
+            } elseif ($isTrial) {
+                $startOn = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
+            }
+
             $data = [
                 'qty' => $productData['qty'],
                 'custom_price' => sprintf("%F", $this->getCustomPrice($product, $productData)),
@@ -278,6 +283,7 @@ class Product extends Create
      */
     private function getStartOnDate($startOn)
     {
+        $nowDate = (new \DateTime())->format('Y-m-d');
         switch ($startOn) {
             case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
                 $result = new \DateTime();
@@ -287,8 +293,25 @@ class Product extends Create
                 $result = new \DateTime();
                 $result = $result->format('Y-m-d');
                 break;
+            case StartDateType::FIRST_DAY_OF_THE_MONTH:
+                $result = new \DateTime();
+                $result = $result->format('Y-m-01');
+                if (strtotime($result) < strtotime($nowDate)) {
+                    $result = new \DateTime();
+                    $result->add(new \DateInterval('P1M'));
+                    $result = $result->format('Y-m-01');
+                }
+                break;
+            case StartDateType::ON_15TH_OF_THE_MONTH:
+                $result = new \DateTime();
+                $result = $result->format('Y-m-15');
+                if (strtotime($result) < strtotime($nowDate)) {
+                    $result = new \DateTime();
+                    $result->add(new \DateInterval('P1M'));
+                    $result = $result->format('Y-m-15');
+                }
+                break;
             default:
-                $nowDate = (new \DateTime())->format('Y-m-d');
                 $result = new \DateTime($startOn);
                 $result = $result->format('Y-m-d');
                 if (strtotime($result) < strtotime($nowDate)) {

@@ -19,6 +19,8 @@ class StartDateType extends AbstractSource
     const MOMENT_OF_PURCHASE = 1;
     const DEFINED_BY_CUSTOMER = 2;
     const LAST_DAY_OF_THE_CURRENT_MONTH = 3;
+    const FIRST_DAY_OF_THE_MONTH = 4;
+    const ON_15TH_OF_THE_MONTH = 5;
 
     /**
      * Get options for Start date type.
@@ -40,6 +42,14 @@ class StartDateType extends AbstractSource
             [
                 'value' => self::LAST_DAY_OF_THE_CURRENT_MONTH,
                 'label' => __('Last day of the current month'),
+            ],
+            [
+                'value' => self::FIRST_DAY_OF_THE_MONTH,
+                'label' => __('First day of the current month'),
+            ],
+            [
+                'value' => self::ON_15TH_OF_THE_MONTH,
+                'label' => __('On the 15th of the current month'),
             ],
         ];
 
