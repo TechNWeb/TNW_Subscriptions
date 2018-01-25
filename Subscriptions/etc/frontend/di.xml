@@ -14,6 +14,7 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="products" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
                 <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
+                <item name="shipping" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Shipping</item>
             </argument>
         </arguments>
     </type>

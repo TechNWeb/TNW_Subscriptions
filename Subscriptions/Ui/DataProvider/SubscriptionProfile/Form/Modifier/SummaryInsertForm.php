@@ -120,12 +120,12 @@ class SummaryInsertForm extends BaseFormModifier
      */
     public function modifyMeta(array $meta)
     {
-        $meta = array_merge_recursive(
-            $meta,
-            [
+        $result = [];
+        if ($this->canShowBlock($this->formType)) {
+            $result = [
                 static::SUMMARY_FIELDSET => [
                     'children' => [
-                         $this->formType => $this->getInsertFormModifier()
+                        $this->formType => $this->getInsertFormModifier()
                     ],
                     'arguments' => [
                         'data' => [
@@ -135,8 +135,11 @@ class SummaryInsertForm extends BaseFormModifier
                         ],
                     ],
                 ],
-            ]
-        );
+            ];
+        }
+
+
+        $meta = array_merge_recursive($meta, $result);
 
         return $meta;
     }
@@ -255,5 +258,31 @@ class SummaryInsertForm extends BaseFormModifier
     private function getNextProfileRelation(SubscriptionProfile $profile)
     {
         return $this->profileOrderManager->getNextProfileRelation($profile, false);
+    }
+
+    /**
+     * Check if it necessary to show block.
+     *
+     * @param string $formType
+     * @return bool
+     */
+    private function canShowBlock($formType)
+    {
+        $result = true;
+        switch ($formType) {
+            case self::SHIPPING_METHODS_INSERT_FORM:
+                if ((bool)$this->getProfile()->getIsVirtual()) {
+                    $result = false;
+                }
+                break;
+            case self::SHIPPING_INFORMATION_INSERT_FORM:
+            case self::BILLING_INFORMATION_INSERT_FORM:
+            case self::PAYMENT_METHODS_INSERT_FORM:
+            case self::PRODUCTS_INSERT_FORM:
+            default:
+                break;
+        }
+
+        return $result;
     }
 }

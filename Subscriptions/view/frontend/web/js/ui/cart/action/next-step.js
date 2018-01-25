@@ -39,10 +39,17 @@ define([
          */
         onNextStepClick: function () {
             var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
+            var isVirtual = registry.get('cart').checkoutConfig.isSubscriptionsVirtual;
 
             var activeCode = stepNavigator.getActiveItemCode();
             if (activeCode === 'products' && isLoggedIn) {
-                stepNavigator.navigateTo('shipping');
+                if (isVirtual) {
+                    stepNavigator.navigateTo('billing');
+                } else {
+                    stepNavigator.navigateTo('shipping');
+                }
+            } else if (activeCode === 'shipping' && isVirtual) {
+                stepNavigator.navigateTo('payment');
             } else {
                 var currentStep = stepNavigator.getCurrentStep();
                 if (currentStep.stepActions) {

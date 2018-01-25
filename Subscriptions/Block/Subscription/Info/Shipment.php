@@ -3,6 +3,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Customer\Api\AddressRepositoryInterface;
@@ -177,8 +178,8 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
         foreach ($addressesList as $address) {
             $streetData = [];
             if ($address->getStreet()) {
-                foreach ($address->getStreet() as $key =>$streetValue) {
-                    $streetKey = 'street_' . ($key+1);
+                foreach ($address->getStreet() as $key => $streetValue) {
+                    $streetKey = 'street_' . ($key + 1);
                     $streetData[$streetKey] = $streetValue;
                 }
             }
@@ -194,7 +195,7 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
                 'zip' => $address->getPostcode(),
                 'fax' => $address->getFax(),
                 'vat_id' => $address->getVatId(),
-                'country' =>$address->getCountryId(),
+                'country' => $address->getCountryId(),
             ];
 
             $result[$address->getId()] = array_merge($addressData, $streetData);
@@ -222,5 +223,25 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
     public function getShippingDetailsEditHtml()
     {
         return $this->getChildHtml('customer_shipping_details_edit_form');
+    }
+
+    /**
+     * Check if it necessary to show shipping address block.
+     *
+     * @return bool
+     */
+    public function canShowShippingAddressBlock()
+    {
+        return true;
+    }
+
+    /**
+     * Check if it necessary to show shipping details block.
+     *
+     * @return bool
+     */
+    public function canShowShippingDetailsBlock()
+    {
+        return !(bool)$this->getSubscriptionProfile()->getIsVirtual();
     }
 }
