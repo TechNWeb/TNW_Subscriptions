@@ -41,15 +41,15 @@ class StartDateType extends AbstractSource
             ],
             [
                 'value' => self::LAST_DAY_OF_THE_CURRENT_MONTH,
-                'label' => __('Last day of the current month'),
+                'label' => __('On the last day of the month'),
             ],
             [
                 'value' => self::FIRST_DAY_OF_THE_MONTH,
-                'label' => __('First day of the current month'),
+                'label' => __('First day of the month'),
             ],
             [
                 'value' => self::ON_15TH_OF_THE_MONTH,
-                'label' => __('On the 15th of the current month'),
+                'label' => __('15th of every month'),
             ],
         ];
 
