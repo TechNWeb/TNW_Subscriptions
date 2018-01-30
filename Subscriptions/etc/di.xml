@@ -793,6 +793,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="attributes" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Attributes</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
