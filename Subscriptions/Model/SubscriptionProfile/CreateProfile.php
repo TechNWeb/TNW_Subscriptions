@@ -523,7 +523,7 @@ class CreateProfile extends BaseCreate
         $profiles = [];
         $customer = $this->customerCreator->prepareCustomer();
         $subQuotes = $this->getSubQuotes();
-        $basicPayment = reset($subQuotes)->getPayment();
+        $basicPayment = clone reset($subQuotes)->getPayment();
         /** @var ModelQuote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);

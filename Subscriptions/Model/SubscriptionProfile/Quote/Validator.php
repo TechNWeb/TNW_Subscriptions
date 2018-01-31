@@ -217,6 +217,10 @@ class Validator
                 $result[CreateProfile::NON_UNIQUE]['current_price'] =
                     round($result[CreateProfile::NON_UNIQUE]['current_price'], 2);
             }
+            if (isset($result[CreateProfile::NON_UNIQUE]['current_preset_qty_price'])) {
+                $result[CreateProfile::NON_UNIQUE]['current_preset_qty_price'] =
+                    round($result[CreateProfile::NON_UNIQUE]['current_preset_qty_price'], 2);
+            }
         }
         //unset from request full request flag (for validation we don't need it)
         // and preset qty price (validation we need only current preset qty price)
