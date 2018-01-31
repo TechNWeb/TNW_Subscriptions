@@ -192,7 +192,7 @@ define([
                 selectedValue,
                 result = 0;
 
-            if (product.type == 'simple') {
+            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
                 result = product.product_price;
             } else if (product.type == 'configurable') {
                 selectedProduct = $(this.options.selectSimpleProduct).val();
@@ -220,7 +220,7 @@ define([
                 frequencyData,
                 frequencyPrice;
 
-            if (product.type == 'simple') {
+            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
                 result = product.frequency_data[optionValue];
             } else if (product.type == 'configurable') {
                 selectedProduct = parseInt($(this.options.selectSimpleProduct).val());
