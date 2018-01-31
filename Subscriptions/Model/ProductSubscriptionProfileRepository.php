@@ -116,10 +116,9 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     public function getList(
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
     ) {
-        $searchResults = $this->searchResultsFactory->create();
-        $searchResults->setSearchCriteria($criteria);
-
         $collection = $this->productSubscriptionProfileCollectionFactory->create();
+        $collection->addAttributeToSelect('*');
+
         foreach ($criteria->getFilterGroups() as $filterGroup) {
             foreach ($filterGroup->getFilters() as $filter) {
                 if ($filter->getField() === 'store_id') {
@@ -130,7 +129,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
             }
         }
-        $searchResults->setTotalCount($collection->getSize());
+
         $sortOrders = $criteria->getSortOrders();
         if ($sortOrders) {
             /** @var SortOrder $sortOrder */
@@ -141,21 +140,21 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                 );
             }
         }
+
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
-        $items = [];
+
+        $collection->load();
+
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($criteria);
+        $searchResults->setItems($collection->getItems());
+        $searchResults->setTotalCount($collection->getSize());
 
         foreach ($collection as $productSubscriptionProfileModel) {
-            $productSubscriptionProfileData = $this->dataProductSubscriptionProfileFactory->create();
-            $this->dataObjectHelper->populateWithArray(
-                $productSubscriptionProfileData,
-                $productSubscriptionProfileModel->getData(),
-                'TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface'
-            );
-            $this->addChildren($productSubscriptionProfileData);
-            $items[] = $productSubscriptionProfileData;
+            $this->addChildren($productSubscriptionProfileModel);
         }
-        $searchResults->setItems($items);
+
         return $searchResults;
     }
 

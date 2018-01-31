@@ -6,10 +6,10 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct;
 
-use Magento\Ui\Component\Form\Fieldset;
-use Magento\Ui\Component\Form\Field;
-use Magento\Ui\Component\Form\Element\Input;
-use Magento\Ui\Component\Container as UiContainer;
+use Magento\Eav\Api\AttributeRepositoryInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Ui\Component\Form;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlFactory;
 use TNW\Subscriptions\Model\Context;
@@ -35,18 +35,42 @@ class Attributes extends Base
     private $contextModel;
 
     /**
+     * @var ArrayManager
+     */
+    private $arrayManager;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var AttributeRepositoryInterface
+     */
+    private $attributeRepository;
+
+    /**
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      * @param Context $contextModel
+     * @param ArrayManager $arrayManager
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param AttributeRepositoryInterface $attributeRepository
      */
     public function __construct(
         Registry $registry,
         UrlFactory $urlFactory,
-        Context $contextModel
+        Context $contextModel,
+        ArrayManager $arrayManager,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        AttributeRepositoryInterface $attributeRepository
     ) {
         parent::__construct($urlFactory);
         $this->registry = $registry;
         $this->contextModel = $contextModel;
+        $this->arrayManager = $arrayManager;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->attributeRepository = $attributeRepository;
     }
 
     /**
@@ -54,27 +78,22 @@ class Attributes extends Base
      */
     public function modifyMeta(array $meta)
     {
-        if ($this->isUsedModifier()) {
-            $meta = array_merge_recursive(
-                $meta,
-                [
-                    'children' => [
-                        'form' => [
-                            'children' => [
-                                'description_fieldset' => [
-                                    'children' => [
-                                        'left_container' => $this->editOptionsButtonMeta(),
-                                        'middle_container' => $this->getProductAttributesMeta(),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            );
+        if (!$this->isUsedModifier()) {
+            return $meta;
         }
 
-        return $meta;
+        return $this->arrayManager->merge('children/form/children/description_fieldset/children', $meta, [
+            'middle_container' => $this->getProductAttributesMeta()
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function modifyData(array $data)
+    {
+        $this->getItem();
+        return $data;
     }
 
     /**
@@ -82,51 +101,7 @@ class Attributes extends Base
      */
     protected function isUsedModifier()
     {
-        return false;
-    }
-
-    /**
-     * Return 'Edit options' button meta data.
-     *
-     * @return array
-     */
-    private function editOptionsButtonMeta()
-    {
-        $currentFormName = $this->registry->registry('form_full_name');
-        $leftContainerName = $currentFormName . '.description_fieldset.left_container';
-
-        return [
-            'children' => [
-                'edit_options' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'formElement' => UiContainer::NAME,
-                                'componentType' => UiContainer::NAME,
-                                'component' => 'TNW_Subscriptions/js/components/options-button',
-                                'additionalClasses' => 'edit-options-button action-advanced action-additional',
-                                'additionalForGroup' => true,
-                                'displayAsLink' => true,
-                                'title' => '[' . __('Edit attributes') . ']',
-                                'actions' => [
-                                    [
-                                        'targetName' => $leftContainerName . '.edit_attributes',
-                                        'actionName' => 'editAttributes',
-                                        'params' =>  [
-                                            $this->getProduct()->getId(), //product id
-                                            $this->getItem()->getId(),  //subscription item id
-                                            $this->getItem()->getSubscriptionProfileId(),  // subscription id
-                                            //$this->getItem()->getCustomOptions() //super attributes data
-                                        ],
-                                    ],
-                                ],
-                                'configureUrl' => $this->getConfigureUrl(),
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        return true;
     }
 
     /**
@@ -138,13 +113,13 @@ class Attributes extends Base
     {
         return [
             'children' => [
-                'options' => [
+                'attributes' => [
                     'arguments' => [
                         'data' => [
                             'config' => [
                                 'label' => false,
                                 'collapsible' => false,
-                                'componentType' => Fieldset::NAME,
+                                'componentType' => Form\Fieldset::NAME,
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                 'sortOrder' => 100,
                                 'dataScope' => self::CONTAINER_PREFIX,
@@ -182,12 +157,14 @@ class Attributes extends Base
                         'config' => [
                             'label' => $attributeData['attributeLabel'] . ':',
                             'collapsible' => false,
-                            'componentType' => Field::NAME,
-                            'formElement' => Input::NAME,
+                            'componentType' => Form\Field::NAME,
+                            'formElement' => Form\Element\Input::NAME,
                             'additionalClasses' => 'edit-product',
-                            'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                            'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                             'sortOrder' => $iterator,
                             'value' => $attributeData['optionLabel'],
+                            'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                            'showPreview' => false,
                         ],
                     ],
                 ],
@@ -195,5 +172,21 @@ class Attributes extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * Loading product attributes
+     *
+     * @return \Magento\Eav\Api\Data\AttributeInterface[]
+     */
+    private function loadAttributes()
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(\Magento\Eav\Api\Data\AttributeGroupInterface::GROUP_ID, '')
+            ->create();
+
+        return $this->attributeRepository
+            ->getList(\TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY, $searchCriteria)
+            ->getItems();
     }
 }

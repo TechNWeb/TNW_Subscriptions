@@ -75,6 +75,8 @@
                 type="Magento\Framework\Api\SearchResults"/>
     <preference for="TNW\Subscriptions\Api\SubscriptionProfileAddressRepositoryInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository"/>
+    <preference for="TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface"
+                type="TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\Address"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface"
