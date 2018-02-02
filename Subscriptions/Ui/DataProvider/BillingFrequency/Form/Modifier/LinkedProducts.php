@@ -275,7 +275,7 @@ class LinkedProducts extends AbstractModifier
                                 'componentType' => 'container',
                                 'component' => 'TNW_Subscriptions/js/components/save-button-linked',
                                 'template' => 'TNW_Subscriptions/form/element/primary-button',
-                                'title' => __('%s', SaveButton::LABEL),
+                                'title' => __('%1', SaveButton::LABEL),
                                 'provider' => null,
                             ],
                         ],
