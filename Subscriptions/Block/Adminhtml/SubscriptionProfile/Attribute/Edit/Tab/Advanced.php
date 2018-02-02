@@ -10,7 +10,6 @@ use Magento\Backend\Block\Widget\Form\Generic;
 use Magento\Config\Model\Config\Source\Yesno;
 use Magento\Eav\Block\Adminhtml\Attribute\PropertyLocker;
 use Magento\Eav\Helper\Data;
-use Magento\Framework\App\ObjectManager;
 
 /**
  * Subscription profile attribute add/edit form main tab.
@@ -22,17 +21,17 @@ class Advanced extends Generic
      *
      * @var Data
      */
-    protected $_eavData = null;
+    private $eavData;
 
     /**
      * @var Yesno
      */
-    protected $_yesNo;
+    private $yesNo;
 
     /**
      * @var array
      */
-    protected $disableScopeChangeList;
+    private $disableScopeChangeList;
 
     /**
      * @var PropertyLocker.
@@ -45,6 +44,7 @@ class Advanced extends Generic
      * @param \Magento\Framework\Data\FormFactory $formFactory
      * @param Yesno $yesNo
      * @param Data $eavData
+     * @param PropertyLocker $propertyLocker
      * @param array $disableScopeChangeList
      * @param array $data
      */
@@ -54,13 +54,16 @@ class Advanced extends Generic
         \Magento\Framework\Data\FormFactory $formFactory,
         Yesno $yesNo,
         Data $eavData,
+        PropertyLocker $propertyLocker,
         array $disableScopeChangeList = ['sku'],
         array $data = []
     ) {
-        $this->_yesNo = $yesNo;
-        $this->_eavData = $eavData;
-        $this->disableScopeChangeList = $disableScopeChangeList;
         parent::__construct($context, $registry, $formFactory, $data);
+
+        $this->yesNo = $yesNo;
+        $this->eavData = $eavData;
+        $this->disableScopeChangeList = $disableScopeChangeList;
+        $this->propertyLocker = $propertyLocker;
     }
 
     /**
@@ -68,10 +71,11 @@ class Advanced extends Generic
      *
      * @return $this
      * @SuppressWarnings(PHPMD)
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _prepareForm()
     {
-        $attributeObject = $this->getAttributeObject();
+        $attributeObject = $this->_coreRegistry->registry('entity_attribute');
 
         $form = $this->_formFactory->create(
             ['data' => ['id' => 'edit_form', 'action' => $this->getData('action'), 'method' => 'post']]
@@ -82,7 +86,7 @@ class Advanced extends Generic
             ['legend' => __('Advanced Attribute Properties'), 'collapsable' => true]
         );
 
-        $yesno = $this->_yesNo->toOptionArray();
+        $yesno = $this->yesNo->toOptionArray();
 
         $validateClass = sprintf(
             'validate-code validate-length maximum-length-%d',
@@ -169,7 +173,7 @@ class Advanced extends Generic
                 'name' => 'frontend_class',
                 'label' => __('Input Validation for Store Owner'),
                 'title' => __('Input Validation for Store Owner'),
-                'values' => $this->_eavData->getFrontendClasses($attributeObject->getEntityType()->getEntityTypeCode())
+                'values' => $this->eavData->getFrontendClasses($attributeObject->getEntityType()->getEntityTypeCode())
             ]
         );
 
@@ -180,49 +184,10 @@ class Advanced extends Generic
             }
         }
 
-        //$this->_eventManager->dispatch('product_attribute_form_build', ['form' => $form]);
-        if (in_array($attributeObject->getAttributeCode(), $this->disableScopeChangeList)) {
-            $form->getElement('is_global')->setDisabled(1);
-        }
+        $form->addValues($attributeObject->getData());
         $this->setForm($form);
-        $this->getPropertyLocker()->lock($form);
+        $this->propertyLocker->lock($form);
 
         return $this;
-    }
-
-    /**
-     * Initialize form fileds values.
-     *
-     * @return $this
-     */
-    protected function _initFormValues()
-    {
-        $this->getForm()->addValues($this->getAttributeObject()->getData());
-
-        return parent::_initFormValues();
-    }
-
-    /**
-     * Retrieve attribute object from registry.
-     *
-     * @return mixed
-     */
-    private function getAttributeObject()
-    {
-        return $this->_coreRegistry->registry('entity_attribute');
-    }
-
-    /**
-     * Get property locker.
-     *
-     * @return PropertyLocker
-     */
-    private function getPropertyLocker()
-    {
-        if (null === $this->propertyLocker) {
-            $this->propertyLocker = ObjectManager::getInstance()->get(PropertyLocker::class);
-        }
-
-        return $this->propertyLocker;
     }
 }

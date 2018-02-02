@@ -14,12 +14,14 @@ use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Eav\Api\AttributeSetRepositoryInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit\SaveButton;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
@@ -104,6 +106,11 @@ class LinkedProducts extends AbstractModifier
     private $config;
 
     /**
+     * @var ArrayManager
+     */
+    private $arrayManager;
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Registry $coreRegistry
      * @param ProductRepositoryInterface $productRepository
@@ -113,6 +120,7 @@ class LinkedProducts extends AbstractModifier
      * @param AttributeSetRepositoryInterface $attributeSetRepository
      * @param GridMetadata $gridMetadata
      * @param Config $config
+     * @param ArrayManager $arrayManager
      * @param string $scopeName
      */
     public function __construct(
@@ -125,6 +133,7 @@ class LinkedProducts extends AbstractModifier
         AttributeSetRepositoryInterface $attributeSetRepository,
         GridMetadata $gridMetadata,
         Config $config,
+        ArrayManager $arrayManager,
         $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -137,6 +146,7 @@ class LinkedProducts extends AbstractModifier
         $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME;
         $this->gridMetadata = $gridMetadata;
         $this->config = $config;
+        $this->arrayManager = $arrayManager;
     }
 
     /**
@@ -204,7 +214,6 @@ class LinkedProducts extends AbstractModifier
                     ]
                 ]
             ]
-
         );
 
         return $meta;
@@ -266,8 +275,7 @@ class LinkedProducts extends AbstractModifier
                                 'componentType' => 'container',
                                 'component' => 'TNW_Subscriptions/js/components/save-button-linked',
                                 'template' => 'TNW_Subscriptions/form/element/primary-button',
-                                'title' =>
-                                    __(\TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit\SaveButton::LABEL),
+                                'title' => __('%s', SaveButton::LABEL),
                                 'provider' => null,
                             ],
                         ],
@@ -288,62 +296,49 @@ class LinkedProducts extends AbstractModifier
     {
         $listingTarget = $scope . '_product_listing';
 
-        $modal = [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'componentType' => Modal::NAME,
-                        'dataScope' => '',
-                        'options' => [
-                            'title' => $title,
-                            'buttons' => [
-                                [
-                                    'text' => __('Cancel'),
-                                    'actions' => [
-                                        'closeModal'
-                                    ]
-                                ],
-                                [
-                                    'text' => __('Add Selected Products'),
-                                    'class' => 'action-primary',
-                                    'actions' => [
-                                        [
-                                            'targetName' => 'index = ' . $listingTarget,
-                                            'actionName' => 'save'
-                                        ],
-                                        'closeModal'
-                                    ]
-                                ],
+        $modal = $this->arrayManager->set('arguments/data/config', [], [
+            'componentType' => Modal::NAME,
+            'dataScope' => '',
+            'options' => [
+                'title' => $title,
+                'buttons' => [
+                    [
+                        'text' => __('Cancel'),
+                        'actions' => [
+                            'closeModal'
+                        ]
+                    ],
+                    [
+                        'text' => __('Add Selected Products'),
+                        'class' => 'action-primary',
+                        'actions' => [
+                            [
+                                'targetName' => 'index = ' . $listingTarget,
+                                'actionName' => 'save'
                             ],
-                        ],
+                            'closeModal'
+                        ]
                     ],
                 ],
             ],
-            'children' => [
-                $listingTarget => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'autoRender' => false,
-                                'componentType' => 'insertListing',
-                                'dataScope' => $listingTarget,
-                                'externalProvider' => $listingTarget . '.' . $listingTarget . '_data_source',
-                                'selectionsProvider' => $listingTarget . '.' . $listingTarget . '.product_columns.ids',
-                                'ns' => $listingTarget,
-                                'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
-                                'realTimeLink' => true,
-                                'dataLinks' => [
-                                    'imports' => false,
-                                    'exports' => true
-                                ],
-                                'behaviourType' => 'simple',
-                                'externalFilterMode' => true,
-                            ],
-                        ],
-                    ],
-                ],
+        ]);
+
+        $modal = $this->arrayManager->set("children/$listingTarget/arguments/data/config", $modal, [
+            'autoRender' => false,
+            'componentType' => 'insertListing',
+            'dataScope' => $listingTarget,
+            'externalProvider' => sprintf('%1$s.%1$s_data_source', $listingTarget),
+            'selectionsProvider' => sprintf('%1$s.%1$s.product_columns.ids', $listingTarget),
+            'ns' => $listingTarget,
+            'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+            'realTimeLink' => true,
+            'dataLinks' => [
+                'imports' => false,
+                'exports' => true
             ],
-        ];
+            'behaviourType' => 'simple',
+            'externalFilterMode' => true,
+        ]);
 
         return $modal;
     }
@@ -359,62 +354,50 @@ class LinkedProducts extends AbstractModifier
     {
         $dataProvider = $scope . '_product_listing';
 
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'additionalClasses' => 'admin__field-wide',
-                        'componentType' => DynamicRows::NAME,
-                        'label' => null,
-                        'columnsHeader' => false,
-                        'columnsHeaderAfterRender' => true,
-                        'renderDefaultRecord' => false,
-                        'template' => 'ui/dynamic-rows/templates/grid',
-                        'component' => 'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
-                        'addButton' => false,
-                        'recordTemplate' => 'record',
-                        'dataScope' => 'links',
-                        'deleteButtonLabel' => __('Remove'),
-                        'dataProvider' => 'data.' . $dataProvider,
-                        'map' => [
-                            'id' => 'entity_id',
-                            'name' => 'name',
-                            'status' => 'status_text',
-                            'sku' => 'sku',
-                            'price' => 'tnw_price',
-                            'thumbnail' => 'thumbnail_src',
-                            'initial_fee' => 'initial_fee',
-                            'preset_qty' => 'preset_qty',
-                            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
-                            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
-                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
-                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
-                            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
-                        ],
-                        'links' => [
-                            'insertData' => '${ $.provider }:${ $.dataProvider }'
-                        ],
-                        'sortOrder' => 2,
-                    ],
-                ],
+        $grid = $this->arrayManager->set('arguments/data/config', [], [
+            'additionalClasses' => 'admin__field-wide',
+            'componentType' => DynamicRows::NAME,
+            'label' => null,
+            'renderDefaultRecord' => false,
+            'template' => 'ui/dynamic-rows/templates/grid',
+            'component' => 'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
+            'columnsHeader' => false,
+            'columnsHeaderAfterRender' => true,
+            'addButton' => false,
+            'recordTemplate' => 'record',
+            'dataScope' => 'links',
+            'deleteButtonLabel' => __('Remove'),
+            'dataProvider' => 'data.' . $dataProvider,
+            'map' => [
+                'id' => 'entity_id',
+                'name' => 'name',
+                'status' => 'status_text',
+                'sku' => 'sku',
+                'price' => 'tnw_price',
+                'thumbnail' => 'thumbnail_src',
+                'initial_fee' => 'initial_fee',
+                'preset_qty' => 'preset_qty',
+                Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+                Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+                Attribute::SUBSCRIPTION_DISCOUNT_TYPE => Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
+                Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+                Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
             ],
-            'children' => [
-                'record' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'componentType' => 'container',
-                                'isTemplate' => true,
-                                'is_collection' => true,
-                                'component' => 'Magento_Ui/js/dynamic-rows/record',
-                                'dataScope' => '',
-                            ],
-                        ],
-                    ],
-                    'children' => $this->gridMetadata->fillMeta(),
-                ],
+            'links' => [
+                'insertData' => '${ $.provider }:${ $.dataProvider }'
             ],
-        ];
+            'sortOrder' => 2,
+        ]);
+
+        $grid = $this->arrayManager->set('children/record/arguments/data/config', $grid, [
+            'componentType' => 'container',
+            'isTemplate' => true,
+            'is_collection' => true,
+            'component' => 'Magento_Ui/js/dynamic-rows/record',
+            'dataScope' => '',
+        ]);
+
+        return $this->arrayManager->set('children/record/children', $grid, $this->gridMetadata->fillMeta());
     }
 
     /**
@@ -438,13 +421,20 @@ class LinkedProducts extends AbstractModifier
             'status' => $this->status->getOptionText($linkedProduct->getStatus()),
             'sku' => $linkedProduct->getSku(),
             'price' => $this->getPrice($linkedProduct, $linkItem),
-            ProductBillingFrequencyInterface::INITIAL_FEE => $linkItem->getInitialFee(),
-            ProductBillingFrequencyInterface::PRESET_QTY => $presetQty,
-            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => $subscriptionUnlockPresetQty,
-            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $linkedProduct->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
-            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $linkedProduct->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
-            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
-            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
+            ProductBillingFrequencyInterface::INITIAL_FEE =>
+                $linkItem->getInitialFee(),
+            ProductBillingFrequencyInterface::PRESET_QTY =>
+                $presetQty,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY =>
+                $subscriptionUnlockPresetQty,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE =>
+                $linkedProduct->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT =>
+                $linkedProduct->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT),
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE =>
+                $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT =>
+                $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
         ];
     }
 

@@ -11,6 +11,7 @@ use Magento\Framework\Controller\ResultFactory;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @method \Magento\Framework\App\Request\Http getRequest()
  */
 class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
@@ -197,26 +198,21 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
      */
     private function returnResult($path = '', array $params = [], array $response = [])
     {
-        if ($this->isAjax()) {
+        if ($this->getRequest()->isAjax()) {
+            /** @var \Magento\Framework\View\Layout $layout */
             $layout = $this->layoutFactory->create();
             $layout->initMessages();
 
             $response['messages'] = [$layout->getMessagesBlock()->getGroupedHtml()];
             $response['params'] = $params;
 
-            return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
+            return $this->resultFactory
+                ->create(ResultFactory::TYPE_JSON)
+                ->setData($response);
         }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath($path, $params);
-    }
-
-    /**
-     * Define whether request is Ajax.
-     *
-     * @return boolean
-     */
-    private function isAjax()
-    {
-        return $this->getRequest()->getParam('isAjax');
+        return $this->resultFactory
+            ->create(ResultFactory::TYPE_REDIRECT)
+            ->setPath($path, $params);
     }
 }
