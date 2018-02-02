@@ -10,7 +10,6 @@ use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Review\Form\Modifier\Pool;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 
 /**
@@ -39,7 +38,7 @@ class Payment extends AbstractDataProvider
     /**
      * Modifiers pool.
      *
-     * @var Pool
+     * @var PoolInterface
      */
     protected $modifiersPool;
 
