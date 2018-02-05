@@ -22,7 +22,7 @@
         </referenceBlock>
 
         <referenceContainer name="product.info.price">
-            <block class="TNW\Subscriptions\Pricing\Render" name="product.subscription.price.final" before="product.price.final">
+            <block class="Magento\Catalog\Pricing\Render" name="product.subscription.price.final" before="product.price.final">
                 <arguments>
                     <argument name="price_render" xsi:type="string">product.price.render.default</argument>
                     <argument name="price_type_code" xsi:type="string">subscription_price</argument>
