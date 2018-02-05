@@ -13,7 +13,6 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Pool;
 
 class Account extends AbstractDataProvider
 {
@@ -54,7 +53,7 @@ class Account extends AbstractDataProvider
     /**
      * Modifiers pool.
      *
-     * @var Pool
+     * @var PoolInterface
      */
     protected $modifiersPool;
 

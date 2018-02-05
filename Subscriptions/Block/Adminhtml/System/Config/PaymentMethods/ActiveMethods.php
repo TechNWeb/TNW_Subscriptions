@@ -18,6 +18,7 @@ use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Paypal\Model\Config;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use Magento\Framework\Data\Form\Element\Fieldset as DataFieldset;
 
 /**
  * Class ActiveMethods

@@ -18,17 +18,27 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
      */
-    protected $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var \Magento\Framework\View\LayoutFactory
      */
-    protected $layoutFactory;
+    private $layoutFactory;
 
     /**
      * @var array
      */
     private $multipleAttributeList;
+
+    /**
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    private $dataObjectFactory;
+
+    /**
+     * @var \Magento\Eav\Model\AttributeFactory
+     */
+    private $attributeFactory;
 
     /**
      * Constructor.
@@ -46,12 +56,17 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Framework\View\LayoutFactory $layoutFactory,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \Magento\Eav\Model\AttributeFactory $attributeFactory,
         array $multipleAttributeList = []
     ) {
         parent::__construct($context, $coreRegistry, $resultPageFactory);
+
         $this->resultJsonFactory = $resultJsonFactory;
         $this->layoutFactory = $layoutFactory;
         $this->multipleAttributeList = $multipleAttributeList;
+        $this->dataObjectFactory = $dataObjectFactory;
+        $this->attributeFactory = $attributeFactory;
     }
 
     /**
@@ -61,20 +76,18 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
      */
     public function execute()
     {
-        $response = new DataObject();
-        $response->setError(false);
+        $response = $this->dataObjectFactory->create();
+        $response->setData('error', false);
 
         $attributeCode = $this->getRequest()->getParam('attribute_code');
         $frontendLabel = $this->getRequest()->getParam('frontend_label');
         $attributeCode = $attributeCode ?: $this->generateCode($frontendLabel[0]);
         $attributeId = $this->getRequest()->getParam('attribute_id');
-        $attribute = $this->_objectManager->create(
-            \Magento\Catalog\Model\ResourceModel\Eav\Attribute::class
-        )->loadByCode(
 
-            $this->entityTypeId,
-            $attributeCode
-        );
+        /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute */
+        $attribute = $this->attributeFactory
+            ->createAttribute(\Magento\Catalog\Model\ResourceModel\Eav\Attribute::class)
+            ->loadByCode($this->entityTypeId, $attributeCode);
 
         if ($attribute->getId() && !$attributeId) {
             $message = strlen($this->getRequest()->getParam('attribute_code'))
@@ -83,8 +96,8 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
 
             $this->setMessageToResponse($response, [$message]);
 
-            $response->setError(true);
-            $response->setProductAttribute($attribute->toArray());
+            $response->setData('error', true);
+            $response->setData('product_attribute', $attribute->toArray());
         }
 
         $multipleOption = $this->getRequest()->getParam('frontend_input');
@@ -144,7 +157,7 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     {
         if (is_array($options) && !$this->isUniqueAdminValues($options['value'], $options['delete'])) {
             $this->setMessageToResponse($response, [__('The value of Admin must be unique.')]);
-            $response->setError(true);
+            $response->setData('error', true);
         }
     }
 }
