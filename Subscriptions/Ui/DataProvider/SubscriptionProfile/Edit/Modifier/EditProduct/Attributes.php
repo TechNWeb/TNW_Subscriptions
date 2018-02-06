@@ -189,7 +189,9 @@ class Attributes extends Base
                 'componentType' => Form\Field::NAME,
                 'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                 'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                'showPreview' => false,
+                'imports' => [
+                    'showPreview' => "{$this->registry->registry('form_full_name')}:previewMode",
+                ],
             ]);
 
             if ($attribute->usesSource()) {
