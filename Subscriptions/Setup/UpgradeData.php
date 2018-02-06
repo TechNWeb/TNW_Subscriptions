@@ -40,6 +40,7 @@ class UpgradeData implements UpgradeDataInterface
     /**
      * @param EavSetupFactory $eavSetupFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductAttributeRepositoryInterface $attributeRepository
      */
     public function __construct(
         EavSetupFactory $eavSetupFactory,
@@ -200,7 +201,7 @@ class UpgradeData implements UpgradeDataInterface
      * @param EavSetup $eavSetup
      * @return void
      */
-    private function addScheduleAttribute($eavSetup)
+    private function addScheduleAttribute(EavSetup $eavSetup)
     {
         $eavSetup->addAttribute(
             Product::ENTITY,
