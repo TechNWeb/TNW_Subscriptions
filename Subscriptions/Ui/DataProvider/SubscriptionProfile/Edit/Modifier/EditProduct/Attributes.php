@@ -13,9 +13,9 @@ use Magento\Eav\Model\Config as EavConfig;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Ui\Component\Form;
+use Magento\Ui\Component\Container as UiContainer;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlFactory;
-use Magento\Ui\DataProvider\Mapper\FormElement;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
@@ -65,9 +65,9 @@ class Attributes extends Base
     private $eavConfig;
 
     /**
-     * @var FormElement
+     * @var array
      */
-    private $formElementMapper;
+    private $loadAttributes;
 
     /**
      * @param Registry $registry
@@ -78,7 +78,6 @@ class Attributes extends Base
      * @param AttributeRepositoryInterface $attributeRepository
      * @param AttributeGroupRepositoryInterface $attributeGroupRepository
      * @param EavConfig $eavConfig
-     * @param FormElement $formElementMapper
      */
     public function __construct(
         Registry $registry,
@@ -88,8 +87,7 @@ class Attributes extends Base
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AttributeRepositoryInterface $attributeRepository,
         AttributeGroupRepositoryInterface $attributeGroupRepository,
-        EavConfig $eavConfig,
-        FormElement $formElementMapper
+        EavConfig $eavConfig
     ) {
         parent::__construct($urlFactory);
         $this->registry = $registry;
@@ -99,7 +97,6 @@ class Attributes extends Base
         $this->attributeRepository = $attributeRepository;
         $this->attributeGroupRepository = $attributeGroupRepository;
         $this->eavConfig = $eavConfig;
-        $this->formElementMapper = $formElementMapper;
     }
 
     /**
@@ -121,7 +118,11 @@ class Attributes extends Base
      */
     public function modifyData(array $data)
     {
-        $this->getItem();
+        foreach ($this->loadAttributes() as $loadAttribute) {
+            $data['additional_attribute'][$loadAttribute->getAttributeCode()]
+                = $this->getItem()->getData($loadAttribute->getAttributeCode());
+        }
+
         return $data;
     }
 
@@ -137,11 +138,36 @@ class Attributes extends Base
      * Return configurable product attributes meta data.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProductAttributesMeta()
     {
         return [
             'children' => [
+                'edit_attributes' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => UiContainer::NAME,
+                                'componentType' => UiContainer::NAME,
+                                'component' => 'TNW_Subscriptions/js/components/edit-button',
+                                'additionalClasses' => 'edit-attributes-button action-advanced action-additional',
+                                'additionalForGroup' => true,
+                                'displayAsLink' => true,
+                                'title' => __('show custom attributes'),
+                                'activeTitle' => __('hide custom attributes'),
+                                'sortOrder' => 119,
+                                'actions' => [
+                                    [
+                                        'targetName' => '${ $.name }',
+                                        'actionName' => 'toggle',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
                 'attributes' => [
                     'arguments' => [
                         'data' => [
@@ -150,9 +176,12 @@ class Attributes extends Base
                                 'collapsible' => false,
                                 'componentType' => Form\Fieldset::NAME,
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset',
-                                'sortOrder' => 100,
+                                'sortOrder' => 120,
                                 'dataScope' => self::CONTAINER_PREFIX,
-                                'additionalClasses' => 'product-options',
+                                'additionalClasses' => 'product-attributes',
+                                'imports' => [
+                                    'visible' => '${ $.parentName }.edit_attributes:active',
+                                ]
                             ],
                         ],
                     ],
@@ -166,6 +195,8 @@ class Attributes extends Base
      * Return super attributes meta data.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getAttributesMeta()
     {
@@ -183,9 +214,9 @@ class Attributes extends Base
                 'default' => $attribute->getDefaultValue(),
                 'label' => $attribute->getDefaultFrontendLabel(),
                 'code' => $attribute->getAttributeCode(),
-                //'source' => $groupCode,
                 'globalScope' => true,
                 'sortOrder' => $iterator,
+                'additionalClasses' => 'edit-product',
                 'componentType' => Form\Field::NAME,
                 'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                 'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -208,7 +239,7 @@ class Attributes extends Base
                 ];
             }
 
-            $result[self::CONTAINER_PREFIX . $attribute->getAttributeId()] = $meta;
+            $result[$attribute->getAttributeCode()] = $meta;
         }
 
         return $result;
@@ -222,7 +253,16 @@ class Attributes extends Base
      */
     private function getFormElementsMapValue($value)
     {
-        $valueMap = $this->formElementMapper->getMappings();
+        static $valueMap = [
+            'text' => 'input',
+            'hidden' => 'input',
+            'boolean' => 'checkbox',
+            'media_image' => 'image',
+            'price' => 'input',
+            'weight' => 'input',
+            'gallery' => 'image',
+        ];
+
         return isset($valueMap[$value]) ? $valueMap[$value] : $value;
     }
 
@@ -235,29 +275,36 @@ class Attributes extends Base
      */
     private function loadAttributes()
     {
-        $attributeSetId = $this->eavConfig
-            ->getEntityType(ProductSubscriptionProfile::ENTITY)
-            ->getDefaultAttributeSetId();
+        if (empty($this->loadAttributes)) {
+            $attributeSetId = $this->eavConfig
+                ->getEntityType(ProductSubscriptionProfile::ENTITY)
+                ->getDefaultAttributeSetId();
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(AttributeGroupInterface::ATTRIBUTE_SET_ID, $attributeSetId)
-            ->addFilter(AttributeGroupInterface::GROUP_NAME, 'Additional information')
-            ->create();
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(AttributeGroupInterface::ATTRIBUTE_SET_ID, $attributeSetId)
+                ->addFilter(AttributeGroupInterface::GROUP_NAME, 'Additional information')
+                ->create();
 
-        $attributeGroupSearchResult = $this->attributeGroupRepository
-            ->getList($searchCriteria)
-            ->getItems();
+            $attributeGroupSearchResult = $this->attributeGroupRepository
+                ->getList($searchCriteria)
+                ->getItems();
 
-        if (empty($attributeGroupSearchResult)) {
-            return [];
+            if (empty($attributeGroupSearchResult)) {
+                return [];
+            }
+
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(
+                    AttributeGroupInterface::GROUP_ID,
+                    reset($attributeGroupSearchResult)->getAttributeGroupId()
+                )
+                ->create();
+
+            $this->loadAttributes = $this->attributeRepository
+                ->getList(ProductSubscriptionProfile::ENTITY, $searchCriteria)
+                ->getItems();
         }
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(AttributeGroupInterface::GROUP_ID, reset($attributeGroupSearchResult)->getAttributeGroupId())
-            ->create();
-
-        return $this->attributeRepository
-            ->getList(ProductSubscriptionProfile::ENTITY, $searchCriteria)
-            ->getItems();
+        return $this->loadAttributes;
     }
 }
