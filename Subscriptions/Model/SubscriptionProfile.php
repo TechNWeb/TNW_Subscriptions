@@ -18,11 +18,14 @@ use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Json\Helper\Data;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\PaymentFactory;
 
 /**
  * Subscription Profile model.
@@ -102,6 +105,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $metadataService;
 
     /**
+     * @var SubscriptionProfilePaymentInterface
+     */
+    private $payment;
+
+    /**
+     * @var PaymentCollectionFactory
+     */
+    private $paymentCollectionFactory;
+
+    /**
+     * @var PaymentFactory
+     */
+    private $paymentFactory;
+
+    /**
      * Attributes are that part of interface
      *
      * @var array
@@ -145,6 +163,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param EncryptorInterface $encryptor
      * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param Data $jsonHelper
+     * @param PaymentCollectionFactory $paymentCollectionFactory
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -159,6 +178,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         EncryptorInterface $encryptor,
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         Data $jsonHelper,
+        PaymentCollectionFactory $paymentCollectionFactory,
+        PaymentFactory $paymentFactory,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -168,6 +189,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->encryptor = $encryptor;
         $this->jsonHelper = $jsonHelper;
         $this->metadataService = $metadataService;
+        $this->paymentCollectionFactory = $paymentCollectionFactory;
+        $this->paymentFactory = $paymentFactory;
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory,
             $resource, $resourceCollection, $data);
     }
@@ -841,4 +864,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             true
         );
     }
+//
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getPayment()
+//    {
+//        if (null === $this->payment || !$this->payment) {
+//            $this->payment = $this->paymentCollectionFactory->create()
+//                ->setSubscriptionProfileFilterFilter($this->getId())
+//                ->getFirstItem();
+//        }
+//        if ($this->getId()) {
+//            $this->payment->setSubscriptionProfile($this);
+//        }
+//
+//        return $this->payment;
+//    }
 }

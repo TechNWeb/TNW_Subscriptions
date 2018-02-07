@@ -558,4 +558,11 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setCancelBeforeNextCycle($cancelBeforeNextCycle);
+
+    /**
+     * Gets Subscription profile payment.
+     *
+     * @return SubscriptionProfilePaymentInterface
+     */
+    public function getPayment();
 }
