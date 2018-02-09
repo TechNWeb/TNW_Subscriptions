@@ -38,11 +38,11 @@ define([
         changeCommentAndValue: function() {
             //Get current price format
             var priceFormat = this.getPriceFormat();
-
             var notice = '';
             var discountAmount = 0;
             var discountType = '';
             var discountTypeValue = '';
+            priceFormat.pattern = '%s';
 
             //Get current component integer value
             var currentValue = this.value();
