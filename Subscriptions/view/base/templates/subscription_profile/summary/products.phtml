@@ -22,6 +22,12 @@
                         <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
                     <?php echo $block->renderProductOptions($item);?>
+                    <dl class="item-options custom-attributes">
+                    <?php foreach ($block->customAttributes($item) as $attribute): ?>
+                        <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
+                        <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
+                    <?php endforeach; ?>
+                    </dl>
                 </div>
                 <div class="additional">
                     <dl>

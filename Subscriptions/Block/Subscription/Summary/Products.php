@@ -51,6 +51,11 @@ class Products extends BaseSummary
     private $formContext;
 
     /**
+     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository
+     */
+    private $productAttributeRepository;
+
+    /**
      * @param Template\Context $context
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
@@ -65,6 +70,7 @@ class Products extends BaseSummary
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
+        \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -73,6 +79,7 @@ class Products extends BaseSummary
         $this->orderRepository = $orderRepository;
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
+        $this->productAttributeRepository = $productAttributeRepository;
     }
 
     /**
@@ -284,5 +291,16 @@ class Products extends BaseSummary
         }
 
         return '';
+    }
+
+    /**
+     * @param ProductSubscriptionProfileInterface $item
+     * @return \Magento\Eav\Model\Entity\Attribute\AbstractAttribute[]
+     */
+    public function customAttributes(ProductSubscriptionProfileInterface $item)
+    {
+        return array_map(function (\Magento\Framework\Api\AttributeInterface $attribute) {
+            return $this->productAttributeRepository->get($attribute->getAttributeCode());
+        }, $item->getCustomAttributes());
     }
 }

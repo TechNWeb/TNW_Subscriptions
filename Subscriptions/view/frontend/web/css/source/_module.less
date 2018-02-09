@@ -529,7 +529,7 @@
 
         .fieldset {
           display: block;
-          text-align: end;
+          text-align: left;
 
           .field {
             text-align: start;
@@ -627,6 +627,19 @@
           .field-description {
             clear: both;
           }
+
+          .edit-attributes-button {
+            line-height: 1.36;
+            padding: 0.3rem 0 0 0;
+            color: #007bdb;
+            text-decoration: none;
+            background: none;
+            border: 0;
+            display: inline;
+            font-weight: 400;
+            border-radius: 0;
+            box-shadow: none;
+          }
         }
 
         .fieldset-wrapper.product-options {
@@ -636,6 +649,23 @@
             label {
               display: inline-block;
               margin: 0 10px 5px 0;
+            }
+            div.control, div.field-control {
+              display: inline-block;
+            }
+          }
+        }
+
+        .fieldset-wrapper.product-attributes {
+          .edit-product {
+            margin: 0;
+
+            label {
+              display: inline-block;
+              margin: 0 10px 5px 0;
+            }
+            label:after {
+              content: ':';
             }
             div.control, div.field-control {
               display: inline-block;
