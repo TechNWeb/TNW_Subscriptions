@@ -70,6 +70,11 @@ class Attributes extends Base
     private $loadAttributes;
 
     /**
+     * @var bool
+     */
+    private $editAllow;
+
+    /**
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      * @param Context $contextModel
@@ -78,6 +83,7 @@ class Attributes extends Base
      * @param AttributeRepositoryInterface $attributeRepository
      * @param AttributeGroupRepositoryInterface $attributeGroupRepository
      * @param EavConfig $eavConfig
+     * @param bool $editAllow
      */
     public function __construct(
         Registry $registry,
@@ -87,7 +93,8 @@ class Attributes extends Base
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AttributeRepositoryInterface $attributeRepository,
         AttributeGroupRepositoryInterface $attributeGroupRepository,
-        EavConfig $eavConfig
+        EavConfig $eavConfig,
+        $editAllow = true
     ) {
         parent::__construct($urlFactory);
         $this->registry = $registry;
@@ -97,6 +104,7 @@ class Attributes extends Base
         $this->attributeRepository = $attributeRepository;
         $this->attributeGroupRepository = $attributeGroupRepository;
         $this->eavConfig = $eavConfig;
+        $this->editAllow = $editAllow;
     }
 
     /**
@@ -220,10 +228,15 @@ class Attributes extends Base
                 'componentType' => Form\Field::NAME,
                 'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                 'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                'imports' => [
-                    'showPreview' => "{$this->registry->registry('form_full_name')}:previewMode",
-                ],
             ]);
+
+            if ($this->editAllow) {
+                $meta = $this->arrayManager->merge('arguments/data/config', $meta, [
+                    'imports' => [
+                        'showPreview' => "{$this->registry->registry('form_full_name')}:previewMode",
+                    ],
+                ]);
+            }
 
             if ($attribute->usesSource()) {
                 $meta = $this->arrayManager->merge('arguments/data/config', $meta, [

@@ -71,4 +71,9 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Attributes">
+        <arguments>
+            <argument name="editAllow" xsi:type="boolean">false</argument>
+        </arguments>
+    </type>
 </config>

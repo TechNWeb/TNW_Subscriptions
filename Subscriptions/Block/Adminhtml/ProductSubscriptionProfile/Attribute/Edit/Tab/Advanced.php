@@ -185,6 +185,18 @@ class Advanced extends Generic
             ]
         );
 
+        $fieldset->addField(
+            'is_visible_on_front',
+            'select',
+            [
+                'name' => 'is_visible_on_front',
+                'label' => __('Visible to Customer'),
+                'title' => __('Visible to Customer'),
+                'note' => __('Do we display product options on the Front-end?'),
+                'values' => $yesno,
+            ]
+        );
+
         if ($attributeObject->getId()) {
             $form->getElement('attribute_code')->setDisabled(1);
             if (!$attributeObject->getIsUserDefined()) {
