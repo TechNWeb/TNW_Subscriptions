@@ -7,8 +7,10 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use Magento\Framework\Api\AttributeInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
@@ -299,8 +301,14 @@ class Products extends BaseSummary
      */
     public function customAttributes(ProductSubscriptionProfileInterface $item)
     {
-        return array_map(function (\Magento\Framework\Api\AttributeInterface $attribute) {
+        $attributes = array_map(function (AttributeInterface $attribute) {
             return $this->productAttributeRepository->get($attribute->getAttributeCode());
         }, $item->getCustomAttributes());
+
+        $attributes = array_filter($attributes, function (ProductSubscriptionProfileAttributeInterface $attribute) {
+            return $attribute->getIsVisibleOnFront();
+        });
+
+        return $attributes;
     }
 }

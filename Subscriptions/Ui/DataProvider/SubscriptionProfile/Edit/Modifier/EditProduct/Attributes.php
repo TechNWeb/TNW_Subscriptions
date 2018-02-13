@@ -16,6 +16,7 @@ use Magento\Ui\Component\Form;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlFactory;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
@@ -306,13 +307,21 @@ class Attributes extends Base
                 return [];
             }
 
-            $searchCriteria = $this->searchCriteriaBuilder
+            $this->searchCriteriaBuilder
                 ->addFilter(
                     AttributeGroupInterface::GROUP_ID,
                     reset($attributeGroupSearchResult)->getAttributeGroupId()
-                )
-                ->create();
+                );
 
+            if (!$this->editAllow) {
+                $this->searchCriteriaBuilder
+                    ->addFilter(
+                        ProductSubscriptionProfileAttributeInterface::IS_VISIBLE_ON_FRONT,
+                        1
+                    );
+            }
+
+            $searchCriteria = $this->searchCriteriaBuilder->create();
             $this->loadAttributes = $this->attributeRepository
                 ->getList(ProductSubscriptionProfile::ENTITY, $searchCriteria)
                 ->getItems();

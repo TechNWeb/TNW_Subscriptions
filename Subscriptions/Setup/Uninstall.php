@@ -95,6 +95,7 @@ class Uninstall implements UninstallInterface
             ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
             ProductSubscriptionProfile::ENTITY_TABLE . '_datetime',
             ProductSubscriptionProfile::ENTITY_TABLE,
+            'tnw_subscriptions_product_subscription_profile_eav_attribute'
         ];
 
         foreach ($tnwTables as $tnwTable) {

@@ -10,10 +10,12 @@ use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Upgrade data for TNW Subscriptions.
@@ -26,12 +28,19 @@ class UpgradeData implements UpgradeDataInterface
     private $eavSetupFactory;
 
     /**
+     * @var SubscriptionSetupFactory
+     */
+    private $subscriptionSetupFactory;
+
+    /**
      * @param EavSetupFactory $eavSetupFactory
      */
     public function __construct(
-        EavSetupFactory $eavSetupFactory
+        EavSetupFactory $eavSetupFactory,
+        SubscriptionSetupFactory $subscriptionSetupFactory
     ) {
         $this->eavSetupFactory = $eavSetupFactory;
+        $this->subscriptionSetupFactory = $subscriptionSetupFactory;
     }
 
     /**
@@ -54,6 +63,9 @@ class UpgradeData implements UpgradeDataInterface
             $this->addInfiniteSubscriptionsProductAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.14", "<")) {
+            $this->upgradeEntities($setup);
+        }
 
         $setup->endSetup();
     }
@@ -132,5 +144,33 @@ class UpgradeData implements UpgradeDataInterface
                 'sort_order' => 140,
             ]
         );
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function upgradeEntities(ModuleDataSetupInterface $setup)
+    {
+        /** @var SubscriptionSetup $subscriptionSetup */
+        $subscriptionSetup = $this->subscriptionSetupFactory->create(['setup' => $setup]);
+
+        $entityTypeId = $subscriptionSetup->getEntityTypeId(ProductSubscriptionProfile::ENTITY);
+        $select = $setup->getConnection()
+            ->select()
+            ->from($setup->getTable('eav_attribute'), ['attribute_id'])
+            ->where($setup->getConnection()->prepareSqlCondition('entity_type_id', $entityTypeId));
+
+        $query = $setup->getConnection()
+            ->insertFromSelect(
+                $select,
+                $setup->getTable('tnw_subscriptions_product_subscription_profile_eav_attribute'),
+                ['attribute_id'],
+                AdapterInterface::INSERT_IGNORE
+            );
+
+        $setup->getConnection()->query($query);
+
+        $subscriptionSetup->installEntities();
     }
 }

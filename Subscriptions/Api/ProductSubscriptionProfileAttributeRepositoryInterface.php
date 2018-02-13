@@ -24,7 +24,7 @@ interface ProductSubscriptionProfileAttributeRepositoryInterface extends Metadat
      * Retrieve specific attribute
      *
      * @param string $attributeCode
-     * @return \Magento\Catalog\Api\Data\EavAttributeInterface
+     * @return Data\ProductSubscriptionProfileAttributeInterface
      */
     public function get($attributeCode);
 }
