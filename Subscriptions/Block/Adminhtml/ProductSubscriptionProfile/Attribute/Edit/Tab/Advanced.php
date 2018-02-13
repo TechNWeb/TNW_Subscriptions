@@ -192,7 +192,6 @@ class Advanced extends Generic
                 'name' => 'is_visible_on_front',
                 'label' => __('Visible to Customer'),
                 'title' => __('Visible to Customer'),
-                'note' => __('Do we display product options on the Front-end?'),
                 'values' => $yesno,
             ]
         );
