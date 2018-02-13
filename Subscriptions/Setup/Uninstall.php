@@ -54,11 +54,11 @@ class Uninstall implements UninstallInterface
     {
         $setup->startSetup();
 
-        $this->dropTables($setup);
         $this->removeProductAttributes();
         $this->removeConfig($setup);
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
+        $this->dropTables($setup);
 
         $setup->endSetup();
     }
