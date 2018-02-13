@@ -634,7 +634,8 @@ class Form extends AbstractDataProvider
             $price = $product->getPrice();
             if (!$price
                 && $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
-                && $additionalData && isset($additionalData['super_attribute'])) {
+                && $additionalData && isset($additionalData['super_attribute'])
+            ) {
                 /** @var Configurable $typeInstance */
                 $typeInstance = $product->getTypeInstance();
                 $simpleProduct = $typeInstance

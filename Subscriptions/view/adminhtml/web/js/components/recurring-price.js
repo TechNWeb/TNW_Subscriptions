@@ -38,17 +38,17 @@ define([
         changeCommentAndValue: function() {
             //Get current price format
             var priceFormat = this.getPriceFormat(),
-            notice = '',
-            discountAmount = 0,
-            discountTypeValue = '',
-            recurringPrice = this.value(), //Get current component integer value,
-            productPrice = this.getProductPriceComponentValue(),
-            productPriceComponent = registry.get('index=price'),
-            lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price'),
-            offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount'),
-            discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
-            discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
-            priceFormat.pattern = '%s';
+                notice = '',
+                discountAmount = 0,
+                discountTypeValue = '',
+                recurringPrice = this.value(), //Get current component integer value,
+                productPrice = this.getProductPriceComponentValue(),
+                productPriceComponent = registry.get('index=price'),
+                lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price'),
+                offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount'),
+                discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
+                discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
+                priceFormat.pattern = '%s';
             if (typeof recurringPrice === 'string') {
                 recurringPrice = formatPrice.formatToNumber(recurringPrice, priceFormat);
             }
