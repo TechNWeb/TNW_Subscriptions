@@ -200,13 +200,14 @@ define([
                 priceFormat = this.getPriceFormat(),
                 productQty = this.getProductQty(),
                 currentFrequencyPrice,
-                saveString = ' %p (SAVE ~%s%)';
+                saveString = ' %p (SAVE ~%s%)',
+                inputFrequencyPrice;
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
                 var frequencyUnit = frequencyData[optionValue].frequency_unit,
                     frequencyUnitType = frequencyData[optionValue].frequency_unit_type,
                     presetQty = frequencyData[optionValue].preset_qty,
                     calculatedUnit = this.getCalculatedUnit(frequencyUnit, frequencyUnitType);
-                var inputFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
+                inputFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
                 currentFrequencyPrice = parseFloat(formatPrice.formatToNumber(inputFrequencyPrice, priceFormat));
                 if (changeType !== 'all' && currentFrequencyPrice <= 0) {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);

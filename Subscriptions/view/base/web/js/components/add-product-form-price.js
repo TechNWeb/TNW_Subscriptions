@@ -37,10 +37,8 @@ define([
             priceFormat.pattern = '%s';
             if (frequencyPrices && value && frequencyPrices[value]){
                 currentValue = frequencyPrices[value].price;
-            } else {
-                if (this.value()) {
-                    currentValue = formatPrice.formatToNumber(this.value(), priceFormat);
-                }
+            } else if (this.value()) {
+                currentValue = formatPrice.formatToNumber(this.value(), priceFormat);
             }
 
             currentValue = formatPrice.formatPrice(currentValue, priceFormat);

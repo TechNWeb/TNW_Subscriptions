@@ -147,8 +147,9 @@ define([
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
                 savingsCalculationType = parseInt(this.options.savingsCalculationType),
-                childrenSelect = $(this.options.childrenSelector);
-            var isNeedStopCalculating = false;
+                childrenSelect = $(this.options.childrenSelector),
+                isNeedStopCalculating = false,
+                resultLabel = '';
             if (childrenSelect) {
                 $.each(childrenSelect, function (key, child) {
                      if (!$(child).val()) {
@@ -166,7 +167,7 @@ define([
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
                     saveString = ' %p (SAVE ~%s%)';
                 $.each(option.labels, function (key, label) {
-                    var resultLabel = $(label).data('default-label');
+                    resultLabel = $(label).data('default-label');
                     if (isNeedStopCalculating === false) {
                         var discount = 0;
                         qtyValue = presetQty ? presetQty : qtyValue;

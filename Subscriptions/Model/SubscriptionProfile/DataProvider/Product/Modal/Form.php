@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable\Interceptor as ConfigurableInterceptor;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\DataObject;
@@ -632,19 +632,14 @@ class Form extends AbstractDataProvider
         if ($productId) {
             $product = $this->formContext->getProductRepository()->getById($productId);
             $price = $product->getPrice();
-            if (!$price) {
-                $type = $product->getTypeId();
-                switch ($type) {
-                    case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                        if ($additionalData && isset($additionalData['super_attribute'])) {
-                            /** @var ConfigurableInterceptor $typeInstance */
-                            $typeInstance = $product->getTypeInstance();
-                            $simpleProduct = $typeInstance
-                                ->getProductByAttributes($additionalData['super_attribute'], $product);
-                            $price = $simpleProduct->getPrice();
-                        }
-                        break;
-                }
+            if (!$price
+                && $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
+                && $additionalData && isset($additionalData['super_attribute'])) {
+                /** @var Configurable $typeInstance */
+                $typeInstance = $product->getTypeInstance();
+                $simpleProduct = $typeInstance
+                    ->getProductByAttributes($additionalData['super_attribute'], $product);
+                $price = $simpleProduct->getPrice();
             }
             $productPrice = $this->convertPrice($price);
 
