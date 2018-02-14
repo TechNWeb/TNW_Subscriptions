@@ -186,36 +186,39 @@ define([
                 frequencyLabel = this.getLabelForOption(optionValue),
                 frequencyData = this.getFrequencyData(),
                 discount = 0,
-                productPrice = this.getProductPrice(),
+                productPrice = parseFloat(this.getProductPrice()),
                 priceFormat = this.getPriceFormat(),
                 productQty = this.getProductQty(),
                 currentFrequencyPrice,
-                saveString = '(SAVE %s)';
-
+                saveString = ' %p (SAVE ~%s%)';
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
                 var frequencyUnit = frequencyData[optionValue].frequency_unit,
                     frequencyUnitType = frequencyData[optionValue].frequency_unit_type,
+                    presetQty = frequencyData[optionValue].preset_qty,
                     calculatedUnit = this.getCalculatedUnit(frequencyUnit, frequencyUnitType);
-
-                currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
-                if (changeType != 'all') {
+                currentFrequencyPrice = parseFloat(this.getCurrentFrequencyPrice(frequencyData, optionValue));
+                if (changeType !== 'all' && currentFrequencyPrice <= 0) {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
-
-                if (this.getSavingsCalculationType() == 2) {
-                    if (frequencyUnitType == 5) {
-                        saveString = '(SAVE ~ %s)'
-                    }
-                    discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * productQty;
-                } else if (this.getSavingsCalculationType() == 1) {
-                    discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
+                currentFrequencyPrice = parseFloat(currentFrequencyPrice);
+                productQty = presetQty ? presetQty : productQty;
+                if (this.getSavingsCalculationType() === 2) {
+                    //formula for service
+                    discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * productQty * 100)
+                        / (productPrice * calculatedUnit);
+                } else if (this.getSavingsCalculationType() === 1) {
+                    //formula for any retail / physical product with preset qty
+                    discount = ((productPrice * productQty - currentFrequencyPrice) * 100)
+                        / (productPrice * productQty);
                 } else {
-                    discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
+                    //formula for any retail / physical product
+                    discount = ((productPrice - currentFrequencyPrice) * productQty * 100) / productPrice;
                 }
-
+                discount = parseInt(discount);
                 if (discount > 0) {
-                    discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
-                    frequencyLabel += '  ' + $.mage.__(saveString).replace('%s', discount);
+                    frequencyLabel += $.mage.__(saveString)
+                        .replace('%p', formatPrice.formatPrice(currentFrequencyPrice, priceFormat))
+                        .replace('%s', discount);
                 }
 
                 return frequencyLabel;
@@ -312,16 +315,7 @@ define([
          * @returns bool|number
          */
         issetFrequencyPrice: function (frequencyData, optionValue) {
-            var currentItemData = this.getCurrentItemData(),
-                issetFrequencyPrice;
-
-            if (this.frequencyIsInitial(optionValue, currentItemData)) {
-                issetFrequencyPrice = currentItemData.price;
-            } else {
-                issetFrequencyPrice = (optionValue && frequencyData[optionValue]);
-            }
-
-            return issetFrequencyPrice
+            return optionValue && frequencyData[optionValue];
         },
 
         /**
@@ -332,29 +326,7 @@ define([
          * @returns number|string
          */
         getCurrentFrequencyPrice: function (frequencyData, optionValue) {
-            var price,
-                currentItemData = this.getCurrentItemData();
-
-            if (this.frequencyIsInitial(optionValue, currentItemData)) {
-                price = currentItemData.price;
-            } else {
-                price = frequencyData[optionValue]['price'];
-            }
-
-            return price;
-        },
-
-        /**
-         * Check if frequency in params is initial for current item.
-         *
-         * @param optionValue
-         * @param currentItemData
-         * @returns {boolean}
-         */
-        frequencyIsInitial: function (optionValue, currentItemData) {
-            var initialFrequencyId = currentItemData.billing_frequency;
-
-            return (initialFrequencyId * 1 == optionValue * 1);
+            return frequencyData[optionValue]['price'];
         },
 
         /**

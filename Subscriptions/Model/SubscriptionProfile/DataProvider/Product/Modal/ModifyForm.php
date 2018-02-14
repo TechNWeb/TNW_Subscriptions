@@ -630,13 +630,8 @@ class ModifyForm extends Form
      */
     protected function isEditButtonVisible()
     {
-        return (
-            null !== $this->currentProduct
-            && !(
-                $this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
-                && count($this->getProductBillingFrequencies($this->currentProduct->getId())) <= 1
-            )
-        );
+        return null !== $this->currentProduct
+            && count($this->getProductBillingFrequencies($this->currentProduct->getId()));
     }
 
     /**

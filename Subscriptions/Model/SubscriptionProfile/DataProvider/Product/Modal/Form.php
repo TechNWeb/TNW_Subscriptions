@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\DataObject;
@@ -621,15 +622,28 @@ class Form extends AbstractDataProvider
      * Returns price for current product.
      *
      * @param int|string|null $productId
+     * @param null|array $additionalData
      * @return string
      */
-    private function getProductPrice($productId = null)
+    private function getProductPrice($productId = null, $additionalData = null)
     {
         $productPrice = null;
         $productId = $productId ?: $this->getRequestProductId();
         if ($productId) {
             $product = $this->formContext->getProductRepository()->getById($productId);
-            $productPrice = $this->convertPrice($product->getPrice());
+            $price = $product->getPrice();
+            if (!$price
+                && $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
+                && $additionalData && isset($additionalData['super_attribute'])
+            ) {
+                /** @var Configurable $typeInstance */
+                $typeInstance = $product->getTypeInstance();
+                $simpleProduct = $typeInstance
+                    ->getProductByAttributes($additionalData['super_attribute'], $product);
+                $price = $simpleProduct->getPrice();
+            }
+            $productPrice = $this->convertPrice($price);
+
         }
 
         return $productPrice;
@@ -683,7 +697,7 @@ class Form extends AbstractDataProvider
 
         if ($needProductValues) {
             $data['trial_period'] = $this->getTrialPeriod($productId);
-            $data['product_price'] = $this->getProductPrice($productId);
+            $data['product_price'] = $this->getProductPrice($productId, $additionalData);
             $data['period'] = self::DEFAULT_PERIOD_VALUE;
             $data['savings_calculation'] = $this->getSavingsCalculation($productId);
         }
