@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Pool;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Account;
 
 /**
