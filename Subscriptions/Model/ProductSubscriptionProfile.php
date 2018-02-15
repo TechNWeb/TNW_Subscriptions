@@ -7,18 +7,22 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Api\AttributeValueFactory;
+use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\Model\AbstractExtensibleModel;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
+use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface;
+
 /**
  * Product subscription profile model.
  */
 class ProductSubscriptionProfile
-    extends AbstractModel
+    extends AbstractExtensibleModel
     implements ProductSubscriptionProfileInterface
 {
     /**
@@ -46,9 +50,47 @@ class ProductSubscriptionProfile
     private $magentoProduct;
 
     /**
+     * @var ProductSubscriptionProfileAttributeRepositoryInterface
+     */
+    private $metadataService;
+
+    /**
+     * Attributes are that part of interface
+     *
+     * @var array
+     */
+    private $interfaceAttributes = [
+        self::ID,
+        self::PARENT_ID,
+        self::SUBSCRIPTION_PROFILE_ID,
+        self::MAGENTO_PRODUCT_ID,
+        self::PRICE,
+        self::INITIAL_FEE,
+        self::QTY,
+        self::PURCHASE_TYPE,
+        self::TRIAL_STATUS,
+        self::TRIAL_PRICE,
+        self::LOCK_PRODUCT_PRICE_STATUS,
+        self::OFFER_FLAT_DISCOUNT_STATUS,
+        self::DISCOUNT_AMOUNT,
+        self::DISCOUNT_TYPE,
+        self::CREATED_AT,
+        self::UPDATED_AT,
+        self::NEED_RECOLLECT,
+        self::NAME,
+        self::SKU,
+        self::TNW_SUBSCR_UNLOCK_PRESET_QTY,
+        self::CUSTOM_OPTIONS,
+    ];
+
+    /**
+     * ProductSubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
      * @param ProductRepositoryInterface $productRepository
+     * @param ProductSubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -56,13 +98,26 @@ class ProductSubscriptionProfile
     public function __construct(
         ModelContext $context,
         Registry $registry,
+        ExtensionAttributesFactory $extensionFactory,
+        AttributeValueFactory $customAttributeFactory,
         ProductRepositoryInterface $productRepository,
+        ProductSubscriptionProfileAttributeRepositoryInterface $metadataService,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+
         $this->productRepository = $productRepository;
-        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->metadataService = $metadataService;
     }
 
     /**
@@ -71,6 +126,19 @@ class ProductSubscriptionProfile
     protected function _construct()
     {
         $this->_init(Resource::class);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getCustomAttributesCodes()
+    {
+        if ($this->customAttributesCodes === null) {
+            $this->customAttributesCodes = $this->getEavAttributesCodes($this->metadataService);
+            $this->customAttributesCodes = array_diff($this->customAttributesCodes, $this->interfaceAttributes);
+        }
+
+        return $this->customAttributesCodes;
     }
 
     /**

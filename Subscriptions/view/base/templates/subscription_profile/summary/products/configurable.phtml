@@ -6,9 +6,9 @@
 ?>
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products\Configurable $block */ ?>
 <?php $options = $block->getItemOptions()?>
+<dl class="item-options config-item-options">
 <?php foreach ($options as $option) : ?>
-    <div class="config-item-options">
-        <label><?php echo $block->escapeHtml($option['attributeLabel']) ?>:</label>
-        <div class="control"><?php echo $block->escapeHtml($option['optionLabel'])?></div>
-    </div>
+    <dt><?php echo $block->escapeHtml($option['attributeLabel']) ?></dt>
+    <dd><?php echo $block->escapeHtml($option['optionLabel']) ?></dd>
 <?php endforeach; ?>
+</dl>

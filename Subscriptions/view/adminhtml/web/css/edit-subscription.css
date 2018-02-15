@@ -915,3 +915,24 @@ button.action-editor.active:before{
     margin-left: 13px;
     line-height: 3.2rem;
 }
+
+.product-attributes {
+    margin-top: 1.5rem;
+}
+.product-attributes .admin__fieldset>.admin__field.edit-product {
+    margin-top: 0;
+    padding-top: 0.3rem;
+    padding-bottom: .3rem;
+}
+.product-attributes .admin__fieldset>.admin__field.edit-product:nth-child(2n) {
+    background-color: #f5f5f5;
+}
+.product-attributes .admin__fieldset>.admin__field.edit-product >.admin__field-label{
+    margin-left: 18px;
+    text-align: left;
+    width: calc( (100%) * .50 - 5px ) !important;
+}
+.product-attributes .edit-product div.admin__field-control {
+    margin-left: 13px;
+    line-height: 3.2rem;
+}
