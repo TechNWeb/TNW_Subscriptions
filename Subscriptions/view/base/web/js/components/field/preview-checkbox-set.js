@@ -61,8 +61,8 @@ define([
          *
          * @return void
          */
-        onPriceUpdate: function(priceValue) {
-            this.setDiscountLabel(priceValue);
+        onPriceUpdate: function() {
+            this.setDiscountLabel('all');
         },
 
         /**
@@ -196,38 +196,41 @@ define([
                 frequencyLabel = this.getLabelForOption(optionValue),
                 frequencyData = this.getFrequencyData(),
                 discount = 0,
-                productPrice = this.getProductPrice(),
+                productPrice = parseFloat(this.getProductPrice()),
                 priceFormat = this.getPriceFormat(),
                 productQty = this.getProductQty(),
                 currentFrequencyPrice,
-                saveString = '(SAVE %s)';
-
+                saveString = ' %p (SAVE ~%s%)',
+                inputFrequencyPrice;
             if (this.issetFrequencyPrice(frequencyData, optionValue)) {
                 var frequencyUnit = frequencyData[optionValue].frequency_unit,
                     frequencyUnitType = frequencyData[optionValue].frequency_unit_type,
                     presetQty = frequencyData[optionValue].preset_qty,
                     calculatedUnit = this.getCalculatedUnit(frequencyUnit, frequencyUnitType);
-
-                currentFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
-                if (changeType != 'all') {
+                inputFrequencyPrice = this.getCurrentFrequencyPrice(frequencyData, optionValue);
+                currentFrequencyPrice = parseFloat(formatPrice.formatToNumber(inputFrequencyPrice, priceFormat));
+                if (changeType !== 'all' && currentFrequencyPrice <= 0) {
                     currentFrequencyPrice = formatPrice.formatToNumber(changeType, priceFormat);
                 }
-
+                currentFrequencyPrice = parseFloat(currentFrequencyPrice);
                 productQty = presetQty ? presetQty : productQty;
                 if (this.getSavingsCalculationType() === 2) {
-                    if (frequencyUnitType == 5) {
-                        saveString = '(SAVE ~ %s)'
-                    }
-                    discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * productQty;
+                    //formula for service
+                    discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * productQty * 100)
+                        / (productPrice * calculatedUnit);
                 } else if (this.getSavingsCalculationType() === 1) {
-                    discount = parseFloat(productPrice) * productQty - parseFloat(currentFrequencyPrice);
+                    //formula for any retail / physical product with preset qty
+                    discount = ((productPrice * productQty - currentFrequencyPrice) * 100)
+                        / (productPrice * productQty);
                 } else {
-                    discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * productQty;
+                    //formula for any retail / physical product
+                    discount = ((productPrice - currentFrequencyPrice) * productQty * 100) / productPrice;
                 }
-
+                discount = parseInt(discount);
                 if (discount > 0) {
-                    discount = this.currencySymbol + formatPrice.formatPrice(discount, priceFormat);
-                    frequencyLabel += '  ' + $.mage.__(saveString).replace('%s', discount);
+                    frequencyLabel += $.mage.__(saveString)
+                        .replace('%p', formatPrice.formatPrice(currentFrequencyPrice, priceFormat))
+                        .replace('%s', discount);
                 }
 
                 return frequencyLabel;

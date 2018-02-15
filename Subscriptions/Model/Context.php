@@ -175,7 +175,8 @@ class Context
             'integerRequired' => $priceFormat['integerRequired'],
             'decimalSymbol' => $priceFormat['decimalSymbol'],
             'groupSymbol' => $priceFormat['groupSymbol'],
-            'groupLength' => $priceFormat['groupLength']
+            'groupLength' => $priceFormat['groupLength'],
+            'pattern' => $priceFormat['pattern'],
         ];
 
         return json_encode($priceFormatData);
