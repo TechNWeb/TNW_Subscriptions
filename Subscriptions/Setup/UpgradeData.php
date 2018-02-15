@@ -48,6 +48,7 @@ class UpgradeData implements UpgradeDataInterface
      * @param EavSetupFactory $eavSetupFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductAttributeRepositoryInterface $attributeRepository
+     * @param SubscriptionSetupFactory $subscriptionSetupFactory
      */
     public function __construct(
         EavSetupFactory $eavSetupFactory,
@@ -248,6 +249,7 @@ class UpgradeData implements UpgradeDataInterface
 
     /**
      * @param ModuleDataSetupInterface $setup
+     * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function upgradeEntities(ModuleDataSetupInterface $setup)

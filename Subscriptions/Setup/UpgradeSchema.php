@@ -40,7 +40,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->removeUniqueProductEntityKey($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.14", "<")) {
+        if (version_compare($context->getVersion(), "2.0.15", "<")) {
             $this->addProductSubscriptionProfileAttributeTable($setup);
         }
 
@@ -216,6 +216,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
     /**
      * @param SchemaSetupInterface $setup
+     * @return void
      * @throws \Zend_Db_Exception
      */
     private function addProductSubscriptionProfileAttributeTable(SchemaSetupInterface $setup)

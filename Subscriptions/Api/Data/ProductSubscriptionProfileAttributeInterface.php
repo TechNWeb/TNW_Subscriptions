@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface for subscription profile product attribute.
+ */
 interface ProductSubscriptionProfileAttributeInterface extends \Magento\Eav\Api\Data\AttributeInterface
 {
     const IS_VISIBLE_ON_FRONT = 'is_visible_on_front';

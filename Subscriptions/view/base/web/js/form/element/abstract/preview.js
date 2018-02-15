@@ -50,7 +50,7 @@ define(['jquery'], function($j) {
             /**
              * Sets complete preview label.
              *
-             * @param value
+             * @param {String} value
              */
             setCompletePreviewLabel: function (value) {
                 this.completePreviewLabel(
@@ -71,7 +71,7 @@ define(['jquery'], function($j) {
             /**
              * Resets value if "showPreview" property changed.
              *
-             * @param value
+             * @param {String} value
              */
             onShowPreviewChanged: function (value) {
                 if (value && this.initialValue && this.value() !== this.initialValue){

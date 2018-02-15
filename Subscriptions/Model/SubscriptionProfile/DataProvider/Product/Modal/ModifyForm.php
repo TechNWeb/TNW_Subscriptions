@@ -94,7 +94,7 @@ class ModifyForm extends Form
         'start_on',
         'qty',
         'super_attribute',
-        'additional_attribute'
+        'additional_attribute',
     ];
 
     /**

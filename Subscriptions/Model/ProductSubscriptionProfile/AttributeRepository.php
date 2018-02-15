@@ -3,6 +3,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface;
@@ -15,22 +16,22 @@ class AttributeRepository implements ProductSubscriptionProfileAttributeReposito
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
-    protected $searchCriteriaBuilder;
+    private $searchCriteriaBuilder;
 
     /**
      * @var \Magento\Framework\Api\FilterBuilder
      */
-    protected $filterBuilder;
+    private $filterBuilder;
 
     /**
      * @var \Magento\Eav\Api\AttributeRepositoryInterface
      */
-    protected $eavAttributeRepository;
+    private $eavAttributeRepository;
 
     /**
      * @var \Magento\Eav\Model\Config
      */
-    protected $eavConfig;
+    private $eavConfig;
 
     /**
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
@@ -63,6 +64,7 @@ class AttributeRepository implements ProductSubscriptionProfileAttributeReposito
 
     /**
      * {@inheritdoc}
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function get($attributeCode)
     {
@@ -75,6 +77,7 @@ class AttributeRepository implements ProductSubscriptionProfileAttributeReposito
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomAttributesMetadata($dataObjectClassName = null)
     {

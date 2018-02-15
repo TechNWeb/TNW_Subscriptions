@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Attribute;
 
+/**
+ * Product subscription profile attribute resource collection
+ */
 class Collection extends \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection
 {
     /**

@@ -63,6 +63,8 @@ class Products extends BaseSummary
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+     * @param FormContext $formContext
+     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
      * @param array $data
      */
     public function __construct(
@@ -296,6 +298,7 @@ class Products extends BaseSummary
     }
 
     /**
+     * get visible attributes
      * @param ProductSubscriptionProfileInterface $item
      * @return \Magento\Eav\Model\Entity\Attribute\AbstractAttribute[]
      */

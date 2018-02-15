@@ -59,7 +59,7 @@ class ProductSubscriptionProfile
      *
      * @var array
      */
-    protected $interfaceAttributes = [
+    private $interfaceAttributes = [
         self::ID,
         self::PARENT_ID,
         self::SUBSCRIPTION_PROFILE_ID,
@@ -87,9 +87,10 @@ class ProductSubscriptionProfile
      * ProductSubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
-     * @param ProductRepositoryInterface $productRepository
      * @param ExtensionAttributesFactory $extensionFactory
      * @param AttributeValueFactory $customAttributeFactory
+     * @param ProductRepositoryInterface $productRepository
+     * @param ProductSubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -97,16 +98,23 @@ class ProductSubscriptionProfile
     public function __construct(
         ModelContext $context,
         Registry $registry,
-        ProductRepositoryInterface $productRepository,
         ExtensionAttributesFactory $extensionFactory,
         AttributeValueFactory $customAttributeFactory,
+        ProductRepositoryInterface $productRepository,
         ProductSubscriptionProfileAttributeRepositoryInterface $metadataService,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory,
-            $resource, $resourceCollection, $data);
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
 
         $this->productRepository = $productRepository;
         $this->metadataService = $metadataService;

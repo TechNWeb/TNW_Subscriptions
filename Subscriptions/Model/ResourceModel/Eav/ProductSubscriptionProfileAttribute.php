@@ -9,9 +9,11 @@ namespace TNW\Subscriptions\Model\ResourceModel\Eav;
 use Magento\Eav\Model\Entity\Attribute;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 
+/**
+ * Product subscription profile attribute model
+ */
 class ProductSubscriptionProfileAttribute extends Attribute implements ProductSubscriptionProfileAttributeInterface
 {
-
     /**
      * {@inheritdoc}
      */

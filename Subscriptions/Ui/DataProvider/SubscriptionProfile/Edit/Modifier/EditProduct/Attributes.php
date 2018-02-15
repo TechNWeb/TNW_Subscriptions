@@ -76,8 +76,8 @@ class Attributes extends Base
     private $editAllow;
 
     /**
-     * @param Registry $registry
      * @param UrlFactory $urlFactory
+     * @param Registry $registry
      * @param Context $contextModel
      * @param ArrayManager $arrayManager
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -87,8 +87,8 @@ class Attributes extends Base
      * @param bool $editAllow
      */
     public function __construct(
-        Registry $registry,
         UrlFactory $urlFactory,
+        Registry $registry,
         Context $contextModel,
         ArrayManager $arrayManager,
         SearchCriteriaBuilder $searchCriteriaBuilder,
@@ -190,7 +190,7 @@ class Attributes extends Base
                                 'additionalClasses' => 'product-attributes',
                                 'imports' => [
                                     'visible' => '${ $.parentName }.edit_attributes:active',
-                                ]
+                                ],
                             ],
                         ],
                     ],
@@ -263,7 +263,7 @@ class Attributes extends Base
      * Retrieve form element
      *
      * @param string $value
-     * @return mixed
+     * @return string
      */
     private function getFormElementsMapValue($value)
     {
