@@ -13,6 +13,9 @@ define([
             selectDefinedByCustomer: false
         },
 
+        /**
+         * @inheritdoc
+         */
         initialize: function () {
             this._super()
                 .observe('selectDefinedByCustomer')

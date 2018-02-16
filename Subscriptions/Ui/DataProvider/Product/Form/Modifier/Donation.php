@@ -34,10 +34,10 @@ class Donation extends BaseModifier
      * @param Context $context
      */
     public function __construct(
-        LocatorInterface $locator,
-        ArrayManager $arrayManager,
         StoreManagerInterface $storeManager,
-        Context $context
+        Context $context,
+        LocatorInterface $locator,
+        ArrayManager $arrayManager
     ) {
         parent::__construct($storeManager, $context);
         $this->locator = $locator;

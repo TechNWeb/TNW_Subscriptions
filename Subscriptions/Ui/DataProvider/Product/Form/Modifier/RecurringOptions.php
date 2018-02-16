@@ -232,11 +232,11 @@ class RecurringOptions extends BaseModifier
                             'children' => [
                                 static::CONTAINER_HEADER_NAME => $this->getHeaderContainerConfig(1010),
                                 static::FIELD_ENABLE => $this->getEnableFieldConfig(1020),
-                                static::GRID_OPTIONS_NAME => $this->getOptionsGridConfig(1030)
-                            ]
-                        ]
-                    ]
-                ]
+                                static::GRID_OPTIONS_NAME => $this->getOptionsGridConfig(1030),
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
 
