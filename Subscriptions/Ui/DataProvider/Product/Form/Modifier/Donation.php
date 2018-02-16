@@ -11,6 +11,9 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Context;
 
+/**
+ * Customize Donation field
+ */
 class Donation extends BaseModifier
 {
     /**
@@ -23,6 +26,13 @@ class Donation extends BaseModifier
      */
     private $arrayManager;
 
+    /**
+     * Donation constructor.
+     * @param LocatorInterface $locator
+     * @param ArrayManager $arrayManager
+     * @param StoreManagerInterface $storeManager
+     * @param Context $context
+     */
     public function __construct(
         LocatorInterface $locator,
         ArrayManager $arrayManager,
