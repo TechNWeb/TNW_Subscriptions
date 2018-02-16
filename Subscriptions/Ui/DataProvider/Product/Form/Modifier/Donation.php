@@ -28,10 +28,10 @@ class Donation extends BaseModifier
 
     /**
      * Donation constructor.
-     * @param LocatorInterface $locator
-     * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
      * @param Context $context
+     * @param LocatorInterface $locator
+     * @param ArrayManager $arrayManager
      */
     public function __construct(
         StoreManagerInterface $storeManager,
