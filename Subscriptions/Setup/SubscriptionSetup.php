@@ -8,6 +8,7 @@
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Eav\Setup\EavSetup;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
@@ -219,6 +220,11 @@ class SubscriptionSetup extends EavSetup
             \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY => [
                 'entity_model' => \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class,
                 'table' => \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY_TABLE,
+                'attribute_model' =>
+                    \TNW\Subscriptions\Model\ResourceModel\Eav\ProductSubscriptionProfileAttribute::class,
+                'entity_attribute_collection' =>
+                    \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Attribute\Collection::class,
+                'additional_attribute_table' => 'tnw_subscriptions_product_subscription_profile_eav_attribute',
                 'attributes' => [
                     ProductSubscriptionProfile::PARENT_ID => [
                         'type' => 'static',
@@ -227,6 +233,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 10,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID => [
                         'type' => 'static',
@@ -235,6 +242,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 20,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::MAGENTO_PRODUCT_ID => [
                         'type' => 'static',
@@ -243,6 +251,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 30,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::NAME => [
                         'type' => 'static',
@@ -251,6 +260,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 40,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::SKU => [
                         'type' => 'static',
@@ -259,6 +269,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 50,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::TNW_SUBSCR_UNLOCK_PRESET_QTY => [
                         'type' => 'static',
@@ -267,6 +278,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 60,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::PRICE => [
                         'type' => 'static',
@@ -275,6 +287,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => true,
                         'frontend_class' => 'validate-number',
                         'sort_order' => 70,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::INITIAL_FEE => [
                         'type' => 'static',
@@ -283,6 +296,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => true,
                         'frontend_class' => 'validate-number',
                         'sort_order' => 80,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::QTY => [
                         'type' => 'static',
@@ -291,6 +305,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => true,
                         'frontend_class' => 'validate-number',
                         'sort_order' => 90,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::PURCHASE_TYPE => [
                         'type' => 'static',
@@ -299,6 +314,7 @@ class SubscriptionSetup extends EavSetup
                         'source' => \TNW\Subscriptions\Model\Config\Source\PurchaseType::class,
                         'required' => true,
                         'sort_order' => 100,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::TRIAL_STATUS => [
                         'type' => 'static',
@@ -307,6 +323,7 @@ class SubscriptionSetup extends EavSetup
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => false,
                         'sort_order' => 110,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::TRIAL_PRICE => [
                         'type' => 'static',
@@ -315,6 +332,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'frontend_class' => 'validate-number',
                         'sort_order' => 120,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::LOCK_PRODUCT_PRICE_STATUS => [
                         'type' => 'static',
@@ -323,6 +341,7 @@ class SubscriptionSetup extends EavSetup
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => true,
                         'sort_order' => 130,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::OFFER_FLAT_DISCOUNT_STATUS => [
                         'type' => 'static',
@@ -331,6 +350,7 @@ class SubscriptionSetup extends EavSetup
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => true,
                         'sort_order' => 140,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::DISCOUNT_AMOUNT => [
                         'type' => 'static',
@@ -339,6 +359,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'frontend_class' => 'validate-number',
                         'sort_order' => 150,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::DISCOUNT_TYPE => [
                         'type' => 'static',
@@ -347,6 +368,7 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'source' => \TNW\Subscriptions\Model\Config\Source\DiscountType::class,
                         'sort_order' => 160,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::NEED_RECOLLECT => [
                         'type' => 'static',
@@ -355,6 +377,7 @@ class SubscriptionSetup extends EavSetup
                         'input' => 'select',
                         'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
                         'required' => true,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::CUSTOM_OPTIONS => [
                         'type' => 'static',
@@ -363,18 +386,21 @@ class SubscriptionSetup extends EavSetup
                         'required' => false,
                         'visible' => false,
                         'sort_order' => 180,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::CREATED_AT => [
                         'type' => 'static',
                         'input' => 'date',
                         'sort_order' => 190,
-                        'visible' => false
+                        'visible' => false,
+                        'is_visible_on_front' => 0,
                     ],
                     ProductSubscriptionProfile::UPDATED_AT => [
                         'type' => 'static',
                         'input' => 'date',
                         'sort_order' => 200,
-                        'visible' => false
+                        'visible' => false,
+                        'is_visible_on_front' => 0,
                     ]
                 ],
             ],
