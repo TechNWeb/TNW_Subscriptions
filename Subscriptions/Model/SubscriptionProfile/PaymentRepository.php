@@ -6,75 +6,163 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use TNW\Subscriptions\Api\PaymentRepositoryInterface;
-
-
-
-use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Api\SearchResults;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterfaceFactory;
+use TNW\Subscriptions\Api\PaymentRepositoryInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory;
 
-use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
-use TNW\Subscriptions\Api\Data\BillingFrequencyInterfaceFactory;
-use TNW\Subscriptions\Api\Data\BillingFrequencySearchResultsInterfaceFactory;
-use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
-use TNW\Subscriptions\Model\ResourceModel\BillingFrequency as ResourceBillingFrequency;
-use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory as BillingFrequencyCollectionFactory;
 
 class PaymentRepository implements PaymentRepositoryInterface
 {
     /**
-     * @inheritDoc
+     * @var CollectionFactory
      */
-    public function save(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
-    )
-    {
-        $subscriptionPayment;
-        // TODO: Implement save() method.
+    private $collectionFactory;
+    /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment
+     */
+    private $resourceModel;
+    /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\PaymentFactory
+     */
+    private $paymentFactory;
+    /**
+     * @var SubscriptionProfilePaymentSearchResultsInterfaceFactory
+     */
+    private $paymentSearchResults;
+
+    /**
+     * PaymentRepository constructor.
+     * @param CollectionFactory $collectionFactory
+     * @param \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment $resourceModel
+     * @param PaymentFactory $paymentFactory
+     * @param SubscriptionProfilePaymentSearchResultsInterfaceFactory $paymentSearchResults
+     */
+    public function __construct(
+        CollectionFactory $collectionFactory,
+        \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment $resourceModel,
+        PaymentFactory $paymentFactory,
+        SubscriptionProfilePaymentSearchResultsInterfaceFactory $paymentSearchResults
+    ) {
+
+        $this->collectionFactory = $collectionFactory;
+        $this->resourceModel = $resourceModel;
+        $this->paymentFactory = $paymentFactory;
+        $this->paymentSearchResults = $paymentSearchResults;
     }
 
     /**
-     * @inheritDoc
+     * Save subscription payment to DB
+     *
+     * @param SubscriptionProfilePaymentInterface $subscriptionPayment
+     * @return SubscriptionProfilePaymentInterface
+     * @throws CouldNotSaveException
      */
-    public function getById($id)
+    public function save(SubscriptionProfilePaymentInterface $subscriptionPayment)
     {
-        $id;
-        // TODO: Implement getById() method.
+        try {
+            if ($subscriptionPayment->getProfileId() && $subscriptionPayment->getEngineCode()) {
+                $this->resourceModel->save($subscriptionPayment);
+            } else {
+                throw new CouldNotSaveException(
+                    __('Could not save the subscription payment. Profile ID or engine code is not found')
+                );
+            }
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__(
+                'Could not save the subscription payment: %1',
+                $e->getMessage()
+            ));
+        }
+        return $subscriptionPayment;
     }
 
     /**
-     * @inheritDoc
+     * Get payment by id
+     *
+     * @param string $paymentId int
+     * @return mixed
+     * @throws NoSuchEntityException
      */
-    public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-    )
+    public function getById($paymentId)
     {
-        $searchCriteria;
-        // TODO: Implement getList() method.
+        $subscriptionProfile = $this->paymentFactory->create();
+        $this->resourceModel->load($subscriptionProfile, $paymentId);
+        if (!$subscriptionProfile->getId()) {
+            throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.',
+                $paymentId));
+        }
+        return $subscriptionProfile;
+    }
+
+
+    /**
+     * Get subscription payment list
+     *
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return SearchResults
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria)
+    {
+        /** @var SearchResults $searchData */
+        $searchData = $this->paymentSearchResults->create();
+        $searchData->setSearchCriteria($searchCriteria);
+        $collection = $this->collectionFactory->create();
+        foreach ($searchCriteria->getFilterGroups() as $group) {
+            $this->addFilterGroupToCollection($group, $collection);
+        }
+        $searchData->setTotalCount($collection->getSize());
+        $sortOrders = $searchCriteria->getSortOrders();
+        if ($sortOrders) {
+            /** @var SortOrder $sortOrder */
+            foreach ($sortOrders as $sortOrder) {
+                $collection->addOrder(
+                    $sortOrder->getField(),
+                    $sortOrder->getDirection() == SortOrder::SORT_ASC ? 'ASC' : 'DESC'
+                );
+            }
+        }
+        $collection->setCurPage($searchCriteria->getCurrentPage());
+        $collection->setPageSize($searchCriteria->getPageSize());
+        $searchData->setItems($collection->getItems());
+        return $searchData;
     }
 
     /**
-     * @inheritDoc
+     * Delete subscription payment
+     *
+     * @param SubscriptionProfilePaymentInterface $subscriptionPayment
+     * @return bool
+     * @throws CouldNotDeleteException
      */
-    public function delete(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
-    )
+    public function delete(SubscriptionProfilePaymentInterface $subscriptionPayment)
     {
-        $subscriptionPayment;
-        // TODO: Implement delete() method.
+        try {
+            $this->resourceModel->delete($subscriptionPayment);
+        } catch (\Exception $exception) {
+            throw new CouldNotDeleteException(__(
+                'Could not delete the subscription profile payment: %1',
+                $exception->getMessage()
+            ));
+        }
+
+        return true;
     }
 
     /**
-     * @inheritDoc
+     * Delete subscription payment
+     *
+     * @param string $id
+     * @return bool
      */
     public function deleteById($id)
     {
-        $id;
-        // TODO: Implement deleteById() method.
+        return $this->delete($this->getById($id));
     }
 }

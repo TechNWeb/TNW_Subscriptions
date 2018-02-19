@@ -13,6 +13,7 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -46,8 +47,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addProductSubscriptionProfileAttributeTable($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.15", "<")) {
+        if (version_compare($context->getVersion(), "2.0.16", "<")) {
             $this->addProfilePaymentTable($setup);
+            $this->dropProfileColumns($setup);
         }
 
         $setup->endSetup();
@@ -337,5 +339,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
             $setup->getConnection()->createTable($table);
         }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    private function dropProfileColumns($setup)
+    {
+        $subscriptionTable = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::ENGINE_CODE);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::TOKEN_HASH);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::PAYMENT_ADDITIONAL_INFO);
+
     }
 }

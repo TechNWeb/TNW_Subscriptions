@@ -67,8 +67,8 @@ class Braintree extends Base
      */
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
-        $result = !empty($profile->getDecodedPaymentAdditionalInfo())
-            ? $profile->getDecodedPaymentAdditionalInfo()
+        $result = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
+            ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
         $result[OrderPaymentInterface::METHOD] = 'braintree';
@@ -82,7 +82,7 @@ class Braintree extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            'payment_method_nonce' => $this->adapterFactory->create()->generateNonce($profile->getPaymentToken()),
+            'payment_method_nonce' => $this->adapterFactory->create()->generateNonce($profile->getPayment()->getPaymentToken()),
         ];
     }
 
@@ -101,7 +101,7 @@ class Braintree extends Base
             $paymentMethod = $this->adapterFactory->create()->generatePaymentMethod(
                 $this->getProfile()->getCustomer(), $methodData['nonce']);
 
-            $this->getProfile()
+            $this->getProfile()->getPayment()
                 ->setPaymentToken($paymentMethod->token)
                 ->setEncodedPaymentAdditionalInfo([
                     OrderPaymentInterface::CC_TYPE => $methodData['additional']['cc_type'],

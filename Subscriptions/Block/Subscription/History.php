@@ -142,12 +142,7 @@ class History extends \Magento\Framework\View\Element\Template
         if (!$this->subscriptions) {
             $collection = $this->subscriptionCollectionFactory->create();
             $this->subscriptions = $collection
-                ->addFieldToSelect(
-                    [
-                        'engine_code',
-                        'payment_additional_info',
-                    ]
-                )->addFieldToFilter(
+                ->addFieldToFilter(
                     'main_table.customer_id',
                     ['eq' => $customerId]
                 )->setOrder(

@@ -27,8 +27,8 @@ class Checkmo extends Base
      */
     public function processProfileByRequestData($requestData)
     {
-        $this->getProfile()->setPaymentAdditionalInfo('');
-        $this->getProfile()->setTokenHash('');
+        $this->getProfile()->getPayment()->setPaymentAdditionalInfo('');
+        $this->getProfile()->getPayment()->setTokenHash('');
         return $this;
     }
 

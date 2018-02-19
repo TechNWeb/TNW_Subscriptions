@@ -74,12 +74,27 @@ interface SubscriptionProfilePaymentInterface
     public function getTokenHash();
 
     /**
+     * Gets payment token.
+     *
+     * @return string|null
+     */
+    public function getPaymentToken();
+
+    /**
      * Sets payment token hash.
      *
      * @param string $tokenHash
      * @return $this
      */
     public function setTokenHash($tokenHash);
+
+    /**
+     * Sets payment token.
+     *
+     * @param string $token
+     * @return $this
+     */
+    public function setPaymentToken($token);
 
     /**
      * Gets payment additional info.
@@ -97,10 +112,26 @@ interface SubscriptionProfilePaymentInterface
     public function setPaymentAdditionalInfo($info);
 
     /**
+     * Gets payment additional info.
+     *
+     * @return []|null
+     */
+    public function getDecodedPaymentAdditionalInfo();
+
+    /**
+     * Sets payment additional info.
+     *
+     * @param  [] $info
+     * @return $this
+     */
+    public function setEncodedPaymentAdditionalInfo($info);
+
+    /**
      * Declare subscription profile model instance
      *
-     * @param SubscriptionProfileInterface $quote
+     * @param SubscriptionProfileInterface $profile
      * @return $this
+     * @internal param SubscriptionProfileInterface $quote
      */
     public function setSubscriptionProfile(SubscriptionProfileInterface $profile);
 

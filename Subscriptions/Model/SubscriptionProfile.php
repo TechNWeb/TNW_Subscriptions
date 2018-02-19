@@ -7,23 +7,24 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
-use Magento\Store\Api\WebsiteRepositoryInterface;
-use Magento\Store\Api\Data\WebsiteInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Json\Helper\Data;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
+use Magento\Store\Api\Data\WebsiteInterface;
+use Magento\Store\Api\WebsiteRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
-use Magento\Framework\Encryption\EncryptorInterface;
-use Magento\Framework\Json\Helper\Data;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\PaymentFactory;
 
@@ -133,7 +134,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         self::ID,
         self::LABEL,
         self::BILLING_FREQUENCY_ID,
-        self::ENGINE_CODE,
         self::START_DATE,
         self::TRIAL_START_DATE,
         self::TERM,
@@ -144,8 +144,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         self::TRIAL_LENGTH,
         self::TRIAL_LENGTH_UNIT,
         self::IS_VIRTUAL,
-        self::TOKEN_HASH,
-        self::PAYMENT_ADDITIONAL_INFO,
         self::CREATED_AT,
         self::UPDATED_AT,
         self::GENERATE_QUOTES_STATE,
@@ -164,6 +162,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param Data $jsonHelper
      * @param PaymentCollectionFactory $paymentCollectionFactory
+     * @param PaymentFactory $paymentFactory
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -350,22 +349,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setFrequency($frequency)
     {
         return $this->setData(self::FREQUENCY, $frequency);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEngineCode()
-    {
-        return $this->getData(self::ENGINE_CODE);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setEngineCode($engine)
-    {
-        return $this->setData(self::ENGINE_CODE, $engine);
     }
 
     /**
@@ -628,86 +611,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     /**
      * @inheritdoc
      */
-    public function getPaymentToken()
-    {
-        return $this->encryptor->decrypt(
-            $this->getData(self::TOKEN_HASH)
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPaymentToken($token)
-    {
-        return $this->setData(
-            self::TOKEN_HASH,
-            $this->encryptor->encrypt($token)
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTokenHash()
-    {
-        return $this->getData(self::TOKEN_HASH);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setTokenHash($tokenHash)
-    {
-        return $this->setData(self::TOKEN_HASH, $tokenHash);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPaymentAdditionalInfo()
-    {
-        return $this->getData(self::PAYMENT_ADDITIONAL_INFO);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPaymentAdditionalInfo($info)
-    {
-        return $this->setData(self::PAYMENT_ADDITIONAL_INFO, $info);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getDecodedPaymentAdditionalInfo()
-    {
-        $return = null;
-        if ($this->getData(self::PAYMENT_ADDITIONAL_INFO)) {
-            $return = $this->jsonHelper->jsonDecode(
-                $this->getData(self::PAYMENT_ADDITIONAL_INFO)
-            );
-        }
-
-        return $return;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setEncodedPaymentAdditionalInfo($info)
-    {
-        return $this->setData(
-            self::PAYMENT_ADDITIONAL_INFO,
-            $this->jsonHelper->jsonEncode($info)
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getGenerateQuotesState()
     {
         return $this->getData(self::GENERATE_QUOTES_STATE);
@@ -864,21 +767,35 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             true
         );
     }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getPayment()
-//    {
-//        if (null === $this->payment || !$this->payment) {
-//            $this->payment = $this->paymentCollectionFactory->create()
-//                ->setSubscriptionProfileFilterFilter($this->getId())
-//                ->getFirstItem();
-//        }
-//        if ($this->getId()) {
-//            $this->payment->setSubscriptionProfile($this);
-//        }
-//
-//        return $this->payment;
-//    }
+
+    /**
+     * Retrieve subscription profile payment
+     *
+     * @return SubscriptionProfilePaymentInterface
+     */
+    public function getPayment()
+    {
+        if ($this->payment === null) {
+            /** @var PaymentCollection $paymentCollection */
+            $paymentCollection = $this->paymentCollectionFactory->create();
+            $this->payment = $paymentCollection->setSubscriptionProfileFilter($this->getId())
+                ->getFirstItem();
+            if ($this->getId()) {
+                $this->payment->setSubscriptionProfile($this);
+            }
+        }
+        return $this->payment;
+    }
+
+    /**
+     * Set payment to profile
+     *
+     * @param SubscriptionProfilePaymentInterface $payment
+     * @return $this
+     */
+    public function setPayment(SubscriptionProfilePaymentInterface $payment)
+    {
+        $this->payment = $payment;
+        return $this;
+    }
 }

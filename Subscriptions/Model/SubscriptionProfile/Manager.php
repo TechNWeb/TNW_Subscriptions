@@ -18,7 +18,6 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -137,10 +136,15 @@ class Manager
      * @var PaymentConfig
      */
     private $paymentConfig;
+    /**
+     * @var PaymentRepository
+     */
+    private $paymentRepository;
 
     /**
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
+     * @param PaymentRepository $paymentRepository
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
      * @param BillingFrequencyRepositoryInterface $frequencyRepository
      * @param DataObjectHelper $dataObjectHelper
@@ -158,6 +162,7 @@ class Manager
     public function __construct(
         EnginePool $enginePool,
         SubscriptionProfileRepository $subscriptionProfileRepository,
+        PaymentRepository $paymentRepository,
         SubscriptionProfileFactory $subscriptionProfileFactory,
         BillingFrequencyRepositoryInterface $frequencyRepository,
         DataObjectHelper $dataObjectHelper,
@@ -187,6 +192,7 @@ class Manager
         $this->historyLogger = $historyLogger;
         $this->scopeConfig = $scopeConfig;
         $this->paymentConfig = $paymentConfig;
+        $this->paymentRepository = $paymentRepository;
     }
 
     /**
@@ -278,7 +284,7 @@ class Manager
     public function getEngine()
     {
         if (!$this->engine) {
-            $engineCode = $this->getProfile()->getEngineCode();
+            $engineCode = $this->getProfile()->getPayment()->getEngineCode();
             /** @var EngineInterface $engine */
             $this->engine = $this->enginePool->getEngineByCode($engineCode);
             $this->engine->setProfile($this->getProfile());
@@ -295,7 +301,10 @@ class Manager
     public function saveProfile()
     {
         $this->setProfile($this->subscriptionProfileRepository->save($this->getProfile()));
-
+        $payment = $this->getProfile()->getPayment();
+        $payment->setProfileId($this->getProfile()->getId());
+        $payment = $this->paymentRepository->save($payment);
+        $this->getProfile()->setPayment($payment);
         return $this->getProfile();
     }
 
@@ -393,11 +402,11 @@ class Manager
         $engine = $this->getEngineFromRequestData($requestData);
         if ($engine) {
             $types = $this->paymentConfig->getCcTypes();
-            $additionalInfoOld = $this->getProfile()->getDecodedPaymentAdditionalInfo();
-            $oldEngine = $this->getProfile()->getEngineCode();
-            $this->getProfile()->setEngineCode($engine);
+            $additionalInfoOld = $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
+            $oldEngine = $this->getProfile()->getPayment()->getEngineCode();
+            $this->getProfile()->getPayment()->setEngineCode($engine);
             $this->getEngine()->processProfileByRequestData($requestData);
-            $additionalInfo = $this->getProfile()->getDecodedPaymentAdditionalInfo();
+            $additionalInfo = $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
             $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
             $ccType = $ccType ? $types[$ccType] : $ccType;
             $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
@@ -569,7 +578,6 @@ class Manager
             $this->getProfile()
                 ->setCustomerId($quote->getCustomerId())
                 ->setWebsiteId($quote->getStore()->getWebsiteId())
-                ->setEngineCode($quote->getPayment()->getMethod())
                 ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
                 ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
                 ->setIsVirtual($quote->getIsVirtual())
@@ -585,6 +593,8 @@ class Manager
                 ->setTrialLength($request['trial_period'])
                 ->setTrialLengthUnit($request['trial_unit_id'])
                 ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
+            $payment = $this->getProfile()->getPayment();
+            $payment->setEngineCode($quote->getPayment()->getMethod());
             $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
             //set trial start date to profile
             if ($request['is_trial']) {
@@ -623,7 +633,7 @@ class Manager
         $data = $this->getEngine()->getProfilePaymentInfo($payment);
         foreach ($data as $key => $value) {
             $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
-            $this->getProfile()->$method($value);
+            $this->getProfile()->getPayment()->$method($value);
         }
 
         return $this;

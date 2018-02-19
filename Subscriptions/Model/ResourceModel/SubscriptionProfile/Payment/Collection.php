@@ -30,7 +30,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      * @param string|int $subscriptionId
      * @return $this
      */
-    public function setSubscriptionProfileFilterFilter($subscriptionId)
+    public function setSubscriptionProfileFilter($subscriptionId)
     {
         return $this->addFieldToFilter(SubscriptionProfilePaymentInterface::PROFILE_ID, $subscriptionId);
     }
