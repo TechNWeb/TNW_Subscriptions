@@ -12,33 +12,38 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\PaymentRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory;
 
-
+/**
+ * Repository for subscription profile payment
+ */
 class PaymentRepository implements PaymentRepositoryInterface
 {
     /**
      * @var CollectionFactory
      */
     private $collectionFactory;
+
     /**
      * @var \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment
      */
     private $resourceModel;
+
     /**
      * @var \TNW\Subscriptions\Model\SubscriptionProfile\PaymentFactory
      */
     private $paymentFactory;
+
     /**
      * @var SubscriptionProfilePaymentSearchResultsInterfaceFactory
      */
     private $paymentSearchResults;
 
     /**
-     * PaymentRepository constructor.
      * @param CollectionFactory $collectionFactory
      * @param \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment $resourceModel
      * @param PaymentFactory $paymentFactory
@@ -50,7 +55,6 @@ class PaymentRepository implements PaymentRepositoryInterface
         PaymentFactory $paymentFactory,
         SubscriptionProfilePaymentSearchResultsInterfaceFactory $paymentSearchResults
     ) {
-
         $this->collectionFactory = $collectionFactory;
         $this->resourceModel = $resourceModel;
         $this->paymentFactory = $paymentFactory;
@@ -87,17 +91,19 @@ class PaymentRepository implements PaymentRepositoryInterface
      * Get payment by id
      *
      * @param string $paymentId int
-     * @return mixed
+     * @return SubscriptionProfileInterface
      * @throws NoSuchEntityException
      */
     public function getById($paymentId)
     {
         $subscriptionProfile = $this->paymentFactory->create();
         $this->resourceModel->load($subscriptionProfile, $paymentId);
+
         if (!$subscriptionProfile->getId()) {
             throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.',
                 $paymentId));
         }
+
         return $subscriptionProfile;
     }
 
@@ -114,11 +120,14 @@ class PaymentRepository implements PaymentRepositoryInterface
         $searchData = $this->paymentSearchResults->create();
         $searchData->setSearchCriteria($searchCriteria);
         $collection = $this->collectionFactory->create();
+
         foreach ($searchCriteria->getFilterGroups() as $group) {
             $this->addFilterGroupToCollection($group, $collection);
         }
+
         $searchData->setTotalCount($collection->getSize());
         $sortOrders = $searchCriteria->getSortOrders();
+
         if ($sortOrders) {
             /** @var SortOrder $sortOrder */
             foreach ($sortOrders as $sortOrder) {
@@ -128,9 +137,11 @@ class PaymentRepository implements PaymentRepositoryInterface
                 );
             }
         }
+
         $collection->setCurPage($searchCriteria->getCurrentPage());
         $collection->setPageSize($searchCriteria->getPageSize());
         $searchData->setItems($collection->getItems());
+
         return $searchData;
     }
 

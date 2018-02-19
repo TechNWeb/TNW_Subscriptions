@@ -272,6 +272,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
     /**
      * @param SchemaSetupInterface $setup
+     * @return void
      * @throws \Zend_Db_Exception
      */
     private function addProfilePaymentTable(SchemaSetupInterface $setup)
@@ -334,18 +335,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
                 SubscriptionProfile::ID,
                 \Magento\Framework\DB\Adapter\AdapterInterface::FK_ACTION_CASCADE
-            )
-            ;
-
+            );
             $setup->getConnection()->createTable($table);
         }
     }
 
     /**
      * @param SchemaSetupInterface $setup
+     * @return void
      * @throws \Zend_Db_Exception
      */
-    private function dropProfileColumns($setup)
+    private function dropProfileColumns(SchemaSetupInterface $setup)
     {
         $subscriptionTable = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
         $setup->getConnection()
@@ -354,6 +354,5 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->dropColumn($subscriptionTable, SubscriptionProfileInterface::TOKEN_HASH);
         $setup->getConnection()
             ->dropColumn($subscriptionTable, SubscriptionProfileInterface::PAYMENT_ADDITIONAL_INFO);
-
     }
 }

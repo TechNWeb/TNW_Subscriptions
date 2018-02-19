@@ -136,6 +136,7 @@ class Manager
      * @var PaymentConfig
      */
     private $paymentConfig;
+
     /**
      * @var PaymentRepository
      */
@@ -305,6 +306,7 @@ class Manager
         $payment->setProfileId($this->getProfile()->getId());
         $payment = $this->paymentRepository->save($payment);
         $this->getProfile()->setPayment($payment);
+
         return $this->getProfile();
     }
 

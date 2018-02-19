@@ -257,8 +257,9 @@ class UpgradeData implements UpgradeDataInterface
      * Drop attributes in subscription profile entity
      *
      * @param $eavSetup EavSetup
+     * @return void
      */
-    private function dropProfileAttributes($eavSetup)
+    private function dropProfileAttributes(EavSetup $eavSetup)
     {
         $eavSetup->removeAttribute(
             SubscriptionProfile::ENTITY,

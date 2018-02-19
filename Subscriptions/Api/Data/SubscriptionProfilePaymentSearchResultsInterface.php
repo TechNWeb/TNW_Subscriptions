@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface for subscription profile payment search result
+ */
 interface SubscriptionProfilePaymentSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
     /**

@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 
+/**
+ * Subscription profile payments collection
+ */
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
 

@@ -6,8 +6,12 @@
 
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface for subscription profile payment.
+ */
 interface SubscriptionProfilePaymentInterface
 {
+    /** subscription profile payment table name */
     const SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE = 'tnw_subscriptions_subscription_profile_payment';
 
     /**
@@ -31,7 +35,7 @@ interface SubscriptionProfilePaymentInterface
     /**
      * Sets id.
      *
-     * @param $id
+     * @param $id int
      * @return $this
      */
     public function setId($id);
@@ -114,14 +118,14 @@ interface SubscriptionProfilePaymentInterface
     /**
      * Gets payment additional info.
      *
-     * @return []|null
+     * @return array|null
      */
     public function getDecodedPaymentAdditionalInfo();
 
     /**
      * Sets payment additional info.
      *
-     * @param  [] $info
+     * @param  array $info
      * @return $this
      */
     public function setEncodedPaymentAdditionalInfo($info);
@@ -131,7 +135,6 @@ interface SubscriptionProfilePaymentInterface
      *
      * @param SubscriptionProfileInterface $profile
      * @return $this
-     * @internal param SubscriptionProfileInterface $quote
      */
     public function setSubscriptionProfile(SubscriptionProfileInterface $profile);
 

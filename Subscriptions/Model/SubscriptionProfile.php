@@ -784,6 +784,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $this->payment->setSubscriptionProfile($this);
             }
         }
+
         return $this->payment;
     }
 
@@ -796,6 +797,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setPayment(SubscriptionProfilePaymentInterface $payment)
     {
         $this->payment = $payment;
+
         return $this;
     }
 }

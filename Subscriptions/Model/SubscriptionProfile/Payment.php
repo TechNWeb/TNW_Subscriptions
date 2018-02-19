@@ -17,16 +17,25 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment as PaymentResource;
 
+/**
+ * Subscription profile payment
+ */
 class Payment extends AbstractModel implements SubscriptionProfilePaymentInterface
 {
     /**
      * @var JsonHelper
      */
     private $jsonHelper;
+
     /**
      * @var EncryptorInterface
      */
     private $encryptor;
+
+    /**
+     * @var SubscriptionProfileInterface
+     */
+    private $subscriptionProfile;
 
     /**
      * @param Context $context
@@ -50,11 +59,6 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
         $this->jsonHelper = $jsonHelper;
         $this->encryptor = $encryptor;
     }
-
-    /**
-     * @var SubscriptionProfileInterface
-     */
-    private $subscriptionProfile;
 
     /**
      * @return void
@@ -193,6 +197,7 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
     {
         $this->subscriptionProfile = $subscriptionProfile;
         $this->setProfileId($subscriptionProfile->getId());
+
         return $this;
     }
 
