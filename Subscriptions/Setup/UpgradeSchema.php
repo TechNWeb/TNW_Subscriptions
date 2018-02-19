@@ -43,6 +43,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (version_compare($context->getVersion(), "2.0.15", "<")) {
+            $this->addProductSubscriptionProfileAttributeTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.15", "<")) {
             $this->addProfilePaymentTable($setup);
         }
 
@@ -214,6 +218,54 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ]
             )
         );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    private function addProductSubscriptionProfileAttributeTable(SchemaSetupInterface $setup)
+    {
+        /**
+         * Create table 'customer_eav_attribute'
+         */
+        $table = $setup->getConnection()
+            ->newTable(
+                $setup->getTable('tnw_subscriptions_product_subscription_profile_eav_attribute')
+            )
+            ->addColumn(
+                'attribute_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+                null,
+                ['unsigned' => true, 'nullable' => false, 'primary' => true],
+                'Attribute ID'
+            )
+            ->addColumn(
+                'is_visible_on_front',
+                \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+                null,
+                ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+                'Is Visible On Front'
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_product_subscription_profile_eav_attribute',
+                    'attribute_id',
+                    'eav_attribute',
+                    'attribute_id'
+                ),
+                'attribute_id',
+                $setup->getTable('eav_attribute'),
+                'attribute_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )
+            ->setComment(
+                'Product Subscription Profile EAV Attribute Table'
+            );
+
+        $setup->getConnection()
+            ->createTable($table);
     }
 
     /**

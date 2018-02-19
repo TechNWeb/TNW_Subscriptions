@@ -263,6 +263,15 @@ class Manager
                             if (!empty($requestData['qty'])) {
                                 $product->setQty(number_format($requestData['qty'], 4));
                             }
+                            if (!empty($requestData['additional_attribute'])) {
+                                foreach ($requestData['additional_attribute'] as $attributeCode => $attributeValue) {
+                                    if (is_array($attributeValue)) {
+                                        $attributeValue = implode(',', $attributeValue);
+                                    }
+
+                                    $product->setCustomAttribute($attributeCode, $attributeValue);
+                                }
+                            }
                         }
                         if ($product->hasDataChanges()) {
                             $product->setNeedRecollect('1');
