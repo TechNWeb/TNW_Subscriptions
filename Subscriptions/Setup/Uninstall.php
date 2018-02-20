@@ -52,15 +52,11 @@ class Uninstall implements UninstallInterface
      */
     public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-        $setup->startSetup();
-
         $this->removeProductAttributes();
         $this->removeConfig($setup);
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
         $this->dropTables($setup);
-
-        $setup->endSetup();
     }
 
     /**
@@ -95,7 +91,6 @@ class Uninstall implements UninstallInterface
             ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
             ProductSubscriptionProfile::ENTITY_TABLE . '_datetime',
             ProductSubscriptionProfile::ENTITY_TABLE,
-            'tnw_subscriptions_product_subscription_profile_eav_attribute'
         ];
 
         foreach ($tnwTables as $tnwTable) {
