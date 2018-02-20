@@ -91,7 +91,7 @@ class PaymentRepository implements PaymentRepositoryInterface
      * Get payment by id
      *
      * @param string $paymentId int
-     * @return SubscriptionProfileInterface
+     * @return SubscriptionProfilePaymentInterface
      * @throws NoSuchEntityException
      */
     public function getById($paymentId)

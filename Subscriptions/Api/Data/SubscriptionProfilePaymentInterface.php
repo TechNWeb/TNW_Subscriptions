@@ -35,7 +35,7 @@ interface SubscriptionProfilePaymentInterface
     /**
      * Sets id.
      *
-     * @param $id int
+     * @param int $id
      * @return $this
      */
     public function setId($id);
@@ -128,7 +128,7 @@ interface SubscriptionProfilePaymentInterface
      * @param  array $info
      * @return $this
      */
-    public function setEncodedPaymentAdditionalInfo($info);
+    public function setEncodedPaymentAdditionalInfo(array $info);
 
     /**
      * Declare subscription profile model instance

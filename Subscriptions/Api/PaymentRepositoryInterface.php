@@ -16,7 +16,7 @@ interface PaymentRepositoryInterface
      *
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function save(
         \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
@@ -36,7 +36,6 @@ interface PaymentRepositoryInterface
      *
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getList(
         \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
@@ -47,7 +46,7 @@ interface PaymentRepositoryInterface
      *
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
      * @return bool true on success
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
      */
     public function delete(
         \TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface $subscriptionPayment
@@ -59,7 +58,6 @@ interface PaymentRepositoryInterface
      * @param string $id
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function deleteById($id);
 }

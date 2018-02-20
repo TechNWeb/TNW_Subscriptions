@@ -158,6 +158,7 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
 
     /**
      * @inheritdoc
+     * @param string $info
      */
     public function setPaymentAdditionalInfo($info)
     {
@@ -181,8 +182,9 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
 
     /**
      * @inheritdoc
+     * @param array $info
      */
-    public function setEncodedPaymentAdditionalInfo($info)
+    public function setEncodedPaymentAdditionalInfo(array $info)
     {
         return $this->setData(
             self::PAYMENT_ADDITIONAL_INFO,
