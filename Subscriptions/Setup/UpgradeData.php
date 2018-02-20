@@ -15,8 +15,10 @@ use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
@@ -89,6 +91,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), "2.0.15", "<")) {
             $this->upgradeEntities($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.16", "<")) {
+            $this->dropProfileAttributes($eavSetup);
         }
 
         $setup->endSetup();
@@ -244,6 +250,28 @@ class UpgradeData implements UpgradeDataInterface
                 'group' => 'Subscription Options',
                 'sort_order' => 150,
             ]
+        );
+    }
+
+    /**
+     * Drop attributes in subscription profile entity
+     *
+     * @param $eavSetup EavSetup
+     * @return void
+     */
+    private function dropProfileAttributes(EavSetup $eavSetup)
+    {
+        $eavSetup->removeAttribute(
+            SubscriptionProfile::ENTITY,
+            SubscriptionProfileInterface::ENGINE_CODE
+        );
+        $eavSetup->removeAttribute(
+            SubscriptionProfile::ENTITY,
+            SubscriptionProfileInterface::TOKEN_HASH
+        );
+        $eavSetup->removeAttribute(
+            SubscriptionProfile::ENTITY,
+            SubscriptionProfileInterface::PAYMENT_ADDITIONAL_INFO
         );
     }
 

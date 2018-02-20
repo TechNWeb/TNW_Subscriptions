@@ -13,7 +13,10 @@ use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -42,6 +45,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), "2.0.15", "<")) {
             $this->addProductSubscriptionProfileAttributeTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), "2.0.16", "<")) {
+            $this->addProfilePaymentTable($setup);
+            $this->dropProfileColumns($setup);
         }
 
         $setup->endSetup();
@@ -260,5 +268,91 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $setup->getConnection()
             ->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    private function addProfilePaymentTable(SchemaSetupInterface $setup)
+    {
+        $tableName = $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE);
+
+        if (!$setup->tableExists($tableName)) {
+            $table = $setup->getConnection()->newTable($tableName);
+
+            $table->addColumn(
+                SubscriptionProfilePaymentInterface::PAYMENT_ID,
+                Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'nullable' => false, 'primary' => true, 'unsigned' => true],
+                'Payment ID'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::PROFILE_ID,
+                Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false, 'unsigned' => true],
+                'Profile ID'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::ENGINE_CODE,
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                ['nullable' => false],
+                'Engine Code'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::TOKEN_HASH,
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                128,
+                ['nullable' => true, 'default' => null],
+                'Token Hash'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::PAYMENT_ADDITIONAL_INFO,
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null],
+                'Payment Additional Info'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::CREATED_AT,
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
+                'Created at'
+            )->addColumn(
+                SubscriptionProfilePaymentInterface::UPDATED_AT,
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT_UPDATE],
+                'Updated at'
+            )->addForeignKey(
+                $setup->getConnection()->getForeignKeyName(
+                    $tableName,
+                    SubscriptionProfilePaymentInterface::PROFILE_ID,
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+                    SubscriptionProfile::ID
+                ),
+                SubscriptionProfilePaymentInterface::PROFILE_ID,
+                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                SubscriptionProfile::ID,
+                \Magento\Framework\DB\Adapter\AdapterInterface::FK_ACTION_CASCADE
+            );
+            $setup->getConnection()->createTable($table);
+        }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    private function dropProfileColumns(SchemaSetupInterface $setup)
+    {
+        $subscriptionTable = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::ENGINE_CODE);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::TOKEN_HASH);
+        $setup->getConnection()
+            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::PAYMENT_ADDITIONAL_INFO);
     }
 }

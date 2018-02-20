@@ -109,7 +109,13 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfileStatusHistory"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistorySearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
-    
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\Payment"/>
+    <preference for="TNW\Subscriptions\Api\PaymentRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\PaymentRepository"/>
+    <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>

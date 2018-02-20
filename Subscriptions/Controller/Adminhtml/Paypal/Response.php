@@ -20,6 +20,7 @@ use Magento\Paypal\Model\Payflow\Service\Response\Transaction;
 use Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator;
 use Magento\Paypal\Model\Payflow\Transparent;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
@@ -133,7 +134,7 @@ class Response extends \Magento\Framework\App\Action\Action
                 $this->dataPersistor->set(EngineInterface::PAYMENT_DATA_KEY,
                     [
                         SubscriptionProfileInterface::ID => $profile->getId(),
-                        SubscriptionProfileInterface::TOKEN_HASH => $this->encryptor->encrypt($response->getPnref()),
+                        SubscriptionProfilePaymentInterface::TOKEN_HASH => $this->encryptor->encrypt($response->getPnref()),
                     ]
                 );
             } else {

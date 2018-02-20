@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface as Logger;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -117,6 +118,13 @@ class Collection extends SearchResult
                     ' '
                 ),
                 'customer_email' => 'customer.email',
+            ]
+        )->join(
+            ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
+            'main_table.entity_id = payment.subscription_profile_id',
+            [
+                'engine_code' => 'payment.engine_code',
+                'payment_additional_info' => 'payment.payment_additional_info',
             ]
         );
 

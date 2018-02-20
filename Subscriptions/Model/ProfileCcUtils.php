@@ -37,7 +37,7 @@ class ProfileCcUtils
      */
     public function isCcPayment($object)
     {
-        return in_array($object->getEngineCode(), EnginePool::getCcEngineList(), true);
+        return in_array($object->getPayment()->getEngineCode(), EnginePool::getCcEngineList(), true);
     }
 
     /**
@@ -76,7 +76,7 @@ class ProfileCcUtils
     public function isCcExpireBy($object, $paymentDate)
     {
         if ($this->isCcPayment($object)) {
-            $paymentInfo = $object->getPaymentAdditionalInfo();
+            $paymentInfo = $object->getPayment()->getPaymentAdditionalInfo();
             if (!empty($paymentInfo) && is_string($paymentInfo)) {
                 $paymentInfo = $this->jsonHelper->jsonDecode($paymentInfo);
                 $expiredAt = $this->getCcExpireDate($paymentInfo);

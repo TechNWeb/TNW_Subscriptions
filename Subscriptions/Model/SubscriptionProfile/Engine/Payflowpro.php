@@ -11,6 +11,7 @@ use Magento\Paypal\Model\Payflowpro as PaypalPayflow;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 
 /**
  * Class Payflowpro
@@ -38,8 +39,8 @@ class Payflowpro extends Base
      */
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
-        $result = !empty($profile->getDecodedPaymentAdditionalInfo())
-            ? $profile->getDecodedPaymentAdditionalInfo()
+        $result = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
+            ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
         $result[OrderPaymentInterface::METHOD] = Config::METHOD_PAYFLOWPRO;
@@ -53,7 +54,7 @@ class Payflowpro extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            PaypalPayflow::PNREF => $profile->getPaymentToken()
+            PaypalPayflow::PNREF => $profile->getPayment()->getPaymentToken()
         ];
     }
 
@@ -66,9 +67,9 @@ class Payflowpro extends Base
         $tokenHash = '';
         $paymentData = $this->getPersistor()->get(self::PAYMENT_DATA_KEY);
         if (isset($paymentData[SubscriptionProfileInterface::ID],
-            $paymentData[SubscriptionProfileInterface::TOKEN_HASH])) {
+            $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH])) {
             if ((int)$paymentData[SubscriptionProfileInterface::ID] === (int)$this->getProfile()->getId()) {
-                $tokenHash = $paymentData[SubscriptionProfileInterface::TOKEN_HASH];
+                $tokenHash = $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH];
             }
         }
         $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
@@ -78,8 +79,8 @@ class Payflowpro extends Base
                 break;
             }
         }
-        $this->getProfile()->setTokenHash($tokenHash);
-        $this->getProfile()->setEncodedPaymentAdditionalInfo($additionalData);
+        $this->getProfile()->getPayment()->setTokenHash($tokenHash);
+        $this->getProfile()->getPayment()->setEncodedPaymentAdditionalInfo($additionalData);
         return $this;
     }
 }
