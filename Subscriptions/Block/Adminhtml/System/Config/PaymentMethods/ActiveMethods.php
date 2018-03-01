@@ -17,6 +17,7 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Paypal\Model\Config;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use Magento\Framework\Data\Form\Element\Fieldset as DataFieldset;
+use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
 
 /**
  * Class ActiveMethods
@@ -45,11 +46,9 @@ class ActiveMethods extends Fieldset
     private $config;
 
     /**
-     * Payment codes which is available for subscription.
-     *
-     * @var array
+     * @var EnginePool
      */
-    private $availableMethodsCodes;
+    private $enginePool;
 
     /**
      * ActiveMethods constructor.
@@ -58,7 +57,7 @@ class ActiveMethods extends Fieldset
      * @param Js $jsHelper
      * @param Yesno $yesNo
      * @param SubscriptionConfig $config
-     * @param array $availableMethodsCodes
+     * @param EnginePool $enginePool
      * @param array $data
      */
     public function __construct(
@@ -67,12 +66,12 @@ class ActiveMethods extends Fieldset
         Js $jsHelper,
         Yesno $yesNo,
         SubscriptionConfig $config,
-        array $availableMethodsCodes = [],
+        EnginePool $enginePool,
         array $data = []
     ) {
         $this->yesNo = $yesNo;
         $this->config = $config;
-        $this->availableMethodsCodes = $availableMethodsCodes;
+        $this->enginePool = $enginePool;
 
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
@@ -169,7 +168,7 @@ class ActiveMethods extends Fieldset
         $paymentMethods = $this->config->getStoreConfig(PaymentHelper::XML_PATH_PAYMENT_METHODS);
         foreach ($paymentMethods as $code => $data) {
             $active = isset($data['active']) ? (bool)($data['active']) : false;
-            if (in_array($code, $this->availableMethodsCodes) && $active) {
+            if (in_array($code, $this->enginePool->getEngineList()) && $active) {
                 if (in_array($code, [Config::METHOD_PAYFLOWPRO, Config::METHOD_PAYMENT_PRO])) {
                     $title = $this->config->getTitleForPaypal();
                 } else {

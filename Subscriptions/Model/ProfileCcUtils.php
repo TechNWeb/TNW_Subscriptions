@@ -22,11 +22,17 @@ class ProfileCcUtils
     private $jsonHelper;
 
     /**
+     * @var EnginePool
+     */
+    private $enginePool;
+
+    /**
      * @param JsonHelper $jsonHelper
      */
-    public function __construct(JsonHelper $jsonHelper)
+    public function __construct(JsonHelper $jsonHelper, EnginePool $enginePool)
     {
         $this->jsonHelper = $jsonHelper;
+        $this->enginePool = $enginePool;
     }
 
     /**
@@ -37,7 +43,7 @@ class ProfileCcUtils
      */
     public function isCcPayment($object)
     {
-        return in_array($object->getPayment()->getEngineCode(), EnginePool::getCcEngineList(), true);
+        return in_array($object->getPayment()->getEngineCode(), $this->enginePool->getCcEngineList(), true);
     }
 
     /**

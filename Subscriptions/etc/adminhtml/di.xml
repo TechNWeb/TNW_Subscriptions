@@ -310,14 +310,4 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions\Modifier\Pool</argument>
         </arguments>
     </type>
-    <type name="TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods">
-        <arguments>
-            <argument name="availableMethodsCodes" xsi:type="array">
-                <item name="checkmo" xsi:type="const">Magento\OfflinePayments\Model\Checkmo::PAYMENT_METHOD_CHECKMO_CODE</item>
-                <item name="payflowpro" xsi:type="const">Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO</item>
-                <item name="paypal_payment_pro" xsi:type="const">Magento\Paypal\Model\Config::METHOD_PAYMENT_PRO</item>
-                <item name="braintree" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
-            </argument>
-        </arguments>
-    </type>
 </config>

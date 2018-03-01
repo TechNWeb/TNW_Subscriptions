@@ -837,4 +837,25 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\EnginePool">
+        <arguments>
+            <argument name="engine" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Checkmo::PAYMENT_METHOD_CHECKMO_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CheckmoFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="braintree" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
