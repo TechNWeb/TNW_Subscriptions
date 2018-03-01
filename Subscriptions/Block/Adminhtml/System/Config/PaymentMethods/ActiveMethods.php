@@ -8,13 +8,11 @@ namespace TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods;
 
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
-use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Config\Model\Config\Source\Yesno;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
-use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Paypal\Model\Config;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
@@ -51,12 +49,7 @@ class ActiveMethods extends Fieldset
      *
      * @var array
      */
-    private $availableMethodsCodes = [
-        Checkmo::PAYMENT_METHOD_CHECKMO_CODE,
-        Config::METHOD_PAYFLOWPRO,
-        Config::METHOD_PAYMENT_PRO,
-        BraintreeConfigProvider::CODE,
-    ];
+    private $availableMethodsCodes;
 
     /**
      * ActiveMethods constructor.
@@ -65,6 +58,7 @@ class ActiveMethods extends Fieldset
      * @param Js $jsHelper
      * @param Yesno $yesNo
      * @param SubscriptionConfig $config
+     * @param array $availableMethodsCodes
      * @param array $data
      */
     public function __construct(
@@ -73,10 +67,12 @@ class ActiveMethods extends Fieldset
         Js $jsHelper,
         Yesno $yesNo,
         SubscriptionConfig $config,
+        array $availableMethodsCodes = [],
         array $data = []
     ) {
         $this->yesNo = $yesNo;
         $this->config = $config;
+        $this->availableMethodsCodes = $availableMethodsCodes;
 
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
@@ -159,7 +155,6 @@ class ActiveMethods extends Fieldset
 
         return $this->fieldRenderer;
     }
-
 
     /**
      * Returns list of filtered active payment methods in magento.
