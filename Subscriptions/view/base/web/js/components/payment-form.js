@@ -55,8 +55,7 @@ define(
              * @returns {boolean}
              */
             beforeSubmit: function () {
-                var current = this,
-                    needShowRequiredError = true,
+                var needShowRequiredError = true,
                     validForm = true;
 
                 this.validate();
@@ -66,16 +65,7 @@ define(
                 }
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
-                        switch (code) {
-                            case 'payflowpro':
-                            case 'braintree':
-                                registry.get('index = ' + code).beforeSubmit();
-                                break;
-
-                            case 'checkmo':
-                            default:
-                                current.save();
-                        }
+                        registry.get('index = ' + code).beforeSubmit();
                         needShowRequiredError = false;
                     }
                 });

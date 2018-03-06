@@ -128,7 +128,6 @@ class Checkmo extends Base implements PaymentModifierInterface
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
             'listens'=> $this->getListens(),
             'options' => [
                 'gateway' => $this->getPaymentCode(),

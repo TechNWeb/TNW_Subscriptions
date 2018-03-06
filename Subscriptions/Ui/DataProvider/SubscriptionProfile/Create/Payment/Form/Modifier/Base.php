@@ -200,6 +200,7 @@ class Base implements ModifierInterface
                                 'config' => array_merge(
                                     [
                                         'label' => false,
+                                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/base',
                                         'collapsible' => false,
                                         'visible' => true,
                                         'opened' => true,
