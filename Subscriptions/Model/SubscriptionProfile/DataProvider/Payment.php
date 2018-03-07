@@ -63,8 +63,7 @@ class Payment extends AbstractDataProvider
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->modifiersPool = $modifiersPool;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
     /**
@@ -84,6 +83,7 @@ class Payment extends AbstractDataProvider
 
     /**
      * @return array|mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getConfigData()
     {
@@ -103,7 +103,6 @@ class Payment extends AbstractDataProvider
         return $configData;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -114,13 +113,14 @@ class Payment extends AbstractDataProvider
 
     /**
      * @inheritdoc
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getMeta()
     {
         $meta = parent::getMeta();
 
         foreach ($this->modifiersPool->getModifiersInstances() as $modifier) {
-            if ($modifier instanceof PaymentModifierInterface){
+            if ($modifier instanceof PaymentModifierInterface) {
                 $modifier->setPaymentFormName($this::DATA_SCOPE_PAYMENT_FORM);
             }
             $meta = $modifier->modifyMeta($meta);

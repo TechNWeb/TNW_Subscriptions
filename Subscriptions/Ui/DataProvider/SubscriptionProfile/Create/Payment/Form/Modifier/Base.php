@@ -10,7 +10,6 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -20,7 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 /**
  * Base form modifier to display payment method.
  */
-class Base implements ModifierInterface
+class Base implements PaymentModifierInterface
 {
     /**#@+
      * Name of payment information fieldset.

@@ -6,10 +6,12 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+
 /**
  * Interface for payment form modifier.
  */
-interface PaymentModifierInterface
+interface PaymentModifierInterface extends ModifierInterface
 {
     /**
      * Sets form name.

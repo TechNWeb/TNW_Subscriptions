@@ -34,6 +34,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     const SORT_ORDER = 20;
 
     /**
+     * @var SubscriptionConfig
+     */
+    private $config;
+
+    /**
      * @var Transparent
      */
     private $paymentPro;
@@ -87,6 +92,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         RequestInterface $request,
         UrlInterface $urlBuilder
     ) {
+        $this->config = $config;
         $this->context = $context;
         $this->paymentPro = $paymentPro;
         $this->paymentConfig = $paymentConfig;
@@ -103,6 +109,9 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     public function modifyData(array $data)
     {
         $data = parent::modifyData($data);
+        if (!$this->config->isPaymentAvailable($this->getPaymentCode())) {
+            return $data;
+        }
 
         $additionalInfo = ($this->getProfile() && $this->getProfile()->getPayment())
             ? $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo()
