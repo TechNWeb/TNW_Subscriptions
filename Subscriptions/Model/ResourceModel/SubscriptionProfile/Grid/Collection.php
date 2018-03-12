@@ -25,11 +25,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 class Collection extends SearchResult
 {
     /**
-     * @var string class name of document
-     */
-    protected $document = SubscriptionProfile::class;
-
-    /**
      * Collection constructor.
      * @param EntityFactory $entityFactory
      * @param Logger $logger
@@ -37,6 +32,7 @@ class Collection extends SearchResult
      * @param EventManager $eventManager
      * @param string $mainTable
      * @param string $resourceModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         EntityFactory $entityFactory,
