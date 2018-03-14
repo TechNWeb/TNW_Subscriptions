@@ -135,7 +135,7 @@ class Config
                 foreach ($this->storeManager->getWebsites() as $website) {
                     if ($this->getStoreConfig($this->xmlIsActive, $website->getId())
                     && !empty($this->getAvailablePaymentsList($websiteId))) {
-                        $this->isIntegrationActive = true;
+                        $this->isSubscriptionsActive = true;
                         $result = true;
                     }
                 }
