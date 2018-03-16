@@ -40,11 +40,23 @@
     </virtualType>
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\RecurringOptions">
         <arguments>
+            <argument name="supportTypes" xsi:type="array">
+                <item name="simple" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_SIMPLE</item>
+                <item name="virtual" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL</item>
+                <item name="downloadable" xsi:type="const">Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE</item>
+                <item name="configurable" xsi:type="const">Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE</item>
+            </argument>
             <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Composite">
         <arguments>
+            <argument name="supportTypes" xsi:type="array">
+                <item name="simple" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_SIMPLE</item>
+                <item name="virtual" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL</item>
+                <item name="downloadable" xsi:type="const">Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE</item>
+                <item name="configurable" xsi:type="const">Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE</item>
+            </argument>
             <argument name="modifiers" xsi:type="array">
                 <!--Add modifier to set default values for subscription product attributes-->
                 <item name="subscriptionDefaultValues" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\DefaultValues</item>
