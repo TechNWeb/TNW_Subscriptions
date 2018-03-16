@@ -191,6 +191,7 @@ class ProfitCalculator
     {
         $profit = 0;
         $products = $this->getProducts($subscriptionProfile);
+
         foreach ($products as $product) {
             $searchCriteria = $this->searchCriteriaBuilder
                 ->addFilter(
@@ -203,8 +204,9 @@ class ProfitCalculator
                 )
                 ->create();
 
-            $result = $this->recurringOptionRepository->getList($searchCriteria);
-            if (!$result->getTotalCount()) {
+            $recurringOptions = $this->recurringOptionRepository->getList($searchCriteria)->getItems();
+
+            if (empty($recurringOptions)) {
                 continue;
             }
 
@@ -217,8 +219,9 @@ class ProfitCalculator
                     $quoteIds = $this->getQuoteIds($subscriptionProfile, self::REMAINING);
                     break;
             }
+
             $amount = $this->getRequestedProductAmount($quoteIds, $product->getId());
-            $profit += ($result->getItems()[0]->getPrice() - $product->getCost()) * $amount;
+            $profit += (\reset($recurringOptions)->getPrice() - $product->getCost()) * $amount;
         }
 
         return $profit;
