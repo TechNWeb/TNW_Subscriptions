@@ -24,6 +24,7 @@ use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
@@ -104,18 +105,21 @@ class RecurringOptions extends BaseModifier
      * @var BillingFrequencyRepository
      */
     private $billingFrequencyRepository;
+
     /**
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @var array
      */
-    private $forbiddenProductTypes = [
-        \Magento\Bundle\Model\Product\Type::TYPE_CODE,
-        \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE
-    ];
+    private $supportTypes;
 
     /**
      * @param LocatorInterface $locator
@@ -124,6 +128,8 @@ class RecurringOptions extends BaseModifier
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Context $context
+     * @param Config $config
+     * @param array $supportTypes
      */
     public function __construct(
         LocatorInterface $locator,
@@ -131,12 +137,16 @@ class RecurringOptions extends BaseModifier
         ArrayManager $arrayManager,
         BillingFrequencyRepository $billingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        Context $context
+        Context $context,
+        Config $config,
+        array $supportTypes
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->config = $config;
+        $this->supportTypes = $supportTypes;
         parent::__construct($storeManager, $context);
     }
 
@@ -145,8 +155,7 @@ class RecurringOptions extends BaseModifier
      */
     public function modifyData(array $data)
     {
-
-        if ($this->isSubscriptionAttributesShown()) {
+        if ($this->config->isSubscriptionsActive() && $this->isSubscriptionAttributesShown()) {
             $options = [];
             $productOptions = $this->locator->getProduct()->getRecurringOptions() ?: [];
 
@@ -201,7 +210,7 @@ class RecurringOptions extends BaseModifier
     {
         $this->meta = $meta;
 
-        if ($this->isSubscriptionAttributesShown()) {
+        if ($this->config->isSubscriptionsActive() && $this->isSubscriptionAttributesShown()) {
             $this->createRecurringOptionsPanel();
         }
 
@@ -726,7 +735,6 @@ class RecurringOptions extends BaseModifier
             $productType = $product->getTypeId();
         }
 
-        return (!in_array($productType, $this->forbiddenProductTypes));
-
+        return in_array($productType, $this->supportTypes);
     }
 }
