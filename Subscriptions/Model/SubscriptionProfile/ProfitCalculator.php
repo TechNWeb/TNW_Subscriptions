@@ -12,8 +12,11 @@ use Magento\Directory\Model\Currency;
 use Magento\Reports\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
@@ -54,6 +57,16 @@ class ProfitCalculator
     private $asOfTodayProfit;
 
     /**
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
+    private $recurringOptionRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
      * @var Currency
      */
     private $currency;
@@ -63,15 +76,21 @@ class ProfitCalculator
      *
      * @param ProductCollectionFactory $productCollectionFactory
      * @param QuoteItemCollectionFactory $quoteItemCollectionFactory
+     * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Currency $currency
      */
     public function __construct(
         ProductCollectionFactory $productCollectionFactory,
         QuoteItemCollectionFactory $quoteItemCollectionFactory,
+        ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
         Currency $currency
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
+        $this->recurringOptionRepository = $recurringOptionRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
     }
 
@@ -166,12 +185,31 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      * @param string $profitType
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProfit(SubscriptionProfile $subscriptionProfile, $profitType)
     {
         $profit = 0;
         $products = $this->getProducts($subscriptionProfile);
+
         foreach ($products as $product) {
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(
+                    ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                    $product->getId()
+                )
+                ->addFilter(
+                    ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
+                    $subscriptionProfile->getBillingFrequencyId()
+                )
+                ->create();
+
+            $recurringOptions = $this->recurringOptionRepository->getList($searchCriteria)->getItems();
+
+            if (empty($recurringOptions)) {
+                continue;
+            }
+
             switch ($profitType) {
                 case self::AS_OF_TODAY:
                     $quoteIds = $this->getQuoteIds($subscriptionProfile, self::AS_OF_TODAY);
@@ -181,8 +219,9 @@ class ProfitCalculator
                     $quoteIds = $this->getQuoteIds($subscriptionProfile, self::REMAINING);
                     break;
             }
+
             $amount = $this->getRequestedProductAmount($quoteIds, $product->getId());
-            $profit += ($product->getPrice() - $product->getCost()) * $amount;
+            $profit += (\reset($recurringOptions)->getPrice() - $product->getCost()) * $amount;
         }
 
         return $profit;
