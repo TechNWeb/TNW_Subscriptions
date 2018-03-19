@@ -283,37 +283,39 @@ class Product extends Create
      */
     private function getStartOnDate($startOn)
     {
-        $nowDate = (new \DateTime())->format('Y-m-d');
-        switch ($startOn) {
-            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-t');
+        $nowDate = date_create()->format('Y-m-d');
+        switch (true) {
+            case is_numeric($startOn) && $startOn == StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
+                $result = date_create()->format('Y-m-t');
                 break;
-            case StartDateType::MOMENT_OF_PURCHASE:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-d');
+
+            case is_numeric($startOn) && $startOn == StartDateType::MOMENT_OF_PURCHASE:
+                $result = date_create()->format('Y-m-d');
                 break;
-            case StartDateType::FIRST_DAY_OF_THE_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-01');
+
+            case is_numeric($startOn) && $startOn == StartDateType::FIRST_DAY_OF_THE_MONTH:
+                $result = date_create()->format('Y-m-01');
+
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = new \DateTime();
                     $result->add(new \DateInterval('P1M'));
                     $result = $result->format('Y-m-01');
                 }
                 break;
-            case StartDateType::ON_15TH_OF_THE_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-15');
+
+            case is_numeric($startOn) && $startOn == StartDateType::ON_15TH_OF_THE_MONTH:
+                $result = date_create()->format('Y-m-15');
+
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = new \DateTime();
                     $result->add(new \DateInterval('P1M'));
                     $result = $result->format('Y-m-15');
                 }
                 break;
+
             default:
-                $result = new \DateTime($startOn);
-                $result = $result->format('Y-m-d');
+                $result = date_create($startOn)->format('Y-m-d');
+
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = $nowDate;
                 }
