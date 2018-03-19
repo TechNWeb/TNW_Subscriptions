@@ -278,19 +278,18 @@ class Product extends Create
      */
     private function getStartOnDate($startOn)
     {
-        switch ($startOn) {
-            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-t');
+        switch (true) {
+            case is_numeric($startOn) && $startOn == StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
+                $result = date_create()->format('Y-m-t');
                 break;
-            case StartDateType::MOMENT_OF_PURCHASE:
-                $result = new \DateTime();
-                $result = $result->format('Y-m-d');
+
+            case is_numeric($startOn) && $startOn == StartDateType::MOMENT_OF_PURCHASE:
+                $result = date_create()->format('Y-m-d');
                 break;
+
             default:
-                $nowDate = (new \DateTime())->format('Y-m-d');
-                $result = new \DateTime($startOn);
-                $result = $result->format('Y-m-d');
+                $nowDate = date_create()->format('Y-m-d');
+                $result = date_create($startOn)->format('Y-m-d');
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = $nowDate;
                 }
