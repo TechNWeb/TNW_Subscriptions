@@ -84,16 +84,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->addInfiniteSubscriptionsProductAttributes($eavSetup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.14", "<")) {
+        if (version_compare($context->getVersion(), "2.1.0", "<")) {
             $this->updateDonationProductAttributes($eavSetup);
             $this->addScheduleAttribute($eavSetup);
-        }
-
-        if (version_compare($context->getVersion(), "2.0.15", "<")) {
             $this->upgradeEntities($setup);
-        }
-
-        if (version_compare($context->getVersion(), "2.0.16", "<")) {
             $this->dropProfileAttributes($eavSetup);
         }
 
