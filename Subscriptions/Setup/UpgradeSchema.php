@@ -43,11 +43,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->removeUniqueProductEntityKey($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.15", "<")) {
+        if (version_compare($context->getVersion(), "2.1.0", "<")) {
             $this->addProductSubscriptionProfileAttributeTable($setup);
-        }
-
-        if (version_compare($context->getVersion(), "2.0.16", "<")) {
             $this->addProfilePaymentTable($setup);
             $this->dropProfileColumns($setup);
         }
