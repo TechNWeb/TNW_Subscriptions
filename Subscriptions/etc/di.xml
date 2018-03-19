@@ -279,7 +279,7 @@
     </type>
     <type name="TNW\Subscriptions\Controller\Subscription\History">
         <plugin name="authentication"
-                type="\Magento\Sales\Controller\Order\Plugin\Authentication"
+                type="Magento\Sales\Controller\Order\Plugin\Authentication"
                 sortOrder="100"
                 disabled="false"/>
     </type>
