@@ -290,6 +290,7 @@ class Product extends Create
             default:
                 $nowDate = date_create()->format('Y-m-d');
                 $result = date_create($startOn)->format('Y-m-d');
+
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = $nowDate;
                 }
