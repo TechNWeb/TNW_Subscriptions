@@ -98,7 +98,7 @@ define(
                         if (errors && errors.length > 0) {
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
-                            this.updateButtons(false);
+                            current.updateButtons(false);
                             current.hideLoader();
                             return;
                         }
