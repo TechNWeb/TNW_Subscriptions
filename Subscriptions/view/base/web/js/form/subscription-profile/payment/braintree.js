@@ -21,6 +21,8 @@ define([
             scriptLoaded: false,
             checked: false,
             braintree: null,
+            grandTotal: null,
+            braintreeClient: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
             sdkUrl: null,
@@ -138,6 +140,10 @@ define([
             try {
                 this.showLoader();
 
+                this.braintreeClient = new this.braintree.api.Client({
+                    clientToken: this.clientToken
+                });
+
                 this.braintree.setup(this.clientToken, 'custom', {
                     id: this.selector,
                     hostedFields: this.getHostedFields(),
@@ -151,14 +157,42 @@ define([
 
                     /**
                      * Callback for success response
-                     * @param {Object} response
                      */
                     onPaymentMethodReceived: function (response) {
-                        if (self.validateCardType()) {
-                            var form = registry.get('index = '+self.options.formName);
-                            form.source.data.payment.braintree.nonce = response.nonce;
-                            form.triggerSave([]);
+                        self.hideLoader();
+
+                        if (!self.validateCardType()) {
+                            return;
                         }
+
+                        var form = registry.get('index = '+self.options.formName);
+                        self.braintreeClient.verify3DS({
+                            amount: self.grandTotal,
+                            creditCard: response.nonce,
+                            onUserClose: function () {
+
+                            }
+                        }, function (error, response) {
+                            var liability;
+
+                            if (error) {
+                                form.triggerSave([error.message]);
+                                return;
+                            }
+
+                            liability = {
+                                shifted: response.verificationDetails.liabilityShifted,
+                                shiftPossible: response.verificationDetails.liabilityShiftPossible
+                            };
+
+                            if (liability.shifted || !liability.shifted && !liability.shiftPossible) {
+                                self.showLoader();
+                                form.source.data.payment.braintree.nonce = response.nonce;
+                                form.triggerSave([]);
+                            } else {
+                                form.triggerSave([$t('Please try again with another form of payment.')]);
+                            }
+                        });
                     },
 
                     /**

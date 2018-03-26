@@ -75,18 +75,20 @@ class Braintree extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
      * @param Context $context
      * @param Config $paymentConfig
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
-     * @param BraintreeAdapterFactory $braintreeAdapter
+     * @param BraintreeAdapterFactory $braintreeAdapterFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Braintree\Gateway\Config\Config $braintreeConfig,
         Context $context,
         Config $paymentConfig,
@@ -100,9 +102,8 @@ class Braintree extends Base implements PaymentModifierInterface
         $this->paymentConfig = $paymentConfig;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($config, $session, $profileRepository, $relationManager);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
     }
-
 
     /**
      * Fix adapter initialization for magento version 2.2.2
@@ -280,6 +281,7 @@ class Braintree extends Base implements PaymentModifierInterface
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sdkUrl' => $this->braintreeConfig->getSdkUrl(),
+            'grandTotal' => $this->getGrandTotal(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),

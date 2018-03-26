@@ -79,15 +79,24 @@ class Base implements PaymentModifierInterface
     private $relationManager;
 
     /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    private $cartRepository;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      */
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
-        OrderRelationManager $relationManager
+        OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -97,6 +106,7 @@ class Base implements PaymentModifierInterface
         ];
         $this->profileRepository = $profileRepository;
         $this->relationManager = $relationManager;
+        $this->cartRepository = $cartRepository;
     }
 
     /**
@@ -166,6 +176,48 @@ class Base implements PaymentModifierInterface
     protected function getListens()
     {
         return $this->listens;
+    }
+
+    /**
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getGrandTotal()
+    {
+        $grandTotal = 0;
+        if ($this->getProfile()) {
+            $nextProfileRelation = $this->relationManager
+                ->getNextProfileRelation($this->getProfile());
+
+            $grandTotal = $this->cartRepository
+                ->get($nextProfileRelation->getMagentoQuoteId())
+                ->getBaseGrandTotal();
+        } else {
+            /** @var \Magento\Quote\Model\Quote $quote */
+            foreach ($this->session->getSubQuotes() as $quote) {
+                $grandTotal += $quote->getBaseGrandTotal();
+            }
+        }
+
+        return $grandTotal;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrencyCode()
+    {
+        $currencyCode = '';
+        if ($this->getProfile()) {
+            $this->getProfile()->getProfileCurrencyCode();
+        } else {
+            /** @var \Magento\Quote\Model\Quote $quote */
+            foreach ($this->session->getSubQuotes() as $quote) {
+                $currencyCode = $quote->getBaseCurrencyCode();
+            }
+        }
+
+        return $currencyCode;
     }
 
     /**

@@ -73,6 +73,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
@@ -85,6 +86,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         Context $context,
         Transparent $paymentPro,
         Config $paymentConfig,
@@ -99,7 +101,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($config, $session, $profileRepository, $relationManager);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
     }
 
     /**
