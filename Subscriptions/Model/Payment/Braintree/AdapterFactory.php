@@ -1,13 +1,14 @@
 <?php
-namespace TNW\Subscriptions\Model\Payment;
+namespace TNW\Subscriptions\Model\Payment\Braintree;
 
 use Magento\Braintree\Gateway\Config\Config;
+use Magento\Braintree\Model\Adapter\BraintreeAdapterFactory;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
  * This factory is preferable to use for Braintree adapter instance creation.
  */
-class BraintreeAdapterFactory
+class AdapterFactory extends BraintreeAdapterFactory
 {
     /**
      * @var ObjectManagerInterface
@@ -25,6 +26,8 @@ class BraintreeAdapterFactory
      */
     public function __construct(ObjectManagerInterface $objectManager, Config $config)
     {
+        parent::__construct($objectManager, $config);
+
         $this->config = $config;
         $this->objectManager = $objectManager;
     }
@@ -32,17 +35,18 @@ class BraintreeAdapterFactory
     /**
      * Creates instance of Braintree Adapter.
      *
-     * @return BraintreeAdapter
+     * @param null $storeId
+     * @return Adapter
      */
-    public function create()
+    public function create($storeId = null)
     {
         return $this->objectManager->create(
-            BraintreeAdapter::class,
+            Adapter::class,
             [
-                'merchantId' => $this->config->getValue(Config::KEY_MERCHANT_ID),
-                'publicKey' => $this->config->getValue(Config::KEY_PUBLIC_KEY),
-                'privateKey' => $this->config->getValue(Config::KEY_PRIVATE_KEY),
-                'environment' => $this->config->getValue(Config::KEY_ENVIRONMENT),
+                'merchantId' => $this->config->getValue(Config::KEY_MERCHANT_ID, $storeId),
+                'publicKey' => $this->config->getValue(Config::KEY_PUBLIC_KEY, $storeId),
+                'privateKey' => $this->config->getValue(Config::KEY_PRIVATE_KEY, $storeId),
+                'environment' => $this->config->getValue(Config::KEY_ENVIRONMENT, $storeId),
             ]
         );
     }

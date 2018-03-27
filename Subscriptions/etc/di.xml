@@ -858,4 +858,14 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory</argument>
+            <argument name="customLogger" xsi:type="object">BraintreeLoggerForTransactionSale</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
+    </type>
 </config>
