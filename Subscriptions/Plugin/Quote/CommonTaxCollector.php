@@ -18,6 +18,21 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 class CommonTaxCollector
 {
     /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    private $serializer;
+
+    /**
+     * CommonTaxCollector constructor.
+     * @param \Magento\Framework\Serialize\Serializer\Json $serializer
+     */
+    public function __construct(
+        \Magento\Framework\Serialize\Serializer\Json $serializer
+    ) {
+        $this->serializer = $serializer;
+    }
+
+    /**
      * Adds subscription data into quote item tax details object.
      *
      * @param MagentoCollector $subject
@@ -46,19 +61,33 @@ class CommonTaxCollector
             $useBaseCurrency,
             $parentCode
         );
-        $subsData = $item->getBuyRequest()->getData(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME) ?: [];
-        if ($subsData) {
-            $presetPrice = !empty($subsData[Create::NON_UNIQUE]['current_preset_qty_price'])
-                ? $subsData[Create::NON_UNIQUE]['current_preset_qty_price']
-                : 0;
-            $usePresetQty =  !empty($subsData[Create::UNIQUE]['use_preset_qty'])
-                ? $subsData[Create::UNIQUE]['use_preset_qty']
-                : 0;
-            if ($presetPrice && $usePresetQty) {
-                $result->setData('subscription_use_preset_qty', $usePresetQty);
-                $result->setData('subscription_preset_qty_price', $presetPrice);
-                $result->setData('store_id', $item->getQuote()->getStoreId());
-            }
+
+        $option = $item->getOptionByCode('info_buyRequest');
+        if (null === $option) {
+            return $result;
+        }
+
+        $infoBuyRequest = $option ? $this->serializer->unserialize($option->getValue()) : [];
+        if (empty($infoBuyRequest[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])) {
+            return $result;
+        }
+
+        $subsData = $infoBuyRequest[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME];
+        if (empty($subsData)) {
+            return $result;
+        }
+
+        $presetPrice = !empty($subsData[Create::NON_UNIQUE]['current_preset_qty_price'])
+            ? $subsData[Create::NON_UNIQUE]['current_preset_qty_price']
+            : 0;
+        $usePresetQty =  !empty($subsData[Create::UNIQUE]['use_preset_qty'])
+            ? $subsData[Create::UNIQUE]['use_preset_qty']
+            : 0;
+
+        if ($presetPrice && $usePresetQty) {
+            $result->setData('subscription_use_preset_qty', $usePresetQty);
+            $result->setData('subscription_preset_qty_price', $presetPrice);
+            $result->setData('store_id', $item->getQuote()->getStoreId());
         }
 
         return $result;

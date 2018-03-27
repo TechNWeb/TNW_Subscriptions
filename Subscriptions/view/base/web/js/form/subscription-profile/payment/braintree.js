@@ -170,7 +170,7 @@ define([
                             amount: self.grandTotal,
                             creditCard: response.nonce,
                             onUserClose: function () {
-
+                                form.triggerSave([$t('Please try again.')]);
                             }
                         }, function (error, response) {
                             var liability;
@@ -186,7 +186,6 @@ define([
                             };
 
                             if (liability.shifted || !liability.shifted && !liability.shiftPossible) {
-                                self.showLoader();
                                 form.source.data.payment.braintree.nonce = response.nonce;
                                 form.triggerSave([]);
                             } else {

@@ -184,19 +184,19 @@ class Base implements PaymentModifierInterface
      */
     protected function getGrandTotal()
     {
-        $grandTotal = 0;
         if ($this->getProfile()) {
             $nextProfileRelation = $this->relationManager
                 ->getNextProfileRelation($this->getProfile());
 
-            $grandTotal = $this->cartRepository
+            return $this->cartRepository
                 ->get($nextProfileRelation->getMagentoQuoteId())
                 ->getBaseGrandTotal();
-        } else {
-            /** @var \Magento\Quote\Model\Quote $quote */
-            foreach ($this->session->getSubQuotes() as $quote) {
-                $grandTotal += $quote->getBaseGrandTotal();
-            }
+        }
+
+        $grandTotal = 0;
+        /** @var \Magento\Quote\Model\Quote $quote */
+        foreach ($this->session->getSubQuotes() as $quote) {
+            $grandTotal += $quote->getBaseGrandTotal();
         }
 
         return $grandTotal;
@@ -207,17 +207,16 @@ class Base implements PaymentModifierInterface
      */
     protected function getCurrencyCode()
     {
-        $currencyCode = '';
         if ($this->getProfile()) {
-            $this->getProfile()->getProfileCurrencyCode();
-        } else {
-            /** @var \Magento\Quote\Model\Quote $quote */
-            foreach ($this->session->getSubQuotes() as $quote) {
-                $currencyCode = $quote->getBaseCurrencyCode();
-            }
+            return $this->getProfile()->getProfileCurrencyCode();
         }
 
-        return $currencyCode;
+        /** @var \Magento\Quote\Model\Quote $quote */
+        foreach ($this->session->getSubQuotes() as $quote) {
+            return $quote->getBaseCurrencyCode();
+        }
+
+        return '';
     }
 
     /**
