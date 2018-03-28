@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Request;
 
 use Magento\Braintree\Gateway\Request\PaymentDataBuilder as DataBuilder;
 use Magento\Braintree\Gateway\SubjectReader;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class PaymentDataBuilder
 {
@@ -16,10 +17,17 @@ class PaymentDataBuilder
      */
     private $subjectReader;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     public function __construct(
-        SubjectReader $subjectReader
+        SubjectReader $subjectReader,
+        EncryptorInterface $encryptor
     ) {
         $this->subjectReader = $subjectReader;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -38,11 +46,11 @@ class PaymentDataBuilder
         $paymentDO = $this->subjectReader->readPayment($buildSubject);
         $payment = $paymentDO->getPayment();
 
-        $token = $payment->getAdditionalInformation('payment_method_token');
-        if (!empty($token)) {
-            $result['paymentMethodToken'] = $token;
+        $tokenHash = $payment->getAdditionalInformation('token_hash');
+        if (!empty($tokenHash)) {
+            $result['paymentMethodToken'] = $this->encryptor->decrypt($tokenHash);
             unset($result[DataBuilder::PAYMENT_METHOD_NONCE]);
-            $payment->unsAdditionalInformation('payment_method_token');
+            $payment->unsAdditionalInformation('token_hash');
         }
 
         return $result;

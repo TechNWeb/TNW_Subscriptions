@@ -27,6 +27,11 @@ class Braintree extends Base
     private $transactionCustomer;
 
     /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -36,6 +41,7 @@ class Braintree extends Base
      * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
      * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -46,7 +52,8 @@ class Braintree extends Base
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
-        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor
     ) {
         parent::__construct(
             $config,
@@ -60,6 +67,7 @@ class Braintree extends Base
 
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -68,7 +76,7 @@ class Braintree extends Base
     public function getProfilePaymentInfo(Payment $payment)
     {
         return [
-            'payment_token' => $payment->getAdditionalInformation('payment_method_token'),
+            'token_hash' => $payment->getAdditionalInformation('token_hash'),
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
@@ -98,7 +106,7 @@ class Braintree extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            'payment_method_token' => $profile->getPayment()->getPaymentToken(),
+            'token_hash' => $profile->getPayment()->getTokenHash(),
         ];
     }
 

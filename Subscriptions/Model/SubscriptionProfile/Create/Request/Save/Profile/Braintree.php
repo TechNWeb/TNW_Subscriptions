@@ -24,21 +24,29 @@ class Braintree extends Base
     private $transactionCustomer;
 
     /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
-        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor
     ) {
         parent::__construct($createModel, $session);
 
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -78,7 +86,9 @@ class Braintree extends Base
 
             /** @var \Magento\Quote\Model\Quote $subQuote */
             foreach ($subQuotes as $subQuote) {
-                $subQuote->getPayment()->setAdditionalInformation('payment_method_token', $paymentMethod->token);
+                $subQuote->getPayment()
+                    ->setAdditionalInformation('token_hash', $this->encryptor->encrypt($paymentMethod->token));
+
                 $subQuote->getPayment()->setCcType($data['payment']['braintree']['additional']['cc_type']);
                 $subQuote->getPayment()->setCcLast4($paymentMethod->last4);
                 $subQuote->getPayment()->setCcExpMonth($paymentMethod->expirationMonth);
