@@ -39,6 +39,10 @@ class Attribute
         \Magento\Eav\Model\ResourceModel\Entity\Attribute $subject,
         $object
     ) {
+        if (!$object->isObjectNew()) {
+            return;
+        }
+
         if (strcasecmp($object->getEntityType()->getEntityTypeCode(), Model\SubscriptionProfile::ENTITY) === 0) {
             // If attribute set is not specified we set Default attribute set for this entity type
             $attributeSetId = $object->getAttributeSetId();
