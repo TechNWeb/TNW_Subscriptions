@@ -145,23 +145,11 @@ class Form extends AbstractDataProvider
     public function getData()
     {
         $productId = $this->getRequestProductId();
-        $additionalData = $this->getAdditionalData();
-        $formData = $this->getFrequenciesData(true, $productId, $additionalData);
-        $data[self::FORM_DATA_VALUE] = $formData;
+        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, [
+            'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute'),
+        ]);
 
         return $data;
-    }
-
-    /**
-     * Return additional data from request.
-     *
-     * @return array
-     */
-    private function getAdditionalData()
-    {
-        return [
-            'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute'),
-        ];
     }
 
     /**
