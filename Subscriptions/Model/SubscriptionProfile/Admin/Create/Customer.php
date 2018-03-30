@@ -12,7 +12,7 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
-use Magento\Quote\Model\Quote\Address as Address;
+use Magento\Quote\Model\Quote as MagentoQuote;
 use Magento\Store\Model\Store;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -194,7 +194,7 @@ class Customer extends Create
      */
     private function saveCustomerAddress(
         CustomerInterface $customer,
-        Address $quoteCustomerAddress
+        MagentoQuote\Address $quoteCustomerAddress
     ) {
         // Possible that customerId is null for new customers
         $quoteCustomerAddress->setCustomerId($customer->getId());
@@ -214,12 +214,12 @@ class Customer extends Create
         }
 
         switch ($addressType) {
-            case Address::ADDRESS_TYPE_BILLING:
+            case MagentoQuote\Address::ADDRESS_TYPE_BILLING:
                 if (is_null($customer->getDefaultBilling())) {
                     $customerAddress->setIsDefaultBilling(true);
                 }
                 break;
-            case Address::ADDRESS_TYPE_SHIPPING:
+            case MagentoQuote\Address::ADDRESS_TYPE_SHIPPING:
                 if (is_null($customer->getDefaultShipping())) {
                     $customerAddress->setIsDefaultShipping(true);
                 }
