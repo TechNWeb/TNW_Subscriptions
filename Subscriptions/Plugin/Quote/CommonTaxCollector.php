@@ -18,21 +18,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 class CommonTaxCollector
 {
     /**
-     * @var \Magento\Framework\Serialize\Serializer\Json
-     */
-    private $serializer;
-
-    /**
-     * CommonTaxCollector constructor.
-     * @param \Magento\Framework\Serialize\Serializer\Json $serializer
-     */
-    public function __construct(
-        \Magento\Framework\Serialize\Serializer\Json $serializer
-    ) {
-        $this->serializer = $serializer;
-    }
-
-    /**
      * Adds subscription data into quote item tax details object.
      *
      * @param MagentoCollector $subject
@@ -67,7 +52,7 @@ class CommonTaxCollector
             return $result;
         }
 
-        $infoBuyRequest = $option ? $this->serializer->unserialize($option->getValue()) : [];
+        $infoBuyRequest = $option ? $this->unserialize($option->getValue()) : [];
         if (empty($infoBuyRequest[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])) {
             return $result;
         }
@@ -88,6 +73,20 @@ class CommonTaxCollector
             $result->setData('subscription_use_preset_qty', $usePresetQty);
             $result->setData('subscription_preset_qty_price', $presetPrice);
             $result->setData('store_id', $item->getQuote()->getStoreId());
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $string
+     * @return string|int|float|bool|array|null
+     */
+    private function unserialize($string)
+    {
+        $result = json_decode($string, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $result = unserialize($string);
         }
 
         return $result;

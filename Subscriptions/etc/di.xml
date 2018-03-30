@@ -859,9 +859,10 @@
         </arguments>
     </type>
 
+    <preference for="Magento\Braintree\Model\Adapter\BraintreeAdapter"
+                type="TNW\Subscriptions\Model\Payment\Braintree\Adapter" />
     <type name="TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer">
         <arguments>
-            <argument name="adapterFactory" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory</argument>
             <argument name="customLogger" xsi:type="object">BraintreeLoggerForTransactionSale</argument>
         </arguments>
     </type>

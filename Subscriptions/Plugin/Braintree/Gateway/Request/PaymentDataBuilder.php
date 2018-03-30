@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Request;
 
 use Magento\Braintree\Gateway\Request\PaymentDataBuilder as DataBuilder;
-use Magento\Braintree\Gateway\SubjectReader;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Framework\Encryption\EncryptorInterface;
 
 class PaymentDataBuilder
