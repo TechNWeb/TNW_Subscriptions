@@ -272,6 +272,10 @@ class Creator extends Base
             ->setScheduledAt($date);
         $id = $this->relationManager->saveRelation($relation)->getId();
 
+        $quote->setData('scheduled', true);
+        $quote->setData('scheduled_at', $date);
+        $this->cartRepository->save($quote);
+
         $this->logToMessageHistory($relation, $profile->getId());
 
         return $id;
