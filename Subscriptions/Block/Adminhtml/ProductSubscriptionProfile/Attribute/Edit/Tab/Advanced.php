@@ -24,21 +24,14 @@ class Advanced extends Generic
      *
      * @var Data
      */
-    protected $eavData = null;
+    private $eavData;
 
     /**
      * Used in creating options for Yes|No config value selection.
      *
      * @var Yesno
      */
-    protected $yesNo;
-
-    /**
-     * List of attribute codes which can't change scope.
-     *
-     * @var array
-     */
-    protected $disableScopeChangeList;
+    private $yesNo;
 
     /**
      * Disable form fields.
@@ -55,7 +48,6 @@ class Advanced extends Generic
      * @param FormFactory $formFactory
      * @param Yesno $yesNo
      * @param Data $eavData
-     * @param array $disableScopeChangeList
      * @param array $data
      */
     public function __construct(
@@ -65,12 +57,10 @@ class Advanced extends Generic
         Yesno $yesNo,
         Data $eavData,
         PropertyLocker $propertyLocker,
-        array $disableScopeChangeList = ['sku'],
         array $data = []
     ) {
         $this->yesNo = $yesNo;
         $this->eavData = $eavData;
-        $this->disableScopeChangeList = $disableScopeChangeList;
         $this->propertyLocker = $propertyLocker;
         parent::__construct($context, $registry, $formFactory, $data);
     }
@@ -202,9 +192,7 @@ class Advanced extends Generic
                 $form->getElement('is_unique')->setDisabled(1);
             }
         }
-        if (in_array($attributeObject->getAttributeCode(), $this->disableScopeChangeList)) {
-            $form->getElement('is_global')->setDisabled(1);
-        }
+
         $this->setForm($form);
         $this->propertyLocker->lock($form);
 
