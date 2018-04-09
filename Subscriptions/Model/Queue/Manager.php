@@ -276,9 +276,10 @@ class Manager
     }
 
     /**
-     * @param $ids
+     * @param array|int $ids
+     * @param string $message
      */
-    public function makeCanceled($ids)
+    public function makeMessage($ids, $message)
     {
         if (empty($ids)) {
             return;
@@ -293,57 +294,7 @@ class Manager
         $connection->update(
             $collection->getMainTable(),
             [
-                'message' => (string)__('Profile is Canceled, skipping...'),
-                'updated_at' => $this->date->gmtDate(),
-            ],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * @param $ids
-     */
-    public function makeSuspended($ids)
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
-            $collection->getMainTable(),
-            [
-                'message' => (string)__('Profile is Suspended, skipping...'),
-                'updated_at' => $this->date->gmtDate(),
-            ],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * @param $ids
-     */
-    public function makeComplete($ids)
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
-            $collection->getMainTable(),
-            [
-                'message' => (string)__('Profile is Complete, skipping...'),
+                'message' => (string)$message,
                 'updated_at' => $this->date->gmtDate(),
             ],
             [Queue::ID . ' in (?)' => $ids]
