@@ -276,6 +276,81 @@ class Manager
     }
 
     /**
+     * @param $ids
+     */
+    public function makeCanceled($ids)
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $connection = $collection->getConnection();
+        $connection->update(
+            $collection->getMainTable(),
+            [
+                'message' => (string)__('Profile is Canceled, skipping...'),
+                'updated_at' => $this->date->gmtDate(),
+            ],
+            [Queue::ID . ' in (?)' => $ids]
+        );
+    }
+
+    /**
+     * @param $ids
+     */
+    public function makeSuspended($ids)
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $connection = $collection->getConnection();
+        $connection->update(
+            $collection->getMainTable(),
+            [
+                'message' => (string)__('Profile is Suspended, skipping...'),
+                'updated_at' => $this->date->gmtDate(),
+            ],
+            [Queue::ID . ' in (?)' => $ids]
+        );
+    }
+
+    /**
+     * @param $ids
+     */
+    public function makeComplete($ids)
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $connection = $collection->getConnection();
+        $connection->update(
+            $collection->getMainTable(),
+            [
+                'message' => (string)__('Profile is Complete, skipping...'),
+                'updated_at' => $this->date->gmtDate(),
+            ],
+            [Queue::ID . ' in (?)' => $ids]
+        );
+    }
+
+    /**
      * Changes status to synced queue items.
      *
      * @param array|int $ids
@@ -387,10 +462,9 @@ class Manager
     public function getBaseCollection()
     {
         /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getSelect()
+        $collection = $this->collectionFactory->create()
             ->join(
-                ['relation' => $this->profileOrderResource->getMainTable()],
+                ['relation' => SubscriptionProfileOrderInterface::MAIN_TABLE],
                 'main_table.profile_order_id = relation.id AND relation.magento_quote_id IS NOT NULL',
                 [
                     SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
@@ -399,7 +473,7 @@ class Manager
                 ]
             )
             ->join(
-                ['profile' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                ['profile' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY],
                 'relation.subscription_profile_id = profile.entity_id',
                 [
                     SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
