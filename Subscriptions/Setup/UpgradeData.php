@@ -54,6 +54,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->addInfiniteSubscriptionsProductAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), "2.0.19", "<")) {
+            $this->removeRequiredFlagFromProductAttrubutes($eavSetup);
+        }
+
 
         $setup->endSetup();
     }
@@ -132,5 +136,23 @@ class UpgradeData implements UpgradeDataInterface
                 'sort_order' => 140,
             ]
         );
+    }
+
+    /**
+     * Update attributes to avoid problem with disabled module
+     *
+     * @param EavSetup $eavSetup
+     */
+    public function removeRequiredFlagFromProductAttrubutes(EavSetup $eavSetup)
+    {
+        foreach (Attribute::getAttributeCodes() as $attributeCode) {
+
+            $eavSetup->updateAttribute(
+                Product::ENTITY,
+                $attributeCode,
+                'is_required',
+                false
+            );
+        }
     }
 }
