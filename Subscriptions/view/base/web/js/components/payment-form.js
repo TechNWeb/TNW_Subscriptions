@@ -21,7 +21,7 @@ define(
                 paymentContainer: '',
                 listens: {
                     responseData: 'processResponseData'
-                },
+                }
             },
 
             /** @inheritdoc */
@@ -56,16 +56,18 @@ define(
              */
             beforeSubmit: function () {
                 var needShowRequiredError = true,
-                    validForm = true;
+                    validForm = true,
+                    fieldset = null;
 
                 this.validate();
                 if (this.source.params.invalid) {
-                    validForm = false;
-                    return validForm;
+                    return false;
                 }
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
-                        registry.get('index = ' + code).beforeSubmit();
+                        fieldset = registry.get('index = ' + code);
+                        fieldset.beforeSubmit();
+                        validForm = _.isArray(fieldset.payment_errors()) && fieldset.payment_errors().length === 0;
                         needShowRequiredError = false;
                     }
                 });
