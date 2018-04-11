@@ -13,6 +13,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
  * Class ProfileProcessor
@@ -75,6 +76,25 @@ class ProfileProcessor
     {
         $profileIds = [];
         $successIds = [];
+
+        // make Canceled
+        $canceledCollection = $this->queueManager->getBaseCollection()
+            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
+            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_CANCELED);
+        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Canceled, skipping...'));
+
+        // make Suspended
+        $canceledCollection = $this->queueManager->getBaseCollection()
+            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
+            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_SUSPENDED);
+        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Suspended, skipping...'));
+
+        // make Complete
+        $canceledCollection = $this->queueManager->getBaseCollection()
+            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
+            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_COMPLETE);
+        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Complete, skipping...'));
+
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
         $allIds = array_keys($itemsCollection->getItems());
         $this->queueManager->makeRunning($allIds);
