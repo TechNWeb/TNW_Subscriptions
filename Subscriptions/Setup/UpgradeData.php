@@ -145,7 +145,24 @@ class UpgradeData implements UpgradeDataInterface
      */
     public function removeRequiredFlagFromProductAttrubutes(EavSetup $eavSetup)
     {
-        foreach (Attribute::getAttributeCodes() as $attributeCode) {
+        $attributeCodes = [
+            'tnw_subscr_purchase_type',
+            'tnw_subscr_trial_status',
+            'tnw_subscr_trial_length',
+            'tnw_subscr_trial_length_unit',
+            'tnw_subscr_lock_product_price',
+            'tnw_subscr_offer_flat_discount',
+            'tnw_subscr_discount_amount',
+            'tnw_subscr_discount_type',
+            'tnw_subscr_trial_price',
+            'tnw_subscr_trial_start_date',
+            'tnw_subscr_start_date',
+            'tnw_subscr_unlock_preset_qty',
+            'tnw_subscr_savings_calculation',
+            'tnw_subscr_inf_subscriptions'
+        ];
+
+        foreach ($attributeCodes as $attributeCode) {
 
             $eavSetup->updateAttribute(
                 Product::ENTITY,
