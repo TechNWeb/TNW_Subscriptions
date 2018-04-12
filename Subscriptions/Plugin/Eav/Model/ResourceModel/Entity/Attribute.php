@@ -13,19 +13,37 @@ use TNW\Subscriptions\Model;
  */
 class Attribute
 {
+    const GROUP_SIZE = 1;
+
     /**
-     * @var \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory
+     * @var \Magento\Eav\Api\AttributeGroupRepositoryInterface
      */
-    private $groupCollectionFactory;
+    private $groupRepository;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var array
+     */
+    private $allowedGroup = [
+        Model\SubscriptionProfile::ENTITY => Model\SubscriptionProfile::DEFAULT_GROUP_CODE,
+        Model\ProductSubscriptionProfile::ENTITY => Model\ProductSubscriptionProfile::DEFAULT_GROUP_CODE
+    ];
 
     /**
      * Attribute constructor.
-     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory
+     * @param \Magento\Eav\Api\AttributeGroupRepositoryInterface $groupRepository
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
-        \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory
+        \Magento\Eav\Api\AttributeGroupRepositoryInterface $groupRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->groupCollectionFactory = $groupCollectionFactory;
+        $this->groupRepository = $groupRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -34,52 +52,44 @@ class Attribute
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute $subject
      * @param \Magento\Eav\Model\Entity\Attribute $object
      * @return void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function beforeSave(
         \Magento\Eav\Model\ResourceModel\Entity\Attribute $subject,
         $object
     ) {
-        if (strcasecmp($object->getEntityType()->getEntityTypeCode(), Model\SubscriptionProfile::ENTITY) === 0) {
-            // If attribute set is not specified we set Default attribute set for this entity type
-            $attributeSetId = $object->getAttributeSetId();
-            if (empty($attributeSetId)) {
-                $attributeSetId = $object->getEntityType()->getDefaultAttributeSetId();
-                $object->setAttributeSetId($attributeSetId);
-            }
-
-            // If attribute group is not specified we set 'additional-information' group
-            $attributeGroupId = $object->getAttributeGroupId();
-            if (empty($attributeGroupId)) {
-                $groupCollection = $this->groupCollectionFactory->create()
-                    ->setAttributeSetFilter($attributeSetId)
-                    ->addFieldToFilter('attribute_group_code', Model\SubscriptionProfile::DEFAULT_GROUP_CODE)
-                    ->setPageSize(1)
-                    ->load();
-
-                $group = $groupCollection->getFirstItem();
-                $object->setAttributeGroupId($group->getId());
-            }
+        if (!$object->isObjectNew()) {
+            return;
         }
 
-        if (strcasecmp($object->getEntityType()->getEntityTypeCode(), Model\ProductSubscriptionProfile::ENTITY) === 0) {
-            // If attribute set is not specified we set Default attribute set for this entity type
-            $attributeSetId = $object->getAttributeSetId();
-            if (empty($attributeSetId)) {
-                $attributeSetId = $object->getEntityType()->getDefaultAttributeSetId();
-                $object->setAttributeSetId($attributeSetId);
-            }
+        if (!isset($this->allowedGroup[$object->getEntityType()->getEntityTypeCode()])) {
+            return;
+        }
 
-            // If attribute group is not specified we set 'additional-information' group
-            $attributeGroupId = $object->getAttributeGroupId();
-            if (empty($attributeGroupId)) {
-                $groupCollection = $this->groupCollectionFactory->create()
-                    ->setAttributeSetFilter($attributeSetId)
-                    ->addFieldToFilter('attribute_group_code', Model\ProductSubscriptionProfile::DEFAULT_GROUP_CODE)
-                    ->setPageSize(1)
-                    ->load();
+        // If attribute set is not specified we set Default attribute set for this entity type
+        $attributeSetId = $object->getAttributeSetId();
+        if (empty($attributeSetId)) {
+            $attributeSetId = $object->getEntityType()->getDefaultAttributeSetId();
+            $object->setAttributeSetId($attributeSetId);
+        }
 
-                $group = $groupCollection->getFirstItem();
-                $object->setAttributeGroupId($group->getId());
+        // If attribute group is not specified we set 'additional-information' group
+        $attributeGroupId = $object->getAttributeGroupId();
+        if (empty($attributeGroupId)) {
+            $this->searchCriteriaBuilder
+                ->addFilter('attribute_set_id', $attributeSetId)
+                ->addFilter(
+                    'attribute_group_code',
+                    $this->allowedGroup[$object->getEntityType()->getEntityTypeCode()]
+                )
+                ->setPageSize(self::GROUP_SIZE);
+
+            $items = $this->groupRepository
+                ->getList($this->searchCriteriaBuilder->create())
+                ->getItems();
+
+            if (!empty($items)) {
+                $object->setAttributeGroupId(reset($items)->getAttributeGroupId());
             }
         }
     }

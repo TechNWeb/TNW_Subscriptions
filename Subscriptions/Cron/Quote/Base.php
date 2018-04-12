@@ -210,6 +210,7 @@ abstract class Base implements ProcessInterface
         $quote->setIsActive(false);
         $quote->setData('ignore_old_qty', true);
         $quote->setData('is_super_mode', true);
+        $quote->setData('scheduled', true);
         //Set store
         $quote->setStore(
             $profile->getWebsite()->getDefaultStore()
