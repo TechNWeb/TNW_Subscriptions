@@ -94,7 +94,7 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
 
         $data[$this->requestProfileIdField] = $this->getProfileId();
 
-        $data['payment'][$this->profileManager->getProfile()->getEngineCode()]['method'] = "1";
+        $data['payment'][$this->profileManager->getProfile()->getPayment()->getEngineCode()]['method'] = "1";
 
         return [
             $this->getProfileId() => $data

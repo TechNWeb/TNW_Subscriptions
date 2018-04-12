@@ -7,8 +7,10 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use Magento\Framework\Api\AttributeInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
@@ -51,11 +53,18 @@ class Products extends BaseSummary
     private $formContext;
 
     /**
+     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository
+     */
+    private $productAttributeRepository;
+
+    /**
      * @param Template\Context $context
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
      * @param \Magento\Sales\Model\OrderRepository $orderRepository
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+     * @param FormContext $formContext
+     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
      * @param array $data
      */
     public function __construct(
@@ -65,6 +74,7 @@ class Products extends BaseSummary
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
+        \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -73,6 +83,7 @@ class Products extends BaseSummary
         $this->orderRepository = $orderRepository;
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
+        $this->productAttributeRepository = $productAttributeRepository;
     }
 
     /**
@@ -232,6 +243,7 @@ class Products extends BaseSummary
                     : 0,
                 'initialFee' => $initialFee > 0,
                 'price' => $price,
+                'isVirtual' => $profile->getIsVirtual(),
             ]
         ]);
     }
@@ -283,5 +295,23 @@ class Products extends BaseSummary
         }
 
         return '';
+    }
+
+    /**
+     * get visible attributes
+     * @param ProductSubscriptionProfileInterface $item
+     * @return \Magento\Eav\Model\Entity\Attribute\AbstractAttribute[]
+     */
+    public function customAttributes(ProductSubscriptionProfileInterface $item)
+    {
+        $attributes = array_map(function (AttributeInterface $attribute) {
+            return $this->productAttributeRepository->get($attribute->getAttributeCode());
+        }, $item->getCustomAttributes());
+
+        $attributes = array_filter($attributes, function (ProductSubscriptionProfileAttributeInterface $attribute) {
+            return $attribute->getIsVisibleOnFront();
+        });
+
+        return $attributes;
     }
 }

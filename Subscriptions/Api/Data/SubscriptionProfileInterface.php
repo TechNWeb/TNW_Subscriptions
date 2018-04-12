@@ -24,6 +24,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const ID = 'entity_id';
     const LABEL = 'label';
     const BILLING_FREQUENCY_ID = 'billing_frequency_id';
+    /** @deprecated this field in profile table is deleted, moved to subscription payment table */
     const ENGINE_CODE = 'engine_code';
     const START_DATE = 'start_date';
     const TRIAL_START_DATE = 'trial_start_date';
@@ -35,7 +36,9 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const TRIAL_LENGTH = 'trial_length';
     const TRIAL_LENGTH_UNIT = 'trial_length_unit';
     const IS_VIRTUAL = 'is_virtual';
+    /** @deprecated this field in profile table is deleted, moved to subscription payment table */
     const TOKEN_HASH = 'token_hash';
+    /** @deprecated this field in profile table is deleted, moved to subscription payment table */
     const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
     const GENERATE_QUOTES_STATE = 'generate_quotes_state';
     const CREATED_AT = 'created_at';
@@ -198,21 +201,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setFrequency($frequency);
-
-    /**
-     * Gets engine.
-     *
-     * @return string|null
-     */
-    public function getEngineCode();
-
-    /**
-     * Sets engine code.
-     *
-     * @param string $engineCode
-     * @return $this
-     */
-    public function setEngineCode($engineCode);
 
     /**
      * Gets subscription profile addresses.
@@ -423,67 +411,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      */
     public function setIsVirtual($isVirtual);
 
-
-    /**
-     * Gets payment token hash.
-     *
-     * @return string|null
-     */
-    public function getTokenHash();
-
-    /**
-     * Sets payment token hash.
-     *
-     * @param string $tokenHash
-     * @return $this
-     */
-    public function setTokenHash($tokenHash);
-
-    /**
-     * Gets payment token.
-     *
-     * @return string|null
-     */
-    public function getPaymentToken();
-
-    /**
-     * Sets payment token.
-     *
-     * @param string $token
-     * @return $this
-     */
-    public function setPaymentToken($token);
-
-    /**
-     * Gets payment additional info.
-     *
-     * @return []|null
-     */
-    public function getDecodedPaymentAdditionalInfo();
-
-    /**
-     * Sets payment additional info.
-     *
-     * @param  [] $info
-     * @return $this
-     */
-    public function setEncodedPaymentAdditionalInfo($info);
-
-    /**
-     * Gets payment additional info.
-     *
-     * @return string|null
-     */
-    public function getPaymentAdditionalInfo();
-
-    /**
-     * Sets payment additional info.
-     *
-     * @param  string $info
-     * @return $this
-     */
-    public function setPaymentAdditionalInfo($info);
-
     /**
      * Gets quotes generation state.
      *
@@ -558,4 +485,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setCancelBeforeNextCycle($cancelBeforeNextCycle);
+
+    /**
+     * Gets Subscription profile payment.
+     *
+     * @return SubscriptionProfilePaymentInterface
+     */
+    public function getPayment();
+
+    /**
+     * Set Subscription profile payment
+     *
+     * @param SubscriptionProfilePaymentInterface $payment
+     * @return $this
+     */
+    public function setPayment(SubscriptionProfilePaymentInterface $payment);
 }

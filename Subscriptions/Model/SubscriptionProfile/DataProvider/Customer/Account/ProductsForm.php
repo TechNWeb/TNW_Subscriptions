@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Acco
 
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
@@ -193,4 +194,21 @@ class ProductsForm extends SummaryProductsForm
 
         return $result;
     }
+
+    /**
+     * Check if edit button is visible
+     *
+     * @return bool
+     */
+    protected function isEditButtonVisible()
+    {
+        return (
+            null !== $this->currentProduct
+            && !(
+                $this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+                && count($this->getProductBillingFrequencies($this->currentProduct->getId())) <= 1
+            )
+        );
+    }
+
 }

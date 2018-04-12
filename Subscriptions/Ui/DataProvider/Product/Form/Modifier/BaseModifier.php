@@ -48,7 +48,7 @@ class BaseModifier extends AbstractModifier
      */
     public function modifyData(array $data)
     {
-        return parent::modifyData($data);
+        return $data;
     }
 
     /**
@@ -56,7 +56,7 @@ class BaseModifier extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        return parent::modifyMeta($meta);
+        return $meta;
     }
 
     /**

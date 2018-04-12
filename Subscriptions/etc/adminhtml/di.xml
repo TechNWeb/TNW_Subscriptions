@@ -67,6 +67,7 @@
                 <item name="savingsCalculation" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\SavingsCalculation</item>
                 <item name="infiniteSubscriptions" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\InfiniteSubscriptions</item>
                 <item name="subscriptionPurchaseType" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\PurchaseType</item>
+                <item name="subscriptionDonation" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Donation</item>
             </argument>
         </arguments>
     </type>

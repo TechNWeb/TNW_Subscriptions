@@ -36,6 +36,7 @@ define([
             //Get current price format
             var priceFormat = this.getPriceFormat(),
                 currentValue = this.value();
+            priceFormat.pattern = '%s';
             if (typeof currentValue === 'string') {
                 currentValue = formatPrice.formatToNumber(currentValue, priceFormat);
             }

@@ -205,6 +205,10 @@ class Grid extends ProductDataProvider
     {
         $collection = $this->getCurrentCollection();
         $productIds = $collection->getAllIds();
+        if (empty($productIds)) {
+            return [];
+        }
+
         /** @var \Magento\CatalogInventory\Api\StockItemCriteriaInterface $criteria */
         $criteria = $this->stockItemCriteriaFactory->create();
 

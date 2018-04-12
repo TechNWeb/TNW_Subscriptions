@@ -295,6 +295,7 @@ class Products extends ModifyForm
                         'component' => 'TNW_Subscriptions/js/components/modify-products-form',
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
+                        'isSubscriptionsVirtual' => $this->getIsVirtualFromSubscriptions(),
                         'requestFields' => $this->getRequestFields(),
                         'editButtons' => $this->getFormEditButtons()
                     ]
@@ -337,5 +338,23 @@ class Products extends ModifyForm
         $data['frequency_unit_string'] = $this->descriptionCreator->getFrequencyWithUnit($billingFrequencyId);
 
         return $data;
+    }
+
+    /**
+     * Returns is virtual param from all subscriptions.
+     *
+     * @return bool
+     */
+    private function getIsVirtualFromSubscriptions()
+    {
+        $result = true;
+        foreach ($this->formContext->getSession()->getSubQuotes() as $quote) {
+            if (!$quote->isVirtual()) {
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

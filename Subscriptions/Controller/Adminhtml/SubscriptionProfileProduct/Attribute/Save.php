@@ -26,27 +26,22 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
     /**
      * @var FilterManager
      */
-    protected $filterManager;
+    private $filterManager;
 
     /**
      * @var Product
      */
-    protected $productHelper;
+    private $productHelper;
 
     /**
      * @var AttributeFactory
      */
-    protected $attributeFactory;
+    private $attributeFactory;
 
     /**
      * @var ValidatorFactory
      */
-    protected $validatorFactory;
-
-    /**
-     * @var CollectionFactory
-     */
-    protected $groupCollectionFactory;
+    private $validatorFactory;
 
     /**
      * @var LayoutFactory
@@ -88,18 +83,39 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @throws \Zend_Validate_Exception
      */
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
         if ($data) {
             $attributeId = $this->getRequest()->getParam('attribute_id');
-            $attributeCode = $this->getRequest()->getParam('attribute_code')
-                ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
-            if (strlen($attributeCode) > 0) {
-                $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,30}$/']);
-                if (!$validatorAttrCode->isValid($attributeCode)) {
-                    $this->messageManager->addError(
+
+            /** @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
+            $model = $this->attributeFactory->create()->load($attributeId);
+            if (!$model->getId() && $attributeId) {
+                $this->messageManager->addErrorMessage(__('This attribute no longer exists.'));
+                return $this->returnResult('tnw_subscriptions/*/', [], ['error' => true]);
+            }
+
+            if ($model->getId()) {
+                // entity type check
+                if ($model->getEntityTypeId() != $this->entityTypeId) {
+                    $this->messageManager->addErrorMessage(__('We can\'t update the attribute.'));
+                    $this->_session->setAttributeData($data);
+
+                    return $this->returnResult('tnw_subscriptions/*/', [], ['error' => true]);
+                }
+
+                $data['attribute_code'] = $model->getAttributeCode();
+                $data['is_user_defined'] = $model->getIsUserDefined();
+                $data['frontend_input'] = $model->getFrontendInput();
+            } else {
+                $attributeCode = $this->getRequest()->getParam('attribute_code')
+                    ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
+
+                if (!\Zend_Validate::is($attributeCode, 'Regex', ['pattern' => '/^[a-z][a-z_0-9]{0,30}$/'])) {
+                    $this->messageManager->addErrorMessage(
                         __(
                             'Attribute code "%1" is invalid. Please use only letters (a-z), ' .
                             'numbers (0-9) or underscore(_) in this field, first character should be a letter.',
@@ -113,48 +129,26 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                         ['error' => true]
                     );
                 }
-            }
-            $data['attribute_code'] = $attributeCode;
 
-            //validate frontend_input
-            if (isset($data['frontend_input'])) {
-                /** @var $inputType \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\Validator */
-                $inputType = $this->validatorFactory->create();
-                if (!$inputType->isValid($data['frontend_input'])) {
-                    foreach ($inputType->getMessages() as $message) {
-                        $this->messageManager->addError($message);
+                $data['attribute_code'] = $attributeCode;
+
+                //validate frontend_input
+                if (isset($data['frontend_input'])) {
+                    /** @var $inputType \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\Validator */
+                    $inputType = $this->validatorFactory->create();
+                    if (!$inputType->isValid($data['frontend_input'])) {
+                        foreach ($inputType->getMessages() as $message) {
+                            $this->messageManager->addErrorMessage($message);
+                        }
+
+                        return $this->returnResult(
+                            'tnw_subscriptions/*/edit',
+                            ['attribute_id' => $attributeId, '_current' => true],
+                            ['error' => true]
+                        );
                     }
-
-                    return $this->returnResult(
-                        'tnw_subscriptions/*/edit',
-                        ['attribute_id' => $attributeId, '_current' => true],
-                        ['error' => true]
-                    );
-                }
-            }
-
-            /* @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
-            $model = $this->attributeFactory->create();
-
-            if ($attributeId) {
-                $model->load($attributeId);
-                if (!$model->getId()) {
-                    $this->messageManager->addError(__('This attribute no longer exists.'));
-
-                    return $this->returnResult('tnw_subscriptions/*/', [], ['error' => true]);
-                }
-                // entity type check
-                if ($model->getEntityTypeId() != $this->entityTypeId) {
-                    $this->messageManager->addError(__('We can\'t update the attribute.'));
-                    $this->_session->setAttributeData($data);
-
-                    return $this->returnResult('tnw_subscriptions/*/', [], ['error' => true]);
                 }
 
-                $data['attribute_code'] = $model->getAttributeCode();
-                $data['is_user_defined'] = $model->getIsUserDefined();
-                $data['frontend_input'] = $model->getFrontendInput();
-            } else {
                 $data['source_model'] = $this->productHelper->getAttributeSourceModelByInputType(
                     $data['frontend_input']
                 );
@@ -238,7 +232,6 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
         }
 
         return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath($path, $params);
-
     }
 
     /**

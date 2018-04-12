@@ -229,14 +229,25 @@ class RecurringOptions extends BaseModifier
             [
                 static::GROUP_RECURRING_OPTIONS_NAME => [
                     'children' => [
-                        static::CONTAINER_HEADER_NAME => $this->getHeaderContainerConfig(1010),
-                        static::FIELD_ENABLE => $this->getEnableFieldConfig(1020),
-                        static::GRID_OPTIONS_NAME => $this->getOptionsGridConfig(1030)
-                    ]
-                ]
+                        'container_recurring_options' => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'label' => null,
+                                        'componentType' => Fieldset::NAME,
+                                    ],
+                                ],
+                            ],
+                            'children' => [
+                                static::CONTAINER_HEADER_NAME => $this->getHeaderContainerConfig(1010),
+                                static::FIELD_ENABLE => $this->getEnableFieldConfig(1020),
+                                static::GRID_OPTIONS_NAME => $this->getOptionsGridConfig(1030),
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
-
 
         return $this;
     }
@@ -419,7 +430,6 @@ class RecurringOptions extends BaseModifier
 
         return $commonContainer;
     }
-
 
     /**
      * Get config for hidden id field

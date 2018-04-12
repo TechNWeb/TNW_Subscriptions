@@ -6,12 +6,10 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
-use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
@@ -27,6 +25,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Base;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
@@ -137,7 +136,7 @@ class SummaryProductsForm extends ModifyForm
         $data = [];
         foreach ($this->getObjects() as $subQuote) {
             $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
-            /** @var Item $item */
+            /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
@@ -159,6 +158,13 @@ class SummaryProductsForm extends ModifyForm
                     'qty' => $item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
                 ];
+
+                /** @var Base $modifier */
+                foreach ($this->pool->getModifiersInstances() as $modifier) {
+                    $modifier->setItem($item);
+                    $data[$subQuote->getId()]["item_{$item->getId()}"] =
+                        $modifier->modifyData($data[$subQuote->getId()]["item_{$item->getId()}"]);
+                }
             }
         }
 

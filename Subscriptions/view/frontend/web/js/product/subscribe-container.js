@@ -146,36 +146,50 @@ define([
                 frequencies = $(this.options.frequencyInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
-                savingsCalculationType = parseInt(this.options.savingsCalculationType);
-
+                savingsCalculationType = parseInt(this.options.savingsCalculationType),
+                childrenSelect = $(this.options.childrenSelector),
+                isNeedStopCalculating = false,
+                resultLabel = '';
+            if (childrenSelect) {
+                $.each(childrenSelect, function (key, child) {
+                     if (!$(child).val()) {
+                         isNeedStopCalculating = true;
+                         return false;
+                     }
+                });
+            }
             $.each(frequencies, function (key, option) {
-                var currentFrequencyPrice = widget.getFrequencyPrice(parseInt($(option).val())),
-                    productPrice = widget.getProductPrice(),
+                var currentFrequencyPrice = parseFloat(widget.getFrequencyPrice(parseInt($(option).val()))),
+                    productPrice = parseFloat(widget.getProductPrice()),
                     frequencyUnit = $(option).data('frequency-unit'),
                     presetQty = $(option).data('preset-qty'),
                     frequencyUnitType = $(option).data('frequency-unit-type'),
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
-                    saveString = '(SAVE %s)';
+                    saveString = ' %p (SAVE ~%s%)';
                 $.each(option.labels, function (key, label) {
-                    var resultLabel = $(label).data('default-label'),
-                        discount = 0;
-
-                    qtyValue = presetQty ? presetQty : qtyValue;
-                    if (savingsCalculationType === 2) {
-                        if (frequencyUnitType == 5) {
-                            saveString = '(SAVE ~ %s)'
+                    resultLabel = $(label).data('default-label');
+                    if (isNeedStopCalculating === false) {
+                        var discount = 0;
+                        qtyValue = presetQty ? presetQty : qtyValue;
+                        if (savingsCalculationType === 2) {
+                            //formula for service
+                            discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * qtyValue * 100)
+                                / (productPrice * calculatedUnit);
+                        } else if (savingsCalculationType === 1) {
+                            //formula for any retail / physical product with preset qty
+                            discount = ((productPrice * qtyValue - currentFrequencyPrice) * 100)
+                                / (productPrice * qtyValue);
+                        } else {
+                            //formula for any retail / physical product
+                            discount = ((productPrice - currentFrequencyPrice) * qtyValue * 100) / productPrice;
                         }
-                        discount = (parseFloat(productPrice) * calculatedUnit - parseFloat(currentFrequencyPrice)) * qtyValue;
-                    } else if (savingsCalculationType === 1) {
-                        discount = parseFloat(productPrice) * qtyValue - parseFloat(currentFrequencyPrice);
-                    } else {
-                        discount = (parseFloat(productPrice) - parseFloat(currentFrequencyPrice)) * qtyValue;
+                        discount = parseInt(discount);
+                        if (discount > 0) {
+                            resultLabel += $t(saveString)
+                                .replace('%p', utils.formatPrice(currentFrequencyPrice, {}))
+                                .replace('%s', discount);
+                        }
                     }
-
-                    if (discount > 0){
-                        resultLabel += '  ' + $t(saveString).replace('%s', utils.formatPrice(discount, {}));
-                    }
-
                     label.innerText = resultLabel;
                 });
             });
@@ -217,9 +231,7 @@ define([
                 result = 0,
                 selectedProduct,
                 selectedValue,
-                frequencyData,
-                frequencyPrice;
-
+                frequencyData;
             if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
                 result = product.frequency_data[optionValue];
             } else if (product.type == 'configurable') {
@@ -228,9 +240,9 @@ define([
                 if (selectedProduct && selectedValue) {
                     frequencyData = product.children[selectedProduct].frequency_data;
                     if (frequencyData) {
-                        frequencyPrice = product.children[selectedProduct].frequency_data[optionValue];
-                        if (frequencyPrice) {
-                            result = frequencyPrice;
+                        result = product.children[selectedProduct].frequency_data[optionValue];
+                        if (result <= 0) {
+                            result = product.frequency_data[optionValue];
                         }
                     }
                 }

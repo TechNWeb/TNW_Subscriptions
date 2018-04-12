@@ -37,28 +37,26 @@ define([
          */
         changeCommentAndValue: function() {
             //Get current price format
-            var priceFormat = this.getPriceFormat();
-
-            var notice = '';
-            var discountAmount = 0;
-            var discountType = '';
-            var discountTypeValue = '';
-
-            //Get current component integer value
-            var currentValue = this.value();
-            if (typeof currentValue == 'string') {
-                currentValue = formatPrice.formatToNumber(currentValue, priceFormat);
+            var priceFormat = this.getPriceFormat(),
+                notice = '',
+                discountAmount = 0,
+                discountTypeValue = '',
+                recurringPrice = this.value(), //Get current component integer value,
+                productPrice = this.getProductPriceComponentValue(),
+                productPriceComponent = registry.get('index=price'),
+                lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price'),
+                offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount'),
+                discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
+                discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
+                priceFormat.pattern = '%s';
+            if (typeof recurringPrice === 'string') {
+                recurringPrice = formatPrice.formatToNumber(recurringPrice, priceFormat);
             }
-
-            var recurringPrice = currentValue;
-
-            var productPrice = this.getProductPriceComponentValue();
-            var productPriceComponent = registry.get('index=price');
-
-            var lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price');
-            var offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount');
-            var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount');
-            var discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
+            //if price field is disabled - don't display discount fields
+            if (!productPriceComponent || productPriceComponent.disabled()) {
+                offerDiscountComponent.checked(false);
+                offerDiscountComponent.visible(false);
+            }
 
             if (lockPriceComponent.checked()) {         // Product price is locked
                 recurringPrice = productPrice;

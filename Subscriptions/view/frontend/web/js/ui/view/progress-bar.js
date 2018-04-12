@@ -56,8 +56,16 @@ define(
                 var step = window.location.hash.substr(1);
                 if (step) {
                     var isLoggedIn = registry.get('cart').checkoutConfig.isCustomerLoggedIn;
+                    var isVirtual = registry.get('cart').checkoutConfig.isSubscriptionsVirtual;
+
                     if (step === 'registration' && isLoggedIn) {
                         step = 'shipping';
+                        if (isVirtual) {
+                            step = 'billing';
+                        }
+                        stepNavigator.applyHash(step);
+                    } else if (step === 'shipping' && isVirtual) {
+                        step = 'billing';
                         stepNavigator.applyHash(step);
                     }
 

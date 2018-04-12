@@ -13,6 +13,21 @@ define(
         'use strict';
 
         return Component.extend({
+            defaults: {
+                isSubscriptionsVirtual: false
+            },
+            /**
+             * @inheritdoc
+             */
+            initialize: function () {
+                this._super();
+                if (registry.get('cart')) {
+                    registry.get('cart').checkoutConfig.isSubscriptionsVirtual = this.isSubscriptionsVirtual;
+                }
+
+                return this;
+            },
+
             /**
              * Process response status.
              */

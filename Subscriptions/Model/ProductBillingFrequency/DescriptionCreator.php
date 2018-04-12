@@ -118,8 +118,11 @@ class DescriptionCreator
             );
         }
 
-        $description[] = __('Products will be shipped every %1 starting %2.',
-            $frequencyUnit, $startDate);
+        $shipOrUse = !empty($subscriptionData[CreateProfile::NON_UNIQUE]['isVirtual'])
+            ? __('can be used')
+            : __('will be shipped');
+
+        $description[] = __('Products %1 every %2 starting %3.', $shipOrUse, $frequencyUnit, $startDate);
 
         return implode(' ', $description);
     }

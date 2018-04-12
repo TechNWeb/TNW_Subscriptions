@@ -52,15 +52,11 @@ class Uninstall implements UninstallInterface
      */
     public function uninstall(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-        $setup->startSetup();
-
-        $this->dropTables($setup);
         $this->removeProductAttributes();
         $this->removeConfig($setup);
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
-
-        $setup->endSetup();
+        $this->dropTables($setup);
     }
 
     /**

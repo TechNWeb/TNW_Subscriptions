@@ -104,8 +104,8 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     {
         $data = parent::modifyData($data);
 
-        $additionalInfo = $this->getProfile()
-            ? $this->getProfile()->getDecodedPaymentAdditionalInfo()
+        $additionalInfo = ($this->getProfile() && $this->getProfile()->getPayment())
+            ? $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
         if (!empty($additionalInfo['cc_type'])) {

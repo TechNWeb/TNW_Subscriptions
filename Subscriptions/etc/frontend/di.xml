@@ -14,6 +14,7 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="products" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
                 <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
+                <item name="shipping" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Shipping</item>
             </argument>
         </arguments>
     </type>
@@ -69,5 +70,10 @@
                 type="TNW\Subscriptions\Plugin\CustomerData\Wishlist"
                 sortOrder="100"
                 disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Attributes">
+        <arguments>
+            <argument name="editAllow" xsi:type="boolean">false</argument>
+        </arguments>
     </type>
 </config>
