@@ -29,5 +29,29 @@ class Attribute
     const SUBSCRIPTION_SAVINGS_CALCULATION = 'tnw_subscr_savings_calculation';
     const SUBSCRIPTION_INFINITE_SUBSCRIPTIONS = 'tnw_subscr_inf_subscriptions';
     const SUBSCRIPTION_SCHEDULE = 'tnw_subscr_schedule';
-    /**#@-*/
+
+    /**
+     * @return array
+     */
+    public static function getAttributeCodes()
+    {
+        return [
+            self::SUBSCRIPTION_PURCHASE_TYPE,
+            self::SUBSCRIPTION_TRIAL_STATUS,
+            self::SUBSCRIPTION_TRIAL_LENGTH,
+            self::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
+            self::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+            self::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+            self::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            self::SUBSCRIPTION_DISCOUNT_TYPE,
+            self::SUBSCRIPTION_TRIAL_PRICE,
+            self::SUBSCRIPTION_TRIAL_START_DATE,
+            self::SUBSCRIPTION_START_DATE,
+            self::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            self::SUBSCRIPTION_SAVINGS_CALCULATION,
+            self::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+            self::SUBSCRIPTION_SCHEDULE
+        ];
+    }
+
 }
