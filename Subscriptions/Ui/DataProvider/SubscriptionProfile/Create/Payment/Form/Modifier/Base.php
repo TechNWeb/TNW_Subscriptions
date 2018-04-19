@@ -220,6 +220,23 @@ class Base implements PaymentModifierInterface
     }
 
     /**
+     * @return \Magento\Quote\Model\Quote\Address|null|\TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface
+     */
+    protected function getBillingAddress()
+    {
+        if ($this->getProfile()) {
+            return $this->getProfile()->getBillingAddress();
+        }
+
+        /** @var \Magento\Quote\Model\Quote $quote */
+        foreach ($this->session->getSubQuotes() as $quote) {
+            return $quote->getBillingAddress();
+        }
+
+        return null;
+    }
+
+    /**
      * Sets listens
      *
      * @param $listens
