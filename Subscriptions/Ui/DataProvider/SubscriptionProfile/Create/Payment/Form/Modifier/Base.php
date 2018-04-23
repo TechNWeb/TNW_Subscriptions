@@ -179,27 +179,12 @@ class Base implements PaymentModifierInterface
     }
 
     /**
-     * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return int
+     * @deprecated
      */
     protected function getGrandTotal()
     {
-        if ($this->getProfile()) {
-            $nextProfileRelation = $this->relationManager
-                ->getNextProfileRelation($this->getProfile());
-
-            return $this->cartRepository
-                ->get($nextProfileRelation->getMagentoQuoteId())
-                ->getBaseGrandTotal();
-        }
-
-        $grandTotal = 0;
-        /** @var \Magento\Quote\Model\Quote $quote */
-        foreach ($this->session->getSubQuotes() as $quote) {
-            $grandTotal += $quote->getBaseGrandTotal();
-        }
-
-        return $grandTotal;
+        return 0;
     }
 
     /**
