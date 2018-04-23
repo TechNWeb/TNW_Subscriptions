@@ -51,6 +51,10 @@ class Braintree extends Base
 
     /**
      * @inheritdoc
+     * @throws PaymentException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Http\ClientException
+     * @throws \Magento\Payment\Gateway\Http\ConverterException
      */
     public function process(array $data)
     {
@@ -58,46 +62,41 @@ class Braintree extends Base
             return;
         }
 
-        try {
-            /** @var \Magento\Quote\Model\Quote[] $subQuotes */
-            $subQuotes = $this->getSubCreateModel()->getSubQuotes();
+        /** @var \Magento\Quote\Model\Quote[] $subQuotes */
+        $subQuotes = $this->getSubCreateModel()->getSubQuotes();
 
-            $customer = reset($subQuotes)->getCustomer();
-            $transfer = $this->transferFactory->create([
-                'firstName' => $customer->getFirstname(),
-                'lastName' => $customer->getLastname(),
-                'email' => $customer->getEmail(),
-                'paymentMethodNonce' => $data['payment']['braintree']['nonce']
-            ]);
+        $customer = reset($subQuotes)->getCustomer();
+        $transfer = $this->transferFactory->create([
+            'firstName' => $customer->getFirstname(),
+            'lastName' => $customer->getLastname(),
+            'email' => $customer->getEmail(),
+            'paymentMethodNonce' => $data['payment']['braintree']['nonce']
+        ]);
 
-            /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */
-            $response = $this->transactionCustomer->placeRequest($transfer);
-            if ($response['object'] instanceof \Braintree\Result\Error) {
-                $errors = [];
-                foreach($response->errors->deepAll() AS $error) {
-                    $errors[] = "{$error->code}: {$error->message}";
-                }
-
-                throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
+        /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */
+        $response = $this->transactionCustomer->placeRequest($transfer);
+        if ($response['object'] instanceof \Braintree\Result\Error) {
+            $errors = [];
+            foreach($response->errors->deepAll() AS $error) {
+                $errors[] = "{$error->code}: {$error->message}";
             }
 
-            /** @var \Braintree\CreditCard $paymentMethod */
-            $paymentMethod = $response['object']->customer->paymentMethods[0];
-
-            /** @var \Magento\Quote\Model\Quote $subQuote */
-            foreach ($subQuotes as $subQuote) {
-                $subQuote->getPayment()
-                    ->setAdditionalInformation('token_hash', $this->encryptor->encrypt($paymentMethod->token));
-
-                $subQuote->getPayment()->setCcType($data['payment']['braintree']['additional']['cc_type']);
-                $subQuote->getPayment()->setCcLast4($paymentMethod->last4);
-                $subQuote->getPayment()->setCcExpMonth($paymentMethod->expirationMonth);
-                $subQuote->getPayment()->setCcExpYear($paymentMethod->expirationYear);
-            }
-
-            $this->getSubCreateModel()->setNeedCollect(true);
-        } catch (\Exception $e) {
-            $this->errors[] = __('Payment: %1', $e->getMessage());
+            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
         }
+
+        /** @var \Braintree\CreditCard $paymentMethod */
+        $paymentMethod = $response['object']->customer->paymentMethods[0];
+
+        /** @var \Magento\Quote\Model\Quote $subQuote */
+        foreach ($subQuotes as $subQuote) {
+            $subQuote->getPayment()
+                ->setAdditionalInformation('token_hash', $this->encryptor->encrypt($paymentMethod->token))
+                ->setCcType($data['payment']['braintree']['additional']['cc_type'])
+                ->setCcLast4($paymentMethod->last4)
+                ->setCcExpMonth($paymentMethod->expirationMonth)
+                ->setCcExpYear($paymentMethod->expirationYear);
+        }
+
+        $this->getSubCreateModel()->setNeedCollect(true);
     }
 }
