@@ -51,7 +51,7 @@ define([
          */
         changeVisibility: function(checkBoxChecked) {
             if (checkBoxChecked && !this.clientToken) {
-                this.processErrors($.mage.__('This payment is not available'));
+                this.processErrors([$t('This payment is not available')]);
                 return;
             }
 
