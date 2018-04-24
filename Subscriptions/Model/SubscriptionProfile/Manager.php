@@ -546,8 +546,7 @@ class Manager
         $date = null
     ) {
         if (!$date) {
-            $date = new \DateTime();
-            $date = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            $date = date_create()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         }
 
         $relation = $this->orderRelationManager

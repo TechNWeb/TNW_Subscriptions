@@ -182,6 +182,7 @@ class Base implements EngineInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function processProfile(Quote $quote)
     {
@@ -196,7 +197,7 @@ class Base implements EngineInterface
             $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
             $quote->setReservedOrderId(null);
             $quote->save();
-            throw new \Exception($e->getMessage());
+            throw $e;
         }
     }
 
