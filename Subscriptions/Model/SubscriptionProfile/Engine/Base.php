@@ -7,16 +7,13 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\Registry;
 use Magento\Payment\Model\Checks\ZeroTotal;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Payment;
-use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use Magento\Payment\Model\Method\Free;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
@@ -52,20 +49,6 @@ class Base implements EngineInterface
     private $cartManagement;
 
     /**
-     * Profile comments logger.
-     *
-     * @var MessageHistoryLogger
-     */
-    private $historyLogger;
-
-    /**
-     * Registry.
-     *
-     * @var Registry
-     */
-    private $registry;
-
-    /**
      * Data persistor
      *
      * @var DataPersistorInterface
@@ -84,24 +67,19 @@ class Base implements EngineInterface
      * @param Config $config
      * @param Context $context
      * @param CartManagementInterface $cartManagement
-     * @param MessageHistoryLogger $historyLogger
-     * @param Registry $registry
      * @param DataPersistorInterface $persistor
+     * @param ZeroTotal $zeroTotalValidator
      */
     public function __construct(
         Config $config,
         Context $context,
         CartManagementInterface $cartManagement,
-        MessageHistoryLogger $historyLogger,
-        Registry $registry,
         DataPersistorInterface $persistor,
         ZeroTotal $zeroTotalValidator
     ) {
         $this->config = $config;
         $this->context = $context;
         $this->cartManagement = $cartManagement;
-        $this->historyLogger = $historyLogger;
-        $this->registry = $registry;
         $this->persistor = $persistor;
         $this->zeroTotalValidator = $zeroTotalValidator;
     }
@@ -188,8 +166,8 @@ class Base implements EngineInterface
     {
         try {
             $this->validatePayment($quote);
+            //throw new \Exception('Hello');
             $order = $this->getCartManagement()->submit($quote);
-            $this->logToMessageHistory($this->getProfile(), $quote, $order);
             $this->updateProfileStatus();
 
             return $order;
@@ -218,34 +196,6 @@ class Base implements EngineInterface
     }
 
     /**
-     * Log to comment profile comment history created order.
-     *
-     * @param SubscriptionProfileInterface $profile
-     * @param Quote $quote
-     * @param OrderInterface $order
-     * @return void
-     */
-    private function logToMessageHistory(
-        SubscriptionProfileInterface $profile,
-        Quote $quote,
-        OrderInterface $order
-    ) {
-        $message = sprintf(
-            $this->historyLogger->getMessage(MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE),
-            $order->getIncrementId(),
-            $this->historyLogger->getConvertedQuoteId($quote->getId())
-        );
-
-        $this->historyLogger->log(
-            $message,
-            $profile->getId(),
-            false,
-            false,
-            $this->registry->registry('profile_process_type')
-        );
-    }
-
-    /**
      * Updates profile status after order processing
      */
     private function updateProfileStatus()
@@ -267,6 +217,7 @@ class Base implements EngineInterface
      * Validates zero total and sets free payment method to quote if validation failed.
      *
      * @param Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function validatePayment(Quote $quote)
     {

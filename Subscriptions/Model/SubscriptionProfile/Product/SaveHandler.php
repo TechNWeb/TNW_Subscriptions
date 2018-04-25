@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
  */
 class SaveHandler implements ExtensionInterface
 {
-
     /**
      * @var ProductSubscriptionProfileRepository
      */
@@ -31,20 +30,32 @@ class SaveHandler implements ExtensionInterface
         $this->productProfileRepository = $productProfileRepository;
     }
 
-
     /**
      * @param SubscriptionProfileInterface $entity
      * @param array $arguments
      * @return SubscriptionProfileInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute($entity, $arguments = [])
     {
         $products = $entity->getProducts();
+        usort($products, function ($a, $b) {
+            $countA = count($a->getChildren());
+            $countB = count($b->getChildren());
 
-        if (!empty($products)){
-            foreach ($products as $product) {
-                $product->setSubscriptionProfileId($entity->getId());
-                $this->productProfileRepository->save($product);
+            if ($countA === $countB) {
+                return 0;
+            }
+
+            return ($countA < $countB) ? 1 : -1;
+        });
+
+        foreach ($products as $product) {
+            $product->setSubscriptionProfileId($entity->getId());
+            $this->productProfileRepository->save($product);
+
+            foreach ($product->getChildren() as $child) {
+                $child->setParentId($product->getId());
             }
         }
 

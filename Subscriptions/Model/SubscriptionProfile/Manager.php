@@ -11,6 +11,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SimpleDataObjectConverter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -298,16 +299,18 @@ class Manager
      * Saves subscription profile.
      *
      * @return SubscriptionProfileInterface
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function saveProfile()
     {
-        $this->setProfile($this->subscriptionProfileRepository->save($this->getProfile()));
-        $payment = $this->getProfile()->getPayment();
-        $payment->setProfileId($this->getProfile()->getId());
-        $payment = $this->paymentRepository->save($payment);
-        $this->getProfile()->setPayment($payment);
+        $profile = $this->getProfile();
+        $this->subscriptionProfileRepository->save($profile);
 
-        return $this->getProfile();
+        $payment = $profile->getPayment()
+            ->setProfileId($profile->getId());
+        $this->paymentRepository->save($payment);
+
+        return $profile;
     }
 
     /**
@@ -538,7 +541,8 @@ class Manager
      * @param Quote $quote
      * @param SubscriptionProfileInterface $profile
      * @param null|string $date
-     * @return null|SubscriptionProfileOrderInterface
+     * @return SubscriptionProfileOrderInterface
+     * @throws LocalizedException
      */
     public function assignQuoteToProfile(
         Quote $quote,
@@ -563,62 +567,60 @@ class Manager
      * @param Quote $quote
      * @param null|\DateTime $date
      * @return $this
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function populateProfileData(Quote $quote, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
-        if (!empty($request)) {
-            $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
-            if (!$frequency || !$frequency->getId()) {
-                throw new \Exception(__('Can not create profile with empty frequency.'));
-            }
+        if (empty($request)) {
+            return $this;
         }
-        if (isset($frequency)) {
-            $startDate = $this->getFullStartDate($request['start_on'], $date);
+
+        $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
+        $startDate = $this->getFullStartDate($request['start_on'], $date);
+
+        $this->getProfile()
+            ->setCustomerId($quote->getCustomerId())
+            ->setWebsiteId($quote->getStore()->getWebsiteId())
+            ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
+            ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
+            ->setIsVirtual($quote->getIsVirtual())
+            ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
+            ->setTerm($request['term'])
+            ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
+            ->setStartDate($startDate)
+            ->setBillingFrequencyId($frequency->getId())
+            ->setFrequency($frequency->getFrequency())
+            ->setUnit($frequency->getUnit())
+            ->setStatus(ProfileStatus::STATUS_PENDING)
+            ->setTrialStartDate(null)
+            ->setTrialLength($request['trial_period'])
+            ->setTrialLengthUnit($request['trial_unit_id'])
+            ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
+
+        $this->getProfile()->getPayment()
+            ->setEngineCode($quote->getPayment()->getMethod());
+
+        //set trial start date to profile
+        if ($request['is_trial']) {
             $this->getProfile()
-                ->setCustomerId($quote->getCustomerId())
-                ->setWebsiteId($quote->getStore()->getWebsiteId())
-                ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
-                ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
-                ->setIsVirtual($quote->getIsVirtual())
-                ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
-                ->setTerm($request['term'])
-                ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
-                ->setStartDate($startDate)
-                ->setBillingFrequencyId($frequency->getId())
-                ->setFrequency($frequency->getFrequency())
-                ->setUnit($frequency->getUnit())
-                ->setStatus(ProfileStatus::STATUS_PENDING)
-                ->setTrialStartDate(null)
-                ->setTrialLength($request['trial_period'])
-                ->setTrialLengthUnit($request['trial_unit_id'])
-                ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
-            $payment = $this->getProfile()->getPayment();
-            $payment->setEngineCode($quote->getPayment()->getMethod());
-            $nowDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-            //set trial start date to profile
-            if ($request['is_trial']) {
-                $this->getProfile()->setTrialStartDate($startDate);
-                $this->getProfile()->setStartDate($this->calculateStartDate());
-                //set status "trial" if trial period starts immediately
-                if (strtotime($startDate) <= strtotime($nowDate)) {
-                    $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
-                }
-            }
-            $this->getProfile()->setAddresses($this->populateAddressesData($quote));
-            $profileProducts = $this->productManager->populateProductsData($quote);
-            $this->getProfile()->setProducts($profileProducts);
-            $this->getProfile()->setVisibleProducts($profileProducts);
-            $this->saveProfile();
-            $profileChildProducts = $this->productManager->populateChildProductsData($quote, $profileProducts);
-            if ($profileChildProducts) {
-                $this->getProfile()->setProducts(
-                    array_merge($profileProducts, $profileChildProducts)
-                );
-                $this->saveProfile();
+                ->setTrialStartDate($startDate)
+                ->setStartDate($this->calculateStartDate());
+
+            //set status "trial" if trial period starts immediately
+            if (strtotime($startDate) <= time()) {
+                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
             }
         }
+
+        $profileProducts = $this->productManager->populateProductsData($quote);
+        $profileChildProducts = $this->productManager->populateChildProductsData($quote, $profileProducts);
+        $profileAddress = $this->populateAddressesData($quote);
+
+        $this->getProfile()
+            ->setAddresses($profileAddress)
+            ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
         return $this;
     }
@@ -755,7 +757,7 @@ class Manager
      * Calculates start date of subscription when trial period is set.
      *
      * @return null|string
-     * @throws \Exception
+     * @throws LocalizedException
      */
     private function calculateStartDate()
     {
@@ -772,8 +774,7 @@ class Manager
                     $intervalUnit = 'M';
                     break;
                 default:
-                    throw new \Exception('Undefined trial length unit type.');
-                    break;
+                    throw new LocalizedException(__('Undefined trial length unit type.'));
             }
 
             $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
