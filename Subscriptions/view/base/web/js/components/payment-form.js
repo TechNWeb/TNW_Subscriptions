@@ -21,7 +21,7 @@ define(
                 paymentContainer: '',
                 listens: {
                     responseData: 'processResponseData'
-                },
+                }
             },
 
             /** @inheritdoc */
@@ -55,27 +55,19 @@ define(
              * @returns {boolean}
              */
             beforeSubmit: function () {
-                var current = this,
-                    needShowRequiredError = true,
-                    validForm = true;
+                var needShowRequiredError = true,
+                    validForm = true,
+                    fieldset = null;
 
                 this.validate();
                 if (this.source.params.invalid) {
-                    validForm = false;
-                    return validForm;
+                    return false;
                 }
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
-                        switch (code) {
-                            case 'payflowpro':
-                            case 'braintree':
-                                registry.get('index = ' + code).beforeSubmit();
-                                break;
-
-                            case 'checkmo':
-                            default:
-                                current.save();
-                        }
+                        fieldset = registry.get('index = ' + code);
+                        fieldset.beforeSubmit();
+                        validForm = _.isArray(fieldset.payment_errors()) && fieldset.payment_errors().length === 0;
                         needShowRequiredError = false;
                     }
                 });
@@ -108,7 +100,7 @@ define(
                         if (errors && errors.length > 0) {
                             var fieldset = registry.get('index = ' + code);
                             fieldset.processErrors(errors);
-                            this.updateButtons(false);
+                            current.updateButtons(false);
                             current.hideLoader();
                             return;
                         }

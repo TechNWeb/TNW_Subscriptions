@@ -41,6 +41,7 @@ class Checkmo extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param CheckmoPayment $checkmoPayment
      */
@@ -49,12 +50,13 @@ class Checkmo extends Base implements PaymentModifierInterface
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         Context $context,
         CheckmoPayment $checkmoPayment
     ) {
         $this->context = $context;
         $this->checkmoPayment = $checkmoPayment;
-        parent::__construct($config, $session, $profileRepository, $relationManager);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
     }
 
     /**
@@ -128,7 +130,6 @@ class Checkmo extends Base implements PaymentModifierInterface
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
             'listens'=> $this->getListens(),
             'options' => [
                 'gateway' => $this->getPaymentCode(),
