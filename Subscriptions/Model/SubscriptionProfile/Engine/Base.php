@@ -166,7 +166,7 @@ class Base implements EngineInterface
     {
         try {
             $this->validatePayment($quote);
-            //throw new \Exception('Hello');
+            throw new \Exception('Hello');
             $order = $this->getCartManagement()->submit($quote);
             $this->updateProfileStatus();
 

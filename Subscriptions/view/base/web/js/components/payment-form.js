@@ -21,6 +21,9 @@ define(
                 paymentContainer: '',
                 listens: {
                     responseData: 'processResponseData'
+                },
+                modules: {
+                    formRight: 'name = cart.steps.insert_form_right'
                 }
             },
 
@@ -145,6 +148,7 @@ define(
             processResponseData: function (data) {
                 if (data.error) {
                     this.updateButtons(false);
+                    this.formRight().updateData();
                 }
             },
 

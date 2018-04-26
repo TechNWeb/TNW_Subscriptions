@@ -7,9 +7,11 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="tnw_subscriptions_cart_default"/>
-    <referenceContainer name="content">
-        <uiComponent name="tnw_subscriptionprofile_checkout_payment_form"/>
-        <uiComponent name="tnw_subscriptionprofile_checkout_product_listing"/>
-        <uiComponent name="tnw_subscriptionprofile_checkout_messages"/>
-    </referenceContainer>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="tnw_subscriptionprofile_checkout_payment_form"/>
+            <uiComponent name="tnw_subscriptionprofile_checkout_product_listing"/>
+            <uiComponent name="tnw_subscriptionprofile_checkout_messages"/>
+        </referenceContainer>
+    </body>
 </page>
