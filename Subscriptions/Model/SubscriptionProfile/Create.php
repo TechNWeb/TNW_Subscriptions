@@ -49,7 +49,7 @@ class Create
     /**
      * Session.
      *
-     * @var QuoteSessionInterface
+     * @var \TNW\Subscriptions\Model\QuoteSession
      */
     private $session;
 
@@ -79,7 +79,7 @@ class Create
     /**
      * Returns subscription admin session.
      *
-     * @return QuoteSessionInterface
+     * @return \TNW\Subscriptions\Model\QuoteSession
      */
     public function getSession()
     {

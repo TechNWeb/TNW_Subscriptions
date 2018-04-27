@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
@@ -516,8 +517,9 @@ class CreateProfile extends BaseCreate
      * Creates subscription profiles.
      *
      * @return SubscriptionProfileInterface[]
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function createSubscriptions()
     {
@@ -538,9 +540,26 @@ class CreateProfile extends BaseCreate
             // Fill profile payment
             $this->profileManager->populatePaymentData($subQuote->getPayment());
 
-            // Process profile
-            $order = $this->profileManager->processProfile($subQuote);
+            try {
+                // Process profile
+                $order = $this->profileManager->processProfile($subQuote);
+            } catch (\Exception $e) {
+                $success = array_map(function (SubscriptionProfileInterface $profile) {
+                    return $profile->getLabel();
+                }, $profiles);
 
+                $successMessage = !empty($success)
+                    ? __('%1 profiles were paid successfully.', implode(', ', $success))
+                    : '';
+
+                throw new LocalizedException(__(
+                    'Payment transaction error: %1. %2 Not paid subscription plans still in your cart.',
+                    $e->getMessage(),
+                    $successMessage
+                ));
+            }
+
+            // Remove quote
             $this->getSession()->removeSubQuote($subQuote);
 
             // Save profile
