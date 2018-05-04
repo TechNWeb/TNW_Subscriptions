@@ -77,10 +77,15 @@ class SubscriptionAmount extends BaseAmount
     public function getDisplayPrice()
     {
         $defaultData = $this->getPriceData();
+        if ($defaultData['trial_price_status'] && empty($defaultData['price'])) {
+            return sprintf('<span class="free">%s</span>', __('Free'));
+        }
+
         $result = $this->formatCurrency($defaultData['price'], true);
         if ($defaultData['frequency_unit_message']) {
             $result .= $defaultData['frequency_unit_message'];
         }
+
         return $result;
     }
 
