@@ -156,10 +156,31 @@ class MessageHistoryLogger
     }
 
     /**
+     * @param $index
+     * @param array $params
+     * @param $subscriptionId
+     * @param bool $isComment
+     * @param bool $isVisibleOnFront
+     * @param bool $isAutomatedProcess
+     */
+    public function message(
+        $index,
+        array $params,
+        $subscriptionId,
+        $isComment = false,
+        $isVisibleOnFront = true,
+        $isAutomatedProcess = false
+    ) {
+        array_unshift($params, $this->getMessage($index));
+        $this->log(sprintf(... $params), $subscriptionId, $isComment, $isVisibleOnFront, $isAutomatedProcess);
+    }
+
+    /**
      * Get message by index.
      *
      * @param int $index
      * @return string
+     * @deprecated
      */
     public function getMessage($index)
     {

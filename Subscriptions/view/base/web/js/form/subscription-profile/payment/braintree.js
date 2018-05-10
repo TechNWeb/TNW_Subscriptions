@@ -5,22 +5,19 @@
 define([
     'jquery',
     'mage/translate',
-    'Magento_Ui/js/form/components/fieldset',
+    'TNW_Subscriptions/js/form/subscription-profile/payment/base',
     'uiRegistry',
     'Magento_Braintree/js/validator',
-    'Magento_Ui/js/lib/spinner',
-    'jquery/ui'
-], function ($, $t, fieldset, registry, validator) {
+    'Magento_Ui/js/lib/spinner'
+], function ($, $t, PaymentBase, registry, validator) {
     'use strict';
 
-    return fieldset.extend({
+    return PaymentBase.extend({
         defaults: {
-            template: 'TNW_Subscriptions/form/subscription-profile/payment/fieldset',
-            payment_errors: null,
-            iframeSrc: null,
             scriptLoaded: false,
-            checked: false,
             braintree: null,
+            grandTotal: null,
+            braintreeClient: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
             sdkUrl: null,
@@ -39,9 +36,7 @@ define([
             this._super()
                 .observe([
                     'scriptLoaded',
-                    'selectedCardType',
-                    'checked',
-                    'payment_errors'
+                    'selectedCardType'
                 ]);
 
             validator.setConfig(this);
@@ -56,7 +51,7 @@ define([
          */
         changeVisibility: function(checkBoxChecked) {
             if (checkBoxChecked && !this.clientToken) {
-                this.processErrors($.mage.__('This payment is not available'));
+                this.processErrors([$t('This payment is not available')]);
                 return;
             }
 
@@ -66,48 +61,11 @@ define([
         },
 
         /**
-         * Trigger form saving.
-         * @param {boolean} value
-         * @return void
-         */
-        saveBilling: function (value) {
-            var form,
-                temp = {},
-                postData = [];
-
-            if (value) {
-                form = registry.get('index = ' + this.options.formName);
-                this.showLoader();
-                this.resetErrors();
-                //creating post data, this structure is needed to proper saving
-                postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {};
-                temp[this.code] = {
-                    method: '1'
-                };
-                postData.payment = temp;
-
-                $.ajax({
-                    url: form.source.process_url,
-                    type: 'post',
-                    context: this,
-                    data: postData,
-                    success: function (response) {
-                        if (response.error) {
-                            this.processErrors(response.error_messages);
-                        }
-                    },
-                    complete: function () {
-                        this.hideLoader();
-                    }
-                });
-            }
-        },
-
-        /**
          * Before submit action for payment method.
          * @return void
          */
         beforeSubmit: function () {
+            $('body').trigger('processStart');
             $('#braintree_submit').trigger('click');
         },
 
@@ -136,7 +94,11 @@ define([
             var self = this;
 
             try {
-                this.showLoader();
+                $('body').trigger('processStart');
+
+                this.braintreeClient = new this.braintree.api.Client({
+                    clientToken: this.clientToken
+                });
 
                 this.braintree.setup(this.clientToken, 'custom', {
                     id: this.selector,
@@ -146,19 +108,22 @@ define([
                      * Triggered when sdk was loaded
                      */
                     onReady: function () {
-                        self.hideLoader();
+                        $('body').trigger('processStop');
                     },
 
                     /**
                      * Callback for success response
-                     * @param {Object} response
                      */
                     onPaymentMethodReceived: function (response) {
-                        if (self.validateCardType()) {
-                            var form = registry.get('index = '+self.options.formName);
-                            form.source.data.payment.braintree.nonce = response.nonce;
-                            form.triggerSave([]);
+                        $('body').trigger('processStop');
+
+                        if (!self.validateCardType()) {
+                            return;
                         }
+
+                        var form = registry.get('index = '+self.options.formName);
+                        form.source.data.payment.braintree.nonce = response.nonce;
+                        form.triggerSave([]);
                     },
 
                     /**
@@ -167,11 +132,11 @@ define([
                      */
                     onError: function (response) {
                         self.processErrors(response.message);
-                        self.hideLoader();
+                        $('body').trigger('processStop');
                     }
                 });
             } catch (e) {
-                this.hideLoader();
+                $('body').trigger('processStop');
                 this.processErrors(e.message);
             }
         },
@@ -265,38 +230,6 @@ define([
          */
         validateCardType: function () {
             return this.selectedCardType();
-        },
-
-        /**
-         * Processing errors
-         * @return void
-         */
-        processErrors: function (errors) {
-            this.set('payment_errors', [errors]);
-        },
-
-        /**
-         * Resets payment errors.
-         * @return void
-         */
-        resetErrors:function () {
-            this.set('payment_errors', '');
-        },
-
-        /**
-         * Shows form loader.
-         * @return void
-         */
-        hideLoader: function () {
-            $('body').trigger('processStop');
-        },
-
-        /**
-         * Hides form loader.
-         * @return void
-         */
-        showLoader: function () {
-            $('body').trigger('processStart');
         }
     });
 });

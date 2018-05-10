@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Item;
@@ -292,7 +293,7 @@ class CreateProfile extends BaseCreate
     /**
      * Returns new or already existing quote for adding in to it requested product.
      *
-     * @return ModelQuote|null
+     * @return ModelQuote
      */
     private function getSubQuote()
     {
@@ -516,72 +517,95 @@ class CreateProfile extends BaseCreate
      * Creates subscription profiles.
      *
      * @return SubscriptionProfileInterface[]
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
      */
     public function createSubscriptions()
     {
         $profiles = [];
         $customer = $this->customerCreator->prepareCustomer();
-        $subQuotes = $this->getSubQuotes();
-        $basicPayment = clone reset($subQuotes)->getPayment();
+
         /** @var ModelQuote $subQuote */
-        foreach ($subQuotes as $subQuote) {
+        foreach ($this->getSubQuotes() as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
             $this->quoteCreator->validate($subQuote);
-            //Create new profile
-            $profile = $this->createProfile($subQuote, $basicPayment);
+
+            // Reset profile
+            $this->profileManager->reset();
+
+            // Fill profile
+            $this->profileManager->populateProfileData($subQuote);
+
+            // Fill profile payment
+            $this->profileManager->populatePaymentData($subQuote->getPayment());
+
+            try {
+                // Process profile
+                $order = $this->profileManager->processProfile($subQuote);
+            } catch (\Exception $e) {
+                $success = array_map(function (SubscriptionProfileInterface $profile) {
+                    return $profile->getLabel();
+                }, $profiles);
+
+                $successMessage = !empty($success)
+                    ? __('%1 profiles were paid successfully.', implode(', ', $success))
+                    : '';
+
+                throw new LocalizedException(__(
+                    'Payment transaction error: %1. %2 Not paid subscription plans still in your cart.',
+                    $e->getMessage(),
+                    $successMessage
+                ));
+            }
+
+            // Remove quote
+            $this->getSession()->removeSubQuote($subQuote);
+
+            // Save profile
+            $profile = $this->profileManager->saveProfile();
+
+            // Add comment about profile creation.
+            $this->messageHistoryLogger->message(
+                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
+                [
+                    $profile->getLabel()
+                ],
+                $profile->getId()
+            );
+
+            // Add comment profile place.
+            $this->messageHistoryLogger->message(
+                MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                [
+                    $order->getIncrementId(),
+                    $this->messageHistoryLogger->getConvertedQuoteId($subQuote->getId())
+                ],
+                $profile->getId()
+            );
+
             $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
             //Assign quote to new profile
             $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile, $startDate);
             //Add new relation to profile processing queue in "pending" state.
             $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
-            try {
-                $this->queueManager->makeRunning($queueItemIds);
-                $order = $this->profileManager->processProfile($subQuote);
-            } catch (\Exception $e) {
-                $this->queueManager->makeError($queueItemIds, $e->getMessage());
-                throw $e;
-            }
-            if (isset($order)) {
-                $this->profileManager->assignOrderToProfile($relation, $order);
-                $this->queueManager->makeCompleted($queueItemIds);
-                $this->eventManager->dispatch(
-                    'checkout_submit_all_after',
-                    ['order' => $order, 'quote' => $subQuote]
-                );
-            }
-            //Generate quote for next payment.
-            $this->quoteGenerator->generateProfileQuotes(
-                $this->profileManager->getProfile(),
-                1
+            $this->queueManager->makeRunning($queueItemIds);
+
+            $this->profileManager->assignOrderToProfile($relation, $order);
+            $this->queueManager->makeCompleted($queueItemIds);
+            $this->eventManager->dispatch(
+                'checkout_submit_all_after',
+                ['order' => $order, 'quote' => $subQuote]
             );
+
+            //Generate quote for next payment.
+            $this->quoteGenerator->generateProfileQuotes($profile, 1);
 
             $profiles[] = $profile;
             //TODO add here email sending
         }
 
         return $profiles;
-    }
-
-    /**
-     * Creates subscription profile.
-     *
-     * @param ModelQuote $subQuote
-     * @param Payment $payment
-     * @return SubscriptionProfileInterface
-     */
-    private function createProfile(
-        ModelQuote $subQuote,
-        Payment $payment
-    ) {
-        $profile = $this->profileManager->reset()
-            ->populateProfileData($subQuote)
-            ->populatePaymentData($payment)
-            ->saveProfile();
-        //Add comment about profile creation.
-        $this->logToMessageCreateSubscription($profile);
-
-        return $profile;
     }
 
     /**
@@ -698,26 +722,6 @@ class CreateProfile extends BaseCreate
             $subQuote->getShippingAddress()->setCollectShippingRates(true);
             $this->setNeedCollect(true);
         }
-    }
-
-    /**
-     * Log message for Subscription Profile creation.
-     *
-     * @param SubscriptionProfileInterface $profile
-     *
-     * @return void
-     */
-    private function logToMessageCreateSubscription(SubscriptionProfileInterface $profile)
-    {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED),
-            $profile->getLabel()
-        );
-
-        $this->messageHistoryLogger->log(
-            $message,
-            $profile->getId()
-        );
     }
 
     /**

@@ -43,13 +43,6 @@ class ProductSubscriptionProfile
     private $productRepository;
 
     /**
-     * Magento product.
-     *
-     * @var Product
-     */
-    private $magentoProduct;
-
-    /**
      * @var ProductSubscriptionProfileAttributeRepositoryInterface
      */
     private $metadataService;
@@ -191,18 +184,12 @@ class ProductSubscriptionProfile
 
     /**
      * @inheritdoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getMagentoProduct()
     {
-        if (!$this->magentoProduct) {
-            $this->magentoProduct = $this->productRepository->getById(
-                $this->getMagentoProductId()
-            );
-        }
-
-        return $this->magentoProduct;
+        return $this->productRepository->getById($this->getMagentoProductId());
     }
-
 
     /**
      * @inheritdoc

@@ -10,7 +10,6 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
-use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
@@ -20,7 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 /**
  * Base form modifier to display payment method.
  */
-class Base implements ModifierInterface
+class Base implements PaymentModifierInterface
 {
     /**#@+
      * Name of payment information fieldset.
@@ -80,15 +79,24 @@ class Base implements ModifierInterface
     private $relationManager;
 
     /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    private $cartRepository;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      */
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository,
-        OrderRelationManager $relationManager
+        OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -98,6 +106,7 @@ class Base implements ModifierInterface
         ];
         $this->profileRepository = $profileRepository;
         $this->relationManager = $relationManager;
+        $this->cartRepository = $cartRepository;
     }
 
     /**
@@ -170,6 +179,49 @@ class Base implements ModifierInterface
     }
 
     /**
+     * @return int
+     * @deprecated
+     */
+    protected function getGrandTotal()
+    {
+        return 0;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrencyCode()
+    {
+        if ($this->getProfile()) {
+            return $this->getProfile()->getProfileCurrencyCode();
+        }
+
+        /** @var \Magento\Quote\Model\Quote $quote */
+        foreach ($this->session->getSubQuotes() as $quote) {
+            return $quote->getBaseCurrencyCode();
+        }
+
+        return '';
+    }
+
+    /**
+     * @return \Magento\Quote\Model\Quote\Address|null|\TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface
+     */
+    protected function getBillingAddress()
+    {
+        if ($this->getProfile()) {
+            return $this->getProfile()->getBillingAddress();
+        }
+
+        /** @var \Magento\Quote\Model\Quote $quote */
+        foreach ($this->session->getSubQuotes() as $quote) {
+            return $quote->getBillingAddress();
+        }
+
+        return null;
+    }
+
+    /**
      * Sets listens
      *
      * @param $listens
@@ -200,6 +252,7 @@ class Base implements ModifierInterface
                                 'config' => array_merge(
                                     [
                                         'label' => false,
+                                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/base',
                                         'collapsible' => false,
                                         'visible' => true,
                                         'opened' => true,

@@ -39,6 +39,12 @@ interface QuoteSessionInterface extends \Magento\Framework\Session\SessionManage
     public function addSubQuote($quote);
 
     /**
+     * @param \Magento\Quote\Model\Quote[]|int|string $quote
+     * @return $this
+     */
+    public function removeSubQuote($quote);
+
+    /**
      * @return int
      */
     public function getCustomerId();

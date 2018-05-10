@@ -313,22 +313,5 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $productSearchCriteria = $this->criteriaBuilder->create();
         $products = $this->productProfileRepository->getList($productSearchCriteria)->getItems();
         $subscriptionProfileModel->setProducts($products);
-        $subscriptionProfileModel->setVisibleProducts($this->getVisibleProducts($products));
-    }
-
-    /**
-     * Returns visible profile products.
-     *
-     * @param ProductSubscriptionProfileInterface[] $products
-     * @return ProductSubscriptionProfileInterface[]
-     */
-    private function getVisibleProducts(array $products)
-    {
-        return array_filter(
-            $products,
-            function (ProductSubscriptionProfileInterface $product) {
-                return !$product->getParentId();
-            }
-        );
     }
 }
