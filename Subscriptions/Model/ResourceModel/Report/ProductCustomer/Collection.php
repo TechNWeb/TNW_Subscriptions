@@ -3,7 +3,7 @@
  * Copyright © 2017 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Model\ResourceModel\Report\Customer;
+namespace TNW\Subscriptions\Model\ResourceModel\Report\ProductCustomer;
 
 use Magento\Framework\Api;
 use \Magento\Customer\Model\ResourceModel\Customer;

@@ -9,16 +9,16 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">tnw_report_product_listing.tnw_report_product_listing_data_source</item>
-            <item name="deps" xsi:type="string">tnw_report_product_listing.tnw_report_product_listing_data_source</item>
+            <item name="provider" xsi:type="string">tnw_report_customer_billing_frequency_listing.tnw_report_customer_billing_frequency_listing_data_source</item>
+            <item name="deps" xsi:type="string">tnw_report_customer_billing_frequency_listing.tnw_report_customer_billing_frequency_listing_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">tnw_report_customer_product_columns</item>
+        <item name="spinner" xsi:type="string">tnw_report_customer_billing_frequency_columns</item>
         <item name="acl" xsi:type="string">TNW_Subscriptions::report_customers_subscribe_products</item>
     </argument>
-    <dataSource name="tnw_report_product_listing_data_source">
+    <dataSource name="tnw_report_customer_billing_frequency_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">tnw_report_product_listing_data_source</argument>
+            <argument name="name" xsi:type="string">tnw_report_customer_billing_frequency_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
@@ -37,16 +37,16 @@
         <filters name="listing_filters" />
         <paging name="listing_paging" />
     </listingToolbar>
-    <columns name="tnw_report_customer_product_columns">
+    <columns name="tnw_report_customer_billing_frequency_columns">
         <selectionsColumn name="ids">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="indexField" xsi:type="string">id</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
             </argument>
         </selectionsColumn>
-        <column name="entity_id">
+        <column name="id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
@@ -56,21 +56,33 @@
                 </item>
             </argument>
         </column>
-        <column name="name">
+        <column name="label">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Product</item>
+                    <item name="label" xsi:type="string" translate="true">Billing Frequency</item>
                     <item name="sortOrder" xsi:type="number">30</item>
                 </item>
             </argument>
         </column>
-        <column name="sku">
+        <column name="unit">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/unit</item>
+                    <item name="label" xsi:type="string" translate="true">Unit</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+            </argument>
+        </column>
+        <column name="frequency">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">SKU</item>
-                    <item name="sortOrder" xsi:type="number">40</item>
+                    <item name="label" xsi:type="string" translate="true">Frequency</item>
+                    <item name="sortOrder" xsi:type="number">50</item>
                 </item>
             </argument>
         </column>
@@ -78,14 +90,14 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string" translate="true">Customers</item>
-                    <item name="sortOrder" xsi:type="number">50</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn name="actions" class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\ProductActions">
+        <actionsColumn name="actions" class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\BillingFrequencyCustomerActions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="indexField" xsi:type="string">id</item>
                     <item name="sortOrder" xsi:type="number">200</item>
                 </item>
             </argument>

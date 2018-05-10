@@ -5,14 +5,14 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Report;
 
-class Customers extends \Magento\Backend\App\Action
+class BillingFrequencyCustomers extends \Magento\Backend\App\Action
 {
     /**
      * @inheritdoc
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('TNW_Subscriptions::report_subscribe_customers');
+        return $this->_authorization->isAllowed('TNW_Subscriptions::report_subscribe_billing_frequency_customers');
     }
 
     /**
@@ -28,10 +28,10 @@ class Customers extends \Magento\Backend\App\Action
 
         $this->_setActiveMenu('Magento_Reports::report_customers_accounts')
             ->_addBreadcrumb(__('Reports'), __('Reports'))
-            ->_addBreadcrumb(__('Products'), __('Products'))
-            ->_addBreadcrumb(__('By Subscribe Customers'), __('By Subscribe Customers'));
+            ->_addBreadcrumb(__('Billing Frequencies'), __('Billing Frequencies'))
+            ->_addBreadcrumb(__('By Customers'), __('By Customers'));
 
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Customer Subscribe Report'));
+        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Customer Report'));
         $this->_view->renderLayout();
     }
 }
