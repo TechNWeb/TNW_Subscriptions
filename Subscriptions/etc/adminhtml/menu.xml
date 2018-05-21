@@ -113,5 +113,22 @@
              parent="Magento_Reports::report_products"
              action="tnw_subscriptions/report/productCustomers"
              resource="TNW_Subscriptions::report_subscribe_product_customers"/>
+
+        <add id="TNW_Subscriptions::report_billing_frequencies"
+             title="Billing Frequencies"
+             translate="title"
+             module="TNW_Subscriptions"
+             sortOrder="50"
+             parent="Magento_Reports::report"
+             resource="TNW_Subscriptions::billing_frequencies"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_billing_frequency_customers"
+             title="By Subscribe Customers"
+             translate="title"
+             sortOrder="10"
+             module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::report_billing_frequencies"
+             action="tnw_subscriptions/report/billingFrequencyCustomers"
+             resource="TNW_Subscriptions::report_subscribe_billing_frequency_customers"/>
     </menu>
 </config>
