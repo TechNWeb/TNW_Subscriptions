@@ -598,4 +598,28 @@ class Config
     {
         return (bool)$this->getStoreConfig($this->xmlCanCancelProfile, $websiteId);
     }
+
+    /**
+     * @return bool
+     */
+    public function getLogStatus()
+    {
+        return $this->scopeConfig->isSetFlag('tnw_subscriptions_general/advanced/log_status');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDbLogStatus()
+    {
+        return $this->scopeConfig->isSetFlag('tnw_subscriptions_general/advanced/db_log_status');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDbLogLimit()
+    {
+        return $this->scopeConfig->getValue('tnw_subscriptions_general/debug/db_log_limit');
+    }
 }

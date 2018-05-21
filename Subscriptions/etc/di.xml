@@ -869,4 +869,18 @@
     <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
     </type>
+
+    <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">tnw_subscriptions</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="1" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Filesystem</item>
+                <item name="2" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Database</item>
+                <item name="3" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Admin</item>
+            </argument>
+            <argument name="processors" xsi:type="array">
+                <item name="uid" xsi:type="object">TNW\Subscriptions\Model\Logger\Processor\UidProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

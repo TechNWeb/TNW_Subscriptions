@@ -32,20 +32,25 @@
 
             <group id="advanced" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Advanced</label>
-                <field id="generated_quotes_count" translate="label" type="text" sortOrder="1" showInDefault="1"
-                       showInWebsite="0">
+                <field id="generated_quotes_count" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0">
                     <label>Number of Quotes</label>
                     <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
                     <comment>The number of future quotes to generate at a time for the new subscription profile.</comment>
                 </field>
-                <field id="log_status" translate="label" type="select" sortOrder="1" showInDefault="1"
-                       showInWebsite="1">
+                <field id="log_status" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="0">
                     <label>Enable Log</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Location is {{base_dir}}/var/log/tnw_subscriptions.log</comment>
                 </field>
+                <field id="db_log_status" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="0">
+                    <label>Enable DB Log</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Add log to the database</comment>
+                </field>
+                <field id="db_log_limit" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0">
+                    <label>DB log Limit</label>
+                </field>
             </group>
-
         </section>
 
         <section id="tnw_subscriptions_profile_options" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
