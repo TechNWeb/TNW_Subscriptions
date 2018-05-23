@@ -49,6 +49,9 @@
                 </field>
                 <field id="db_log_limit" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0">
                     <label>DB log Limit</label>
+                    <depends>
+                        <field id="db_log_status">1</field>
+                    </depends>
                 </field>
             </group>
         </section>
