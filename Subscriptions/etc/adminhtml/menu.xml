@@ -86,5 +86,21 @@
              action="tnw_subscriptions/subscriptionprofileproduct_attribute/index" resource="TNW_Subscriptions::ProductSubscriptionProfile_attributes"
              dependsOnModule="TNW_Subscriptions"
              dependsOnConfig="tnw_subscriptions_general/general/active"/>
+
+        <add id="TNW_Subscriptions::tools"
+             title="Tools"
+             module="TNW_Subscriptions"
+             sortOrder="110"
+             parent="TNW_Subscriptions::top_level"
+             resource="TNW_Subscriptions::tools"/>
+
+        <add id="TNW_Subscriptions::tools_message"
+             action="tnw_subscriptions/message/view"
+             title="Message Log"
+             translate="title"
+             module="TNW_Salesforce"
+             sortOrder="10"
+             parent="TNW_Subscriptions::tools"
+             resource="TNW_Subscriptions::tools_message"/>
     </menu>
 </config>
