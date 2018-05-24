@@ -6,86 +6,47 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use TNW\Subscriptions\Model\SubscriptionProfile\Engine\CheckmoFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\InvalidEngineException;
-use TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory;
 
 /**
  * Class EnginePool
  */
 class EnginePool
 {
-    const ENGINE_CODE_CHECKMO = 'checkmo';
-    const ENGINE_CODE_PAYFLOW = 'payflowpro';
-    const ENGINE_CODE_BRAINTREE = 'braintree';
-
-    const ERROR_INVALID_ENGINE = "Invalid engine code: '%1'";
-
     /**
-     * Factory for creating checkmo engine.
-     *
-     * @var CheckmoFactory
+     * @var array
      */
-
-    private $checkmoFactory;
-
-    /**
-     * Factory for creating payflowpro engine.
-     *
-     * @var PayflowproFactory
-     */
-    private $payflowproFactory;
-
-    /**
-     * Factory for creating braintree engine.
-     *
-     * @var BraintreeFactory
-     */
-    private $braintreeFactory;
+    private $engine;
 
     /**
      * EnginePool constructor.
-     * @param CheckmoFactory $checkmoFactory
-     * @param PayflowproFactory $payflowproFactory
-     * @param BraintreeFactory $braintreeFactory
+     * @param array $engine
      */
     public function __construct(
-        CheckmoFactory $checkmoFactory,
-        PayflowproFactory $payflowproFactory,
-        BraintreeFactory $braintreeFactory
+        array $engine
     ) {
-        $this->checkmoFactory = $checkmoFactory;
-        $this->payflowproFactory = $payflowproFactory;
-        $this->braintreeFactory = $braintreeFactory;
+        $this->engine = $engine;
     }
 
     /**
      * Returns engine instance by code.
      *
-     * @param string $engine
+     * @param string $code
      * @return EngineInterface
      * @throws InvalidEngineException
      */
-    public function getEngineByCode($engine)
+    public function getEngineByCode($code)
     {
-        $result = null;
-        switch ($engine) {
-            case self::ENGINE_CODE_CHECKMO:
-                $result = $this->checkmoFactory->create();
-                break;
-            case self::ENGINE_CODE_PAYFLOW:
-                $result = $this->payflowproFactory->create();
-                break;
-            case self::ENGINE_CODE_BRAINTREE:
-                $result = $this->braintreeFactory->create();
-                break;
-            default:
-                throw new InvalidEngineException(__(self::ERROR_INVALID_ENGINE, $engine));
+        foreach ($this->engine as $engine) {
+            if (strcasecmp($engine['code'], $code) !== 0) {
+                continue;
+            }
+
+            return $engine['factory']->create();
         }
 
-        return $result;
+        throw new InvalidEngineException(__("Invalid engine code: '%1'", $code));
     }
 
     /**
@@ -95,11 +56,7 @@ class EnginePool
      */
     public function getEngineList()
     {
-        return [
-            self::ENGINE_CODE_CHECKMO,
-            self::ENGINE_CODE_PAYFLOW,
-            self::ENGINE_CODE_BRAINTREE,
-        ];
+        return array_map([$this, 'mapperCode'], $this->engine);
     }
 
     /**
@@ -107,11 +64,28 @@ class EnginePool
      *
      * @return array
      */
-    public static function getCcEngineList()
+    public function getCcEngineList()
     {
-        return [
-            self::ENGINE_CODE_PAYFLOW,
-            self::ENGINE_CODE_BRAINTREE,
-        ];
+        return array_map([$this, 'mapperCode'], array_filter($this->engine, [$this, 'filterCc']));
+    }
+
+    /**
+     * Mapper
+     * @param array $engine
+     * @return string
+     */
+    private function mapperCode(array $engine)
+    {
+        return $engine['code'];
+    }
+
+    /**
+     * Filter
+     * @param array $engine
+     * @return bool
+     */
+    private function filterCc(array $engine)
+    {
+        return $engine['cc'];
     }
 }

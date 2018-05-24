@@ -32,6 +32,7 @@ class Collection extends SearchResult
      * @param EventManager $eventManager
      * @param string $mainTable
      * @param string $resourceModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
         EntityFactory $entityFactory,
