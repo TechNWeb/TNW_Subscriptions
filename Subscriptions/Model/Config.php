@@ -21,6 +21,8 @@ use Magento\Paypal\Model\Config as PaypalConfig;
  */
 class Config
 {
+    const MESSAGE_MAX_OBJECT_DEEP = 8;
+
     /**#@+
      * Config xml path for General section
      */
@@ -621,5 +623,16 @@ class Config
     public function getDbLogLimit()
     {
         return $this->scopeConfig->getValue('tnw_subscriptions_general/debug/db_log_limit');
+    }
+
+    /**
+     * @return int
+     */
+    public function messageObjectDeep()
+    {
+        return min(
+            self::MESSAGE_MAX_OBJECT_DEEP,
+            (int)$this->scopeConfig->getValue('tnw_subscriptions_general/advanced/log_object_deep')
+        );
     }
 }
