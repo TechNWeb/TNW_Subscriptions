@@ -31,9 +31,10 @@ class Download extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        return $this->fileFactory->create('tnw_subscriptions.log', [
+        $filaName = $this->_request->getParam('fileName', 'tnw_subscriptions.log');
+        return $this->fileFactory->create($filaName, [
             'type'  => 'filename',
-            'value' => 'log/tnw_subscriptions.log'
-        ], DirectoryList::VAR_DIR);
+            'value' => $filaName
+        ], DirectoryList::LOG, 'text/plain');
     }
 }

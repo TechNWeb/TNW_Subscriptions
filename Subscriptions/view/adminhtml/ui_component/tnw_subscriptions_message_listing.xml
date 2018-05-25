@@ -14,11 +14,7 @@
         </item>
         <item name="spinner" xsi:type="string">tnw_subscriptions_message_columns</item>
         <item name="buttons" xsi:type="array">
-            <item name="download" xsi:type="array">
-                <item name="name" xsi:type="string">download</item>
-                <item name="label" xsi:type="string" translate="true">Download File</item>
-                <item name="url" xsi:type="string">tnw_subscriptions/message/download</item>
-            </item>
+            <item name="download" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\Message\Button\Download</item>
             <item name="clear" xsi:type="array">
                 <item name="name" xsi:type="string">clear</item>
                 <item name="label" xsi:type="string" translate="true">Clear Table</item>
