@@ -1,5 +1,9 @@
+[![Build Status](https://travis-ci.com/PowerSync/TNW_Subscriptions.svg?token=wTy7W42WZpomVzzpPmp4&branch=develop)](https://travis-ci.com/PowerSync/TNW_Subscriptions)
+
 # TNW_Subscriptions
 Magento2 Subscriptions capability
+
+
 ## Configuring subscription crons
 
 
