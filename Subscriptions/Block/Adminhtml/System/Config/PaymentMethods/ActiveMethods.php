@@ -8,17 +8,16 @@ namespace TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods;
 
 use Magento\Backend\Block\Context;
 use Magento\Backend\Model\Auth\Session;
-use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Config\Block\System\Config\Form\Fieldset;
 use Magento\Config\Model\Config\Source\Yesno;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
-use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Paypal\Model\Config;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use Magento\Framework\Data\Form\Element\Fieldset as DataFieldset;
+use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
 
 /**
  * Class ActiveMethods
@@ -47,16 +46,9 @@ class ActiveMethods extends Fieldset
     private $config;
 
     /**
-     * Payment codes which is available for subscription.
-     *
-     * @var array
+     * @var EnginePool
      */
-    private $availableMethodsCodes = [
-        Checkmo::PAYMENT_METHOD_CHECKMO_CODE,
-        Config::METHOD_PAYFLOWPRO,
-        Config::METHOD_PAYMENT_PRO,
-        BraintreeConfigProvider::CODE,
-    ];
+    private $enginePool;
 
     /**
      * ActiveMethods constructor.
@@ -65,6 +57,7 @@ class ActiveMethods extends Fieldset
      * @param Js $jsHelper
      * @param Yesno $yesNo
      * @param SubscriptionConfig $config
+     * @param EnginePool $enginePool
      * @param array $data
      */
     public function __construct(
@@ -73,10 +66,12 @@ class ActiveMethods extends Fieldset
         Js $jsHelper,
         Yesno $yesNo,
         SubscriptionConfig $config,
+        EnginePool $enginePool,
         array $data = []
     ) {
         $this->yesNo = $yesNo;
         $this->config = $config;
+        $this->enginePool = $enginePool;
 
         parent::__construct($context, $authSession, $jsHelper, $data);
     }
@@ -160,7 +155,6 @@ class ActiveMethods extends Fieldset
         return $this->fieldRenderer;
     }
 
-
     /**
      * Returns list of filtered active payment methods in magento.
      *
@@ -174,7 +168,7 @@ class ActiveMethods extends Fieldset
         $paymentMethods = $this->config->getStoreConfig(PaymentHelper::XML_PATH_PAYMENT_METHODS);
         foreach ($paymentMethods as $code => $data) {
             $active = isset($data['active']) ? (bool)($data['active']) : false;
-            if (in_array($code, $this->availableMethodsCodes) && $active) {
+            if (in_array($code, $this->enginePool->getEngineList()) && $active) {
                 if (in_array($code, [Config::METHOD_PAYFLOWPRO, Config::METHOD_PAYMENT_PRO])) {
                     $title = $this->config->getTitleForPaypal();
                 } else {

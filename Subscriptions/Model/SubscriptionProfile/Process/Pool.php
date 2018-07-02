@@ -17,12 +17,12 @@ class Pool implements PoolInterface
     /**
      * @var array
      */
-    protected $processors = [];
+    private $processors;
 
     /**
      * @var array
      */
-    protected $processorsInstances = [];
+    private $processorsInstances;
 
     /**
      * Object manager.
@@ -49,6 +49,14 @@ class Pool implements PoolInterface
      */
     public function getProcessors()
     {
+        usort($this->processors, function ($a, $b) {
+            if (empty($a['sortOrder']) || empty($b['sortOrder'])) {
+                throw new LocalizedException(__('Parameter "sortOrder" must be present.'));
+            }
+
+            return ($a['sortOrder'] < $b['sortOrder']) ? -1 : 1;
+        });
+
         return $this->processors;
     }
 
@@ -58,13 +66,9 @@ class Pool implements PoolInterface
     public function getProcessorsInstances()
     {
         if (!$this->processorsInstances) {
-            foreach ($this->processors as $modifier) {
+            foreach ($this->getProcessors() as $modifier) {
                 if (empty($modifier['class'])) {
                     throw new LocalizedException(__('Parameter "class" must be present.'));
-                }
-
-                if (empty($modifier['sortOrder'])) {
-                    throw new LocalizedException(__('Parameter "sortOrder" must be present.'));
                 }
 
                 $modifierObject = $this->objectManager->create($modifier['class']);

@@ -34,6 +34,11 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     const SORT_ORDER = 20;
 
     /**
+     * @var SubscriptionConfig
+     */
+    private $config;
+
+    /**
      * @var Transparent
      */
     private $paymentPro;
@@ -68,6 +73,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param Transparent $paymentPro
      * @param Config $paymentConfig
@@ -80,6 +86,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         Context $context,
         Transparent $paymentPro,
         Config $paymentConfig,
@@ -87,13 +94,14 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         RequestInterface $request,
         UrlInterface $urlBuilder
     ) {
+        $this->config = $config;
         $this->context = $context;
         $this->paymentPro = $paymentPro;
         $this->paymentConfig = $paymentConfig;
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($config, $session, $profileRepository, $relationManager);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
     }
 
     /**
@@ -103,6 +111,9 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     public function modifyData(array $data)
     {
         $data = parent::modifyData($data);
+        if (!$this->config->isPaymentAvailable($this->getPaymentCode())) {
+            return $data;
+        }
 
         $additionalInfo = ($this->getProfile() && $this->getProfile()->getPayment())
             ? $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo()
