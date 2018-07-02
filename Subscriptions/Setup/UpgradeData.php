@@ -195,8 +195,7 @@ class UpgradeData implements UpgradeDataInterface
             'tnw_subscr_start_date',
             'tnw_subscr_unlock_preset_qty',
             'tnw_subscr_savings_calculation',
-            'tnw_subscr_inf_subscriptions',
-            'tnw_subscr_schedule'
+            'tnw_subscr_inf_subscriptions'
         ];
 
         foreach ($attributeCodes as $attributeCode) {
@@ -270,7 +269,7 @@ class UpgradeData implements UpgradeDataInterface
                 'source' => \TNW\Subscriptions\Model\Config\Source\ScheduleType::class,
                 'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
                 'visible' => true,
-                'required' => true,
+                'required' => false,
                 'user_defined' => true,
                 'default' => null,
                 'searchable' => false,
