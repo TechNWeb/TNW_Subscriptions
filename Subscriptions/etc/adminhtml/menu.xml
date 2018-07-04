@@ -130,5 +130,21 @@
              parent="TNW_Subscriptions::report_billing_frequencies"
              action="tnw_subscriptions/report/billingFrequencyCustomers"
              resource="TNW_Subscriptions::report_subscribe_billing_frequency_customers"/>
+
+        <add id="TNW_Subscriptions::tools"
+             title="Tools"
+             module="TNW_Subscriptions"
+             sortOrder="110"
+             parent="TNW_Subscriptions::top_level"
+             resource="TNW_Subscriptions::tools"/>
+
+        <add id="TNW_Subscriptions::tools_message"
+             action="tnw_subscriptions/message/view"
+             title="Message Log"
+             translate="title"
+             module="TNW_Salesforce"
+             sortOrder="10"
+             parent="TNW_Subscriptions::tools"
+             resource="TNW_Subscriptions::tools_message"/>
     </menu>
 </config>

@@ -74,21 +74,37 @@ class Updater extends Base
      */
     public function process(array $data)
     {
+        $this->context->messageDebug('Process quote updater');
         foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
+                $this->context->messageDebug("Update Quotes by Profile:\n%s", $profile);
                 try {
                     foreach ($this->getProfileQuotes($profile) as $profileQuote) {
+                        $this->context->messageDebug(
+                            "Quote. Data Quote:\n%s\nData Quote Items:\n%s",
+                            $profileQuote,
+                            $profileQuote->getItemsCollection()
+                        );
+
                         $this->prepareQuote($profileQuote);
-                        $this->processQuote(
-                            $profile,
-                            $profileQuote
+                        $this->processQuote($profile, $profileQuote);
+
+                        $this->context->messageDebug(
+                            "Updated Quote. Data Quote:\n%s\nData Quote Items:\n%s",
+                            $profileQuote,
+                            $profileQuote->getItemsCollection()
                         );
                     }
+
                     $this->updateProfileCollectFlag($profile, false);
                 } catch (\Exception $e) {
-                    $this->context->log('Error on quotes recalculation for profile - ' . $profile->getId());
-                    $this->context->log($e->getMessage());
+                    $this->context->messageError(
+                        'Error on quotes recalculation for profile - %d. Message: %s',
+                        $profile->getId(),
+                        $e
+                    );
                 }
+
                 $this->profileRepository->save($profile);
             }
         }

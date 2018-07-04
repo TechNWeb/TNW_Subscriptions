@@ -7,6 +7,12 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="TNW\Subscriptions\Model\ResourceModel\Message\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">tnw_subscriptions_message</argument>
+            <argument name="resourceModel" xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Message</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -18,6 +24,8 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
+                <item name="tnw_subscriptions_message_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Message\Grid\Collection</item>
                 <item name="tnw_billingfrequency_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection</item>
                 <item name="tnw_productbillingfrequency_grid_data_source"
@@ -880,5 +888,24 @@
     </type>
     <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
+    </type>
+
+    <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">tnw_subscriptions</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="1" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Filesystem</item>
+                <item name="2" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Database</item>
+                <item name="3" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Admin</item>
+            </argument>
+            <argument name="processors" xsi:type="array">
+                <item name="uid" xsi:type="object">TNW\Subscriptions\Model\Logger\Processor\UidProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\Context">
+        <arguments>
+            <argument name="logger" xsi:type="object">TNW\Subscriptions\Logger</argument>
+        </arguments>
     </type>
 </config>

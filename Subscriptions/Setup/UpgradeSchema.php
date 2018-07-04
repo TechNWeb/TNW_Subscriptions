@@ -25,6 +25,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 {
     /**
      * {@inheritdoc}
+     * @throws \Zend_Db_Exception
      */
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -47,6 +48,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addProductSubscriptionProfileAttributeTable($setup);
             $this->addProfilePaymentTable($setup);
             $this->dropProfileColumns($setup);
+        }
+
+        if (version_compare($context->getVersion(), '2.1.1', '<')) {
+            $this->addMessageTable($setup);
         }
 
         $setup->endSetup();
@@ -340,16 +345,65 @@ class UpgradeSchema implements UpgradeSchemaInterface
     /**
      * @param SchemaSetupInterface $setup
      * @return void
-     * @throws \Zend_Db_Exception
      */
     private function dropProfileColumns(SchemaSetupInterface $setup)
     {
         $subscriptionTable = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
         $setup->getConnection()
-            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::ENGINE_CODE);
+            ->dropColumn($subscriptionTable, 'engine_code');
         $setup->getConnection()
-            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::TOKEN_HASH);
+            ->dropColumn($subscriptionTable, 'token_hash');
         $setup->getConnection()
-            ->dropColumn($subscriptionTable, SubscriptionProfileInterface::PAYMENT_ADDITIONAL_INFO);
+            ->dropColumn($subscriptionTable, 'payment_additional_info');
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    private function addMessageTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable('tnw_subscriptions_message')
+            ->addColumn('message_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true
+            ], 'Message ID')
+            ->addColumn('transaction_uid', Table::TYPE_TEXT, 32, [
+                'nullable' => true,
+                'default' => null
+            ], 'Transaction')
+            ->addColumn('level', Table::TYPE_SMALLINT, null, [
+                'unsigned' => true,
+                'nullable' => true,
+                'default' => null,
+            ], 'Level')
+            ->addColumn('website_id', Table::TYPE_SMALLINT, null, [
+                'unsigned' => true,
+                'nullable' => true,
+                'default' => null,
+            ], 'Website')
+            ->addColumn('message', Table::TYPE_TEXT, '64k', [
+                'nullable' => true,
+                'default' => null
+            ], 'Message')
+            ->addColumn('created_at', Table::TYPE_TIMESTAMP, null, [
+                'nullable' => false,
+                'default' => Table::TIMESTAMP_INIT
+            ], 'Create At')
+            ->addIndex(
+                $setup->getIdxName('tnw_subscriptions_message', ['website_id']),
+                ['website_id']
+            )
+            ->addForeignKey(
+                $setup->getFkName('tnw_subscriptions_message', 'website_id', 'store_website', 'website_id'),
+                'website_id', $setup->getTable('store_website'), 'website_id', Table::ACTION_CASCADE
+            )
+        ;
+
+        $setup->getConnection()->createTable($table);
     }
 }

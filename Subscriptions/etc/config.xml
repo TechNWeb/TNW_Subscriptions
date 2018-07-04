@@ -14,6 +14,9 @@
             </general>
             <advanced>
                 <generated_quotes_count>30</generated_quotes_count>
+                <db_log_status>1</db_log_status>
+                <db_log_limit>10000</db_log_limit>
+                <log_object_deep>4</log_object_deep>
             </advanced>
         </tnw_subscriptions_general>
         <tnw_subscriptions_profile_options>

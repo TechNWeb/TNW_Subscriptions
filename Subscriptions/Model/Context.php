@@ -18,11 +18,18 @@ use Magento\Framework\Locale\CurrencyInterface;
 
 /**
  * Class subscription context.
+ *
+ * @method messageError($format, $args = null, $_ = null)
+ * @method messageSuccess($format, $args = null, $_ = null)
+ * @method messageWarning($format, $args = null, $_ = null)
+ * @method messageNotice($format, $args = null, $_ = null)
+ * @method messageDebug($format, $args = null, $_ = null)
  */
 class Context
 {
     /**
      * @var ManagerInterface
+     * @deprecated
      */
     private $messageManager;
     /**
@@ -89,6 +96,7 @@ class Context
 
     /**
      * @return ManagerInterface
+     * @deprecated
      */
     public function getMessageManager()
     {
@@ -111,6 +119,116 @@ class Context
         return $this->logger;
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     */
+    public function __call($name, $arguments)
+    {
+        if (\stripos($name, 'message') !== 0){
+            throw new \BadMethodCallException('Unknown method');
+        }
+
+        if (\count($arguments) === 0) {
+            throw new \BadMethodCallException('Missed argument "$format"');
+        }
+
+        // Prepare arguments
+        $arguments = array_map(function ($argument) {
+            return \print_r($argument, true);
+        }, array_map([$this, 'convertToArray'], $arguments));
+
+        // FIX: Too few argument
+        if (\substr_count($arguments[0], '%') > (\count($arguments) - 1)) {
+            $arguments[0] = \str_replace('%', '%%', $arguments[0]);
+        }
+
+        /** @var string $message */
+        $message = sprintf(...$arguments);
+
+        /** switch level */
+        switch (strtolower(substr($name, 7))) {
+            case 'error':
+                $this->logger->error($message);
+                break;
+            case 'success':
+                $this->logger->info($message);
+                break;
+            case 'warning':
+                $this->logger->warning($message);
+                break;
+            case 'notice':
+                $this->logger->notice($message);
+                break;
+            case 'debug':
+                $this->logger->debug($message);
+                break;
+        }
+    }
+
+    /**
+     * @param $entity
+     * @return mixed
+     */
+    private function convertToArray($entity)
+    {
+        static $level = 0;
+
+        // Up level
+        if (++$level > $this->config->messageObjectDeep()) {
+            $entity = '[... nesting level exceeded ...]';
+        }
+
+        if ($entity instanceof \Magento\Framework\Phrase) {
+            $entity = $entity->render();
+        }
+
+        if ($entity instanceof \Exception) {
+            $entity = $entity->getMessage();
+        }
+
+        if ($entity instanceof \Magento\Framework\Data\Collection) {
+            $entity = array_filter($entity->getItems(), function ($item) {
+                if ($item instanceof \Magento\Framework\Model\AbstractModel) {
+                    return !$item->isDeleted();
+                }
+
+                return true;
+            });
+        }
+
+        if ($entity instanceof \Magento\Framework\Model\AbstractModel) {
+            $entity = $entity->getData();
+        }
+
+        if (\is_object($entity)) {
+            $entity = \sprintf('[... unsupported object name: %s ...]', \get_class($entity));
+        }
+
+        if (\is_array($entity)) {
+            $entity = \array_map([$this, 'convertToArray'], $entity);
+        }
+
+        if (\is_bool($entity)) {
+            $entity =  $entity ? 'true' : 'false';
+        }
+
+        if (\is_scalar($entity)) {
+            $entity = (string) $entity;
+        }
+
+        // Down level
+        $level--;
+        return $entity;
+    }
+
+    /**
+     * @param string $message
+     * @param string $messageType
+     * @param string $group
+     * @return $this
+     * @deprecated
+     */
     public function addMessage($message, $messageType, $group)
     {
         $this->messageManager->addMessage(
@@ -123,6 +241,11 @@ class Context
         return $this;
     }
 
+    /**
+     * @param $text
+     * @param string $logLevel
+     * @deprecated
+     */
     public function log($text, $logLevel = LogLevel::INFO)
     {
         $this->logger->log($logLevel, $text);

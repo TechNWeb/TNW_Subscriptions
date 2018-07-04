@@ -87,6 +87,7 @@ class Creator extends Base
      */
     public function process(array $data)
     {
+        $this->context->log('Process quote creator');
         foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
                 $this->generateProfileQuotes($profile);
@@ -106,6 +107,12 @@ class Creator extends Base
         try {
             $count = $quotesCount ?: $this->config->getGeneratedQuotesCount();
             list($cycles, $needMore) = $this->getBillingCycles($profile, $count);
+
+            if (!empty($cycles)) {
+                $this->context->messageDebug("Create Quotes by Profile:\n%s", $profile);
+                $this->context->messageDebug("Generate cycles date:\n%s", $cycles);
+            }
+
             foreach ($cycles as $cycleDate) {
                 $quote = $this->processQuote($profile, $this->getEmptyQuote());
                 $relations[] = $this->assignQuoteToProfile(
@@ -113,21 +120,35 @@ class Creator extends Base
                     $quote,
                     $cycleDate
                 );
+
+                $this->context->messageDebug(
+                    "Created Quote by Cycle Date %s. Data Quote:\n%s\nData Quote Items:\n%s",
+                    $cycleDate,
+                    $quote,
+                    $quote->getItemsCollection()
+                );
             }
+
             $this->updateGenerateQuotesState(
                 $profile,
                 $this->getNeedGenerateState($profile, $needMore)
             );
+
             //Add created relations to profile process queue
             $this->queueManager->insertItems($relations);
         } catch (\Exception $e) {
-            $this->context->log('Error on quotes generation for profile - ' . $profile->getId());
-            $this->context->log($e->getMessage());
+            $this->context->messageError(
+                'Error on quotes generation for profile - %d. Message: %s',
+                $profile->getId(),
+                $e
+            );
+
             $this->updateGenerateQuotesState(
                 $profile,
                 SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE
             );
         }
+
         $this->profileRepository->save($profile);
     }
 
@@ -189,7 +210,6 @@ class Creator extends Base
                     break;
                 default:
                     throw new \Exception('Undefined length unit type.');
-                    break;
             }
         } else {
             // Profile has a finite count of cycles
@@ -245,7 +265,6 @@ class Creator extends Base
                 break;
             default:
                 throw new \Exception('Undefined length unit type.');
-                break;
         }
 
         $expression = 'P' . $length . $intervalUnit;
