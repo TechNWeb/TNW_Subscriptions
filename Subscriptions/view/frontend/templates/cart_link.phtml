@@ -13,7 +13,7 @@
 >
     <a class="tnw-subscriptions-cart-link"
        href="<?php echo $block->escapeUrl($block->getCartUrl()) ?>"
-       title="<?php /* @noEscape */ echo __('Subscription Cart') ?>"
+       title="<?php /* @noEscape */ echo __('Shopping Cart') ?>"
        data-bind="attr: {href: subscriptionCart().href}, click: showPopup"
     >
         <img src="<?php /* @noEscape */ echo $block->getViewFileUrl('TNW_Subscriptions/images/cart-link.svg'); ?>"
@@ -34,7 +34,7 @@
                     data-action="close"
                     data-bind="attr: { title: $t('Close') }, click: hidePopup">
                 </button>
-                <span><?php /* @noEscape */ echo __('You have no items in your subscription cart.') ?></span>
+                <span><?php /* @noEscape */ echo __('You have no items in your shopping cart.') ?></span>
             </div>
         </div>
     </div>
