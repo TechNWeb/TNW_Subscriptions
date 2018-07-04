@@ -7,16 +7,12 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Data\Collection\AbstractDb;
-use Magento\Framework\Encryption\EncryptorInterface;
-use Magento\Framework\Json\Helper\Data;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
-use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
@@ -26,7 +22,6 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile\PaymentFactory;
 
 /**
  * Subscription Profile model.
@@ -73,34 +68,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $websiteRepository;
 
     /**
-     * Profile customer.
-     *
-     * @var CustomerInterface
-     */
-    private $customer;
-
-    /**
-     * Profile website.
-     *
-     * @var WebsiteInterface
-     */
-    private $website;
-
-    /**
-     * Provides basic logic for hashing strings.
-     *
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
-     * JSON helper.
-     *
-     * @var Data
-     */
-    private $jsonHelper;
-
-    /**
      * @var SubscriptionProfileAttributeRepositoryInterface
      */
     private $metadataService;
@@ -114,11 +81,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @var PaymentCollectionFactory
      */
     private $paymentCollectionFactory;
-
-    /**
-     * @var PaymentFactory
-     */
-    private $paymentFactory;
 
     /**
      * Attributes are that part of interface
@@ -158,11 +120,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param AttributeValueFactory $customAttributeFactory
      * @param CustomerRepositoryInterface $customerRepository
      * @param WebsiteRepositoryInterface $websiteRepository
-     * @param EncryptorInterface $encryptor
      * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
-     * @param Data $jsonHelper
      * @param PaymentCollectionFactory $paymentCollectionFactory
-     * @param PaymentFactory $paymentFactory
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -174,24 +133,26 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         AttributeValueFactory $customAttributeFactory,
         CustomerRepositoryInterface $customerRepository,
         WebsiteRepositoryInterface $websiteRepository,
-        EncryptorInterface $encryptor,
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
-        Data $jsonHelper,
         PaymentCollectionFactory $paymentCollectionFactory,
-        PaymentFactory $paymentFactory,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+
         $this->customerRepository = $customerRepository;
         $this->websiteRepository = $websiteRepository;
-        $this->encryptor = $encryptor;
-        $this->jsonHelper = $jsonHelper;
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
-        $this->paymentFactory = $paymentFactory;
-        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory,
-            $resource, $resourceCollection, $data);
     }
 
 
@@ -304,19 +265,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         return $this->setData(self::WEBSITE_ID, $websiteId);
     }
 
-
     /**
      * @inheritdoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getWebsite()
     {
-        if (!$this->website) {
-            $this->website = $this->websiteRepository->getById(
-                $this->getWebsiteId()
-            );
-        }
-
-        return $this->website;
+        return $this->websiteRepository->getById($this->getWebsiteId());
     }
 
     /**
@@ -567,13 +522,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getProducts()
     {
-        return $this->getData(self::PROFILE_PRODUCTS);
+        return $this->getData(self::PROFILE_PRODUCTS) ?: [];
     }
 
     /**
      * @inheritdoc
      */
-    public function setProducts($products)
+    public function setProducts(array $products)
     {
         return $this->setData(self::PROFILE_PRODUCTS, $products);
     }
@@ -583,29 +538,25 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getVisibleProducts()
     {
-        return $this->getData(self::PROFILE_VISIBLE_PRODUCTS);
+        $items = [];
+        foreach ($this->getProducts() as $item) {
+            if ($item->getParentId()) {
+                continue;
+            }
+
+            $items[] = $item;
+        }
+
+        return $items;
     }
 
     /**
      * @inheritdoc
-     */
-    public function setVisibleProducts(array $products)
-    {
-        return $this->setData(self::PROFILE_VISIBLE_PRODUCTS, $products);
-    }
-
-    /**
-     * @inheritdoc
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomer()
     {
-        if (!$this->customer) {
-            $this->customer = $this->customerRepository->getById(
-                $this->getCustomerId()
-            );
-        }
-
-        return $this->customer;
+        return $this->customerRepository->getById($this->getCustomerId());
     }
 
     /**

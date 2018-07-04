@@ -61,6 +61,8 @@ define(
 
                     this.clearElemsData(additionalFieldsets);
                     this.cancelEdit();
+                } else {
+                    this.triggerSave(data.error_messages);
                 }
                 $('body').trigger('processStop');
             },

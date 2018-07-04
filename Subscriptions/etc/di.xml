@@ -7,6 +7,12 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="TNW\Subscriptions\Model\ResourceModel\Message\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">tnw_subscriptions_message</argument>
+            <argument name="resourceModel" xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Message</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -18,6 +24,8 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
+                <item name="tnw_subscriptions_message_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Message\Grid\Collection</item>
                 <item name="tnw_billingfrequency_grid_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection</item>
                 <item name="tnw_productbillingfrequency_grid_data_source"
@@ -30,6 +38,18 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_create_customer_grid_data_source"
                       xsi:type="string">Magento\Customer\Model\ResourceModel\Grid\Collection</item>
+                <item name="tnw_report_product_customer_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\ProductCustomer\Collection
+                </item>
+                <item name="tnw_report_customer_product_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\CustomerProduct\Collection
+                </item>
+                <item name="tnw_report_customer_billing_frequency_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\CustomerBillingFrequency\Collection
+                </item>
+                <item name="tnw_report_billing_frequency_customer_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\BillingFrequencyCustomer\Collection
+                </item>
             </argument>
         </arguments>
     </type>
@@ -836,5 +856,56 @@
                 type="TNW\Subscriptions\Plugin\Quote\AbstractCalculator"
                 sortOrder="100"
                 disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\EnginePool">
+        <arguments>
+            <argument name="engine" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Checkmo::PAYMENT_METHOD_CHECKMO_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CheckmoFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="braintree" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\Braintree\Model\Adapter\BraintreeAdapter"
+                type="TNW\Subscriptions\Model\Payment\Braintree\Adapter" />
+    <type name="TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer">
+        <arguments>
+            <argument name="customLogger" xsi:type="object">BraintreeLoggerForTransactionSale</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
+    </type>
+
+    <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">tnw_subscriptions</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="1" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Filesystem</item>
+                <item name="2" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Database</item>
+                <item name="3" xsi:type="object">TNW\Subscriptions\Model\Logger\Handler\Admin</item>
+            </argument>
+            <argument name="processors" xsi:type="array">
+                <item name="uid" xsi:type="object">TNW\Subscriptions\Model\Logger\Processor\UidProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\Context">
+        <arguments>
+            <argument name="logger" xsi:type="object">TNW\Subscriptions\Logger</argument>
+        </arguments>
     </type>
 </config>

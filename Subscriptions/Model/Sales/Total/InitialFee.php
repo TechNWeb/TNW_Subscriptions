@@ -10,7 +10,7 @@ use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
-use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 
 /**
@@ -46,7 +46,7 @@ class InitialFee extends AbstractTotal
         }
         $totalInitialFee = 0;
         $baseTotalInitialFee = 0;
-        /** @var Item $item */
+        /** @var AbstractItem $item */
         foreach ($items as $item) {
             $associatedTaxables = $item->getAssociatedTaxables();
             list($initialFee, $baseInitialFee) = $this->getItemInitialFees($item);
@@ -72,10 +72,10 @@ class InitialFee extends AbstractTotal
     /**
      * Returns quote item subscription initial fees extension attribute.
      *
-     * @param Item $item
+     * @param AbstractItem $item
      * @return array
      */
-    private function getItemInitialFees(Item $item)
+    private function getItemInitialFees(AbstractItem $item)
     {
         $initialFee = 0;
         $baseInitialFee = 0;

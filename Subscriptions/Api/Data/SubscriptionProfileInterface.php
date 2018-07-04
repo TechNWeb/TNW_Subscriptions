@@ -59,7 +59,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * Constant for subscription profile products
      */
     const PROFILE_PRODUCTS = 'profile_products';
-    const PROFILE_VISIBLE_PRODUCTS = 'profile_visible_products';
     /**#@-*/
 
     /**
@@ -109,7 +108,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     /**
      * Gets customer.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface|null
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     public function getCustomer();
 
@@ -230,7 +229,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @param ProductSubscriptionProfileInterface[] $products
      * @return $this
      */
-    public function setProducts($products);
+    public function setProducts(array $products);
 
     /**
      * Gets subscription profile visible products.
@@ -238,14 +237,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return ProductSubscriptionProfileInterface[]
      */
     public function getVisibleProducts();
-
-    /**
-     * Sets subscription profile visible products.
-     *
-     * @param ProductSubscriptionProfileInterface[] $products
-     * @return $this
-     */
-    public function setVisibleProducts(array $products);
 
     /**
      * Gets subscription profile shipping address.

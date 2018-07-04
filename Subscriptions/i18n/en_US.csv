@@ -355,7 +355,7 @@ Message,Message
 "Number of Quotes","Number of Quotes"
 The number of future quotes to generate at a time for the new subscription profile.
 "Past Due","Past Due"
-"The number of payment attempts prior to changing the status of the profile to "Suspended"","The number of payment attempts prior to changing the status of the profile to "Suspended""
+"The number of payment attempts prior to changing the status of the profile to ""Suspended""","The number of payment attempts prior to changing the status of the profile to ""Suspended"""
 "The number of days between retrying a failed payment.","The number of days between retrying a failed payment."
 "The number of days before suspending a profile due to a failed payment.","The number of days before suspending a profile due to a failed payment."
 "Default catalog setting for all products.","Default catalog setting for all products."

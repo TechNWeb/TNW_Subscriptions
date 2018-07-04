@@ -8,12 +8,15 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductBillingFrequencyRepository;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
@@ -77,12 +80,24 @@ class Product extends Create
     private $productDataObject;
 
     /**
+     * @var ProductBillingFrequencyRepository
+     */
+    private $productBillingFrequencyRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCalculator $priceCalculator
      * @param ExtensionManager $extensionManager
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         Context $context,
@@ -90,12 +105,16 @@ class Product extends Create
         ProductRepositoryInterface $productRepository,
         PriceCalculator $priceCalculator,
         ExtensionManager $extensionManager,
-        ProductTypeManagerResolver $productTypeResolver
+        ProductTypeManagerResolver $productTypeResolver,
+        ProductBillingFrequencyRepository $productBillingFrequencyRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
         $this->productTypeResolver = $productTypeResolver;
+        $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
 
         parent::__construct($context, $session);
     }
@@ -181,6 +200,7 @@ class Product extends Create
      *
      * @param bool $fullRequest
      * @return DataObject
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getPreparedBuyRequest($fullRequest = false)
     {
@@ -200,6 +220,26 @@ class Product extends Create
                 $startOn = $productData['start_on'];
             } elseif ($isTrial) {
                 $startOn = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
+            }
+
+            if ($productData['use_preset_qty']) {
+                $this->searchCriteriaBuilder
+                    ->addFilter(
+                        ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                        $this->getProduct()->getId()
+                    )
+                    ->addFilter(
+                        ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
+                        $productData['billing_frequency']
+                    );
+
+                $searchOptions = $this->productBillingFrequencyRepository
+                    ->getList($this->searchCriteriaBuilder->create())
+                    ->getItems();
+
+                if (!empty($searchOptions)) {
+                    $productData['qty'] = reset($searchOptions)->getPresetQty();
+                }
             }
 
             $data = [

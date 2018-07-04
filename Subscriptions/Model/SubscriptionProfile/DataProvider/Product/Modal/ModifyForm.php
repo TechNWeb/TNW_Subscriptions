@@ -960,13 +960,7 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => '%s',
-                        'imports' => [
-                            'canShowEdit' => $this->currentFormName . ':previewMode'
-                        ],
-                        'exports' => [
-                            'value' => '${ $.parentForm}.edit_fieldset.billing_frequency:changeItemPriceLabel',
-                        ],
-                        'parentForm' => $this->currentFormName,
+                        'parentFormName' => $this->currentFormName,
                     ]
                 ]
             ]

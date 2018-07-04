@@ -434,10 +434,10 @@ class History extends \Magento\Framework\View\Element\Template
     /**
      * Return formatted next payment date.
      *
-     * @param Document $subscription
+     * @param \Magento\Framework\DataObject $subscription
      * @return string
      */
-    public function getNextPaymentFormatted(Document $subscription)
+    public function getNextPaymentFormatted(\Magento\Framework\DataObject $subscription)
     {
         return $subscription->getNextBillingCycleDate()
             ? $this->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG)

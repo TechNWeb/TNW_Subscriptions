@@ -14,16 +14,8 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UninstallInterface;
-use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
-use TNW\Subscriptions\Model\CustomerQuote;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
-use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\Address;
-use TNW\Subscriptions\Model\SubscriptionProfileStatusHistory;
 
 /**
  * Class Uninstall
@@ -68,29 +60,34 @@ class Uninstall implements UninstallInterface
     protected function dropTables(SchemaSetupInterface $setup)
     {
         $tnwTables = [
-            ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE,
-            SubscriptionProfileOrderInterface::MAIN_TABLE,
-            BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE,
-            CustomerQuote::CUSTOMER_QUOTE_TABLE,
-            SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
-            SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE,
-            SalesExtensionAttributesInterface::CREDITMEMO_ITEM_EXTENSION_TABLE,
-            Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE,
+            'tnw_subscriptions_product_billing_frequency',
+            'tnw_subscriptions_subscription_profile_order',
+            'tnw_subscriptions_billing_frequency',
+            'tnw_subscriptions_customer_quote',
+            'tnw_subscriptions_quote_item_extension_entity',
+            'tnw_subscriptions_order_item_extension_entity',
+            'tnw_subscriptions_creditmemo_item_extension_entity',
+            'tnw_subscriptions_subscription_profile_address',
             'tnw_subscriptions_subscription_profile_message_history',
-            Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE,
-            SubscriptionProfileStatusHistory::TABLE,
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_varchar',
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_text',
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_int',
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_decimal',
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY . '_datetime',
-            SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
-            ProductSubscriptionProfile::ENTITY_TABLE . '_varchar',
-            ProductSubscriptionProfile::ENTITY_TABLE . '_text',
-            ProductSubscriptionProfile::ENTITY_TABLE . '_int',
-            ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
-            ProductSubscriptionProfile::ENTITY_TABLE . '_datetime',
-            ProductSubscriptionProfile::ENTITY_TABLE,
+            'tnw_subscriptions_subscription_profile_queue',
+            'tnw_subscriptions_subscription_profile_status_history',
+            'tnw_subscriptions_message',
+
+            // Profile EAV
+            'tnw_subscriptions_subscription_profile_entity_varchar',
+            'tnw_subscriptions_subscription_profile_entity_text',
+            'tnw_subscriptions_subscription_profile_entity_int',
+            'tnw_subscriptions_subscription_profile_entity_decimal',
+            'tnw_subscriptions_subscription_profile_entity_datetime',
+            'tnw_subscriptions_subscription_profile_entity',
+
+            // Product Profile EAV
+            'tnw_subscriptions_product_subscription_profile_entity_varchar',
+            'tnw_subscriptions_product_subscription_profile_entity_text',
+            'tnw_subscriptions_product_subscription_profile_entity_int',
+            'tnw_subscriptions_product_subscription_profile_entity_decimal',
+            'tnw_subscriptions_product_subscription_profile_entity_datetime',
+            'tnw_subscriptions_product_subscription_profile_entity',
         ];
 
         foreach ($tnwTables as $tnwTable) {

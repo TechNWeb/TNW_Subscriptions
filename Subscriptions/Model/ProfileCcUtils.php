@@ -22,22 +22,28 @@ class ProfileCcUtils
     private $jsonHelper;
 
     /**
+     * @var EnginePool
+     */
+    private $enginePool;
+
+    /**
      * @param JsonHelper $jsonHelper
      */
-    public function __construct(JsonHelper $jsonHelper)
+    public function __construct(JsonHelper $jsonHelper, EnginePool $enginePool)
     {
         $this->jsonHelper = $jsonHelper;
+        $this->enginePool = $enginePool;
     }
 
     /**
      * Object use credit card payment method or not.
      *
-     * @param SubscriptionProfileInterface|\Magento\Framework\DataObject $object
+     * @param \Magento\Framework\DataObject $object
      * @return bool
      */
     public function isCcPayment($object)
     {
-        return in_array($object->getPayment()->getEngineCode(), EnginePool::getCcEngineList(), true);
+        return in_array($object->getEngineCode(), $this->enginePool->getCcEngineList(), true);
     }
 
     /**
@@ -76,7 +82,7 @@ class ProfileCcUtils
     public function isCcExpireBy($object, $paymentDate)
     {
         if ($this->isCcPayment($object)) {
-            $paymentInfo = $object->getPayment()->getPaymentAdditionalInfo();
+            $paymentInfo = $object->getPaymentAdditionalInfo();
             if (!empty($paymentInfo) && is_string($paymentInfo)) {
                 $paymentInfo = $this->jsonHelper->jsonDecode($paymentInfo);
                 $expiredAt = $this->getCcExpireDate($paymentInfo);
