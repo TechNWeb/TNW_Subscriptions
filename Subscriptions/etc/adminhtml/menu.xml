@@ -27,7 +27,7 @@
              module="TNW_Subscriptions" parent="TNW_Subscriptions::top_level" sortOrder="60"
              resource="TNW_Subscriptions::tnw_subscriptions_settings"/>
         <!-- Subscription -> Configuration -> General Configuration -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_general" title="General" module="TNW_Subscriptions"
+        <add id="TNW_Subscriptions::tnw_subscriptions_config_general" title="General" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_general" sortOrder="65"
              parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Sales::sales"/>
         <!-- Subscription -> Configuration -> Billing Frequencies - Billing Frequencies grid -->
@@ -35,15 +35,15 @@
              translate="title" module="TNW_Subscriptions" sortOrder="70" parent="TNW_Subscriptions::tnw_subscriptions_settings"
              action="tnw_subscriptions/billingfrequency/index" resource="TNW_Subscriptions::BillingFrequency"/>
         <!-- Subscription -> Configuration -> Subscription Profiles -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_profile_options" title="Subscription Profiles" module="TNW_Subscriptions"
+        <add id="TNW_Subscriptions::tnw_subscriptions_config_profile_options" title="Subscription Profiles" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_profile_options" sortOrder="72"
              parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Sales::sales"/>
         <!-- Subscription -> Configuration -> Products -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_product" title="Products" module="TNW_Subscriptions"
+        <add id="TNW_Subscriptions::tnw_subscriptions_config_product" title="Products" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_product" sortOrder="74"
              parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Catalog::products"/>
         <!-- Subscription -> Configuration -> Customers -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_customer" title="Customers" module="TNW_Subscriptions"
+        <add id="TNW_Subscriptions::tnw_subscriptions_config_customer" title="Customers" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_customer" sortOrder="76"
              parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Customer::customers"/>
 
