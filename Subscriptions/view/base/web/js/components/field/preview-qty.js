@@ -3,14 +3,35 @@
  * See TNW_LICENSE.txt for license details.
  */
 define([
-    'TNW_Subscriptions/js/components/field/preview-field',
-    'uiRegistry'
-], function (Abstract, registry) {
+    'TNW_Subscriptions/js/components/field/preview-field'
+], function (Abstract) {
     'use strict';
 
     return Abstract.extend({
         defaults: {
-            parentForm: null
+            listens: {
+                '${ $.parentFormName }.edit_fieldset.billing_frequency:value': 'changeBillingFrequency'
+            },
+            imports: {
+                'canShowEdit': '${ $.parentFormName }:previewMode'
+            },
+            exports: {
+                'value': '${ $.parentFormName }.edit_fieldset.billing_frequency:changeItemPriceLabel'
+            },
+            modules: {
+                parentForm: '${ $.parentFormName }'
+            }
+        },
+
+        changeBillingFrequency: function(value) {
+            var form = this.parentForm();
+            if (form) {
+                var frequenciesData = form.source.data['item_' + form.additionalData.objectItemId].frequency_data.product_frequencies;
+
+                if (frequenciesData && value && frequenciesData[value]){
+                    this.value(frequenciesData[value].preset_qty);
+                }
+            }
         },
 
         /**
@@ -20,7 +41,7 @@ define([
          * @param previewMode
          */
         canShowEdit: function (previewMode) {
-            var parent = this.getParentForm(),
+            var parent = this.parentForm(),
                 currentItemData = null,
                 unlockPresetQty = 0,
                 showPreview = true;
@@ -38,15 +59,6 @@ define([
             }
 
             this.showPreview(showPreview);
-        },
-
-        getParentForm: function() {
-            var parent = null;
-            if (this.parentForm) {
-                parent = registry.get(this.parentForm);
-            }
-
-            return parent;
         },
 
         /**
