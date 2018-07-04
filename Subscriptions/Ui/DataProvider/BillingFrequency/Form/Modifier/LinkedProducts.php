@@ -11,7 +11,6 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
-use Magento\Eav\Api\AttributeSetRepositoryInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\ArrayManager;
@@ -85,13 +84,6 @@ class LinkedProducts extends AbstractModifier
     private $status;
 
     /**
-     * Repository for retrieving attribute sets.
-     *
-     * @var AttributeSetRepositoryInterface
-     */
-    private $attributeSetRepository;
-
-    /**
      * Grid Metadata for Linked Products.
      *
      * @var GridMetadata
@@ -111,16 +103,27 @@ class LinkedProducts extends AbstractModifier
     private $arrayManager;
 
     /**
+     * @var \Magento\Framework\Locale\CurrencyInterface
+     */
+    private $localeCurrency;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Registry $coreRegistry
      * @param ProductRepositoryInterface $productRepository
      * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
      * @param ImageHelper $imageHelper
      * @param Status $status
-     * @param AttributeSetRepositoryInterface $attributeSetRepository
      * @param GridMetadata $gridMetadata
      * @param Config $config
      * @param ArrayManager $arrayManager
+     * @param \Magento\Framework\Locale\CurrencyInterface $localeCurrency
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param string $scopeName
      */
     public function __construct(
@@ -130,10 +133,11 @@ class LinkedProducts extends AbstractModifier
         ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
         ImageHelper $imageHelper,
         Status $status,
-        AttributeSetRepositoryInterface $attributeSetRepository,
         GridMetadata $gridMetadata,
         Config $config,
         ArrayManager $arrayManager,
+        \Magento\Framework\Locale\CurrencyInterface $localeCurrency,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -142,11 +146,12 @@ class LinkedProducts extends AbstractModifier
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
         $this->imageHelper = $imageHelper;
         $this->status = $status;
-        $this->attributeSetRepository = $attributeSetRepository;
         $this->scopeName = $scopeName ? $scopeName : self::DEFAULT_SCOPE_NAME;
         $this->gridMetadata = $gridMetadata;
         $this->config = $config;
         $this->arrayManager = $arrayManager;
+        $this->localeCurrency = $localeCurrency;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -374,6 +379,7 @@ class LinkedProducts extends AbstractModifier
                 'status' => 'status_text',
                 'sku' => 'sku',
                 'price' => 'tnw_price',
+                'reg_price' => 'reg_price',
                 'thumbnail' => 'thumbnail_src',
                 'initial_fee' => 'initial_fee',
                 'preset_qty' => 'preset_qty',
@@ -406,14 +412,19 @@ class LinkedProducts extends AbstractModifier
      * @param ProductInterface $linkedProduct
      * @param ProductBillingFrequencyInterface $linkItem
      * @return array
+     * @throws \Zend_Currency_Exception
      */
     private function fillData(ProductInterface $linkedProduct, ProductBillingFrequencyInterface $linkItem)
     {
+        $store = $this->storeManager->getStore(\Magento\Store\Model\Store::DEFAULT_STORE_ID);
+        $currency = $this->localeCurrency->getCurrency($store->getBaseCurrencyCode());
+
         $subscriptionUnlockPresetQty = $linkedProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
         $presetQty = $linkItem->getPresetQty();
         if (!(int)$subscriptionUnlockPresetQty && !(int)$presetQty) {
             $presetQty = null;
         }
+
         return [
             'id' => $linkedProduct->getId(),
             'thumbnail' => $this->imageHelper->init($linkedProduct, 'product_listing_thumbnail')->getUrl(),
@@ -421,6 +432,9 @@ class LinkedProducts extends AbstractModifier
             'status' => $this->status->getOptionText($linkedProduct->getStatus()),
             'sku' => $linkedProduct->getSku(),
             'price' => $this->getPrice($linkedProduct, $linkItem),
+            'reg_price' => $linkedProduct->getPrice()
+                ? $currency->toCurrency(sprintf('%f', $linkedProduct->getPrice()))
+                : '',
             ProductBillingFrequencyInterface::INITIAL_FEE =>
                 $linkItem->getInitialFee(),
             ProductBillingFrequencyInterface::PRESET_QTY =>

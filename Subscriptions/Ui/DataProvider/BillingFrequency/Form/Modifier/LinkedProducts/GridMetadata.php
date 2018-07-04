@@ -278,6 +278,8 @@ class GridMetadata
             ]
         );
 
+        $priceColumn['arguments']['data']['config']['columnsHeaderClasses'] = 'tnw_price_column';
+
         $lockProductPriceColumn = $this->getColumnBaseData(
             Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
             false,
@@ -354,13 +356,18 @@ class GridMetadata
             [],
             null,
             null,
-            __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.'),
+            __('Fee charged once upon creation of the subscription. Leave blank if subscription has no initial fee.'),
             true,
             [],
             [
                 'validate-zero-or-greater' => true,
             ]
         );
+
+        $initialFeeColumn['arguments']['data']['config']['columnsHeaderClasses'] = 'tnw_price_column';
+
+        $regPriceColumn = $this->getColumnBaseData('reg_price', false, __('Reg. Price'), 95);
+        $regPriceColumn = $this->setColumnSpecialData($regPriceColumn);
 
         $statusColumn = $this->getColumnBaseData('status', false, __('Status'), 100);
         $statusColumn = $this->setColumnSpecialData($statusColumn);
@@ -399,6 +406,7 @@ class GridMetadata
             'discount_amount' => $discountAmountColumn,
             'discount_type' => $discountTypeColumn,
             'initial_fee' => $initialFeeColumn,
+            'reg_price' => $regPriceColumn,
             'status' => $statusColumn,
             'preset_qty' => $presetQtyColumn,
             'unlock_preset_qty' => $unlockPresetQtyColumn,
