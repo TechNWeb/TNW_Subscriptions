@@ -38,7 +38,7 @@ define([
          */
         getPreviewLabel: function () {
             var result = this.shiftedValue();
-            if (this.current_date ===  this.shiftedValue()){
+            if (Date.parse(this.current_date) === Date.parse(result)){
                 result = $j.mage.__('Today');
             }
             return result;
