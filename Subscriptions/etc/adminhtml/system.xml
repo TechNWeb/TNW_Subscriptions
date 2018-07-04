@@ -4,7 +4,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="tnw_subscriptions" translate="label" sortOrder="360">
-            <label>TNW Subscriptions</label>
+            <label>mPower</label>
         </tab>
 
         <section id="tnw_subscriptions_general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1"
@@ -46,22 +46,23 @@
                         <config_path>tnw_subscriptions_general/advanced/log_status</config_path>
                     </field>
                     <field id="db_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0">
-                        <label>Enable DB</label>
+                        <label>DB Logging</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>Add log to the database</comment>
+                        <comment>Capture logs in the database.</comment>
                         <config_path>tnw_subscriptions_general/advanced/db_log_status</config_path>
                     </field>
                     <field id="db_log_limit" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0">
-                        <label>DB log Limit</label>
+                        <label>DB Log Limit</label>
                         <config_path>tnw_subscriptions_general/advanced/db_log_limit</config_path>
+                        <comment>Maximum number of rows to retain in the database before data is purged.</comment>  
                         <depends>
                             <field id="db_status">1</field>
                         </depends>
                     </field>
                     <field id="object_deep" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0">
-                        <label>Object deep</label>
+                        <label>Log Object Depth</label>
                         <config_path>tnw_subscriptions_general/advanced/log_object_deep</config_path>
-                        <comment>4 by default. Max - 8</comment>
+                        <comment>4 is the default depth. Maximum is 8.</comment>
                         <validate>validate-digits validate-digits-range digits-range-1-8</validate>
                     </field>
                 </group>
@@ -108,42 +109,42 @@
 
             <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>General</label>
-                <comment>Default catalog setting for all products.</comment>
+                <comment>Default catalog setting for all products. Used when creating or importing new products into the catalog.</comment>
                 <field id="purchase_type" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Available For</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\PurchaseType</source_model>
-                    <comment>Default catalog setting for the product to determine if the product to be sold on recurring basis, as a stand alone or both.</comment>
+                    <comment>Captures if products should be available for a one-time pruchase, as a subscription, or both.</comment>
                 </field>
                 <field id="start_date_type" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1">
                     <label>Start Date</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
-                    <comment>Default catalog setting for the product to determine when the subscription should start.</comment>
+                    <comment>Default catalog setting to determine when a subscription should start.</comment>
                 </field>
                 <field id="lock_product_price_status" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
                     <label>Lock Product Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Default catalog setting for the product to determine if the recurring price will always match the product price.</comment>
+                    <comment>Default catalog setting to determine if the recurring price will always match the product price.</comment>
                 </field>
                 <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
                     <label>Unlock Preset Quiantity</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Product quantity is preset for the customer and cannot be changed.</comment>
+                    <comment>Product quantity will be preset for a customer and a customer cannot change product quantity when buying products.</comment>
                 </field>
                 <field id="savings_calculation" translate="label comment" type="select" sortOrder="40" showInDefault="1"
                        showInWebsite="1">
                     <label>Savings Calculation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Product is a service that my customers use on daily basis.</comment>
+                    <comment>Product is a service which customers use on daily basis.</comment>
                 </field>
                 <field id="infinite_subscriptions" translate="label comment" type="select" sortOrder="50" showInDefault="1"
                        showInWebsite="1">
                     <label>Infinite Subscriptions</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Products in the catalog will be configured for infinite subscription only.</comment>
+                    <comment>Products in the catalog will be configured to renew automatically until the customer cancels the subscription.</comment>
                 </field>
             </group>
 
@@ -154,12 +155,14 @@
                        showInWebsite="1">
                     <label>Offer Flat Discount</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Automatically offer a flat discount when subscribing to products.</comment>
                 </field>
                 <field id="discount_amount" translate="label" type="addon_text" sortOrder="20" showInDefault="1"
                        showInWebsite="1">
                     <label>Discount Amount</label>
                     <frontend_class>validate-number</frontend_class>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
+                    <comment>Flat discount amount for each product.</comment>
                     <depends>
                         <field id="offer_flat_discount_status">1</field>
                     </depends>
@@ -168,6 +171,7 @@
                        showInWebsite="1">
                     <label>Discount Type</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\DiscountType</source_model>
+                    <comment>Type of the flat discount.</comment>
                     <depends>
                         <field id="offer_flat_discount_status">1</field>
                     </depends>
@@ -176,7 +180,7 @@
 
             <group id="trial" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Trial</label>
-                <comment>Default catalog setting for the product to determine if products in the catalog should all have a trial.</comment>
+                <comment>Default catalog setting for all products to determine if they should all have a trial period.</comment>
                 <field id="trial_status" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
                     <label>Is Trial Offered</label>
@@ -186,6 +190,7 @@
                        showInWebsite="1">
                     <label>Trial Length</label>
                     <frontend_class>validate-number</frontend_class>
+                    <comment>The trial length is in days by default. The unit may change from days to weeks and so on. See 'Trial Length Unit' configuration value.</comment>
                     <depends>
                         <field id="trial_status">1</field>
                     </depends>
@@ -194,6 +199,7 @@
                        showInWebsite="1">
                     <label>Trial Length Unit</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType</source_model>
+                    <comment>The unit for 'Trial Length' configuration value.</comment>
                     <depends>
                         <field id="trial_status">1</field>
                     </depends>
@@ -203,6 +209,7 @@
                     <label>Trial Price</label>
                     <frontend_class>validate-number</frontend_class>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
+                    <comment>Default trial amount.</comment>
                     <depends>
                         <field id="trial_status">1</field>
                     </depends>
