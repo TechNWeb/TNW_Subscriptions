@@ -1,3 +1,6 @@
 .admin__field-control .admin__control-addon .custom-add-after-label {
     padding-right: 5px
 }
+th.tnw_price_column {
+    width: 10%;
+}

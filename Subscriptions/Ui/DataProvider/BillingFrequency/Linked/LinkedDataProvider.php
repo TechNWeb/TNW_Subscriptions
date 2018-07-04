@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class LinkedDataProvider
+ * @method \Magento\Catalog\Model\ResourceModel\Product\Collection getCollection()
  */
 class LinkedDataProvider extends AbstractDataProvider
 {
@@ -90,6 +91,7 @@ class LinkedDataProvider extends AbstractDataProvider
     public function getData()
     {
         $collection = $this->getCollection();
+        //$collection->addPriceData();
         $collection->addAttributeToFilter(
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             [

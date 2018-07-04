@@ -87,6 +87,50 @@
              dependsOnModule="TNW_Subscriptions"
              dependsOnConfig="tnw_subscriptions_general/general/active"/>
 
+        <add id="TNW_Subscriptions::report_subscribe_customer_products"
+             title="By Subscribe Products"
+             translate="title"
+             sortOrder="30"
+             module="TNW_Subscriptions"
+             parent="Magento_Reports::report_customers"
+             action="tnw_subscriptions/report/customerProducts"
+             resource="TNW_Subscriptions::report_subscribe_customer_products"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_customer_billing_frequencies"
+             title="By Billing Frequencies"
+             translate="title"
+             sortOrder="40"
+             module="TNW_Subscriptions"
+             parent="Magento_Reports::report_customers"
+             action="tnw_subscriptions/report/customerBillingFrequencies"
+             resource="TNW_Subscriptions::report_subscribe_customer_billing_frequencies"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_product_customers"
+             title="By Subscribe Customers"
+             translate="title"
+             sortOrder="30"
+             module="TNW_Subscriptions"
+             parent="Magento_Reports::report_products"
+             action="tnw_subscriptions/report/productCustomers"
+             resource="TNW_Subscriptions::report_subscribe_product_customers"/>
+
+        <add id="TNW_Subscriptions::report_billing_frequencies"
+             title="Billing Frequencies"
+             translate="title"
+             module="TNW_Subscriptions"
+             sortOrder="50"
+             parent="Magento_Reports::report"
+             resource="TNW_Subscriptions::billing_frequencies"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_billing_frequency_customers"
+             title="By Subscribe Customers"
+             translate="title"
+             sortOrder="10"
+             module="TNW_Subscriptions"
+             parent="TNW_Subscriptions::report_billing_frequencies"
+             action="tnw_subscriptions/report/billingFrequencyCustomers"
+             resource="TNW_Subscriptions::report_subscribe_billing_frequency_customers"/>
+
         <add id="TNW_Subscriptions::tools"
              title="Tools"
              module="TNW_Subscriptions"

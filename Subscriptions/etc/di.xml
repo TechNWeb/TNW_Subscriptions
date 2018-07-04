@@ -38,6 +38,18 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_create_customer_grid_data_source"
                       xsi:type="string">Magento\Customer\Model\ResourceModel\Grid\Collection</item>
+                <item name="tnw_report_product_customer_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\ProductCustomer\Collection
+                </item>
+                <item name="tnw_report_customer_product_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\CustomerProduct\Collection
+                </item>
+                <item name="tnw_report_customer_billing_frequency_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\CustomerBillingFrequency\Collection
+                </item>
+                <item name="tnw_report_billing_frequency_customer_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\BillingFrequencyCustomer\Collection
+                </item>
             </argument>
         </arguments>
     </type>
