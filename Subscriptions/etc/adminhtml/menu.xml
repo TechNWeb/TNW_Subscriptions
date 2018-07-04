@@ -48,7 +48,7 @@
              parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Customer::customers"/>
 
         <!-- Subscription -> Attributes -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_profile_options" title="Custom Attributes" translate="title"
+        <add id="TNW_Subscriptions::tnw_subscriptions_attributes" title="Custom Attributes" translate="title"
              module="TNW_Subscriptions" parent="TNW_Subscriptions::top_level" sortOrder="100"
              resource="TNW_Subscriptions::tnw_subscriptions_attributes"/>
         <!-- Subscription -> Attributes -> Subscription - manage profile attributes -->
