@@ -86,5 +86,23 @@
              action="tnw_subscriptions/subscriptionprofileproduct_attribute/index" resource="TNW_Subscriptions::ProductSubscriptionProfile_attributes"
              dependsOnModule="TNW_Subscriptions"
              dependsOnConfig="tnw_subscriptions_general/general/active"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_products"
+             title="By Subscribe Products"
+             translate="title"
+             sortOrder="30"
+             module="TNW_Subscriptions"
+             parent="Magento_Reports::report_customers"
+             action="tnw_subscriptions/report/products"
+             resource="TNW_Subscriptions::report_subscribe_products"/>
+
+        <add id="TNW_Subscriptions::report_subscribe_customers"
+             title="By Subscribe Customers"
+             translate="title"
+             sortOrder="30"
+             module="TNW_Subscriptions"
+             parent="Magento_Reports::report_products"
+             action="tnw_subscriptions/report/customers"
+             resource="TNW_Subscriptions::report_subscribe_customers"/>
     </menu>
 </config>

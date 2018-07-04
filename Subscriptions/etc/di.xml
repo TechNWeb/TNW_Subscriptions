@@ -30,6 +30,10 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Grid\Collection</item>
                 <item name="tnw_subscriptionprofile_create_customer_grid_data_source"
                       xsi:type="string">Magento\Customer\Model\ResourceModel\Grid\Collection</item>
+                <item name="tnw_report_customer_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\Customer\Collection</item>
+                <item name="tnw_report_product_listing_data_source"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\Product\Collection</item>
             </argument>
         </arguments>
     </type>
