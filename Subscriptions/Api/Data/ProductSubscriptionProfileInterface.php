@@ -102,7 +102,7 @@ interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterf
     /**
      * Gets magento product.
      *
-     * @return Product|null
+     * @return Product
      */
     public function getMagentoProduct();
 
@@ -386,14 +386,14 @@ interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterf
     /**
      * Gets child products.
      *
-     * @return array
+     * @return ProductSubscriptionProfileInterface[]
      */
     public function getChildren();
 
     /**
      * Sets child products.
      *
-     * @param array $children
+     * @param ProductSubscriptionProfileInterface[] $children
      * @return $this
      */
     public function setChildren(array $children);

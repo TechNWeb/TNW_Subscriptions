@@ -314,8 +314,7 @@ class Context implements ContextInterface
 
                 break;
             default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $item->getTypeId()));
-                break;
+                throw new \InvalidArgumentException(__('Unsupported product type - %1', $item->getTypeId()));
         }
 
         return $imageHelper;

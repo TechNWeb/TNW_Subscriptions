@@ -31,8 +31,6 @@ class Braintree extends Base
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $historyLogger
-     * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
      * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
      * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
@@ -42,8 +40,6 @@ class Braintree extends Base
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
-        \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $historyLogger,
-        \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
@@ -53,8 +49,6 @@ class Braintree extends Base
             $config,
             $context,
             $cartManagement,
-            $historyLogger,
-            $registry,
             $persistor,
             $zeroTotalValidator
         );

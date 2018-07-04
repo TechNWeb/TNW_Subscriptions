@@ -184,8 +184,7 @@ class Manager
                     }
                     break;
                 default:
-                    throw new \InvalidArgumentException(__('Unsupported product type -' . $item->getProductType()));
-                    break;
+                    throw new \InvalidArgumentException(__('Unsupported product type - %1', $item->getProductType()));
             }
         }
 
@@ -313,14 +312,17 @@ class Manager
         $products = [];
         $confOptions = $item->getBuyRequest()->getDataByPath('super_attribute');
         $subscriptionProduct->setCustomOptions(\Zend_Json::encode($confOptions));
+
         $productObject = new DataObject($item->getProduct()->getData());
-        $productObject->setName($item->getName())->setSku($item->getSku());
+        $productObject
+            ->setData('name', $item->getName())
+            ->setData('sku', $item->getSku());
+
         foreach ($item->getChildren() as $child) {
-            $productObject->setEntityId($child->getProduct()->getId());
+            $productObject->setData('entity_id', $child->getProduct()->getId());
             $product = $this->reset()
                 ->populateProductDataFromQuoteItem($child, $productObject, true)
                 ->getProfileProduct();
-            $product->setParentId($subscriptionProduct->getId());
             $product->setCustomOptions(\Zend_Json::encode($confOptions));
             $products[] = $product;
         }

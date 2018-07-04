@@ -5,7 +5,6 @@ namespace TNW\Subscriptions\Model\Queue;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Quote\Api\CartRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
-use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
@@ -13,11 +12,8 @@ use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as SubscriptionProfileOrderResource;
 
 /**
  * Class Manager
@@ -48,7 +44,7 @@ class Manager
     /**
      * Profile manager.
      *
-     * @var ProfileManager
+     * @var SubscriptionProfile\Manager
      */
     private $profileManager;
 
@@ -74,47 +70,38 @@ class Manager
     private $profileRepository;
 
     /**
-     * Subscription profile order repository.
-     *
-     * @var SubscriptionProfileOrderRepositoryInterface
-     */
-    private $profileOrderRepository;
-
-    /**
      * Subscription profile status history manager.
      *
-     * @var HistoryManager
+     * @var SubscriptionProfile\Status\HistoryManager
      */
     private $statusHistoryManager;
 
     /**
-     * @var SubscriptionProfileOrderResource;
+     * @var SubscriptionProfile\MessageHistoryLogger
      */
-    private $profileOrderResource;
+    private $messageHistoryLogger;
 
     /**
      * @param CollectionFactory $collectionFactory
      * @param DateTime $date
      * @param Config $config
-     * @param ProfileManager $profileManager
+     * @param SubscriptionProfile\Manager $profileManager
      * @param RelationManager $relationManager
      * @param CartRepositoryInterface $cartRepository
      * @param SubscriptionProfileRepository $profileRepository
-     * @param SubscriptionProfileOrderRepositoryInterface $profileOrderRepository
-     * @param HistoryManager $statusHistoryManager
-     * @param SubscriptionProfileOrderResource $profileOrderResource
+     * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
+     * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         CollectionFactory $collectionFactory,
         DateTime $date,
         Config $config,
-        ProfileManager $profileManager,
+        SubscriptionProfile\Manager $profileManager,
         RelationManager $relationManager,
         CartRepositoryInterface $cartRepository,
         SubscriptionProfileRepository $profileRepository,
-        SubscriptionProfileOrderRepositoryInterface $profileOrderRepository,
-        HistoryManager $statusHistoryManager,
-        SubscriptionProfileOrderResource $profileOrderResource
+        SubscriptionProfile\Status\HistoryManager $statusHistoryManager,
+        SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->date = $date;
@@ -123,9 +110,8 @@ class Manager
         $this->relationManager = $relationManager;
         $this->cartRepository = $cartRepository;
         $this->profileRepository = $profileRepository;
-        $this->profileOrderRepository = $profileOrderRepository;
         $this->statusHistoryManager = $statusHistoryManager;
-        $this->profileOrderResource = $profileOrderResource;
+        $this->messageHistoryLogger = $messageHistoryLogger;
     }
 
     /**
@@ -360,22 +346,39 @@ class Manager
      *
      * @param Queue $item
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function processItem(Queue $item)
     {
-        $result = false;
         $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
         $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-        if (!$this->itemOnHold($item)) {
-            $order = $this->profileManager->setProfile($profile)
-                ->processProfile($quote);
-            $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
-                ->setMagentoOrderId($order->getId());
-            $this->relationManager->saveRelation($relation);
-            $result = true;
+
+        if ($this->itemOnHold($item)) {
+            return false;
         }
 
-        return $result;
+        $order = $this->profileManager->reset()
+            ->setProfile($profile)
+            ->processProfile($quote);
+
+        //Add comment profile place.
+        $this->messageHistoryLogger->message(
+            SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+            [
+                $order->getIncrementId(),
+                $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
+            ],
+            $profile->getId(),
+            false,
+            false,
+            true
+        );
+
+        $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
+            ->setMagentoOrderId($order->getId());
+        $this->relationManager->saveRelation($relation);
+
+        return true;
     }
 
     /**
@@ -383,6 +386,7 @@ class Manager
      *
      * @param Queue $item
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function itemOnHold(Queue $item)
     {

@@ -99,9 +99,10 @@ define([
                     _.each(step.blocks, function (item, index) {
                         var form = registry.get(current.name + '.' + 'insert_form_' + index);
                         form.render_url = config.render_url + '?' + current.getRenderParams(step);
-                        form.renderSettings.url = form.render_url;
+                        form.renderSettings.url = form.updateSettings.url = form.render_url;
                         var externalFormName =  item.handle + '.' + item.handle;
                         form.externalFormName = externalFormName;
+                        form.externalSource = form.requestModule(externalFormName + '_data_source');
                         form.ns = item.handle;
                         form.params.namespace = item.handle;
                         form.params.step = step.code;

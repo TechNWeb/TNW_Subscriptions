@@ -130,7 +130,8 @@ class Manager
      * Saves profile to order relation.
      *
      * @param null|SubscriptionProfileOrderInterface $relation
-     * @return null|SubscriptionProfileOrderInterface
+     * @return SubscriptionProfileOrderInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function saveRelation($relation = null)
     {
@@ -165,6 +166,8 @@ class Manager
      *
      * @param int $id
      * @return SubscriptionProfileOrderInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRelationById($id)
     {
