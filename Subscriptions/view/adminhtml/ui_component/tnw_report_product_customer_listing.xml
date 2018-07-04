@@ -9,17 +9,17 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">tnw_report_customer_listing.tnw_report_customer_listing_data_source</item>
-            <item name="deps" xsi:type="string">tnw_report_customer_listing.tnw_report_customer_listing_data_source</item>
+            <item name="provider" xsi:type="string">tnw_report_product_customer_listing.tnw_report_product_customer_listing_data_source</item>
+            <item name="deps" xsi:type="string">tnw_report_product_customer_listing.tnw_report_product_customer_listing_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">tnw_report_customer_product_columns</item>
+        <item name="spinner" xsi:type="string">tnw_report_product_customer_columns</item>
         <item name="acl" xsi:type="string">TNW_Subscriptions::report_customers_subscribe_products</item>
     </argument>
-    <dataSource name="tnw_report_customer_listing_data_source">
+    <dataSource name="tnw_report_product_customer_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">tnw_report_customer_listing_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="name" xsi:type="string">tnw_report_product_customer_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -37,7 +37,7 @@
         <filters name="listing_filters" />
         <paging name="listing_paging" />
     </listingToolbar>
-    <columns name="tnw_report_customer_product_columns">
+    <columns name="tnw_report_product_customer_columns">
         <selectionsColumn name="ids">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -60,7 +60,6 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
-                    <!--<item name="add_field" xsi:type="boolean">true</item>-->
                     <item name="label" xsi:type="string" translate="true">Name</item>
                     <item name="sortOrder" xsi:type="number">30</item>
                 </item>
@@ -79,13 +78,12 @@
         <column name="product_count">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <!--<item name="add_field" xsi:type="boolean">true</item>-->
                     <item name="label" xsi:type="string" translate="true">Products</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn name="actions" class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\CustomerActions">
+        <actionsColumn name="actions" class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\CustomerProductActions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="indexField" xsi:type="string">entity_id</item>

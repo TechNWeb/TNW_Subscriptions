@@ -11,9 +11,9 @@ use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\UrlInterface;
 
 /**
- * Product Actions
+ * Customer Actions
  */
-class ProductActions extends Column
+class BillingFrequencyCustomerActions extends Column
 {
     /**
      * @var UrlInterface
@@ -52,7 +52,9 @@ class ProductActions extends Column
 
         foreach ($dataSource['data']['items'] as &$item) {
             $item[$this->getData('name')]['edit'] = [
-                'href' => $this->urlBuilder->getUrl('tnw_subscriptions/report/customers', ['product_id' => $item['entity_id']]),
+                'href' => $this->urlBuilder->getUrl('tnw_subscriptions/report/billingFrequencyCustomers', [
+                    'billing_frequency_id' => $item['id']
+                ]),
                 'label' => __('Show Customers'),
                 'hidden' => false,
             ];
