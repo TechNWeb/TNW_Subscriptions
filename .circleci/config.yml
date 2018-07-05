@@ -36,6 +36,12 @@ jobs:
             cd /var/www/
             sudo chown -R circleci:circleci html
       - run:
+          name: Install Codeception
+          command: |
+            cd /var/www/
+            sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
+            sudo chmod a+x /usr/local/bin/codecept
+      - run:
           name: Get Magento Code Quality Tool
           command: |
             cd /var/www/html/
@@ -82,12 +88,12 @@ jobs:
           command: |
             cd /var/www/html
             ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
-      # Need to FIX unit tests
-      #- run:
-      #    name: Run Unit Test
-      #    command: |
-      #      cd /var/www/html/magento2-$MAGENTO_VERSION
-      #      ./bin/magento dev:tests:run -c'--filter=TNW' unit
+      - run:
+          name: Run Codeception Tests
+          command: |
+            cd /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Subscriptions
+            codecept run -g TNW -g Subscriptions
+            #./bin/magento dev:tests:run -c'--filter=TNW' unit
   m224_php71:
     <<: *php71-base
     environment:
