@@ -94,40 +94,44 @@ class Collection extends SearchResult
             ]
         );
 
-        $this->getSelect()->join(
-            ['frequency' =>
-                $this->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
-            'main_table.billing_frequency_id = frequency.id',
-            ['frequency_label' => 'frequency.label']
-        )->joinLeft(
-            ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-            'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
-            ['next_billing_cycle_date' => 'relation.scheduled_at']
-        )->joinLeft(
-            ['quotes' => $this->getTable('quote')],
-            'quotes.entity_id = relation.magento_quote_id',
-            ['grand_total' => 'quotes.grand_total']
-        )->join(
-            ['customer' => $this->getTable('customer_entity')],
-            'customer.entity_id = main_table.customer_id',
-            [
-                'customer_name' => $connection->getConcatSql(
-                    [
-                        'customer.firstname',
-                        'customer.lastname',
-                    ],
-                    ' '
-                ),
-                'customer_email' => 'customer.email',
-            ]
-        )->join(
-            ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
-            'main_table.entity_id = payment.subscription_profile_id',
-            [
-                'engine_code' => 'payment.engine_code',
-                'payment_additional_info' => 'payment.payment_additional_info',
-            ]
-        );
+        $this->getSelect()
+            ->joinLeft(
+                ['frequency' => $this->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
+                'main_table.billing_frequency_id = frequency.id',
+                ['frequency_label' => 'frequency.label']
+            )
+            ->joinLeft(
+                ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+                'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
+                ['next_billing_cycle_date' => 'relation.scheduled_at']
+            )
+            ->joinLeft(
+                ['quotes' => $this->getTable('quote')],
+                'quotes.entity_id = relation.magento_quote_id',
+                ['grand_total' => 'quotes.grand_total']
+            )
+            ->joinLeft(
+                ['customer' => $this->getTable('customer_entity')],
+                'customer.entity_id = main_table.customer_id',
+                [
+                    'customer_name' => $connection->getConcatSql(
+                        [
+                            'customer.firstname',
+                            'customer.lastname',
+                        ],
+                        ' '
+                    ),
+                    'customer_email' => 'customer.email',
+                ]
+            )
+            ->joinLeft(
+                ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
+                'main_table.entity_id = payment.subscription_profile_id',
+                [
+                    'engine_code' => 'payment.engine_code',
+                    'payment_additional_info' => 'payment.payment_additional_info',
+                ]
+            );
 
         return $this;
     }
