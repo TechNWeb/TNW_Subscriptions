@@ -1,10 +1,8 @@
 <?php
-/**
- * @group TNW
- * @group Subscriptions
- */
+namespace TNW_Subscriptions;
+use TNW_Subscriptions\AcceptanceTester;
 
-class CreateBillingFrequencyCest
+class AdminLoginCest
 {
     public function _before(AcceptanceTester $I)
     {

@@ -1,5 +1,5 @@
 <?php
-
+namespace TNW_Subscriptions;
 
 /**
  * Inherited Methods
