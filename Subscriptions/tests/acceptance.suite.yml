@@ -8,5 +8,5 @@ actor: AcceptanceTester
 modules:
     enabled:
         - PhpBrowser:
-            url: http://magento-qa.box/magento
+            url: http://127.0.0.1/magento
         - \TNW_Subscriptions\Helper\Acceptance
