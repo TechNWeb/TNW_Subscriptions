@@ -23,5 +23,11 @@ class AdminLoginCest
     // tests
     public function tryToTest(AcceptanceTester $I)
     {
+        $I->amOnPage('/admin');
+        $I->fillField('#username','admin');
+        $I->fillField('#login','123123qa');
+        $I->click('Sign in');
+        $I->see('Dashboard1111');
+        $I->seeInCurrentUrl('/m2/admin/admin/dashboard');
     }
 }
