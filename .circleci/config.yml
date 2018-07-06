@@ -42,6 +42,16 @@ jobs:
             sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
             sudo chmod a+x /usr/local/bin/codecept
       - run:
+          name: Download Selenium
+          command: |
+            cd /var/www/
+            curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+      - run:
+          name: Add host
+          command: |
+            echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
+            cat /etc/hosts
+      - run:
           name: Get Magento Code Quality Tool
           command: |
             cd /var/www/html/
@@ -56,24 +66,25 @@ jobs:
           command: |
             cd /var/www/html/
             wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
-            cd magento2-$MAGENTO_VERSION
+            mv ./magento2-$MAGENTO_VERSION/* ./magento
+            cd magento
             composer install --prefer-dist
             ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
           name: Create the Folder for the Extension
           command: |
-            cd /var/www/html/magento2-$MAGENTO_VERSION/app
+            cd /var/www/html/magento/app
             mkdir -p code/TNW
       - run:
           name: Copy the Extension Files
           command: |
-            cp -R ~/tnw_extension/* /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW
-            ls -la /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW
+            cp -R ~/tnw_extension/* /var/www/html/magento/app/code/TNW
+            ls -la /var/www/html/magento/app/code/TNW
       - run:
           name: Install the Extension
           command: |
-            cd /var/www/html/magento2-$MAGENTO_VERSION
+            cd /var/www/html/magento
             rm -rf ./generated/*
             ./bin/magento module:status
             ./bin/magento module:enable TNW_Subscriptions
@@ -81,7 +92,7 @@ jobs:
       - run:
           name: Compile the Code
           command: |
-            cd /var/www/html/magento2-$MAGENTO_VERSION
+            cd /var/www/html/magento
             php bin/magento setup:di:compile
       - run:
           name: Run Magento Coding Standard
@@ -91,7 +102,7 @@ jobs:
       - run:
           name: Run Codeception Tests
           command: |
-            cd /var/www/html/magento2-$MAGENTO_VERSION/app/code/TNW/Subscriptions
+            cd /var/www/html/magento/app/code/TNW/Subscriptions
             codecept run -g TNW -g Subscriptions
             #./bin/magento dev:tests:run -c'--filter=TNW' unit
   m224_php71:
