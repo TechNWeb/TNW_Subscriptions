@@ -42,11 +42,6 @@ jobs:
             sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
             sudo chmod a+x /usr/local/bin/codecept
       - run:
-          name: Download Selenium
-          command: |
-            cd /var/www/
-            curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
-      - run:
           name: Add host
           command: |
             echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
