@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Report;
