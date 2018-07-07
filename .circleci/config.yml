@@ -84,6 +84,7 @@ jobs:
       - run:
           name: Magento HTTP configuration
           command: |
+            sudo a2enmod rewrite
             sudo cp ~/tnw_extension/apache.conf /etc/apache2/sites-available/apache.conf
             sudo a2ensite apache
             sudo service apache2 start
