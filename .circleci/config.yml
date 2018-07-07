@@ -87,8 +87,7 @@ jobs:
             sudo cp ~/tnw_extension/apache.conf /etc/apache2/sites-available/apache.conf
             sudo a2ensite apache
             sudo service apache2 start
-            cd /var/www/html/magento
-            curl http://magento-qa.box:8080/index.php/admin
+            curl http://magento-qa.box:8080
       - run:
           name: Get Magento Code Quality Tool
           command: |
