@@ -44,8 +44,10 @@ jobs:
       - run:
           name: Add host
           command: |
+            sudo service apache2 restart
             echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
             cat /etc/hosts
+            curl http://127.0.0.1
       - run:
           name: Get Magento Code Quality Tool
           command: |
