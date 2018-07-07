@@ -28,6 +28,6 @@ class AdminLoginCest
         $I->fillField('#login','admin123');
         $I->click('Sign in');
         $I->see('Dashboard');
-        $I->seeInCurrentUrl('/m2/admin/admin/dashboard');
+        $I->seeInCurrentUrl('/admin/admin/dashboard');
     }
 }
