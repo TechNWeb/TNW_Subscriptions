@@ -86,8 +86,8 @@ jobs:
       - run:
           name: Magento HTTP configuration
           command: |
-            sudo nano /etc/apache2/conf.d/magento.conf
-            echo "ServerName 127.0.0.1" | sudo tee /etc/apache2/conf.d/magento.conf
+            cp ~/tnw_extension/apache.conf /etc/apache2/sites-available
+            a2ensite apache.conf
             sudo service apache2 restart
             cd /var/www/html/magento
             find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
