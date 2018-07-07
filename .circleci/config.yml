@@ -88,31 +88,30 @@ jobs:
             sudo a2ensite apache
             sudo service apache2 start
             cd /var/www/html/magento
-            curl http://magento-qa.box:8080
-      #- run:
-      #    name: Get Magento Code Quality Tool
-      #    command: |
-      #      cd /var/www/html/
-      #      git clone https://github.com/magento/marketplace-eqp magento-coding-standard
-      #      cd magento-coding-standard
-      #      composer install
-      #- run:
-      #    name: Run Magento Coding Standard
-      #    command: |
-      #      cd /var/www/html
-      #      ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
-      #- run:
-      #    name: Install Codeception
-      #    command: |
-      #      cd /var/www/
-      #      sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
-      #      sudo chmod a+x /usr/local/bin/codecept
-      #- run:
-      #    name: Run Codeception Tests
-      #    command: |
-      #      cd /var/www/html/magento/app/code/TNW/Subscriptions
-      #      codecept run -g TNW -g Subscriptions
-      #      #./bin/magento dev:tests:run -c'--filter=TNW' unit
+            curl http://magento-qa.box:8080/admin
+      - run:
+          name: Get Magento Code Quality Tool
+          command: |
+            cd /var/www/html/
+            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+            cd magento-coding-standard
+            composer install
+      - run:
+          name: Run Magento Coding Standard
+          command: |
+            cd /var/www/html
+            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
+      - run:
+          name: Install Codeception
+          command: |
+            cd /var/www/
+            sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
+            sudo chmod a+x /usr/local/bin/codecept
+      - run:
+          name: Run Codeception Tests
+          command: |
+            cd /var/www/html/magento/app/code/TNW/Subscriptions
+            codecept run -g TNW -g Subscriptions
   m224_php71:
     <<: *php71-base
     environment:
