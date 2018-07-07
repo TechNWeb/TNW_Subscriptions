@@ -81,7 +81,7 @@ jobs:
           command: |
             sudo cp ~/tnw_extension/apache.conf /etc/apache2/sites-available
             sudo a2ensite apache.conf
-            sudo service apache2 reload
+      #     sudo service apache2 reload
             sudo service apache2 restart
             cd /var/www/html/magento
             find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
