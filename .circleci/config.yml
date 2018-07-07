@@ -80,7 +80,7 @@ jobs:
           name: Permissions
           command: |
             cd /var/www/
-            sudo chown -R www-data:www-data html
+            sudo chmod -R 777 html
       - run:
           name: Magento HTTP configuration
           command: |
@@ -88,9 +88,6 @@ jobs:
             sudo a2ensite apache
             sudo service apache2 start
             cd /var/www/html/magento
-            find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-            find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-            chmod u+x bin/magento
             curl http://magento-qa.box:8080/magento
       #- run:
       #    name: Get Magento Code Quality Tool
