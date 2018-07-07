@@ -36,6 +36,11 @@ jobs:
             echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
             cat /etc/hosts
       - run:
+          name: System Permissions
+          command: |
+            cd /var/www/
+            sudo chown -R circleci:circleci html
+      - run:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
@@ -75,7 +80,6 @@ jobs:
           name: Permissions
           command: |
             cd /var/www/
-            sudo adduser circleci www-data
             sudo chown -R www-data:www-data html
       - run:
           name: Magento HTTP configuration
