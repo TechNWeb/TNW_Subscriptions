@@ -41,13 +41,6 @@ jobs:
             echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
             cat /etc/hosts
       - run:
-          name: Get Magento Code Quality Tool
-          command: |
-            cd /var/www/html/
-            git clone https://github.com/magento/marketplace-eqp magento-coding-standard
-            cd magento-coding-standard
-            composer install
-      - run:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
@@ -86,7 +79,7 @@ jobs:
       - run:
           name: Magento HTTP configuration
           command: |
-            cp ~/tnw_extension/apache.conf /etc/apache2/sites-available
+            sudo cp ~/tnw_extension/apache.conf /etc/apache2/sites-available
             a2ensite apache.conf
             sudo service apache2 restart
             cd /var/www/html/magento
@@ -95,16 +88,23 @@ jobs:
             chmod u+x bin/magento
             curl http://127.0.0.1/magento
       #- run:
-      #    name: Install Codeception
+      #    name: Get Magento Code Quality Tool
       #    command: |
-      #      cd /var/www/
-      #      sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
-      #      sudo chmod a+x /usr/local/bin/codecept
+      #      cd /var/www/html/
+      #      git clone https://github.com/magento/marketplace-eqp magento-coding-standard
+      #      cd magento-coding-standard
+      #      composer install
       #- run:
       #    name: Run Magento Coding Standard
       #    command: |
       #      cd /var/www/html
       #      ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
+      #- run:
+      #    name: Install Codeception
+      #    command: |
+      #      cd /var/www/
+      #      sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
+      #      sudo chmod a+x /usr/local/bin/codecept
       #- run:
       #    name: Run Codeception Tests
       #    command: |
