@@ -91,8 +91,8 @@ jobs:
             find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
             find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
             chmod u+x bin/magento
-            curl http://127.0.0.1
-            curl http://172.26.0.3
+            curl http://127.0.0.1/magento
+            curl http://172.26.0.3/magento
       #- run:
       #    name: Install Codeception
       #    command: |
