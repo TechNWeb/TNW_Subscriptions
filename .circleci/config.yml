@@ -26,18 +26,12 @@ jobs:
             sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
             sudo docker-php-ext-install -j$(nproc) intl soap xsl zip mcrypt pdo pdo_mysql gd gettext mbstring bcmath
       - run:
-          name: Configure PHP
+          name: System changes: PHP, Hosts, Permissions
           command: |
             echo "memory_limit = 2G" | sudo tee --append /usr/local/etc/php/conf.d/memory.ini
             php -i
-      - run:
-          name: Add host
-          command: |
             echo "127.0.0.1 magento-qa.box" | sudo tee --append /etc/hosts
             cat /etc/hosts
-      - run:
-          name: System Permissions
-          command: |
             cd /var/www/
             sudo chown -R circleci:circleci html
       - run:
@@ -54,13 +48,10 @@ jobs:
             ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box:8080 --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
-          name: Create the Folder for the Extension
+          name: Copy Extension Files
           command: |
             cd /var/www/html/magento/app
             mkdir -p code/TNW
-      - run:
-          name: Copy the Extension Files
-          command: |
             cp -R ~/tnw_extension/* /var/www/html/magento/app/code/TNW
             ls -la /var/www/html/magento/app/code/TNW
       - run:
@@ -77,17 +68,14 @@ jobs:
             cd /var/www/html/magento
             php bin/magento setup:di:compile
       - run:
-          name: Permissions
+          name: Setup & Configure Apache for Magento
           command: |
             cd /var/www/
             sudo chmod -R 777 html
-      - run:
-          name: Magento HTTP configuration
-          command: |
             sudo a2enmod rewrite
-            sudo cp ~/tnw_extension/apache.conf /etc/apache2/sites-available/apache.conf
-            sudo a2ensite apache
-            sudo service apache2 start
+            sudo cp ~/tnw_extension/.circleci/magento.conf /etc/apache2/sites-available/magento.conf
+            sudo a2ensite magento
+            sudo service apache2 restart
       - run:
           name: Get Magento Code Quality Tool
           command: |
@@ -96,7 +84,7 @@ jobs:
             cd magento-coding-standard
             composer install
       - run:
-          name: Run Magento Coding Standard
+          name: Run Magento Code Quality Tool
           command: |
             cd /var/www/html
             ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
