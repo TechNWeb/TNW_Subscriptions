@@ -25,9 +25,9 @@ class AdminLoginCest
     {
         $I->amOnPage('/admin');
         $I->fillField('#username','admin');
-        $I->fillField('#login','123123qa');
+        $I->fillField('#login','admin123');
         $I->click('Sign in');
-        $I->see('Dashboard1111');
-        $I->seeInCurrentUrl('/m2/admin/admin/dashboard');
+        $I->see('Dashboard');
+        $I->seeInCurrentUrl('/admin/admin/dashboard');
     }
 }
