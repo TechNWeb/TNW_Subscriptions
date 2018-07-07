@@ -86,13 +86,14 @@ jobs:
       - run:
           name: Magento HTTP configuration
           command: |
+            sudo nano /etc/apache2/conf.d/magento.conf
+            echo "ServerName 127.0.0.1" | sudo tee /etc/apache2/conf.d/magento.conf
             sudo service apache2 restart
             cd /var/www/html/magento
             find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
             find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
             chmod u+x bin/magento
             curl http://127.0.0.1/magento
-            curl http://172.26.0.3/magento
       #- run:
       #    name: Install Codeception
       #    command: |
