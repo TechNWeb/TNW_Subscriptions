@@ -10,24 +10,22 @@ use TNW_Subscriptions\AcceptanceTester;
  * @group TNW
  * @group Subscriptions
  */
-class AdminLoginCest
+class GeneralCest
 {
     public function _before(AcceptanceTester $I)
     {
+        $I->logInAsAdminUser();
     }
 
     public function _after(AcceptanceTester $I)
     {
+        // TODO: Logout
     }
 
-    // tests
-    public function tryToTest(AcceptanceTester $I)
+    public function seeMainMenuItem(AcceptanceTester $I)
     {
-        $I->amOnPage('/admin');
-        $I->fillField('#username','admin');
-        $I->fillField('#login','admin123');
-        $I->click('Sign in');
-        $I->see('Dashboard');
-        $I->seeInCurrentUrl('/admin/admin/dashboard');
+        $I->wantTo('See the if the main menu item is visible');
+        $I->see('#menu-tnw-subscriptions-top-level');
+        $I->see('mPower', '#menu-tnw-subscriptions-top-level .submenu-title');
     }
 }
