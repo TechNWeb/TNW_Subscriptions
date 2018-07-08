@@ -25,7 +25,6 @@ class GeneralCest
     {
         $I->wantTo('Log into Magento Admin.');
         $I->logInAsAdminUser();
-        $I->wantTo('See the if the main menu item is visible.');
         $I->seeElement('#menu-tnw-subscriptions-top-level');
         $I->see('mPower', '#menu-tnw-subscriptions-top-level .submenu-title');
     }
