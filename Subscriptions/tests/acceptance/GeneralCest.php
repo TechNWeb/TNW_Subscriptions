@@ -25,7 +25,7 @@ class GeneralCest
     public function seeMainMenuItem(AcceptanceTester $I)
     {
         $I->wantTo('See the if the main menu item is visible');
-        $I->see('#menu-tnw-subscriptions-top-level');
+        $I->seeElement('#menu-tnw-subscriptions-top-level');
         $I->see('mPower', '#menu-tnw-subscriptions-top-level .submenu-title');
     }
 }
