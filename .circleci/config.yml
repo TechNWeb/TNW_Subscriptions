@@ -45,7 +45,7 @@ jobs:
             mv ./magento2-$MAGENTO_VERSION/ ./magento
             cd magento
             composer install --prefer-dist
-            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box:8080 --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box:8080 --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password 123123qa --cleanup-database --use-rewrites 1
             ./bin/magento --version
       - run:
           name: Copy Extension Files
@@ -62,6 +62,15 @@ jobs:
             ./bin/magento module:status
             ./bin/magento module:enable TNW_Subscriptions
             ./bin/magento setup:upgrade
+      - run:
+          name: mPower (Basic Configuration)
+          command: |
+            cd /var/www/html/magento
+            ./bin/magento config:set tnw_subscriptions_general/general/active 1
+            ./bin/magento config:set tnw_subscriptions_product/general/infinite_subscriptions 1
+            ./bin/magento config:set tnw_subscriptions_general/advanced/log/status 1
+            ./bin/magento cache:clean
+            ./bin/magento cache:flush
       - run:
           name: Compile the Code
           command: |
@@ -98,7 +107,7 @@ jobs:
           name: Run Codeception Tests
           command: |
             cd /var/www/html/magento/app/code/TNW/Subscriptions
-            codecept run -g TNW -g Subscriptions
+            codecept run -g TNW -g Subscriptions --steps
   m224_php71:
     <<: *php71-base
     environment:

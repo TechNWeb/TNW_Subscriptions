@@ -1,0 +1,2 @@
+tests/acceptance/BillingFrequencyCest.php:validateBillingFrequencyPageName
+tests/acceptance/BillingFrequencyCest.php:validateBillingFrequencyButtonText

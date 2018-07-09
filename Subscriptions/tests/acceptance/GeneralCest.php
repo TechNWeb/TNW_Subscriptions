@@ -21,10 +21,21 @@ class GeneralCest
         // TODO: Logout
     }
 
-    public function seeMainMenuItem(AcceptanceTester $I)
-    {
-        $I->wantTo('Log into Magento Admin.');
+    public function testMagentoAdminLogin(AcceptanceTester $I) {
+        $I->wantTo('Test Admin Login');
+        $I->amGoingTo('Log into Magento Admin Panel');
         $I->logInAsAdminUser();
+        $I->expectTo('land on the dashboard');
+        $I->see('Dashboard');
+        $I->seeInCurrentUrl('/admin/admin/dashboard');
+    }
+
+    public function isMainMenuItemVisible(AcceptanceTester $I)
+    {
+        $I->wantTo('Test General Setup');
+        $I->logInAsAdminUser();
+        $I->amGoingTo('Check if the mPower extension is enabled');
+        $I->expectTo('see the main menu button');
         $I->seeElement('#menu-tnw-subscriptions-top-level');
         $I->see('mPower', '#menu-tnw-subscriptions-top-level .submenu-title');
     }

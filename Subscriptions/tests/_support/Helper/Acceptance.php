@@ -11,7 +11,7 @@ class Acceptance extends \Codeception\Module
      */
     public function logInAsAdminUser()
     {
-        $I = $this->getModule('PhpBrowser');;
+        $I = $this->getModule('PhpBrowser');
 
         /**
          * If we use WebDriver (selenium) then maybe it would be worth putting those
@@ -21,7 +21,7 @@ class Acceptance extends \Codeception\Module
 
         $I->amOnPage('/admin');
         $I->fillField('#username','admin');
-        $I->fillField('#login','admin123');
+        $I->fillField('#login','123123qa');
         $I->click('Sign in');
     }
 }

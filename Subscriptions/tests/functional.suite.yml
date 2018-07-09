@@ -10,3 +10,4 @@ modules:
     enabled:
         # add a framework module here
         - \TNW_Subscriptions\Helper\Functional
+        - \TNW_Subscriptions\Helper\Acceptance
