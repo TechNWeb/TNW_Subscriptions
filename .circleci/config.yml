@@ -68,7 +68,7 @@ jobs:
             cd /var/www/html/magento
             ./bin/magento config:set tnw_subscriptions_general/general/active 1
             ./bin/magento config:set tnw_subscriptions_product/general/infinite_subscriptions 1
-            ./bin/magento config:set tnw_subscriptions_general/advanced/log/status 1
+            ./bin/magento config:set tnw_subscriptions_general/advanced/log_status 1
             ./bin/magento cache:clean
             ./bin/magento cache:flush
       - run:
