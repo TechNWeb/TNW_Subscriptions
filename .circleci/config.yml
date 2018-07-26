@@ -89,11 +89,11 @@ jobs:
           command: |
             cd /var/www/html/magento
             ./bin/magento setup:di:compile
-      - run:
-          name: Run Codeception Tests
-          command: |
-            cd /var/www/html/magento/app/code/TNW/Subscriptions
-            codecept run -g TNW -g Subscriptions
+#      - run:
+#          name: Run Codeception Tests
+#          command: |
+#            cd /var/www/html/magento/app/code/TNW/Subscriptions
+#            codecept run -g TNW -g Subscriptions
       - run:
           name: Installing Magento EE
           command: |
