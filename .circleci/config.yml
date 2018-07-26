@@ -12,6 +12,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: docker
     environment:
       MAGENTO_VERSION: "2.2.5"
+      COMPOSER_AUTH: '{"http-basic": {"repo.magento.com": {"username": "a32f9576628eb71f11b1a381c900516c", "password": "eee87cca8b50f63c9664ead0d0d93d4b"}}}'
     working_directory: ~/tnw_extension
     steps:
       - checkout
