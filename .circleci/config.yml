@@ -38,36 +38,6 @@ jobs:
           name: Wait for DB
           command: dockerize -wait tcp://127.0.0.1:3306 -timeout 120s
       - run:
-          name: Installing Magento
-          command: |
-            cd /var/www/html/
-            wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
-            mv ./magento2-$MAGENTO_VERSION/ ./magento
-            cd magento
-            composer install --prefer-dist
-            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box:8080 --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
-            ./bin/magento --version
-      - run:
-          name: Copy Extension Files
-          command: |
-            cd /var/www/html/magento/app
-            mkdir -p code/TNW
-            cp -R ~/tnw_extension/* /var/www/html/magento/app/code/TNW
-            ls -la /var/www/html/magento/app/code/TNW
-      - run:
-          name: Install the Extension
-          command: |
-            cd /var/www/html/magento
-            rm -rf ./generated/*
-            ./bin/magento module:status
-            ./bin/magento module:enable TNW_Subscriptions
-            ./bin/magento setup:upgrade
-      - run:
-          name: Compile the Code
-          command: |
-            cd /var/www/html/magento
-            php bin/magento setup:di:compile
-      - run:
           name: Setup & Configure Apache for Magento
           command: |
             cd /var/www/
@@ -84,21 +54,79 @@ jobs:
             cd magento-coding-standard
             composer install
       - run:
-          name: Run Magento Code Quality Tool
-          command: |
-            cd /var/www/html
-            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
-      - run:
           name: Install Codeception
           command: |
             cd /var/www/
             sudo curl -LsS https://codeception.com/codecept.phar -o /usr/local/bin/codecept
             sudo chmod a+x /usr/local/bin/codecept
       - run:
+          name: Installing Magento
+          command: |
+            cd /var/www/html/
+            wget https://github.com/magento/magento2/archive/$MAGENTO_VERSION.tar.gz -O - | tar -xz
+            mv ./magento2-$MAGENTO_VERSION/ ./magento
+            cd magento
+            composer install --prefer-dist
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnw --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box:8080 --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento --version
+      - run:
+          name: Copy the Extension Files
+          command: |
+            cd /var/www/html/magento
+            mkdir -p ./app/code/TNW
+            cp -R ~/tnw_extension/* ./app/code/TNW
+            ls -la ./app/code/TNW
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html/magento
+            rm -rf ./generated/*
+            ./bin/magento module:status
+            ./bin/magento module:enable TNW_Subscriptions
+            ./bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html/magento
+            ./bin/magento setup:di:compile
+      - run:
           name: Run Codeception Tests
           command: |
             cd /var/www/html/magento/app/code/TNW/Subscriptions
             codecept run -g TNW -g Subscriptions
+      - run:
+          name: Installing Magento EE
+          command: |
+            cd /var/www/html/
+            composer create-project -s RC --repository-url=https://repo.magento.com/ magento/project-enterprise-edition magento2-ee-$MAGENTO_VERSION $MAGENTO_VERSION
+            cd magento2-ee-$MAGENTO_VERSION
+            ./bin/magento setup:install --backend-frontname admin --db-host 127.0.0.1 --db-prefix tnwee --db-name magento --db-user mage --db-password mage --base-url http://magento-qa.box/ --language en_US --timezone America/Chicago --currency USD --admin-lastname Admin --admin-firstname Admin --admin-email admin@example.com --admin-user admin --admin-password admin123 --cleanup-database --use-rewrites 1
+            ./bin/magento --version
+      - run:
+          name: Copy the Extension Files
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            mkdir -p ./app/code/TNW
+            cp -R ~/tnw_extension/* ./app/code/TNW
+            ls -la ./app/code/TNW
+      - run:
+          name: Install the Extension
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            rm -rf ./generated/*
+            ./bin/magento module:status
+            ./bin/magento module:enable TNW_Subscriptions
+            ./bin/magento setup:upgrade
+      - run:
+          name: Compile the Code
+          command: |
+            cd /var/www/html/magento2-ee-$MAGENTO_VERSION
+            ./bin/magento setup:di:compile
+      - run:
+          name: Run Magento Code Quality Tool
+          command: |
+            cd /var/www/html
+            ./magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
   m224_php71:
     <<: *php71-base
     environment:
