@@ -2,11 +2,11 @@
 /**
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
- *
  */
 namespace TNW\Subscriptions\Controller\Cart;
 
-use Magento\Framework\App\Action\Context;
+use Magento\Catalog\Controller\Product\View\ViewInterface;
+use Magento\Framework\App\Action;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Registry;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -17,19 +17,8 @@ use Psr\Log\LoggerInterface;
 /**
  * Configure product's options in subscription cart.
  */
-class Configure extends \Magento\Framework\App\Action\Action
-    implements \Magento\Catalog\Controller\Product\View\ViewInterface
+class Configure extends Action\Action implements ViewInterface
 {
-    /**
-     * @var ItemFactory
-     */
-    private $quoteItemFactory;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $quoteRepository;
-
     /**
      * @var LoggerInterface
      */
@@ -41,30 +30,40 @@ class Configure extends \Magento\Framework\App\Action\Action
     private $registry;
 
     /**
-     * @param Context $context
-     * @param ItemFactory $quoteItemFactory
-     * @param CartRepositoryInterface $quoteRepository
+     * @var \Magento\Framework\DataObjectFactory
+     */
+    private $dataObjectFactory;
+
+    /**
+     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
+     */
+    private $quoteSession;
+
+    /**
+     * @param Action\Context $context
      * @param LoggerInterface $logger
      * @param Registry $registry
+     * @param \Magento\Framework\DataObjectFactory $dataObjectFactory
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
      */
     public function __construct(
-        Context $context,
-        ItemFactory $quoteItemFactory,
-        CartRepositoryInterface $quoteRepository,
+        Action\Context $context,
         LoggerInterface $logger,
-        Registry $registry
+        Registry $registry,
+        \Magento\Framework\DataObjectFactory $dataObjectFactory,
+        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
     ) {
         parent::__construct($context);
         $this->logger = $logger;
-        $this->quoteItemFactory = $quoteItemFactory;
-        $this->quoteRepository = $quoteRepository;
         $this->registry = $registry;
+        $this->dataObjectFactory = $dataObjectFactory;
+        $this->quoteSession = $quoteSession;
     }
 
     /**
      * Action to reconfigure subscriptions cart item
      *
-     * @return \Magento\Framework\View\Result\Page|\Magento\Framework\Controller\Result\Redirect
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
@@ -78,12 +77,18 @@ class Configure extends \Magento\Framework\App\Action\Action
 
         try {
             if (!$quoteItem || $productId != $quoteItem->getProductId()) {
-                $this->messageManager->addError(__("We can't find the subscription item."));
+                $this->messageManager->addErrorMessage(__("We can't find the subscription item."));
 
                 return $this->goBack();
             }
 
-            $params = $this->getParams($quoteItem);
+            $params = $this->dataObjectFactory->create()
+                ->addData([
+                    'category_id' => false,
+                    'configure_mode' => true,
+                    'buy_request' => $quoteItem->getBuyRequest(),
+                ]);
+
             $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
             $this->_objectManager->get(\Magento\Catalog\Helper\Product\View::class)
                 ->prepareAndRender(
@@ -95,7 +100,7 @@ class Configure extends \Magento\Framework\App\Action\Action
 
             return $resultPage;
         } catch (\Exception $e) {
-            $this->messageManager->addError(__('We cannot configure the product.'));
+            $this->messageManager->addErrorMessage(__('We cannot configure the product.'));
             $this->logger->critical($e);
 
             return $this->goBack();
@@ -122,34 +127,15 @@ class Configure extends \Magento\Framework\App\Action\Action
      */
     private function initQuoteItem($quoteItemId)
     {
-        /** @var Item $quoteItem */
-        $quoteItem = $this->quoteItemFactory->create()->load($quoteItemId);
-        $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
-        $quoteItem->setQuote($quote);
-        $this->registry->register('old_quote_item_id', $quoteItemId);
+        foreach ($this->quoteSession->getSubQuotes() as $subQuote) {
+            if (!$quoteItem = $subQuote->getItemById($quoteItemId)) {
+                continue;
+            }
 
-        return $quoteItem;
-    }
-
-    /**
-     * Return additional params for quoteIem.
-     *
-     * @param Item $quoteItem
-     * @return \Magento\Framework\DataObject
-     */
-    private function getParams(Item $quoteItem)
-    {
-        $params = new \Magento\Framework\DataObject();
-        $params->setCategoryId(false);
-        $params->setConfigureMode(true);
-        $buyRequest = $quoteItem->getBuyRequest();
-        $attributes = $this->getRequest()->getParam('attributes');
-
-        if (!empty($attributes) && is_array($attributes)) {
-            $buyRequest->setSuperAttribute($attributes);
+            $this->registry->register('old_quote_item_id', $quoteItemId);
+            return $quoteItem;
         }
-        $params->setBuyRequest($buyRequest);
 
-        return $params;
+        return null;
     }
 }

@@ -22,7 +22,6 @@ define([
             setQtyFromFrequency: false,
             frequencyInputSelector: 'input[name="billing_frequency"]',
             qtyInputSelector: '#subscribe_qty',
-            qtyInputSelectorHidden: '#subscribe_qty_hidden',
             minicartSelector: '[data-block="minicart"]',
             messagesSelector: '[data-placeholder="messages"]',
             productStatusSelector: '.stock.available',
@@ -132,10 +131,8 @@ define([
          */
         _updateQtyFromFrequency: function () {
             var currentFrequency = $(this.options.frequencyInputSelector + ':checked'),
-                qtyInput = $(this.options.qtyInputSelector),
-                qtyInputHidden = $(this.options.qtyInputSelectorHidden);
+                qtyInput = $(this.options.qtyInputSelector);
             qtyInput.val(Number(currentFrequency.data('preset-qty')));
-            qtyInputHidden.val(Number(currentFrequency.data('preset-qty')));
         },
 
         /**

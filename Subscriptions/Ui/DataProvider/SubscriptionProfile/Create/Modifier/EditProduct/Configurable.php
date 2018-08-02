@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
-use Magento\Framework\UrlFactory;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
@@ -40,22 +39,22 @@ class Configurable extends Base
     /**
      * URL instance
      *
-     * @var UrlFactory
+     * @var UrlInterface
      */
-    private $urlFactory;
+    private $urlBuilder;
 
     /**
      * @param FormContext $formContext
      * @param Registry $registry
-     * @param UrlFactory $urlFactory
+     * @param UrlInterface $urlBuilder
      */
     public function __construct(
         FormContext $formContext,
         Registry $registry,
-        UrlFactory $urlFactory
+        UrlInterface $urlBuilder
     ) {
         $this->registry = $registry;
-        $this->urlFactory = $urlFactory;
+        $this->urlBuilder = $urlBuilder;
 
         parent::__construct($formContext);
     }
@@ -260,16 +259,9 @@ class Configurable extends Base
      */
     private function getConfigureUrl()
     {
-        /** @var UrlInterface $url */
-        $url = $this->urlFactory->create();
-
-        $params =  [
+        return $this->urlBuilder->getUrl('tnw_subscriptions/cart/configure', [
             'id' => $this->getItem()->getId(),
-            'product_id' => $this->getItem()->getProduct()->getId(),
-            'attributes' => $this->getItem()->getBuyRequest()->getSuperAttribute(),
-        ];
-
-        return $url->getUrl('tnw_subscriptions/cart/configure')
-            . '?' . http_build_query($params);
+            'product_id' => $this->getItem()->getProduct()->getId()
+        ]);
     }
 }

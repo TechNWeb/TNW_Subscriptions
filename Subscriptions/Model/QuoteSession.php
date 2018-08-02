@@ -205,19 +205,19 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
             $quoteIds = $this->getSubQuoteIds();
             $this->quotes = [];
             if ($quoteIds) {
-                $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-                    ModelQuote::KEY_ENTITY_ID,
-                    $quoteIds,
-                    'in'
-                )->create();
+                $searchCriteria = $this->searchCriteriaBuilder
+                    ->addFilter(ModelQuote::KEY_ENTITY_ID, $quoteIds, 'in')
+                    ->create();
+
                 $quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
                 $quotes = $this->quoteValidator->setSession($this)->validate($quotes);
-                $quoteIds = array_map(
-                    function (ModelQuote $quote) {
-                        return $quote->getId();
-                    },
-                    $quotes
-                );
+
+                $quoteIds = [];
+                foreach ($quotes as $quote) {
+                    $quote->setItems($quote->getAllVisibleItems());
+                    $quoteIds[] = $quote->getId();
+                }
+
                 $this->setSubQuoteIds($quoteIds);
                 $this->quotes = $quotes;
                 $this->processQuote();
