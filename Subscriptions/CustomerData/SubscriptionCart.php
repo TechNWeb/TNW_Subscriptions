@@ -86,7 +86,7 @@ class SubscriptionCart implements SectionSourceInterface
         }
 
         if ($itemsQty > 0) {
-            $href = $this->urlBuilder->getUrl('tnw_subscriptions/cart/index');
+            $href = $this->urlBuilder->getUrl('tnw_subscriptions/cart');
         }
 
         return [

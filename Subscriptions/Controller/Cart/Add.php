@@ -153,7 +153,7 @@ class Add extends Action
                         $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
                         $quoteItemToDelete = $quote->getItemById($quoteItem->getId());
                         $this->createProfile->removeSubscriptions($quoteItemToDelete);
-                        $redirectUrl = $this->_url->getUrl('tnw_subscriptions/cart/index');
+                        $redirectUrl = $this->_url->getUrl('tnw_subscriptions/cart');
                     }
                     if (isset($params['subscribe_qty'])) {
                         $filter = new \Zend_Filter_LocalizedToNormalized(

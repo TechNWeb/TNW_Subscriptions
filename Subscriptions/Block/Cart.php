@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Block;
 use Magento\Checkout\Block\Cart\Sidebar;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use TNW\Subscriptions\Model\Checkout\CompositeConfigProvider;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
@@ -17,11 +16,6 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
  */
 class Cart extends Template
 {
-    /**
-     * @var CompositeConfigProvider
-     */
-    private $configProvider;
-
     /**
      * @var Sidebar
      */
@@ -37,47 +31,18 @@ class Cart extends Template
      *
      * @param QuoteSessionInterface $quoteSession
      * @param Context $context
-     * @param CompositeConfigProvider $configProvider
      * @param Sidebar $sidebar
      * @param array $data
      */
     public function __construct(
         QuoteSessionInterface $quoteSession,
         Context $context,
-        CompositeConfigProvider $configProvider,
         Sidebar $sidebar,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->quoteSession = $quoteSession;
-        $this->configProvider = $configProvider;
-        $this->jsLayout = isset($data['jsLayout']) && is_array($data['jsLayout'])
-            ? $data['jsLayout']
-            : [];
         $this->sidebar = $sidebar;
-    }
-
-    /**
-     * Get JS layout
-     *
-     * @return string
-     */
-    public function getJsLayout()
-    {
-        //set config data
-        $this->jsLayout['components']['cart']['checkoutConfig'] = $this->getCheckoutConfig();
-
-        return \Zend_Json::encode($this->jsLayout);
-    }
-
-    /**
-     * Get subscriptions checkout configuration
-     *
-     * @return array
-     */
-    public function getCheckoutConfig()
-    {
-        return $this->configProvider->getConfig();
     }
 
     /**
@@ -108,5 +73,40 @@ class Cart extends Template
     public function getConfig()
     {
         return $this->sidebar->getConfig();
+    }
+
+    /**
+     * Return list of available checkout methods
+     *
+     * @param string $alias Container block alias in layout
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getMethods($alias)
+    {
+        $childName = $this->getLayout()->getChildName($this->getNameInLayout(), $alias);
+        if ($childName) {
+            return $this->getLayout()->getChildNames($childName);
+        }
+
+        return [];
+    }
+
+    /**
+     * Return HTML of checkout method (link, button etc.)
+     *
+     * @param string $name Block name in layout
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getMethodHtml($name)
+    {
+        $block = $this->getLayout()->getBlock($name);
+        if (!$block) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Invalid method: %1', $name));
+        }
+
+        return $block->toHtml();
     }
 }

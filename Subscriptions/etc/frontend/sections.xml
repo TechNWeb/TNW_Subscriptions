@@ -4,4 +4,10 @@
     <action name="tnw_subscriptions/cart/add">
         <section name="tnw-subscriptions-subscription-cart"/>
     </action>
+    <action name="checkout/cart/add">
+        <section name="tnw-subscriptions-subscription-cart"/>
+    </action>
+    <action name="checkout/cart/delete">
+        <section name="tnw-subscriptions-subscription-cart"/>
+    </action>
 </config>

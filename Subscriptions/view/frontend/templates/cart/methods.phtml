@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/** @var $block \TNW\Subscriptions\Block\Cart */
+?>
+<?php if (!$block->hasError()): ?>
+<?php $methods = $block->getMethods('methods') ?>
+<ul class="checkout methods items checkout-methods-items">
+<?php foreach ($methods as $method): ?>
+    <?php if ($methodHtml = $block->getMethodHtml($method)): ?>
+    <li class="item"><?= /* @escapeNotVerified */ $methodHtml ?></li>
+    <?php endif; ?>
+<?php endforeach; ?>
+</ul>
+<?php endif; ?>

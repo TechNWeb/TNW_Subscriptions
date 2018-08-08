@@ -1,0 +1,13 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+// @codingStandardsIgnoreFile
+/**  @var $block \TNW\Subscriptions\Block\Cart */
+?>
+<div class="cart-empty">
+    <p><?= /* @escapeNotVerified */ __('You have no items in your shopping cart.') ?></p>
+    <p><?php /* @escapeNotVerified */ echo __('Click <a href="%1">here</a> to continue shopping.',
+            $block->escapeUrl($block->getContinueShoppingUrl())) ?></p>
+</div>
