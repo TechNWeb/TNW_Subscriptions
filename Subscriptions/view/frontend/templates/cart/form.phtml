@@ -7,7 +7,7 @@
 
 /**  @var $block \TNW\Subscriptions\Block\Cart\Profile */
 ?>
-<form action="<?= /* @escapeNotVerified */ $block->getUrl('checkout/cart/updatePost') ?>"
+<form action="<?= /* @escapeNotVerified */ $block->getUrl('tnw_subscriptions/cart/updatePost') ?>"
       method="post"
       id="form-validate"
       data-mage-init='{"validation":{}}'
@@ -97,7 +97,7 @@
         .subscriptions-cart .items .item .details .name {
             display: block;
             hyphens: auto;
-            margin: 5px 0 15px;
+            margin: 5px 0 25px;
             word-wrap: break-word;
             font-weight: 400;
         }
@@ -141,19 +141,24 @@
             position: absolute;
             right: 0;
             margin-bottom: 20px;
+            text-align: right;
         }
 
-        .subscriptions-cart .items .item .details .price-container .price {
+        .subscriptions-cart .items .item .details .price-container span {
             font-size: 15px;
             font-weight: 600;
             display: inline-block;
         }
 
-        .subscriptions-cart .items .item .details .price-container .base-price.has-trial .price {
-            font-size: 20px;
+        .subscriptions-cart .items .item .details .price-container .price {
+            font-size: 32px;
         }
 
-        .subscriptions-cart .items .item .details .price-container .initial-price .price {
+        .subscriptions-cart .items .item .details .price-container .base-price.has-trial .price {
+            font-size: 22px;
+        }
+
+        .subscriptions-cart .items .item .details .price-container .subscription-price .price {
             font-size: 32px;
             font-weight: 600;
             display: inline-block;
@@ -161,8 +166,8 @@
         }
 
         @media (max-width: 768px) {
-            .subscriptions-cart .price-wrapper .price-container {
-                /*position: static;*/
+            .subscriptions-cart .items .item .details .price-container {
+                position: static;
             }
 
             .subscriptions-cart .items .item .details .description {
@@ -185,7 +190,7 @@
             <tr class="item-info">
                 <td class="col image">
                     <div class="image-wrapper">
-                        <?php echo $block->getItemImage($item->getProduct(), 'cart_page_product_thumbnail')->toHtml() ?>
+                        <?php echo $block->getItemImage($block->getItemPurchaseProduct($item), 'cart_page_product_thumbnail')->toHtml() ?>
                     </div>
                     <div class="buttons">
                         <?php if ($item->getProduct()->isVisibleInSiteVisibility()): ?>
@@ -193,16 +198,15 @@
                                href="<?= /* @escapeNotVerified */ $block->getOneTimeItemConfigureUrl($item) ?>"
                                title="<?= $block->escapeHtml(__('Edit item parameters')) ?>">
                                     <span>
-                                        <?= /* @escapeNotVerified */ __('Edit') ?>
+                                        <?= $block->escapeHtml(__('Edit')) ?>
                                     </span>
                             </a>
                         <?php endif ?>
-                        <a href="#"
+                        <a class="action action-delete"
                            title="<?= $block->escapeHtml(__('Remove item')) ?>"
-                           class="action action-delete"
-                           data-post='<?= /* @escapeNotVerified */ '' ?>'>
+                           href="<?= /* @escapeNotVerified */ $block->getOneTimeItemDeleteUrl($item) ?>">
                                 <span>
-                                    <?= /* @escapeNotVerified */ __('Remove item') ?>
+                                    <?= $block->escapeHtml(__('Remove item')) ?>
                                 </span>
                         </a>
                     </div>
@@ -215,13 +219,11 @@
                         <div class="description"><?php echo $block->escapeHtml($block->getItemDescription($item)) ?></div>
                         <div class="price-wrapper">
                             <div class="price-container">
-                                <div class="initial-price">
-                                    <span class="price">$40.00</span>
-                                </div>
+                                <?= /* @escapeNotVerified */ $block->getOneTimeItemPrice($item) ?>
                             </div>
                         </div>
                         <dl class="options">
-                            <dt>Qty</dt>
+                            <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
                             <dd class="control qty">
                                 <input name="cart[<?php echo $item->getItemId() ?>][qty]"
                                        value="<?php echo $item->getQty() ?>"
@@ -255,7 +257,7 @@
         <table class="data table">
             <caption class="table-caption">
                 <h2><?= /* @escapeNotVerified */ __('Subscription Profile #%1', ++$quoteIndex) ?></h2>
-                <p>Total of <b>6 shipments</b>. Products will be shipped <b>every</b> 7 days starting <b>today</b>.</p>
+                <p><?= /* @escapeNotVerified */ $block->frequencyDescription($subQuote) ?></p>
             </caption>
             <colgroup>
                 <col width="20%" />
@@ -266,7 +268,7 @@
                 <tr class="item-info">
                     <td class="col image">
                         <div class="image-wrapper">
-                            <?php echo $block->getItemImage($item->getProduct(), 'cart_page_product_thumbnail')->toHtml() ?>
+                            <?php echo $block->getItemImage($block->getItemPurchaseProduct($item), 'cart_page_product_thumbnail')->toHtml() ?>
                         </div>
                         <div class="buttons">
                             <?php if ($item->getProduct()->isVisibleInSiteVisibility()): ?>
@@ -274,16 +276,15 @@
                                    href="<?= /* @escapeNotVerified */ $block->getItemConfigureUrl($item) ?>"
                                    title="<?= $block->escapeHtml(__('Edit item parameters')) ?>">
                                     <span>
-                                        <?= /* @escapeNotVerified */ __('Edit') ?>
+                                        <?= $block->escapeHtml(__('Edit')) ?>
                                     </span>
                                 </a>
                             <?php endif ?>
-                            <a href="#"
+                            <a class="action action-delete"
                                title="<?= $block->escapeHtml(__('Remove item')) ?>"
-                               class="action action-delete"
-                               data-post='<?= /* @escapeNotVerified */ '' ?>'>
+                               href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($item) ?>">
                                 <span>
-                                    <?= /* @escapeNotVerified */ __('Remove item') ?>
+                                    <?= $block->escapeHtml(__('Remove item')) ?>
                                 </span>
                             </a>
                         </div>
@@ -293,18 +294,12 @@
                             <h3 class="name">
                                 <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a>
                             </h3>
-                            <div class="description"><?php echo $block->escapeHtml($block->getItemDescription($item)) ?></div>
+                            <div class="description"><?= /* @escapeNotVerified */ $block->getItemDescription($item) ?></div>
                             <div class="price-wrapper">
-                                <div class="price-container">
-                                    <div class="initial-price">
-                                        <span class="price">$50.00</span>
-                                        <span class="middle-text">initial payment</span>
-                                    </div>
-                                    <div class="base-price has-trial">then <span class="price">$40.00</span>/<span class="unit">month</span></div>
-                                </div>
+                                <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($item) ?></div>
                             </div>
                             <dl class="options">
-                                <dt>Qty</dt>
+                                <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
                                 <dd class="control qty">
                                     <input name="cart[<?php echo $item->getItemId() ?>][qty]"
                                            value="<?php echo $item->getQty() ?>"
@@ -313,6 +308,9 @@
                                            class="input-text qty"
                                            data-validate="{required:true,'validate-greater-than-zero':true}"
                                            data-role="cart-item-qty"
+                                           <?php if (!$block->allowEditSubscribeQty($item)) : ?>
+                                           readonly="readonly"
+                                           <?php endif ?>
                                            type="number">
                                 </dd>
                                 <?php foreach ($block->getItemOptions($item) as $option) : ?>

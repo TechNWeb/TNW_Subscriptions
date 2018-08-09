@@ -488,6 +488,6 @@ class Subscribe extends View
     {
         return $this->getProduct()->hasPreconfiguredValues()
             ? $this->getProduct()->getPreconfiguredValues()->getData($field)
-            : [];
+            : null;
     }
 }

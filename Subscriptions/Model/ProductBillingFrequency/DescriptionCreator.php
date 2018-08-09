@@ -155,7 +155,7 @@ class DescriptionCreator
             $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
             $lastPhrase = __('trial');
         } elseif ($initialFee) {
-            $middlePhrase = '';
+            $middlePhrase = ' ';
             $lastPhrase = __('initial payment');
         }
 
@@ -172,11 +172,12 @@ class DescriptionCreator
         }
 
         $total = $this->addContainer(
-            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']),
+            $this->formatPrice($itemTotal),
             'price'
         );
+
         $frequencyUnit = $this->addContainer(
-            '/' .$this->getFrequencyWithUnit( $subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
+            '/' .$this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
             'unit'
         );
 
