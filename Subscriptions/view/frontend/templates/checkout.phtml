@@ -6,8 +6,8 @@
 
 /** @var $block \TNW\Subscriptions\Block\Checkout */
 ?>
-<div id="tnw-subscriptions-cart" data-role="loader-container" data-bind="scope:'cart'" class="tnw-subscriptions-cart-container">
-    <div id="tnw-subscriptions-loader" data-role="cart-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
+<div id="tnw-subscriptions-checkout" data-role="loader-container" data-bind="scope:'checkout'" class="tnw-subscriptions-checkout-container">
+    <div id="tnw-subscriptions-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
         <div class="loader">
             <img src="<?php echo $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif')) ?>"
                  alt="<?php /* @noEscape */ echo __('Loading...') ?>"
@@ -17,17 +17,20 @@
     <!-- ko template: getTemplate() --><!-- /ko -->
     <script type="text/x-magento-init">
         {
-            "#tnw-subscriptions-cart": {
+            "#tnw-subscriptions-checkout": {
                 "Magento_Ui/js/core/app": <?php /* @noEscape */ echo $block->getJsLayout();?>
             }
         }
     </script>
+    <script type="text/javascript">
+        window.checkoutConfig = <?= /* @escapeNotVerified */ $block->getSerializedCheckoutConfig() ?>;
+        // Create aliases for customer.js model from customer module
+        window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+        window.customerData = window.checkoutConfig.customerData;
+        require([
+            'Magento_Ui/js/block-loader'
+        ], function(blockLoader) {
+            blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+        })
+    </script>
 </div>
-<script>
-    window.customerData = [];
-    require([
-        'Magento_Ui/js/block-loader'
-    ], function(blockLoader) {
-        blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
-    })
-</script>

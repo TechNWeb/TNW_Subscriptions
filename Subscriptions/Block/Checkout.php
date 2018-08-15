@@ -25,11 +25,17 @@ class Checkout extends Template
      */
     private $compositeConfigProvider;
 
+    /**
+     * @var \TNW\Subscriptions\Block\Checkout\LayoutProcessorInterface[]
+     */
+    private $layoutProcessors;
+
     public function __construct(
         Template\Context $context,
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Framework\Serialize\Serializer\Json $serializer,
         \TNW\Subscriptions\Model\Checkout\CompositeConfigProvider $compositeConfigProvider,
+        array $layoutProcessors = [],
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -38,6 +44,7 @@ class Checkout extends Template
         $this->jsLayout = isset($data['jsLayout']) && \is_array($data['jsLayout']) ? $data['jsLayout'] : [];
         $this->serializer = $serializer;
         $this->compositeConfigProvider = $compositeConfigProvider;
+        $this->layoutProcessors = $layoutProcessors;
     }
 
     /**
@@ -45,8 +52,9 @@ class Checkout extends Template
      */
     public function getJsLayout()
     {
-        //set config data
-        $this->jsLayout['components']['cart']['checkoutConfig'] = $this->getCheckoutConfig();
+        foreach ($this->layoutProcessors as $processor) {
+            $this->jsLayout = $processor->process($this->jsLayout);
+        }
 
         return $this->serializer->serialize($this->jsLayout);
     }
@@ -70,5 +78,23 @@ class Checkout extends Template
     public function getCheckoutConfig()
     {
         return $this->compositeConfigProvider->getConfig();
+    }
+
+    /**
+     * Get base url for block.
+     *
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        return $this->_storeManager->getStore()->getBaseUrl();
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getSerializedCheckoutConfig()
+    {
+        return $this->serializer->serialize($this->getCheckoutConfig());
     }
 }

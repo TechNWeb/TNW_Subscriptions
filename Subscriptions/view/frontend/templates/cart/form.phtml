@@ -14,87 +14,10 @@
       class="form form-cart subscriptions-cart">
     <?= $block->getBlockHtml('formkey') ?>
 
-    <?php if ($oneTimePurchase = $block->getQuote()) : ?>
-    <table class="data table">
-        <caption class="table-caption">
-            <h2><?= /* @escapeNotVerified */ __('One-Time Purchase') ?></h2>
-        </caption>
-        <colgroup>
-            <col width="20%" />
-            <col />
-        </colgroup>
-        <tbody class="items">
-        <?php foreach ($oneTimePurchase->getAllVisibleItems() as $item) : ?>
-            <tr class="item-info">
-                <td class="col image">
-                    <div class="image-wrapper">
-                        <?php echo $block->getItemImage($block->getItemPurchaseProduct($item), 'cart_page_product_thumbnail')->toHtml() ?>
-                    </div>
-                    <div class="buttons">
-                        <?php if ($item->getProduct()->isVisibleInSiteVisibility()): ?>
-                            <a class="action action-edit"
-                               href="<?= /* @escapeNotVerified */ $block->getOneTimeItemConfigureUrl($item) ?>"
-                               title="<?= $block->escapeHtml(__('Edit item parameters')) ?>">
-                                    <span>
-                                        <?= $block->escapeHtml(__('Edit')) ?>
-                                    </span>
-                            </a>
-                        <?php endif ?>
-                        <a class="action action-delete"
-                           title="<?= $block->escapeHtml(__('Remove item')) ?>"
-                           href="<?= /* @escapeNotVerified */ $block->getOneTimeItemDeleteUrl($item) ?>">
-                                <span>
-                                    <?= $block->escapeHtml(__('Remove item')) ?>
-                                </span>
-                        </a>
-                    </div>
-                </td>
-                <td class="col item">
-                    <div class="details">
-                        <h3 class="name">
-                            <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a>
-                        </h3>
-                        <div class="description"><?php echo $block->escapeHtml($block->getItemDescription($item)) ?></div>
-                        <div class="price-wrapper">
-                            <div class="price-container">
-                                <?= /* @escapeNotVerified */ $block->getOneTimeItemPrice($item) ?>
-                            </div>
-                        </div>
-                        <dl class="options">
-                            <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
-                            <dd class="control qty">
-                                <input name="cart[<?php echo $item->getItemId() ?>][qty]"
-                                       value="<?php echo $item->getQty() ?>"
-                                       size="4"
-                                       title="<?= $block->escapeHtml(__('Qty')) ?>"
-                                       class="input-text qty"
-                                       data-validate="{required:true,'validate-greater-than-zero':true}"
-                                       data-role="cart-item-qty"
-                                       type="number">
-                            </dd>
-                            <?php foreach ($block->getItemOptions($item) as $option) : ?>
-                                <?php $_formatedOptionValue = $block->getFormatedOptionValue($option) ?>
-                                <dt><?php echo $block->escapeHtml($option['label']); ?></dt>
-                                <dd>
-                                    <?php if (isset($_formatedOptionValue['full_view'])): ?>
-                                        <?= /* @escapeNotVerified */ $_formatedOptionValue['full_view'] ?>
-                                    <?php else: ?>
-                                        <?= /* @escapeNotVerified */ $_formatedOptionValue['value'] ?>
-                                    <?php endif; ?>
-                                </dd>
-                            <?php endforeach; ?>
-                        </dl>
-                    </div>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php endif; ?>
-    <?php foreach ($block->getSubQuotes() as $quoteIndex => $subQuote) : ?>
+    <?php foreach ($block->getSubQuotes() as $subQuote) : ?>
         <table class="data table">
             <caption class="table-caption">
-                <h2><?= /* @escapeNotVerified */ __('Subscription Profile #%1', ++$quoteIndex) ?></h2>
+                <h2><?= $block->escapeHtml($block->getCaption($subQuote)) ?></h2>
                 <p><?= /* @escapeNotVerified */ $block->frequencyDescription($subQuote) ?></p>
             </caption>
             <colgroup>

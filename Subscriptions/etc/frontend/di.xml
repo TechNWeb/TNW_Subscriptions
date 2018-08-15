@@ -12,9 +12,7 @@
     <type name="TNW\Subscriptions\Model\Checkout\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="products" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Products</item>
-                <item name="customer" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Customer</item>
-                <item name="shipping" xsi:type="object">TNW\Subscriptions\Model\Checkout\ConfigProvider\Shipping</item>
+                <item name="default_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\DefaultConfigProvider</item>
             </argument>
         </arguments>
     </type>

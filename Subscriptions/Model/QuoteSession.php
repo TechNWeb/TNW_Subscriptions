@@ -228,6 +228,18 @@ abstract class QuoteSession extends SessionManager implements QuoteSessionInterf
     }
 
     /**
+     * @inheritdoc
+     */
+    public function isSubscription($quote)
+    {
+        if ($quote instanceof ModelQuote) {
+            $quote = $quote->getId();
+        }
+
+        return \in_array($quote, (array)$this->storage->getSubQuoteIds());
+    }
+
+    /**
      * Removes quote from subscription quotes list.
      *
      * @param ModelQuote|string|int $quote

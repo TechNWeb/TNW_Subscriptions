@@ -6,18 +6,32 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <update handle="styles"/>
-    <update handle="tnw_subscriptions_checkout_default"/>
+    <head>
+        <css src="TNW_Subscriptions::css/checkout.css"/>
+    </head>
     <body>
         <referenceContainer name="content">
             <block class="TNW\Subscriptions\Block\Checkout" name="tnw_subscriptions.checkout.root" template="TNW_Subscriptions::checkout.phtml" cacheable="false">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array">
+                            <item name="form.input" xsi:type="array">
+                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="provider" xsi:type="string">checkoutProvider</item>
+                                    <item name="deps" xsi:type="array">
+                                        <item name="0" xsi:type="string">checkoutProvider</item>
+                                    </item>
+                                    <item name="template" xsi:type="string">ui/form/field</item>
+                                    <item name="elementTmpl" xsi:type="string">ui/form/element/input</item>
+                                </item>
+                            </item>
+                        </item>
                         <item name="components" xsi:type="array">
-                            <item name="cart" xsi:type="array">
+                            <item name="checkout" xsi:type="array">
                                 <item name="component" xsi:type="string">uiComponent</item>
                                 <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">TNW_Subscriptions/cart</item>
+                                    <item name="template" xsi:type="string">TNW_Subscriptions/checkout</item>
                                 </item>
                                 <item name="children" xsi:type="array">
                                     <item name="errors" xsi:type="array">
@@ -25,219 +39,201 @@
                                         <item name="component" xsi:type="string">Magento_Ui/js/view/messages</item>
                                         <item name="displayArea" xsi:type="string">messages</item>
                                     </item>
-                                    <item name="progressBar" xsi:type="array">
+                                    <item name="estimation" xsi:type="array">
                                         <item name="sortOrder" xsi:type="string">10</item>
-                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/view/progress-bar</item>
-                                        <item name="displayArea" xsi:type="string">progressBar</item>
+                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/estimation</item>
+                                        <item name="displayArea" xsi:type="string">estimation</item>
                                         <item name="config" xsi:type="array">
-                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/progress-bar</item>
-                                            <item name="steps" xsi:type="array">
-                                                <item name="0" xsi:type="array">
-                                                    <item name="code" xsi:type="string">products</item>
-                                                    <item name="alias" xsi:type="string"/>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_products_form</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="requestFieldName" xsi:type="string">modify_form_data</item>
-                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
-                                                    <item name="title" xsi:type="string" translate="true">Products</item>
-                                                    <item name="sortOrder" xsi:type="string">0</item>
-                                                    <item name="isActive" xsi:type="boolean">true</item>
-                                                </item>
-                                                <item name="1" xsi:type="array">
-                                                    <item name="code" xsi:type="string">registration</item>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_registration_form</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="title" xsi:type="string" translate="true">Registration</item>
-                                                    <item name="sortOrder" xsi:type="string">1</item>
-                                                    <item name="isActive" xsi:type="boolean">false</item>
-                                                </item>
-                                                <item name="2" xsi:type="array">
-                                                    <item name="code" xsi:type="string">shipping</item>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form</item>
-                                                        </item>
-                                                        <item name="right" xsi:type="array">
-                                                            <item name="type" xsi:type="string">listing</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="requestFieldName" xsi:type="string">account_form_data</item>
-                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
-                                                    <item name="stepActions" xsi:type="array">
-                                                        <item name="0" xsi:type="array">
-                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_shipping_form</item>
-                                                            <item name="actionName" xsi:type="string">save</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="title" xsi:type="string" translate="true">Shipping</item>
-                                                    <item name="sortOrder" xsi:type="string">2</item>
-                                                    <item name="isActive" xsi:type="boolean">false</item>
-                                                </item>
-                                                <item name="3" xsi:type="array">
-                                                    <item name="code" xsi:type="string">billing</item>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
-                                                        </item>
-                                                        <item name="right" xsi:type="array">
-                                                            <item name="type" xsi:type="string">listing</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="requestFieldName" xsi:type="string">billing_form_data</item>
-                                                    <item name="requestFieldValue" xsi:type="string">new_subscription</item>
-                                                    <item name="stepActions" xsi:type="array">
-                                                        <item name="0" xsi:type="array">
-                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_billing_form</item>
-                                                            <item name="actionName" xsi:type="string">save</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="title" xsi:type="string" translate="true">Billing</item>
-                                                    <item name="sortOrder" xsi:type="string">3</item>
-                                                    <item name="isActive" xsi:type="boolean">false</item>
-                                                </item>
-                                                <item name="4" xsi:type="array">
-                                                    <item name="code" xsi:type="string">payment</item>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
-                                                        </item>
-                                                        <item name="right" xsi:type="array">
-                                                            <item name="type" xsi:type="string">listing</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_product_listing</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="stepActions" xsi:type="array">
-                                                        <item name="0" xsi:type="array">
-                                                            <item name="targetName" xsi:type="string">tnw_subscriptionprofile_checkout_payment_form</item>
-                                                            <item name="actionName" xsi:type="string">beforeSubmit</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="title" xsi:type="string" translate="true">Payment</item>
-                                                    <item name="nextButtonTitle" xsi:type="string" translate="true">Place Order</item>
-                                                    <item name="sortOrder" xsi:type="string">4</item>
-                                                    <item name="isActive" xsi:type="boolean">false</item>
-                                                </item>
-                                                <item name="5" xsi:type="array">
-                                                    <item name="code" xsi:type="string">thankyou</item>
-                                                    <item name="blocks" xsi:type="array">
-                                                        <item name="content" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_thankyoupage_form</item>
-                                                        </item>
-                                                        <item name="messages" xsi:type="array">
-                                                            <item name="type" xsi:type="string">form</item>
-                                                            <item name="handle" xsi:type="string">tnw_subscriptionprofile_checkout_messages</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="stepActions" xsi:type="array">
-                                                        <item name="0" xsi:type="array">
-                                                            <item name="targetName" xsi:type="string">steps</item>
-                                                            <item name="actionName" xsi:type="string">redirectToCatalog</item>
-                                                        </item>
-                                                    </item>
-                                                    <item name="title" xsi:type="string" translate="true">Thank You!</item>
-                                                    <item name="nextButtonTitle" xsi:type="string" translate="true">Browse Catalog</item>
-                                                    <item name="sortOrder" xsi:type="string">5</item>
-                                                    <item name="isActive" xsi:type="boolean">false</item>
-                                                </item>
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/estimation</item>
+                                            <item name="deps" xsi:type="array">
+                                                <item name="0" xsi:type="string">checkout.sidebar</item>
                                             </item>
-                                        </item>
-                                    </item>
-                                    <item name="next_step" xsi:type="array">
-                                        <item name="sortOrder" xsi:type="string">20</item>
-                                        <item name="component" xsi:type="string">uiComponent</item>
-                                        <item name="displayArea" xsi:type="string">nextStep</item>
-                                        <item name="config" xsi:type="array">
-                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/next-step</item>
-                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/action/next-step</item>
                                         </item>
                                     </item>
                                     <item name="steps" xsi:type="array">
-                                        <item name="config" xsi:type="array">
-                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/steps</item>
-                                        </item>
-                                        <item name="displayArea" xsi:type="string">steps</item>
-                                        <item name="sortOrder" xsi:type="string">30</item>
-                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/model/steps</item>
-                                        <item name="provider" xsi:type="string">cart.data_source</item>
-                                        <item name="deps" xsi:type="string">cart.data_source</item>
-                                        <item name="handle" xsi:type="string">tnw_subscriptions_subscriptionprofile_checkout</item>
-                                        <item name="children" xsi:type="array">
-                                            <item name="insert_form_messages" xsi:type="array">
-                                                <item name="displayArea" xsi:type="string">insert_form</item>
-                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
-                                                <item name="autoRender" xsi:type="boolean">false</item>
-                                                <item name="formSubmitType" xsi:type="string">ajax</item>
-                                                <item name="cssPrefix" xsi:type="string">checkout_content</item>
-                                            </item>
-                                            <item name="insert_form_content" xsi:type="array">
-                                                <item name="displayArea" xsi:type="string">insert_form</item>
-                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
-                                                <item name="autoRender" xsi:type="boolean">false</item>
-                                                <item name="formSubmitType" xsi:type="string">ajax</item>
-                                                <item name="cssPrefix" xsi:type="string">checkout_content</item>
-                                            </item>
-                                            <item name="insert_form_right" xsi:type="array">
-                                                <item name="displayArea" xsi:type="string">insert_form</item>
-                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-form</item>
-                                                <item name="autoRender" xsi:type="boolean">false</item>
-                                                <item name="formSubmitType" xsi:type="string">ajax</item>
-                                                <item name="cssPrefix" xsi:type="string">checkout_right</item>
-                                            </item>
-                                        </item>
-                                    </item>
-                                    <item name="data_source" xsi:type="array">
-                                        <item name="displayArea" xsi:type="string">data_source</item>
-                                        <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
-                                    </item>
-                                    <item name="bottom_next_step" xsi:type="array">
-                                        <item name="sortOrder" xsi:type="string">50</item>
                                         <item name="component" xsi:type="string">uiComponent</item>
-                                        <item name="displayArea" xsi:type="string">bottomNextStep</item>
+                                        <item name="displayArea" xsi:type="string">steps</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="shipping" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/shipping</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/checkout/shipping</item>
+                                                    <item name="deps" xsi:type="array">
+                                                        <item name="0" xsi:type="string">checkoutProvider</item>
+                                                    </item>
+                                                </item>
+                                                <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                <item name="sortOrder" xsi:type="string">1</item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="customer-email" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/email</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/form/element/email</item>
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">customer-email</item>
+                                                        <item name="tooltip" xsi:type="array">
+                                                            <item name="description" xsi:type="string" translate="true">We'll send your order confirmation here.</item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="before-login-form" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                                <item name="displayArea" xsi:type="string">before-login-form</item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- before login form fields -->
+                                                                </item>
+                                                            </item>
+                                                            <item name="additional-login-form-fields" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                                <item name="displayArea" xsi:type="string">additional-login-form-fields</item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- additional login form fields -->
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="address-list" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/shipping/list</item>
+                                                        <item name="displayArea" xsi:type="string">address-list</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/shipping/list</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                            <item name="discount" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/discount</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/checkout/discount</item>
+                                                    <item name="deps" xsi:type="array">
+                                                        <item name="0" xsi:type="string">checkoutProvider</item>
+                                                    </item>
+                                                </item>
+                                                <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                <item name="sortOrder" xsi:type="string">2</item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="errors" xsi:type="array">
+                                                        <item name="sortOrder" xsi:type="string">0</item>
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/discount/messages</item>
+                                                        <item name="displayArea" xsi:type="string">messages</item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                            <item name="payment" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/payment</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/checkout/payment</item>
+                                                    <item name="deps" xsi:type="array">
+                                                        <item name="0" xsi:type="string">checkoutProvider</item>
+                                                    </item>
+                                                </item>
+                                                <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                <item name="sortOrder" xsi:type="string">3</item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="renders" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="children" xsi:type="array">
+                                                            <!-- merge payment method renders here -->
+                                                        </item>
+                                                    </item>
+                                                    <item name="additional-payment-validators" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="children" xsi:type="array">
+                                                            <!-- merge payment validators here -->
+                                                            <item name="email-validator" xsi:type="array">
+                                                                <item name="component" xsi:type="string">Magento_Checkout/js/view/payment/email-validator</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="customer-email" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/email</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/form/element/email</item>
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">customer-email</item>
+                                                        <item name="tooltip" xsi:type="array">
+                                                            <item name="description" xsi:type="string" translate="true">We'll send your order confirmation here.</item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="before-login-form" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                                <item name="displayArea" xsi:type="string">before-login-form</item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- before login form fields -->
+                                                                </item>
+                                                            </item>
+                                                            <item name="additional-login-form-fields" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                                <item name="displayArea" xsi:type="string">additional-login-form-fields</item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- additional login form fields -->
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="payments-list" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/payment/list</item>
+                                                        <item name="displayArea" xsi:type="string">payment-methods-list</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/payment/list</item>
+                                                            <item name="deps" xsi:type="array">
+                                                                <item name="0" xsi:type="string">checkout.steps.payment.renders</item>
+                                                                <item name="1" xsi:type="string">checkout.steps.payment.additional-payment-validators</item>
+                                                            </item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="before-place-order" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                                <item name="displayArea" xsi:type="string">before-place-order</item>
+                                                                <item name="dataScope" xsi:type="string">before-place-order</item>
+                                                                <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                                <item name="config" xsi:type="array">
+                                                                    <item name="template" xsi:type="string">Magento_Checkout/payment/before-place-order</item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="sidebar" xsi:type="array">
+                                        <item name="sortOrder" xsi:type="string">50</item>
+                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/sidebar</item>
+                                        <item name="displayArea" xsi:type="string">sidebar</item>
                                         <item name="config" xsi:type="array">
-                                            <item name="template" xsi:type="string">TNW_Subscriptions/cart/next-step</item>
-                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/ui/cart/action/next-step</item>
+                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/sidebar</item>
+                                            <item name="deps" xsi:type="array">
+                                                <item name="0" xsi:type="string">checkout.steps</item>
+                                            </item>
+                                        </item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="summary" xsi:type="array">
+                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/summary</item>
+                                                <item name="displayArea" xsi:type="string">summary</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary</item>
+                                                </item>
+                                                <item name="children" xsi:type="array">
+
+                                                </item>
+                                            </item>
                                         </item>
                                     </item>
                                 </item>
+                            </item>
+                            <item name="checkoutProvider" xsi:type="array">
+                                <item name="component" xsi:type="string">uiComponent</item>
                             </item>
                         </item>
                     </argument>
                 </arguments>
             </block>
         </referenceContainer>
+        <referenceContainer name="page.messages" remove="true"/>
+        <referenceContainer name="authentication-popup" remove="true"/>
+        <referenceContainer name="customer.section.config" remove="true"/>
+        <referenceContainer name="product.price.render.default" remove="true"/>
+        <referenceContainer name="customer.customer.data" remove="true"/>
+        <move element="logo" destination="checkout.header.wrapper"/>
     </body>
 </page>

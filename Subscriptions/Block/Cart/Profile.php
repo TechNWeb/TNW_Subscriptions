@@ -10,11 +10,6 @@ use Magento\Framework\View\Element\Template;
 class Profile extends Template
 {
     /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    private $checkoutSession;
-
-    /**
      * @var \TNW\Subscriptions\Model\QuoteSessionInterface
      */
     private $quoteSession;
@@ -46,7 +41,6 @@ class Profile extends Template
 
     public function __construct(
         Template\Context $context,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
         \Magento\Catalog\Helper\Product\Configuration $configuration,
         \Magento\Catalog\Block\Product\ImageBuilder $imageBuilder,
@@ -56,26 +50,12 @@ class Profile extends Template
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->checkoutSession = $checkoutSession;
         $this->quoteSession = $quoteSession;
         $this->configuration = $configuration;
         $this->imageBuilder = $imageBuilder;
         $this->descriptionCreator = $descriptionCreator;
         $this->priceCurrency = $priceCurrency;
         $this->formKey = $formKey;
-    }
-
-    /**
-     * @return \Magento\Quote\Model\Quote|null
-     */
-    public function getQuote()
-    {
-        $quote = $this->checkoutSession->getQuote();
-        if (empty($quote->getAllVisibleItems())) {
-            return null;
-        }
-
-        return $quote;
     }
 
     /**
@@ -149,49 +129,15 @@ class Profile extends Template
      *
      * @return string
      */
-    public function getOneTimeItemConfigureUrl($item)
-    {
-        return $this->getUrl('checkout/cart/configure', [
-            'id' => $item->getId(),
-            'product_id' => $item->getProduct()->getId()
-        ]);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote\Item $item
-     *
-     * @return string
-     */
-    public function getOneTimeItemDeleteUrl($item)
-    {
-        return $this->getUrl('checkout/cart/delete', [
-            'id' => $item->getId(),
-            'form_key' => $this->formKey->getFormKey()
-        ]);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote\Item $item
-     *
-     * @return string
-     */
-    public function getOneTimeItemPrice($item)
-    {
-        return $this->priceCurrency->format(
-            $item->getRowTotal(),
-            true,
-            \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
-            $item->getStore()
-        );
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote\Item $item
-     *
-     * @return string
-     */
     public function getItemConfigureUrl($item)
     {
+        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
+            return $this->getUrl('checkout/cart/configure', [
+                'id' => $item->getId(),
+                'product_id' => $item->getProduct()->getId()
+            ]);
+        }
+
         return $this->getUrl('tnw_subscriptions/cart/configure', [
            'id' => $item->getId(),
            'product_id' => $item->getProduct()->getId()
@@ -205,6 +151,13 @@ class Profile extends Template
      */
     public function getItemDeleteUrl($item)
     {
+        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
+            return $this->getUrl('checkout/cart/delete', [
+                'id' => $item->getId(),
+                'form_key' => $this->formKey->getFormKey()
+            ]);
+        }
+
         return $this->getUrl('tnw_subscriptions/cart/delete', [
             'id' => $item->getId(),
             'form_key' => $this->formKey->getFormKey()
@@ -251,7 +204,22 @@ class Profile extends Template
      */
     public function getSubQuotes()
     {
-        return array_values($this->quoteSession->getSubQuotes());
+        return $this->quoteSession->getSubQuotes();
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     */
+    public function getCaption($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return __('One-Time Purchase');
+        }
+
+        static $quoteIndex = 0;
+        return __('Subscription Profile #%1', ++$quoteIndex);
     }
 
     /**
@@ -262,6 +230,10 @@ class Profile extends Template
      */
     public function frequencyDescription($quote)
     {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return '';
+        }
+
         $fullSubscriptionData = null;
 
         $initialFee = $price = 0;
@@ -289,6 +261,15 @@ class Profile extends Template
      */
     public function getItemPrice($item)
     {
+        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
+            return $this->priceCurrency->format(
+                $item->getRowTotal(),
+                true,
+                \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
+                $item->getStore()
+            );
+        }
+
         return $this->descriptionCreator
             ->getDescribedItemPriceHtml(
                 $item->getRowTotal(),
