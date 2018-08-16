@@ -74,4 +74,11 @@
             <argument name="editAllow" xsi:type="boolean">false</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Block\Checkout">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="addressFormAttributes" xsi:type="object">TNW\Subscriptions\Block\Checkout\AddressProcessor</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

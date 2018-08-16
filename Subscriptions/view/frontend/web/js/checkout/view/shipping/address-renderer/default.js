@@ -7,8 +7,9 @@ define([
     'jquery',
     'ko',
     'uiComponent',
-    'Magento_Customer/js/customer-data'
-], function ($, ko, Component, customerData) {
+    'Magento_Customer/js/customer-data',
+    'TNW_Subscriptions/js/checkout/model/shipping-address/form-popup-state'
+], function ($, ko, Component, customerData, formPopUpState) {
     'use strict';
 
     var countryData = customerData.get('directory-data');
@@ -45,6 +46,7 @@ define([
          * Edit address.
          */
         editAddress: function () {
+            formPopUpState.isVisible(true);
             this.showPopup();
         },
 

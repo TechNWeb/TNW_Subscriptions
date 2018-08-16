@@ -9,9 +9,7 @@
 <!-- ko foreach: getRegion('before-login-form') -->
     <!-- ko template: getTemplate() --><!-- /ko -->
 <!-- /ko -->
-<form class="form form-login" data-role="email-with-possible-login"
-      data-bind="submit:login"
-      method="post">
+<form class="form form-login" data-role="email-with-possible-login" data-bind="submit:login" method="post">
     <fieldset id="customer-email-fieldset" class="fieldset" data-bind="blockLoader: isLoading">
         <div class="field required">
             <label class="label" for="customer-email">
@@ -49,7 +47,6 @@
                            data-validate="{required:true}" autocomplete="off"/>
                     <span class="note" data-bind="i18n: 'You already have an account with us. Sign in or continue as guest.'"></span>
                 </div>
-
             </div>
             <!-- ko foreach: getRegion('additional-login-form-fields') -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
@@ -57,7 +54,9 @@
             <div class="actions-toolbar">
                 <input name="context" type="hidden" value="checkout" />
                 <div class="primary">
-                    <button type="submit" class="action login primary" data-action="checkout-method-login"><span data-bind="i18n: 'Login'"></span></button>
+                    <button type="submit" class="action login primary" data-action="checkout-method-login">
+                        <span data-bind="i18n: 'Login'"></span>
+                    </button>
                 </div>
                 <div class="secondary">
                     <a class="action remind" data-bind="attr: { href: forgotPasswordUrl }">

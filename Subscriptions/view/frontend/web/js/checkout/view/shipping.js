@@ -11,6 +11,7 @@ define([
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
+    'TNW_Subscriptions/js/checkout/model/shipping-address/form-popup-state',
     'Magento_Ui/js/modal/modal',
     'uiRegistry',
     'mage/translate'
@@ -22,6 +23,7 @@ define([
     customer,
     addressList,
     shippingService,
+    formPopUpState,
     modal,
     registry,
     $t
@@ -39,7 +41,7 @@ define([
         visible: ko.observable(true),
         errorValidationMessage: ko.observable(false),
         isCustomerLoggedIn: customer.isLoggedIn,
-        isFormPopUpVisible: ko.observable(false),
+        isFormPopUpVisible: formPopUpState.isVisible,
         isFormInline: addressList().length === 0,
         isNewAddressAdded: ko.observable(false),
         saveInAddressBook: 1,

@@ -28,9 +28,11 @@
         window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
         window.customerData = window.checkoutConfig.customerData;
         require([
+            'mage/url',
             'Magento_Ui/js/block-loader'
-        ], function(blockLoader) {
+        ], function(url, blockLoader) {
             blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+            return url.setBaseUrl('<?= /* @escapeNotVerified */ $block->getBaseUrl() ?>');
         })
     </script>
 </div>

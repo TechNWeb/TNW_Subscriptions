@@ -5,7 +5,7 @@
  */
 -->
 <li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
-    <div class="step-title" translate="'Shipping Address'" data-role="title" />
+    <div class="step-title" data-role="title"  data-bind="i18n: 'Shipping Address'"></div>
     <div id="checkout-step-shipping" class="step-content" data-role="content">
         <!-- ko if: (!quoteIsVirtual) -->
             <!-- ko foreach: getRegion('customer-email') -->
@@ -21,15 +21,12 @@
 
         <!-- Address form pop up -->
         <!-- ko if: (!isFormInline) -->
-            <button type="button"
-                    class="action action-show-popup"
-                    click="showFormPopUp"
-                    visible="!isNewAddressAdded()">
-                <span translate="'New Address'" />
+            <button type="button" class="action action-show-popup" data-bind="click: showFormPopUp, visible: !isNewAddressAdded()">
+                <span data-bind="i18n: 'New Address'"></span>
             </button>
-            <div id="tsc-new-shipping-address"
-                 data-bind="visible: isFormPopUpVisible()"
-                 render="shippingFormTemplate" />
+            <div id="tsc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
+                <!--ko template: shippingFormTemplate--><!--/ko-->
+            </div>
         <!--/ko-->
 
         <!-- ko foreach: getRegion('before-form') -->
@@ -37,49 +34,39 @@
         <!--/ko-->
 
         <!-- Inline address form -->
-        <render if="isFormInline" args="shippingFormTemplate" />
+        <!-- ko if: isFormInline -->
+            <!-- ko template: shippingFormTemplate --><!-- /ko -->
+        <!--/ko-->
     </div>
 </li>
 
 <!--Shipping method template-->
 <li id="shipping-method" class="checkout-shipping-method" data-bind="fadeVisible: visible(), blockLoader: isLoading">
     <div class="checkout-shipping-method">
-        <div class="step-title" translate="'Shipping Methods'" data-role="title"></div>
-
-        <each args="getRegion('before-shipping-method-form')" render="" />
-
-        <div id="checkout-step-shipping_method"
-             class="step-content"
-             data-role="content"
-             role="tabpanel"
-             aria-hidden="false">
-            <form id="co-shipping-method-form"
-                  class="form methods-shipping"
-                  if="rates().length"
-                  submit="setShippingInformation"
-                  novalidate="novalidate">
-
-                <render args="shippingMethodListTemplate"/>
-
+        <div class="step-title" data-role="title" data-bind="i18n: 'Shipping Methods'"></div>
+        <!-- ko foreach: getRegion('before-shipping-method-form') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div id="checkout-step-shipping_method" class="step-content methods-shipping" data-role="content">
+            <form id="co-shipping-method-form" class="form" data-bind="if: rates().length, submit: setShippingInformation" novalidate="novalidate">
+                <!-- ko template: shippingMethodListTemplate --><!-- /ko -->
                 <div id="onepage-checkout-shipping-method-additional-load">
-                    <each args="getRegion('shippingAdditional')" render="" />
+                    <!-- ko foreach: getRegion('shippingAdditional') -->
+                        <!-- ko template: getTemplate() --><!-- /ko -->
+                    <!--/ko-->
                 </div>
-                <div role="alert"
-                     if="errorValidationMessage().length"
-                     class="message notice">
-                    <span text="errorValidationMessage()" />
+                <div role="alert" data-bind="if: errorValidationMessage().length" class="message notice">
+                    <span data-bind="text: errorValidationMessage()"></span>
                 </div>
                 <div class="actions-toolbar" id="shipping-method-buttons-container">
                     <div class="primary">
                         <button data-role="opc-continue" type="submit" class="button action continue primary">
-                            <span translate="'Next'" />
+                            <span data-bind="i18n: 'Next'"></span>
                         </button>
                     </div>
                 </div>
             </form>
-            <div class="no-quotes-block"
-                 ifnot="rates().length > 0"
-                 translate="'Sorry, no quotes are available for this order at this time'" />
+            <div class="no-quotes-block" data-bind="ifnot: rates().length > 0, i18n: 'Sorry, no quotes are available for this order at this time'"></div>
         </div>
     </div>
 </li>
