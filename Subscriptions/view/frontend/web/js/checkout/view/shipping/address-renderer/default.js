@@ -8,8 +8,9 @@ define([
     'ko',
     'uiComponent',
     'Magento_Customer/js/customer-data',
-    'TNW_Subscriptions/js/checkout/model/shipping-address/form-popup-state'
-], function ($, ko, Component, customerData, formPopUpState) {
+    'TNW_Subscriptions/js/checkout/model/profile',
+    'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state'
+], function ($, ko, Component, customerData, profile, formPopUpState) {
     'use strict';
 
     var countryData = customerData.get('directory-data');
@@ -23,7 +24,14 @@ define([
         initObservable: function () {
             this._super();
             this.isSelected = ko.computed(function () {
-                return false;
+                var isSelected = false,
+                    shippingAddress = profile.shippingAddress();
+
+                if (shippingAddress) {
+                    isSelected = shippingAddress.getKey() == this.address().getKey();
+                }
+
+                return isSelected;
             }, this);
 
             return this;
@@ -34,12 +42,14 @@ define([
          * @return {String}
          */
         getCountryName: function (countryId) {
-            return countryData()[countryId] != undefined ? countryData()[countryId].name : ''; //eslint-disable-line
+            return countryData()[countryId] != undefined
+                ? countryData()[countryId].name
+                : '';
         },
 
         /** Set selected customer shipping address  */
         selectAddress: function () {
-
+            profile.shippingAddress(this.address());
         },
 
         /**
@@ -54,7 +64,7 @@ define([
          * Show popup.
          */
         showPopup: function () {
-            $('[data-open-modal="opc-new-shipping-address"]').trigger('click');
+            $('[data-open-modal="tsc-new-shipping-address"]').trigger('click');
         }
     });
 });

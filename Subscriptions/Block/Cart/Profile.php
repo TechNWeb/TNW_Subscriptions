@@ -234,25 +234,40 @@ class Profile extends Template
             return '';
         }
 
+        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        return $this->descriptionCreator->getDescription($fullSubscriptionData);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array
+     */
+    private function fullSubscriptionData($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return [];
+        }
+
         $fullSubscriptionData = null;
 
-        $initialFee = $price = 0;
+        $initialFee = 0;
         foreach ($quote->getAllVisibleItems() as $item) {
             if (!$fullSubscriptionData) {
                 $fullSubscriptionData = $item->getBuyRequest()
                     ->getDataByPath('subscription_data');
             }
 
-            $price += $item->getBuyRequest()->getDataByPath('subscription_data/non_unique/price') * $item->getQty();
             $initialFee += $this->getInitialFeeFromItem($item);
         }
 
-        $fullSubscriptionData['non_unique']['price'] = $price;
+        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
         $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
+        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
         $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
         $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
 
-        return $this->descriptionCreator->getDescription($fullSubscriptionData);
+        return $fullSubscriptionData;
     }
 
     /**
@@ -270,12 +285,35 @@ class Profile extends Template
             );
         }
 
-        return $this->descriptionCreator
-            ->getDescribedItemPriceHtml(
-                $item->getRowTotal(),
-                $item->getBuyRequest()->getDataByPath('subscription_data'),
-                $this->getInitialFeeFromItem($item)
+        return $this->descriptionCreator->getDescribedItemPriceHtml(
+            $item->getRowTotal(),
+            $item->getBuyRequest()->getDataByPath('subscription_data'),
+            $this->getInitialFeeFromItem($item)
+        );
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     */
+    public function getSubtotal($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return $this->priceCurrency->format(
+                $quote->getSubtotal(),
+                true,
+                \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
+                $quote->getStore()
             );
+        }
+
+        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        return $this->descriptionCreator->getDescribedItemPriceHtml(
+            $quote->getSubtotal(),
+            $fullSubscriptionData,
+            $fullSubscriptionData['non_unique']['initialPrice']
+        );
     }
 
     /**

@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/** @var $block \TNW\Subscriptions\Block\Cart\Profile */
+?>
+<div id="cart-totals" class="cart-totals">
+    <?php foreach ($block->getSubQuotes() as $subQuote) : ?>
+    <table class="data table totals">
+        <caption class="table-caption">
+            <h3><?= $block->escapeHtml($block->getCaption($subQuote)) ?></h3>
+        </caption>
+        <tfoot>
+        <tr class="totals">
+            <th class="mark"><?= $block->escapeHtml(__('Subtotal')) ?></th>
+            <td class="amount">
+                <?= /* @escapeNotVerified */ $block->getSubtotal($subQuote) ?>
+            </td>
+        </tr>
+        </tfoot>
+        <tbody>
+        <?php foreach ($subQuote->getAllVisibleItems() as $item) : ?>
+        <tr class="totals">
+            <th class="mark" colspan="2">
+                <span class="label product-name"><?php echo $item->getQty() ?>x <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a></span>
+            </th>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endforeach; ?>
+</div>

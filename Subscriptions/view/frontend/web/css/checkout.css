@@ -153,7 +153,7 @@
     margin: 20px 0;
 }
 .tnw-subscriptions-checkout-container .checkout-discount .form.discount {
-    max-width: 500px;
+    max-width: 300px;
 }
 .tnw-subscriptions-checkout-container .checkout-discount .form.discount .field .label {
     border: 0;
@@ -203,14 +203,17 @@
     }
     .tnw-subscriptions-checkout-container .checkout-discount .actions-toolbar {
         text-align: left;
+        position: relative;
     }
     .tnw-subscriptions-checkout-container .checkout-discount .actions-toolbar > .primary .action {
         margin-bottom: 0;
         width: auto;
     }
     .tnw-subscriptions-checkout-container .checkout-discount .actions-toolbar .primary {
-        float: right;
         margin: 0;
+        position: absolute;
+        right: -159px;
+        top: -52px;
     }
     .tnw-subscriptions-checkout-container .tsc-wrapper .form-login,
     .tnw-subscriptions-checkout-container .tsc-wrapper .form-shipping-address {

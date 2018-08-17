@@ -22,6 +22,9 @@
                                     <argument name="css_class" xsi:type="string">summary title</argument>
                                 </arguments>
                             </block>
+                            <container name="tnw_subscriptions.cart.totals.container" as="totals" label="Shopping Cart Totals">
+                                <block class="TNW\Subscriptions\Block\Cart\Profile" name="tnw_subscriptions.cart.totals" template="TNW_Subscriptions::cart/totals.phtml" />
+                            </container>
                             <block class="TNW\Subscriptions\Block\Cart" name="tnw_subscriptions.cart.methods.bottom" template="TNW_Subscriptions::cart/methods.phtml">
                                 <container name="tnw_subscriptions.cart.methods" as="methods">
                                     <block class="TNW\Subscriptions\Block\Checkout\Link" name="tnw_subscriptions.cart.methods.checkout.bottom" template="TNW_Subscriptions::checkout/link.phtml" />

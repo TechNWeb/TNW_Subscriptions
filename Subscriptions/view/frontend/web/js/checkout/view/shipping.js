@@ -4,30 +4,19 @@
  */
 
 define([
+    'ko',
     'jquery',
     'underscore',
+    'uiRegistry',
+    'mage/translate',
     'Magento_Ui/js/form/form',
-    'ko',
+    'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
-    'TNW_Subscriptions/js/checkout/model/shipping-address/form-popup-state',
-    'Magento_Ui/js/modal/modal',
-    'uiRegistry',
-    'mage/translate'
-], function (
-    $,
-    _,
-    Component,
-    ko,
-    customer,
-    addressList,
-    shippingService,
-    formPopUpState,
-    modal,
-    registry,
-    $t
-) {
+    'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
+    'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
+], function (ko, $, _, registry, $t, Component, modal, customer, addressList, shippingService, formPopUpState) {
     'use strict';
 
     var popUp = null;

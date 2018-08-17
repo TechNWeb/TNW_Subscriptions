@@ -5,11 +5,73 @@
     text-align: left;
 }
 
+.cart-totals .table-caption {
+    display: table-caption;
+    height: auto;
+    width: 100%;
+    position: static;
+    text-align: left;
+}
+
+.cart-totals h3 {
+    font-weight: 400;
+}
+
+.cart-totals .amount {
+    font-size: 1rem;
+}
+
+.cart-totals .price {
+    font-size: 1.4rem;
+}
+
+.cart-totals tfoot .mark {
+    font-size: 1.8rem;
+}
+
+.cart-totals tfoot .amount {
+    font-size: 1.2rem;
+}
+
+.cart-totals tfoot .amount .price {
+    font-size: 1.8rem;
+}
+
+.cart-totals tbody tr:last-child td {
+    padding-bottom: 0;
+}
+
+.cart-totals .table tfoot > tr:first-child th,
+.cart-totals .table tfoot > tr:first-child td {
+    padding-top: 11px;
+}
+
+.cart-totals .product-name a {
+    color: #333333;
+}
+
 .table-caption h2::before {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 22px;
     line-height: 28px;
+    color: #757575;
+    content: '\e611';
+    font-family: 'luma-icons';
+    vertical-align: top;
+    display: inline-block;
+    font-weight: normal;
+    overflow: hidden;
+    speak: none;
+    text-align: center;
+    margin: 0 6px 0 0;
+}
+
+.table-caption h3::before {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 18px;
+    line-height: 19px;
     color: #757575;
     content: '\e611';
     font-family: 'luma-icons';

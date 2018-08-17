@@ -105,7 +105,7 @@ class DescriptionCreator
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $description[] = __('%1 for %2 and then ', $formattedPrice, $frequencyTrialPeriod);
         } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
-            $description[] = __("%1 initial payment and then ", $formattedPrice);
+            $description[] = __('%1 initial payment and then ', $formattedPrice);
         }
 
         $description[] = __('%1 / every %2. ',
