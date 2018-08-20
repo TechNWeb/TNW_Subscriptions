@@ -30,10 +30,11 @@ class CompositeConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $config = [];
+        $config[] = [];
         foreach ($this->configProviders as $configProvider) {
-            $config = array_merge_recursive($config, $configProvider->getConfig());
+            $config[] = $configProvider->getConfig();
         }
-        return $config;
+
+        return array_merge_recursive(...$config);
     }
 }

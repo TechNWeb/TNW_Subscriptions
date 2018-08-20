@@ -10,11 +10,6 @@ use Magento\Framework\App\Action;
 class UpdatePost extends Action\Action
 {
     /**
-     * @var \Magento\Checkout\Model\Session\Proxy
-     */
-    private $checkoutSession;
-
-    /**
      * @var \Magento\Framework\Data\Form\FormKey\Validator
      */
     private $formKeyValidator;
@@ -39,29 +34,20 @@ class UpdatePost extends Action\Action
      */
     private $quoteRepository;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
     public function __construct(
         Action\Context $context,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Magento\CatalogInventory\Api\StockStateInterface $stockState,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
         parent::__construct($context);
-        $this->checkoutSession = $checkoutSession;
         $this->formKeyValidator = $formKeyValidator;
         $this->quoteSession = $quoteSession;
         $this->localeResolver = $localeResolver;
         $this->stockState = $stockState;
         $this->quoteRepository = $quoteRepository;
-        $this->logger = $logger;
     }
 
     /**
@@ -87,13 +73,7 @@ class UpdatePost extends Action\Action
                     }
                 }
 
-                $quotes = \array_merge(
-                    $this->quoteSession->getSubQuotes(),
-                    [$this->checkoutSession->getQuote()]
-                );
-
-                /** @var \Magento\Quote\Model\Quote $quote */
-                foreach ($quotes as $quote) {
+                foreach ($this->quoteSession->getSubQuotes() as $quote) {
                     $cartData = $this->suggestItemsQty($quote, $cartData);
                     $this->updateItems($quote, $cartData);
 
@@ -104,12 +84,9 @@ class UpdatePost extends Action\Action
                 }
             }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->messageManager->addError(
-                $e->getMessage()
-            );
+            $this->messageManager->addExceptionMessage($e);
         } catch (\Exception $e) {
             $this->messageManager->addExceptionMessage($e, __('We can\'t update the shopping cart.'));
-            $this->logger->critical($e);
         }
 
         return $this->resultRedirectFactory->create()
@@ -176,7 +153,7 @@ class UpdatePost extends Action\Action
                 continue;
             }
 
-            if (\in_array($quote->getId(), $this->quoteSession->getSubQuoteIds())
+            if ($this->quoteSession->isSubscription($quote)
                 && $item->getProduct()->getData('tnw_subscr_unlock_preset_qty')
             ) {
                 continue;

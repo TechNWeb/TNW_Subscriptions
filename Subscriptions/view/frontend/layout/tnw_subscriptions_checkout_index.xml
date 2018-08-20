@@ -293,7 +293,12 @@
                                                     <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary</item>
                                                 </item>
                                                 <item name="children" xsi:type="array">
-
+                                                    <item name="quotes" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/summary/quotes</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/quotes</item>
+                                                        </item>
+                                                    </item>
                                                 </item>
                                             </item>
                                         </item>

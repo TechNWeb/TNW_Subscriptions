@@ -15,9 +15,9 @@ class Profile extends Template
     private $quoteSession;
 
     /**
-     * @var \Magento\Catalog\Helper\Product\Configuration
+     * @var \Magento\Catalog\Helper\Product\ConfigurationPool
      */
-    private $configuration;
+    private $configurationPool;
 
     /**
      * @var \Magento\Catalog\Block\Product\ImageBuilder
@@ -42,7 +42,7 @@ class Profile extends Template
     public function __construct(
         Template\Context $context,
         \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
-        \Magento\Catalog\Helper\Product\Configuration $configuration,
+        \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
         \Magento\Catalog\Block\Product\ImageBuilder $imageBuilder,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
@@ -51,7 +51,7 @@ class Profile extends Template
     ) {
         parent::__construct($context, $data);
         $this->quoteSession = $quoteSession;
-        $this->configuration = $configuration;
+        $this->configurationPool = $configurationPool;
         $this->imageBuilder = $imageBuilder;
         $this->descriptionCreator = $descriptionCreator;
         $this->priceCurrency = $priceCurrency;
@@ -65,7 +65,7 @@ class Profile extends Template
      */
     public function getItemOptions($item)
     {
-        return $this->configuration->getOptions($item);
+        return $this->configurationPool->getByProductType($item->getProductType())->getOptions($item);
     }
 
     /**
@@ -192,11 +192,14 @@ class Profile extends Template
      */
     public function getFormatedOptionValue($optionValue)
     {
+        /* @var $helper \Magento\Catalog\Helper\Product\Configuration */
+        $helper = $this->configurationPool->getByProductType('default');
         $params = [
             'max_length' => 55,
             'cut_replacer' => ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>'
         ];
-        return $this->configuration->getFormattedOptionValue($optionValue, $params);
+
+        return $helper->getFormattedOptionValue($optionValue, $params);
     }
 
     /**

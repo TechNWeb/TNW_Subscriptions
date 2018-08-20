@@ -13,6 +13,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private $formKey;
 
     /**
+     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
+     */
+    private $quoteSession;
+
+    /**
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
      */
     private $customerRepository;
@@ -52,19 +57,57 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private $urlBuilder;
 
+    /**
+     * @var \Magento\Quote\Model\QuoteIdMaskFactory
+     */
+    private $quoteIdMaskFactory;
+
+    /**
+     * @var \Magento\Catalog\Helper\Image
+     */
+    private $imageHelper;
+
+    /**
+     * @var \Magento\Catalog\Helper\Product\ConfigurationPool
+     */
+    private $configurationPool;
+
+    /**
+     * @var \Magento\Framework\Locale\FormatInterface
+     */
+    private $localeFormat;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         \Magento\Customer\Model\Address\Config $addressConfig,
         \Magento\Framework\App\Http\Context $httpContext,
         \Magento\Directory\Model\Country\Postcode\ConfigInterface $postCodesConfig,
         \Magento\Customer\Model\Url $customerUrlManager,
-        \Magento\Framework\UrlInterface $urlBuilder
+        \Magento\Framework\UrlInterface $urlBuilder,
+        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Catalog\Helper\Image $imageHelper,
+        \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
+        \Magento\Framework\Locale\FormatInterface $localeFormat,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
+        $this->quoteSession = $quoteSession;
         $this->customerSession = $customerSession;
         $this->addressMapper = $addressMapper;
         $this->addressConfig = $addressConfig;
@@ -72,6 +115,12 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->postCodesConfig = $postCodesConfig;
         $this->customerUrlManager = $customerUrlManager;
         $this->urlBuilder = $urlBuilder;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->imageHelper = $imageHelper;
+        $this->configurationPool = $configurationPool;
+        $this->localeFormat = $localeFormat;
+        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -85,7 +134,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
     {
         $output['formKey'] = $this->formKey->getFormKey();
         $output['customerData'] = $this->getCustomerData();
+        $output['quotes'] = $this->getQuotes();
         $output['isCustomerLoggedIn'] = $this->isCustomerLoggedIn();
+        $output['storeCode'] = $this->getStoreCode();
         $output['postCodes'] = $this->postCodesConfig->getPostCodes();
         $output['registerUrl'] = $this->getRegisterUrl();
         $output['checkoutUrl'] = $this->getCheckoutUrl();
@@ -93,6 +144,12 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['pageNotFoundUrl'] = $this->pageNotFoundUrl();
         $output['forgotPasswordUrl'] = $this->getForgotPasswordUrl();
 
+        $quoteData['priceFormat'] = $this->localeFormat
+            ->getPriceFormat(null, $this->storeManager->getStore()->getCurrentCurrencyCode());
+        $quoteData['basePriceFormat'] = $this->localeFormat
+            ->getPriceFormat(null, $this->storeManager->getStore()->getBaseCurrencyCode());
+
+        $output['originCountryCode'] = $this->getOriginCountryCode();
         return $output;
     }
 
@@ -149,6 +206,71 @@ class DefaultConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * @return string
+     */
+    private function getStoreCode()
+    {
+        return $this->storeManager->getStore()->getCode();
+    }
+
+    /**
+     * Retrieve quote data
+     *
+     * @return array
+     */
+    private function getQuotes()
+    {
+        $quotes = [];
+        foreach ($this->quoteSession->getSubQuotes() as $subQuote) {
+            $quoteData = $subQuote->toArray();
+            $quoteData['is_virtual'] = $subQuote->getIsVirtual();
+
+            if (!$subQuote->getCustomer()->getId()) {
+                $quoteData['entity_id'] = $this->quoteIdMaskFactory->create()
+                    ->load($subQuote->getId(), 'quote_id')
+                    ->getMaskedId();
+            }
+
+            $quoteData['items'] = [];
+            foreach ($subQuote->getAllVisibleItems() as $index => $quoteItem) {
+                $quoteData['items'][$index] = $quoteItem->toArray();
+                $quoteData['items'][$index]['options'] = $this->getFormattedOptionValue($quoteItem);
+                $quoteData['items'][$index]['thumbnail'] = $this->imageHelper
+                    ->init($quoteItem->getProduct(), 'product_thumbnail_image')->getUrl();
+            }
+
+            $quotes[] = $quoteData;
+        }
+
+        return $quotes;
+    }
+
+    /**
+     * Retrieve formatted item options view
+     *
+     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @return array
+     */
+    protected function getFormattedOptionValue($item)
+    {
+        $optionsData = [];
+        $options = $this->configurationPool->getByProductType($item->getProductType())->getOptions($item);
+        foreach ($options as $index => $optionValue) {
+            /* @var $helper \Magento\Catalog\Helper\Product\Configuration */
+            $helper = $this->configurationPool->getByProductType('default');
+            $params = [
+                'max_length' => 55,
+                'cut_replacer' => ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>'
+            ];
+            $option = $helper->getFormattedOptionValue($optionValue, $params);
+            $optionsData[$index] = $option;
+            $optionsData[$index]['label'] = $optionValue['label'];
+        }
+
+        return $optionsData;
+    }
+
+    /**
      * Retrieve customer registration URL
      *
      * @return string
@@ -201,5 +323,17 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private function getForgotPasswordUrl()
     {
         return $this->customerUrlManager->getForgotPasswordUrl();
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getOriginCountryCode()
+    {
+        return $this->scopeConfig->getValue(
+            \Magento\Shipping\Model\Config::XML_PATH_ORIGIN_COUNTRY_ID,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()
+        );
     }
 }

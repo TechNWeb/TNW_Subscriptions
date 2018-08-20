@@ -79,9 +79,8 @@ class SubscriptionCart implements SectionSourceInterface
     {
         $itemsQty = 0;
         $href = 'javascript:';
-        $subQuotes = $this->session->getSubQuotes();
 
-        foreach ($subQuotes as $quote) {
+        foreach ($this->session->getSubQuotes() as $quote) {
             $itemsQty += $this->summaryCount($quote);
         }
 

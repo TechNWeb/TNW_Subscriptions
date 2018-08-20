@@ -13,10 +13,11 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
+    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
-], function (ko, $, _, registry, $t, Component, modal, customer, addressList, shippingService, formPopUpState) {
+], function (ko, $, _, registry, $t, Component, modal, customer, addressList, checkoutQuotes, shippingService, formPopUpState) {
     'use strict';
 
     var popUp = null;
@@ -27,14 +28,14 @@ define([
             shippingMethodListTemplate: 'TNW_Subscriptions/checkout/shipping/shipping-method-list',
             shippingMethodItemTemplate: 'TNW_Subscriptions/checkout/shipping/shipping-method-item'
         },
-        visible: ko.observable(true),
+        visible: ko.observable(!checkoutQuotes.isVirtual()),
         errorValidationMessage: ko.observable(false),
         isCustomerLoggedIn: customer.isLoggedIn,
         isFormPopUpVisible: formPopUpState.isVisible,
         isFormInline: addressList().length === 0,
         isNewAddressAdded: ko.observable(false),
         saveInAddressBook: 1,
-        quoteIsVirtual: false,
+        quoteIsVirtual: checkoutQuotes.isVirtual(),
 
         /**
          * @return {exports}
@@ -47,7 +48,7 @@ define([
             this._super();
 
             hasNewAddress = addressList.some(function (address) {
-                return address.getType() == 'new-customer-address'; //eslint-disable-line eqeqeq
+                return address.getType() === 'new-customer-address'; //eslint-disable-line eqeqeq
             });
 
             this.isNewAddressAdded(hasNewAddress);
@@ -159,7 +160,9 @@ define([
         rates: shippingService.getShippingRates(),
         isLoading: shippingService.isLoading,
         isSelected: ko.computed(function () {
-            return null;
+            return checkoutQuotes.shippingMethod() ?
+                checkoutQuotes.shippingMethod()['carrier_code'] + '_' + checkoutQuotes.shippingMethod()['method_code'] :
+                null;
         }),
 
         /**
@@ -167,6 +170,8 @@ define([
          * @return {Boolean}
          */
         selectShippingMethod: function (shippingMethod) {
+            checkoutQuotes.shippingMethod(shippingMethod);
+
             return true;
         },
 
