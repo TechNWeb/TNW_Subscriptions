@@ -10,5 +10,16 @@ define([
 ], function (ko, Component, checkoutQuotes) {
     'use strict';
 
-    return Component.extend({});
+    return Component.extend({
+        quotes: ko.observable([]),
+
+        /**
+         * @inheritdoc
+         */
+        initialize: function () {
+            this._super();
+            // Set initial items to observable field
+            this.quotes(checkoutQuotes.getQuotes());
+        }
+    });
 });

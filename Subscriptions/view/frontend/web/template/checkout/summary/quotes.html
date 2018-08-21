@@ -5,101 +5,54 @@
  */
 -->
 <div class="block quotes-in-cart">
-    <div class="content minicart-quote">
-        <div class="title">One-Time Purchase</div>
-        <div class="content minicart-items" data-role="content">
-            <div class="minicart-items-wrapper overflowed">
-                <ol class="minicart-items">
+    <!-- ko foreach: {data: quotes, as: 'quote'} -->
+    <div class="content minisub-quote">
+        <div class="minisub-quote-wrapper overflowed">
+            <div class="title" data-bind="text: quote.getProfileName()"></div>
+            <div class="content minisub-items" data-role="content">
+                <ol class="minisub-items">
+                    <!-- ko foreach: {data: quote.getItems(), as: 'item'} -->
                     <li class="product-item">
                         <div class="product">
-                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + getHeight($parents[1]) + 'px; width: ' + getWidth($parents[1]) + 'px;' }" style="height: 75px; width: 75px;">
+                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + item.thumbnail.height + 'px; width: ' + item.thumbnail.width + 'px;' }">
                                 <span class="product-image-wrapper">
-                                    <img data-bind="attr: {'src': getSrc($parents[1]), 'width': getWidth($parents[1]), 'height': getHeight($parents[1]), 'alt': getAlt($parents[1]) }" src="http://magento.sub22.local/pub/media/catalog/product/cache/fd4c882ce4b945a790b629f572e4ef93/l/t/lt06.jpg" alt="Luma Yoga For Life" width="75" height="75">
+                                    <img data-bind="attr: {'src': item.thumbnail.src, 'width': item.thumbnail.width, 'height': item.thumbnail.height, 'alt': item.thumbnail.alt }">
                                 </span>
                             </span>
                             <div class="product-item-details">
                                 <div class="product-item-inner">
                                     <div class="product-item-name-block">
-                                        <strong class="product-item-name" data-bind="text: $parent.name">Luma Yoga For Life</strong>
-                                        <div class="details-qty">
-                                            <span class="label">
-                                                <span>Qty</span>
-                                            </span>
-                                            <span class="value" data-bind="text: $parent.qty">1</span>
-                                        </div>
-                                    </div>
-                                    <div class="subtotal">
-                                        <span class="price-excluding-tax" data-bind="attr:{'data-label': $t('Excl. Tax')}" data-label="Excl. Tax">
-                                            <span class="cart-price">
-                                                <span class="price" data-bind="text: getFormattedPrice(getRowDisplayPriceExclTax($parents[2]))">$9.00</span>
-                                            </span>
-                                        </span>
+                                        <span class="qty" data-bind="text: item.qty+'x'"></span>
+                                        <span class="product-item-name" data-bind="text: item.name"></span>
                                     </div>
                                 </div>
-                                <div class="product options" data-bind="mageInit: {'collapsible':{'openedState': 'active'}}" data-collapsible="true" role="tablist">
-                                    <span data-role="title" class="toggle" role="tab" aria-selected="false" aria-expanded="false" tabindex="0">
-                                        <span>View Details</span>
-                                    </span>
-                                    <div data-role="content" class="content" role="tabpanel" aria-hidden="true" style="display: none;">
-                                        <strong class="subtitle">
-                                            <span>Options Details</span>
-                                        </strong>
+                                <!-- ko if: (item.options.length > 0)-->
+                                <div class="product options" data-bind="mageInit: {'collapsible':{'openedState': 'active'}}">
+                                    <span data-role="title" class="toggle"><!-- ko i18n: 'View Details' --><!-- /ko --></span>
+                                    <div data-role="content" class="content">
+                                        <strong class="subtitle"><!-- ko i18n: 'Options Details' --><!-- /ko --></strong>
                                         <dl class="item-options">
-                                            <dt class="label" data-bind="text: label">Downloads</dt>
-                                            <dd class="values" data-bind="html: value">Episode 1</dd>
+                                            <!-- ko foreach: item.options -->
+                                                <dt class="label" data-bind="text: label"></dt>
+                                                <!-- ko if: ($data.full_view)-->
+                                                    <dd class="values" data-bind="html: full_view"></dd>
+                                                <!-- /ko -->
+                                                <!-- ko ifnot: ($data.full_view)-->
+                                                    <dd class="values" data-bind="html: value"></dd>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
                                         </dl>
                                     </div>
                                 </div>
-
+                                <!-- /ko -->
                             </div>
                         </div>
                     </li>
-
-                    <li class="product-item">
-                        <div class="product">
-                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + getHeight($parents[1]) + 'px; width: ' + getWidth($parents[1]) + 'px;' }" style="height: 75px; width: 75px;">
-                                <span class="product-image-wrapper">
-                                    <img data-bind="attr: {'src': getSrc($parents[1]), 'width': getWidth($parents[1]), 'height': getHeight($parents[1]), 'alt': getAlt($parents[1]) }" src="http://magento.sub22.local/pub/media/catalog/product/cache/fd4c882ce4b945a790b629f572e4ef93/w/j/wj12-blue_main.jpg" alt="Olivia 1/4 Zip Light Jacket" width="75" height="75">
-                                </span>
-                            </span>
-                            <div class="product-item-details">
-
-                                <div class="product-item-inner">
-                                    <div class="product-item-name-block">
-                                        <strong class="product-item-name" data-bind="text: $parent.name">Olivia 1/4 Zip Light Jacket</strong>
-                                        <div class="details-qty">
-                                            <span class="label"><span>Qty</span></span>
-                                            <span class="value" data-bind="text: $parent.qty">3</span>
-                                        </div>
-                                    </div>
-                                    <div class="subtotal">
-                                        <span class="price-excluding-tax" data-bind="attr:{'data-label': $t('Excl. Tax')}" data-label="Excl. Tax">
-                                            <span class="cart-price">
-                                                <span class="price" data-bind="text: getFormattedPrice(getRowDisplayPriceExclTax($parents[2]))">$231.00</span>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="product options" data-bind="mageInit: {'collapsible':{'openedState': 'active'}}" data-collapsible="true" role="tablist">
-                                    <span data-role="title" class="toggle" role="tab" aria-selected="false" aria-expanded="false" tabindex="0">
-                                        <span>View Details</span>
-                                    </span>
-                                    <div data-role="content" class="content" role="tabpanel" aria-hidden="true" style="display: none;">
-                                        <strong class="subtitle"><span>Options Details</span></strong>
-                                        <dl class="item-options">
-                                            <dt class="label" data-bind="text: label">Size</dt>
-                                            <dd class="values" data-bind="html: value">XS</dd>
-                                            <dt class="label" data-bind="text: label">Color</dt>
-                                            <dd class="values" data-bind="html: value">Blue</dd>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
+                    <!-- /ko -->
                 </ol>
             </div>
+            <div class="description" data-bind="text: quote.getProfileDescription()"></div>
         </div>
     </div>
+    <!-- /ko -->
 </div>

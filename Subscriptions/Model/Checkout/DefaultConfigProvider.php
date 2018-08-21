@@ -87,6 +87,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private $scopeConfig;
 
+    /**
+     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     */
+    private $descriptionCreator;
+
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -103,7 +108,8 @@ class DefaultConfigProvider implements ConfigProviderInterface
         \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
@@ -121,6 +127,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->localeFormat = $localeFormat;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
+        $this->descriptionCreator = $descriptionCreator;
     }
 
     /**
@@ -144,9 +151,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['pageNotFoundUrl'] = $this->pageNotFoundUrl();
         $output['forgotPasswordUrl'] = $this->getForgotPasswordUrl();
 
-        $quoteData['priceFormat'] = $this->localeFormat
+        $output['priceFormat'] = $this->localeFormat
             ->getPriceFormat(null, $this->storeManager->getStore()->getCurrentCurrencyCode());
-        $quoteData['basePriceFormat'] = $this->localeFormat
+        $output['basePriceFormat'] = $this->localeFormat
             ->getPriceFormat(null, $this->storeManager->getStore()->getBaseCurrencyCode());
 
         $output['originCountryCode'] = $this->getOriginCountryCode();
@@ -217,6 +224,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
      * Retrieve quote data
      *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getQuotes()
     {
@@ -224,6 +232,8 @@ class DefaultConfigProvider implements ConfigProviderInterface
         foreach ($this->quoteSession->getSubQuotes() as $subQuote) {
             $quoteData = $subQuote->toArray();
             $quoteData['is_virtual'] = $subQuote->getIsVirtual();
+            $quoteData['profile_name'] = $this->getProfileName($subQuote);
+            $quoteData['profile_description'] = $this->getProfileDescription($subQuote);
 
             if (!$subQuote->getCustomer()->getId()) {
                 $quoteData['entity_id'] = $this->quoteIdMaskFactory->create()
@@ -234,15 +244,130 @@ class DefaultConfigProvider implements ConfigProviderInterface
             $quoteData['items'] = [];
             foreach ($subQuote->getAllVisibleItems() as $index => $quoteItem) {
                 $quoteData['items'][$index] = $quoteItem->toArray();
-                $quoteData['items'][$index]['options'] = $this->getFormattedOptionValue($quoteItem);
-                $quoteData['items'][$index]['thumbnail'] = $this->imageHelper
-                    ->init($quoteItem->getProduct(), 'product_thumbnail_image')->getUrl();
+
+                $quoteData['items'][$index]['options']
+                    = $this->getFormattedOptionValue($quoteItem);
+
+                $imageHelper = $this->imageHelper->init(
+                    $this->getItemPurchaseProduct($quoteItem),
+                    'product_thumbnail_image',
+                    ['width' => 60, 'height' => 60]
+                );
+
+                $quoteData['items'][$index]['thumbnail'] = [
+                    'src' => $imageHelper->getUrl(),
+                    'alt' => $imageHelper->getLabel(),
+                    'width' => $imageHelper->getWidth(),
+                    'height' => $imageHelper->getHeight(),
+                ];
             }
 
             $quotes[] = $quoteData;
         }
 
         return $quotes;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     */
+    private function getProfileName($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return __('One-Time Purchase');
+        }
+
+        static $quoteIndex = 0;
+        return __('Subscription #%1', ++$quoteIndex);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getProfileDescription($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return '';
+        }
+
+        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        return $this->descriptionCreator->getDescription($fullSubscriptionData);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array
+     */
+    private function fullSubscriptionData($quote)
+    {
+        if (!$this->quoteSession->isSubscription($quote)) {
+            return [];
+        }
+
+        $fullSubscriptionData = null;
+
+        $initialFee = 0;
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if (!$fullSubscriptionData) {
+                $fullSubscriptionData = $item->getBuyRequest()
+                    ->getDataByPath('subscription_data');
+            }
+
+            $initialFee += $this->getInitialFeeFromItem($item);
+        }
+
+        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
+        $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
+        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
+        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
+        $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
+
+        return $fullSubscriptionData;
+    }
+
+    /**
+     * Returns initial fee from item.
+     *
+     * @param \Magento\Quote\Model\Quote\Item $item
+     * @return int
+     */
+    private function getInitialFeeFromItem($item)
+    {
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees) {
+            $initialFee = $initialFees->getSubsInitialFee();
+        }
+
+        return !empty($initialFee) ? $initialFee : 0;
+    }
+
+    /**
+     * Get item configurable child product
+     *
+     * @param \Magento\Quote\Model\Quote\Item $item
+     *
+     * @return \Magento\Catalog\Model\Product
+     */
+    private function getItemPurchaseProduct($item)
+    {
+        if ($option = $item->getOptionByCode('simple_product')) {
+            return $option->getProduct();
+        }
+
+        $option = $item->getOptionByCode('product_type');
+        if ($option) {
+            return $option->getProduct();
+        }
+
+        return $item->getProduct();
     }
 
     /**

@@ -14,6 +14,8 @@ define([], function () {
      */
     return function (quoteData) {
         return {
+            data: quoteData,
+
             /**
              * @return {*}
              */
@@ -29,10 +31,24 @@ define([], function () {
             },
 
             /**
-             * @return {*}
+             * @return {Array}
              */
             getItems: function () {
                 return quoteData.items;
+            },
+
+            /**
+             * @return {String}
+             */
+            getProfileName: function () {
+                return quoteData['profile_name'];
+            },
+
+            /**
+             * @return {String}
+             */
+            getProfileDescription: function () {
+                return quoteData['profile_description'];
             }
         };
     };
