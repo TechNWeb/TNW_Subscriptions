@@ -44,27 +44,14 @@
 <li id="shipping-method" class="checkout-shipping-method" data-bind="fadeVisible: visible(), blockLoader: isLoading">
     <div class="checkout-shipping-method">
         <div class="step-title" data-role="title" data-bind="i18n: 'Shipping Methods'"></div>
-        <!-- ko foreach: getRegion('before-shipping-method-form') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
         <div id="checkout-step-shipping_method" class="step-content methods-shipping" data-role="content">
             <form id="co-shipping-method-form" class="form" data-bind="if: rates().length, submit: setShippingInformation" novalidate="novalidate">
                 <!-- ko template: shippingMethodListTemplate --><!-- /ko -->
-                <div id="onepage-checkout-shipping-method-additional-load">
-                    <!-- ko foreach: getRegion('shippingAdditional') -->
-                        <!-- ko template: getTemplate() --><!-- /ko -->
-                    <!--/ko-->
-                </div>
-                <div role="alert" data-bind="if: errorValidationMessage().length" class="message notice">
+                <!-- ko if: errorValidationMessage().length -->
+                <div role="alert" class="message notice">
                     <span data-bind="text: errorValidationMessage()"></span>
                 </div>
-                <div class="actions-toolbar" id="shipping-method-buttons-container">
-                    <div class="primary">
-                        <button data-role="opc-continue" type="submit" class="button action continue primary">
-                            <span data-bind="i18n: 'Next'"></span>
-                        </button>
-                    </div>
-                </div>
+                <!-- /ko -->
             </form>
             <div class="no-quotes-block" data-bind="ifnot: rates().length > 0, i18n: 'Sorry, no quotes are available for this order at this time'"></div>
         </div>

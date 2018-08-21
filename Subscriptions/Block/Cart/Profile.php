@@ -237,40 +237,7 @@ class Profile extends Template
             return '';
         }
 
-        $fullSubscriptionData = $this->fullSubscriptionData($quote);
-        return $this->descriptionCreator->getDescription($fullSubscriptionData);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote $quote
-     *
-     * @return array
-     */
-    private function fullSubscriptionData($quote)
-    {
-        if (!$this->quoteSession->isSubscription($quote)) {
-            return [];
-        }
-
-        $fullSubscriptionData = null;
-
-        $initialFee = 0;
-        foreach ($quote->getAllVisibleItems() as $item) {
-            if (!$fullSubscriptionData) {
-                $fullSubscriptionData = $item->getBuyRequest()
-                    ->getDataByPath('subscription_data');
-            }
-
-            $initialFee += $this->getInitialFeeFromItem($item);
-        }
-
-        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
-        $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
-        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
-        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
-        $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
-
-        return $fullSubscriptionData;
+        return $this->descriptionCreator->getDescriptionByQuote($quote);
     }
 
     /**
@@ -288,11 +255,7 @@ class Profile extends Template
             );
         }
 
-        return $this->descriptionCreator->getDescribedItemPriceHtml(
-            $item->getRowTotal(),
-            $item->getBuyRequest()->getDataByPath('subscription_data'),
-            $this->getInitialFeeFromItem($item)
-        );
+        return $this->descriptionCreator->getDescribedItemPriceHtmlByQuoteItem($item);
     }
 
     /**
@@ -311,30 +274,7 @@ class Profile extends Template
             );
         }
 
-        $fullSubscriptionData = $this->fullSubscriptionData($quote);
-        return $this->descriptionCreator->getDescribedItemPriceHtml(
-            $quote->getSubtotal(),
-            $fullSubscriptionData,
-            $fullSubscriptionData['non_unique']['initialPrice']
-        );
-    }
-
-    /**
-     * Returns initial fee from item.
-     *
-     * @param \Magento\Quote\Model\Quote\Item $item
-     * @return int
-     */
-    private function getInitialFeeFromItem($item)
-    {
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
-        }
-
-        return !empty($initialFee) ? $initialFee : 0;
+        return $this->descriptionCreator->getDescribedPriceHtmlByQuote($quote);
     }
 
     /**

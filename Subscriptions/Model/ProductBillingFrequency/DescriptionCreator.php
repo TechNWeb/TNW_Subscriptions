@@ -128,6 +128,79 @@ class DescriptionCreator
     }
 
     /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getDescriptionByQuote($quote)
+    {
+        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        return $this->getDescription($fullSubscriptionData);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return string
+     */
+    public function getDescribedPriceHtmlByQuote($quote)
+    {
+        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        return $this->getDescribedItemPriceHtml(
+            $quote->getSubtotal(),
+            $fullSubscriptionData,
+            $fullSubscriptionData['non_unique']['initialPrice']
+        );
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array
+     */
+    private function fullSubscriptionData($quote)
+    {
+        $fullSubscriptionData = null;
+
+        $initialFee = 0;
+        foreach ($quote->getAllVisibleItems() as $item) {
+            if (!$fullSubscriptionData) {
+                $fullSubscriptionData = $item->getBuyRequest()
+                    ->getDataByPath('subscription_data');
+            }
+
+            $initialFee += $this->getInitialFeeFromItem($item);
+        }
+
+        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
+        $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
+        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
+        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
+        $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
+
+        return $fullSubscriptionData;
+    }
+
+    /**
+     * Returns initial fee from item.
+     *
+     * @param \Magento\Quote\Model\Quote\Item $item
+     * @return int
+     */
+    private function getInitialFeeFromItem($item)
+    {
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees) {
+            $initialFee = $initialFees->getSubsInitialFee();
+        }
+
+        return !empty($initialFee) ? $initialFee : 0;
+    }
+
+    /**
      * Returns item price with description.
      *
      * @param float|string $itemTotal
@@ -187,6 +260,20 @@ class DescriptionCreator
             implode(' ', $priceClasses),
             $thenPhrase,
             $total . $frequencyUnit
+        );
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item $quoteItem
+     *
+     * @return string
+     */
+    public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
+    {
+        return $this->getDescribedItemPriceHtml(
+            $quoteItem->getRowTotal(),
+            $quoteItem->getBuyRequest()->getDataByPath('subscription_data'),
+            $this->getInitialFeeFromItem($quoteItem)
         );
     }
 
@@ -258,7 +345,7 @@ class DescriptionCreator
      * @param $price
      * @return float
      */
-    private function formatPrice($price)
+    public function formatPrice($price)
     {
         return $this->context->getPriceCurrency()->format(
             $price,

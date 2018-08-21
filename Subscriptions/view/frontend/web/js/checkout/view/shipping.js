@@ -59,6 +59,10 @@ define([
                 }
             });
 
+            checkoutQuotes.shippingMethod.subscribe(function () {
+                self.errorValidationMessage(false);
+            });
+
             registry.async('checkoutProvider')(function (checkoutProvider) {
 
                 checkoutProvider.set(

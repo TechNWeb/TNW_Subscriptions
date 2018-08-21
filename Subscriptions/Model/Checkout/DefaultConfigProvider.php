@@ -292,61 +292,10 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private function getProfileDescription($quote)
     {
         if (!$this->quoteSession->isSubscription($quote)) {
-            return '';
+            return __('Subtotal: %1', $this->descriptionCreator->formatPrice($quote->getSubtotal()));
         }
 
-        $fullSubscriptionData = $this->fullSubscriptionData($quote);
-        return $this->descriptionCreator->getDescription($fullSubscriptionData);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote $quote
-     *
-     * @return array
-     */
-    private function fullSubscriptionData($quote)
-    {
-        if (!$this->quoteSession->isSubscription($quote)) {
-            return [];
-        }
-
-        $fullSubscriptionData = null;
-
-        $initialFee = 0;
-        foreach ($quote->getAllVisibleItems() as $item) {
-            if (!$fullSubscriptionData) {
-                $fullSubscriptionData = $item->getBuyRequest()
-                    ->getDataByPath('subscription_data');
-            }
-
-            $initialFee += $this->getInitialFeeFromItem($item);
-        }
-
-        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
-        $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
-        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
-        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
-        $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
-
-        return $fullSubscriptionData;
-    }
-
-    /**
-     * Returns initial fee from item.
-     *
-     * @param \Magento\Quote\Model\Quote\Item $item
-     * @return int
-     */
-    private function getInitialFeeFromItem($item)
-    {
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
-        }
-
-        return !empty($initialFee) ? $initialFee : 0;
+        return $this->descriptionCreator->getDescriptionByQuote($quote);
     }
 
     /**
@@ -362,8 +311,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
             return $option->getProduct();
         }
 
-        $option = $item->getOptionByCode('product_type');
-        if ($option) {
+        if ($option = $item->getOptionByCode('product_type')) {
             return $option->getProduct();
         }
 
