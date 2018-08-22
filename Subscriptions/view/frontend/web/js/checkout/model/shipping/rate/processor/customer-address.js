@@ -4,12 +4,11 @@
  */
 
 define([
-    'Magento_Checkout/js/model/resource-url-manager',
     'mage/storage',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/registry',
     'TNW_Subscriptions/js/checkout/model/error-processor'
-], function (resourceUrlManager, storage, shippingService, rateRegistry, errorProcessor) {
+], function (storage, shippingService, rateRegistry, errorProcessor) {
     'use strict';
 
     return {
@@ -27,7 +26,7 @@ define([
                 shippingService.isLoading(false);
             } else {
                 storage.post(
-                    resourceUrlManager.getUrlForEstimationShippingMethodsByAddressId(),
+                    'tnw_subscriptions/cart/estimateshippingmethods',
                     JSON.stringify({
                         addressId: address.customerAddressId
                     }),
@@ -39,9 +38,8 @@ define([
                     shippingService.setShippingRates([]);
                     errorProcessor.process(response);
                 }).always(function () {
-                        shippingService.isLoading(false);
-                    }
-                );
+                    shippingService.isLoading(false);
+                });
             }
         }
     };

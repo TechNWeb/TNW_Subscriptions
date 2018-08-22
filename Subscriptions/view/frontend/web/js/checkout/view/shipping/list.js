@@ -31,17 +31,14 @@ define([
                 .initChildren();
 
             addressList.subscribe(function (changes) {
-                    var self = this;
+                var self = this;
 
-                    changes.forEach(function (change) {
-                        if (change.status === 'added') {
-                            self.createRendererComponent(change.value, change.index);
-                        }
-                    });
-                },
-                this,
-                'arrayChange'
-            );
+                changes.forEach(function (change) {
+                    if (change.status === 'added') {
+                        self.createRendererComponent(change.value, change.index);
+                    }
+                });
+            }, this, 'arrayChange');
 
             return this;
         },

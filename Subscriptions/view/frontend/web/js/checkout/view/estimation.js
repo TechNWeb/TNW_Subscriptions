@@ -5,11 +5,11 @@
 
 define([
     'uiComponent',
-    'TNW_Subscriptions/js/checkout/model/profile',
+    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
     'Magento_Catalog/js/price-utils',
     'TNW_Subscriptions/js/checkout/model/totals',
     'TNW_Subscriptions/js/checkout/model/sidebar'
-], function (Component, profile, priceUtils, totals, sidebarModel) {
+], function (Component, checkoutQuotes, priceUtils, totals, sidebarModel) {
     'use strict';
 
     return Component.extend({
@@ -49,7 +49,7 @@ define([
          * @return {*|String}
          */
         getFormattedPrice: function (price) {
-            return priceUtils.formatPrice(price, profile.getPriceFormat());
+            return priceUtils.formatPrice(price, checkoutQuotes.getPriceFormat());
         },
 
         /**

@@ -23,45 +23,13 @@ define([
 
             return data;
         },
-        billingAddress = ko.observable(null),
-        shippingAddress = ko.observable(null),
-        shippingMethod = ko.observable(null),
-        paymentMethod = ko.observable(null),
-        basePriceFormat = window.checkoutConfig.basePriceFormat,
-        priceFormat = window.checkoutConfig.priceFormat,
-        storeCode = window.checkoutConfig.storeCode,
         totalsData = proceedTotalsData([]),
         totals = ko.observable(totalsData),
         collectedTotals = ko.observable({});
 
     return {
         totals: totals,
-        shippingAddress: shippingAddress,
-        shippingMethod: shippingMethod,
-        billingAddress: billingAddress,
-        paymentMethod: paymentMethod,
         guestEmail: null,
-
-        /**
-         * @return {Boolean}
-         */
-        isVirtual: function () {
-            return false;
-        },
-
-        /**
-         * @return {*}
-         */
-        getPriceFormat: function () {
-            return priceFormat;
-        },
-
-        /**
-         * @return {*}
-         */
-        getBasePriceFormat: function () {
-            return basePriceFormat;
-        },
 
         /**
          *
@@ -78,27 +46,6 @@ define([
             data = proceedTotalsData(data);
             totals(data);
             this.setCollectedTotals('subtotal_with_discount', parseFloat(data['subtotal_with_discount']));
-        },
-
-        /**
-         * @param {*} paymentMethodCode
-         */
-        setPaymentMethod: function (paymentMethodCode) {
-            paymentMethod(paymentMethodCode);
-        },
-
-        /**
-         * @return {*}
-         */
-        getPaymentMethod: function () {
-            return paymentMethod;
-        },
-
-        /**
-         * @return {*}
-         */
-        getStoreCode: function () {
-            return storeCode;
         },
 
         /**

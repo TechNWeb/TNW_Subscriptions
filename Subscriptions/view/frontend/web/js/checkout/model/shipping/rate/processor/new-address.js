@@ -4,12 +4,11 @@
  */
 
 define([
-    'Magento_Checkout/js/model/resource-url-manager',
     'mage/storage',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/registry',
     'TNW_Subscriptions/js/checkout/model/error-processor'
-], function (resourceUrlManager, storage, shippingService, rateRegistry, errorProcessor) {
+], function (storage, shippingService, rateRegistry, errorProcessor) {
     'use strict';
 
     return {
@@ -22,7 +21,7 @@ define([
 
             shippingService.isLoading(true);
             cache = rateRegistry.get(address.getCacheKey());
-            serviceUrl = resourceUrlManager.getUrlForEstimationShippingMethodsForNewAddress();
+            serviceUrl = 'tnw_subscriptions/cart/estimateshippingmethods';
             payload = JSON.stringify({
                     address: {
                         'street': address.street,

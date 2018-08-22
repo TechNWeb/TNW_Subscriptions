@@ -22,7 +22,7 @@ define([
 
             messageContainer = messageContainer || globalMessageList;
 
-            if (response.status == 401) { //eslint-disable-line eqeqeq
+            if (response.status == 401) {
                 window.location.replace(url.build('customer/account/login/'));
             } else {
                 error = JSON.parse(response.responseText);

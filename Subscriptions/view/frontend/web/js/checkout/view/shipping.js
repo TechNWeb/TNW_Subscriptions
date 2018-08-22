@@ -13,11 +13,26 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
+    'TNW_Subscriptions/js/checkout/action/create-address',
     'TNW_Subscriptions/js/checkout/model/checkout-quotes',
     'TNW_Subscriptions/js/checkout/model/shipping-service',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
-], function (ko, $, _, registry, $t, Component, modal, customer, addressList, checkoutQuotes, shippingService, formPopUpState) {
+], function (
+    ko,
+    $,
+    _,
+    registry,
+    $t,
+    Component,
+    modal,
+    customer,
+    addressList,
+    createAddress,
+    checkoutQuotes,
+    shippingService,
+    formPopUpState
+) {
     'use strict';
 
     var popUp = null;
@@ -25,11 +40,10 @@ define([
     return Component.extend({
         defaults: {
             shippingFormTemplate: 'TNW_Subscriptions/checkout/shipping/form',
-            shippingMethodListTemplate: 'TNW_Subscriptions/checkout/shipping/shipping-method-list',
-            shippingMethodItemTemplate: 'TNW_Subscriptions/checkout/shipping/shipping-method-item'
+            shippingMethodListTemplate: 'TNW_Subscriptions/checkout/shipping/method/list',
+            shippingMethodItemTemplate: 'TNW_Subscriptions/checkout/shipping/method/item'
         },
         visible: ko.observable(!checkoutQuotes.isVirtual()),
-        errorValidationMessage: ko.observable(false),
         isCustomerLoggedIn: customer.isLoggedIn,
         isFormPopUpVisible: formPopUpState.isVisible,
         isFormInline: addressList().length === 0,
@@ -42,13 +56,12 @@ define([
          */
         initialize: function () {
             var self = this,
-                hasNewAddress,
-                fieldsetName = 'checkout.steps.shipping-step.shippingAddress.shipping-address-fieldset';
+                hasNewAddress;
 
             this._super();
 
             hasNewAddress = addressList.some(function (address) {
-                return address.getType() === 'new-customer-address'; //eslint-disable-line eqeqeq
+                return address.getType() === 'new-customer-address';
             });
 
             this.isNewAddressAdded(hasNewAddress);
@@ -57,10 +70,6 @@ define([
                 if (value) {
                     self.getPopUp().openModal();
                 }
-            });
-
-            checkoutQuotes.shippingMethod.subscribe(function () {
-                self.errorValidationMessage(false);
             });
 
             registry.async('checkoutProvider')(function (checkoutProvider) {
@@ -151,6 +160,10 @@ define([
                 addressData = this.source.get('shippingAddress');
                 // if user clicked the checkbox, its value is true or false. Need to convert.
                 addressData['save_in_address_book'] = this.saveInAddressBook ? 1 : 0;
+
+                // New address must be selected as a shipping address
+                newShippingAddress = createAddress(addressData);
+                checkoutQuotes.shippingAddress(newShippingAddress);
 
                 // New address must be selected as a shipping address
                 this.getPopUp().closeModal();

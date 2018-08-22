@@ -4,10 +4,10 @@
  */
 
 define([
-    'TNW_Subscriptions/js/checkout/model/profile',
+    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/processor/new-address',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/processor/customer-address'
-], function (profile, defaultProcessor, customerAddressProcessor) {
+], function (checkoutQuotes, defaultProcessor, customerAddressProcessor) {
     'use strict';
 
     var processors = [];
@@ -15,13 +15,13 @@ define([
     processors.default =  defaultProcessor;
     processors['customer-address'] = customerAddressProcessor;
 
-    profile.shippingAddress.subscribe(function () {
-        var type = profile.shippingAddress().getType();
+    checkoutQuotes.shippingAddress.subscribe(function () {
+        var type = checkoutQuotes.shippingAddress().getType();
 
         if (processors[type]) {
-            processors[type].getRates(profile.shippingAddress());
+            processors[type].getRates(checkoutQuotes.shippingAddress());
         } else {
-            processors.default.getRates(profile.shippingAddress());
+            processors.default.getRates(checkoutQuotes.shippingAddress());
         }
     });
 

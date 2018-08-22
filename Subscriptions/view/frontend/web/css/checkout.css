@@ -74,6 +74,21 @@
     float: right;
     margin: 20px 0 0;
 }
+.tnw-subscriptions-checkout-container .tsc-wrapper .edit-address-link {
+    display: block;
+    float: left;
+    margin: 26px 5px 0 0;
+    line-height: 1.42857143;
+    padding: 0;
+    color: #006bb4;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    font-weight: 400;
+    border-radius: 0;
+    word-wrap: break-word;
+    box-shadow: none;
+}
 .tnw-subscriptions-checkout-container .tsc-wrapper .shipping-address-item.selected-item .action-select-shipping-item {
     visibility: hidden;
 }
@@ -384,6 +399,38 @@
         float: none;
         margin-top: 10px;
         width: 100%;
+    }
+    .tnw-subscriptions-checkout-container .tsc-wrapper .edit-address-link {
+        display: inline-block;
+        text-decoration: none;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        top: 5px;
+    }
+    .tnw-subscriptions-checkout-container .tsc-wrapper .edit-address-link::before {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 18px;
+        line-height: 20px;
+        color: #757575;
+        content: '\e601';
+        font-family: 'luma-icons';
+        vertical-align: middle;
+        display: inline-block;
+        font-weight: normal;
+        overflow: hidden;
+        text-align: center;
+    }
+    .tnw-subscriptions-checkout-container .tsc-wrapper .edit-address-link > span {
+        border: 0;
+        clip: rect(0, 0, 0, 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
     }
     .tnw-subscriptions-checkout-container .tsc-wrapper .action-show-popup {
         width: 100%;

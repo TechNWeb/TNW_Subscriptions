@@ -45,15 +45,14 @@
     <div class="checkout-shipping-method">
         <div class="step-title" data-role="title" data-bind="i18n: 'Shipping Methods'"></div>
         <div id="checkout-step-shipping_method" class="step-content methods-shipping" data-role="content">
-            <form id="co-shipping-method-form" class="form" data-bind="if: rates().length, submit: setShippingInformation" novalidate="novalidate">
+            <!-- ko if: rates().length -->
+            <form id="co-shipping-method-form" class="form" data-bind="submit: setShippingInformation" novalidate="novalidate">
                 <!-- ko template: shippingMethodListTemplate --><!-- /ko -->
-                <!-- ko if: errorValidationMessage().length -->
-                <div role="alert" class="message notice">
-                    <span data-bind="text: errorValidationMessage()"></span>
-                </div>
-                <!-- /ko -->
             </form>
-            <div class="no-quotes-block" data-bind="ifnot: rates().length > 0, i18n: 'Sorry, no quotes are available for this order at this time'"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: rates().length -->
+            <div class="no-quotes-block" data-bind="i18n: 'Sorry, no quotes are available for this order at this time'"></div>
+            <!-- /ko -->
         </div>
     </div>
 </li>
