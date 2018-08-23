@@ -15,9 +15,10 @@ define([
     'Magento_Customer/js/model/address-list',
     'TNW_Subscriptions/js/checkout/action/create-address',
     'TNW_Subscriptions/js/checkout/model/checkout-quotes',
-    'TNW_Subscriptions/js/checkout/model/shipping-service',
+    'TNW_Subscriptions/js/checkout/model/shipping/service',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
-    'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
+    'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/validator',
+    'TNW_Subscriptions/js/checkout/model/shipping/rate/processor'
 ], function (
     ko,
     $,
@@ -31,7 +32,9 @@ define([
     createAddress,
     checkoutQuotes,
     shippingService,
-    formPopUpState
+    formPopUpState,
+    rateValidator,
+    rateProcessor
 ) {
     'use strict';
 
@@ -56,7 +59,8 @@ define([
          */
         initialize: function () {
             var self = this,
-                hasNewAddress;
+                hasNewAddress,
+                fieldsetName = 'checkout.steps.shipping.shippingAddress.shipping-address-fieldset';
 
             this._super();
 
@@ -72,16 +76,12 @@ define([
                 }
             });
 
+            checkoutQuotes.shippingAddress.subscribe(function () {
+                rateProcessor.getRates(checkoutQuotes.shippingAddress());
+            });
+
             registry.async('checkoutProvider')(function (checkoutProvider) {
-
-                checkoutProvider.set(
-                    'shippingAddress',
-                    $.extend(true, {}, checkoutProvider.get('shippingAddress'))
-                );
-
-                checkoutProvider.on('shippingAddress', function (shippingAddrsData) {
-
-                });
+                rateValidator.initFields(fieldsetName);
             });
 
             return this;

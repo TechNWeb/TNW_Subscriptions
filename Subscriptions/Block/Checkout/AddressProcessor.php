@@ -68,7 +68,7 @@ class AddressProcessor implements LayoutProcessorInterface
      */
     public function process($jsLayout)
     {
-        $fieldset = 'components/checkout/children/steps/children/shipping/children/shipping-address-fieldset/children';
+        $fieldset = 'components/checkout/children/steps/children/shipping/children/shippingAddress/children/shipping-address-fieldset/children';
         foreach ($this->addressAttributes() as $attributeCode => $attributeConfig) {
             $additionalConfig = $this->arrayManager->get("$fieldset/$attributeCode", $jsLayout, []);
             if (!$this->isFieldVisible($attributeCode, $attributeConfig, $additionalConfig)) {

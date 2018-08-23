@@ -62,73 +62,6 @@ define([
         },
 
         /**
-         * Convert Address object to address form data.
-         *
-         * @param {Object} addrs
-         * @returns {Object}
-         */
-        quoteAddressToFormAddressData: function (addrs) {
-            var self = this,
-                output = {},
-                streetObject;
-
-            if ($.isArray(addrs.street)) {
-                streetObject = {};
-                addrs.street.forEach(function (value, index) {
-                    streetObject[index] = value;
-                });
-                addrs.street = streetObject;
-            }
-
-            $.each(addrs, function (key) {
-                if (addrs.hasOwnProperty(key) && !$.isFunction(addrs[key])) {
-                    output[self.toUnderscore(key)] = addrs[key];
-                }
-            });
-
-            return output;
-        },
-
-        /**
-         * @param {String} string
-         */
-        toUnderscore: function (string) {
-            return string.replace(/([A-Z])/g, function ($1) {
-                return '_' + $1.toLowerCase();
-            });
-        },
-
-        /**
-         * @param {Object} formProviderData
-         * @param {String} formIndex
-         * @return {Object}
-         */
-        formDataProviderToFlatData: function (formProviderData, formIndex) {
-            var addressData = {};
-
-            $.each(formProviderData, function (path, value) {
-                var pathComponents = path.split('.'),
-                    dataObject = {};
-
-                pathComponents.splice(pathComponents.indexOf(formIndex), 1);
-                pathComponents.reverse();
-                $.each(pathComponents, function (index, pathPart) {
-                    var parent = {};
-
-                    if (index == 0) { //eslint-disable-line eqeqeq
-                        dataObject[pathPart] = value;
-                    } else {
-                        parent[pathPart] = dataObject;
-                        dataObject = parent;
-                    }
-                });
-                $.extend(true, addressData, dataObject);
-            });
-
-            return addressData;
-        },
-
-        /**
          * Convert object to array
          * @param {Object} object
          * @returns {Array}
@@ -141,21 +74,6 @@ define([
             });
 
             return convertedArray.slice(0);
-        },
-
-        /**
-         * @param {Object} addrs
-         * @return {*|Object}
-         */
-        addressToEstimationAddress: function (addrs) {
-            var self = this,
-                estimatedAddressData = {};
-
-            $.each(addrs, function (key) {
-                estimatedAddressData[self.toUnderscore(key)] = addrs[key];
-            });
-
-            return this.formAddressDataToQuoteAddress(estimatedAddressData);
         }
     };
 });
