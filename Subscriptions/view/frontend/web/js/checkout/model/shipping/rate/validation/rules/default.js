@@ -16,6 +16,12 @@ define(['underscore', 'mageUtils'], function (_, utils) {
             return {
                 'country_id': {
                     'required': true
+                },
+                'region_id': {
+                    'required': false
+                },
+                'postcode': {
+                    'required': true
                 }
             };
         },

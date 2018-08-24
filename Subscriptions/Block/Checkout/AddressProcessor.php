@@ -85,6 +85,23 @@ class AddressProcessor implements LayoutProcessorInterface
             );
         }
 
+        $fieldset = 'components/checkout/children/steps/children/payment/children/payment-address-fieldset/children';
+        foreach ($this->addressAttributes() as $attributeCode => $attributeConfig) {
+            $additionalConfig = $this->arrayManager->get("$fieldset/$attributeCode", $jsLayout, []);
+            if (!$this->isFieldVisible($attributeCode, $attributeConfig, $additionalConfig)) {
+                continue;
+            }
+
+            $jsLayout = $this->arrayManager->set(
+                "$fieldset/$attributeCode",
+                $jsLayout,
+                array_replace_recursive(
+                    $this->getFieldConfig($attributeCode, $attributeConfig),
+                    $additionalConfig
+                )
+            );
+        }
+
         return $jsLayout;
     }
 

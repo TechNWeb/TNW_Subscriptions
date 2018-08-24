@@ -4,26 +4,58 @@
  */
 
 define([
+    'ko',
     'jquery',
     'underscore',
     'uiComponent',
-    'ko',
-    'mage/translate'
+    'mage/translate',
+    'Magento_Customer/js/customer-data',
+    'Magento_Customer/js/model/customer',
+    'Magento_Customer/js/model/address-list',
+    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
+    'TNW_Subscriptions/js/checkout/action/select-billing-address'
 ], function (
+    ko,
     $,
     _,
     Component,
-    ko,
-    $t
+    $t,
+    customerData,
+    customer,
+    addressList,
+    checkoutQuotes,
+    selectBillingAddress
 ) {
     'use strict';
 
+    var newAddressOption = {
+            /**
+             * Get new address label
+             * @returns {String}
+             */
+            getAddressInline: function () {
+                return $t('New Address');
+            },
+            customerAddressId: null
+        },
+        countryData = customerData.get('directory-data'),
+        addressOptions = addressList().filter(function (address) {
+            return address.getType() == 'customer-address';
+        });
+
+    addressOptions.push(newAddressOption);
+
     return Component.extend({
         defaults: {
-            activeMethod: ''
+            activeMethod: '',
+            selectedAddress: null,
+            isAddressDetailsVisible: checkoutQuotes.billingAddress() != null,
+            isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length === 1,
+            isAddressSameAsShipping: false,
+            saveInAddressBook: 1
         },
         isVisible: ko.observable(true),
-        quoteIsVirtual: false,
+        quoteIsVirtual: checkoutQuotes.isVirtual(),
         isPaymentMethodsAvailable: ko.computed(function () {
             return false;
         }),
@@ -36,10 +68,43 @@ define([
         },
 
         /**
-         * Navigate method.
+         * @return {exports.initObservable}
          */
-        navigate: function () {
-            var self = this;
+        initObservable: function () {
+            this._super()
+                .observe([
+                    'selectedAddress',
+                    'isAddressDetailsVisible',
+                    'isAddressFormVisible',
+                    'isAddressSameAsShipping',
+                    'saveInAddressBook'
+                ]);
+
+            checkoutQuotes.shippingAddress.subscribe(function (shippingAddress) {
+                if (this.isAddressSameAsShipping()) {
+                    selectBillingAddress(shippingAddress);
+                }
+            }, this);
+
+            checkoutQuotes.billingAddress.subscribe(function (newAddress) {
+                if (checkoutQuotes.isVirtual()) {
+                    this.isAddressSameAsShipping(false);
+                } else {
+                    this.isAddressSameAsShipping(
+                        newAddress != null &&
+                        newAddress.getCacheKey() === checkoutQuotes.shippingAddress().getCacheKey()
+                    );
+                }
+
+                if (newAddress != null && newAddress.saveInAddressBook !== undefined) {
+                    this.saveInAddressBook(newAddress.saveInAddressBook);
+                } else {
+                    this.saveInAddressBook(1);
+                }
+                this.isAddressDetailsVisible(true);
+            }, this);
+
+            return this;
         },
 
         /**
@@ -47,6 +112,60 @@ define([
          */
         getFormKey: function () {
             return window.checkoutConfig.formKey;
+        },
+
+        currentBillingAddress: checkoutQuotes.billingAddress,
+        addressOptions: addressOptions,
+        customerHasAddresses: addressOptions.length > 1,
+
+        canUseShippingAddress: ko.computed(function () {
+            return !checkoutQuotes.isVirtual() && checkoutQuotes.shippingAddress() && checkoutQuotes.shippingAddress().canUseForBilling();
+        }),
+
+        useShippingAddress: function () {
+            if (this.isAddressSameAsShipping()) {
+                selectBillingAddress(checkoutQuotes.shippingAddress());
+
+                this.isAddressDetailsVisible(true);
+            } else {
+                checkoutQuotes.billingAddress(null);
+                this.isAddressDetailsVisible(false);
+            }
+
+            return true;
+        },
+
+        /**
+         * @param {Number} countryId
+         * @return {*}
+         */
+        getCountryName: function (countryId) {
+            return countryData()[countryId] !== undefined
+                ? countryData()[countryId].name
+                : '';
+        },
+
+        /**
+         * Edit address action
+         */
+        editAddress: function () {
+            checkoutQuotes.billingAddress(null);
+            this.isAddressDetailsVisible(false);
+        },
+
+        /**
+         * @param {Object} address
+         */
+        onAddressChange: function (address) {
+            this.isAddressFormVisible(address == newAddressOption);
+        },
+
+        /**
+         * @param {Object} address
+         * @return {*}
+         */
+        addressOptionsText: function (address) {
+            return address.getAddressInline();
         }
     });
 });

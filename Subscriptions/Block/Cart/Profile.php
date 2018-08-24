@@ -217,12 +217,17 @@ class Profile extends Template
      */
     public function getCaption($quote)
     {
+        static $quoteIndex = [];
+
         if (!$this->quoteSession->isSubscription($quote)) {
             return __('One-Time Purchase');
         }
 
-        static $quoteIndex = 0;
-        return __('Subscription Profile #%1', ++$quoteIndex);
+        if (!isset($quoteIndex[$quote->getId()])) {
+            $quoteIndex[$quote->getId()] = \count($quoteIndex) + 1;
+        }
+
+        return __('Subscription Profile #%1', $quoteIndex[$quote->getId()]);
     }
 
     /**

@@ -169,6 +169,30 @@
 .tnw-subscriptions-checkout-container .checkout-payment-method .no-quotes-block {
     margin: 20px 0;
 }
+.tnw-subscriptions-checkout-container .checkout-payment .checkout-billing-address {
+    margin: 20px 0;
+}
+.tnw-subscriptions-checkout-container .checkout-payment .checkout-billing-address .billing-address-details {
+    line-height: 27px;
+    padding: 0 0 0 23px;
+}
+.tnw-subscriptions-checkout-container .checkout-payment .billing-address-same-as-shipping-block {
+    margin: 0 0 10px;
+}
+.tnw-subscriptions-checkout-container .checkout-payment .field-select-billing,
+.tnw-subscriptions-checkout-container .checkout-payment .billing-address-form {
+    max-width: 500px;
+}
+.tnw-subscriptions-checkout-container .checkout-payment .field-select-billing > .label {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
 .tnw-subscriptions-checkout-container .checkout-discount .form.discount {
     max-width: 300px;
 }
