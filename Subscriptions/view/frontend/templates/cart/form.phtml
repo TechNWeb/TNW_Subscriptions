@@ -93,14 +93,14 @@
             <?php endforeach; ?>
             </tbody>
         </table>
+        <div class="cart main actions">
+            <button type="submit"
+                    name="update_cart_action"
+                    value="update_qty"
+                    title="<?= $block->escapeHtml(__('Update Shopping Cart')) ?>"
+                    class="action update">
+                <span><?= /* @escapeNotVerified */ __('Update Shopping Cart') ?></span>
+            </button>
+        </div>
     <?php endforeach; ?>
-    <div class="cart main actions">
-        <button type="submit"
-                name="update_cart_action"
-                value="update_qty"
-                title="<?= $block->escapeHtml(__('Update Shopping Cart')) ?>"
-                class="action update">
-            <span><?= /* @escapeNotVerified */ __('Update Shopping Cart') ?></span>
-        </button>
-    </div>
 </form>
