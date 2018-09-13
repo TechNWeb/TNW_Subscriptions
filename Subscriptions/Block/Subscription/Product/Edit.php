@@ -89,19 +89,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     }
 
     /**
-     * Get subscribe url
-     *
-     * @return string
-     */
-    public function getSubscribeUrl()
-    {
-        return $this->_urlBuilder->getUrl(
-            'tnw_subscriptions/subscription_products/save',
-            ['product_id' => $this->getProduct()->getId()]
-        );
-    }
-
-    /**
      * Return subscription product Id.
      *
      * @return string

@@ -5,7 +5,7 @@
  */
 // @codingStandardsIgnoreFile
 
-/**  @var $block \TNW\Subscriptions\Block\Cart\Profile */
+/**  @var $block \TNW\Subscriptions\Block\Cart\Grid */
 ?>
 <form action="<?= /* @escapeNotVerified */ $block->getUrl('tnw_subscriptions/cart/updatePost') ?>"
       method="post"
@@ -14,27 +14,27 @@
       class="form form-cart subscriptions-cart">
     <?= $block->getBlockHtml('formkey') ?>
 
-    <?php foreach ($block->getSubQuotes() as $subQuote) : ?>
+    <?php foreach ($block->groupQuoteItems() as $groupItems) : ?>
         <table class="data table">
             <caption class="table-caption">
-                <h2><?= $block->escapeHtml($block->getCaption($subQuote)) ?></h2>
-                <p><?= /* @escapeNotVerified */ $block->frequencyDescription($subQuote) ?></p>
+                <h2><?= $block->escapeHtml($block->getCaption($groupItems)) ?></h2>
+                <p><?= /* @escapeNotVerified */ $block->frequencyDescription($groupItems) ?></p>
             </caption>
             <colgroup>
                 <col width="20%" />
                 <col />
             </colgroup>
             <tbody class="items">
-            <?php foreach ($subQuote->getAllVisibleItems() as $item) : ?>
+            <?php foreach ($groupItems as $groupItem) : ?>
                 <tr class="item-info">
                     <td class="col image">
                         <div class="image-wrapper">
-                            <?php echo $block->getItemImage($block->getItemPurchaseProduct($item), 'cart_page_product_thumbnail')->toHtml() ?>
+                            <?php echo $block->getItemImage($block->getItemPurchaseProduct($groupItem), 'cart_page_product_thumbnail')->toHtml() ?>
                         </div>
                         <div class="buttons">
-                            <?php if ($item->getProduct()->isVisibleInSiteVisibility()): ?>
+                            <?php if ($groupItem->getProduct()->isVisibleInSiteVisibility()): ?>
                                 <a class="action action-edit"
-                                   href="<?= /* @escapeNotVerified */ $block->getItemConfigureUrl($item) ?>"
+                                   href="<?= /* @escapeNotVerified */ $block->getItemConfigureUrl($groupItem) ?>"
                                    title="<?= $block->escapeHtml(__('Edit item parameters')) ?>">
                                     <span>
                                         <?= $block->escapeHtml(__('Edit')) ?>
@@ -43,7 +43,7 @@
                             <?php endif ?>
                             <a class="action action-delete"
                                title="<?= $block->escapeHtml(__('Remove item')) ?>"
-                               href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($item) ?>">
+                               href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($groupItem) ?>">
                                 <span>
                                     <?= $block->escapeHtml(__('Remove item')) ?>
                                 </span>
@@ -53,28 +53,28 @@
                     <td class="col item">
                         <div class="details">
                             <h3 class="name">
-                                <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a>
+                                <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($groupItem) ?>"><?php echo $block->escapeHtml($block->getItemName($groupItem)) ?></a>
                             </h3>
-                            <div class="description"><?= /* @escapeNotVerified */ $block->getItemDescription($item) ?></div>
+                            <div class="description"><?= /* @escapeNotVerified */ $block->getItemDescription($groupItem) ?></div>
                             <div class="price-wrapper">
-                                <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($item) ?></div>
+                                <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($groupItem) ?></div>
                             </div>
                             <dl class="options">
                                 <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
                                 <dd class="control qty">
-                                    <input name="cart[<?php echo $item->getItemId() ?>][qty]"
-                                           value="<?php echo $item->getQty() ?>"
+                                    <input name="cart[<?php echo $groupItem->getItemId() ?>][qty]"
+                                           value="<?php echo $groupItem->getQty() ?>"
                                            size="4"
                                            title="<?= $block->escapeHtml(__('Qty')) ?>"
                                            class="input-text qty"
                                            data-validate="{required:true,'validate-greater-than-zero':true}"
                                            data-role="cart-item-qty"
-                                           <?php if (!$block->allowEditSubscribeQty($item)) : ?>
+                                           <?php if (!$block->allowEditSubscribeQty($groupItem)) : ?>
                                            readonly="readonly"
                                            <?php endif ?>
                                            type="number">
                                 </dd>
-                                <?php foreach ($block->getItemOptions($item) as $option) : ?>
+                                <?php foreach ($block->getItemOptions($groupItem) as $option) : ?>
                                     <?php $_formatedOptionValue = $block->getFormatedOptionValue($option) ?>
                                     <dt><?php echo $block->escapeHtml($option['label']); ?></dt>
                                     <dd>

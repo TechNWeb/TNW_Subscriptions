@@ -54,6 +54,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addMessageTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.4', '<')) {
+            $this->addIsSubscriptionColumn($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -405,5 +409,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ;
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addIsSubscriptionColumn(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->addColumn(
+            $setup->getTable('quote'),
+            'is_tnw_subscription',
+            [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => 0,
+                'comment' => 'Is TNW Subscription Quote'
+            ]
+        );
     }
 }

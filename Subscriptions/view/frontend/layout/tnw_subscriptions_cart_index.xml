@@ -23,7 +23,7 @@
                                 </arguments>
                             </block>
                             <container name="tnw_subscriptions.cart.totals.container" as="totals" label="Shopping Cart Totals">
-                                <block class="TNW\Subscriptions\Block\Cart\Profile" name="tnw_subscriptions.cart.totals" template="TNW_Subscriptions::cart/totals.phtml" />
+                                <!--<block class="TNW\Subscriptions\Block\Cart\Totals" name="tnw_subscriptions.cart.totals" template="TNW_Subscriptions::cart/totals.phtml" />-->
                             </container>
                             <block class="TNW\Subscriptions\Block\Cart" name="tnw_subscriptions.cart.methods.bottom" template="TNW_Subscriptions::cart/methods.phtml">
                                 <container name="tnw_subscriptions.cart.methods" as="methods">
@@ -31,7 +31,7 @@
                                 </container>
                             </block>
                         </container>
-                        <block class="TNW\Subscriptions\Block\Cart\Profile" name="tnw_subscriptions.cart.form" as="cart-items" template="TNW_Subscriptions::cart/form.phtml" after="cart.summary" />
+                        <block class="TNW\Subscriptions\Block\Cart\Grid" name="tnw_subscriptions.cart.form" as="cart-items" template="TNW_Subscriptions::cart/form.phtml" after="cart.summary" />
                     </container>
                 </container>
                 <container name="tnw_subscriptions.cart.noitems" as="no-items">

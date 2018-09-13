@@ -14,7 +14,7 @@
     <a class="tnw-subscriptions-cart-link"
        href="<?php echo $block->escapeUrl($block->getCartUrl()) ?>"
        title="<?php /* @noEscape */ echo __('Shopping Cart') ?>"
-       data-bind="attr: {href: subscriptionCart().href}, click: showPopup"
+       data-bind="click: showPopup"
     >
         <img src="<?php /* @noEscape */ echo $block->getViewFileUrl('TNW_Subscriptions/images/cart-link.svg'); ?>"
             width="24"
@@ -22,7 +22,7 @@
             class="tnw-subscriptions-minicart"
         >
         <span class="no-display"
-              data-bind="text: subscriptionCart().itemsCount, css: {'no-display': !subscriptionCart().itemsCount}">
+              data-bind="text: subscriptionCart().summary_count, css: {'no-display': !subscriptionCart().summary_count}">
         </span>
     </a>
     <div class="tnw-subscriptions-cart-empty no-display">

@@ -795,6 +795,10 @@
                 type="TNW\Subscriptions\Plugin\Quote\PrepareBuyRequest"
                 sortOrder="100"
                 disabled="false"/>
+        <plugin name="tnw_subs_around_add_product_to_cart"
+                type="TNW\Subscriptions\Plugin\Catalog\Model\Product\AbstractType"
+                sortOrder="110"
+                disabled="false"/>
     </type>
 
     <type name="Magento\Quote\Model\Quote\Config">
@@ -903,6 +907,54 @@
     <type name="TNW\Subscriptions\Model\Context">
         <arguments>
             <argument name="logger" xsi:type="object">TNW\Subscriptions\Logger</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TNW\Quote\Quote" type="Magento\Quote\Model\Quote">
+        <arguments>
+            <argument name="resource" xsi:type="object">TNW\Subscriptions\Model\ResourceModel\Quote</argument>
+            <argument name="data" xsi:type="array">
+                <item name="is_tnw_subscription" xsi:type="boolean">true</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Quote\Factory\Quote" type="Magento\Quote\Model\QuoteFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TNW\Quote\Quote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Quote\Repository\Quote" type="Magento\Quote\Model\QuoteRepository">
+        <arguments>
+            <argument name="quoteFactory" xsi:type="object">TNW\Quote\Factory\Quote</argument>
+            <argument name="saveHandler" xsi:type="object">TNW\Quote\Factory\Quote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Checkout\Session\Storage" type="Magento\Framework\Session\Storage">
+        <arguments>
+            <argument name="namespace" xsi:type="string">subscription</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Checkout\Session" type="Magento\Checkout\Model\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">TNW\Checkout\Session\Storage</argument>
+            <argument name="quoteRepository" xsi:type="object">TNW\Quote\Repository\Quote</argument>
+            <argument name="quoteFactory" xsi:type="object">TNW\Quote\Factory\Quote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Checkout\Cart" type="Magento\Checkout\Model\Cart">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Checkout\Controller\Cart\Add">
+        <arguments>
+            <argument name="cart" xsi:type="object">TNW\Checkout\Cart</argument>
         </arguments>
     </type>
 </config>

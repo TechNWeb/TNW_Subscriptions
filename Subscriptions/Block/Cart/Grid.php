@@ -7,12 +7,12 @@ namespace TNW\Subscriptions\Block\Cart;
 
 use Magento\Framework\View\Element\Template;
 
-class Profile extends Template
+class Grid extends Template
 {
     /**
-     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
+     * @var \Magento\Checkout\Model\Session
      */
-    private $quoteSession;
+    private $checkoutSession;
 
     /**
      * @var \Magento\Catalog\Helper\Product\ConfigurationPool
@@ -41,7 +41,7 @@ class Profile extends Template
 
     public function __construct(
         Template\Context $context,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
         \Magento\Catalog\Block\Product\ImageBuilder $imageBuilder,
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
@@ -50,7 +50,7 @@ class Profile extends Template
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->quoteSession = $quoteSession;
+        $this->checkoutSession = $checkoutSession;
         $this->configurationPool = $configurationPool;
         $this->imageBuilder = $imageBuilder;
         $this->descriptionCreator = $descriptionCreator;
@@ -131,16 +131,9 @@ class Profile extends Template
      */
     public function getItemConfigureUrl($item)
     {
-        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
-            return $this->getUrl('checkout/cart/configure', [
-                'id' => $item->getId(),
-                'product_id' => $item->getProduct()->getId()
-            ]);
-        }
-
-        return $this->getUrl('tnw_subscriptions/cart/configure', [
-           'id' => $item->getId(),
-           'product_id' => $item->getProduct()->getId()
+        return $this->getUrl('checkout/cart/configure', [
+            'id' => $item->getId(),
+            'product_id' => $item->getProduct()->getId()
         ]);
     }
 
@@ -151,14 +144,7 @@ class Profile extends Template
      */
     public function getItemDeleteUrl($item)
     {
-        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
-            return $this->getUrl('checkout/cart/delete', [
-                'id' => $item->getId(),
-                'form_key' => $this->formKey->getFormKey()
-            ]);
-        }
-
-        return $this->getUrl('tnw_subscriptions/cart/delete', [
+        return $this->getUrl('checkout/cart/delete', [
             'id' => $item->getId(),
             'form_key' => $this->formKey->getFormKey()
         ]);
@@ -202,12 +188,9 @@ class Profile extends Template
         return $helper->getFormattedOptionValue($optionValue, $params);
     }
 
-    /**
-     * @return \Magento\Quote\Model\Quote[]
-     */
-    public function getSubQuotes()
+    public function groupQuoteItems()
     {
-        return $this->quoteSession->getSubQuotes();
+        return [$this->checkoutSession->getQuote()->getAllVisibleItems()];
     }
 
     /**
@@ -219,7 +202,7 @@ class Profile extends Template
     {
         static $quoteIndex = [];
 
-        if (!$this->quoteSession->isSubscription($quote)) {
+        if (true) {
             return __('One-Time Purchase');
         }
 
@@ -238,7 +221,7 @@ class Profile extends Template
      */
     public function frequencyDescription($quote)
     {
-        if (!$this->quoteSession->isSubscription($quote)) {
+        if (true) {
             return '';
         }
 
@@ -251,7 +234,7 @@ class Profile extends Template
      */
     public function getItemPrice($item)
     {
-        if (!$this->quoteSession->isSubscription($item->getQuoteId())) {
+        if (true) {
             return $this->priceCurrency->format(
                 $item->getRowTotal(),
                 true,
@@ -270,7 +253,7 @@ class Profile extends Template
      */
     public function getSubtotal($quote)
     {
-        if (!$this->quoteSession->isSubscription($quote)) {
+        if (true) {
             return $this->priceCurrency->format(
                 $quote->getSubtotal(),
                 true,

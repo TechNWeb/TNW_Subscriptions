@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Block;
 use Magento\Checkout\Block\Cart\Sidebar;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Cart block.
@@ -17,31 +16,30 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 class Cart extends Template
 {
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
+
+    /**
      * @var Sidebar
      */
     private $sidebar;
 
     /**
-     * @var QuoteSessionInterface
-     */
-    private $quoteSession;
-
-    /**
      * Cart constructor.
      *
-     * @param QuoteSessionInterface $quoteSession
      * @param Context $context
      * @param Sidebar $sidebar
      * @param array $data
      */
     public function __construct(
-        QuoteSessionInterface $quoteSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         Context $context,
         Sidebar $sidebar,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->quoteSession = $quoteSession;
+        $this->checkoutSession = $checkoutSession;
         $this->sidebar = $sidebar;
     }
 
@@ -52,7 +50,7 @@ class Cart extends Template
      */
     public function getCartItemsCount()
     {
-        return $this->quoteSession->getSubQuoteItemsCount();
+        return $this->checkoutSession->getQuote()->getItemsCount();
     }
 
     /**

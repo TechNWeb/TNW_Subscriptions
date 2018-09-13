@@ -144,34 +144,6 @@ class Subscribe extends View
     }
 
     /**
-     * Retrieve old quote item id
-     *
-     * @return mixed
-     */
-    private function getOldQuoteItemId()
-    {
-        return $this->_coreRegistry->registry('old_quote_item_id');
-    }
-
-    /**
-     * Get subscribe url.
-     *
-     * @return string
-     */
-    public function getSubscribeUrl()
-    {
-        $oldQuoteItemId = $this->getOldQuoteItemId();
-        $params = ['product_id' => $this->getProduct()->getId()];
-        if ($oldQuoteItemId) {
-            $params['old_quote_item_id'] = $oldQuoteItemId;
-        }
-        return $this->_urlBuilder->getUrl(
-            'tnw_subscriptions/cart/add',
-            $params
-        );
-    }
-
-    /**
      * Get "Enable Subscriptions" config value for current website.
      *
      * @return bool

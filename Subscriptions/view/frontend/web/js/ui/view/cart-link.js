@@ -36,7 +36,7 @@ define([
             var self = this,
                 result = false;
 
-            if (self.subscriptionCart().itemsCount === 0) {
+            if (self.subscriptionCart().summary_count === 0) {
                 if (!this.dialog) {
                     this.createDialog();
                     this.dialog.dropdownDialog('open');

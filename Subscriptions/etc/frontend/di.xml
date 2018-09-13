@@ -16,10 +16,27 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Block\Cart">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Block\Cart\Grid">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\CustomerData\Cart" type="Magento\Checkout\CustomerData\Cart">
+        <arguments>
+            <argument name="checkoutCart" xsi:type="object">TNW\Checkout\Cart</argument>
+            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
     <type name="Magento\Customer\CustomerData\SectionPoolInterface">
         <arguments>
             <argument name="sectionSourceMap" xsi:type="array">
-                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TNW\Subscriptions\CustomerData\SubscriptionCart</item>
+                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TNW\CustomerData\Cart</item>
             </argument>
         </arguments>
     </type>

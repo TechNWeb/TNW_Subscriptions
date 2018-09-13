@@ -118,10 +118,10 @@
             </div>
         </div>
     </div>
-    <button type="button"
+    <button type="submit"
             id="product-subscribe-button"
             title="<?php /* @escapeNotVerified */ echo __('Subscribe') ?>"
-            class="action primary subscribe">
+            class="action primary tocart">
         <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
     </button>
 </div>
@@ -129,7 +129,6 @@
     {
         "#product_addtocart_form": {
             "tnwSubscribeContainer": {
-                "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
                 "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
                 "canShowSubscribePriceBlock" : true,
                 "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
