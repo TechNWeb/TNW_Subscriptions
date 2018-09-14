@@ -188,44 +188,78 @@ class Grid extends Template
         return $helper->getFormattedOptionValue($optionValue, $params);
     }
 
-    public function groupQuoteItems()
+    /**
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
+     *
+     * @return bool
+     */
+    public function isSubscriptionGroup($groupItems)
     {
-        return [$this->checkoutSession->getQuote()->getAllVisibleItems()];
+        return $this->isSubscriptionItem(reset($groupItems));
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item $item
+     *
+     * @return bool
+     */
+    public function isSubscriptionItem($item)
+    {
+        return null !== $item->getOptionByCode('subscription');
+    }
+
+    /**
+     * @return array
+     */
+    public function groupQuoteItems()
+    {
+        $group = [];
+        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
+            $option = $item->getOptionByCode('subscription');
+            if (null === $option) {
+                $group['no_option'][] = $item;
+            } else {
+                $group[$option->getValue()][] = $item;
+            }
+        }
+
+        return $group;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return string
      */
-    public function getCaption($quote)
+    public function getCaption($groupItems)
     {
         static $quoteIndex = [];
 
-        if (true) {
+        if (!$this->isSubscriptionGroup($groupItems)) {
             return __('One-Time Purchase');
         }
 
-        if (!isset($quoteIndex[$quote->getId()])) {
-            $quoteIndex[$quote->getId()] = \count($quoteIndex) + 1;
+        $key = spl_object_hash(reset($groupItems));
+        if (!isset($quoteIndex[$key])) {
+            $quoteIndex[$key] = \count($quoteIndex) + 1;
         }
 
-        return __('Subscription Profile #%1', $quoteIndex[$quote->getId()]);
+        return __('Subscription Profile #%1', $quoteIndex[$key]);
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function frequencyDescription($quote)
+    public function frequencyDescription($groupItems)
     {
-        if (true) {
+        if (!$this->isSubscriptionGroup($groupItems)) {
             return '';
         }
 
-        return $this->descriptionCreator->getDescriptionByQuote($quote);
+        return $this->descriptionCreator->getDescriptionByGroup($groupItems);
     }
 
     /**
@@ -234,7 +268,7 @@ class Grid extends Template
      */
     public function getItemPrice($item)
     {
-        if (true) {
+        if (!$this->isSubscriptionItem($item)) {
             return $this->priceCurrency->format(
                 $item->getRowTotal(),
                 true,
@@ -247,22 +281,27 @@ class Grid extends Template
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return string
      */
-    public function getSubtotal($quote)
+    public function getSubtotal($groupItems)
     {
-        if (true) {
+        if (!$this->isSubscriptionGroup($groupItems)) {
+            $subtotal = array_reduce($groupItems, function ($carry, \Magento\Quote\Model\Quote\Item $item) {
+                $carry += $item->getRowTotal();
+                return $carry;
+            }, 0);
+
             return $this->priceCurrency->format(
-                $quote->getSubtotal(),
+                $subtotal,
                 true,
                 \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
-                $quote->getStore()
+                reset($groupItems)->getStore()
             );
         }
 
-        return $this->descriptionCreator->getDescribedPriceHtmlByQuote($quote);
+        return $this->descriptionCreator->getDescribedPriceHtmlByGroup($groupItems);
     }
 
     /**

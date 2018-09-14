@@ -4,24 +4,24 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/** @var $block \TNW\Subscriptions\Block\Cart\Profile */
+/** @var $block \TNW\Subscriptions\Block\Cart\Grid */
 ?>
 <div id="cart-totals" class="cart-totals">
-    <?php foreach ($block->getSubQuotes() as $subQuote) : ?>
+    <?php foreach ($block->groupQuoteItems() as $groupItems) : ?>
     <table class="data table totals">
         <caption class="table-caption">
-            <h3><?= $block->escapeHtml($block->getCaption($subQuote)) ?></h3>
+            <h3><?= $block->escapeHtml($block->getCaption($groupItems)) ?></h3>
         </caption>
         <tfoot>
         <tr class="totals">
             <th class="mark"><?= $block->escapeHtml(__('Subtotal')) ?></th>
             <td class="amount">
-                <?= /* @escapeNotVerified */ $block->getSubtotal($subQuote) ?>
+                <?= /* @escapeNotVerified */ $block->getSubtotal($groupItems) ?>
             </td>
         </tr>
         </tfoot>
         <tbody>
-        <?php foreach ($subQuote->getAllVisibleItems() as $item) : ?>
+        <?php foreach ($groupItems as $item) : ?>
         <tr class="totals">
             <th class="mark" colspan="2">
                 <span class="label product-name"><?php echo $item->getQty() ?>x <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a></span>

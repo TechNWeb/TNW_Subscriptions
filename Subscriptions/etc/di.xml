@@ -795,10 +795,9 @@
                 type="TNW\Subscriptions\Plugin\Quote\PrepareBuyRequest"
                 sortOrder="100"
                 disabled="false"/>
-        <plugin name="tnw_subs_around_add_product_to_cart"
-                type="TNW\Subscriptions\Plugin\Catalog\Model\Product\AbstractType"
-                sortOrder="110"
-                disabled="false"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Item\Processor">
+        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\Processor" />
     </type>
 
     <type name="Magento\Quote\Model\Quote\Config">

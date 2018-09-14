@@ -128,56 +128,61 @@ class DescriptionCreator
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return string
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getDescriptionByQuote($quote)
+    public function getDescriptionByGroup($groupItems)
     {
-        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
         return $this->getDescription($fullSubscriptionData);
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return string
      */
-    public function getDescribedPriceHtmlByQuote($quote)
+    public function getDescribedPriceHtmlByGroup($groupItems)
     {
-        $fullSubscriptionData = $this->fullSubscriptionData($quote);
+        $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
         return $this->getDescribedItemPriceHtml(
-            $quote->getSubtotal(),
+            $fullSubscriptionData['non_unique']['price'],
             $fullSubscriptionData,
             $fullSubscriptionData['non_unique']['initialPrice']
         );
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
      *
      * @return array
      */
-    private function fullSubscriptionData($quote)
+    private function fullSubscriptionData($groupItems)
     {
         $fullSubscriptionData = null;
 
-        $initialFee = 0;
-        foreach ($quote->getAllVisibleItems() as $item) {
+        $isVirtual = true;
+        $initialFee = $subtotal = 0;
+        foreach ($groupItems as $item) {
             if (!$fullSubscriptionData) {
-                $fullSubscriptionData = $item->getBuyRequest()
-                    ->getDataByPath('subscription_data');
+                $fullSubscriptionData['unique'] = \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
             }
 
+            $subtotal += $item->getRowTotal();
             $initialFee += $this->getInitialFeeFromItem($item);
+
+            if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getProduct()->getIsVirtual()) {
+                $isVirtual = false;
+            }
         }
 
-        $fullSubscriptionData['non_unique']['price'] = $quote->getSubtotal();
-        $fullSubscriptionData['non_unique']['totalPrice'] = $quote->getSubtotal() + $initialFee;
+        $fullSubscriptionData['non_unique']['price'] = $subtotal;
+        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal + $initialFee;
         $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
         $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
-        $fullSubscriptionData['non_unique']['isVirtual'] = $quote->isVirtual();
+        $fullSubscriptionData['non_unique']['isVirtual'] = $isVirtual;
 
         return $fullSubscriptionData;
     }
@@ -272,7 +277,7 @@ class DescriptionCreator
     {
         return $this->getDescribedItemPriceHtml(
             $quoteItem->getRowTotal(),
-            $quoteItem->getBuyRequest()->getDataByPath('subscription_data'),
+            [CreateProfile::UNIQUE => \Zend_Json::decode($quoteItem->getOptionByCode('subscription')->getValue())],
             $this->getInitialFeeFromItem($quoteItem)
         );
     }
