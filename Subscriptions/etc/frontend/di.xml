@@ -19,24 +19,24 @@
 
     <type name="TNW\Subscriptions\Block\Cart">
         <arguments>
-            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
         </arguments>
     </type>
     <type name="TNW\Subscriptions\Block\Cart\Grid">
         <arguments>
-            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
         </arguments>
     </type>
-    <virtualType name="TNW\CustomerData\Cart" type="Magento\Checkout\CustomerData\Cart">
+    <virtualType name="TS\CustomerData\Cart" type="Magento\Checkout\CustomerData\Cart">
         <arguments>
-            <argument name="checkoutCart" xsi:type="object">TNW\Checkout\Cart</argument>
-            <argument name="checkoutSession" xsi:type="object">TNW\Checkout\Session</argument>
+            <argument name="checkoutCart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
         </arguments>
     </virtualType>
     <type name="Magento\Customer\CustomerData\SectionPoolInterface">
         <arguments>
             <argument name="sectionSourceMap" xsi:type="array">
-                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TNW\CustomerData\Cart</item>
+                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TS\CustomerData\Cart</item>
             </argument>
         </arguments>
     </type>
@@ -96,6 +96,36 @@
             <argument name="layoutProcessors" xsi:type="array">
                 <item name="addressFormAttributes" xsi:type="object">TNW\Subscriptions\Block\Checkout\AddressProcessor</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Add">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Configure">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Delete">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\UpdateItemOptions">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\UpdatePost">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
         </arguments>
     </type>
 </config>

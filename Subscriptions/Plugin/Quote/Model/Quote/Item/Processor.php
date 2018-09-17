@@ -43,41 +43,9 @@ class Processor
 
         $buyRequest = $item->getBuyRequest();
         if (isset($buyRequest['subscribe_active']) && $buyRequest['subscribe_active']) {
-            if (isset($buyRequest['subscribe_qty'])) {
-                $buyRequest['qty'] = \Zend_Filter::filterStatic(
-                    $buyRequest['subscribe_qty'],
-                    'LocalizedToNormalized',
-                    [['locale' => $this->localeResolver->getLocale()]]
-                );
-
-                unset($buyRequest['subscribe_qty']);
-            }
-
-            //TODO: refactor
             $this->productModifier->reset();
             $this->productModifier->setData($buyRequest->getData());
             $this->productModifier->setProduct($candidate);
-
-            $preparedBuyRequest = $this->productModifier->getPreparedBuyRequest();
-
-            // Set qty
-            $item->setQty($preparedBuyRequest->getData('qty'));
-
-            // Set custom price
-            $customPrice = $preparedBuyRequest->getData('custom_price');
-
-            $item->setCustomPrice($customPrice);
-            $item->setOriginalCustomPrice($customPrice);
-
-            // Set subscription option
-            $option = $this->dataObjectFactory->create()->setData([
-                'product_id' => $candidate->getId(),
-                'product' => $candidate,
-                'code' => 'subscription',
-                'value' => \json_encode($preparedBuyRequest->getDataByPath('subscription_data/unique'))
-            ]);
-
-            $item->addOption($option);
 
             // Set initial fee
             $this->productModifier->setInitialFeeToItem($item);

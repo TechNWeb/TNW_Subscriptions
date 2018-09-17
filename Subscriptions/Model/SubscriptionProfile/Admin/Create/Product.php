@@ -243,8 +243,7 @@ class Product extends Create
             }
 
             $data = [
-                'qty' => $productData['qty'],
-                'custom_price' => sprintf("%F", $this->getCustomPrice($product, $productData)),
+                'custom_price' => sprintf('%F', $this->getCustomPrice($product, $productData)),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
@@ -259,17 +258,12 @@ class Product extends Create
                     static::FULL_REQUEST_PARAM_NAME => true,
                 ],
             ];
+
             if ($fullRequest) {
                 $data = $this->addPricesToRequest($data, $productData);
             }
-            //unset already unused fields
-            unset(
-                $productData['billing_frequency'],
-                $productData['term'],
-                $productData['period'],
-                $productData['start_on']
-            );
-            $this->buyRequest = new DataObject(array_merge($data, $productData));
+
+            $this->buyRequest = new DataObject(array_merge($productData, $data));
         }
 
         return $this->buyRequest;

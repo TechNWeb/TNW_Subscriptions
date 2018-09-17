@@ -131,7 +131,7 @@ class Grid extends Template
      */
     public function getItemConfigureUrl($item)
     {
-        return $this->getUrl('checkout/cart/configure', [
+        return $this->getUrl('tnw_subscriptions/cart/configure', [
             'id' => $item->getId(),
             'product_id' => $item->getProduct()->getId()
         ]);
@@ -144,7 +144,7 @@ class Grid extends Template
      */
     public function getItemDeleteUrl($item)
     {
-        return $this->getUrl('checkout/cart/delete', [
+        return $this->getUrl('tnw_subscriptions/cart/delete', [
             'id' => $item->getId(),
             'form_key' => $this->formKey->getFormKey()
         ]);
