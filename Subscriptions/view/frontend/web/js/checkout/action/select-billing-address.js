@@ -5,21 +5,21 @@
 
 define([
     'jquery',
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes'
-], function ($, checkoutQuotes) {
+    'TNW_Subscriptions/js/checkout/model/quote'
+], function ($, quote) {
     'use strict';
 
     return function (billingAddress) {
         var address = null;
 
-        if (checkoutQuotes.shippingAddress()
-            && billingAddress.getCacheKey() == checkoutQuotes.shippingAddress().getCacheKey()
+        if (quote.shippingAddress()
+            && billingAddress.getCacheKey() == quote.shippingAddress().getCacheKey()
         ) {
             address = $.extend({}, billingAddress);
             address.saveInAddressBook = null;
         } else {
             address = billingAddress;
         }
-        checkoutQuotes.billingAddress(address);
+        quote.billingAddress(address);
     };
 });

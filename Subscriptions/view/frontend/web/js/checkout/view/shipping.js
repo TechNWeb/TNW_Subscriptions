@@ -14,7 +14,7 @@ define([
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
     'TNW_Subscriptions/js/checkout/action/create-address',
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
+    'TNW_Subscriptions/js/checkout/model/quote',
     'TNW_Subscriptions/js/checkout/model/shipping/service',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/validator',
@@ -30,7 +30,7 @@ define([
     customer,
     addressList,
     createAddress,
-    checkoutQuotes,
+    quote,
     shippingService,
     formPopUpState,
     rateValidator,
@@ -46,13 +46,13 @@ define([
             shippingMethodListTemplate: 'TNW_Subscriptions/checkout/shipping/method/list',
             shippingMethodItemTemplate: 'TNW_Subscriptions/checkout/shipping/method/item'
         },
-        visible: ko.observable(!checkoutQuotes.isVirtual()),
+        visible: ko.observable(!quote.isVirtual()),
         isCustomerLoggedIn: customer.isLoggedIn,
         isFormPopUpVisible: formPopUpState.isVisible,
         isFormInline: addressList().length === 0,
         isNewAddressAdded: ko.observable(false),
         saveInAddressBook: 1,
-        quoteIsVirtual: checkoutQuotes.isVirtual(),
+        quoteIsVirtual: quote.isVirtual(),
 
         /**
          * @return {exports}
@@ -76,8 +76,8 @@ define([
                 }
             });
 
-            checkoutQuotes.shippingAddress.subscribe(function () {
-                rateProcessor.getRates(checkoutQuotes.shippingAddress());
+            quote.shippingAddress.subscribe(function () {
+                rateProcessor.getRates(quote.shippingAddress());
             });
 
             registry.async('checkoutProvider')(function (checkoutProvider) {
@@ -163,7 +163,7 @@ define([
 
                 // New address must be selected as a shipping address
                 newShippingAddress = createAddress(addressData);
-                checkoutQuotes.shippingAddress(newShippingAddress);
+                quote.shippingAddress(newShippingAddress);
 
                 // New address must be selected as a shipping address
                 this.getPopUp().closeModal();
@@ -177,8 +177,8 @@ define([
         rates: shippingService.getShippingRates(),
         isLoading: shippingService.isLoading,
         isSelected: ko.computed(function () {
-            return checkoutQuotes.shippingMethod() ?
-                checkoutQuotes.shippingMethod()['carrier_code'] + '_' + checkoutQuotes.shippingMethod()['method_code'] :
+            return quote.shippingMethod() ?
+                quote.shippingMethod()['carrier_code'] + '_' + quote.shippingMethod()['method_code'] :
                 null;
         }),
 
@@ -187,7 +187,7 @@ define([
          * @return {Boolean}
          */
         selectShippingMethod: function (shippingMethod) {
-            checkoutQuotes.shippingMethod(shippingMethod);
+            quote.shippingMethod(shippingMethod);
 
             return true;
         },

@@ -3,8 +3,18 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
     <action name="tnw_subscriptions/cart/add">
         <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
     </action>
     <action name="tnw_subscriptions/cart/delete">
         <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
+    </action>
+    <action name="tnw_subscriptions/cart/updatePost">
+        <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
+    </action>
+    <action name="tnw_subscriptions/cart/updateItemOptions">
+        <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
     </action>
 </config>

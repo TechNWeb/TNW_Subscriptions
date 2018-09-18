@@ -7,8 +7,6 @@
 namespace TNW\Subscriptions\Controller\Checkout;
 
 use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\View\Result\PageFactory;
 
 /**
  * Controller for Cart Subscription.
@@ -16,16 +14,9 @@ use Magento\Framework\View\Result\PageFactory;
 class Index extends Action
 {
     /**
-     * Result page factory.
-     *
-     * @var PageFactory
+     * @var \Magento\Checkout\Model\Session
      */
-    private $resultPageFactory;
-
-    /**
-     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
-     */
-    private $quoteSession;
+    private $checkoutSession;
 
     /**
      * @var \Magento\Checkout\Helper\Data
@@ -37,24 +28,15 @@ class Index extends Action
      */
     private $customerSession;
 
-    /**
-     * @param Context $context
-     * @param PageFactory $resultPageFactory
-     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
-     * @param \Magento\Checkout\Helper\Data $checkoutHelper
-     * @param \Magento\Customer\Model\Session\Proxy $customerSession
-     */
     public function __construct(
-        Context $context,
-        PageFactory $resultPageFactory,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
+        \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Helper\Data $checkoutHelper,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Customer\Model\Session\Proxy $customerSession
     ) {
         parent::__construct($context);
 
-        $this->resultPageFactory = $resultPageFactory;
-        $this->quoteSession = $quoteSession;
+        $this->checkoutSession = $checkoutSession;
         $this->checkoutHelper = $checkoutHelper;
         $this->customerSession = $customerSession;
     }
@@ -64,22 +46,20 @@ class Index extends Action
      */
     public function execute()
     {
-        if (!$this->quoteSession->getSubQuoteItemsCount()) {
+        $quote = $this->checkoutHelper->getQuote();
+        if (!$quote->hasItems() || $quote->getHasError() || !$quote->validateMinimumAmount()) {
             return $this->resultRedirectFactory->create()->setPath('tnw_subscriptions/cart');
         }
 
-        if (!$this->customerSession->isLoggedIn()) {
-            foreach ($this->quoteSession->getSubQuotes() as $subQuote) {
-                if ($this->checkoutHelper->isAllowedGuestCheckout($subQuote)) {
-                    continue;
-                }
-
-                $this->messageManager->addErrorMessage(__('Guest checkout is disabled.'));
-                return $this->resultRedirectFactory->create()->setPath('checkout/cart');
-            }
+        if (!$this->customerSession->isLoggedIn() && !$this->checkoutHelper->isAllowedGuestCheckout($quote)) {
+            $this->messageManager->addErrorMessage(__('Guest checkout is disabled.'));
+            return $this->resultRedirectFactory->create()->setPath('tnw_subscriptions/cart');
         }
 
-        $resultPage = $this->resultPageFactory->create();
+        $this->customerSession->regenerateId();
+        $this->checkoutSession->setCartWasUpdated(false);
+
+        $resultPage = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
         $resultPage->getConfig()->getTitle()->set(__('Checkout'));
 
         return $resultPage;

@@ -128,4 +128,11 @@
             <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Controller\Checkout\Index">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
+        </arguments>
+    </type>
 </config>

@@ -11,7 +11,7 @@ define([
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/rules',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/address-converter',
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes'
+    'TNW_Subscriptions/js/checkout/model/quote'
 ], function (
     $,
     ko,
@@ -20,7 +20,7 @@ define([
     rateValidationRules,
     formPopUpState,
     addressConverter,
-    checkoutQuotes
+    quote
 ) {
     'use strict';
 
@@ -70,7 +70,7 @@ define([
         validateFields: function () {
             var addressFlat = uiRegistry.get('checkoutProvider').shippingAddress;
             if (rateValidationRules.validateAddressData(addressFlat)) {
-                checkoutQuotes.shippingAddress(
+                quote.shippingAddress(
                     addressConverter.formAddressDataToQuoteAddress(addressFlat)
                 );
             }

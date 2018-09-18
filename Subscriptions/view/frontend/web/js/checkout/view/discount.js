@@ -6,11 +6,11 @@
 define([
     'ko',
     'uiComponent',
-    'TNW_Subscriptions/js/checkout/model/profile'
-], function (ko, Component, profile) {
+    'TNW_Subscriptions/js/checkout/model/quote'
+], function (ko, Component, quote) {
     'use strict';
 
-    var totals = profile.getTotals(),
+    var totals = quote.getTotals(),
         couponCode = ko.observable(null),
         isApplied;
 

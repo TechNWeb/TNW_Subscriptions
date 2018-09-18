@@ -4,11 +4,11 @@
  */
 
 define([
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes'
-], function (checkoutQuotes) {
+    'TNW_Subscriptions/js/checkout/model/quote'
+], function (quote) {
     'use strict';
 
     return function (shippingAddress) {
-        checkoutQuotes.shippingAddress(shippingAddress);
+        quote.shippingAddress(shippingAddress);
     };
 });

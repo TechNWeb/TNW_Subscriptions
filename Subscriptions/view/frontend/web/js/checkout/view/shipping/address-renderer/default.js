@@ -8,9 +8,9 @@ define([
     'ko',
     'uiComponent',
     'Magento_Customer/js/customer-data',
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
+    'TNW_Subscriptions/js/checkout/model/quote',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state'
-], function ($, ko, Component, customerData, checkoutQuotes, formPopUpState) {
+], function ($, ko, Component, customerData, quote, formPopUpState) {
     'use strict';
 
     var countryData = customerData.get('directory-data');
@@ -25,7 +25,7 @@ define([
             this._super();
             this.isSelected = ko.computed(function () {
                 var isSelected = false,
-                    shippingAddress = checkoutQuotes.shippingAddress();
+                    shippingAddress = quote.shippingAddress();
 
                 if (shippingAddress) {
                     isSelected = shippingAddress.getKey() == this.address().getKey();
@@ -49,7 +49,7 @@ define([
 
         /** Set selected customer shipping address  */
         selectAddress: function () {
-            checkoutQuotes.shippingAddress(this.address());
+            quote.shippingAddress(this.address());
         },
 
         /**

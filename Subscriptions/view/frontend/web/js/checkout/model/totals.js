@@ -5,17 +5,34 @@
 
 define([
     'ko',
-    'TNW_Subscriptions/js/checkout/model/profile',
+    'TNW_Subscriptions/js/checkout/model/quote',
     'Magento_Customer/js/customer-data'
-], function (ko, profile, customerData) {
+], function (ko, quote, customerData) {
     'use strict';
 
-    var cartData = customerData.get('cart'),
+    var quoteItems = ko.observable(quote.totals().items),
+        cartData = customerData.get('cart'),
+        quoteSubtotal = parseFloat(quote.totals().subtotal),
         subtotalAmount = parseFloat(cartData().subtotalAmount);
 
+    quote.totals.subscribe(function (newValue) {
+        quoteItems(newValue.items);
+    });
+
+    if (quoteSubtotal !== subtotalAmount) {
+        customerData.reload(['cart'], false);
+    }
+
     return {
-        totals: profile.totals,
+        totals: quote.totals,
         isLoading: ko.observable(false),
+
+        /**
+         * @return {Function}
+         */
+        getItems: function () {
+            return quoteItems;
+        },
 
         /**
          * @param {*} code
@@ -28,15 +45,15 @@ define([
                 return null;
             }
 
-            for (i in this.totals()['total_segments']) { //eslint-disable-line guard-for-in
+            for (i in this.totals()['total_segments']) {
                 total = this.totals()['total_segments'][i];
 
-                if (total.code == code) { //eslint-disable-line eqeqeq
+                if (total.code === code) {
                     return total;
                 }
             }
 
-            return {value: 0};
+            return null;
         }
     };
 });

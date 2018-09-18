@@ -13,9 +13,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private $formKey;
 
     /**
-     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
+     * @var \Magento\Checkout\Model\Session
      */
-    private $quoteSession;
+    private $checkoutSession;
 
     /**
      * @var \Magento\Customer\Api\CustomerRepositoryInterface
@@ -23,7 +23,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private $customerRepository;
 
     /**
-     * @var \Magento\Customer\Model\Session\Proxy
+     * @var \Magento\Customer\Model\Session
      */
     private $customerSession;
 
@@ -92,10 +92,25 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private $descriptionCreator;
 
+    /**
+     * @var \Magento\Quote\Api\CartItemRepositoryInterface
+     */
+    private $quoteItemRepository;
+
+    /**
+     * @var \Magento\Quote\Api\CartTotalRepositoryInterface
+     */
+    private $quoteTotalRepository;
+
+    /**
+     * @var \Magento\Checkout\Helper\Data
+     */
+    private $checkoutHelper;
+
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
         \Magento\Customer\Model\Session\Proxy $customerSession,
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         \Magento\Customer\Model\Address\Config $addressConfig,
@@ -109,11 +124,14 @@ class DefaultConfigProvider implements ConfigProviderInterface
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
+        \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository,
+        \Magento\Quote\Api\CartTotalRepositoryInterface $quoteTotalRepository,
+        \Magento\Checkout\Helper\Data $checkoutHelper
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
-        $this->quoteSession = $quoteSession;
+        $this->checkoutSession = $checkoutSession;
         $this->customerSession = $customerSession;
         $this->addressMapper = $addressMapper;
         $this->addressConfig = $addressConfig;
@@ -128,6 +146,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
         $this->descriptionCreator = $descriptionCreator;
+        $this->quoteItemRepository = $quoteItemRepository;
+        $this->quoteTotalRepository = $quoteTotalRepository;
+        $this->checkoutHelper = $checkoutHelper;
     }
 
     /**
@@ -141,9 +162,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
     {
         $output['formKey'] = $this->formKey->getFormKey();
         $output['customerData'] = $this->getCustomerData();
-        $output['quotes'] = $this->getQuotes();
+        $output['quoteData'] = $this->getQuoteData();
+        $output['quoteGroupItemData'] = $this->getQuoteGroupItemData();
         $output['isCustomerLoggedIn'] = $this->isCustomerLoggedIn();
         $output['storeCode'] = $this->getStoreCode();
+        $output['isGuestCheckoutAllowed'] = $this->isGuestCheckoutAllowed();
         $output['postCodes'] = $this->postCodesConfig->getPostCodes();
         $output['registerUrl'] = $this->getRegisterUrl();
         $output['checkoutUrl'] = $this->getCheckoutUrl();
@@ -152,9 +175,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['forgotPasswordUrl'] = $this->getForgotPasswordUrl();
 
         $output['priceFormat'] = $this->localeFormat
-            ->getPriceFormat(null, $this->storeManager->getStore()->getCurrentCurrencyCode());
+            ->getPriceFormat(null, $this->checkoutSession->getQuote()->getQuoteCurrencyCode());
         $output['basePriceFormat'] = $this->localeFormat
-            ->getPriceFormat(null, $this->storeManager->getStore()->getBaseCurrencyCode());
+            ->getPriceFormat(null, $this->checkoutSession->getQuote()->getBaseCurrencyCode());
+
+        $output['totalsData'] = $this->getTotalsData();
 
         $output['originCountryCode'] = $this->getOriginCountryCode();
         return $output;
@@ -217,36 +242,50 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private function getStoreCode()
     {
-        return $this->storeManager->getStore()->getCode();
+        return $this->checkoutSession->getQuote()->getStore()->getCode();
     }
 
     /**
-     * Retrieve quote data
-     *
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return bool
      */
-    private function getQuotes()
+    private function isGuestCheckoutAllowed()
     {
-        $quotes = [];
-        foreach ($this->quoteSession->getSubQuotes() as $subQuote) {
-            $quoteData = $subQuote->toArray();
-            $quoteData['is_virtual'] = $subQuote->getIsVirtual();
-            $quoteData['profile_name'] = $this->getProfileName($subQuote);
-            $quoteData['profile_description'] = $this->getProfileDescription($subQuote);
+        return $this->checkoutHelper->isAllowedGuestCheckout($this->checkoutSession->getQuote());
+    }
 
-            if (!$subQuote->getCustomer()->getId()) {
-                $quoteData['entity_id'] = $this->quoteIdMaskFactory->create()
-                    ->load($subQuote->getId(), 'quote_id')
+    /**
+     * @return array
+     */
+    private function getQuoteData()
+    {
+        $quoteData = [];
+        if ($this->checkoutSession->getQuote()->getId()) {
+            $quote = $this->checkoutSession->getQuote();
+
+            $quoteData = $quote->toArray();
+            $quoteData['is_virtual'] = $quote->getIsVirtual();
+
+            if (!$quote->getCustomer()->getId()) {
+                /** @var $quoteIdMask \Magento\Quote\Model\QuoteIdMask */
+                $quoteIdMask = $this->quoteIdMaskFactory->create();
+                $quoteData['entity_id'] = $quoteIdMask
+                    ->load($this->checkoutSession->getQuote()->getId(), 'quote_id')
                     ->getMaskedId();
             }
+        }
 
-            $quoteData['items'] = [];
-            foreach ($subQuote->getAllVisibleItems() as $index => $quoteItem) {
-                $quoteData['items'][$index] = $quoteItem->toArray();
+        return $quoteData;
+    }
 
-                $quoteData['items'][$index]['options']
-                    = $this->getFormattedOptionValue($quoteItem);
+    private function getQuoteGroupItemData()
+    {
+        $quoteItemData = [];
+        $quoteId = $this->checkoutSession->getQuote()->getId();
+        if ($quoteId) {
+            $quoteItems = $this->quoteItemRepository->getList($quoteId);
+            foreach ($quoteItems as $index => $quoteItem) {
+                $quoteItemData[$index] = $quoteItem->toArray();
+                $quoteItemData[$index]['options'] = $this->getFormattedOptionValue($quoteItem);
 
                 $imageHelper = $this->imageHelper->init(
                     $this->getItemPurchaseProduct($quoteItem),
@@ -254,18 +293,19 @@ class DefaultConfigProvider implements ConfigProviderInterface
                     ['width' => 60, 'height' => 60]
                 );
 
-                $quoteData['items'][$index]['thumbnail'] = [
+                $quoteItemData[$index]['thumbnail'] = [
                     'src' => $imageHelper->getUrl(),
                     'alt' => $imageHelper->getLabel(),
                     'width' => $imageHelper->getWidth(),
                     'height' => $imageHelper->getHeight(),
                 ];
-            }
 
-            $quotes[] = $quoteData;
+                //$quoteItemData[$index]['profile_name'] = $this->getProfileName($subQuote);
+                //$quoteItemData[$index]['profile_description'] = $this->getProfileDescription($subQuote);
+            }
         }
 
-        return $quotes;
+        return $quoteItemData;
     }
 
     /**
@@ -275,7 +315,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private function getProfileName($quote)
     {
-        if (!$this->quoteSession->isSubscription($quote)) {
+        if (true) {
             return __('One-Time Purchase');
         }
 
@@ -291,11 +331,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private function getProfileDescription($quote)
     {
-        if (!$this->quoteSession->isSubscription($quote)) {
+        if (true) {
             return __('Subtotal: %1', $this->descriptionCreator->formatPrice($quote->getSubtotal()));
         }
 
-        return $this->descriptionCreator->getDescriptionByQuote($quote);
+        return $this->descriptionCreator->getDescriptionByGroup($quote);
     }
 
     /**
@@ -408,5 +448,43 @@ class DefaultConfigProvider implements ConfigProviderInterface
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $this->storeManager->getStore()
         );
+    }
+
+    /**
+     * Return quote totals data
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getTotalsData()
+    {
+        $totals = $this->quoteTotalRepository->get($this->checkoutSession->getQuote()->getId());
+
+        $items = [];
+        /** @var  \Magento\Quote\Model\Cart\Totals\Item $item */
+        foreach ($totals->getItems() as $item) {
+            $items[] = $item->__toArray();
+        }
+
+        $totalSegmentsData = [];
+        /** @var \Magento\Quote\Model\Cart\TotalSegment $totalSegment */
+        foreach ($totals->getTotalSegments() as $totalSegment) {
+            $totalSegmentArray = $totalSegment->toArray();
+            if (\is_object($totalSegment->getExtensionAttributes())) {
+                $totalSegmentArray['extension_attributes'] = $totalSegment->getExtensionAttributes()->__toArray();
+            }
+
+            $totalSegmentsData[] = $totalSegmentArray;
+        }
+
+        $totals->setItems($items);
+        $totals->setTotalSegments($totalSegmentsData);
+        $totalsArray = $totals->toArray();
+
+        if (\is_object($totals->getExtensionAttributes())) {
+            $totalsArray['extension_attributes'] = $totals->getExtensionAttributes()->__toArray();
+        }
+
+        return $totalsArray;
     }
 }

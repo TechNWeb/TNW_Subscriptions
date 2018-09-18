@@ -12,7 +12,7 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
-    'TNW_Subscriptions/js/checkout/model/checkout-quotes',
+    'TNW_Subscriptions/js/checkout/model/quote',
     'TNW_Subscriptions/js/checkout/action/select-billing-address'
 ], function (
     ko,
@@ -23,7 +23,7 @@ define([
     customerData,
     customer,
     addressList,
-    checkoutQuotes,
+    quote,
     selectBillingAddress
 ) {
     'use strict';
@@ -49,13 +49,13 @@ define([
         defaults: {
             activeMethod: '',
             selectedAddress: null,
-            isAddressDetailsVisible: checkoutQuotes.billingAddress() != null,
+            isAddressDetailsVisible: quote.billingAddress() != null,
             isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length === 1,
             isAddressSameAsShipping: false,
             saveInAddressBook: 1
         },
         isVisible: ko.observable(true),
-        quoteIsVirtual: checkoutQuotes.isVirtual(),
+        quoteIsVirtual: quote.isVirtual(),
         isPaymentMethodsAvailable: ko.computed(function () {
             return false;
         }),
@@ -80,19 +80,19 @@ define([
                     'saveInAddressBook'
                 ]);
 
-            checkoutQuotes.shippingAddress.subscribe(function (shippingAddress) {
+            quote.shippingAddress.subscribe(function (shippingAddress) {
                 if (this.isAddressSameAsShipping()) {
                     selectBillingAddress(shippingAddress);
                 }
             }, this);
 
-            checkoutQuotes.billingAddress.subscribe(function (newAddress) {
-                if (checkoutQuotes.isVirtual()) {
+            quote.billingAddress.subscribe(function (newAddress) {
+                if (quote.isVirtual()) {
                     this.isAddressSameAsShipping(false);
                 } else {
                     this.isAddressSameAsShipping(
                         newAddress != null &&
-                        newAddress.getCacheKey() === checkoutQuotes.shippingAddress().getCacheKey()
+                        newAddress.getCacheKey() === quote.shippingAddress().getCacheKey()
                     );
                 }
 
@@ -114,21 +114,21 @@ define([
             return window.checkoutConfig.formKey;
         },
 
-        currentBillingAddress: checkoutQuotes.billingAddress,
+        currentBillingAddress: quote.billingAddress,
         addressOptions: addressOptions,
         customerHasAddresses: addressOptions.length > 1,
 
         canUseShippingAddress: ko.computed(function () {
-            return !checkoutQuotes.isVirtual() && checkoutQuotes.shippingAddress() && checkoutQuotes.shippingAddress().canUseForBilling();
+            return !quote.isVirtual() && quote.shippingAddress() && quote.shippingAddress().canUseForBilling();
         }),
 
         useShippingAddress: function () {
             if (this.isAddressSameAsShipping()) {
-                selectBillingAddress(checkoutQuotes.shippingAddress());
+                selectBillingAddress(quote.shippingAddress());
 
                 this.isAddressDetailsVisible(true);
             } else {
-                checkoutQuotes.billingAddress(null);
+                quote.billingAddress(null);
                 this.isAddressDetailsVisible(false);
             }
 
@@ -149,7 +149,7 @@ define([
          * Edit address action
          */
         editAddress: function () {
-            checkoutQuotes.billingAddress(null);
+            quote.billingAddress(null);
             this.isAddressDetailsVisible(false);
         },
 

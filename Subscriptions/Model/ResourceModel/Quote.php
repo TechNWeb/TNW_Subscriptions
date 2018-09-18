@@ -34,30 +34,22 @@ class Quote extends \Magento\Quote\Model\ResourceModel\Quote
     /**
      * @inheritdoc
      */
-    protected function _getLoadSelect($field, $value, $object)
-    {
-        return parent::_getLoadSelect($field, $value, $object)
-            ->where('is_tnw_subscription = ?', $this->isSubscription);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function loadByIdWithoutStore($quote, $quoteId)
+    public function loadByCustomerId($quote, $customerId)
     {
         $connection = $this->getConnection();
-        if ($connection) {
-            $select = \Magento\Framework\Model\ResourceModel\Db\AbstractDb::_getLoadSelect('entity_id', $quoteId, $quote)
-                ->where('is_tnw_subscription = ?', $this->isSubscription);
+        $select = $this->_getLoadSelect('customer_id', $customerId, $quote)
+            ->where('is_active = ?', 1)
+            ->where('is_tnw_subscription = ?', $this->isSubscription)
+            ->order('updated_at ' . \Magento\Framework\DB\Select::SQL_DESC)
+            ->limit(1);
 
-            $data = $connection->fetchRow($select);
-
-            if ($data) {
-                $quote->setData($data);
-            }
+        $data = $connection->fetchRow($select);
+        if ($data) {
+            $quote->setData($data);
         }
 
         $this->_afterLoad($quote);
+
         return $this;
     }
 

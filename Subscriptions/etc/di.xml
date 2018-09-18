@@ -936,7 +936,7 @@
 
     <virtualType name="TS\Model\ShippingAddressManagement" type="Magento\Quote\Model\ShippingAddressManagement">
         <arguments>
-            <argument name="quoteRepository" xsi:type="object">TS\Quote\Repository\Quote</argument>
+            <argument name="quoteRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
         </arguments>
     </virtualType>
 
@@ -992,10 +992,29 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TS\Model\Checkout\Proxy\Session" type="Magento\Checkout\Model\Session\Proxy">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Helper\Checkout\Data" type="Magento\Checkout\Helper\Data">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="TS\Model\Checkout\Cart" type="Magento\Checkout\Model\Cart">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
             <argument name="quoteRepository"  xsi:type="object">TS\Model\RepositoryQuote</argument>
         </arguments>
     </virtualType>
+
+    <type name="TNW\Subscriptions\Model\Checkout\DefaultConfigProvider">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
+        </arguments>
+    </type>
 </config>
