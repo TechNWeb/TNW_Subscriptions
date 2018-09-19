@@ -107,6 +107,16 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private $checkoutHelper;
 
+    /**
+     * @var \TNW\Subscriptions\Model\Quote\ItemGroup
+     */
+    private $quoteItemGroup;
+
+    /**
+     * @var \Magento\Checkout\Model\Cart\ImageProvider
+     */
+    private $imageProvider;
+
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -127,7 +137,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository,
         \Magento\Quote\Api\CartTotalRepositoryInterface $quoteTotalRepository,
-        \Magento\Checkout\Helper\Data $checkoutHelper
+        \Magento\Checkout\Helper\Data $checkoutHelper,
+        \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
+        \Magento\Checkout\Model\Cart\ImageProvider $imageProvider
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
@@ -149,6 +161,8 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->quoteItemRepository = $quoteItemRepository;
         $this->quoteTotalRepository = $quoteTotalRepository;
         $this->checkoutHelper = $checkoutHelper;
+        $this->quoteItemGroup = $quoteItemGroup;
+        $this->imageProvider = $imageProvider;
     }
 
     /**
@@ -163,7 +177,8 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['formKey'] = $this->formKey->getFormKey();
         $output['customerData'] = $this->getCustomerData();
         $output['quoteData'] = $this->getQuoteData();
-        $output['quoteGroupItemData'] = $this->getQuoteGroupItemData();
+        $output['quoteItemData'] = $this->getQuoteItemData();
+        $output['quoteGroupData'] = $this->getQuoteGroupData();
         $output['isCustomerLoggedIn'] = $this->isCustomerLoggedIn();
         $output['storeCode'] = $this->getStoreCode();
         $output['isGuestCheckoutAllowed'] = $this->isGuestCheckoutAllowed();
@@ -173,6 +188,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['defaultSuccessPageUrl'] = $this->getDefaultSuccessPageUrl();
         $output['pageNotFoundUrl'] = $this->pageNotFoundUrl();
         $output['forgotPasswordUrl'] = $this->getForgotPasswordUrl();
+        $output['imageData'] = $this->imageProvider->getImages($this->checkoutSession->getQuote()->getId());
 
         $output['priceFormat'] = $this->localeFormat
             ->getPriceFormat(null, $this->checkoutSession->getQuote()->getQuoteCurrencyCode());
@@ -277,7 +293,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         return $quoteData;
     }
 
-    private function getQuoteGroupItemData()
+    private function getQuoteItemData()
     {
         $quoteItemData = [];
         $quoteId = $this->checkoutSession->getQuote()->getId();
@@ -299,43 +315,30 @@ class DefaultConfigProvider implements ConfigProviderInterface
                     'width' => $imageHelper->getWidth(),
                     'height' => $imageHelper->getHeight(),
                 ];
-
-                //$quoteItemData[$index]['profile_name'] = $this->getProfileName($subQuote);
-                //$quoteItemData[$index]['profile_description'] = $this->getProfileDescription($subQuote);
             }
         }
 
         return $quoteItemData;
     }
 
-    /**
-     * @param \Magento\Quote\Model\Quote $quote
-     *
-     * @return string
-     */
-    private function getProfileName($quote)
+    private function getQuoteGroupData()
     {
-        if (true) {
-            return __('One-Time Purchase');
+        $quoteGroupData = [];
+        $quoteId = $this->checkoutSession->getQuote()->getId();
+        if ($quoteId) {
+            $quoteItems = $this->quoteItemRepository->getList($quoteId);
+            foreach ($this->quoteItemGroup->groups($quoteItems) as $group) {
+                $quoteGroupData[] = [
+                    'caption' => $this->quoteItemGroup->caption($group),
+                    'description' => $this->quoteItemGroup->frequencyDescription($group),
+                    'itemIds' => array_map(function ($item) {
+                        return $item->getId();
+                    }, $group)
+                ];
+            }
         }
 
-        static $quoteIndex = 0;
-        return __('Subscription #%1', ++$quoteIndex);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote $quote
-     *
-     * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function getProfileDescription($quote)
-    {
-        if (true) {
-            return __('Subtotal: %1', $this->descriptionCreator->formatPrice($quote->getSubtotal()));
-        }
-
-        return $this->descriptionCreator->getDescriptionByGroup($quote);
+        return $quoteGroupData;
     }
 
     /**
@@ -458,6 +461,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private function getTotalsData()
     {
+        /** @var \Magento\Quote\Model\Cart\Totals $totals */
         $totals = $this->quoteTotalRepository->get($this->checkoutSession->getQuote()->getId());
 
         $items = [];

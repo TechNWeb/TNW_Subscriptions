@@ -79,6 +79,13 @@ define([
         },
 
         /**
+         * @return {*}
+         */
+        getGroups: function () {
+            return window.checkoutConfig.quoteGroupData;
+        },
+
+        /**
          *
          * @return {*}
          */

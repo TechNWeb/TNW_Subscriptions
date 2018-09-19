@@ -39,6 +39,11 @@ class Grid extends Template
      */
     private $formKey;
 
+    /**
+     * @var \TNW\Subscriptions\Model\Quote\ItemGroup
+     */
+    private $quoteItemGroup;
+
     public function __construct(
         Template\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
@@ -47,6 +52,7 @@ class Grid extends Template
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Magento\Framework\Data\Form\FormKey $formKey,
+        \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -56,6 +62,7 @@ class Grid extends Template
         $this->descriptionCreator = $descriptionCreator;
         $this->priceCurrency = $priceCurrency;
         $this->formKey = $formKey;
+        $this->quoteItemGroup = $quoteItemGroup;
     }
 
     /**
@@ -189,41 +196,12 @@ class Grid extends Template
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
-     *
-     * @return bool
-     */
-    public function isSubscriptionGroup($groupItems)
-    {
-        return $this->isSubscriptionItem(reset($groupItems));
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote\Item $item
-     *
-     * @return bool
-     */
-    public function isSubscriptionItem($item)
-    {
-        return null !== $item->getOptionByCode('subscription');
-    }
-
-    /**
      * @return array
      */
     public function groupQuoteItems()
     {
-        $group = [];
-        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
-            $option = $item->getOptionByCode('subscription');
-            if (null === $option) {
-                $group['no_option'][] = $item;
-            } else {
-                $group[$option->getValue()][] = $item;
-            }
-        }
-
-        return $group;
+        return $this->quoteItemGroup
+            ->groups($this->checkoutSession->getQuote()->getAllVisibleItems());
     }
 
     /**
@@ -233,18 +211,7 @@ class Grid extends Template
      */
     public function getCaption($groupItems)
     {
-        static $quoteIndex = [];
-
-        if (!$this->isSubscriptionGroup($groupItems)) {
-            return __('One-Time Purchase');
-        }
-
-        $key = spl_object_hash(reset($groupItems));
-        if (!isset($quoteIndex[$key])) {
-            $quoteIndex[$key] = \count($quoteIndex) + 1;
-        }
-
-        return __('Subscription Profile #%1', $quoteIndex[$key]);
+        return $this->quoteItemGroup->caption($groupItems);
     }
 
     /**
@@ -255,11 +222,7 @@ class Grid extends Template
      */
     public function frequencyDescription($groupItems)
     {
-        if (!$this->isSubscriptionGroup($groupItems)) {
-            return '';
-        }
-
-        return $this->descriptionCreator->getDescriptionByGroup($groupItems);
+        return $this->quoteItemGroup->frequencyDescription($groupItems);
     }
 
     /**
@@ -268,7 +231,7 @@ class Grid extends Template
      */
     public function getItemPrice($item)
     {
-        if (!$this->isSubscriptionItem($item)) {
+        if (!$this->quoteItemGroup->isSubscriptionItem($item)) {
             return $this->priceCurrency->format(
                 $item->getRowTotal(),
                 true,
@@ -287,7 +250,7 @@ class Grid extends Template
      */
     public function getSubtotal($groupItems)
     {
-        if (!$this->isSubscriptionGroup($groupItems)) {
+        if (!$this->quoteItemGroup->isSubscriptionGroup($groupItems)) {
             $subtotal = array_reduce($groupItems, function ($carry, \Magento\Quote\Model\Quote\Item $item) {
                 $carry += $item->getRowTotal();
                 return $carry;

@@ -5,34 +5,34 @@
  */
 -->
 <div class="block quotes-in-cart">
-    <!-- ko foreach: {data: items, as: 'item'} -->
+    <!-- ko foreach: {data: groups, as: 'group'} -->
     <div class="content minisub-quote">
         <div class="minisub-quote-wrapper overflowed">
-            <div class="title" data-bind="text: quote.getProfileName()"></div>
+            <div class="title" data-bind="text: $parent.getProfileName(group)"></div>
             <div class="content minisub-items" data-role="content">
                 <ol class="minisub-items">
-                    <!-- ko foreach: {data: quote.getItems(), as: 'item'} -->
+                    <!-- ko foreach: {data: $parent.getItems(group), as: 'item'} -->
                     <li class="product-item">
                         <div class="product">
-                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + item.thumbnail.height + 'px; width: ' + item.thumbnail.width + 'px;' }">
+                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + $parents[1].getImageItem(item).height + 'px; width: ' + $parents[1].getImageItem(item).width + 'px;' }">
                                 <span class="product-image-wrapper">
-                                    <img data-bind="attr: {'src': item.thumbnail.src, 'width': item.thumbnail.width, 'height': item.thumbnail.height, 'alt': item.thumbnail.alt }">
+                                    <img data-bind="attr: {'src': $parents[1].getImageItem(item).src, 'width': $parents[1].getImageItem(item).width, 'height': $parents[1].getImageItem(item).height, 'alt': $parents[1].getImageItem(item).alt }">
                                 </span>
                             </span>
                             <div class="product-item-details">
                                 <div class="product-item-inner">
-                                    <div class="product-item-name-block">
+                                    <div class="produoptionsct-item-name-block">
                                         <span class="qty" data-bind="text: item.qty+'x'"></span>
                                         <span class="product-item-name" data-bind="text: item.name"></span>
                                     </div>
                                 </div>
-                                <!-- ko if: (item.options.length > 0)-->
+                                <!-- ko if: (JSON.parse(item.options).length > 0)-->
                                 <div class="product options" data-bind="mageInit: {'collapsible':{'openedState': 'active'}}">
                                     <span data-role="title" class="toggle"><!-- ko i18n: 'View Details' --><!-- /ko --></span>
                                     <div data-role="content" class="content">
                                         <strong class="subtitle"><!-- ko i18n: 'Options Details' --><!-- /ko --></strong>
                                         <dl class="item-options">
-                                            <!-- ko foreach: item.options -->
+                                            <!-- ko foreach: JSON.parse(item.options) -->
                                                 <dt class="label" data-bind="text: label"></dt>
                                                 <!-- ko if: ($data.full_view)-->
                                                     <dd class="values" data-bind="html: full_view"></dd>
@@ -51,7 +51,7 @@
                     <!-- /ko -->
                 </ol>
             </div>
-            <div class="description" data-bind="text: quote.getProfileDescription()"></div>
+            <div class="description" data-bind="text: $parent.getProfileDescription(group)"></div>
         </div>
     </div>
     <!-- /ko -->

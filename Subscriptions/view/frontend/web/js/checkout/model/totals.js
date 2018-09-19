@@ -11,7 +11,7 @@ define([
     'use strict';
 
     var quoteItems = ko.observable(quote.totals().items),
-        cartData = customerData.get('cart'),
+        cartData = customerData.get('tnw-subscriptions-subscription-cart'),
         quoteSubtotal = parseFloat(quote.totals().subtotal),
         subtotalAmount = parseFloat(cartData().subtotalAmount);
 
@@ -20,7 +20,7 @@ define([
     });
 
     if (quoteSubtotal !== subtotalAmount) {
-        customerData.reload(['cart'], false);
+        customerData.reload(['tnw-subscriptions-subscription-cart'], false);
     }
 
     return {
@@ -32,6 +32,28 @@ define([
          */
         getItems: function () {
             return quoteItems;
+        },
+
+        /**
+         * @param {*} itemId
+         * @return {*}
+         */
+        getItem: function (itemId) {
+            var i, item;
+
+            if (!quoteItems()) {
+                return null;
+            }
+
+            for (i in quoteItems()) {
+                item = quoteItems()[i];
+
+                if (item['item_id'] === itemId) {
+                    return item;
+                }
+            }
+
+            return null;
         },
 
         /**

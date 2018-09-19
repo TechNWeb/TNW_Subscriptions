@@ -27,7 +27,7 @@
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
         </arguments>
     </type>
-    <virtualType name="TS\CustomerData\Cart" type="Magento\Checkout\CustomerData\Cart">
+    <virtualType name="TS\CustomerData\Checkout\Cart" type="Magento\Checkout\CustomerData\Cart">
         <arguments>
             <argument name="checkoutCart" xsi:type="object">TS\Model\Checkout\Cart</argument>
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
@@ -36,9 +36,12 @@
     <type name="Magento\Customer\CustomerData\SectionPoolInterface">
         <arguments>
             <argument name="sectionSourceMap" xsi:type="array">
-                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TS\CustomerData\Cart</item>
+                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TS\CustomerData\Checkout\Cart</item>
             </argument>
         </arguments>
+    </type>
+    <type name="Magento\Checkout\CustomerData\AbstractItem">
+        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\CustomerData\AbstractItem" />
     </type>
 
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">

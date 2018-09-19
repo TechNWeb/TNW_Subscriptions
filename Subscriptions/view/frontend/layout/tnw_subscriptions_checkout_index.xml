@@ -375,12 +375,12 @@
                                                     <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary</item>
                                                 </item>
                                                 <item name="children" xsi:type="array">
-                                                    <!--<item name="cart_items" xsi:type="array">-->
-                                                        <!--<item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/summary/cart-items</item>-->
-                                                        <!--<item name="config" xsi:type="array">-->
-                                                            <!--<item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/cart-items</item>-->
-                                                        <!--</item>-->
-                                                    <!--</item>-->
+                                                    <item name="cart_items" xsi:type="array">
+                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/summary/cart-items</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/cart-items</item>
+                                                        </item>
+                                                    </item>
                                                 </item>
                                             </item>
                                         </item>
@@ -399,7 +399,6 @@
         <referenceContainer name="authentication-popup" remove="true"/>
         <referenceContainer name="customer.section.config" remove="true"/>
         <referenceContainer name="product.price.render.default" remove="true"/>
-        <referenceContainer name="customer.customer.data" remove="true"/>
         <move element="logo" destination="checkout.header.wrapper"/>
     </body>
 </page>
