@@ -113,9 +113,9 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private $quoteItemGroup;
 
     /**
-     * @var \Magento\Checkout\Model\Cart\ImageProvider
+     * @var \Magento\Quote\Api\ShippingMethodManagementInterface
      */
-    private $imageProvider;
+    private $shippingMethodManager;
 
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
@@ -139,7 +139,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         \Magento\Quote\Api\CartTotalRepositoryInterface $quoteTotalRepository,
         \Magento\Checkout\Helper\Data $checkoutHelper,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        \Magento\Checkout\Model\Cart\ImageProvider $imageProvider
+        \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManager
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
@@ -162,7 +162,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->quoteTotalRepository = $quoteTotalRepository;
         $this->checkoutHelper = $checkoutHelper;
         $this->quoteItemGroup = $quoteItemGroup;
-        $this->imageProvider = $imageProvider;
+        $this->shippingMethodManager = $shippingMethodManager;
     }
 
     /**
@@ -180,6 +180,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['quoteItemData'] = $this->getQuoteItemData();
         $output['quoteGroupData'] = $this->getQuoteGroupData();
         $output['isCustomerLoggedIn'] = $this->isCustomerLoggedIn();
+        $output['selectedShippingMethod'] = $this->getSelectedShippingMethod();
         $output['storeCode'] = $this->getStoreCode();
         $output['isGuestCheckoutAllowed'] = $this->isGuestCheckoutAllowed();
         $output['postCodes'] = $this->postCodesConfig->getPostCodes();
@@ -188,7 +189,6 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $output['defaultSuccessPageUrl'] = $this->getDefaultSuccessPageUrl();
         $output['pageNotFoundUrl'] = $this->pageNotFoundUrl();
         $output['forgotPasswordUrl'] = $this->getForgotPasswordUrl();
-        $output['imageData'] = $this->imageProvider->getImages($this->checkoutSession->getQuote()->getId());
 
         $output['priceFormat'] = $this->localeFormat
             ->getPriceFormat(null, $this->checkoutSession->getQuote()->getQuoteCurrencyCode());
@@ -251,6 +251,27 @@ class DefaultConfigProvider implements ConfigProviderInterface
     private function isCustomerLoggedIn()
     {
         return (bool)$this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+    }
+
+    /**
+     * Retrieve selected shipping method
+     *
+     * @return array|null
+     */
+    private function getSelectedShippingMethod()
+    {
+        $shippingMethodData = null;
+        try {
+            $quoteId = $this->checkoutSession->getQuote()->getId();
+            $shippingMethod = $this->shippingMethodManager->get($quoteId);
+            if ($shippingMethod) {
+                $shippingMethodData = $shippingMethod->__toArray();
+            }
+        } catch (\Exception $exception) {
+            $shippingMethodData = null;
+        }
+
+        return $shippingMethodData;
     }
 
     /**

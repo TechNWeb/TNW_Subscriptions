@@ -46,7 +46,7 @@
         <div class="step-title" data-role="title" data-bind="i18n: 'Shipping Methods'"></div>
         <div id="checkout-step-shipping_method" class="step-content methods-shipping" data-role="content">
             <!-- ko if: rates().length -->
-            <form id="co-shipping-method-form" class="form" data-bind="submit: setShippingInformation" novalidate="novalidate">
+            <form id="co-shipping-method-form" class="form" novalidate="novalidate">
                 <!-- ko template: shippingMethodListTemplate --><!-- /ko -->
             </form>
             <!-- /ko -->

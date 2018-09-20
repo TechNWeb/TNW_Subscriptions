@@ -29,11 +29,19 @@ class ItemGroup
         foreach ((array)$items as $item) {
             $option = $item->getOptionByCode('subscription');
             if (null === $option) {
-                $group[\md5('no_option')][] = $item;
+                $group['no_option'][] = $item;
             } else {
-                $group[\md5($option->getValue())][] = $item;
+                $group[$option->getValue()][] = $item;
             }
         }
+
+        uksort($group, function ($a, $b) {
+            if ($b === 'no_option') {
+                return 1;
+            }
+
+            return 0;
+        });
 
         return $group;
     }
@@ -68,7 +76,12 @@ class ItemGroup
     public function frequencyDescription($group)
     {
         if (!$this->isSubscriptionGroup($group)) {
-            return '';
+            $subtotal = array_reduce($group, function ($carry, \Magento\Quote\Model\Quote\Item $item) {
+                $carry += $item->getRowTotal();
+                return $carry;
+            });
+
+            return __('Subtotal: %1', $this->descriptionCreator->formatPrice($subtotal));
         }
 
         return $this->descriptionCreator->getDescriptionByGroup($group);

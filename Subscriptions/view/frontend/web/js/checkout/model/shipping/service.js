@@ -4,8 +4,9 @@
  */
 
 define([
-    'ko'
-], function (ko) {
+    'ko',
+    'TNW_Subscriptions/js/checkout/model/data-resolver'
+], function (ko, dataResolver) {
     'use strict';
 
     var shippingRates = ko.observableArray([]);
@@ -21,6 +22,7 @@ define([
         setShippingRates: function (ratesData) {
             shippingRates(ratesData);
             shippingRates.valueHasMutated();
+            dataResolver.resolveShippingRates(ratesData);
         },
 
         /**

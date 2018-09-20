@@ -81,6 +81,23 @@ define([
         /**
          * @return {*}
          */
+        getItem: function (itemId) {
+            var i, item, quoteItemData = window.checkoutConfig.quoteItemData;
+
+            for (i in quoteItemData) {
+                item = quoteItemData[i];
+
+                if (item['item_id'] === itemId) {
+                    return item;
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * @return {*}
+         */
         getGroups: function () {
             return window.checkoutConfig.quoteGroupData;
         },

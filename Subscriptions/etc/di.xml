@@ -1017,4 +1017,31 @@
             <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
         </arguments>
     </type>
+
+    <virtualType name="TS\Model\Quote\QuoteManagement" type="Magento\Quote\Model\QuoteManagement">
+        <arguments>
+            <argument name="quoteRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\Webapi\ParamOverriderCartId" type="Magento\Quote\Model\Webapi\ParamOverriderCartId">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Webapi\Proxy\ParamOverriderCartId" type="Magento\Quote\Model\Webapi\ParamOverriderCartId\Proxy">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\Quote\Webapi\ParamOverriderCartId</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Webapi\Controller\Rest\ParamsOverrider">
+        <arguments>
+            <argument name="paramOverriders" xsi:type="array">
+                <item name="%tnw_subscriptions_cart_id%" xsi:type="object">TS\Model\Webapi\Proxy\ParamOverriderCartId</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

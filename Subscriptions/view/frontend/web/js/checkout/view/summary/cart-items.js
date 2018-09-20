@@ -44,9 +44,10 @@ define([
          * @param {Object} item
          * @return {Array}
          */
-        getImageItem: function (item) {
-            if (imageData[item]) {
-                return imageData[item['item_id']];
+        getThumbnailItem: function (item) {
+            var quoteItem = quote.getItem(item['item_id']);
+            if (null !== quoteItem) {
+                return quoteItem['thumbnail'];
             }
 
             return [];

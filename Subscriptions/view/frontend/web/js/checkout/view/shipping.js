@@ -13,12 +13,16 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
-    'TNW_Subscriptions/js/checkout/action/create-address',
+    'TNW_Subscriptions/js/checkout/action/create-shipping-address',
+    'TNW_Subscriptions/js/checkout/data',
+    'TNW_Subscriptions/js/checkout/model/data-resolver',
     'TNW_Subscriptions/js/checkout/model/quote',
     'TNW_Subscriptions/js/checkout/model/shipping/service',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/validator',
-    'TNW_Subscriptions/js/checkout/model/shipping/rate/processor'
+    'TNW_Subscriptions/js/checkout/action/select-shipping-address',
+    'TNW_Subscriptions/js/checkout/action/select-shipping-method',
+    'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
 ], function (
     ko,
     $,
@@ -29,12 +33,15 @@ define([
     modal,
     customer,
     addressList,
-    createAddress,
+    createShippingAddress,
+    data,
+    dataResolver,
     quote,
     shippingService,
     formPopUpState,
     rateValidator,
-    rateProcessor
+    selectShippingAddress,
+    selectShippingMethod
 ) {
     'use strict';
 
@@ -64,6 +71,8 @@ define([
 
             this._super();
 
+            dataResolver.resolveShippingAddress();
+
             hasNewAddress = addressList.some(function (address) {
                 return address.getType() === 'new-customer-address';
             });
@@ -76,11 +85,20 @@ define([
                 }
             });
 
-            quote.shippingAddress.subscribe(function () {
-                rateProcessor.getRates(quote.shippingAddress());
-            });
-
             registry.async('checkoutProvider')(function (checkoutProvider) {
+                var shippingAddressData = data.getShippingAddressFromData();
+
+                if (shippingAddressData) {
+                    checkoutProvider.set(
+                        'shippingAddress',
+                        $.extend(true, {}, checkoutProvider.get('shippingAddress'), shippingAddressData)
+                    );
+                }
+
+                checkoutProvider.on('shippingAddress', function (shippingAddrsData) {
+                    data.setShippingAddressFromData(shippingAddrsData);
+                });
+
                 rateValidator.initFields(fieldsetName);
             });
 
@@ -124,7 +142,7 @@ define([
                 /** @inheritdoc */
                 this.popUpForm.options.opened = function () {
                     // Store temporary address for revert action in case when user click cancel action
-                    self.temporaryAddress = $.extend(true, {}, {});
+                    self.temporaryAddress = $.extend(true, {}, data.getShippingAddressFromData());
                 };
                 popUp = modal(this.popUpForm.options, $(this.popUpForm.element));
             }
@@ -136,6 +154,7 @@ define([
          * Revert address and close modal.
          */
         onClosePopUp: function () {
+            data.setShippingAddressFromData($.extend(true, {}, this.temporaryAddress));
             this.getPopUp().closeModal();
         },
 
@@ -150,8 +169,7 @@ define([
          * Save new shipping address
          */
         saveNewAddress: function () {
-            var addressData,
-                newShippingAddress;
+            var addressData;
 
             this.source.set('params.invalid', false);
             this.triggerShippingDataValidateEvent();
@@ -162,8 +180,7 @@ define([
                 addressData['save_in_address_book'] = this.saveInAddressBook ? 1 : 0;
 
                 // New address must be selected as a shipping address
-                newShippingAddress = createAddress(addressData);
-                quote.shippingAddress(newShippingAddress);
+                selectShippingAddress(createShippingAddress(addressData));
 
                 // New address must be selected as a shipping address
                 this.getPopUp().closeModal();
@@ -187,25 +204,23 @@ define([
          * @return {Boolean}
          */
         selectShippingMethod: function (shippingMethod) {
-            quote.shippingMethod(shippingMethod);
+            selectShippingMethod(shippingMethod);
 
-            return true;
-        },
+            console.log(quote.shippingMethod());
 
-        /**
-         * Set shipping information handler
-         */
-        setShippingInformation: function () {
             if (this.validateShippingInformation()) {
-
+                data.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
+                return true;
             }
+
+            return false;
         },
 
         /**
          * @return {Boolean}
          */
         validateShippingInformation: function () {
-            return true;
+            return false;
         },
 
         /**

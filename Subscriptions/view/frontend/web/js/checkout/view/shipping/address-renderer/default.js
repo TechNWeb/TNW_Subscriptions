@@ -8,9 +8,10 @@ define([
     'ko',
     'uiComponent',
     'Magento_Customer/js/customer-data',
+    'TNW_Subscriptions/js/checkout/data',
     'TNW_Subscriptions/js/checkout/model/quote',
     'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state'
-], function ($, ko, Component, customerData, quote, formPopUpState) {
+], function ($, ko, Component, customerData, data, quote, formPopUpState) {
     'use strict';
 
     var countryData = customerData.get('directory-data');
@@ -50,6 +51,7 @@ define([
         /** Set selected customer shipping address  */
         selectAddress: function () {
             quote.shippingAddress(this.address());
+            data.setSelectedShippingAddress(this.address().getKey());
         },
 
         /**

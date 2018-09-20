@@ -14,9 +14,9 @@
                     <!-- ko foreach: {data: $parent.getItems(group), as: 'item'} -->
                     <li class="product-item">
                         <div class="product">
-                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + $parents[1].getImageItem(item).height + 'px; width: ' + $parents[1].getImageItem(item).width + 'px;' }">
+                            <span class="product-image-container" data-bind="attr: {'style': 'height: ' + $parents[1].getThumbnailItem(item).height + 'px; width: ' + $parents[1].getThumbnailItem(item).width + 'px;' }">
                                 <span class="product-image-wrapper">
-                                    <img data-bind="attr: {'src': $parents[1].getImageItem(item).src, 'width': $parents[1].getImageItem(item).width, 'height': $parents[1].getImageItem(item).height, 'alt': $parents[1].getImageItem(item).alt }">
+                                    <img data-bind="attr: {'src': $parents[1].getThumbnailItem(item).src, 'width': $parents[1].getThumbnailItem(item).width, 'height': $parents[1].getThumbnailItem(item).height, 'alt': $parents[1].getThumbnailItem(item).alt }">
                                 </span>
                             </span>
                             <div class="product-item-details">

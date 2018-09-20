@@ -74,6 +74,30 @@ define([
             });
 
             return convertedArray.slice(0);
+        },
+
+        /**
+         * @param {String} string
+         */
+        toUnderscore: function (string) {
+            return string.replace(/([A-Z])/g, function ($1) {
+                return '_' + $1.toLowerCase();
+            });
+        },
+
+        /**
+         * @param {Object} addrs
+         * @return {*|Object}
+         */
+        addressToEstimationAddress: function (addrs) {
+            var self = this,
+                estimatedAddressData = {};
+
+            $.each(addrs, function (key) {
+                estimatedAddressData[self.toUnderscore(key)] = addrs[key];
+            });
+
+            return this.formAddressDataToQuoteAddress(estimatedAddressData);
         }
     };
 });

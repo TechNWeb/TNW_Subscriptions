@@ -12,7 +12,7 @@ define([
     return function (addressData) {
         var address = addressConverter.formAddressDataToQuoteAddress(addressData),
             isAddressUpdated = addressList().some(function (currentAddress, index, addresses) {
-                if (currentAddress.getKey() == address.getKey()) {
+                if (currentAddress.getKey() === address.getKey()) {
                     addresses[index] = address;
 
                     return true;
