@@ -63,25 +63,34 @@ class Base implements EngineInterface
     private $zeroTotalValidator;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus
+     */
+    private $profileUpdateStatus;
+
+    /**
      * Base constructor.
+     *
      * @param Config $config
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param DataPersistorInterface $persistor
      * @param ZeroTotal $zeroTotalValidator
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus $profileUpdateStatus
      */
     public function __construct(
         Config $config,
         Context $context,
         CartManagementInterface $cartManagement,
         DataPersistorInterface $persistor,
-        ZeroTotal $zeroTotalValidator
+        ZeroTotal $zeroTotalValidator,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus $profileUpdateStatus
     ) {
         $this->config = $config;
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->persistor = $persistor;
         $this->zeroTotalValidator = $zeroTotalValidator;
+        $this->profileUpdateStatus = $profileUpdateStatus;
     }
 
     /**
@@ -171,7 +180,7 @@ class Base implements EngineInterface
 
             return $order;
         } catch (\Exception $e) {
-            $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
+            $this->profileUpdateStatus->updateStatus($this->getProfile()->getId(), ProfileStatus::STATUS_PAST_DUE);
             $quote->setReservedOrderId(null);
             $quote->save();
             throw $e;
@@ -209,7 +218,8 @@ class Base implements EngineInterface
                 $status = ProfileStatus::STATUS_TRIAL;
             }
         }
-        $this->getProfile()->setStatus($status);
+
+        $this->profileUpdateStatus->updateStatus($this->getProfile()->getId(), $status);
     }
 
     /**
