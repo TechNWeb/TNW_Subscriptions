@@ -540,6 +540,8 @@ class CreateProfile extends BaseCreate
             // Fill profile payment
             $this->profileManager->populatePaymentData($subQuote->getPayment());
 
+            $oldStatus = $this->profileManager->getProfile()->getStatus();
+
             try {
                 // Process profile
                 $order = $this->profileManager->processProfile($subQuote);
@@ -564,6 +566,19 @@ class CreateProfile extends BaseCreate
 
             // Save profile
             $profile = $this->profileManager->saveProfile();
+
+            $newStatus = $this->profileManager->getProfile()->getStatus();
+            if ($oldStatus !== $newStatus) {
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $oldStatus,
+                        $newStatus
+                    ],
+                    $profile->getId()
+                );
+            }
 
             // Add comment about profile creation.
             $this->messageHistoryLogger->message(
