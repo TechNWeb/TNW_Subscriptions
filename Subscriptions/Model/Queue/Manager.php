@@ -291,16 +291,18 @@ class Manager
      * Changes status to synced queue items.
      *
      * @param array|int $ids
+     * @param string $message
      */
-    public function makeCompleted($ids)
+    public function makeCompleted($ids, $message = '')
     {
         if (empty($ids)) {
             return;
         }
 
-        if (!is_array($ids)) {
+        if (!\is_array($ids)) {
             $ids = [$ids];
         }
+
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
         $connection = $collection->getConnection();
@@ -309,7 +311,7 @@ class Manager
             [
                 'status' => QueueStatus::QUEUE_STATUS_COMPLETE,
                 'updated_at' => $this->date->gmtDate(),
-                'message' => '',
+                'message' => (string)$message,
                 'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
             ],
             [Queue::ID . ' in (?)' => $ids]
