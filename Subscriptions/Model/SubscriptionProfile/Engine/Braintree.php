@@ -33,7 +33,6 @@ class Braintree extends Base
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
      * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
      * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus $profileUpdateStatus
      * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      */
@@ -43,7 +42,6 @@ class Braintree extends Base
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus $profileUpdateStatus,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
     ) {
@@ -52,8 +50,7 @@ class Braintree extends Base
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator,
-            $profileUpdateStatus
+            $zeroTotalValidator
         );
 
         $this->transferFactory = $transferFactory;

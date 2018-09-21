@@ -359,9 +359,27 @@ class Manager
             return false;
         }
 
+        $oldStatus = $profile->getStatus();
+
         $order = $this->profileManager->reset()
             ->setProfile($profile)
             ->processProfile($quote);
+
+        $newStatus = $profile->getStatus();
+        if ($oldStatus !== $newStatus) {
+            //Add comment profile place.
+            $this->messageHistoryLogger->message(
+                SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                [
+                    $oldStatus,
+                    $newStatus
+                ],
+                $profile->getId(),
+                false,
+                false,
+                true
+            );
+        }
 
         //Add comment profile place.
         $this->messageHistoryLogger->message(
