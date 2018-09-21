@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
 /**
- * Copyright © 2017 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
 -->
@@ -65,6 +65,15 @@
                 </item>
             </argument>
         </column>
+        <column name="frequency">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Frequency</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+            </argument>
+        </column>
         <column name="unit">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType</item>
@@ -73,15 +82,6 @@
                     <item name="dataType" xsi:type="string">select</item>
                     <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/columns/unit</item>
                     <item name="label" xsi:type="string" translate="true">Unit</item>
-                    <item name="sortOrder" xsi:type="number">40</item>
-                </item>
-            </argument>
-        </column>
-        <column name="frequency">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Frequency</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
             </argument>
