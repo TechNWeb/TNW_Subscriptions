@@ -82,6 +82,11 @@ class Manager
     private $messageHistoryLogger;
 
     /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param DateTime $date
      * @param Config $config
@@ -101,7 +106,8 @@ class Manager
         CartRepositoryInterface $cartRepository,
         SubscriptionProfileRepository $profileRepository,
         SubscriptionProfile\Status\HistoryManager $statusHistoryManager,
-        SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
+        SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
+        ProfileStatus $profileStatus
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->date = $date;
@@ -112,6 +118,7 @@ class Manager
         $this->profileRepository = $profileRepository;
         $this->statusHistoryManager = $statusHistoryManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->profileStatus = $profileStatus;
     }
 
     /**
@@ -371,8 +378,8 @@ class Manager
             $this->messageHistoryLogger->message(
                 SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
                 [
-                    $oldStatus,
-                    $newStatus
+                    $this->profileStatus->getLabelByValue($oldStatus),
+                    $this->profileStatus->getLabelByValue($newStatus)
                 ],
                 $profile->getId(),
                 false,
