@@ -23,6 +23,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class for creating subscription profile.
@@ -107,6 +108,11 @@ class CreateProfile extends BaseCreate
     private $subQuotes;
 
     /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Address $addressCreator
@@ -130,7 +136,8 @@ class CreateProfile extends BaseCreate
         ManagerInterface $eventManager,
         MessageHistoryLogger $messageHistoryLogger,
         QueueManager $queueManager,
-        QuoteGenerator $quoteGenerator
+        QuoteGenerator $quoteGenerator,
+        ProfileStatus $profileStatus
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -141,6 +148,7 @@ class CreateProfile extends BaseCreate
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->queueManager = $queueManager;
         $this->quoteGenerator = $quoteGenerator;
+        $this->profileStatus = $profileStatus;
 
         parent::__construct($context, $session);
     }
@@ -568,13 +576,13 @@ class CreateProfile extends BaseCreate
             $profile = $this->profileManager->saveProfile();
 
             $newStatus = $this->profileManager->getProfile()->getStatus();
-            if ($oldStatus !== $newStatus) {
+            if ($oldStatus != $newStatus) {
                 //Add comment profile place.
                 $this->messageHistoryLogger->message(
                     MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
                     [
-                        $oldStatus,
-                        $newStatus
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($newStatus)
                     ],
                     $profile->getId()
                 );
