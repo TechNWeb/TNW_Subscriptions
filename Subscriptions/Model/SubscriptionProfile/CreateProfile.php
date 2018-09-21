@@ -576,7 +576,7 @@ class CreateProfile extends BaseCreate
             $profile = $this->profileManager->saveProfile();
 
             $newStatus = $this->profileManager->getProfile()->getStatus();
-            if ($oldStatus !== $newStatus) {
+            if ($oldStatus != $newStatus) {
                 //Add comment profile place.
                 $this->messageHistoryLogger->message(
                     MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,

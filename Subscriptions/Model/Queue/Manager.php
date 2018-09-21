@@ -372,8 +372,10 @@ class Manager
             ->setProfile($profile)
             ->processProfile($quote);
 
+        $this->profileRepository->save($profile);
+
         $newStatus = $profile->getStatus();
-        if ($oldStatus !== $newStatus) {
+        if ($oldStatus != $newStatus) {
             //Add comment profile place.
             $this->messageHistoryLogger->message(
                 SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
