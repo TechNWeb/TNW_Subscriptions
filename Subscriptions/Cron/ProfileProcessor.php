@@ -62,12 +62,19 @@ class ProfileProcessor
     {
         $profileIds = [];
 
+        $canceledCollection = $this->queueManager->getBaseCollection()
+            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_CANCELED)
+            ->addFieldToFilter('relation.scheduled_at', [
+                'gteq' => date_create()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT)
+            ]);
+
+        $this->queueManager->makeDelete($canceledCollection->getAllIds());
+
         /** @var \TNW\Subscriptions\Model\Queue $queue */
         foreach ($this->queueManager->getCollectionToday($websiteId) as $queue) {
             switch ($queue->getData('profile_status')) {
                 case ProfileStatus::STATUS_CANCELED:
-                    $this->queueManager->makeSkipped($queue->getId(), __('Profile is Canceled, skipping...'));
-                    break;
+                    continue 2;
 
                 case ProfileStatus::STATUS_SUSPENDED:
                     $this->queueManager->makeSkipped($queue->getId(), __('Profile is Suspended, skipping...'));

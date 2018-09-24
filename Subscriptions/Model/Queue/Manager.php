@@ -258,6 +258,27 @@ class Manager
     }
 
     /**
+     * @param int[]|int $ids
+     */
+    public function makeDelete($ids)
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        if (!\is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        /** @var Collection $collection */
+        $collection = $this->collectionFactory->create();
+        $collection->getConnection()->delete(
+            $collection->getMainTable(),
+            [Queue::ID . ' in (?)' => $ids]
+        );
+    }
+
+    /**
      * Changes status to running for queue items.
      *
      * @param array|int $ids
