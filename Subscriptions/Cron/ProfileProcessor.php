@@ -10,6 +10,7 @@ use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
  * Class ProfileProcessor
@@ -64,9 +65,7 @@ class ProfileProcessor
 
         $canceledCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_CANCELED)
-            ->addFieldToFilter('relation.scheduled_at', [
-                'gteq' => date_create()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT)
-            ]);
+            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING);
 
         $this->queueManager->makeDelete($canceledCollection->getAllIds());
 
