@@ -70,24 +70,26 @@ class Process extends Action
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->processItem($item);
-                        $successIds[] = $item->getId();
-                        $this->queueManager->makeCompleted($successIds);
+                        $this->queueManager->makeCompleted($item->getId());
                         $this->profileProcessor->updateProfilesStatuses(
                             [$item->getSubscriptionProfileId()]
                         );
+                        $this->messageManager->addSuccessMessage(
+                            'Record was successfully processed.',
+                            'backend'
+                        );
                     } catch (\Exception $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage());
+                        $this->messageManager->addErrorMessage(
+                            $e->getMessage(),
+                            'backend'
+                        );
                     }
-                    $this->messageManager->addSuccessMessage(
-                        'Record was successfully processed.',
-                        'backend'
-                    );
-                }else {
-                    $this->messageManager->addError('Record can not be processed.', 'backend');
+                } else {
+                    $this->messageManager->addErrorMessage('Record can not be processed.', 'backend');
                 }
-
             } catch (\Exception $e) {
-                $this->messageManager->addError($e->getMessage(), 'backend');
+                $this->messageManager->addErrorMessage($e->getMessage(), 'backend');
             }
         }
 

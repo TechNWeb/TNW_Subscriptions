@@ -129,29 +129,8 @@ class Manager
      */
     public function getActiveList($websiteId = null)
     {
-        $collection = $this->getBaseCollection();
-        $connection = $collection->getConnection();
-        $pendingCondition = implode(
-            ' AND ',
-            [
-                $connection->quoteInto("relation.scheduled_at <= ?", $this->getCurrentDate()),
-                $connection->quoteInto(
-                    "main_table.status in (?)",
-                    [QueueStatus::QUEUE_STATUS_PENDING, QueueStatus::QUEUE_STATUS_RUNNING]
-                ),
-            ]
-        );
-        $errorCondition = implode(
-            ' AND ',
-            [
-                $connection->quoteInto("main_table.updated_at <= ?", $this->getAttemptDate()),
-                $connection->quoteInto("main_table.status = ?", QueueStatus::QUEUE_STATUS_ERROR),
-                $connection->quoteInto("main_table.attempt_count <= ?", $this->config->getAttemptCount()),
-            ]
-        );
-
+        $collection = $this->getCollectionToday($websiteId);
         $collection->getSelect()
-            ->where('(' . $pendingCondition . ') OR (' . $errorCondition . ')')
             ->where(
                 'profile.status NOT IN (?)',
                 [
@@ -159,11 +138,46 @@ class Manager
                     ProfileStatus::STATUS_SUSPENDED,
                     ProfileStatus::STATUS_COMPLETE,
                 ]
-            )
+            );
+
+        return $collection;
+    }
+
+    /**
+     * @param int|null $websiteId
+     *
+     * @return Collection
+     */
+    public function getCollectionToday($websiteId = null)
+    {
+        $collection = $this->getBaseCollection();
+        $connection = $collection->getConnection();
+        $pendingCondition = implode(
+            ' AND ',
+            [
+                $connection->quoteInto('relation.scheduled_at <= ?', $this->getCurrentDate()),
+                $connection->quoteInto('main_table.status = ?', QueueStatus::QUEUE_STATUS_PENDING),
+            ]
+        );
+
+        $otherCondition = implode(
+            ' AND ',
+            [
+                $connection->quoteInto('main_table.updated_at <= ?', $this->getAttemptDate()),
+                $connection->quoteInto('main_table.status IN (?)', [
+                    QueueStatus::QUEUE_STATUS_ERROR,
+                    QueueStatus::QUEUE_STATUS_SKIPPED
+                ]),
+                $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
+            ]
+        );
+
+        $collection->getSelect()
+            ->where("($pendingCondition) OR ($otherCondition)")
             ->order('relation.scheduled_at ASC')
             ->group(['main_table.profile_order_id']);
 
-        if ($websiteId) {
+        if (null !== $websiteId) {
             $collection->getSelect()
                 ->where('profile.website_id = ?', $websiteId);
         }
@@ -215,92 +229,11 @@ class Manager
     }
 
     /**
-     * Changes status to running for queue items.
-     *
-     * @param array|int $ids
-     */
-    public function makeRunning($ids)
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
-            $collection->getMainTable(),
-            ['status' => QueueStatus::QUEUE_STATUS_RUNNING],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * Changes status to error and sets error message for queue items.
-     *
-     * @param array|int $ids
+     * @param int[]|int $ids
+     * @param string $status
      * @param string $message
      */
-    public function makeError($ids, $message)
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
-            $collection->getMainTable(),
-            [
-                'status' => QueueStatus::QUEUE_STATUS_ERROR,
-                'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
-                'message' => $message,
-                'updated_at' => $this->date->gmtDate(),
-            ],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * @param array|int $ids
-     * @param string $message
-     */
-    public function makeMessage($ids, $message)
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
-            $collection->getMainTable(),
-            [
-                'message' => (string)$message,
-                'updated_at' => $this->date->gmtDate(),
-            ],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * Changes status to synced queue items.
-     *
-     * @param array|int $ids
-     * @param string $message
-     */
-    public function makeCompleted($ids, $message = '')
+    protected function makeStatus($ids, $status, $message = '')
     {
         if (empty($ids)) {
             return;
@@ -312,17 +245,59 @@ class Manager
 
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
-        $connection = $collection->getConnection();
-        $connection->update(
+        $collection->getConnection()->update(
             $collection->getMainTable(),
             [
-                'status' => QueueStatus::QUEUE_STATUS_COMPLETE,
-                'updated_at' => $this->date->gmtDate(),
-                'message' => (string)$message,
+                'status' => $status,
                 'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
+                'message' => $message,
+                'updated_at' => $this->date->gmtDate(),
             ],
             [Queue::ID . ' in (?)' => $ids]
         );
+    }
+
+    /**
+     * Changes status to running for queue items.
+     *
+     * @param array|int $ids
+     */
+    public function makeRunning($ids)
+    {
+        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_RUNNING);
+    }
+
+    /**
+     * Changes status to error and sets error message for queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     */
+    public function makeError($ids, $message)
+    {
+        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message);
+    }
+
+    /**
+     * Changes status to synced queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     */
+    public function makeCompleted($ids, $message = '')
+    {
+        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_COMPLETE, $message);
+    }
+
+    /**
+     * Changes status to synced queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     */
+    public function makeSkipped($ids, $message = '')
+    {
+        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_SKIPPED, $message);
     }
 
     /**
@@ -332,10 +307,9 @@ class Manager
      */
     private function getAttemptDate()
     {
-        $date = new \DateTime();
-        $condition = 'P' . $this->config->getAttemptInterval() . 'D';
-        $date->sub(new \DateInterval($condition));
-        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        return date_create()
+            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))
+            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**
@@ -345,8 +319,8 @@ class Manager
      */
     private function getCurrentDate()
     {
-        $date = new \DateTime();
-        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        return date_create()
+            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**
@@ -368,26 +342,27 @@ class Manager
 
         $oldStatus = $profile->getStatus();
 
-        $order = $this->profileManager->reset()
-            ->setProfile($profile)
-            ->processProfile($quote);
+        try {
+            $order = $this->profileManager->setProfile($profile)
+                ->processProfile($quote);
+        } finally {
+            $this->profileRepository->save($profile);
 
-        $this->profileRepository->save($profile);
-
-        $newStatus = $profile->getStatus();
-        if ($oldStatus != $newStatus) {
-            //Add comment profile place.
-            $this->messageHistoryLogger->message(
-                SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                [
-                    $this->profileStatus->getLabelByValue($oldStatus),
-                    $this->profileStatus->getLabelByValue($newStatus)
-                ],
-                $profile->getId(),
-                false,
-                false,
-                true
-            );
+            $newStatus = $profile->getStatus();
+            if ($oldStatus != $newStatus) {
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($newStatus)
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+            }
         }
 
         //Add comment profile place.
