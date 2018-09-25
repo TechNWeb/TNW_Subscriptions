@@ -82,6 +82,11 @@ class Manager
     private $messageHistoryLogger;
 
     /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param DateTime $date
      * @param Config $config
@@ -101,7 +106,8 @@ class Manager
         CartRepositoryInterface $cartRepository,
         SubscriptionProfileRepository $profileRepository,
         SubscriptionProfile\Status\HistoryManager $statusHistoryManager,
-        SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
+        SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
+        ProfileStatus $profileStatus
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->date = $date;
@@ -112,6 +118,7 @@ class Manager
         $this->profileRepository = $profileRepository;
         $this->statusHistoryManager = $statusHistoryManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->profileStatus = $profileStatus;
     }
 
     /**
@@ -291,16 +298,18 @@ class Manager
      * Changes status to synced queue items.
      *
      * @param array|int $ids
+     * @param string $message
      */
-    public function makeCompleted($ids)
+    public function makeCompleted($ids, $message = '')
     {
         if (empty($ids)) {
             return;
         }
 
-        if (!is_array($ids)) {
+        if (!\is_array($ids)) {
             $ids = [$ids];
         }
+
         /** @var Collection $collection */
         $collection = $this->collectionFactory->create();
         $connection = $collection->getConnection();
@@ -309,7 +318,7 @@ class Manager
             [
                 'status' => QueueStatus::QUEUE_STATUS_COMPLETE,
                 'updated_at' => $this->date->gmtDate(),
-                'message' => '',
+                'message' => (string)$message,
                 'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
             ],
             [Queue::ID . ' in (?)' => $ids]
@@ -357,9 +366,29 @@ class Manager
             return false;
         }
 
+        $oldStatus = $profile->getStatus();
+
         $order = $this->profileManager->reset()
             ->setProfile($profile)
             ->processProfile($quote);
+
+        $this->profileRepository->save($profile);
+
+        $newStatus = $profile->getStatus();
+        if ($oldStatus != $newStatus) {
+            //Add comment profile place.
+            $this->messageHistoryLogger->message(
+                SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                [
+                    $this->profileStatus->getLabelByValue($oldStatus),
+                    $this->profileStatus->getLabelByValue($newStatus)
+                ],
+                $profile->getId(),
+                false,
+                false,
+                true
+            );
+        }
 
         //Add comment profile place.
         $this->messageHistoryLogger->message(

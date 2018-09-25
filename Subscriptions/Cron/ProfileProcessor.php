@@ -81,19 +81,19 @@ class ProfileProcessor
         $canceledCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_CANCELED);
-        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Canceled, skipping...'));
+        $this->queueManager->makeCompleted($canceledCollection->getAllIds(), __('Profile is Canceled, skipping...'));
 
         // make Suspended
         $canceledCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_SUSPENDED);
-        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Suspended, skipping...'));
+        $this->queueManager->makeCompleted($canceledCollection->getAllIds(), __('Profile is Suspended, skipping...'));
 
         // make Complete
         $canceledCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING)
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_COMPLETE);
-        $this->queueManager->makeMessage($canceledCollection->getAllIds(), __('Profile is Complete, skipping...'));
+        $this->queueManager->makeCompleted($canceledCollection->getAllIds(), __('Profile is Complete, skipping...'));
 
         $itemsCollection = $this->queueManager->getActiveList($websiteId);
         $allIds = array_keys($itemsCollection->getItems());
