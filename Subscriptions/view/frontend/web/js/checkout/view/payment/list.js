@@ -11,7 +11,7 @@ define([
     'Magento_Checkout/js/model/payment/method-list',
     'Magento_Checkout/js/model/payment/renderer-list',
     'uiLayout',
-    'Magento_Checkout/js/model/checkout-data-resolver',
+    'TNW_Subscriptions/js/checkout/model/data-resolver',
     'mage/translate',
     'uiRegistry'
 ], function (_, ko, utils, Component, paymentMethods, rendererList, layout, checkoutDataResolver, $t, registry) {
@@ -131,7 +131,7 @@ define([
                 _.each(rendererList(), function (renderer) {
 
                     if (renderer.hasOwnProperty('typeComparatorCallback') &&
-                        typeof renderer.typeComparatorCallback == 'function'
+                        typeof renderer.typeComparatorCallback === 'function'
                     ) {
                         isRendererForMethod = renderer.typeComparatorCallback(renderer.type, paymentMethodData.method);
                     } else {

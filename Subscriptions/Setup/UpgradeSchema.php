@@ -54,7 +54,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addMessageTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.1.4', '<')) {
+        if (version_compare($context->getVersion(), '2.1.7', '<')) {
             $this->addIsSubscriptionColumn($setup);
         }
 

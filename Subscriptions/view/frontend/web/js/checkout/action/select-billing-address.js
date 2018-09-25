@@ -13,7 +13,7 @@ define([
         var address = null;
 
         if (quote.shippingAddress()
-            && billingAddress.getCacheKey() == quote.shippingAddress().getCacheKey()
+            && billingAddress.getCacheKey() === quote.shippingAddress().getCacheKey()
         ) {
             address = $.extend({}, billingAddress);
             address.saveInAddressBook = null;

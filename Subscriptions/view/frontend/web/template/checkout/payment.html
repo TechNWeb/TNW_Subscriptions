@@ -50,14 +50,15 @@
 
             <fieldset class="fieldset" data-bind="visible: !isAddressDetailsVisible()">
                 <div class="field field-select-billing">
-                    <label class="label"><span data-bind="i18n: 'My billing and shipping address are the same'"></span></label>
+                    <label for="billing-address-id" class="label">
+                        <span data-bind="i18n: 'My billing and shipping address are the same'"></span>
+                    </label>
                     <div class="control" data-bind="if: (addressOptions.length > 1)">
-                        <select class="select" name="billing_address_id" data-bind="
-                            options: addressOptions,
-                            optionsText: addressOptionsText,
-                            value: selectedAddress,
-                            event: {change: onAddressChange(selectedAddress())};
-                        "></select>
+                        <select class="select"
+                                id="billing-address-id"
+                                name="billing_address_id"
+                                data-bind="options: addressOptions, optionsText: addressOptionsText, value: selectedAddress, event: {change: onAddressChange(selectedAddress())};">
+                        </select>
                     </div>
                 </div>
                 <div class="billing-address-form" data-bind="fadeVisible: isAddressFormVisible">
@@ -87,7 +88,7 @@
 
 <!--Payment method template-->
 <li id="payment-method" class="checkout-payment-method" data-bind="fadeVisible: isVisible">
-    <div class="step-title" data-role="title" data-bind="i18n: 'Payment Information'"></div>
+    <!--<div class="step-title" data-role="title" data-bind="i18n: 'Payment Information'"></div>-->
     <div id="checkout-step-payment-method" class="step-content" data-role="content">
         <form id="co-payment-form" class="form payments" novalidate="novalidate">
             <input data-bind='attr: {value: getFormKey()}' type="hidden" name="form_key"/>

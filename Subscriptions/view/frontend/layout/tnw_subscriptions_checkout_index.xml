@@ -217,6 +217,14 @@
                                                         <item name="component" xsi:type="string">uiComponent</item>
                                                         <item name="children" xsi:type="array">
                                                             <!-- merge payment method renders here -->
+                                                            <item name="braintree" xsi:type="array">
+                                                                <item name="component" xsi:type="string">Magento_Braintree/js/view/payment/braintree</item>
+                                                                <item name="methods" xsi:type="array">
+                                                                    <item name="braintree" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
                                                         </item>
                                                     </item>
                                                     <item name="additional-payment-validators" xsi:type="array">

@@ -13,6 +13,8 @@ define([
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
     'TNW_Subscriptions/js/checkout/model/quote',
+    'TNW_Subscriptions/js/checkout/model/payment/service',
+    'Magento_Checkout/js/model/payment/method-converter',
     'TNW_Subscriptions/js/checkout/action/select-billing-address'
 ], function (
     ko,
@@ -24,9 +26,14 @@ define([
     customer,
     addressList,
     quote,
+    paymentService,
+    paymentMethodConverter,
     selectBillingAddress
 ) {
     'use strict';
+
+    /** Set payment methods to collection */
+    paymentService.setPaymentMethods(paymentMethodConverter(window.checkoutConfig.paymentMethods));
 
     var newAddressOption = {
             /**
@@ -51,13 +58,13 @@ define([
             selectedAddress: null,
             isAddressDetailsVisible: quote.billingAddress() != null,
             isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length === 1,
-            isAddressSameAsShipping: false,
+            isAddressSameAsShipping: true,
             saveInAddressBook: 1
         },
         isVisible: ko.observable(true),
         quoteIsVirtual: quote.isVirtual(),
         isPaymentMethodsAvailable: ko.computed(function () {
-            return false;
+            return paymentService.getAvailablePaymentMethods().length > 0;
         }),
 
         /** @inheritdoc */
@@ -85,6 +92,8 @@ define([
                     selectBillingAddress(shippingAddress);
                 }
             }, this);
+
+            quote.shippingAddress.valueHasMutated();
 
             quote.billingAddress.subscribe(function (newAddress) {
                 if (quote.isVirtual()) {
@@ -157,7 +166,7 @@ define([
          * @param {Object} address
          */
         onAddressChange: function (address) {
-            this.isAddressFormVisible(address == newAddressOption);
+            this.isAddressFormVisible(address === newAddressOption);
         },
 
         /**

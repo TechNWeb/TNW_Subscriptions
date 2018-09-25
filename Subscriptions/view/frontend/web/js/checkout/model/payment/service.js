@@ -7,11 +7,10 @@ define([
     'ko',
     'underscore',
     'TNW_Subscriptions/js/checkout/model/quote',
+    'Magento_Checkout/js/model/payment/method-list',
     'TNW_Subscriptions/js/checkout/action/select-payment-method'
-], function (ko, _, quote, selectPaymentMethod) {
+], function (ko, _, quote, methodList, selectPaymentMethod) {
     'use strict';
-
-    var methodList = ko.observableArray([]);
 
     /**
      * Free method filter

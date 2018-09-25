@@ -117,6 +117,11 @@ class DefaultConfigProvider implements ConfigProviderInterface
      */
     private $shippingMethodManager;
 
+    /**
+     * @var \Magento\Quote\Api\PaymentMethodManagementInterface
+     */
+    private $paymentMethodManagement;
+
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -139,7 +144,8 @@ class DefaultConfigProvider implements ConfigProviderInterface
         \Magento\Quote\Api\CartTotalRepositoryInterface $quoteTotalRepository,
         \Magento\Checkout\Helper\Data $checkoutHelper,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManager
+        \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManager,
+        \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
     ) {
         $this->formKey = $formKey;
         $this->customerRepository = $customerRepository;
@@ -163,6 +169,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
         $this->checkoutHelper = $checkoutHelper;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->shippingMethodManager = $shippingMethodManager;
+        $this->paymentMethodManagement = $paymentMethodManagement;
     }
 
     /**
@@ -196,6 +203,7 @@ class DefaultConfigProvider implements ConfigProviderInterface
             ->getPriceFormat(null, $this->checkoutSession->getQuote()->getBaseCurrencyCode());
 
         $output['totalsData'] = $this->getTotalsData();
+        $output['paymentMethods'] = $this->getPaymentMethods();
 
         $output['originCountryCode'] = $this->getOriginCountryCode();
         return $output;
@@ -511,5 +519,25 @@ class DefaultConfigProvider implements ConfigProviderInterface
         }
 
         return $totalsArray;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getPaymentMethods()
+    {
+        $paymentMethods = [];
+        $quote = $this->checkoutSession->getQuote();
+        //if ($quote->getIsVirtual()) {
+            foreach ($this->paymentMethodManagement->getList($quote->getId()) as $paymentMethod) {
+                $paymentMethods[] = [
+                    'code' => $paymentMethod->getCode(),
+                    'title' => $paymentMethod->getTitle()
+                ];
+            }
+        //}
+
+        return $paymentMethods;
     }
 }

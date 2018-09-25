@@ -17,7 +17,8 @@ define([
     'TNW_Subscriptions/js/checkout/model/address-converter',
     'TNW_Subscriptions/js/checkout/action/create-billing-address',
     'TNW_Subscriptions/js/checkout/action/select-payment-method',
-    'TNW_Subscriptions/js/checkout/action/select-billing-address'
+    'TNW_Subscriptions/js/checkout/action/select-billing-address',
+    'TNW_Subscriptions/js/checkout/model/payment/service'
 ], function (
     _,
     addressList,
@@ -29,7 +30,8 @@ define([
     addressConverter,
     createBillingAddress,
     selectPaymentMethod,
-    selectBillingAddress
+    selectBillingAddress,
+    paymentService
 ) {
     'use strict';
 
