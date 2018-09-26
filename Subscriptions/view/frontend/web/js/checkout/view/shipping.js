@@ -22,6 +22,7 @@ define([
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/validator',
     'TNW_Subscriptions/js/checkout/action/select-shipping-address',
     'TNW_Subscriptions/js/checkout/action/select-shipping-method',
+    'TNW_Subscriptions/js/checkout/model/shipping/save/processor',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
 ], function (
     ko,
@@ -41,7 +42,8 @@ define([
     formPopUpState,
     rateValidator,
     selectShippingAddress,
-    selectShippingMethod
+    selectShippingMethod,
+    shippingSaveProcessor
 ) {
     'use strict';
 
@@ -206,12 +208,11 @@ define([
         selectShippingMethod: function (shippingMethod) {
             selectShippingMethod(shippingMethod);
 
-            console.log(quote.shippingMethod());
-
-            if (this.validateShippingInformation()) {
+            //if (this.validateShippingInformation()) {
+                shippingSaveProcessor.saveShippingInformation();
                 data.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
                 return true;
-            }
+            //}
 
             return false;
         },
@@ -220,7 +221,7 @@ define([
          * @return {Boolean}
          */
         validateShippingInformation: function () {
-            return false;
+            return true;
         },
 
         /**

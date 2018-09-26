@@ -30,6 +30,7 @@ define([
     }
 
     return {
+        isLoading: ko.observable(false),
         isFreeAvailable: false,
 
         /**

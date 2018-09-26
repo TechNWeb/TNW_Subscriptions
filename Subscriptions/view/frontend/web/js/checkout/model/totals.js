@@ -48,7 +48,7 @@ define([
             for (i in quoteItems()) {
                 item = quoteItems()[i];
 
-                if (item['item_id'] === itemId) {
+                if (Number.parseInt(item['item_id']) === Number.parseInt(itemId)) {
                     return item;
                 }
             }

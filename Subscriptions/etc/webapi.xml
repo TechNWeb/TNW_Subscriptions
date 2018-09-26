@@ -106,6 +106,15 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
+    <route url="/V1/tnw-subscriptions-carts/mine/shipping-information" method="POST">
+        <service class="Magento\Checkout\Api\ShippingInformationManagementInterface" method="saveAddressInformation"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
+        </data>
+    </route>
     <route url="/V1/tnw-subscriptions-carts/mine/selected-payment-method" method="GET">
         <service class="Magento\Quote\Api\PaymentMethodManagementInterface" method="get"/>
         <resources>

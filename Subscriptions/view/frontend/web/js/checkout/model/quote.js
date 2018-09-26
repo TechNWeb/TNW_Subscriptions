@@ -17,8 +17,11 @@ define([
             var i, item, quoteItemData = window.checkoutConfig.quoteItemData;
 
             for (i in quoteItemData) {
-                item = quoteItemData[i];
+                if (!quoteItemData.hasOwnProperty(i)) {
+                    continue;
+                }
 
+                item = quoteItemData[i];
                 if (item['item_id'] === itemId) {
                     return item;
                 }

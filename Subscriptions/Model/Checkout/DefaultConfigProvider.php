@@ -5,7 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-class DefaultConfigProvider implements ConfigProviderInterface
+class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
     /**
      * @var \Magento\Framework\Data\Form\FormKey
@@ -529,14 +529,14 @@ class DefaultConfigProvider implements ConfigProviderInterface
     {
         $paymentMethods = [];
         $quote = $this->checkoutSession->getQuote();
-        //if ($quote->getIsVirtual()) {
+        if ($quote->getIsVirtual()) {
             foreach ($this->paymentMethodManagement->getList($quote->getId()) as $paymentMethod) {
                 $paymentMethods[] = [
                     'code' => $paymentMethod->getCode(),
                     'title' => $paymentMethod->getTitle()
                 ];
             }
-        //}
+        }
 
         return $paymentMethods;
     }

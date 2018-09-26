@@ -21,7 +21,7 @@ class Checkout extends Template
     private $serializer;
 
     /**
-     * @var \TNW\Subscriptions\Model\Checkout\CompositeConfigProvider
+     * @var \Magento\Checkout\Model\CompositeConfigProvider
      */
     private $compositeConfigProvider;
 
@@ -34,7 +34,7 @@ class Checkout extends Template
         Template\Context $context,
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Framework\Serialize\Serializer\Json $serializer,
-        \TNW\Subscriptions\Model\Checkout\CompositeConfigProvider $compositeConfigProvider,
+        \Magento\Checkout\Model\CompositeConfigProvider $compositeConfigProvider,
         array $layoutProcessors = [],
         array $data = []
     ) {

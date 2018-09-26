@@ -192,7 +192,7 @@ define([
                 title = this.defaultGroupTitle;
             }
 
-            return title + ':';
+            return title;
         },
 
         /**

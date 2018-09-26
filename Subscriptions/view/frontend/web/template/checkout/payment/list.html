@@ -9,10 +9,7 @@
     <!-- ko repeat: {foreach: paymentGroupsList, item: '$group'} -->
     <div class="payment-group">
         <!-- ko if: getRegion($group().displayArea)().length -->
-        <div data-bind="i18n: getGroupTitle($group)"
-             class="step-title"
-             data-role="title">
-        </div>
+        <div class="step-title" data-role="title" data-bind="i18n: getGroupTitle($group)"></div>
         <!-- /ko -->
         <!-- ko foreach: {data: getRegion($group().displayArea), as: 'method'} -->
             <!-- ko template: getTemplate() --><!-- /ko -->

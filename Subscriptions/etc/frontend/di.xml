@@ -9,20 +9,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface" type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Quote"/>
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
-    <type name="TNW\Subscriptions\Model\Checkout\CompositeConfigProvider">
-        <arguments>
-            <argument name="configProviders" xsi:type="array">
-                <item name="default_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\DefaultConfigProvider</item>
-                <item name="ccform" xsi:type="object">Magento\Payment\Model\CcGenericConfigProvider</item>
-                <item name="cc_card_config_provider" xsi:type="object">Magento\Payment\Model\CcConfigProvider</item>
-                <item name="braintree_config_provider" xsi:type="object">Magento\Braintree\Model\Ui\ConfigProvider</item>
-                <item name="braintree_paypal_config_provider" xsi:type="object">Magento\Braintree\Model\Ui\PayPal\ConfigProvider</item>
-                <item name="offline_payment_checkmo_config_provider" xsi:type="object">Magento\OfflinePayments\Model\CheckmoConfigProvider</item>
-                <item name="vault_config_provider" xsi:type="object">Magento\Vault\Model\Ui\VaultConfigProvider</item>
-                <item name="vault_cards_config_provider" xsi:type="object">Magento\Vault\Model\Ui\TokensConfigProvider</item>
-            </argument>
-        </arguments>
-    </type>
 
     <type name="TNW\Subscriptions\Block\Cart">
         <arguments>
@@ -101,11 +87,21 @@
             <argument name="editAllow" xsi:type="boolean">false</argument>
         </arguments>
     </type>
+
+    <virtualType name="TS\Model\Model\Checkout\CompositeConfigProvider" type="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="checkout_default_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\DefaultConfigProvider</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <type name="TNW\Subscriptions\Block\Checkout">
         <arguments>
             <argument name="layoutProcessors" xsi:type="array">
                 <item name="addressFormAttributes" xsi:type="object">TNW\Subscriptions\Block\Checkout\AddressProcessor</item>
             </argument>
+            <argument name="compositeConfigProvider" xsi:type="object">TS\Model\Model\Checkout\CompositeConfigProvider</argument>
         </arguments>
     </type>
 
