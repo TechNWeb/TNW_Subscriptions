@@ -67,7 +67,8 @@ class StatusActive extends Base
             ProfileStatus::STATUS_COMPLETE,
             ProfileStatus::STATUS_HOLDED,
             ProfileStatus::STATUS_CANCELED,
-            ProfileStatus::STATUS_SUSPENDED
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_PAST_DUE
         ];
     }
 
