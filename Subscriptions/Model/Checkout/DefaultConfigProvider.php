@@ -456,7 +456,7 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
      */
     public function getDefaultSuccessPageUrl()
     {
-        return $this->urlBuilder->getUrl('checkout/onepage/success/');
+        return $this->urlBuilder->getUrl('tnw_subscriptions/checkout/success/');
     }
 
     /**
