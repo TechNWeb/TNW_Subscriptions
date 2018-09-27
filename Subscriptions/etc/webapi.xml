@@ -106,6 +106,8 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
+
+    <!-- Managing My shipping information -->
     <route url="/V1/tnw-subscriptions-carts/mine/shipping-information" method="POST">
         <service class="Magento\Checkout\Api\ShippingInformationManagementInterface" method="saveAddressInformation"/>
         <resources>
@@ -115,8 +117,10 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
-    <route url="/V1/tnw-subscriptions-carts/mine/selected-payment-method" method="GET">
-        <service class="Magento\Quote\Api\PaymentMethodManagementInterface" method="get"/>
+
+    <!-- My place order with payment information saving -->
+    <route url="/V1/tnw-subscriptions-carts/mine/payment-information" method="POST">
+        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="savePaymentInformationAndPlaceOrder"/>
         <resources>
             <resource ref="self" />
         </resources>
@@ -124,8 +128,10 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
-    <route url="/V1/tnw-subscriptions-carts/mine/selected-payment-method" method="PUT">
-        <service class="Magento\Quote\Api\PaymentMethodManagementInterface" method="set"/>
+
+    <!-- Managing My totals information -->
+    <route url="/V1/tnw-subscriptions-carts/mine/totals-information" method="POST">
+        <service class="Magento\Checkout\Api\TotalsInformationManagementInterface" method="calculate"/>
         <resources>
             <resource ref="self" />
         </resources>
@@ -133,8 +139,28 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
-    <route url="/V1/tnw-subscriptions-carts/mine/payment-methods" method="GET">
-        <service class="Magento\Quote\Api\PaymentMethodManagementInterface" method="getList"/>
+
+    <!-- Managing mine Cart Coupons -->
+    <route url="/V1/tnw-subscriptions-carts/mine/coupons" method="GET">
+        <service class="Magento\Quote\Api\CouponManagementInterface" method="get"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tnw-subscriptions-carts/mine/coupons/:couponCode" method="PUT">
+        <service class="Magento\Quote\Api\CouponManagementInterface" method="set"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/tnw-subscriptions-carts/mine/coupons" method="DELETE">
+        <service class="Magento\Quote\Api\CouponManagementInterface" method="remove"/>
         <resources>
             <resource ref="self" />
         </resources>

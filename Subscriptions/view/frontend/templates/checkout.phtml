@@ -33,6 +33,18 @@
         ], function(url, blockLoader) {
             blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
             return url.setBaseUrl('<?= /* @escapeNotVerified */ $block->getBaseUrl() ?>');
-        })
+        });
+
+        require.config({
+            map: {
+                '*': {
+                    'Magento_Checkout/js/action/place-order': 'TNW_Subscriptions/js/checkout/action/place-order',
+                    'Magento_Checkout/js/model/resource-url-manager': 'TNW_Subscriptions/js/checkout/model/resource-url-manager',
+                    'Magento_Checkout/js/checkout-data': 'TNW_Subscriptions/js/checkout/data',
+                    'Magento_Checkout/js/model/full-screen-loader': 'TNW_Subscriptions/js/checkout/model/full-screen-loader',
+                    'Magento_Checkout/js/model/shipping-save-processor/default': 'TNW_Subscriptions/js/checkout/model/shipping/save/processor'
+                }
+            }
+        });
     </script>
 </div>

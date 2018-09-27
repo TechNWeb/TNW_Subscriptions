@@ -13,17 +13,18 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
+    'Magento_Checkout/js/model/address-converter',
     'TNW_Subscriptions/js/checkout/action/create-shipping-address',
     'TNW_Subscriptions/js/checkout/data',
-    'TNW_Subscriptions/js/checkout/model/data-resolver',
-    'TNW_Subscriptions/js/checkout/model/quote',
-    'TNW_Subscriptions/js/checkout/model/shipping/service',
-    'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
+    'Magento_Checkout/js/model/checkout-data-resolver',
+    'Magento_Checkout/js/model/quote',
+    'Magento_Checkout/js/model/shipping-service',
+    'Magento_Checkout/js/model/shipping-address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/validator',
-    'TNW_Subscriptions/js/checkout/action/select-shipping-address',
-    'TNW_Subscriptions/js/checkout/action/select-shipping-method',
-    'TNW_Subscriptions/js/checkout/model/shipping/save/processor',
-    'TNW_Subscriptions/js/checkout/model/shipping/rate/service'
+    'Magento_Checkout/js/action/select-shipping-address',
+    'Magento_Checkout/js/action/select-shipping-method',
+    'Magento_Checkout/js/action/set-shipping-information',
+    'Magento_Checkout/js/model/shipping-rate-service'
 ], function (
     ko,
     $,
@@ -34,6 +35,7 @@ define([
     modal,
     customer,
     addressList,
+    addressConverter,
     createShippingAddress,
     data,
     dataResolver,
@@ -43,7 +45,7 @@ define([
     rateValidator,
     selectShippingAddress,
     selectShippingMethod,
-    shippingSaveProcessor
+    setShippingInformation
 ) {
     'use strict';
 
@@ -72,6 +74,12 @@ define([
                 fieldsetName = 'checkout.steps.shipping.shippingAddress.shipping-address-fieldset';
 
             this._super();
+
+            quote.shippingMethod.subscribe(function () {
+                if (self.validateShippingInformation()) {
+                    setShippingInformation();
+                }
+            });
 
             dataResolver.resolveShippingAddress();
 
@@ -207,20 +215,72 @@ define([
          */
         selectShippingMethod: function (shippingMethod) {
             selectShippingMethod(shippingMethod);
+            data.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
 
-            //if (this.validateShippingInformation()) {
-                shippingSaveProcessor.saveShippingInformation();
-                data.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
-                return true;
-            //}
-
-            return false;
+            return true;
         },
 
         /**
          * @return {Boolean}
          */
         validateShippingInformation: function () {
+            var shippingAddress,
+                addressData,
+                loginFormSelector = 'form[data-role=email-with-possible-login]',
+                emailValidationResult = customer.isLoggedIn(),
+                field;
+
+            if (!customer.isLoggedIn()) {
+                $(loginFormSelector).validation();
+                emailValidationResult = Boolean($(loginFormSelector + ' input[name=username]').valid());
+            }
+
+            if (this.isFormInline) {
+                this.source.set('params.invalid', false);
+                this.triggerShippingDataValidateEvent();
+
+                if (emailValidationResult &&
+                    this.source.get('params.invalid') ||
+                    !quote.shippingMethod()['method_code'] ||
+                    !quote.shippingMethod()['carrier_code']
+                ) {
+                    this.focusInvalid();
+
+                    return false;
+                }
+
+                shippingAddress = quote.shippingAddress();
+                addressData = addressConverter.formAddressDataToQuoteAddress(
+                    this.source.get('shippingAddress')
+                );
+
+                // Copy form data to quote shipping address object
+                for (field in addressData) {
+                    if (addressData.hasOwnProperty(field) &&
+                        shippingAddress.hasOwnProperty(field) &&
+                        typeof addressData[field] !== 'function' &&
+                        _.isEqual(shippingAddress[field], addressData[field])
+                    ) {
+                        shippingAddress[field] = addressData[field];
+                    } else if (typeof addressData[field] !== 'function' &&
+                        !_.isEqual(shippingAddress[field], addressData[field])) {
+                        shippingAddress = addressData;
+                        break;
+                    }
+                }
+
+                if (customer.isLoggedIn()) {
+                    shippingAddress['save_in_address_book'] = 1;
+                }
+                selectShippingAddress(shippingAddress);
+            }
+
+            if (!emailValidationResult) {
+                $(loginFormSelector + ' input[name=username]').focus();
+
+                return false;
+            }
+
             return true;
         },
 

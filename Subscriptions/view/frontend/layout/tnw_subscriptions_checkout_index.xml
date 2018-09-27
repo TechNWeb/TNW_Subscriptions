@@ -103,7 +103,7 @@
                                                         <item name="sortOrder" xsi:type="string">1</item>
                                                         <item name="children" xsi:type="array">
                                                             <item name="customer-email" xsi:type="array">
-                                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/email</item>
+                                                                <item name="component" xsi:type="string">Magento_Checkout/js/view/form/element/email</item>
                                                                 <item name="config" xsi:type="array">
                                                                     <item name="template" xsi:type="string">TNW_Subscriptions/checkout/form/element/email</item>
                                                                 </item>
@@ -154,7 +154,7 @@
                                                                         <item name="visible" xsi:type="boolean">false</item>
                                                                     </item>
                                                                     <item name="region_id" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/region</item>
+                                                                        <item name="component" xsi:type="string">Magento_Ui/js/form/element/region</item>
                                                                         <item name="config" xsi:type="array">
                                                                             <item name="template" xsi:type="string">ui/form/field</item>
                                                                             <item name="elementTmpl" xsi:type="string">ui/form/element/select</item>
@@ -241,7 +241,7 @@
                                                         </item>
                                                     </item>
                                                     <item name="customer-email" xsi:type="array">
-                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/email</item>
+                                                        <item name="component" xsi:type="string">Magento_Checkout/js/view/form/element/email</item>
                                                         <item name="config" xsi:type="array">
                                                             <item name="template" xsi:type="string">TNW_Subscriptions/checkout/form/element/email</item>
                                                         </item>
@@ -303,7 +303,7 @@
                                                                 <item name="visible" xsi:type="boolean">false</item>
                                                             </item>
                                                             <item name="region_id" xsi:type="array">
-                                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/form/element/region</item>
+                                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/region</item>
                                                                 <item name="config" xsi:type="array">
                                                                     <item name="template" xsi:type="string">ui/form/field</item>
                                                                     <item name="elementTmpl" xsi:type="string">ui/form/element/select</item>

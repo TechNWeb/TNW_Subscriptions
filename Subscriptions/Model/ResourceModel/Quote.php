@@ -58,7 +58,11 @@ class Quote extends \Magento\Quote\Model\ResourceModel\Quote
      */
     protected function _afterLoad(\Magento\Framework\Model\AbstractModel $object)
     {
-        $object->setData('is_tnw_subscription', $this->isSubscription);
+        // Set default is_tnw_subscription
+        if (!$object->hasData('is_tnw_subscription')) {
+            $object->setData('is_tnw_subscription', $this->isSubscription);
+        }
+
         return parent::_afterLoad($object);
     }
 }

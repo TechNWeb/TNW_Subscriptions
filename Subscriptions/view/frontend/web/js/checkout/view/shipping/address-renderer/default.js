@@ -9,8 +9,8 @@ define([
     'uiComponent',
     'Magento_Customer/js/customer-data',
     'TNW_Subscriptions/js/checkout/data',
-    'TNW_Subscriptions/js/checkout/model/quote',
-    'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state'
+    'Magento_Checkout/js/model/quote',
+    'Magento_Checkout/js/model/shipping-address/form-popup-state'
 ], function ($, ko, Component, customerData, data, quote, formPopUpState) {
     'use strict';
 
@@ -29,7 +29,7 @@ define([
                     shippingAddress = quote.shippingAddress();
 
                 if (shippingAddress) {
-                    isSelected = shippingAddress.getKey() == this.address().getKey();
+                    isSelected = shippingAddress.getKey() === this.address().getKey();
                 }
 
                 return isSelected;

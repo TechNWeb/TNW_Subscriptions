@@ -9,7 +9,7 @@ define([
     'mage/translate',
     'uiRegistry',
     'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/rules',
-    'TNW_Subscriptions/js/checkout/model/shipping/address/form-popup-state',
+    'Magento_Checkout/js/model/shipping-address/form-popup-state',
     'TNW_Subscriptions/js/checkout/model/address-converter',
     'TNW_Subscriptions/js/checkout/model/quote'
 ], function (

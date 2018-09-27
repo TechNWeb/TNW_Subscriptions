@@ -87,7 +87,7 @@
 </li>
 
 <!--Payment method template-->
-<li id="payment-method" class="checkout-payment-method" data-bind="fadeVisible: isVisible">
+<li id="payment-method" class="checkout-payment-method" data-bind="fadeVisible: isVisible, blockLoader: isLoading">
     <!--<div class="step-title" data-role="title" data-bind="i18n: 'Payment Information'"></div>-->
     <div id="checkout-step-payment-method" class="step-content" data-role="content">
         <form id="co-payment-form" class="form payments" novalidate="novalidate">

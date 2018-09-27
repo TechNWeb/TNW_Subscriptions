@@ -12,10 +12,10 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
-    'TNW_Subscriptions/js/checkout/model/quote',
+    'Magento_Checkout/js/model/quote',
     'TNW_Subscriptions/js/checkout/model/payment/service',
     'Magento_Checkout/js/model/payment/method-converter',
-    'TNW_Subscriptions/js/checkout/action/select-billing-address'
+    'Magento_Checkout/js/action/select-billing-address'
 ], function (
     ko,
     $,
@@ -61,6 +61,7 @@ define([
             isAddressSameAsShipping: true,
             saveInAddressBook: 1
         },
+        isLoading: paymentService.isLoading,
         isVisible: ko.observable(true),
         quoteIsVirtual: quote.isVirtual(),
         isPaymentMethodsAvailable: ko.computed(function () {

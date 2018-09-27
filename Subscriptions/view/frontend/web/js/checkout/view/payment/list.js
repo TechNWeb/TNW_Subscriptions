@@ -11,7 +11,7 @@ define([
     'Magento_Checkout/js/model/payment/method-list',
     'Magento_Checkout/js/model/payment/renderer-list',
     'uiLayout',
-    'TNW_Subscriptions/js/checkout/model/data-resolver',
+    'Magento_Checkout/js/model/checkout-data-resolver',
     'mage/translate',
     'uiRegistry'
 ], function (_, ko, utils, Component, paymentMethods, rendererList, layout, checkoutDataResolver, $t, registry) {

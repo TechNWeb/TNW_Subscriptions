@@ -7,7 +7,7 @@
  */
 define([
     'underscore',
-    'TNW_Subscriptions/js/checkout/model/post-code-resolver'
+    'Magento_Checkout/js/model/default-post-code-resolver'
 ], function (_, PostCodeResolver) {
     'use strict';
 
