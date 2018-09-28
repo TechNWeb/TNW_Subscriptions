@@ -28,6 +28,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Validator;
  *
  * @method QuoteSession setCustomerId($id)
  * @method QuoteSession setCurrencyId($currencyId)
+ * @deprecated
  */
 abstract class QuoteSession extends SessionManager implements QuoteSessionInterface
 {

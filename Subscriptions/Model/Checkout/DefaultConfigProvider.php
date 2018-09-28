@@ -434,7 +434,7 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
      */
     public function getCheckoutUrl()
     {
-        return $this->urlBuilder->getUrl('checkout');
+        return $this->urlBuilder->getUrl('tnw_subscriptions/checkout');
     }
 
     /**
@@ -456,7 +456,7 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
      */
     public function getDefaultSuccessPageUrl()
     {
-        return $this->urlBuilder->getUrl('tnw_subscriptions/checkout/success/');
+        return $this->urlBuilder->getUrl('tnw_subscriptions/checkout/success');
     }
 
     /**

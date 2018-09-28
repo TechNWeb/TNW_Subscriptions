@@ -141,4 +141,17 @@
             <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Controller\Checkout\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="successValidator" xsi:type="object">TS\Model\Checkout\Session\SuccessValidator</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Block\Checkout\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
 </config>

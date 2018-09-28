@@ -17,7 +17,7 @@ class Success extends \Magento\Framework\View\Element\Template
     /**
      * @var \Magento\Sales\Model\Order\Config
      */
-    protected $_orderConfig;
+    protected $orderConfig;
 
     /**
      * @var \Magento\Framework\App\Http\Context
@@ -40,9 +40,9 @@ class Success extends \Magento\Framework\View\Element\Template
     ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
-        $this->_orderConfig = $orderConfig;
-        $this->_isScopePrivate = true;
+        $this->orderConfig = $orderConfig;
         $this->httpContext = $httpContext;
+        $this->_isScopePrivate = true;
     }
 
     /**
@@ -101,7 +101,7 @@ class Success extends \Magento\Framework\View\Element\Template
     {
         return !\in_array(
             $order->getStatus(),
-            $this->_orderConfig->getInvisibleOnFrontStatuses()
+            $this->orderConfig->getInvisibleOnFrontStatuses()
         );
     }
 

@@ -565,12 +565,13 @@ class Manager
      * Set data to profile from quote.
      *
      * @param Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
      * @param null|\DateTime $date
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function populateProfileData(Quote $quote, $date = null)
+    public function populateProfileData(Quote $quote, $quoteItems, $date = null)
     {
         $request = $this->getUniqueBuyRequest($quote);
         if (empty($request)) {
@@ -614,8 +615,8 @@ class Manager
             }
         }
 
-        $profileProducts = $this->productManager->populateProductsData($quote);
-        $profileChildProducts = $this->productManager->populateChildProductsData($quote, $profileProducts);
+        $profileProducts = $this->productManager->populateProductsData($quoteItems);
+        $profileChildProducts = $this->productManager->populateChildProductsData($quoteItems, $profileProducts);
         $profileAddress = $this->populateAddressesData($quote);
 
         $this->getProfile()

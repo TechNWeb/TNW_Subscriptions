@@ -173,6 +173,7 @@ class CreateProfile extends BaseCreate
      * Gets subscription quotes.
      *
      * @return array
+     * @deprecated
      */
     public function getSubQuotes()
     {
@@ -212,6 +213,7 @@ class CreateProfile extends BaseCreate
      *
      * @param array $productData
      * @return false|Item
+     * @deprecated
      */
     public function addToSubscription(array $productData)
     {
@@ -302,6 +304,7 @@ class CreateProfile extends BaseCreate
      * Returns new or already existing quote for adding in to it requested product.
      *
      * @return ModelQuote
+     * @deprecated
      */
     private function getSubQuote()
     {
@@ -543,7 +546,7 @@ class CreateProfile extends BaseCreate
             $this->profileManager->reset();
 
             // Fill profile
-            $this->profileManager->populateProfileData($subQuote);
+            $this->profileManager->populateProfileData($subQuote, $subQuote->getAllVisibleItems());
 
             // Fill profile payment
             $this->profileManager->populatePaymentData($subQuote->getPayment());
