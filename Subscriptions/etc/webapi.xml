@@ -120,7 +120,7 @@
 
     <!-- My place order with payment information saving -->
     <route url="/V1/tnw-subscriptions-carts/mine/payment-information" method="POST">
-        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="savePaymentInformationAndPlaceOrder"/>
+        <service class="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement" method="savePaymentInformationAndPlaceOrder"/>
         <resources>
             <resource ref="self" />
         </resources>

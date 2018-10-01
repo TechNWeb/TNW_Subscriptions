@@ -1054,4 +1054,10 @@
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
         </arguments>
     </virtualType>
+
+    <type name="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </type>
 </config>

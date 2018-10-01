@@ -229,6 +229,23 @@
                                                                 <item name="component" xsi:type="string">Magento_Vault/js/view/payment/vault</item>
                                                                 <item name="methods" xsi:type="array"/>
                                                             </item>
+                                                            <item name="offline-payments" xsi:type="array">
+                                                                <item name="component" xsi:type="string">Magento_OfflinePayments/js/view/payment/offline-payments</item>
+                                                                <item name="methods" xsi:type="array">
+                                                                    <item name="checkmo" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="banktransfer" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="cashondelivery" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="purchaseorder" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
                                                         </item>
                                                     </item>
                                                     <item name="additional-payment-validators" xsi:type="array">

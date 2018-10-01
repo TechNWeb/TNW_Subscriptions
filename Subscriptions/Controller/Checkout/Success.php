@@ -35,10 +35,11 @@ class Success extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         if (!$this->successValidator->isValid()) {
-            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+            return $this->resultRedirectFactory->create()
+                ->setPath('tnw_subscriptions/checkout');
         }
 
-        $this->checkoutSession->clearQuote();
+        //$this->checkoutSession->clearQuote();
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
 }

@@ -25,10 +25,21 @@ class Success extends \Magento\Framework\View\Element\Template
     protected $httpContext;
 
     /**
+     * @var \TNW\Subscriptions\Model\Backend\UrlBuilder
+     */
+    private $urlBuilder;
+
+    /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder
+     */
+    private $profileOrder;
+
+    /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Sales\Model\Order\Config $orderConfig
      * @param \Magento\Framework\App\Http\Context $httpContext
+     * @param \TNW\Subscriptions\Model\Backend\UrlBuilder $urlBuilder
      * @param array $data
      */
     public function __construct(
@@ -36,12 +47,16 @@ class Success extends \Magento\Framework\View\Element\Template
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Config $orderConfig,
         \Magento\Framework\App\Http\Context $httpContext,
+        \TNW\Subscriptions\Model\Backend\UrlBuilder $urlBuilder,
+        \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder $profileOrder,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->orderConfig = $orderConfig;
         $this->httpContext = $httpContext;
+        $this->urlBuilder = $urlBuilder;
+        $this->profileOrder = $profileOrder;
         $this->_isScopePrivate = true;
     }
 
@@ -124,5 +139,35 @@ class Success extends \Magento\Framework\View\Element\Template
     public function getContinueUrl()
     {
         return $this->_storeManager->getStore()->getBaseUrl();
+    }
+
+    /**
+     * @param $profileId
+     *
+     * @return string
+     */
+    public function getEditUrl($profileId)
+    {
+        return $this->urlBuilder->getEditUrl($profileId);
+    }
+
+    /**
+     * @param $profileId
+     *
+     * @return string
+     */
+    public function getEditLabel($profileId)
+    {
+        return $this->urlBuilder->getEditLabel($profileId);
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getProfileIds()
+    {
+        $orderId = $this->checkoutSession->getLastOrderId();
+        return $this->profileOrder->profileIdsByOrderId($orderId);
     }
 }

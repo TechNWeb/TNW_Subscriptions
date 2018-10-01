@@ -567,13 +567,15 @@ class Manager
      * @param Quote $quote
      * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
      * @param null|\DateTime $date
+     *
      * @return $this
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Json_Exception
      */
     public function populateProfileData(Quote $quote, $quoteItems, $date = null)
     {
-        $request = $this->getUniqueBuyRequest($quote);
+        $request = $this->getUniqueBuyRequest($quoteItems);
         if (empty($request)) {
             return $this;
         }
@@ -735,23 +737,20 @@ class Manager
     /**
      * Returns unique subscription data from  buy request.
      *
-     * @param Quote $quote
+     * @param Quote\Item[] $quoteItems
+     *
      * @return array|null
+     * @throws \Zend_Json_Exception
      */
-    private function getUniqueBuyRequest(Quote $quote)
+    private function getUniqueBuyRequest(array $quoteItems)
     {
-        $result = null;
-        $items = $quote->getAllVisibleItems();
-
-        if ($items) {
-            /** @var Item $item */
-            $item = reset($items);
-            $result = $item->getBuyRequest()->getDataByPath(
-                Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . Create::UNIQUE
-            );
+        /** @var Item $item */
+        $item = reset($quoteItems);
+        if (!$item instanceof \Magento\Quote\Model\Quote\Item) {
+            return null;
         }
 
-        return $result;
+        return \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
     }
 
     /**

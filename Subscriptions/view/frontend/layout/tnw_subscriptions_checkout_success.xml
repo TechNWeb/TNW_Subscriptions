@@ -13,7 +13,7 @@
         <referenceBlock name="page.main.title">
             <block class="TNW\Subscriptions\Block\Checkout\Success" name="checkout.success.print.button" template="Magento_Checkout::button.phtml"/>
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">Thank you for your purchase!</argument>
+                <argument translate="true" name="title" xsi:type="string">Thank you for shopping with us!</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">

@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 class QuoteSubmitSuccess implements ObserverInterface
 {
@@ -31,16 +30,23 @@ class QuoteSubmitSuccess implements ObserverInterface
      */
     private $queueManager;
 
+    /**
+     * @var \TNW\Subscriptions\Model\Source\ProfileStatus
+     */
+    private $profileStatus;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        MessageHistoryLogger $messageHistoryLogger,
-        \TNW\Subscriptions\Model\Queue\Manager $queueManager
+        \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
+        \TNW\Subscriptions\Model\Queue\Manager $queueManager,
+        \TNW\Subscriptions\Model\Source\ProfileStatus $profileStatus
     ) {
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->queueManager = $queueManager;
+        $this->profileStatus = $profileStatus;
     }
 
     /**
@@ -65,24 +71,49 @@ class QuoteSubmitSuccess implements ObserverInterface
                 continue;
             }
 
-            $profile = $this->profileManager
+            $this->profileManager
                 ->reset()
                 ->populateProfileData($quote, $quoteItems)
-                ->populatePaymentData($quote->getPayment())
-                ->saveProfile();
+                ->populatePaymentData($quote->getPayment());
+
+            $profile = $this->profileManager->getProfile();
+            $oldStatus = $profile->getStatus();
+
+            $status = $this->profileStatus::STATUS_ACTIVE;
+            if ($profile->getTrialStartDate()) {
+                $startDate = $profile->getStartDate();
+                if (\date_create()->diff(\date_create($startDate))->invert === 0) {
+                    $status = $this->profileStatus::STATUS_TRIAL;
+                }
+            }
+
+            $profile->setStatus($status);
+
+            // Save profile
+            $this->profileManager->saveProfile();
 
             // Add comment about profile creation.
             $this->messageHistoryLogger->message(
-                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
+                $this->messageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
                 [
                     $profile->getLabel()
                 ],
                 $profile->getId()
             );
 
+            //Add comment profile place.
+            $this->messageHistoryLogger->message(
+                $this->messageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                [
+                    $this->profileStatus->getLabelByValue($oldStatus),
+                    $this->profileStatus->getLabelByValue($status)
+                ],
+                $profile->getId()
+            );
+
             // Add comment profile place.
             $this->messageHistoryLogger->message(
-                MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                $this->messageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
                 [
                     $order->getIncrementId(),
                     $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
