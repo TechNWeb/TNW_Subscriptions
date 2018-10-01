@@ -39,7 +39,7 @@ class Success extends \Magento\Framework\App\Action\Action
                 ->setPath('tnw_subscriptions/checkout');
         }
 
-        //$this->checkoutSession->clearQuote();
+        $this->checkoutSession->clearQuote();
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
 }
