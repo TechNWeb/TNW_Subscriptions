@@ -239,7 +239,7 @@ define([
                 this.source.set('params.invalid', false);
                 this.triggerShippingDataValidateEvent();
 
-                if (emailValidationResult &&
+                if (!emailValidationResult &&
                     this.source.get('params.invalid') ||
                     !quote.shippingMethod()['method_code'] ||
                     !quote.shippingMethod()['carrier_code']
