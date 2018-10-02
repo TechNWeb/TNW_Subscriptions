@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Queue;
 
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -99,18 +98,11 @@ class ViewAction extends Column
      */
     private function isNeedShowActions(array $item)
     {
-        $needToShow = false;
-        $scheduledAt = $this->timezone->date($item['scheduled_at'])->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-        $dateTime = new DateTime();
-        $dateNow = $dateTime->strToTime($this->timezone->date()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT));
+        $scheduledAt = $this->timezone->date($item['scheduled_at']);
+        $dateNow = $this->timezone->date();
 
-        if (
-            ($dateNow > $dateTime->strToTime($scheduledAt))
-            && ($item['status'] !== Status::QUEUE_STATUS_COMPLETE)
-        ) {
-            $needToShow = true;
-        }
-
-        return $needToShow;
+        return
+            ($dateNow->diff($scheduledAt)->format('%r%a') <= 0)
+            && (strcasecmp($item['status'], Status::QUEUE_STATUS_COMPLETE) !== 0);
     }
 }
