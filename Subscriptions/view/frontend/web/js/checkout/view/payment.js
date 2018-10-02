@@ -10,11 +10,13 @@ define([
     'uiComponent',
     'mage/translate',
     'Magento_Customer/js/customer-data',
+    'TNW_Subscriptions/js/checkout/data',
     'Magento_Customer/js/model/customer',
     'Magento_Customer/js/model/address-list',
     'Magento_Checkout/js/model/quote',
     'TNW_Subscriptions/js/checkout/model/payment/service',
     'Magento_Checkout/js/model/payment/method-converter',
+    'Magento_Checkout/js/action/create-billing-address',
     'Magento_Checkout/js/action/select-billing-address'
 ], function (
     ko,
@@ -23,11 +25,13 @@ define([
     Component,
     $t,
     customerData,
+    checkoutData,
     customer,
     addressList,
     quote,
     paymentService,
     paymentMethodConverter,
+    createBillingAddress,
     selectBillingAddress
 ) {
     'use strict';
@@ -35,7 +39,8 @@ define([
     /** Set payment methods to collection */
     paymentService.setPaymentMethods(paymentMethodConverter(window.checkoutConfig.paymentMethods));
 
-    var newAddressOption = {
+    var lastSelectedBillingAddress = null,
+        newAddressOption = {
             /**
              * Get new address label
              * @returns {String}
@@ -138,6 +143,7 @@ define([
 
                 this.isAddressDetailsVisible(true);
             } else {
+                lastSelectedBillingAddress = quote.billingAddress();
                 quote.billingAddress(null);
                 this.isAddressDetailsVisible(false);
             }
@@ -159,6 +165,7 @@ define([
          * Edit address action
          */
         editAddress: function () {
+            lastSelectedBillingAddress = quote.billingAddress();
             quote.billingAddress(null);
             this.isAddressDetailsVisible(false);
         },
@@ -168,6 +175,66 @@ define([
          */
         onAddressChange: function (address) {
             this.isAddressFormVisible(address === newAddressOption);
+        },
+
+        /**
+         * Update address action
+         */
+        updateAddress: function () {
+            var addressData, newBillingAddress;
+
+            if (this.selectedAddress() && this.selectedAddress() !== newAddressOption) {
+                selectBillingAddress(this.selectedAddress());
+                checkoutData.setSelectedBillingAddress(this.selectedAddress().getKey());
+            } else {
+                this.source.set('params.invalid', false);
+                this.source.trigger(this.dataScopePrefix + '.data.validate');
+
+                if (this.source.get(this.dataScopePrefix + '.custom_attributes')) {
+                    this.source.trigger(this.dataScopePrefix + '.custom_attributes.data.validate');
+                }
+
+                if (!this.source.get('params.invalid')) {
+                    addressData = this.source.get(this.dataScopePrefix);
+
+                    if (customer.isLoggedIn() && !this.customerHasAddresses) {
+                        this.saveInAddressBook(1);
+                    }
+                    addressData['save_in_address_book'] = this.saveInAddressBook() ? 1 : 0;
+                    newBillingAddress = createBillingAddress(addressData);
+
+                    // New address must be selected as a billing address
+                    selectBillingAddress(newBillingAddress);
+                    checkoutData.setSelectedBillingAddress(newBillingAddress.getKey());
+                    checkoutData.setNewCustomerBillingAddress(addressData);
+                }
+            }
+        },
+
+        /**
+         * Cancel address edit action
+         */
+        cancelAddressEdit: function () {
+            this.restoreBillingAddress();
+
+            if (quote.billingAddress()) {
+                // restore 'Same As Shipping' checkbox state
+                this.isAddressSameAsShipping(
+                    quote.billingAddress() != null &&
+                    quote.billingAddress().getCacheKey() === quote.shippingAddress().getCacheKey() &&
+                    !quote.isVirtual()
+                );
+                this.isAddressDetailsVisible(true);
+            }
+        },
+
+        /**
+         * Restore billing address
+         */
+        restoreBillingAddress: function () {
+            if (lastSelectedBillingAddress != null) {
+                selectBillingAddress(lastSelectedBillingAddress);
+            }
         },
 
         /**

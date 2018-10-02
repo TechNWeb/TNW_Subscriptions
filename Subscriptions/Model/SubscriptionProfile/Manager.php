@@ -32,6 +32,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
  * Class Manager
@@ -72,6 +73,11 @@ class Manager
      * @var BillingFrequencyRepositoryInterface
      */
     private $frequencyRepository;
+
+    /**
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
 
     /**
      * Factory for creating profile addresses.
@@ -144,6 +150,16 @@ class Manager
     private $paymentRepository;
 
     /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\Queue
+     */
+    private $resourceQueue;
+
+    /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
      * @param PaymentRepository $paymentRepository
@@ -160,6 +176,8 @@ class Manager
      * @param MessageHistoryLogger $historyLogger
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentConfig $paymentConfig
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param ProfileStatus $profileStatus
      */
     public function __construct(
         EnginePool $enginePool,
@@ -177,7 +195,9 @@ class Manager
         ShippingMethods $shippingMethods,
         MessageHistoryLogger $historyLogger,
         ScopeConfigInterface $scopeConfig,
-        PaymentConfig $paymentConfig
+        PaymentConfig $paymentConfig,
+        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
+        ProfileStatus $profileStatus
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -195,6 +215,8 @@ class Manager
         $this->scopeConfig = $scopeConfig;
         $this->paymentConfig = $paymentConfig;
         $this->paymentRepository = $paymentRepository;
+        $this->resourceQueue = $resourceQueue;
+        $this->profileStatus = $profileStatus;
     }
 
     /**
@@ -816,7 +838,7 @@ class Manager
     public function getEngineFromRequestData(array $requestData)
     {
         $engine = null;
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] : [];
+        $paymentPostData = $requestData['payment'] ?? [];
         foreach ($paymentPostData as $code => $methodData) {
             if ($methodData['method']) {
                 $engine = $code;
@@ -834,9 +856,79 @@ class Manager
      */
     public function getShippingMethodFromRequestData(array $requestData)
     {
-        $shippingMethodCode = isset($requestData['shipping_method_id'])
-            ? $requestData['shipping_method_id']
-            : null;
-        return $shippingMethodCode;
+        return $requestData['shipping_method_id'] ?? null;
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param Quote $quote
+     * @param $quoteItems
+     *
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems)
+    {
+        $this
+            ->reset()
+            ->populateProfileData($quote, $quoteItems)
+            ->populatePaymentData($quote->getPayment());
+
+        $profile = $this->getProfile();
+        $oldStatus = $profile->getStatus();
+
+        $status = $this->profileStatus::STATUS_ACTIVE;
+        if ($profile->getTrialStartDate()) {
+            $startDate = $profile->getStartDate();
+            if (\date_create()->diff(\date_create($startDate))->invert === 0) {
+                $status = $this->profileStatus::STATUS_TRIAL;
+            }
+        }
+
+        $profile->setStatus($status);
+
+        // Save profile
+        $this->saveProfile();
+
+        // Add comment about profile creation.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
+            [
+                $profile->getLabel()
+            ],
+            $profile->getId()
+        );
+
+        //Add comment profile place.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+            [
+                $this->profileStatus->getLabelByValue($oldStatus),
+                $this->profileStatus->getLabelByValue($status)
+            ],
+            $profile->getId()
+        );
+
+        // Add comment profile place.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+            [
+                $order->getIncrementId(),
+                $this->historyLogger->getConvertedQuoteId($quote->getId())
+            ],
+            $profile->getId()
+        );
+
+        $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
+        //Assign quote to new profile
+        $relation = $this->assignQuoteToProfile($quote, $profile, $startDate);
+        //Add new relation to profile processing queue in "pending" state.
+        $queueItemIds = $this->resourceQueue->insertItems($relation->getId());
+        $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_RUNNING);
+
+        $this->assignOrderToProfile($relation, $order);
+        $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
     }
 }

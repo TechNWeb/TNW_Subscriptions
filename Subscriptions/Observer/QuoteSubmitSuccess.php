@@ -21,38 +21,29 @@ class QuoteSubmitSuccess implements ObserverInterface
     private $quoteItemGroup;
 
     /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger
+     * @var \Magento\Sales\Api\OrderCustomerManagementInterface
      */
-    private $messageHistoryLogger;
-
-    /**
-     * @var \TNW\Subscriptions\Model\Queue\Manager
-     */
-    private $queueManager;
-
-    /**
-     * @var \TNW\Subscriptions\Model\Source\ProfileStatus
-     */
-    private $profileStatus;
+    private $orderCustomerService;
 
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        \TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
-        \TNW\Subscriptions\Model\Queue\Manager $queueManager,
-        \TNW\Subscriptions\Model\Source\ProfileStatus $profileStatus
+        \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService
     ) {
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
-        $this->messageHistoryLogger = $messageHistoryLogger;
-        $this->queueManager = $queueManager;
-        $this->profileStatus = $profileStatus;
+        $this->orderCustomerService = $orderCustomerService;
     }
 
     /**
      * @param Observer $observer
      *
      * @return void
+     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
      */
     public function execute(Observer $observer)
     {
@@ -62,74 +53,26 @@ class QuoteSubmitSuccess implements ObserverInterface
         }
 
         $order = $observer->getData('order');
-        if (!$order instanceof \Magento\Sales\Model\Order || !$order->getId()) {
+        if (!$order instanceof \Magento\Sales\Model\Order || !$order->getEntityId()) {
             return;
         }
 
-        foreach ($this->quoteItemGroup->groups($quote->getAllVisibleItems()) as $groupKey => $quoteItems) {
-            if (strcasecmp($groupKey, 'no_option') === 0) {
-                continue;
-            }
+        $groups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function($key) {
+            return strcasecmp($key, 'no_option') !== 0;
+        }, ARRAY_FILTER_USE_KEY);
 
-            $this->profileManager
-                ->reset()
-                ->populateProfileData($quote, $quoteItems)
-                ->populatePaymentData($quote->getPayment());
+        if (empty($groups)) {
+            return;
+        }
 
-            $profile = $this->profileManager->getProfile();
-            $oldStatus = $profile->getStatus();
+        // Create customer
+        if ($order->getCustomerIsGuest()) {
+            $quote->setCustomer($this->orderCustomerService->create($order->getEntityId()));
+        }
 
-            $status = $this->profileStatus::STATUS_ACTIVE;
-            if ($profile->getTrialStartDate()) {
-                $startDate = $profile->getStartDate();
-                if (\date_create()->diff(\date_create($startDate))->invert === 0) {
-                    $status = $this->profileStatus::STATUS_TRIAL;
-                }
-            }
-
-            $profile->setStatus($status);
-
-            // Save profile
-            $this->profileManager->saveProfile();
-
-            // Add comment about profile creation.
-            $this->messageHistoryLogger->message(
-                $this->messageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
-                [
-                    $profile->getLabel()
-                ],
-                $profile->getId()
-            );
-
-            //Add comment profile place.
-            $this->messageHistoryLogger->message(
-                $this->messageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                [
-                    $this->profileStatus->getLabelByValue($oldStatus),
-                    $this->profileStatus->getLabelByValue($status)
-                ],
-                $profile->getId()
-            );
-
-            // Add comment profile place.
-            $this->messageHistoryLogger->message(
-                $this->messageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
-                [
-                    $order->getIncrementId(),
-                    $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
-                ],
-                $profile->getId()
-            );
-
-            $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
-            //Assign quote to new profile
-            $relation = $this->profileManager->assignQuoteToProfile($quote, $profile, $startDate);
-            //Add new relation to profile processing queue in "pending" state.
-            $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
-            $this->queueManager->makeRunning($queueItemIds);
-
-            $this->profileManager->assignOrderToProfile($relation, $order);
-            $this->queueManager->makeCompleted($queueItemIds);
+        // Create profile
+        foreach ($groups as $groupKey => $quoteItems) {
+            $this->profileManager->createByOrder($order, $quote, $quoteItems);
         }
     }
 }
