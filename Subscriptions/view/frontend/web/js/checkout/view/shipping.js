@@ -76,7 +76,7 @@ define([
             this._super();
 
             quote.shippingMethod.subscribe(function () {
-                if (self.validateShippingInformation()) {
+                if (self.validateShippingInformation(false)) {
                     setShippingInformation();
                 }
             });
@@ -214,16 +214,21 @@ define([
          * @return {Boolean}
          */
         selectShippingMethod: function (shippingMethod) {
+            if (!this.validateShippingInformation(true)) {
+                return false;
+            }
+
             selectShippingMethod(shippingMethod);
             data.setSelectedShippingRate(shippingMethod['carrier_code'] + '_' + shippingMethod['method_code']);
 
+            setShippingInformation();
             return true;
         },
 
         /**
          * @return {Boolean}
          */
-        validateShippingInformation: function () {
+        validateShippingInformation: function (updateAddress) {
             var shippingAddress,
                 addressData,
                 loginFormSelector = 'form[data-role=email-with-possible-login]',
@@ -239,45 +244,42 @@ define([
                 this.source.set('params.invalid', false);
                 this.triggerShippingDataValidateEvent();
 
-                if (!emailValidationResult &&
-                    this.source.get('params.invalid') ||
-                    !quote.shippingMethod()['method_code'] ||
-                    !quote.shippingMethod()['carrier_code']
-                ) {
+                if (emailValidationResult && this.source.get('params.invalid')) {
                     this.focusInvalid();
-
                     return false;
                 }
 
-                shippingAddress = quote.shippingAddress();
-                addressData = addressConverter.formAddressDataToQuoteAddress(
-                    this.source.get('shippingAddress')
-                );
+                if (typeof updateAddress !== 'undefined' ?  updateAddress : true) {
+                    shippingAddress = quote.shippingAddress();
+                    addressData = addressConverter.formAddressDataToQuoteAddress(
+                        this.source.get('shippingAddress')
+                    );
 
-                // Copy form data to quote shipping address object
-                for (field in addressData) {
-                    if (addressData.hasOwnProperty(field) &&
-                        shippingAddress.hasOwnProperty(field) &&
-                        typeof addressData[field] !== 'function' &&
-                        _.isEqual(shippingAddress[field], addressData[field])
-                    ) {
-                        shippingAddress[field] = addressData[field];
-                    } else if (typeof addressData[field] !== 'function' &&
-                        !_.isEqual(shippingAddress[field], addressData[field])) {
-                        shippingAddress = addressData;
-                        break;
+                    // Copy form data to quote shipping address object
+                    for (field in addressData) {
+                        if (addressData.hasOwnProperty(field) &&
+                            shippingAddress.hasOwnProperty(field) &&
+                            typeof addressData[field] !== 'function' &&
+                            _.isEqual(shippingAddress[field], addressData[field])
+                        ) {
+                            shippingAddress[field] = addressData[field];
+                        } else if (typeof addressData[field] !== 'function' &&
+                            !_.isEqual(shippingAddress[field], addressData[field])) {
+                            shippingAddress = addressData;
+                            break;
+                        }
                     }
-                }
 
-                if (customer.isLoggedIn()) {
-                    shippingAddress['save_in_address_book'] = 1;
+                    if (customer.isLoggedIn()) {
+                        shippingAddress['save_in_address_book'] = 1;
+                    }
+
+                    selectShippingAddress(shippingAddress);
                 }
-                selectShippingAddress(shippingAddress);
             }
 
             if (!emailValidationResult) {
                 $(loginFormSelector + ' input[name=username]').focus();
-
                 return false;
             }
 

@@ -4,7 +4,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 -->
-<tr class="row" data-bind="click: element.selectShippingMethod">
+<tr class="row" data-bind="click: element.selectShippingMethod.bind(element)">
     <td class="col col-method">
         <!-- ko ifnot: method.error_message -->
         <input type="radio" class="radio"

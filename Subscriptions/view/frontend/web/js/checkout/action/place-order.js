@@ -26,7 +26,7 @@ define([
         if (customer.isLoggedIn()) {
             serviceUrl = urlBuilder.createUrl('/tnw-subscriptions-carts/mine/payment-information', {});
         } else {
-            serviceUrl = urlBuilder.createUrl('/guest-carts/:quoteId/payment-information', {
+            serviceUrl = urlBuilder.createUrl('/guest-tnw-subscriptions-carts/:quoteId/payment-information', {
                 quoteId: quote.getQuoteId()
             });
             payload.email = quote.guestEmail;

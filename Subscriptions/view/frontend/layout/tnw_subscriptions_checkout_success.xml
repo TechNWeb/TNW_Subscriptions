@@ -20,7 +20,6 @@
             <block class="TNW\Subscriptions\Block\Checkout\Success" name="checkout.success" template="TNW_Subscriptions::checkout/success.phtml" cacheable="false">
                 <container name="order.success.additional.info" label="Order Success Additional Info"/>
             </block>
-            <block class="Magento\Checkout\Block\Registration" name="checkout.registration" template="Magento_Checkout::registration.phtml" cacheable="false"/>
         </referenceContainer>
     </body>
 </page>

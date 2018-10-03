@@ -158,16 +158,14 @@ class Creator extends Base
     public function getProfilesIdsToProcess($websiteId)
     {
         $collection = $this->getBaseCollection()
-            ->addFieldToFilter(
-                SubscriptionProfileInterface::GENERATE_QUOTES_STATE,
-                [
-                    'in' => [
-                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
-                        SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
-                    ]
-                ]
-            )
-            //->addFieldToFilter(SubscriptionProfileInterface::STATUS, \TNW\Subscriptions\Model\Source\ProfileStatus::STATUS_ACTIVE)
+            ->addFieldToFilter( SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [
+                SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
+                SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
+            ]])
+            ->addFieldToFilter(SubscriptionProfileInterface::STATUS, ['nin' => [
+                \TNW\Subscriptions\Model\Source\ProfileStatus::STATUS_COMPLETE,
+                \TNW\Subscriptions\Model\Source\ProfileStatus::STATUS_CANCELED
+            ]])
             ->addFieldToFilter(SubscriptionProfileInterface::WEBSITE_ID, $websiteId)
             ->addFieldToFilter(SubscriptionProfileInterface::NEED_RECOLLECT, 0)
             ->addFieldToFilter('products_need_recollect', 0);

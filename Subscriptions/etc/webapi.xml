@@ -129,6 +129,14 @@
         </data>
     </route>
 
+    <!-- Guest place order with payment information saving -->
+    <route url="/V1/guest-tnw-subscriptions-carts/:cartId/payment-information" method="POST">
+        <service class="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement" method="savePaymentInformationAndPlaceOrder"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
     <!-- Managing My totals information -->
     <route url="/V1/tnw-subscriptions-carts/mine/totals-information" method="POST">
         <service class="Magento\Checkout\Api\TotalsInformationManagementInterface" method="calculate"/>

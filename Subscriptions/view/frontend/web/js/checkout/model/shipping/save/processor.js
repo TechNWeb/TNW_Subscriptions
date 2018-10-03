@@ -10,7 +10,7 @@ define([
     'TNW_Subscriptions/js/checkout/model/payment/service',
     'Magento_Checkout/js/model/payment/method-converter',
     'Magento_Checkout/js/model/error-processor',
-    'Magento_Checkout/js/model/url-builder'
+    'TNW_Subscriptions/js/checkout/model/resource-url-manager'
 ], function (
     ko,
     quote,
@@ -18,7 +18,7 @@ define([
     paymentService,
     methodConverter,
     errorProcessor,
-    urlBuilder
+    resourceUrlManager
 ) {
     'use strict';
 
@@ -31,7 +31,7 @@ define([
 
             paymentService.isLoading(true);
 
-            serviceUrl = urlBuilder.createUrl('/tnw-subscriptions-carts/mine/shipping-information', {});
+            serviceUrl = resourceUrlManager.getUrlForSetShippingInformation(quote);
 
             payload = JSON.stringify({
                 addressInformation: {

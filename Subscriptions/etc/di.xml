@@ -1029,6 +1029,13 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TS\Model\Quote\GuestQuoteManagement" type="Magento\Quote\Model\GuestCart\GuestCartManagement">
+        <arguments>
+            <argument name="cartRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+            <argument name="quoteManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="TS\Model\Quote\Webapi\ParamOverriderCartId" type="Magento\Quote\Model\Webapi\ParamOverriderCartId">
         <arguments>
             <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
@@ -1058,6 +1065,12 @@
     <type name="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement">
         <arguments>
             <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\GuestQuoteManagement</argument>
         </arguments>
     </type>
 </config>
