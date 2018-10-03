@@ -174,10 +174,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Payment\Model\Checks\CanUseCheckout">
-        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Payment\Model\Checks\CanUseCheckout" />
-    </type>
-
     <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
         <arguments>
             <argument name="extensionActions" xsi:type="array">
