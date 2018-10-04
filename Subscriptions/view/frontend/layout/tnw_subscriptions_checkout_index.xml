@@ -420,7 +420,6 @@
         </referenceContainer>
         <referenceContainer name="page.messages" remove="true"/>
         <referenceContainer name="authentication-popup" remove="true"/>
-        <referenceContainer name="customer.section.config" remove="true"/>
         <referenceContainer name="product.price.render.default" remove="true"/>
         <move element="logo" destination="checkout.header.wrapper"/>
     </body>

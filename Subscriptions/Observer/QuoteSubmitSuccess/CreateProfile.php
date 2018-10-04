@@ -3,12 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Observer;
+namespace TNW\Subscriptions\Observer\QuoteSubmitSuccess;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
-class QuoteSubmitSuccess implements ObserverInterface
+class CreateProfile implements ObserverInterface
 {
     /**
      * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager

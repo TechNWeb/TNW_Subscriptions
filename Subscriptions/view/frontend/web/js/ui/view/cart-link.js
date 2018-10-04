@@ -4,87 +4,121 @@
  */
 
 define([
+    'ko',
+    'jquery',
+    'underscore',
+    'mage/translate',
     'uiComponent',
     'Magento_Customer/js/customer-data',
-    'jquery'
-], function (Component, customerData, $) {
+    'Magento_Customer/js/model/authentication-popup'
+], function (ko, $, _, $t, Component, customerData, authenticationPopup) {
     'use strict';
 
+    var sidebarInitialized = false,
+        addToCartCalls = 0;
+
     return Component.extend({
-        defaults: {
-            dialog: null,
-            cartLink: ".tnw-subscriptions-cart-link"
-        },
+        shoppingCartUrl: window.subcheckout.shoppingCartUrl,
+        cart: {},
 
         /**
          * @inheritdoc
          */
         initialize: function () {
-            this._super();
-
-            this.subscriptionCart = customerData.get('tnw-subscriptions-subscription-cart');
-        },
-
-        /**
-         * Show empty subscription cart popup or redirect to subscription cart page if it is not empty.
-         *
-         * @param {Object} element
-         * @param {Object} event
-         * @return {boolean}
-         */
-        showPopup: function(element, event) {
             var self = this,
-                result = false;
+                cartData = customerData.get('tnw-subscriptions-subscription-cart');
 
-            if (self.subscriptionCart().summary_count === 0) {
-                if (!this.dialog) {
-                    this.createDialog();
-                    this.dialog.dropdownDialog('open');
-                    $('body').on('click.outsideDropdown', function() {
-                        if(!self.dialog.dropdownDialog("isOpen") && !$(event.target).closest('.ui-dialog').length) {
-                            self.dialog.dropdownDialog('open');
-                        }
-                    }.bind(this));
-                }
-            } else {
-                if (self.dialog !== null) {
-                    $(this.cartLink).off();
-                    self.dialog.dropdownDialog('destroy');
-                    self.dialog = null;
-                    $('img.tnw-subscriptions-minicart').click();
-                }
+            this.update(cartData());
+            cartData.subscribe(function (updatedCart) {
+                addToCartCalls--;
+                this.isLoading(addToCartCalls > 0);
+                sidebarInitialized = false;
+                this.update(updatedCart);
+            }, this);
 
-                result = true;
+            $('[data-block="minicart"]').on('contentLoading', function () {
+                addToCartCalls++;
+                self.isLoading(true);
+            });
+
+            if (cartData()['website_id'] !== window.subcheckout.websiteId) {
+                customerData.reload(['tnw-subscriptions-subscription-cart'], false);
             }
 
-            return result;
+            return this._super();
+        },
+        isLoading: ko.observable(false),
+
+        /**
+         * Update mini shopping cart content.
+         *
+         * @param {Object} updatedCart
+         * @returns void
+         */
+        update: function (updatedCart) {
+            _.each(updatedCart, function (value, key) {
+                if (!this.cart.hasOwnProperty(key)) {
+                    this.cart[key] = ko.observable();
+                }
+                this.cart[key](value);
+            }, this);
         },
 
         /**
-         * Hide subscription empty cart popup.
+         * Get cart param by name.
+         * @param {String} name
+         * @returns {*}
          */
-        hidePopup: function() {
-          if (this.dialog !== null) {
-              this.dialog.dropdownDialog('close');
-          }
+        getCartParam: function (name) {
+            if (!_.isUndefined(name)) {
+                if (!this.cart.hasOwnProperty(name)) {
+                    this.cart[name] = ko.observable();
+                }
+            }
+
+            return this.cart[name]();
         },
 
         /**
-         * Create subscription empty cart popup.
+         * Close mini shopping cart.
          */
-        createDialog: function() {
-            this.dialog = $('.tnw-subscriptions-cart-empty');
-            this.dialog.dropdownDialog({
-                "appendTo": "[data-role=tnw-subscriptions-cart-link]",
-                "triggerEvent":"click",
-                "triggerTarget": this.cartLink,
-                "timeout": "2000",
-                "closeOnMouseLeave": false,
-                "closeOnEscape": true,
-                "triggerClass": "active",
-                "parentClass": "active",
-                "buttons": []
-            });
+        closeMinicart: function () {
+            $('[data-block="tnw-subscriptions-minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
+        },
+
+        /**
+         * @return {boolean}
+         */
+        actionCheckout: function () {
+            var cart = customerData.get('tnw-subscriptions-subscription-cart'),
+                customer = customerData.get('customer');
+
+            this.closeMinicart();
+
+            if (!customer().firstname && cart().isGuestCheckoutAllowed === false) {
+                // set URL for redirect on successful login/registration. It's postprocessed on backend.
+                $.cookie('login_redirect', window.subcheckout.checkoutUrl);
+
+                if (window.subcheckout.isRedirectRequired) {
+                    location.href = window.subcheckout.customerLoginUrl;
+                } else {
+                    authenticationPopup.showModal();
+                }
+
+                return false;
+            }
+            location.href = window.subcheckout.checkoutUrl;
+            return true;
+        },
+
+        /**
+         * Returns count of cart line items
+         * @returns {Number}
+         */
+        getCartLineItemsCount: function () {
+            var items = this.getCartParam('items') || [];
+
+            return parseInt(items.length, 10);
         }
     });
 });

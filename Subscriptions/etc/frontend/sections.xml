@@ -17,4 +17,21 @@
         <section name="tnw-subscriptions-subscription-cart"/>
         <section name="cart"/>
     </action>
+    <action name="rest/*/V1/tnw-subscriptions-carts/*/payment-information">
+        <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
+        <section name="checkout-data"/>
+        <section name="last-ordered-items"/>
+    </action>
+    <action name="rest/*/V1/guest-tnw-subscriptions-carts/*/payment-information">
+        <section name="tnw-subscriptions-subscription-cart"/>
+        <section name="cart"/>
+        <section name="checkout-data"/>
+    </action>
+    <action name="rest/*/V1/carts/*/payment-information">
+        <section name="tnw-subscriptions-subscription-cart"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/payment-information">
+        <section name="tnw-subscriptions-subscription-cart"/>
+    </action>
 </config>

@@ -28,9 +28,14 @@
         <observer name="tnw_subscription_quote_load_after" instance="TNW\Subscriptions\Observer\SalesQuoteLoadAfter" />
     </event>
     <event name="sales_model_service_quote_submit_success">
-        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\QuoteSubmitSuccess"/>
+        <observer name="tnw_subscription_create_profile" instance="TNW\Subscriptions\Observer\QuoteSubmitSuccess\CreateProfile"/>
+        <observer name="tnw_subscription_remove_items_subscription" instance="TS\Observer\QuoteSubmitSuccess\RemoveItems\Subscription"/>
+        <observer name="tnw_subscription_remove_items_sale" instance="TS\Observer\QuoteSubmitSuccess\RemoveItems\Sales"/>
     </event>
     <event name="payment_method_is_active">
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\PaymentMethodIsActive"/>
+    </event>
+    <event name="checkout_cart_add_product_complete">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\CheckoutCartAddProduct"/>
     </event>
 </config>

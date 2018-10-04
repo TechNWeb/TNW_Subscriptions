@@ -1069,4 +1069,17 @@
             <argument name="cartManagement" xsi:type="object">TS\Model\Quote\GuestQuoteManagement</argument>
         </arguments>
     </type>
+
+    <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Subscription" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
+        <arguments>
+            <argument name="isSubscription" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Sales" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
+        <arguments>
+            <argument name="isSubscription" xsi:type="boolean">false</argument>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </virtualType>
 </config>
