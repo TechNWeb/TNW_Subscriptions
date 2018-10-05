@@ -9,7 +9,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="product.info">
-            <block class="TNW\Subscriptions\Block\Cart\Url\Add" name="subscription.checkout.cart.url.add"/>
+            <!--<block class="TNW\Subscriptions\Block\Cart\Url\Add" name="subscription.checkout.cart.url.add"/>-->
         </referenceBlock>
         <referenceContainer name="product.info.form.content">
             <block name="product.info.addtocart"  as="addtocart" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
