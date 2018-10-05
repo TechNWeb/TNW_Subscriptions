@@ -6,12 +6,10 @@
 define([
     'ko',
     'uiComponent',
-    'TNW_Subscriptions/js/checkout/model/totals',
+    'Magento_Checkout/js/model/totals',
     'TNW_Subscriptions/js/checkout/model/quote'
 ], function (ko, Component, totals, quote) {
     'use strict';
-
-    var imageData = window.checkoutConfig.imageData;
 
     return Component.extend({
         groups: ko.observable([]),
@@ -31,7 +29,23 @@ define([
         },
 
         getTotalItem: function (itemId) {
-            return totals.getItem(itemId);
+            var i, quoteItems = totals.getItems()();
+
+            if (!quoteItems) {
+                return null;
+            }
+
+            for (i in quoteItems) {
+                if (!quoteItems.hasOwnProperty(i)) {
+                    continue;
+                }
+
+                if (Number.parseInt(quoteItems[i]['item_id']) === Number.parseInt(itemId)) {
+                    return quoteItems[i];
+                }
+            }
+
+            return null;
         },
 
         getItems: function (group) {

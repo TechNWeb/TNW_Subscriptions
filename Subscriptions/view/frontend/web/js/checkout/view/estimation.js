@@ -7,7 +7,7 @@ define([
     'uiComponent',
     'TNW_Subscriptions/js/checkout/model/quote',
     'Magento_Catalog/js/price-utils',
-    'TNW_Subscriptions/js/checkout/model/totals',
+    'Magento_Checkout/js/model/totals',
     'TNW_Subscriptions/js/checkout/model/sidebar'
 ], function (Component, quote, priceUtils, totals, sidebarModel) {
     'use strict';

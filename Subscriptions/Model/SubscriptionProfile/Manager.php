@@ -18,6 +18,9 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
@@ -871,12 +874,31 @@ class Manager
      */
     public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems)
     {
+        /** @var OrderPaymentInterface $orderPayment */
+        $orderPayment = $order->getPayment();
+        $quotePayment = $quote->getPayment()
+            ->addData([
+                'cc_type' => $orderPayment->getCcType(),
+                'cc_last_4' => $orderPayment->getCcLast4(),
+                'cc_exp_month' => $orderPayment->getCcExpMonth(),
+                'cc_exp_year' => $orderPayment->getCcExpYear(),
+            ]);
+
         $this
             ->reset()
             ->populateProfileData($quote, $quoteItems)
-            ->populatePaymentData($quote->getPayment());
+            ->populatePaymentData($quotePayment);
 
         $profile = $this->getProfile();
+
+        //TODO: Необходимо использовать Vault Payment
+        if (($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
+            ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
+        ) {
+            /** @var $paymentToken PaymentTokenInterface */
+            $profile->getPayment()->setPaymentToken($paymentToken->getGatewayToken());
+        }
+
         $oldStatus = $profile->getStatus();
 
         $status = $this->profileStatus::STATUS_ACTIVE;

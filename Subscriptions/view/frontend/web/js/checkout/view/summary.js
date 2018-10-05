@@ -5,7 +5,7 @@
 
 define([
     'uiComponent',
-    'TNW_Subscriptions/js/checkout/model/totals'
+    'Magento_Checkout/js/model/totals'
 ], function (Component, totals) {
     'use strict';
 

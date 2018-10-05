@@ -188,10 +188,10 @@ define([
                 checkoutData.setSelectedBillingAddress(this.selectedAddress().getKey());
             } else {
                 this.source.set('params.invalid', false);
-                this.source.trigger(this.dataScopePrefix + '.data.validate');
+                this.source.trigger('billingAddress.data.validate');
 
-                if (this.source.get(this.dataScopePrefix + '.custom_attributes')) {
-                    this.source.trigger(this.dataScopePrefix + '.custom_attributes.data.validate');
+                if (this.source.get('billingAddress.custom_attributes')) {
+                    this.source.trigger('billingAddress.custom_attributes.data.validate');
                 }
 
                 if (!this.source.get('params.invalid')) {

@@ -21,12 +21,12 @@
 
         <!-- Address form pop up -->
         <!-- ko if: (!isFormInline) -->
-            <button type="button" class="action action-show-popup" data-bind="click: showFormPopUp, visible: !isNewAddressAdded()">
-                <span data-bind="i18n: 'New Address'"></span>
-            </button>
-            <div id="tsc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
-                <!--ko template: shippingFormTemplate--><!--/ko-->
-            </div>
+        <button type="button" class="action action-show-popup" data-bind="click: showFormPopUp, visible: !isNewAddressAdded()">
+            <span data-bind="i18n: 'New Address'"></span>
+        </button>
+        <div id="tsc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
+            <!--ko template: shippingFormTemplate--><!--/ko-->
+        </div>
         <!--/ko-->
 
         <!-- ko foreach: getRegion('before-form') -->

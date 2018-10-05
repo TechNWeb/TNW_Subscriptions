@@ -222,10 +222,10 @@
                                                                     </item>
                                                                 </item>
                                                             </item>
-                                                            <item name="vault" xsi:type="array">
-                                                                <item name="component" xsi:type="string">Magento_Vault/js/view/payment/vault</item>
-                                                                <item name="methods" xsi:type="array"/>
-                                                            </item>
+                                                            <!--<item name="vault" xsi:type="array">-->
+                                                                <!--<item name="component" xsi:type="string">Magento_Vault/js/view/payment/vault</item>-->
+                                                                <!--<item name="methods" xsi:type="array"/>-->
+                                                            <!--</item>-->
                                                             <item name="offline-payments" xsi:type="array">
                                                                 <item name="component" xsi:type="string">Magento_OfflinePayments/js/view/payment/offline-payments</item>
                                                                 <item name="methods" xsi:type="array">
@@ -361,7 +361,7 @@
                                                 </item>
                                             </item>
                                             <item name="discount" xsi:type="array">
-                                                <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/discount</item>
+                                                <item name="component" xsi:type="string">Magento_SalesRule/js/view/payment/discount</item>
                                                 <item name="config" xsi:type="array">
                                                     <item name="template" xsi:type="string">TNW_Subscriptions/checkout/discount</item>
                                                     <item name="deps" xsi:type="array">
@@ -373,7 +373,7 @@
                                                 <item name="children" xsi:type="array">
                                                     <item name="errors" xsi:type="array">
                                                         <item name="sortOrder" xsi:type="string">0</item>
-                                                        <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/discount/messages</item>
+                                                        <item name="component" xsi:type="string">Magento_SalesRule/js/view/payment/discount-messages</item>
                                                         <item name="displayArea" xsi:type="string">messages</item>
                                                     </item>
                                                 </item>

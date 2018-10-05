@@ -129,6 +129,17 @@
         </data>
     </route>
 
+    <!-- Get payment information -->
+    <route url="/V1/tnw-subscriptions-carts/mine/payment-information" method="GET">
+        <service class="Magento\Checkout\Api\PaymentInformationManagementInterface" method="getPaymentInformation"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
+        </data>
+    </route>
+
     <!-- Guest place order with payment information saving -->
     <route url="/V1/guest-tnw-subscriptions-carts/:cartId/payment-information" method="POST">
         <service class="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement" method="savePaymentInformationAndPlaceOrder"/>

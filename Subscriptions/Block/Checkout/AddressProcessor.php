@@ -79,7 +79,7 @@ class AddressProcessor implements LayoutProcessorInterface
                 "$fieldset/$attributeCode",
                 $jsLayout,
                 array_replace_recursive(
-                    $this->getFieldConfig($attributeCode, $attributeConfig),
+                    $this->getFieldConfig($attributeCode, $attributeConfig, 'shippingAddress'),
                     $additionalConfig
                 )
             );
@@ -96,7 +96,7 @@ class AddressProcessor implements LayoutProcessorInterface
                 "$fieldset/$attributeCode",
                 $jsLayout,
                 array_replace_recursive(
-                    $this->getFieldConfig($attributeCode, $attributeConfig),
+                    $this->getFieldConfig($attributeCode, $attributeConfig, 'billingAddress'),
                     $additionalConfig
                 )
             );
@@ -108,25 +108,26 @@ class AddressProcessor implements LayoutProcessorInterface
     /**
      * @param string $attributeCode
      * @param array $attributeConfig
+     * @param string $scope
      *
      * @return array
      */
-    protected function getFieldConfig($attributeCode, array $attributeConfig)
+    protected function getFieldConfig($attributeCode, array $attributeConfig, $scope)
     {
         if (strcasecmp($attributeConfig['formElement'], 'multiline') === 0) {
-            return $this->getMultilineFieldConfig($attributeCode, $attributeConfig);
+            return $this->getMultilineFieldConfig($attributeCode, $attributeConfig, $scope);
         }
 
         return [
             'component' => self::$formElementMap[$attributeConfig['formElement']] ?? 'Magento_Ui/js/form/element/abstract',
             'config' => [
-                'customScope' => 'shippingAddress',
+                'customScope' => $scope,
                 'template' => 'ui/form/field',
                 'elementTmpl' => isset(self::$templateMap[$attributeConfig['formElement']])
                     ? 'ui/form/element/' . self::$templateMap[$attributeConfig['formElement']]
                     : 'ui/form/element/' . $attributeConfig['formElement'],
             ],
-            'dataScope' => 'shippingAddress.' . $attributeCode,
+            'dataScope' => $scope. '.' . $attributeCode,
             'label' => __($attributeConfig['label']),
             'provider' => 'checkoutProvider',
             'sortOrder' => $attributeConfig['sortOrder'],
@@ -138,10 +139,11 @@ class AddressProcessor implements LayoutProcessorInterface
     /**
      * @param string $attributeCode
      * @param array $attributeConfig
+     * @param $scope
      *
      * @return array
      */
-    private function getMultilineFieldConfig($attributeCode, array $attributeConfig)
+    private function getMultilineFieldConfig($attributeCode, array $attributeConfig, $scope)
     {
         $lines = [];
         unset($attributeConfig['validation']['required-entry']);
@@ -151,7 +153,7 @@ class AddressProcessor implements LayoutProcessorInterface
                 'component' => 'Magento_Ui/js/form/element/abstract',
                 'config' => [
                     // customScope is used to group elements within a single form e.g. they can be validated separately
-                    'customScope' => 'shippingAddress',
+                    'customScope' => $scope,
                     'template' => 'ui/form/field',
                     'elementTmpl' => 'ui/form/element/input'
                 ],
@@ -180,7 +182,7 @@ class AddressProcessor implements LayoutProcessorInterface
             ],
             'label' => $attributeConfig['label'],
             'required' => (bool)$attributeConfig['required'],
-            'dataScope' => 'shippingAddress.' . $attributeCode,
+            'dataScope' => $scope . '.' . $attributeCode,
             'provider' => 'checkoutProvider',
             'sortOrder' => $attributeConfig['sortOrder'],
             'type' => 'group',
