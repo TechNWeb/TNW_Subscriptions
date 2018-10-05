@@ -243,6 +243,26 @@
                                                                     </item>
                                                                 </item>
                                                             </item>
+                                                            <item name="paypal-payments" xsi:type="array">
+                                                                <item name="component" xsi:type="string">Magento_Paypal/js/view/payment/paypal-payments</item>
+                                                                <item name="methods" xsi:type="array">
+                                                                    <item name="payflowpro" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="payflow_link" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="payflow_advanced" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="hosted_pro" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                    <item name="paypal_billing_agreement" xsi:type="array">
+                                                                        <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
                                                         </item>
                                                     </item>
                                                     <item name="additional-payment-validators" xsi:type="array">
