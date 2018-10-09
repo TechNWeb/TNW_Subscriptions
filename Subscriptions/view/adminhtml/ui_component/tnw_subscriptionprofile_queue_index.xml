@@ -13,16 +13,14 @@
     </argument>
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider"
-                  xsi:type="string">tnw_subscriptionprofile_queue_index.tnw_subscriptionprofile_queue_index_data_source</item>
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_queue_index.tnw_subscriptionprofile_queue_index_data_source</item>
             <item name="deps" xsi:type="string">tnw_subscriptionprofile_queue_index.tnw_subscriptionprofile_queue_index_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">queue_columns</item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_queue_index_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class"
-                      xsi:type="string">TNW\Subscriptions\Model\Queue\DataProvider</argument>
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\Queue\DataProvider</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_queue_index_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
@@ -89,14 +87,6 @@
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Profile</item>
-                </item>
-            </argument>
-        </column>
-        <column name="magento_quote_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Quote Id</item>
                 </item>
             </argument>
         </column>

@@ -69,14 +69,22 @@ class Creator extends Base
         QuoteFactory $quoteFactory,
         CollectionFactory $collectionFactory,
         RelationManager $relationManager,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         Manager $queueManager,
         MessageHistoryLogger $messageHistoryLogger
     ) {
         $this->quoteFactory = $quoteFactory;
         $this->queueManager = $queueManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
-        parent::__construct($profileRepository, $criteriaBuilder, $context, $config, $cartRepository,
-            $collectionFactory, $relationManager
+        parent::__construct(
+            $profileRepository,
+            $criteriaBuilder,
+            $context,
+            $config,
+            $cartRepository,
+            $collectionFactory,
+            $relationManager,
+            $profileManager
         );
     }
 

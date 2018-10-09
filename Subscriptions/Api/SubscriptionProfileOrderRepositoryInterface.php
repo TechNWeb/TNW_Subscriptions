@@ -26,7 +26,7 @@ interface SubscriptionProfileOrderRepositoryInterface
      * Retrieve SubscriptionProfileOrder
      * @param string $id
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 

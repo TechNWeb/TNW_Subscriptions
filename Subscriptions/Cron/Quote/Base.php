@@ -7,8 +7,6 @@
 namespace TNW\Subscriptions\Cron\Quote;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\DataObject;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface as SubscriptionProduct;
@@ -17,7 +15,6 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -77,6 +74,11 @@ abstract class Base implements ProcessInterface
     protected $relationManager;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     */
+    private $profileManager;
+
+    /**
      * @param SubscriptionProfileRepository $profileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param Context $context
@@ -92,7 +94,8 @@ abstract class Base implements ProcessInterface
         Config $config,
         CartRepositoryInterface $cartRepository,
         CollectionFactory $collectionFactory,
-        RelationManager $relationManager
+        RelationManager $relationManager,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
     ) {
         $this->profileRepository = $profileRepository;
         $this->criteriaBuilder = $criteriaBuilder;
@@ -101,6 +104,7 @@ abstract class Base implements ProcessInterface
         $this->cartRepository = $cartRepository;
         $this->collectionFactory = $collectionFactory;
         $this->relationManager = $relationManager;
+        $this->profileManager = $profileManager;
     }
 
     /**
@@ -135,66 +139,25 @@ abstract class Base implements ProcessInterface
      * Returns list of profiles with no quotes.
      *
      * @param int $websiteId
+     *
      * @return SubscriptionProfileInterface[]
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getProfiles($websiteId)
     {
         $result = [];
         $ids = $this->getProfilesIdsToProcess($websiteId);
         if (!empty($ids)) {
-            $this->criteriaBuilder->addFilter(
-                SubscriptionProfileInterface::ID,
-                $ids,
-                'in'
-            );
-            /** @var SearchCriteriaInterface $searchCriteria */
-            $searchCriteria = $this->criteriaBuilder->create();
-            $result = $this->profileRepository->getList($searchCriteria)->getItems();
+            $searchCriteria = $this->criteriaBuilder
+                ->addFilter(SubscriptionProfileInterface::ID, $ids, 'in')
+                ->create();
+
+            $result = $this->profileRepository
+                ->getList($searchCriteria)
+                ->getItems();
         }
 
         return $result;
-    }
-
-    /**
-     * Returns request for adding product to subscription quote.
-     *
-     * @param SubscriptionProduct $profileProduct
-     * @return DataObject
-     */
-    protected function getProductAddRequest(
-        SubscriptionProduct $profileProduct
-    ) {
-        $data = [
-            'custom_price' => $profileProduct->getUnitPrice(),
-            'qty' => $profileProduct->getQty(),
-            Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
-                Create::UNIQUE => [
-                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty(),
-                ],
-                Create::NON_UNIQUE => [
-                    'current_preset_qty_price' => $profileProduct->getPrice(),
-                ],
-                Create::FULL_REQUEST_PARAM_NAME => false,
-            ]
-        ];
-        $productType = $profileProduct->getMagentoProduct()->getTypeId();
-        switch ($productType) {
-            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
-            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
-                break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                $data = $this->addConfigurableOptions(
-                    $profileProduct,
-                    $data
-                );
-                break;
-            default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $productType));
-                break;
-        }
-
-        return new DataObject($data);
     }
 
     /**
@@ -206,86 +169,9 @@ abstract class Base implements ProcessInterface
      */
     protected function processQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
-        //Deactivate quote
-        $quote->setIsActive(false);
-        $quote->setData('ignore_old_qty', true);
-        $quote->setData('is_super_mode', true);
-        $quote->setData('scheduled', true);
-        //Set store
-        $quote->setStore(
-            $profile->getWebsite()->getDefaultStore()
-        );
-        //Set currency
-        $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
-        //Set customer
-        if (!$quote->getCustomerId()) {
-            $quote->assignCustomer($profile->getCustomer());
-        }
-        //Add products
-        $this->addProductsToQuote($profile, $quote);
-        //Set shipping address
-        $quote->getShippingAddress()->addData(
-            $profile->getShippingAddress()->getData()
-        );
-        $quote->getShippingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
-        //Set billing address
-        $quote->getBillingAddress()->addData(
-            $profile->getBillingAddress()->getData()
-        );
-        $quote->getBillingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
-        //Set shipping method
-        $quote->getShippingAddress()
-            ->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod($profile->getShippingMethod());
-        $quote->setTotalsCollectedFlag(false);
+        $this->profileManager->populateQuoteData($quote, $profile);
         $this->cartRepository->save($quote);
 
         return $quote;
-    }
-
-    /**
-     * Adds products to quote.
-     *
-     * @param SubscriptionProfileInterface $profile
-     * @param Quote $quote
-     * @return void
-     */
-    protected function addProductsToQuote(SubscriptionProfileInterface $profile, Quote $quote)
-    {
-        foreach ($profile->getVisibleProducts() as $profileProduct) {
-            $addRequest = $this->getProductAddRequest($profileProduct);
-            $quote->addProduct($profileProduct->getMagentoProduct(), $addRequest);
-        }
-    }
-
-    /**
-     * Adds conf. options to buy request.
-     *
-     * @param SubscriptionProduct $profileProduct
-     * @param array $data
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    private function addConfigurableOptions(SubscriptionProduct $profileProduct, array $data)
-    {
-        $options = [];
-        /** @var SubscriptionProduct $child */
-        foreach ($profileProduct->getChildren() as $child) {
-            $options += array_replace(
-                $options,
-                \Zend_Json::decode($child->getCustomOptions()) ?: []
-            );
-        }
-        if (empty($options)) {
-            throw new \InvalidArgumentException(__('Custom options must be set.'));
-        }
-        $data['super_attribute'] = $options;
-
-        return $data;
     }
 }

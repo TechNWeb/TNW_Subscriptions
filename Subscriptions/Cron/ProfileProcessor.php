@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Cron;
 
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
@@ -65,63 +66,144 @@ class ProfileProcessor
      * Processes profile queue.
      *
      * @param int $websiteId
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function process($websiteId)
     {
-        $profileIds = [];
-
         $canceledCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_CANCELED)
             ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING);
 
         $this->queueManager->makeDelete($canceledCollection->getAllIds());
 
-        /** @var \TNW\Subscriptions\Model\Queue $queue */
-        foreach ($this->queueManager->getCollectionToday($websiteId) as $queue) {
+        // Queue collection
+        $collectionToday = $this->queueManager->getCollectionToday($websiteId);
 
-            $queueId = $queue->getId();
-            $profileId = $queue->getData('subscription_profile_id');
+        // Getting Profile IDs
+        $profileIds = array_map([$this, 'profileIdByQueue'], $collectionToday->getItems());
+
+        // Filtering not active
+        $activeQueueList = array_filter($collectionToday->getItems(), [$this, 'filterQueue']);
+
+        foreach ($this->groupedQueue($activeQueueList) as $queues) {
+            $queueIds = array_map([$this, 'queueIdByQueue'], $queues);
+            $this->queueManager->makeRunning($queueIds);
 
             try {
-                $profile = $this->profileRepository->getById($profileId);
-            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-                $this->queueManager->makeError($queueId, $e->getMessage());
-                continue;
-            }
-
-            switch ($profile->getStatus()) {
-                case ProfileStatus::STATUS_CANCELED:
-                    continue 2;
-
-                case ProfileStatus::STATUS_SUSPENDED:
-                    $this->queueManager->makeSkipped($queueId, __('Profile is Suspended, skipping...'));
-                    break;
-
-                case ProfileStatus::STATUS_COMPLETE:
-                    $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
-                    break;
-
-                default:
-                    $profileIds[] = $profileId;
-
-                    if ($this->passWithoutProcessing($queue)) {
-                        continue 2;
-                    }
-
-                    $this->queueManager->makeRunning($queueId);
-
-                    try {
-                        $this->queueManager->processItem($queue);
-                        $this->queueManager->makeCompleted($queueId);
-                    } catch (\Exception $e) {
-                        $this->context->messageError('Error on processing profile: %s', $e->getMessage());
-                        $this->queueManager->makeError($queueId, $e->getMessage());
-                    }
-                    break;
+                $this->queueManager->placeOrderByGroupQueue($queues);
+                $this->queueManager->makeCompleted($queueIds);
+            } catch (\Exception $e) {
+                $this->context->messageError('Error on processing profile: %s', $e);
+                $this->queueManager->makeError($queueIds, $e->getMessage());
             }
         }
 
         $this->updateProfilesStatuses($profileIds);
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue $queue
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function filterQueue(\TNW\Subscriptions\Model\Queue $queue)
+    {
+        $queueId = $queue->getId();
+
+        try {
+            $profile = $this->profileByQueue($queue);
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $this->queueManager->makeError($queueId, $e->getMessage());
+            return false;
+        }
+
+        switch ($profile->getStatus()) {
+            case ProfileStatus::STATUS_CANCELED:
+                return false;
+
+            case ProfileStatus::STATUS_SUSPENDED:
+                $this->queueManager->makeSkipped($queueId, __('Profile is Suspended, skipping...'));
+                return false;
+
+            case ProfileStatus::STATUS_COMPLETE:
+                $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
+                return false;
+
+            default:
+                if ($this->passWithoutProcessing($queue)) {
+                    return false;
+                }
+
+                return true;
+        }
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue $queue
+     *
+     * @return int|null
+     */
+    public function queueIdByQueue(\TNW\Subscriptions\Model\Queue $queue)
+    {
+        return $queue->getId();
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue $queue
+     *
+     * @return int
+     */
+    public function profileIdByQueue(\TNW\Subscriptions\Model\Queue $queue)
+    {
+        return (int)$queue->getData('subscription_profile_id');
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue $queue
+     *
+     * @return SubscriptionProfileInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function profileByQueue(\TNW\Subscriptions\Model\Queue $queue)
+    {
+        return $this->profileRepository->getById($this->profileIdByQueue($queue));
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue[] $queues
+     *
+     * @return \TNW\Subscriptions\Model\Queue[][]
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function groupedQueue($queues)
+    {
+        $groupProfile = [];
+        foreach ($queues as $queue) {
+            $profile = $this->profileByQueue($queue);
+            $groupProfile[$this->groupKey($profile)][] = $queue;
+        }
+
+        return $groupProfile;
+    }
+
+    /**
+     * @param SubscriptionProfileInterface $profile
+     *
+     * @return string
+     */
+    private function groupKey(SubscriptionProfileInterface $profile)
+    {
+        /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $address */
+        $address = $profile->getShippingAddress();
+
+        return implode('/', [
+            $profile->getCustomerId(),
+            $profile->getPayment()->getEngineCode(),
+            $profile->getShippingMethod(),
+            serialize($address->getData())
+        ]);
     }
 
     /**
