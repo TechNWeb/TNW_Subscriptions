@@ -195,15 +195,27 @@ class ProfileProcessor
      */
     private function groupKey(SubscriptionProfileInterface $profile)
     {
-        /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $address */
-        $address = $profile->getShippingAddress();
+        $part[] = $profile->getCustomerId();
+        $part[] = $profile->getPayment()->getEngineCode();
 
-        return implode('/', [
-            $profile->getCustomerId(),
-            $profile->getPayment()->getEngineCode(),
-            $profile->getShippingMethod(),
-            serialize($address->getData())
-        ]);
+        if (!$profile->getIsVirtual()) {
+            /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $address */
+            $address = $profile->getShippingAddress();
+
+            $part[] = $profile->getShippingMethod();
+            $part[] = \serialize([
+                $address->getFirstname(),
+                $address->getMiddlename(),
+                $address->getLastname(),
+                $address->getPostcode(),
+                $address->getRegion(),
+                $address->getRegionId(),
+                $address->getStreet(),
+                $address->getTelephone(),
+            ]);
+        }
+
+        return implode('/', $part);
     }
 
     /**

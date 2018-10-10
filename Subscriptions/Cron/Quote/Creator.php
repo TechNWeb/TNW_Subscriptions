@@ -339,7 +339,7 @@ class Creator extends Base
      */
     private function getEmptyQuote()
     {
-        return $this->quoteFactory->create();
+        return $this->quoteFactory->create(['data' => ['is_active' => false]]);
     }
 
     /**

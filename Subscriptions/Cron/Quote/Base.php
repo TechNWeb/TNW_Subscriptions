@@ -165,10 +165,14 @@ abstract class Base implements ProcessInterface
      *
      * @param SubscriptionProfileInterface $profile
      * @param Quote $quote
+     *
      * @return Quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Json_Exception
      */
     protected function processQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
+        $this->cartRepository->save($quote);
         $this->profileManager->populateQuoteData($quote, $profile);
         $this->cartRepository->save($quote);
 

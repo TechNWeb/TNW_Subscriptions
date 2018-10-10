@@ -671,21 +671,31 @@ class Manager
      */
     public function populateQuoteData(Quote $quote, SubscriptionProfileInterface $profile)
     {
+        if (!$quote->getId()) {
+            throw new LocalizedException(__('Quote not saved'));
+        }
+
+        $this->setProfile($profile);
+
         //Deactivate quote
         $quote->setIsActive(false);
         $quote->setData('ignore_old_qty', true);
         $quote->setData('is_super_mode', true);
         $quote->setData('scheduled', true);
+
         //Set store
         $quote->setStore(
             $profile->getWebsite()->getDefaultStore()
         );
+
         //Set currency
         $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
+
         //Set customer
         if (!$quote->getCustomerId()) {
             $quote->assignCustomer($profile->getCustomer());
         }
+
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $quote->addProduct(
@@ -701,6 +711,7 @@ class Manager
         $quote->getShippingAddress()->setCustomerId(
             $profile->getCustomerId()
         );
+
         //Set billing address
         $quote->getBillingAddress()->addData(
             $profile->getBillingAddress()->getData()
@@ -708,12 +719,20 @@ class Manager
         $quote->getBillingAddress()->setCustomerId(
             $profile->getCustomerId()
         );
+
+        // Set payment method
+        $quote->getPayment()
+            ->importData($this->getEngine()->getPaymentInfo($profile))
+            ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
         //Set shipping method
         $quote->getShippingAddress()
             ->setCollectShippingRates(true)
             ->collectShippingRates()
             ->setShippingMethod($profile->getShippingMethod());
+
         $quote->setTotalsCollectedFlag(false);
+        $quote->collectTotals();
     }
 
     /**

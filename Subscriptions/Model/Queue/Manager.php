@@ -92,11 +92,6 @@ class Manager
     private $timezone;
 
     /**
-     * @var \Magento\Quote\Model\QuoteManagement
-     */
-    private $quoteManagement;
-
-    /**
      * @var \Magento\Quote\Model\QuoteFactory
      */
     private $quoteFactory;
@@ -113,7 +108,7 @@ class Manager
      * @param ProfileStatus $profileStatus
      * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
-     * @param \Magento\Quote\Model\QuoteManagement $quoteManagement
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -127,7 +122,6 @@ class Manager
         ProfileStatus $profileStatus,
         \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
-        \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Quote\Model\QuoteFactory $quoteFactory
     ) {
         $this->collectionFactory = $collectionFactory;
@@ -141,7 +135,6 @@ class Manager
         $this->profileStatus = $profileStatus;
         $this->resourceQueue = $resourceQueue;
         $this->timezone = $timezone;
-        $this->quoteManagement = $quoteManagement;
         $this->quoteFactory = $quoteFactory;
     }
 
@@ -369,6 +362,7 @@ class Manager
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Zend_Json_Exception
+     * @throws \Exception
      */
     public function placeOrderByGroupQueue($groupQueue)
     {
@@ -378,7 +372,8 @@ class Manager
             return;
         }
 
-        $quote = $this->quoteFactory->create();
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        $this->cartRepository->save($quote);
 
         foreach ($groupQueue as $queue) {
             $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
@@ -387,31 +382,81 @@ class Manager
 
         $this->cartRepository->save($quote);
 
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->quoteManagement->submit($quote);
+        try {
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->profileManager
+                ->getEngine()
+                ->getCartManagement()
+                ->submit($quote);
 
-        foreach ($groupQueue as $queue) {
-            $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 
-            //Add comment profile place.
-            $this->messageHistoryLogger->message(
-                SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
-                [
-                    $order->getIncrementId(),
-                    $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
-                ],
-                $profile->getId(),
-                false,
-                false,
-                true
-            );
+                $oldStatus = $profile->getStatus();
 
-            $relation = $this->relationManager
-                ->getRelationById($queue->getProfileOrderId())
-                ->setMagentoQuoteId($quote->getId())
-                ->setMagentoOrderId($order->getId());
+                $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
+                if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
+                    $profile->setStatus(ProfileStatus::STATUS_TRIAL);
+                }
 
-            $this->relationManager->saveRelation($relation);
+                $this->profileRepository->save($profile);
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($profile->getStatus())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                    [
+                        $order->getIncrementId(),
+                        $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+
+                $relation = $this->relationManager
+                    ->getRelationById($queue->getProfileOrderId())
+                    ->setMagentoQuoteId($quote->getId())
+                    ->setMagentoOrderId($order->getId());
+
+                $this->relationManager->saveRelation($relation);
+            }
+        } catch (\Exception $e) {
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                $oldStatus = $profile->getStatus();
+                $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
+                $this->profileRepository->save($profile);
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($profile->getStatus())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+            }
+
+            throw $e;
         }
     }
 
