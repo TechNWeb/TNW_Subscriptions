@@ -210,8 +210,10 @@ class ProfileProcessor
                 $address->getPostcode(),
                 $address->getRegion(),
                 $address->getRegionId(),
+                $address->getCity(),
                 $address->getStreet(),
                 $address->getTelephone(),
+                $address->getCompany(),
             ]);
         }
 
