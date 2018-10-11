@@ -178,6 +178,10 @@
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\Helper\Cart" />
     </type>
 
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="tnw_subscriptions_initial_fee" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\InitialFee" />
+    </type>
+
     <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
         <arguments>
             <argument name="extensionActions" xsi:type="array">

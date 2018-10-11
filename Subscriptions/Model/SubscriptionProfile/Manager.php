@@ -1018,6 +1018,7 @@ class Manager
      * @param Quote $quote
      * @param $quoteItems
      *
+     * @return SubscriptionProfileInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -1103,5 +1104,7 @@ class Manager
 
         $this->assignOrderToProfile($relation, $order);
         $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
+
+        return $profile;
     }
 }

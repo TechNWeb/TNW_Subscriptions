@@ -25,14 +25,21 @@ class CreateProfile implements ObserverInterface
      */
     private $orderCustomerService;
 
+    /**
+     * @var \TNW\Subscriptions\Cron\Quote\Creator
+     */
+    private $quoteGenerator;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService
+        \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService,
+        \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator
     ) {
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->orderCustomerService = $orderCustomerService;
+        $this->quoteGenerator = $quoteGenerator;
     }
 
     /**
@@ -72,7 +79,9 @@ class CreateProfile implements ObserverInterface
 
         // Create profile
         foreach ($groups as $groupKey => $quoteItems) {
-            $this->profileManager->createByOrder($order, $quote, $quoteItems);
+            $profile = $this->profileManager->createByOrder($order, $quote, $quoteItems);
+            //Generate quote for next payment.
+            //$this->quoteGenerator->generateProfileQuotes($profile, 1);
         }
     }
 }

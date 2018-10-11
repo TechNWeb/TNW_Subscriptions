@@ -148,7 +148,7 @@ class DescriptionCreator
     {
         $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
         return $this->getDescribedItemPriceHtml(
-            $fullSubscriptionData['non_unique']['price'],
+            $fullSubscriptionData['non_unique']['totalPrice'],
             $fullSubscriptionData,
             $fullSubscriptionData['non_unique']['initialPrice']
         );
@@ -178,8 +178,8 @@ class DescriptionCreator
             }
         }
 
-        $fullSubscriptionData['non_unique']['price'] = $subtotal;
-        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal + $initialFee;
+        $fullSubscriptionData['non_unique']['price'] = $subtotal - $initialFee;
+        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal;
         $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
         $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
         $fullSubscriptionData['non_unique']['isVirtual'] = $isVirtual;
@@ -191,18 +191,21 @@ class DescriptionCreator
      * Returns initial fee from item.
      *
      * @param \Magento\Quote\Model\Quote\Item $item
-     * @return int
+     * @return float
      */
     private function getInitialFeeFromItem($item)
     {
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
+        $extensionAttributes = $item->getExtensionAttributes();
+        if (!$extensionAttributes instanceof \Magento\Quote\Api\Data\CartItemExtensionInterface) {
+            return 0;
         }
 
-        return !empty($initialFee) ? $initialFee : 0;
+        $subsInitialFees = $extensionAttributes->getSubsInitialFees();
+        if (!$subsInitialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem) {
+            return 0;
+        }
+
+        return $subsInitialFees->getSubsInitialFee() * $item->getQty();
     }
 
     /**
@@ -221,8 +224,8 @@ class DescriptionCreator
         $thenPhrase = '';
         $priceClasses = ['base-price'];
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = ($itemTotal + $initialFee)
-            ? $this->formatPrice($itemTotal + $initialFee)
+        $formattedPrice = $itemTotal > 0
+            ? $this->formatPrice($itemTotal)
             : __('Free');
         $formattedPrice = $this->addContainer(
             $formattedPrice,
@@ -230,7 +233,7 @@ class DescriptionCreator
         );
 
         if ($isTrial) {
-            $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
+            $middlePhrase = $itemTotal ? __('for the') : '';
             $lastPhrase = __('trial');
         } elseif ($initialFee) {
             $middlePhrase = ' ';
@@ -250,7 +253,7 @@ class DescriptionCreator
         }
 
         $total = $this->addContainer(
-            $this->formatPrice($itemTotal),
+            $this->formatPrice($itemTotal - $initialFee),
             'price'
         );
 
@@ -272,6 +275,7 @@ class DescriptionCreator
      * @param \Magento\Quote\Model\Quote\Item $quoteItem
      *
      * @return string
+     * @throws \Zend_Json_Exception
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {
