@@ -211,25 +211,20 @@ class Manager
      * Retrieve Subscription profile ID by Order ID
      *
      * @param int $orderId
-     * @return int|false
+     *
+     * @return int[]
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getSubscriptionProfileIdByOrder($orderId)
+    public function getProfileIdsByOrder($orderId)
     {
-        $this->criteriaBuilder
+        $searchCriteria = $this->criteriaBuilder
             ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID, $orderId)
-            ->setPageSize(1);
+            ->create();
 
-        /** @var SearchCriteriaInterface $searchCriteria */
-        $searchCriteria = $this->criteriaBuilder->create();
-        $results = $this->profileOrderRepository->getList($searchCriteria)->getItems();
-        
-        if (count($results)) {
-            /* @var SubscriptionProfileOrderInterface $item */
-            $item = $results[0];
-            return (int)$item->getSubscriptionProfileId();
-        }
-        
-        return false;
+        $searchResults = $this->profileOrderRepository->getList($searchCriteria);
+        return array_map(function (SubscriptionProfileOrderInterface $profileOrder) {
+            return $profileOrder->getSubscriptionProfileId();
+        }, $searchResults->getItems());
     }
 
     /**

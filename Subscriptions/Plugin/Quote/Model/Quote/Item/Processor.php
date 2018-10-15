@@ -8,28 +8,14 @@ namespace TNW\Subscriptions\Plugin\Quote\Model\Quote\Item;
 class Processor
 {
     /**
-     * @var \Magento\Framework\DataObjectFactory
-     */
-    private $dataObjectFactory;
-
-    /**
      * @var \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product
      */
     private $productModifier;
 
-    /**
-     * @var \Magento\Framework\Locale\ResolverInterface
-     */
-    private $localeResolver;
-
     public function __construct(
-        \Magento\Framework\DataObjectFactory $dataObjectFactory,
-        \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier,
-        \Magento\Framework\Locale\ResolverInterface $localeResolver
+        \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
     ) {
-        $this->dataObjectFactory = $dataObjectFactory;
         $this->productModifier = $productModifier;
-        $this->localeResolver = $localeResolver;
     }
 
     public function aroundPrepare(

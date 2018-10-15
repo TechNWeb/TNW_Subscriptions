@@ -148,7 +148,7 @@ class DescriptionCreator
     {
         $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
         return $this->getDescribedItemPriceHtml(
-            $fullSubscriptionData['non_unique']['totalPrice'],
+            $fullSubscriptionData['non_unique']['price'],
             $fullSubscriptionData,
             $fullSubscriptionData['non_unique']['initialPrice']
         );
@@ -178,8 +178,8 @@ class DescriptionCreator
             }
         }
 
-        $fullSubscriptionData['non_unique']['price'] = $subtotal - $initialFee;
-        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal;
+        $fullSubscriptionData['non_unique']['price'] = $subtotal;
+        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal + $initialFee;
         $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
         $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
         $fullSubscriptionData['non_unique']['isVirtual'] = $isVirtual;
@@ -224,8 +224,8 @@ class DescriptionCreator
         $thenPhrase = '';
         $priceClasses = ['base-price'];
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = $itemTotal > 0
-            ? $this->formatPrice($itemTotal)
+        $formattedPrice = ($itemTotal + $initialFee) > 0
+            ? $this->formatPrice($itemTotal + $initialFee)
             : __('Free');
         $formattedPrice = $this->addContainer(
             $formattedPrice,
@@ -233,7 +233,7 @@ class DescriptionCreator
         );
 
         if ($isTrial) {
-            $middlePhrase = $itemTotal ? __('for the') : '';
+            $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
             $lastPhrase = __('trial');
         } elseif ($initialFee) {
             $middlePhrase = ' ';
@@ -253,7 +253,7 @@ class DescriptionCreator
         }
 
         $total = $this->addContainer(
-            $this->formatPrice($itemTotal - $initialFee),
+            $this->formatPrice($itemTotal),
             'price'
         );
 

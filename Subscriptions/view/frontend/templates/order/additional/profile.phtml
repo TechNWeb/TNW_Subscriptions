@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+/** @var TNW\Subscriptions\Block\Sales\Order\Additional\Profile $block */
+?>
+<?php if($block->isProfileItem()) : ?>
+<div class="sub-profile-option">
+    <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b><br>
+    <?= $block->getProfiles() ?>
+</div>
+<?php if($initialFee = $block->getInitialFee()) : ?>
+<div class="sub-profile-option">
+    <b><?= /* @escapeNotVerified */ __('Initial fee included')?></b><br>
+    <?= /* @escapeNotVerified */ $block->getOrder()->formatPrice($initialFee) ?>
+</div>
+<?php endif; ?>
+<?php endif; ?>

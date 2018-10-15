@@ -30,16 +30,23 @@ class CreateProfile implements ObserverInterface
      */
     private $quoteGenerator;
 
+    /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     */
+    private $relationResource;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
         \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService,
-        \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator
+        \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator,
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
     ) {
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->orderCustomerService = $orderCustomerService;
         $this->quoteGenerator = $quoteGenerator;
+        $this->relationResource = $relationResource;
     }
 
     /**
@@ -78,10 +85,34 @@ class CreateProfile implements ObserverInterface
         }
 
         // Create profile
+        $insertData = [];
         foreach ($groups as $groupKey => $quoteItems) {
             $profile = $this->profileManager->createByOrder($order, $quote, $quoteItems);
+
+            /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
+            foreach ($profile->getProducts() as $product) {
+                $quoteItemId = $product->getData('quote_item_id');
+                if (empty($quoteItemId)) {
+                    continue;
+                }
+
+                $orderItem = $order->getItemByQuoteItemId($quoteItemId);
+                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                    continue;
+                }
+
+                $insertData[] = [
+                    'profile_item_id' => $product->getId(),
+                    'quote_item_id' => $quoteItemId,
+                    'order_item_id' => $orderItem->getId()
+                ];
+            }
+
             //Generate quote for next payment.
             //$this->quoteGenerator->generateProfileQuotes($profile, 1);
         }
+
+        // Save Items Relation
+        $this->relationResource->insertSales($insertData);
     }
 }

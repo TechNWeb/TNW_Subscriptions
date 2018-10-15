@@ -7,12 +7,8 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="order_totals">
-            <block class="TNW\Subscriptions\Block\Adminhtml\Sales\Order\Totals" name="tnw_subs_initial_fee_totals">
-                <action method="getBeforeCondition">
-                    <argument name="condition" xsi:type="string">shipping</argument>
-                </action>
-            </block>
+        <referenceBlock name="invoice_totals">
+            <block class="TNW\Subscriptions\Block\Sales\Order\InitialFee" name="initial_fee" template="TNW_Subscriptions::order/initial_fee.phtml"/>
         </referenceBlock>
     </body>
 </page>
