@@ -96,10 +96,6 @@ class InitialFee extends \Magento\Framework\View\Element\Template
      */
     private function reduceCreditmemoItems($carry, \Magento\Sales\Model\Order\Creditmemo\Item $item)
     {
-        if ($item->getParentId()) {
-            return $carry;
-        }
-
         $extensionAttributes = $item->getExtensionAttributes();
         if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\CreditmemoItemExtensionInterface) {
             return $carry;
@@ -122,10 +118,6 @@ class InitialFee extends \Magento\Framework\View\Element\Template
      */
     private function reduceInvoiceItems($carry, \Magento\Sales\Model\Order\Invoice\Item $item)
     {
-        if ($item->getParentId()) {
-            return $carry;
-        }
-
         $extensionAttributes = $item->getExtensionAttributes();
         if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\InvoiceItemExtensionInterface) {
             return $carry;

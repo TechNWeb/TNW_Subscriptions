@@ -45,8 +45,8 @@ class InitialFee extends AbstractTotal
                 continue;
             }
 
-            $totalInitialFee += $itemInitialFees->getSubsInitialFee();
-            $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee();
+            $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
+            $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
         }
 
         $total->setTotalAmount($this->getCode(), $totalInitialFee);

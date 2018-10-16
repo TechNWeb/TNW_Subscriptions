@@ -5,21 +5,23 @@
  */
 namespace TNW\Subscriptions\Block\Sales\Order\Additional;
 
+use Magento\Framework\View\Element\Template;
+
 class Profile extends \Magento\Framework\View\Element\Template
 {
     /**
-     * @return bool
+     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
      */
-    public function isProfileItem()
-    {
-        $item = $this->getItem();
-        if (!$item instanceof \Magento\Sales\Model\Order\Item) {
-            return false;
-        }
+    private $itemRelationResource;
 
-        //TODO:
+    public function __construct(
+        Template\Context $context,
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
 
-        return true;
+        $this->itemRelationResource = $itemRelationResource;
     }
 
     /**
@@ -42,7 +44,7 @@ class Profile extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        return $initialFees->getSubsInitialFee() * $item->getQtyOrdered();
+        return $initialFees->getSubsInitialFee();
     }
 
     /**
@@ -62,10 +64,26 @@ class Profile extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getProfileIds()
+    {
+        $item = $this->getItem();
+        if (!$item instanceof \Magento\Sales\Model\Order\Item) {
+            return [];
+        }
+
+        return $this->itemRelationResource->profileIdsByOrderItemId($item->getItemId());
+    }
+
+    /**
+     * @param int $profileId
+     *
      * @return string
      */
-    public function getProfiles()
+    public function textProfileId($profileId)
     {
-        return 'S-130';
+        return sprintf('S-%d', $profileId);
     }
 }

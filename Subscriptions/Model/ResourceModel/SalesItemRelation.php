@@ -50,4 +50,27 @@ class SalesItemRelation extends AbstractDb
         $this->getConnection()
             ->insertArray($this->getMainTable(), $columns, $data);
     }
+
+    /**
+     * @param int $orderItemId
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function profileIdsByOrderItemId($orderItemId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()
+            ->from(['relation' => $this->getMainTable()], [])
+            ->joinInner(
+                ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                'relation.profile_item_id = profileItem.entity_id',
+                ['subscription_profile_id']
+            )
+            ->where('relation.order_item_id = ?', $orderItemId)
+        ;
+
+        return $connection->fetchRow($select);
+    }
 }

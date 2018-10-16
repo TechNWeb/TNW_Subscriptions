@@ -114,41 +114,22 @@ class InitialFee extends AbstractTotal
      * Returns order item subscription initial fees extension attribute.
      *
      * @param CreditmemoItem $item
-     * @param float|null $summaryInitialFee
-     * @param float|null $requestedFee
+     *
      * @return array
      */
-    private function getItemCurrentInitialFees(
-        CreditmemoItem $item,
-        $summaryInitialFee = null,
-        $requestedFee = null
-    ) {
+    private function getItemCurrentInitialFees(CreditmemoItem $item)
+    {
         $initialFee = 0;
         $baseInitialFee = 0;
-        $initialFeeRefunded = 0;
-        $baseInitialFeeRefunded = 0;
-        $ratio = 1;
+
         $initialFees = $this->getOrderItemInitialFees($item->getOrderItem());
-        if ($requestedFee && $summaryInitialFee) {
-            $ratio = $requestedFee / $summaryInitialFee;
-        }
 
         if ($initialFees) {
             $initialFee = $initialFees->getSubsInitialFee();
             $baseInitialFee = $initialFees->getBaseSubsInitialFee();
-            $initialFeeRefunded = $initialFees->getSubsInitialFeeRefunded();
-            $baseInitialFeeRefunded = $initialFees->getBaseSubsInitialFeeRefunded();
         }
 
-        $currentFee = $item->getCreditmemo()->roundPrice(
-            ($initialFee - $initialFeeRefunded) * $ratio,
-            'base'
-        );
-        $currentBaseFee = $item->getCreditmemo()->roundPrice(
-            ($baseInitialFee - $baseInitialFeeRefunded) * $ratio
-        );
-
-        return [$currentFee, $currentBaseFee];
+        return [$initialFee, $baseInitialFee];
     }
 
     /**
@@ -182,9 +163,8 @@ class InitialFee extends AbstractTotal
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemInitialFees = $this->getOrderItemInitialFees($item->getOrderItem());
             if ($orderItemInitialFees && !$item->getOrderItem()->isDummy() && $item->getQty() > 0) {
-                $baseItemFee = (float)$orderItemInitialFees->getBaseSubsInitialFee();
-                $baseFeeRefunded = (float)$orderItemInitialFees->getBaseSubsInitialFeeRefunded();
-                $totalInitialFees += $baseItemFee - $baseFeeRefunded;
+                $itemFee = (float)$orderItemInitialFees->getBaseSubsInitialFee();
+                $totalInitialFees += $itemFee * $item->getQty();
             }
         }
 

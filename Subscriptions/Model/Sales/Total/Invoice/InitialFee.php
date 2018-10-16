@@ -32,7 +32,6 @@ class InitialFee extends AbstractTotal
         foreach ($invoice->getAllItems() as $item) {
             /** @var OrderItem $orderItem */
             $orderItem = $item->getOrderItem();
-            $orderItemQty = $orderItem->getQtyOrdered();
 
             if ($orderItem->isDummy() || $item->getQty() < 0) {
                 continue;
@@ -40,18 +39,10 @@ class InitialFee extends AbstractTotal
 
             list($currentFee, $baseCurrentFee) = $this->getItemCurrentInitialFees($orderItem);
 
-            if ($currentFee && $orderItemQty) {
-                if (!$item->isLast()) {
-                    $ratio = ($orderItemQty - $orderItem->getQtyInvoiced() > 0)
-                        ? $item->getQty() / ($orderItemQty - $orderItem->getQtyInvoiced())
-                        : 0;
-                    $currentFee = $invoice->roundPrice($currentFee * $ratio);
-                    $baseCurrentFee = $invoice->roundPrice($baseCurrentFee * $ratio, 'base');
-                }
-
+            if ($currentFee) {
                 $this->setItemInitialFees($item, $currentFee, $baseCurrentFee);
-                $totalInitialFee += $currentFee;
-                $baseTotalInitialFee += $baseCurrentFee;
+                $totalInitialFee += $currentFee * $item->getQty();
+                $baseTotalInitialFee += $baseCurrentFee * $item->getQty();
             }
         }
 
@@ -71,8 +62,6 @@ class InitialFee extends AbstractTotal
     {
         $initialFee = 0;
         $baseInitialFee = 0;
-        $initialFeeInvoiced = 0;
-        $baseInitialFeeInvoiced = 0;
         $initialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
@@ -80,11 +69,9 @@ class InitialFee extends AbstractTotal
         if ($initialFees) {
             $initialFee = $initialFees->getSubsInitialFee();
             $baseInitialFee = $initialFees->getBaseSubsInitialFee();
-            $initialFeeInvoiced = $initialFees->getSubsInitialFeeInvoiced();
-            $baseInitialFeeInvoiced = $initialFees->getBaseSubsInitialFeeInvoiced();
         }
 
-        return [$initialFee - $initialFeeInvoiced, $baseInitialFee - $baseInitialFeeInvoiced];
+        return [$initialFee, $baseInitialFee];
     }
 
     /**
