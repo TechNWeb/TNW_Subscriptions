@@ -3,17 +3,27 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo;
-
-use Magento\Sales\Api\Data\CreditmemoItemInterface;
-use Magento\Sales\Api\Data\OrderItemInterface;
 
 /**
  * Subscription initial fee block for credit memo.
  */
 class InitialFee extends \Magento\Backend\Block\Template
 {
+    /**
+     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+        $this->priceCurrency = $priceCurrency;
+    }
+
     /**
      * Source object
      *
@@ -30,12 +40,7 @@ class InitialFee extends \Magento\Backend\Block\Template
     {
         $parent = $this->getParentBlock();
         $this->source = $parent->getSource();
-        $total = new \Magento\Framework\DataObject(
-            [
-                'code' => 'tnw_subs_initial_fee',
-                'block_name' => $this->getNameInLayout(),
-            ]
-        );
+        $total = new \Magento\Framework\DataObject(['code' => 'tnw_subs_initial_fee', 'block_name' => $this->getNameInLayout()]);
         $parent->addTotal($total, 'agjustments');
 
         return $this;
@@ -56,52 +61,19 @@ class InitialFee extends \Magento\Backend\Block\Template
      *
      * @return float|int
      */
-    public function getBaseInitialFee()
+    public function getInitialFeeAmount()
     {
-        $result = 0;
-        /** @var CreditmemoItemInterface $item */
-        foreach ($this->getSource()->getAllItems() as $item) {
-            $initialFees = $item->getOrderItem()->getExtensionAttributes()
-                ? $item->getOrderItem()->getExtensionAttributes()->getSubsInitialFees()
-                : null;
-            if ($initialFees) {
-                $baseFee = (float)$initialFees->getBaseSubsInitialFee();
-                $baseFeeRefunded = (float)$initialFees->getBaseSubsInitialFeeRefunded();
-                $itemFee = $baseFee - $baseFeeRefunded;
-                if ($itemFee > 0 && $item->getQty()) {
-                    $result += $itemFee;
-                }
-            }
-        }
-
-        return $result;
+        $initialFee = $this->getSource()->getData('base_subscription_initial_fee');
+        return $this->priceCurrency->round($initialFee) * 1;
     }
 
     /**
-     * Returns total initial fee available to refund.
+     * Get label for shipping total based on configuration settings
      *
-     * @return float|int
+     * @return string
      */
-    public function getInitialFeeTotalValue()
+    public function getInitialFeeLabel()
     {
-        $result = 0;
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $this->getSource()->getOrder();
-        /** @var OrderItemInterface $item */
-        foreach ($order->getAllItems() as $item) {
-            $initialFees = $item->getExtensionAttributes()
-                ? $item->getExtensionAttributes()->getSubsInitialFees()
-                : null;
-            if ($initialFees) {
-                $baseFee = (float)$initialFees->getBaseSubsInitialFee();
-                $baseFeeRefunded = (float)$initialFees->getBaseSubsInitialFeeRefunded();
-                $itemFee = $baseFee - $baseFeeRefunded;
-                if ($itemFee > 0) {
-                    $result += $itemFee;
-                }
-            }
-        }
-
-        return __('Total: ') . $order->formatBasePrice($result);
+        return __('Initial Fee(s)');
     }
 }

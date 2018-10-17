@@ -50,59 +50,38 @@ class InitialFee extends AbstractTotal
     {
         $totalInitialFee = 0;
         $baseTotalInitialFee = 0;
-        $summaryInitialFee = $this->getSummaryInitialFee($creditmemo);
+        $baseMaxInitialFee = $this->getMaxInitialFee($creditmemo);
         $baseRequestedFee = $this->getRequestedInitialFee($creditmemo);
 
-        if ($baseRequestedFee > $summaryInitialFee) {
+        if ($baseRequestedFee > $baseMaxInitialFee) {
             throw new LocalizedException(
-                __('Maximum initial fee allowed to refund is: %1', $summaryInitialFee)
+                __('Maximum initial fee allowed to refund is: %1', $baseMaxInitialFee)
             );
         }
 
-        $requestedFee = ($baseRequestedFee >= 0) ? $creditmemo->roundPrice($baseRequestedFee) : false;
+        if (empty($baseRequestedFee)) {
+            $baseRequestedFee = $baseMaxInitialFee;
+        }
+
+        $requestedFee = $creditmemo->roundPrice($baseRequestedFee);
+        $maxInitialFee = $creditmemo->roundPrice($baseMaxInitialFee);
+
         /** @var CreditmemoItem $item */
         foreach ($creditmemo->getAllItems() as $item) {
-            $orderItemQty = $item->getOrderItem()->getQtyOrdered();
-            $orderItemQtyRefunded = $item->getOrderItem()->getQtyRefunded();
-
-            if ($item->getOrderItem()->isDummy() || !$this->hasInitialFeeToRefund($item) || !$orderItemQty) {
+            if ($item->getOrderItem()->isDummy() || !$this->hasInitialFeeToRefund($item)) {
                 continue;
             }
 
-            $currentFee = 0;
-            $baseCurrentFee = 0;
-            if (in_array($item->getQty(), [$orderItemQty, $orderItemQty - $orderItemQtyRefunded])) {
-                //this case needed when we refund last item or refund whole position
-                list($currentFee, $baseCurrentFee) = $this->getItemCurrentInitialFees($item);
-                if ($baseRequestedFee) {
-                    //case when there is initial fee to refund
-                    $baseCurrentFee = min($baseRequestedFee, $baseCurrentFee);
-                    $currentFee = min($requestedFee, $currentFee);
-                    $baseRequestedFee = ($baseRequestedFee >= $baseCurrentFee)
-                        ? $baseRequestedFee - $baseCurrentFee
-                        : 0;
-                    $requestedFee = $creditmemo->roundPrice($baseRequestedFee);
-                    $summaryInitialFee = ($summaryInitialFee >= $currentFee)
-                        ? $summaryInitialFee - $currentFee
-                        : 0;
-                } elseif ($baseRequestedFee === 0) {
-                    //case when we create credit memo but there is no initial fee to refund
-                    $currentFee = 0;
-                    $baseCurrentFee = 0;
-                }
-            } elseif ($item->getQty()) {
-                //case when we partially refund item
-                list($currentFee, $baseCurrentFee) = $this->getItemCurrentInitialFees(
-                    $item,
-                    $summaryInitialFee,
-                    $requestedFee
-                );
-            }
-
+            //this case needed when we refund last item or refund whole position
+            list($currentFee, $baseCurrentFee) = $this->getItemCurrentInitialFees($item);
             $this->setItemInitialFees($item, $currentFee, $baseCurrentFee);
-            $totalInitialFee += $currentFee;
-            $baseTotalInitialFee += $baseCurrentFee;
+
+            $totalInitialFee += min($requestedFee, $maxInitialFee);
+            $baseTotalInitialFee += min($baseRequestedFee, $baseMaxInitialFee);
         }
+
+        $creditmemo->setData('subscription_initial_fee', $totalInitialFee);
+        $creditmemo->setData('base_subscription_initial_fee', $baseTotalInitialFee);
 
         $creditmemo->setGrandTotal($creditmemo->getGrandTotal() + $totalInitialFee);
         $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal() + $baseTotalInitialFee);
@@ -157,18 +136,19 @@ class InitialFee extends AbstractTotal
      * @param Creditmemo $creditmemo
      * @return float|int
      */
-    protected function getSummaryInitialFee(Creditmemo $creditmemo)
+    protected function getMaxInitialFee(Creditmemo $creditmemo)
     {
         $totalInitialFees = 0;
         foreach ($creditmemo->getAllItems() as $item) {
-            $orderItemInitialFees = $this->getOrderItemInitialFees($item->getOrderItem());
-            if ($orderItemInitialFees && !$item->getOrderItem()->isDummy() && $item->getQty() > 0) {
-                $itemFee = (float)$orderItemInitialFees->getBaseSubsInitialFee();
-                $totalInitialFees += $itemFee * $item->getQty();
+            $orderItem = $item->getOrderItem();
+            $initialFees = $this->getOrderItemInitialFees($orderItem);
+
+            if ($initialFees && !$item->getOrderItem()->isDummy()) {
+                $totalInitialFees += (float)$initialFees->getBaseSubsInitialFee() * $orderItem->getQtyInvoiced();
             }
         }
 
-        return $totalInitialFees;
+        return $totalInitialFees - $creditmemo->getBaseAdjustment();
     }
 
     /**

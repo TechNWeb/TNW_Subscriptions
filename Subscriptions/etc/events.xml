@@ -22,15 +22,21 @@
         <observer name="legacy_model_load" instance="Magento\Framework\EntityManager\Observer\AfterEntityLoad" />
     </event>
     <event name="sales_quote_save_before">
-        <observer name="tnw_subscription_quote_save_before" instance="TNW\Subscriptions\Observer\SalesQuoteSaveBefore" />
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesQuoteSaveBefore" />
     </event>
     <event name="sales_quote_load_after">
-        <observer name="tnw_subscription_quote_load_after" instance="TNW\Subscriptions\Observer\SalesQuoteLoadAfter" />
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesQuoteLoadAfter" />
     </event>
     <event name="payment_method_is_active">
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\PaymentMethodIsActive"/>
     </event>
     <event name="checkout_cart_add_product_complete">
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\CheckoutCartAddProduct"/>
+    </event>
+    <event name="sales_order_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SalesOrderLoadAfter\ExtensionAttributes"/>
+    </event>
+    <event name="sales_order_creditmemo_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SalesOrderLoadAfter\ExtensionAttributes"/>
     </event>
 </config>
