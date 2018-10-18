@@ -178,6 +178,14 @@
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\Helper\Cart" />
     </type>
 
+    <type name="Magento\Sales\Model\Order\Creditmemo">
+        <plugin name="tnw_subscriptions_extension_attributes" type="TNW\Subscriptions\Plugin\Model\ExtensionAttributes" />
+    </type>
+
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="tnw_subscriptions_extension_attributes" type="TNW\Subscriptions\Plugin\Model\ExtensionAttributes" />
+    </type>
+
     <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
         <arguments>
             <argument name="extensionActions" xsi:type="array">
@@ -339,34 +347,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
-        <plugin name="tnw_subs_order_item_save"
-                type="TNW\Subscriptions\Plugin\Sales\Order\Item\AfterSave"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
-    <type name="Magento\Sales\Api\Data\OrderInterface">
-        <plugin name="tnw_subs_order_item_collection"
-                type="TNW\Subscriptions\Plugin\Sales\Order\ItemCollection"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
-    <type name="Magento\Sales\Model\ResourceModel\Order\Invoice\Item">
-        <plugin name="tnw_subs_invoice_resource_item_save"
-                type="TNW\Subscriptions\Plugin\Sales\Invoice\Item\ResourceSave"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
-    <type name="Magento\Sales\Model\ResourceModel\Order\Creditmemo\Item">
-        <plugin name="tnw_subs_creditmemo_resource_item_save"
-                type="TNW\Subscriptions\Plugin\Sales\Creditmemo\Item\ResourceSave"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
     <type name="Magento\Sales\Model\Order\Invoice\Item">
         <plugin name="tnw_subs_invoice_item_register_and_cancel"
                 type="TNW\Subscriptions\Plugin\Sales\Invoice\Item"
@@ -377,20 +357,6 @@
     <type name="Magento\Sales\Model\Order\Creditmemo\Item">
         <plugin name="tnw_subs_creditmemo_item_register_and_cancel"
                 type="TNW\Subscriptions\Plugin\Sales\Creditmemo\Item"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
-    <type name="Magento\Sales\Api\Data\InvoiceInterface">
-        <plugin name="tnw_subs_invoice_item_collection"
-                type="TNW\Subscriptions\Plugin\Sales\Invoice\ItemCollection"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
-    <type name="Magento\Sales\Api\Data\CreditmemoInterface">
-        <plugin name="tnw_subs_creditmemo_item_collection"
-                type="TNW\Subscriptions\Plugin\Sales\Creditmemo\ItemCollection"
                 sortOrder="100"
                 disabled="false"/>
     </type>

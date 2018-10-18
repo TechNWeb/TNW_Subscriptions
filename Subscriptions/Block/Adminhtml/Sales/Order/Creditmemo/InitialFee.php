@@ -27,7 +27,7 @@ class InitialFee extends \Magento\Backend\Block\Template
     /**
      * Source object
      *
-     * @var \Magento\Framework\DataObject
+     * @var \Magento\Sales\Model\Order\Creditmemo
      */
     private $source;
 
@@ -49,7 +49,7 @@ class InitialFee extends \Magento\Backend\Block\Template
     /**
      * Get source object
      *
-     * @return \Magento\Framework\DataObject
+     * @return \Magento\Sales\Model\Order\Creditmemo
      */
     public function getSource()
     {
@@ -63,7 +63,7 @@ class InitialFee extends \Magento\Backend\Block\Template
      */
     public function getInitialFeeAmount()
     {
-        $initialFee = $this->getSource()->getData('base_subscription_initial_fee');
+        $initialFee = $this->getSource()->getExtensionAttributes()->getBaseSubscriptionInitialFee();
         return $this->priceCurrency->round($initialFee) * 1;
     }
 
