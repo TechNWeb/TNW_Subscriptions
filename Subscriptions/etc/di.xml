@@ -326,13 +326,6 @@
         </arguments>
     </type>
 
-    <type name="Magento\Quote\Model\Quote\Item">
-        <plugin name="tnw_subs_quote_item_save"
-                type="TNW\Subscriptions\Plugin\Quote\Item\AfterSave"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
     <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
         <plugin name="tnw_subscriptions_copy_data_to_order"
                 type="TNW\Subscriptions\Plugin\Quote\Item\ToOrderItem"

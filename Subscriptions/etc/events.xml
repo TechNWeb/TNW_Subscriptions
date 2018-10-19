@@ -33,6 +33,12 @@
     <event name="checkout_cart_add_product_complete">
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\CheckoutCartAddProduct"/>
     </event>
+    <event name="sales_quote_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_quote_item_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
     <event name="sales_order_load_after">
         <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
     </event>
