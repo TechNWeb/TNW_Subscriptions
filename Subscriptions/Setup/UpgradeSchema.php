@@ -58,6 +58,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addIsSubscriptionColumn($setup);
             $this->dropUniqueKeyProfileOrder($setup);
             $this->createProfileItemSalesItemTable($setup);
+            $this->createOrderExtensionTable($setup);
+            $this->createCreditMemoExtensionTable($setup);
         }
 
         $setup->endSetup();
@@ -441,6 +443,94 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'order_item_id',
                 $setup->getTable('sales_order_item'),
                 'item_id',
+                Table::ACTION_CASCADE
+            );
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function createOrderExtensionTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_order_extension_entity'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => false,
+            ], 'Profile Item')
+            ->addColumn('subscription_initial_fee_refunded', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Refunded initial fee')
+            ->addColumn('base_subscription_initial_fee_refunded', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Base refunded initial fee')
+            ->addIndex(
+                $setup->getIdxName(
+                    'tnw_subscriptions_order_extension_entity',
+                    ['entity_id']
+                ),
+                ['entity_id']
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_order_extension_entity',
+                    'entity_id',
+                    'sales_order',
+                    'entity_id'
+                ),
+                'entity_id',
+                $setup->getTable('sales_order'),
+                'entity_id',
+                Table::ACTION_CASCADE
+            );
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function createCreditMemoExtensionTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_creditmemo_extension_entity'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => false,
+            ], 'Profile Item')
+            ->addColumn('subscription_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Initial fee')
+            ->addColumn('base_subscription_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Base initial fee')
+            ->addIndex(
+                $setup->getIdxName(
+                    'tnw_subscriptions_creditmemo_extension_entity',
+                    ['entity_id']
+                ),
+                ['entity_id']
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_creditmemo_extension_entity',
+                    'entity_id',
+                    'sales_creditmemo',
+                    'entity_id'
+                ),
+                'entity_id',
+                $setup->getTable('sales_creditmemo'),
+                'entity_id',
                 Table::ACTION_CASCADE
             );
 

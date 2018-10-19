@@ -172,10 +172,12 @@ class ExtensionAttributes
                 continue;
             }
 
-            $connection->update(
+            $bind[$joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_FIELD]] = $entity->getId();
+
+            $connection->insertOnDuplicate(
                 $resource->getTable($joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_TABLE]),
                 $bind,
-                $connection->prepareSqlCondition($joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_FIELD], $entity->getId())
+                array_keys($bind)
             );
         }
     }
