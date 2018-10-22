@@ -50,5 +50,17 @@ class SalesOrderCreditmemoRegisterBefore implements ObserverInterface
 
         $amount = $this->priceCurrency->round($amount * $creditmemo->getOrder()->getBaseToOrderRate());
         $extensionAttributes->setSubscriptionInitialFee($amount);
+
+        //TODO: Fix calculate
+        $creditmemo->setGrandTotal(0)
+            ->setBaseGrandTotal(0)
+            ->setTaxAmount(0)
+            ->setBaseTaxAmount(0)
+            ->setDiscountTaxCompensationAmount(0)
+            ->setShippingDiscountTaxCompensationAmount(0)
+            ->setBaseShippingDiscountTaxCompensationAmnt(0)
+            ->setBaseDiscountTaxCompensationAmount(0);
+
+        $creditmemo->collectTotals();
     }
 }

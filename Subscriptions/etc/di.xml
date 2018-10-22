@@ -333,13 +333,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Sales\Model\Convert\Order">
-        <plugin name="tnw_subscriptions_copy_data_to_invoice_item"
-                type="TNW\Subscriptions\Plugin\Sales\Order\Converter"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
-
     <type name="Magento\Sales\Model\Order\Invoice\Item">
         <plugin name="tnw_subs_invoice_item_register_and_cancel"
                 type="TNW\Subscriptions\Plugin\Sales\Invoice\Item"

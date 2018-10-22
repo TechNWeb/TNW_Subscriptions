@@ -7,11 +7,15 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="creditmemo_totals">
-            <block class="TNW\Subscriptions\Block\Sales\Order\Creditmemo\InitialFee" name="initial_fee" template="TNW_Subscriptions::order/initial_fee.phtml"/>
+        <referenceBlock name="invoice_totals">
+            <block class="TNW\Subscriptions\Block\Sales\Order\InitialFee" name="initial_fee" template="TNW_Subscriptions::order/initial_fee.phtml">
+                <action method="setIsPlaneMode">
+                    <argument name="value" xsi:type="string">1</argument>
+                </action>
+            </block>
         </referenceBlock>
         <referenceBlock name="additional.product.info">
-            <block class="TNW\Subscriptions\Block\Sales\Order\Additional\Profile" name="additional.product.info.profile" template="TNW_Subscriptions::order/additional/profile.phtml" />
+
         </referenceBlock>
     </body>
 </page>

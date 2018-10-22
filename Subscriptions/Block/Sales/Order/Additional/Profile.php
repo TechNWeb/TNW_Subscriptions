@@ -25,29 +25,6 @@ class Profile extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * @return bool|string
-     */
-    public function getInitialFee()
-    {
-        $item = $this->getOrder()->getItemById($this->getItem()->getItemId());
-        if (!$item instanceof \Magento\Sales\Model\Order\Item) {
-            return 0;
-        }
-
-        $extensionAttributes = $item->getExtensionAttributes();
-        if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\OrderItemExtensionInterface) {
-            return 0;
-        }
-
-        $initialFees = $extensionAttributes->getSubsInitialFees();
-        if (!$initialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem) {
-            return 0;
-        }
-
-        return $initialFees->getSubsInitialFee();
-    }
-
-    /**
      * @return \Magento\Sales\Model\Order\Item
      */
     private function getItem()

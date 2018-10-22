@@ -73,10 +73,17 @@ class Totals extends Template
         $result = 0;
         $baseResult = 0;
         foreach ($items as $item) {
-            if ($item instanceof \Magento\Sales\Model\Order\Item) {
-                $qty = $item->getQtyOrdered();
-            } else {
-                $qty = $item->getQty();
+            switch (true) {
+                case $item instanceof \Magento\Sales\Model\Order\Item:
+                    $qty = $item->getQtyOrdered();
+                    break;
+
+                case $item instanceof \Magento\Sales\Model\Order\Invoice\Item:
+                    $qty = $item->getQty();
+                    $item = $item->getOrderItem();
+                    break;
+                default:
+                    continue 2;
             }
 
             $result +=  $this->getItemInitialFee($item) * $qty;

@@ -3,7 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Block\Sales\Order;
+namespace TNW\Subscriptions\Block\Sales\Order\Creditmemo;
 
 use Magento\Framework\View\Element\Template;
 
@@ -51,60 +51,16 @@ class InitialFee extends \Magento\Framework\View\Element\Template
     public function calculateInitialFee()
     {
         $source = $this->getSource();
-
-        switch (true) {
-            case $source instanceof \Magento\Sales\Model\Order:
-                return array_reduce($source->getAllVisibleItems(), [$this, 'reduceOrderItems']);
-
-            case $source instanceof \Magento\Sales\Model\Order\Invoice:
-                return array_reduce($source->getAllItems(), [$this, 'reduceInvoiceItems']);
+        if (!$source instanceof \Magento\Sales\Model\Order\Creditmemo) {
+            return 0;
         }
 
-        return 0;
-    }
-
-    /**
-     * @param $carry
-     * @param \Magento\Sales\Model\Order\Item $item
-     *
-     * @return float
-     */
-    private function reduceOrderItems($carry, \Magento\Sales\Model\Order\Item $item)
-    {
-        $extensionAttributes = $item->getExtensionAttributes();
-        if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\OrderItemExtensionInterface) {
-            return $carry;
+        $extensionAttributes = $source->getExtensionAttributes();
+        if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\CreditmemoExtensionInterface) {
+            return 0;
         }
 
-        $initialFees = $extensionAttributes->getSubsInitialFees();
-        if (!$initialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem) {
-            return $carry;
-        }
-
-        $carry += $initialFees->getSubsInitialFee() * $item->getQtyOrdered();
-        return $carry;
-    }
-
-    /**
-     * @param $carry
-     * @param \Magento\Sales\Model\Order\Invoice\Item $item
-     *
-     * @return float
-     */
-    private function reduceInvoiceItems($carry, \Magento\Sales\Model\Order\Invoice\Item $item)
-    {
-        $extensionAttributes = $item->getOrderItem()->getExtensionAttributes();
-        if (!$extensionAttributes instanceof \Magento\Sales\Api\Data\OrderItemExtensionInterface) {
-            return $carry;
-        }
-
-        $initialFees = $extensionAttributes->getSubsInitialFees();
-        if (!$initialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem) {
-            return $carry;
-        }
-
-        $carry += $initialFees->getSubsInitialFee() * $item->getQty();
-        return $carry;
+        return $extensionAttributes->getSubscriptionInitialFee();
     }
 
     /**

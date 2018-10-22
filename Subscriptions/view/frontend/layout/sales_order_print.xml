@@ -14,5 +14,9 @@
                 </action>
             </block>
         </referenceBlock>
+        <referenceBlock name="additional.product.info">
+            <block class="TNW\Subscriptions\Block\Sales\Order\Additional\Profile" name="additional.product.info.profile" template="TNW_Subscriptions::order/additional/profile.phtml" />
+            <block class="TNW\Subscriptions\Block\Sales\Order\Additional\InitialFee" name="additional.product.info.initial_fee" template="TNW_Subscriptions::order/additional/initial_fee.phtml" />
+        </referenceBlock>
     </body>
 </page>

@@ -42,6 +42,9 @@
     <event name="sales_order_load_after">
         <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
     </event>
+    <event name="sales_order_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
     <event name="sales_order_item_load_after">
         <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
     </event>

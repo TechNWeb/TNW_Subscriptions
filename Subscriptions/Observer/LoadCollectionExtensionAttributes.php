@@ -36,7 +36,9 @@ class LoadCollectionExtensionAttributes implements ObserverInterface
             return;
         }
 
+        /** @var \Magento\Framework\Data\Collection\AbstractDb $collection */
         $collection = reset($collectionIndex);
         $this->joinProcessor->process($collection);
+        //$collection->getSelect()->group($collection->getResource()->getIdFieldName());
     }
 }

@@ -405,9 +405,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addIndex(
                 $setup->getIdxName(
                     'tnw_subscriptions_profile_item_sales_item',
-                    ['profile_item_id', 'quote_item_id', 'order_item_id']
+                    ['profile_item_id', 'quote_item_id', 'order_item_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
-                ['profile_item_id', 'quote_item_id', 'order_item_id']
+                ['profile_item_id', 'quote_item_id', 'order_item_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
             )
             ->addForeignKey(
                 $setup->getFkName(
@@ -473,9 +475,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addIndex(
                 $setup->getIdxName(
                     'tnw_subscriptions_order_extension_entity',
-                    ['entity_id']
+                    ['entity_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
-                ['entity_id']
+                ['entity_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
             )
             ->addForeignKey(
                 $setup->getFkName(
@@ -517,9 +521,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addIndex(
                 $setup->getIdxName(
                     'tnw_subscriptions_creditmemo_extension_entity',
-                    ['entity_id']
+                    ['entity_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 ),
-                ['entity_id']
+                ['entity_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
             )
             ->addForeignKey(
                 $setup->getFkName(

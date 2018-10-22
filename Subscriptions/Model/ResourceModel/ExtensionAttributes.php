@@ -109,14 +109,16 @@ class ExtensionAttributes
             return;
         }
 
-        $data = $connection->fetchRow($select);
-        $this->joinProcessor->extractExtensionAttributes($extensibleEntityClass, $data);
+        $data = $this->joinProcessor->extractExtensionAttributes(
+            $extensibleEntityClass,
+            $connection->fetchRow($select)
+        );
 
-        if (empty($dataAll[0][$entity::EXTENSION_ATTRIBUTES_KEY])) {
+        if (empty($data[$entity::EXTENSION_ATTRIBUTES_KEY])) {
             return;
         }
 
-        $entity->setExtensionAttributes($dataAll[0][$entity::EXTENSION_ATTRIBUTES_KEY]);
+        $entity->setExtensionAttributes($data[$entity::EXTENSION_ATTRIBUTES_KEY]);
     }
 
     /**
@@ -172,13 +174,20 @@ class ExtensionAttributes
                 continue;
             }
 
-            $bind[$joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_FIELD]] = $entity->getId();
+            $indexName = $joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_FIELD];
+            $tableName = $resource->getTable($joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_TABLE]);
+            $where = $connection->prepareSqlCondition($indexName, $entity->getId());
 
-            $connection->insertOnDuplicate(
-                $resource->getTable($joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_TABLE]),
-                $bind,
-                array_keys($bind)
-            );
+            $select = $connection->select()
+                ->from($tableName, [$indexName])
+                ->where($where);
+
+            if ($connection->fetchOne($select) !== false) {
+                $connection->update($tableName, $bind, $where);
+            } else {
+                $bind[$indexName] = $entity->getId();
+                $connection->insert($tableName, $bind);
+            }
         }
     }
 }
