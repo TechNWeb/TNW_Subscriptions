@@ -117,23 +117,7 @@
 
 /* todo: replace with actual diagram*/
 .admin__profile-dashboard-profit-diagram {
-    border: 2px solid;
-    width: 30%;
     margin: 0 3% 0 3%;
-    padding-top: 30%;
-    float: left;
-    background-color: #f1f1f1;
-    border-radius: 100%
-}
-
-.admin__profile-dashboard-profit-diagram-legend {
-    width: 60%;
-    float: left;
-}
-
-.admin__profile-dashboard-profit-diagram-legend-text {
-    position: relative;
-    margin-bottom: 2%;
 }
 
 .profit-color {

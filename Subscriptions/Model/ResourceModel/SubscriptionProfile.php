@@ -52,50 +52,66 @@ class SubscriptionProfile extends AbstractEntity
      * Get sum of all paid subscription profile orders.
      *
      * @param \Magento\Framework\Model\AbstractModel $object
-     * @throws \Zend_Db_Statement_Exception
      * @return string
      */
     public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $id = $object->getId();
-        $select = $this->getConnection()->select()
-            ->from(
-                ['profile_order' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-                ['total' => new \Zend_Db_Expr('sum(sales_order.' . OrderInterface::GRAND_TOTAL . ')')]
-            )->join(
-                ['sales_order' => $this->getTable('sales_order')],
-            'sales_order.entity_id = profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
-            []
-        )->where('profile_order.' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . ' = ?', $id)
-            ->where('sales_order.status <> ?', \Magento\Sales\Model\Order::STATE_CANCELED);
+        $select = $this->currentValueSelect($object);
+        return (float)$this->getConnection()->fetchOne($select);
+    }
 
-        return $this->getConnection()->query($select)->fetchColumn();
+    /**
+     * @param \Magento\Framework\Model\AbstractModel $object
+     *
+     * @return \Magento\Framework\DB\Select
+     */
+    private function currentValueSelect(\Magento\Framework\Model\AbstractModel $object)
+    {
+        $connection = $this->getConnection();
+        return $connection->select()
+            ->from(
+                ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+SUM(orderItemExtension.base_subs_initial_fee))')]
+            )
+            ->joinInner(
+                ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
+                'profileItem.entity_id = salesRelative.profile_item_id',
+                []
+            )
+            ->joinInner(
+                ['invoiceItem' => $this->getTable('sales_invoice_item')],
+                'salesRelative.order_item_id = invoiceItem.order_item_id',
+                []
+            )
+            ->joinLeft(
+                ['orderItemExtension' => $this->getTable('tnw_subscriptions_order_item_extension_entity')],
+                'invoiceItem.order_item_id = orderItemExtension.item_id',
+                []
+            )
+            ->where('profileItem.subscription_profile_id = ?', $object->getId());
     }
 
     /**
      * Get sum of all generated non-paid quotes for subscription profile.
      *
      * @param \Magento\Framework\Model\AbstractModel $object
-     * @throws \Zend_Db_Statement_Exception
      * @return string
      */
     public function getTotalValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $id = $object->getId();
-        $select = $this->getConnection()->select()
-            ->from(
-                ['profile_order' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-                ['total' => new \Zend_Db_Expr('sum(quote.' . OrderInterface::GRAND_TOTAL . ')')]
-            )->join(
-                ['quote' => $this->getTable('quote')],
-                'quote.entity_id = profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,
-                []
-            )->where('profile_order.' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . ' = ?', $id)
-            ->where(
-                new \Zend_Db_Expr('profile_order.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is NULL')
-            );
+        $connection = $this->getConnection();
+        $sql = $connection->select()
+            ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
+            ->where('subscription_profile_id = ?', $object->getId())
+            ->where('magento_order_id IS NULL');
 
-        return $this->getConnection()->query($select)->fetchColumn();
+        $futureOrderCount = (float)$connection->fetchOne($sql);
+
+        $sql = $this->currentValueSelect($object)
+            ->limit(1);
+
+        $profitOne = $connection->fetchOne($sql);
+        return $futureOrderCount * $profitOne;
     }
 
     /**
