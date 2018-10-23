@@ -3,18 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Directory\Model\Currency;
-use Magento\Reports\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -28,23 +21,6 @@ class ProfitCalculator
     /** Profit types. */
     const AS_OF_TODAY = 'as_of_today';
     const REMAINING = 'remaining';
-
-    /**
-     * @var ProductCollectionFactory
-     */
-    private $productCollectionFactory;
-
-    /**
-     * @var QuoteItemCollectionFactory
-     */
-    private $quoteItemCollectionFactory;
-
-    /**
-     * Product list cache.
-     *
-     * @var ProductInterface[]
-     */
-    private $products;
 
     /**
      * @var float|int
@@ -74,21 +50,15 @@ class ProfitCalculator
     /**
      * ProfitCalculator constructor.
      *
-     * @param ProductCollectionFactory $productCollectionFactory
-     * @param QuoteItemCollectionFactory $quoteItemCollectionFactory
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Currency $currency
      */
     public function __construct(
-        ProductCollectionFactory $productCollectionFactory,
-        QuoteItemCollectionFactory $quoteItemCollectionFactory,
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Currency $currency
     ) {
-        $this->productCollectionFactory = $productCollectionFactory;
-        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
@@ -128,7 +98,9 @@ class ProfitCalculator
      * As of today profit equals (product price - product cost) * product amount from all paid quotes(has order).
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -146,6 +118,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
@@ -158,7 +131,9 @@ class ProfitCalculator
      * Remaining profit equals (product price - product cost) * product amount from all non paid quotes(has no order).
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRemainingProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -176,6 +151,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
