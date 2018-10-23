@@ -95,6 +95,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->dropProfileAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.7', '<')) {
+            $this->fillProfileItemSalesItemTable($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -335,5 +339,36 @@ class UpgradeData implements UpgradeDataInterface
         $setup->getConnection()->query($query);
 
         $subscriptionSetup->installEntities();
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     */
+    private function fillProfileItemSalesItemTable(ModuleDataSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $select = $connection->select()
+            ->from(
+                ['profileItem' => $setup->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                ['profile_item_id' => 'entity_id']
+            )
+            ->joinInner(
+                ['relation' => $setup->getTable('tnw_subscriptions_subscription_profile_order')],
+                'profileItem.subscription_profile_id = relation.subscription_profile_id',
+                []
+            )
+            ->joinInner(
+                ['quoteItem' => $setup->getTable('quote_item')],
+                'relation.magento_quote_id = quoteItem.quote_id AND profileItem.magento_product_id = quoteItem.product_id AND profileItem.qty = quoteItem.qty',
+                ['quote_item_id' => 'item_id']
+            )
+            ->joinInner(
+                ['orderItem' => $setup->getTable('sales_order_item')],
+                'relation.magento_order_id = orderItem.order_id AND profileItem.magento_product_id = orderItem.product_id AND profileItem.qty = orderItem.qty_ordered',
+                ['order_item_id' => 'item_id']
+            );
+
+        $query = $connection->insertFromSelect($select, $setup->getTable('tnw_subscriptions_profile_item_sales_item'));
+        $connection->query($query);
     }
 }
