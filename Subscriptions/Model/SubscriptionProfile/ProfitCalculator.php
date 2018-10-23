@@ -155,6 +155,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {

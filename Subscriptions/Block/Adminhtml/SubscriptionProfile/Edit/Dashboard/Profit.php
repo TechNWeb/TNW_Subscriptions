@@ -56,6 +56,7 @@ class Profit extends Template
      * As of today profit equals (product price - product cost) * product amount from paid quotes(has order).
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getAsOfTodayProfit()
     {
@@ -64,6 +65,7 @@ class Profit extends Template
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedAsOfTodayProfit($includeContainer = true)
     {
@@ -76,6 +78,7 @@ class Profit extends Template
      * Remaining profit equals (product price - product cost) * product amount form non paid quotes(has no order).
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRemainingProfit()
     {
@@ -93,8 +96,9 @@ class Profit extends Template
 
     /**
      * Get can hide Remaining profit row
-     * 
+     *
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getHideRemainingProfit()
     {
