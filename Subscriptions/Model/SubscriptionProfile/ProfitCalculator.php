@@ -69,7 +69,9 @@ class ProfitCalculator
      * Total profit equals "as of today" profit + "remaining" profit.
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTotalProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -81,7 +83,9 @@ class ProfitCalculator
      *
      * @param SubscriptionProfile $subscriptionProfile
      * @param bool $addContainer
+     *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
     {
@@ -151,7 +155,6 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
