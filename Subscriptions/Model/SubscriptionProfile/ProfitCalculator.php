@@ -219,7 +219,13 @@ class ProfitCalculator
                     break;
             }
 
-            $profit += (\reset($recurringOptions)->getPrice() - $product->getCost()) * $qty;
+            $cost = $product->getCost();
+            $children = $profileProduct->getChildren();
+            if (empty($cost) && !empty($children)) {
+                $cost = \reset($children)->getMagentoProduct()->getCost();
+            }
+
+            $profit += (\reset($recurringOptions)->getPrice() - $cost) * $qty;
         }
 
         return $profit;
