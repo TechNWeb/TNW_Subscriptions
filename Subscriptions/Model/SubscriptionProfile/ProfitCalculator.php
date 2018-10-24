@@ -198,26 +198,22 @@ class ProfitCalculator
                 continue;
             }
 
+            $select = $connection->select()
+                ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
+                ->where('subscription_profile_id = ?', $subscriptionProfile->getId());
+
             switch ($profitType) {
                 case self::AS_OF_TODAY:
-                    $select = $connection->select()
-                        ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-                        ->where('subscription_profile_id = ?', $subscriptionProfile->getId())
-                        ->where('magento_order_id IS NOT NULL');
-
-                    $qty = $profileProduct->getQty() * $connection->fetchOne($select);
+                    $select->where('magento_order_id IS NOT NULL');
                     break;
 
                 case self::REMAINING:
                 default:
-                    $select = $connection->select()
-                        ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-                        ->where('subscription_profile_id = ?', $subscriptionProfile->getId())
-                        ->where('magento_order_id IS NULL');
-
-                    $qty = $profileProduct->getQty() * $connection->fetchOne($select);
+                    $select->where('magento_order_id IS NULL');
                     break;
             }
+
+            $qty = $profileProduct->getQty() * $connection->fetchOne($select);
 
             $cost = $product->getCost();
             $children = $profileProduct->getChildren();
