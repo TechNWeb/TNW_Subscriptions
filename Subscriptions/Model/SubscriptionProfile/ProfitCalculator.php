@@ -166,41 +166,51 @@ class ProfitCalculator
     /**
      * Calculate profit for subscription profile depends on requested profit type.
      *
-     * @param SubscriptionProfile $subscriptionProfile
+     * @param SubscriptionProfile $profile
      * @param string $profitType
      * @return float|int
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getProfit(SubscriptionProfile $subscriptionProfile, $profitType)
+    private function getProfit(SubscriptionProfile $profile, $profitType)
     {
         $profit = 0;
 
-        $resource = $subscriptionProfile->getResource();
+        $resource = $profile->getResource();
         $connection = $resource->getConnection();
 
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(
+                ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                array_map([$this, 'profileItemProductId'], $profile->getProducts()),
+                'in'
+            )
+            ->addFilter(ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID, $profile->getBillingFrequencyId())
+            ->create();
+
+        $recurringOptions = $this->recurringOptionRepository
+            ->getList($searchCriteria)
+            ->getItems();
+
         /** @var ProductSubscriptionProfileInterface $profileProduct */
-        foreach ($subscriptionProfile->getVisibleProducts() as $profileProduct) {
+        foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $children = $profileProduct->getChildren();
+
+            if (!empty($children) &&
+                $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
+            ) {
+                $profileProduct = \reset($children);
+            }
+
             $product = $profileProduct->getMagentoProduct();
-            $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter(
-                    ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                    $product->getId()
-                )
-                ->addFilter(
-                    ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
-                    $subscriptionProfile->getBillingFrequencyId()
-                )
-                ->create();
+            $recurringOption = $this->searchRecurringOption($recurringOptions, $product->getId());
 
-            $recurringOptions = $this->recurringOptionRepository->getList($searchCriteria)->getItems();
-
-            if (empty($recurringOptions)) {
+            if (empty($recurringOption)) {
                 continue;
             }
 
             $select = $connection->select()
                 ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-                ->where('subscription_profile_id = ?', $subscriptionProfile->getId());
+                ->where('subscription_profile_id = ?', $profile->getId());
 
             switch ($profitType) {
                 case self::AS_OF_TODAY:
@@ -214,17 +224,38 @@ class ProfitCalculator
             }
 
             $qty = $profileProduct->getQty() * $connection->fetchOne($select);
-
-            $cost = $product->getCost();
-            $children = $profileProduct->getChildren();
-            if (empty($cost) && !empty($children)) {
-                $cost = \reset($children)->getMagentoProduct()->getCost();
-            }
-
-            $profit += (\reset($recurringOptions)->getPrice() - $cost) * $qty;
+            $profit += ($recurringOption->getPrice() - $product->getCost()) * $qty;
         }
 
         return $profit;
+    }
+
+    /**
+     * @param $recurringOptions
+     * @param $productId
+     *
+     * @return ProductBillingFrequencyInterface|false
+     */
+    private function searchRecurringOption($recurringOptions, $productId)
+    {
+        $filteredRecurringOptions = array_filter(
+            $recurringOptions,
+            function (ProductBillingFrequencyInterface $frequency) use ($productId) {
+                return (int)$frequency->getMagentoProductId() === (int)$productId;
+            }
+        );
+
+        return \reset($filteredRecurringOptions);
+    }
+
+    /**
+     * @param ProductSubscriptionProfileInterface $item
+     *
+     * @return null|string
+     */
+    private function profileItemProductId(ProductSubscriptionProfileInterface $item)
+    {
+        return $item->getMagentoProductId();
     }
 
     /**
