@@ -10,6 +10,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
  * Modifier to set "Past Due" status
@@ -35,6 +36,8 @@ class StatusPastDue extends Base
             []
         )->where(
             'profile.status NOT IN (?)', $this->getIgnoredStatuses()
+        )->where(
+            'main_table.status IN (?)', $this->getQueueStatuses()
         )->where(
             'relation.magento_order_id IS NULL'
         )->where(
@@ -69,6 +72,18 @@ class StatusPastDue extends Base
             ProfileStatus::STATUS_CANCELED,
             ProfileStatus::STATUS_SUSPENDED,
             ProfileStatus::STATUS_PAST_DUE
+        ];
+    }
+
+    /**
+     * Returns list of queue statuses.
+     *
+     * @return array
+     */
+    private function getQueueStatuses()
+    {
+        return [
+            QueueStatus::QUEUE_STATUS_ERROR,
         ];
     }
 }

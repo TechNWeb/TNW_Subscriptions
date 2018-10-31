@@ -3,15 +3,10 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api;
-
-use Magento\Framework\Api\SearchCriteriaInterface;
 
 interface SubscriptionProfileRepositoryInterface
 {
-
-
     /**
      * Save SubscriptionProfile
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface $subscriptionProfile
@@ -26,7 +21,7 @@ interface SubscriptionProfileRepositoryInterface
      * Retrieve SubscriptionProfile
      * @param string $id
      * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getById($id);
 
@@ -43,7 +38,6 @@ interface SubscriptionProfileRepositoryInterface
     /**
      * Delete SubscriptionProfile
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface $subscriptionProfile
-     * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function delete(
@@ -53,7 +47,6 @@ interface SubscriptionProfileRepositoryInterface
     /**
      * Delete SubscriptionProfile by ID
      * @param string $id
-     * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */

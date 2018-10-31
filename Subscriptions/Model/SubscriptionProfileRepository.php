@@ -32,6 +32,11 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
 class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInterface
 {
     /**
+     * @var SubscriptionProfileInterface[]
+     */
+    protected $profileById = [];
+
+    /**
      * Data object helper.
      *
      * @var DataObjectHelper
@@ -196,21 +201,26 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
             }
         }
 
+        unset($this->profileById[$subscriptionProfile->getId()]);
         return $subscriptionProfile;
     }
 
     /**
      * @inheritdoc
      */
-    public function getById($subscriptionProfileId)
+    public function getById($profileId)
     {
-        $subscriptionProfile = $this->subscriptionProfileFactory->create();
-        $this->resource->load($subscriptionProfile, $subscriptionProfileId);
-        if (!$subscriptionProfile->getId()) {
-            throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.',
-                $subscriptionProfileId));
+        if (!isset($this->profileById[$profileId])) {
+            $subscriptionProfile = $this->subscriptionProfileFactory->create();
+            $this->resource->load($subscriptionProfile, $profileId);
+            if (!$subscriptionProfile->getId()) {
+                throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.', $profileId));
+            }
+
+            $this->profileById[$profileId] = $subscriptionProfile;
         }
-        return $subscriptionProfile;
+
+        return $this->profileById[$profileId];
     }
 
     /**
@@ -266,18 +276,17 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     /**
      * @inheritdoc
      */
-    public function delete(
-        SubscriptionProfileInterface $subscriptionProfile
-    ) {
+    public function delete(SubscriptionProfileInterface $profile)
+    {
         try {
-            $this->entityManager->delete($subscriptionProfile);
+            $this->entityManager->delete($profile);
+            unset($this->profileById[$profile->getId()]);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the SubscriptionProfile: %1',
                 $exception->getMessage()
             ));
         }
-        return true;
     }
 
     /**
@@ -285,7 +294,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      */
     public function deleteById($subscriptionProfileId)
     {
-        return $this->delete($this->getById($subscriptionProfileId));
+        $this->delete($this->getById($subscriptionProfileId));
     }
 
     /**

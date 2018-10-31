@@ -11,10 +11,8 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
-/**
- * Class ProfileProcessor
- */
 class ProfileProcessor
 {
     /**
@@ -39,25 +37,34 @@ class ProfileProcessor
     private $statusProcessorsPool;
 
     /**
+     * Profile Repository
+     *
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
      * @param Context $context
      * @param Manager $queueManager
      * @param PoolInterface $statusProcessorsPool
+     * @param SubscriptionProfileRepository $profileRepository
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
-        PoolInterface $statusProcessorsPool
+        PoolInterface $statusProcessorsPool,
+        SubscriptionProfileRepository $profileRepository
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
         $this->statusProcessorsPool = $statusProcessorsPool;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
      * Processes profile queue.
      *
      * @param int $websiteId
-     * @throws \RuntimeException.
      */
     public function process($websiteId)
     {
@@ -71,33 +78,44 @@ class ProfileProcessor
 
         /** @var \TNW\Subscriptions\Model\Queue $queue */
         foreach ($this->queueManager->getCollectionToday($websiteId) as $queue) {
-            switch ($queue->getData('profile_status')) {
+
+            $queueId = $queue->getId();
+            $profileId = $queue->getData('subscription_profile_id');
+
+            try {
+                $profile = $this->profileRepository->getById($profileId);
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                $this->queueManager->makeError($queueId, $e->getMessage());
+                continue;
+            }
+
+            switch ($profile->getStatus()) {
                 case ProfileStatus::STATUS_CANCELED:
                     continue 2;
 
                 case ProfileStatus::STATUS_SUSPENDED:
-                    $this->queueManager->makeSkipped($queue->getId(), __('Profile is Suspended, skipping...'));
+                    $this->queueManager->makeSkipped($queueId, __('Profile is Suspended, skipping...'));
                     break;
 
                 case ProfileStatus::STATUS_COMPLETE:
-                    $this->queueManager->makeSkipped($queue->getId(), __('Profile is Complete, skipping...'));
+                    $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
                     break;
 
                 default:
-                    $profileIds[] = $queue->getData('subscription_profile_id');
+                    $profileIds[] = $profileId;
 
                     if ($this->passWithoutProcessing($queue)) {
                         continue 2;
                     }
 
-                    $this->queueManager->makeRunning($queue->getId());
+                    $this->queueManager->makeRunning($queueId);
 
                     try {
                         $this->queueManager->processItem($queue);
-                        $this->queueManager->makeCompleted($queue->getId());
+                        $this->queueManager->makeCompleted($queueId);
                     } catch (\Exception $e) {
                         $this->context->messageError('Error on processing profile: %s', $e->getMessage());
-                        $this->queueManager->makeError($queue->getId(), $e->getMessage());
+                        $this->queueManager->makeError($queueId, $e->getMessage());
                     }
                     break;
             }
