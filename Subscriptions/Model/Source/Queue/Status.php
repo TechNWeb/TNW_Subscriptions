@@ -26,6 +26,7 @@ class Status implements ArrayInterface
     const QUEUE_STATUS_PENDING = 'pending';
     const QUEUE_STATUS_RUNNING = 'running';
     const QUEUE_STATUS_ERROR = 'error';
+    const QUEUE_STATUS_SKIPPED = 'skipped';
     const QUEUE_STATUS_COMPLETE = 'complete';
     /**#@-*/
 
@@ -41,6 +42,7 @@ class Status implements ArrayInterface
                 self::QUEUE_STATUS_PENDING => __('Pending'),
                 self::QUEUE_STATUS_RUNNING => __('Running'),
                 self::QUEUE_STATUS_ERROR => __('Error'),
+                self::QUEUE_STATUS_SKIPPED => __('Skipped'),
                 self::QUEUE_STATUS_COMPLETE => __('Complete'),
             ];
         }
