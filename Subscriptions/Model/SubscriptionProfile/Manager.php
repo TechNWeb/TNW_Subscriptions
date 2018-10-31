@@ -24,6 +24,7 @@ use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
@@ -36,6 +37,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use Magento\Framework\DataObject;
 
 /**
  * Class Manager
@@ -163,6 +165,11 @@ class Manager
     private $profileStatus;
 
     /**
+     * @var DataObject\Factory
+     */
+    private $dataObjectFactory;
+
+    /**
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
      * @param PaymentRepository $paymentRepository
@@ -200,7 +207,8 @@ class Manager
         ScopeConfigInterface $scopeConfig,
         PaymentConfig $paymentConfig,
         \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
-        ProfileStatus $profileStatus
+        ProfileStatus $profileStatus,
+        \Magento\Framework\DataObject\Factory $dataObjectFactory
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -220,6 +228,7 @@ class Manager
         $this->paymentRepository = $paymentRepository;
         $this->resourceQueue = $resourceQueue;
         $this->profileStatus = $profileStatus;
+        $this->dataObjectFactory = $dataObjectFactory;
     }
 
     /**
@@ -651,6 +660,148 @@ class Manager
             ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
         return $this;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     *
+     * @throws LocalizedException
+     * @throws \Zend_Json_Exception
+     */
+    public function populateQuoteData(Quote $quote, SubscriptionProfileInterface $profile)
+    {
+        if (!$quote->getId()) {
+            throw new LocalizedException(__('Quote not saved'));
+        }
+
+        $this->setProfile($profile);
+
+        //Deactivate quote
+        $quote->setIsActive(false);
+        $quote->setData('ignore_old_qty', true);
+        $quote->setData('is_super_mode', true);
+        $quote->setData('scheduled', true);
+
+        //Set store
+        $quote->setStore(
+            $profile->getWebsite()->getDefaultStore()
+        );
+
+        //Set currency
+        $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
+
+        //Set customer
+        if (!$quote->getCustomerId()) {
+            $quote->assignCustomer($profile->getCustomer());
+        }
+
+        //Add products
+        foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $quote->addProduct(
+                $profileProduct->getMagentoProduct(),
+                $this->getProductAddRequest($profileProduct)
+            );
+        }
+
+        //Set shipping address
+        $quote->getShippingAddress()->addData(
+            $profile->getShippingAddress()->getData()
+        );
+        $quote->getShippingAddress()->setCustomerId(
+            $profile->getCustomerId()
+        );
+
+        //Set billing address
+        $quote->getBillingAddress()->addData(
+            $profile->getBillingAddress()->getData()
+        );
+        $quote->getBillingAddress()->setCustomerId(
+            $profile->getCustomerId()
+        );
+
+        // Set payment method
+        $quote->getPayment()
+            ->importData($this->getEngine()->getPaymentInfo($profile))
+            ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
+        //Set shipping method
+        $quote->getShippingAddress()
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->setShippingMethod($profile->getShippingMethod());
+
+        $quote->setTotalsCollectedFlag(false);
+        $quote->collectTotals();
+    }
+
+    /**
+     * Returns request for adding product to subscription quote.
+     *
+     * @param ProductSubscriptionProfileInterface $profileProduct
+     *
+     * @return DataObject
+     * @throws \Zend_Json_Exception
+     */
+    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct)
+    {
+        $data = [
+            'custom_price' => $profileProduct->getUnitPrice(),
+            'qty' => $profileProduct->getQty(),
+            Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
+                Create::UNIQUE => [
+                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty(),
+                ],
+                Create::NON_UNIQUE => [
+                    'current_preset_qty_price' => $profileProduct->getPrice(),
+                ],
+                Create::FULL_REQUEST_PARAM_NAME => false,
+            ]
+        ];
+
+        $productType = $profileProduct->getMagentoProduct()->getTypeId();
+        switch ($productType) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                break;
+
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $data = $this->addConfigurableOptions($profileProduct, $data);
+                break;
+
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $productType));
+        }
+
+        return $this->dataObjectFactory->create($data);
+    }
+
+    /**
+     * Adds conf. options to buy request.
+     *
+     * @param ProductSubscriptionProfileInterface $profileProduct
+     * @param array $data
+     *
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \Zend_Json_Exception
+     */
+    private function addConfigurableOptions(ProductSubscriptionProfileInterface $profileProduct, array $data)
+    {
+        $options = [];
+        /** @var ProductSubscriptionProfileInterface $child */
+        foreach ($profileProduct->getChildren() as $child) {
+            $options[] = \Zend_Json::decode($child->getCustomOptions()) ?: [];
+        }
+
+        if (empty($options)) {
+            throw new \InvalidArgumentException(__('Custom options must be set.')->render());
+        }
+
+        $data['super_attribute'] = array_replace(...$options);
+
+        return $data;
     }
 
     /**

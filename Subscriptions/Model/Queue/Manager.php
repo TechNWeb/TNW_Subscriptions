@@ -87,6 +87,16 @@ class Manager
     private $resourceQueue;
 
     /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * @var \Magento\Quote\Model\QuoteFactory
+     */
+    private $quoteFactory;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param Config $config
      * @param SubscriptionProfile\Manager $profileManager
@@ -97,6 +107,8 @@ class Manager
      * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
      * @param ProfileStatus $profileStatus
      * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -108,7 +120,9 @@ class Manager
         SubscriptionProfile\Status\HistoryManager $statusHistoryManager,
         SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
         ProfileStatus $profileStatus,
-        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
@@ -120,6 +134,8 @@ class Manager
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->profileStatus = $profileStatus;
         $this->resourceQueue = $resourceQueue;
+        $this->timezone = $timezone;
+        $this->quoteFactory = $quoteFactory;
     }
 
     /**
@@ -153,25 +169,24 @@ class Manager
     {
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
-        $pendingCondition = implode(
-            ' AND ',
-            [
-                $connection->quoteInto('relation.scheduled_at <= ?', $this->getCurrentDate()),
-                $connection->quoteInto('main_table.status = ?', QueueStatus::QUEUE_STATUS_PENDING),
-            ]
-        );
+        $currentDate = $this->timezone->date();
 
-        $otherCondition = implode(
-            ' AND ',
-            [
-                $connection->quoteInto('main_table.updated_at <= ?', $this->getAttemptDate()),
-                $connection->quoteInto('main_table.status IN (?)', [
-                    QueueStatus::QUEUE_STATUS_ERROR,
-                    QueueStatus::QUEUE_STATUS_SKIPPED
-                ]),
-                $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
-            ]
-        );
+        $pendingCondition = implode(' AND ', [
+            $connection->prepareSqlCondition('relation.scheduled_at', [
+                'from' => $currentDate->format('Y-m-d 00:00:00'),
+                'to' => $currentDate->format('Y-m-d 23:59:59')
+            ]),
+            $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
+        ]);
+
+        $otherCondition = implode(' AND ', [
+            $connection->quoteInto('main_table.updated_at <= ?', $this->getAttemptDate()),
+            $connection->quoteInto('main_table.status IN (?)', [
+                QueueStatus::QUEUE_STATUS_ERROR,
+                QueueStatus::QUEUE_STATUS_SKIPPED
+            ]),
+            $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
+        ]);
 
         $collection->getSelect()
             ->where("($pendingCondition) OR ($otherCondition)")
@@ -274,19 +289,8 @@ class Manager
      */
     private function getAttemptDate()
     {
-        return date_create()
+        return $this->timezone->date()
             ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))
-            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-    }
-
-    /**
-     * Returns formatted current date.
-     *
-     * @return null|string
-     */
-    private function getCurrentDate()
-    {
-        return date_create()
             ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
@@ -350,6 +354,121 @@ class Manager
         $this->relationManager->saveRelation($relation);
 
         return true;
+    }
+
+    /**
+     * @param \TNW\Subscriptions\Model\Queue[] $groupQueue
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     * @throws \Exception
+     */
+    public function placeOrderByGroupQueue($groupQueue)
+    {
+        // filter item on hold
+        $groupQueue = array_filter($groupQueue, [$this, 'filterItemOnHold']);
+        if (empty($groupQueue)) {
+            return;
+        }
+
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        $this->cartRepository->save($quote);
+
+        foreach ($groupQueue as $queue) {
+            $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+            $this->profileManager->populateQuoteData($quote, $profile);
+        }
+
+        $this->cartRepository->save($quote);
+
+        try {
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $this->profileManager
+                ->getEngine()
+                ->getCartManagement()
+                ->submit($quote);
+
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                $oldStatus = $profile->getStatus();
+
+                $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
+                if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
+                    $profile->setStatus(ProfileStatus::STATUS_TRIAL);
+                }
+
+                $this->profileRepository->save($profile);
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($profile->getStatus())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                    [
+                        $order->getIncrementId(),
+                        $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+
+                $relation = $this->relationManager
+                    ->getRelationById($queue->getProfileOrderId())
+                    ->setMagentoQuoteId($quote->getId())
+                    ->setMagentoOrderId($order->getId());
+
+                $this->relationManager->saveRelation($relation);
+            }
+        } catch (\Exception $e) {
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                $oldStatus = $profile->getStatus();
+                $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
+                $this->profileRepository->save($profile);
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                    [
+                        $this->profileStatus->getLabelByValue($oldStatus),
+                        $this->profileStatus->getLabelByValue($profile->getStatus())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Queue $item
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function filterItemOnHold(Queue $item)
+    {
+        return !$this->itemOnHold($item);
     }
 
     /**

@@ -50,10 +50,10 @@ class ProfileLink extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $profileId = $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID];
-                if ($profileId) {
-                    $item[SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID] =
-                        $this->profileUrlBuilder->getEditHtmlLink($profileId, true);
+                if (!empty($item['profiles'])) {
+                    $item['profiles'] = implode(', ', array_map(function ($profileId) {
+                        return $this->profileUrlBuilder->getEditHtmlLink($profileId, true);
+                    }, explode(',', $item['profiles'])));
                 }
             }
         }

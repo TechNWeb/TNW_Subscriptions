@@ -6,15 +6,8 @@
 
 namespace TNW\Subscriptions\Cron\Quote;
 
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteria;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
-use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface as ProfileRelation;
 
@@ -23,29 +16,6 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface as ProfileRelat
  */
 class Updater extends Base
 {
-    /**
-     * Updater constructor.
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param SearchCriteriaBuilder $criteriaBuilder
-     * @param Context $context
-     * @param Config $config
-     * @param CartRepositoryInterface $cartRepository
-     * @param CollectionFactory $collectionFactory
-     * @param RelationManager $relationManager
-     */
-    public function __construct(
-        SubscriptionProfileRepository $profileRepository,
-        SearchCriteriaBuilder $criteriaBuilder,
-        Context $context,
-        Config $config,
-        CartRepositoryInterface $cartRepository,
-        CollectionFactory $collectionFactory,
-        RelationManager $relationManager
-    ) {
-        parent::__construct($profileRepository, $criteriaBuilder, $context, $config, $cartRepository,
-            $collectionFactory, $relationManager);
-    }
-
     /**
      * @inheritdoc
      */
@@ -69,7 +39,9 @@ class Updater extends Base
      * Recalculates profile quotes if profile or profile product was changed.
      *
      * @param array $data
+     *
      * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function process(array $data)
     {

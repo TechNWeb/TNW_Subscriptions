@@ -167,7 +167,6 @@ class Manager
      * @param int $id
      * @return SubscriptionProfileOrderInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRelationById($id)
     {
