@@ -146,7 +146,8 @@
                 type="TNW\Subscriptions\Plugin\Product\Product"
                 sortOrder="100"
                 disabled="false"/>
-    </type>    <type name="Magento\Catalog\Model\ResourceModel\Product">
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Product">
         <plugin name="subscriptions_product"
                 type="TNW\Subscriptions\Plugin\Product\ResourceModel\Product"
                 sortOrder="100"
@@ -171,6 +172,10 @@
                 type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"
                 sortOrder="10"
                 disabled="false"/>
+    </type>
+
+    <type name="Magento\Checkout\Helper\Cart">
+        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\Helper\Cart" />
     </type>
 
     <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
@@ -794,6 +799,10 @@
                 type="TNW\Subscriptions\Plugin\Quote\PrepareBuyRequest"
                 sortOrder="100"
                 disabled="false"/>
+        <plugin name="tnw_subs" type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType" />
+    </type>
+    <type name="Magento\Quote\Model\Quote\Item\Processor">
+        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\Processor" />
     </type>
 
     <type name="Magento\Quote\Model\Quote\Config">
@@ -904,4 +913,177 @@
             <argument name="logger" xsi:type="object">TNW\Subscriptions\Logger</argument>
         </arguments>
     </type>
+
+    <preference for="Magento\Quote\Model\ResourceModel\Quote"
+                type="TNW\Subscriptions\Model\ResourceModel\Quote" />
+
+    <virtualType name="TS\Model\ResourceModel\Quote" type="TNW\Subscriptions\Model\ResourceModel\Quote">
+        <arguments>
+            <argument name="isSubscription" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote" type="Magento\Quote\Model\Quote">
+        <arguments>
+            <argument name="resource" xsi:type="object">TS\Model\ResourceModel\Quote</argument>
+            <argument name="data" xsi:type="array">
+                <item name="is_tnw_subscription" xsi:type="boolean">true</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\FactoryQuote" type="Magento\Quote\Model\QuoteFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\Quote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\ShippingAddressManagement" type="Magento\Quote\Model\ShippingAddressManagement">
+        <arguments>
+            <argument name="quoteRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\ShippingAssignment\ShippingProcessor" type="Magento\Quote\Model\Quote\ShippingAssignment\ShippingProcessor">
+        <arguments>
+            <argument name="shippingAddressManagement" xsi:type="object">TS\Model\ShippingAddressManagement</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\ShippingAssignment\ShippingAssignmentProcessor" type="Magento\Quote\Model\Quote\ShippingAssignment\ShippingAssignmentProcessor">
+        <arguments>
+            <argument name="shippingProcessor" xsi:type="object">TS\Model\Quote\ShippingAssignment\ShippingProcessor</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\ShippingAssignment\ShippingAssignmentPersister" type="Magento\Quote\Model\Quote\ShippingAssignment\ShippingAssignmentPersister">
+        <arguments>
+            <argument name="shippingAssignmentProcessor" xsi:type="object">TS\Model\Quote\ShippingAssignment\ShippingAssignmentProcessor</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\QuoteRepository\SaveHandler" type="Magento\Quote\Model\QuoteRepository\SaveHandler">
+        <arguments>
+            <argument name="quoteResource" xsi:type="object">TS\Model\ResourceModel\Quote</argument>
+            <argument name="shippingAssignmentPersister" xsi:type="object">TS\Model\Quote\ShippingAssignment\ShippingAssignmentPersister</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\QuoteRepository\Proxy\SaveHandler" type="Magento\Quote\Model\QuoteRepository\SaveHandler\Proxy">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\QuoteRepository\SaveHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\RepositoryQuote" type="TNW\Subscriptions\Model\QuoteRepository">
+        <arguments>
+            <argument name="quoteFactory" xsi:type="object">TS\Model\FactoryQuote</argument>
+            <argument name="saveHandler" xsi:type="object">TS\Model\QuoteRepository\Proxy\SaveHandler</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Checkout\Session\Storage" type="Magento\Framework\Session\Storage">
+        <arguments>
+            <argument name="namespace" xsi:type="string">subscription</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Checkout\Session" type="Magento\Checkout\Model\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">TS\Model\Checkout\Session\Storage</argument>
+            <argument name="quoteRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+            <argument name="quoteFactory" xsi:type="object">TS\Model\FactoryQuote</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Checkout\Proxy\Session" type="Magento\Checkout\Model\Session\Proxy">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Helper\Checkout\Data" type="Magento\Checkout\Helper\Data">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Checkout\Cart" type="Magento\Checkout\Model\Cart">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+            <argument name="quoteRepository"  xsi:type="object">TS\Model\RepositoryQuote</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Model\Checkout\DefaultConfigProvider">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TS\Model\Quote\QuoteManagement" type="Magento\Quote\Model\QuoteManagement">
+        <arguments>
+            <argument name="quoteRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\GuestQuoteManagement" type="Magento\Quote\Model\GuestCart\GuestCartManagement">
+        <arguments>
+            <argument name="cartRepository" xsi:type="object">TS\Model\RepositoryQuote</argument>
+            <argument name="quoteManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Quote\Webapi\ParamOverriderCartId" type="Magento\Quote\Model\Webapi\ParamOverriderCartId">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Model\Webapi\Proxy\ParamOverriderCartId" type="Magento\Quote\Model\Webapi\ParamOverriderCartId\Proxy">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">TS\Model\Quote\Webapi\ParamOverriderCartId</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Webapi\Controller\Rest\ParamsOverrider">
+        <arguments>
+            <argument name="paramOverriders" xsi:type="array">
+                <item name="%tnw_subscriptions_cart_id%" xsi:type="object">TS\Model\Webapi\Proxy\ParamOverriderCartId</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TS\Model\Checkout\Session\SuccessValidator" type="Magento\Checkout\Model\Session\SuccessValidator">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement">
+        <arguments>
+            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\GuestQuoteManagement</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Subscription" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
+        <arguments>
+            <argument name="isSubscription" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Sales" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
+        <arguments>
+            <argument name="isSubscription" xsi:type="boolean">false</argument>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </virtualType>
 </config>

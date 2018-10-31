@@ -9,6 +9,7 @@
 
 <?php if ($block->isSubscribeAvailable()): ?>
     <?php if ($block->IsOnlySubscribePurchase()): ?>
+        <input type="hidden" name="subscribe_active" value="1" />
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
             <div class="title-container">
                 <div class="tab-title" data-role="collapsible" tabindex="0">
@@ -24,6 +25,7 @@
             </div>
         </div>
     <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
+        <input type="hidden" name="subscribe_active" value="1" />
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
             <div class="title-container">
                 <div class="tab-title" id="subscribe-tab-head" data-role="collapsible" tabindex="0">
@@ -47,8 +49,10 @@
             </div>
         </div>
     <?php else: ?>
+        <input type="hidden" name="subscribe_active" value="0" />
         <?php echo $block->getChildHtml('addtocart_orig') ?>
     <?php endif ?>
 <?php else: ?>
+    <input type="hidden" name="subscribe_active" value="0" />
     <?php echo $block->getChildHtml('addtocart_orig') ?>
 <?php endif ?>

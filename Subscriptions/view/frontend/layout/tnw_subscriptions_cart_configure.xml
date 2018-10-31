@@ -12,19 +12,27 @@
             <block class="Magento\Framework\View\Element\Js\Components" name="checkout_cart_configure_head_components" template="Magento_Checkout::js/components.phtml"/>
         </referenceBlock>
         <referenceBlock name="product.info">
-            <block class="Magento\Checkout\Block\Cart\Item\Configure" name="checkout.cart.item.configure.block"/>
+            <block class="TNW\Subscriptions\Block\Cart\Url\Configure" name="subscription.checkout.cart.url.configure"/>
         </referenceBlock>
-        <referenceBlock name="product.info.addtocart">
+        <referenceBlock name="product.info.addtocart.subscription">
             <action method="setTemplate">
-                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart-tabs.phtml</argument>
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
             </action>
-            <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.updatecart.subscription" as="updatecart_subscribe" template="TNW_Subscriptions::product/view/updatecart/subscribe.phtml"/>
         </referenceBlock>
-        <referenceBlock name="product.info.addtocart.additional">
+        <referenceBlock name="product.info.addtocart.orig">
             <action method="setTemplate">
-                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart-tabs.phtml</argument>
+                <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
             </action>
-            <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.updatecart.subscription" as="updatecart_subscribe" template="TNW_Subscriptions::product/view/updatecart/subscribe.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional.subscription">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional.orig">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
+            </action>
         </referenceBlock>
         <referenceBlock name="reviews.tab" remove="true"/>
         <referenceBlock name="view.addto.compare" remove="true"/>

@@ -45,4 +45,20 @@ class Product
 
         return [$product];
     }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $subject
+     * @param \Closure $proceed
+     * @param \Magento\Framework\DataObject $buyRequest
+     *
+     * @return mixed
+     */
+    public function aroundProcessBuyRequest(
+        \Magento\Catalog\Model\Product $subject,
+        \Closure $proceed,
+        \Magento\Framework\DataObject $buyRequest
+    ) {
+        return $proceed($buyRequest)
+            ->addData(['subscription_data'=>$buyRequest->getSubscriptionData()]);
+    }
 }

@@ -72,6 +72,16 @@ class UrlBuilder implements UrlBuilderInterface
     }
 
     /**
+     * @param $id
+     *
+     * @return string
+     */
+    public function getEditLabel($id)
+    {
+        return SubscriptionProfileInterface::LABEL_PREFIX . $id;
+    }
+
+    /**
      * Get subscription edit URL link
      * 
      * @param int $id
@@ -80,15 +90,11 @@ class UrlBuilder implements UrlBuilderInterface
      */
     public function getEditHtmlLink($id, $targetBlank = false)
     {
-        $url = $this->getEditUrl($id);
-        $label = SubscriptionProfileInterface::LABEL_PREFIX . $id;
-        $html = sprintf(
+        return sprintf(
             "<a%s href=\"%s\">%s</a>",
             $targetBlank ? ' target="_blank"' : '',
-            $url,
-            $label
+            $this->getEditUrl($id),
+            $this->getEditLabel($id)
         );
-        
-        return $html;
     }
 }

@@ -7,10 +7,10 @@
 namespace TNW\Subscriptions\Model\Session;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Model\Session;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
 use Magento\Store\Api\Data\StoreInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\QuoteSession;
 
 /**
@@ -19,9 +19,14 @@ use TNW\Subscriptions\Model\QuoteSession;
 class Quote extends QuoteSession
 {
     /**
-     * @var Session
+     * @var CustomerSession
      */
     private $customerSession;
+
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
 
     /**
      * @return int
@@ -77,15 +82,40 @@ class Quote extends QuoteSession
     }
 
     /**
-     * @return Session
+     * @inheritdoc
+     */
+    public function getSubQuotes()
+    {
+        $quote = $this->getCheckoutSession()->getQuote();
+        if (empty($quote->getAllVisibleItems())) {
+            return parent::getSubQuotes();
+        }
+
+        return array_merge([$quote->getId() => $quote], parent::getSubQuotes());
+    }
+
+    /**
+     * @return CustomerSession
      */
     private function getCustomerSession()
     {
         if ($this->customerSession === null) {
-            $this->customerSession = ObjectManager::getInstance()->get(Session::class);
+            $this->customerSession = ObjectManager::getInstance()->get(CustomerSession::class);
         }
 
         return $this->customerSession;
+    }
+
+    /**
+     * @return CheckoutSession
+     */
+    private function getCheckoutSession()
+    {
+        if ($this->checkoutSession === null) {
+            $this->checkoutSession = ObjectManager::getInstance()->get(CheckoutSession::class);
+        }
+
+        return $this->checkoutSession;
     }
 
     /**

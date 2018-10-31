@@ -54,6 +54,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addMessageTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.7', '<')) {
+            $this->addIsSubscriptionColumn($setup);
+            $this->dropUniqueKeyProfileOrder($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -405,5 +410,34 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ;
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addIsSubscriptionColumn(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->addColumn(
+            $setup->getTable('quote'),
+            'is_tnw_subscription',
+            [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => 0,
+                'comment' => 'Is TNW Subscription Quote'
+            ]
+        );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function dropUniqueKeyProfileOrder(SchemaSetupInterface $setup)
+    {
+        $tableName = $setup->getTable('tnw_subscriptions_subscription_profile_order');
+        $setup->getConnection()->dropIndex(
+            $tableName,
+            $setup->getIdxName($tableName, ['magento_order_id'])
+        );
     }
 }

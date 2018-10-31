@@ -9,8 +9,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="header-wrapper">
-            <block class="TNW\Subscriptions\Block\Cart\Link" name="tnw_subscriptions.cart.link" after="minicart"
-                   template="TNW_Subscriptions::cart_link.phtml">
+            <block class="TNW\Subscriptions\Block\Cart\Link" name="tnw_subscriptions.cart.link" after="minicart" template="TNW_Subscriptions::cart_link.phtml">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="types" xsi:type="array"/>
@@ -23,10 +22,10 @@
                 </arguments>
             </block>
         </referenceContainer>
-        <referenceBlock name="wishlist_sidebar">
-            <action method="setTemplate">
-                <argument name="template" xsi:type="string">TNW_Subscriptions::wishlist/sidebar.phtml</argument>
-            </action>
-        </referenceBlock>
+        <!--<referenceBlock name="wishlist_sidebar">-->
+            <!--<action method="setTemplate">-->
+                <!--<argument name="template" xsi:type="string">TNW_Subscriptions::wishlist/sidebar.phtml</argument>-->
+            <!--</action>-->
+        <!--</referenceBlock>-->
     </body>
 </page>

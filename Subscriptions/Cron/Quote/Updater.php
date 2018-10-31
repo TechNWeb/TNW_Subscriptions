@@ -46,22 +46,21 @@ class Updater extends Base
             $collectionFactory, $relationManager);
     }
 
-
     /**
      * @inheritdoc
      */
     public function getProfilesIdsToProcess($websiteId)
     {
-        $collection = $this->getBaseCollection();
-        $collection->addFieldToFilter(
-            SubscriptionProfileInterface::WEBSITE_ID,
-            $websiteId
-        )->addFieldToFilter(
-            [
+        $collection = $this->getBaseCollection()
+            ->addFieldToFilter(SubscriptionProfileInterface::WEBSITE_ID, $websiteId)
+            ->addFieldToFilter(SubscriptionProfileInterface::STATUS, ['nin' => [
+                \TNW\Subscriptions\Model\Source\ProfileStatus::STATUS_COMPLETE,
+                \TNW\Subscriptions\Model\Source\ProfileStatus::STATUS_CANCELED
+            ]])
+            ->addFieldToFilter([
                 ['attribute' => SubscriptionProfileInterface::NEED_RECOLLECT, 'eq' => 1],
                 ['attribute' => 'products_need_recollect', 'eq' => 1]
-            ]
-        );
+            ]);
 
         return $collection->getAllIds();
     }

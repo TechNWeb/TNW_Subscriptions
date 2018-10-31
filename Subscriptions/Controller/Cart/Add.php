@@ -3,253 +3,201 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Cart;
 
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\Context;
-use Magento\Framework\Data\Form\FormKey\Validator;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Locale\ResolverInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Model\Quote\ItemFactory;
-use Magento\Store\Model\StoreManagerInterface;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 
 /**
  * Add product to existing quote, or to newly created one.
  */
-class Add extends Action
+class Add extends \Magento\Checkout\Controller\Cart
 {
     /**
-     * @var CreateProfile
-     */
-    private $createProfile;
-
-    /**
-     * Requested product instance.
-     *
-     * @var ProductInterface
-     */
-    private $product;
-
-    /**
-     * Check request has form key and it's correct.
-     *
-     * @var Validator
-     */
-    private $formKeyValidator;
-
-    /**
-     * Help retrieve product information from Db.
-     *
      * @var ProductRepositoryInterface
      */
-    private $productRepository;
+    protected $productRepository;
 
     /**
-     * Check module is enable.
-     *
-     * @var Config
+     * @var \Magento\Framework\Locale\ResolverInterface
      */
-    private $config;
+    private $localeResolver;
 
-    /**
-     * Help retrieve product information for correct store.
-     *
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * Subscription session.
-     *
-     * @var QuoteSessionInterface
-     */
-    private $session;
-
-    /**
-     * @var ItemFactory
-     */
-    private $quoteItemFactory;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $quoteRepository;
-
-    /**
-     * @var array
-     */
-    private $allowedRequestFields = [
-        'product',
-        'product_id',
-        'qty',
-        'subscribe_qty',
-        'billing_frequency',
-        'term',
-        'period',
-        'start_on',
-        'selected_configurable_option',
-        'super_attribute',
-        'old_quote_item_id',
-    ];
-
-    /**
-     * @param Context $context
-     * @param QuoteSessionInterface $session
-     * @param Validator $formKeyValidator
-     * @param ProductRepositoryInterface $productRepository
-     * @param StoreManagerInterface $storeManager
-     * @param CreateProfile $createProfile
-     * @param Config $config
-     * @param ItemFactory $quoteItemFactory
-     * @param CartRepositoryInterface $quoteRepository
-     */
     public function __construct(
-        Context $context,
-        QuoteSessionInterface $session,
-        Validator $formKeyValidator,
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
+        \Magento\Checkout\Model\Cart $cart,
         ProductRepositoryInterface $productRepository,
-        StoreManagerInterface $storeManager,
-        CreateProfile $createProfile,
-        Config $config,
-        ItemFactory $quoteItemFactory,
-        CartRepositoryInterface $quoteRepository
+        \Magento\Framework\Locale\ResolverInterface $localeResolver
     ) {
-        $this->formKeyValidator = $formKeyValidator;
+        parent::__construct(
+            $context,
+            $scopeConfig,
+            $checkoutSession,
+            $storeManager,
+            $formKeyValidator,
+            $cart
+        );
+
         $this->productRepository = $productRepository;
-        $this->storeManager = $storeManager;
-        $this->createProfile = $createProfile;
-        $this->config = $config;
-        $this->session = $session;
-        $this->quoteItemFactory = $quoteItemFactory;
-        $this->quoteRepository = $quoteRepository;
-        parent::__construct($context);
+        $this->localeResolver = $localeResolver;
     }
 
     /**
-     * Add product to subscription quote action.
+     * Initialize product instance from request data
      *
-     * @inheritdoc
+     * @return \Magento\Catalog\Api\Data\ProductInterface|false
+     */
+    protected function initProduct()
+    {
+        $productId = (int)$this->getRequest()->getParam('product');
+        if ($productId) {
+            $storeId = $this->_storeManager->getStore()->getId();
+            try {
+                return $this->productRepository->getById($productId, false, $storeId);
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Add product to shopping cart action
+     *
+     * @return \Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
-        $message = __('We can\'t add this item to your subscription shopping cart right now.');
-        $error = true;
-        $redirectUrl = null;
-        if ($this->config->isSubscriptionsActive()) {
-            if ($this->formKeyValidator->validate($this->getRequest()) && $this->initProduct()) {
-                $params = $this->getFilteredParams();
-                try {
-                    if (isset($params['old_quote_item_id'])) {
-                        $quoteItemId = (int)$params['old_quote_item_id'];
-                        /** @var \Magento\Quote\Model\Quote\Item $quoteItem */
-                        $quoteItem = $this->quoteItemFactory->create()->load($quoteItemId);
-                        $quote = $this->quoteRepository->get($quoteItem->getQuoteId());
-                        $quoteItemToDelete = $quote->getItemById($quoteItem->getId());
-                        $this->createProfile->removeSubscriptions($quoteItemToDelete);
-                        $redirectUrl = $this->_url->getUrl('tnw_subscriptions/cart/index');
-                    }
-                    if (isset($params['subscribe_qty'])) {
-                        $filter = new \Zend_Filter_LocalizedToNormalized(
-                            ['locale' => $this->_objectManager->get(ResolverInterface::class)->getLocale()]
-                        );
-                        $params['qty'] = $filter->filter($params['subscribe_qty']);
-                        unset($params['subscribe_qty']);
-                    }
-                    $result = $this->createProfile->addToSubscription($params);
-                    if ($result) {
-                        $message = __(
-                            'You added %1 to your subscription cart.',
-                            $this->initProduct()->getName()
-                        );
-                        $error = false;
-                        $this->session->addSubQuote($result->getQuote());
-                    }
-                } catch (\Exception $e) {
-                    $this->_objectManager->get(\Psr\Log\LoggerInterface::class)->critical($e);
-                    $redirectUrl = null;
+        if (!$this->_formKeyValidator->validate($this->getRequest())) {
+            return $this->resultRedirectFactory->create()->setPath('*/*/');
+        }
+
+        $params = $this->getRequest()->getParams();
+
+        try {
+            if (isset($params['qty'])) {
+                $params['qty'] = \Zend_Filter::filterStatic($params['qty'], 'LocalizedToNormalized', [
+                    ['locale' => $this->localeResolver->getLocale()]
+                ]);
+            }
+
+            /** @var \Magento\Catalog\Model\Product $product */
+            $product = $this->initProduct();
+            $related = $this->getRequest()->getParam('related_product');
+
+            /**
+             * Check product availability
+             */
+            if (!$product) {
+                return $this->goBack();
+            }
+
+            $this->cart->addProduct($product, $params);
+            if (!empty($related)) {
+                $this->cart->addProductsByIds(explode(',', $related));
+            }
+
+            $this->cart->save();
+
+            $this->_eventManager->dispatch('checkout_cart_add_product_complete', [
+                'product' => $product,
+                'request' => $this->getRequest(),
+                'response' => $this->getResponse()
+            ]);
+
+            if (!$this->_checkoutSession->getNoCartRedirect(true)) {
+                if (!$this->cart->getQuote()->getHasError()) {
+                    $message = __(
+                        'You added %1 to your shopping cart.',
+                        $product->getName()
+                    );
+                    $this->messageManager->addSuccessMessage($message);
+                }
+
+                return $this->goBack(null, $product);
+            }
+
+            return $this->resultRedirectFactory->create()->setPath('*/*');
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            if ($this->_checkoutSession->getUseNotice(true)) {
+                $this->messageManager->addNoticeMessage($e->getMessage());
+            } else {
+                $messages = array_unique(explode("\n", $e->getMessage()));
+                foreach ($messages as $message) {
+                    $this->messageManager->addErrorMessage($message);
                 }
             }
-        }
-        $this->processResponse($error, $message, $redirectUrl, $this->initProduct());
 
-        return $this->_response;
-    }
-
-    /**
-     * Check whether requested product exists in Db.
-     *
-     * @return ProductInterface|bool
-     */
-    private function initProduct()
-    {
-        if ($this->product === null) {
-            $productId = (int)$this->getRequest()->getParam('product_id');
-            $storeId = $this->storeManager->getStore()->getId();
-            try {
-                $this->product = $this->productRepository->getById($productId, false, $storeId);
-            } catch (NoSuchEntityException $e) {
-                $this->product = false;
+            if (!$url = $this->_checkoutSession->getRedirectUrl(true)) {
+                $url = $this->_redirect->getRedirectUrl($this->_url->getUrl('tnw_subscriptions/cart'));
             }
-        }
 
-        return $this->product;
+            return $this->goBack($url);
+        } catch (\Exception $e) {
+            $this->messageManager->addExceptionMessage($e, __('We can\'t add this item to your shopping cart right now.'));
+            return $this->goBack();
+        }
     }
 
     /**
-     * Add necessary information to response.
+     * Resolve response
      *
-     * @param bool $error
-     * @param string $message
-     * @param string|null $redirectUrl
+     * @param string $backUrl
      * @param \Magento\Catalog\Model\Product $product
-     * @return void
+     * @return $this|\Magento\Framework\Controller\Result\Redirect
      */
-    private function processResponse($error, $message, $redirectUrl, $product = null)
+    protected function goBack($backUrl = null, $product = null)
     {
-        if ($message) {
-            if ($error) {
-                $this->messageManager->addErrorMessage($message);
-            } else {
-                $this->messageManager->addSuccessMessage($message);
-            }
+        if (!$this->_request->isAjax()) {
+            return parent::_goBack($backUrl);
         }
 
-        $result['error'] = $error;
-        $result['message'] = $message;
-        if ($redirectUrl) {
-            $result['redirectUrl'] = $redirectUrl;
-        }
-        if ($product && !$product->getIsSalable()) {
+        $result = [];
+
+        if ($backUrl || $backUrl = $this->getBackUrl()) {
+            $result['backUrl'] = $backUrl;
+        } else if ($product && !$product->getIsSalable()) {
             $result['product'] = [
-                'statusText' => __('Out of stock'),
+                'statusText' => __('Out of stock')
             ];
         }
-        $this->getResponse()->representJson(
-            $this->_objectManager->get(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($result)
-        );
+
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData($result);
     }
 
     /**
-     * Returns filtered request params.
+     * Get resolved back url
      *
-     * @return array
+     * @param null $defaultUrl
+     *
+     * @return mixed|null|string
      */
-    private function getFilteredParams()
+    protected function getBackUrl($defaultUrl = null)
     {
-        $allowed  = $this->allowedRequestFields;
-        return array_filter(
-            $this->getRequest()->getParams(),
-            function ($key) use ($allowed) {
-                return in_array($key, $allowed);
-            },
-            ARRAY_FILTER_USE_KEY
+        $returnUrl = $this->_request->getParam('return_url');
+        if ($returnUrl && $this->_isInternalUrl($returnUrl)) {
+            $this->messageManager->getMessages()->clear();
+            return $returnUrl;
+        }
+
+        $shouldRedirectToCart = $this->_scopeConfig->getValue(
+            'checkout/cart/redirect_to_cart',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+
+        if ($shouldRedirectToCart || $this->_request->getParam('in_cart')) {
+            if ($this->_request->getActionName() === 'add' && !$this->_request->getParam('in_cart')) {
+                $this->_checkoutSession->setContinueShoppingUrl($this->_redirect->getRefererUrl());
+            }
+
+            return $this->_url->getUrl('tnw_subscriptions/cart');
+        }
+
+        return $defaultUrl;
     }
 }

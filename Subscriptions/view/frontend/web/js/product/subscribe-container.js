@@ -21,8 +21,8 @@ define([
             periodControlSelector: '#period-field',
             setQtyFromFrequency: false,
             frequencyInputSelector: 'input[name="billing_frequency"]',
+            activeInputSelector: 'input[name="subscribe_active"]',
             qtyInputSelector: '#subscribe_qty',
-            qtyInputSelectorHidden: '#subscribe_qty_hidden',
             minicartSelector: '[data-block="minicart"]',
             messagesSelector: '[data-placeholder="messages"]',
             productStatusSelector: '.stock.available',
@@ -86,15 +86,11 @@ define([
          */
         _bind: function () {
             var widget = this,
-                button = $(this.options.subscribeButtonSelector),
                 untilCancelledInput = $(this.options.untilCancelledInputSelector),
                 frequencyInput = $(this.options.frequencyInputSelector),
+                activeInput = $(this.options.activeInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
                 childrenSelect = $(this.options.childrenSelector);
-
-            button.on('click', $.proxy(function() {
-                widget._submitForm();
-            }, this));
 
             untilCancelledInput.on('change', $.proxy(function() {
                 widget._togglePeriod();
@@ -107,11 +103,13 @@ define([
             }
 
             this.containers.subscriptionTab.on('click', $.proxy(function() {
+                activeInput.val(1);
                 widget.containers.subscriptionPriceBox.show();
                 widget.containers.addToCartPriceBox.hide();
             }, this));
 
             this.containers.addToCartTab.on('click', $.proxy(function() {
+                activeInput.val(0);
                 widget.containers.subscriptionPriceBox.hide();
                 widget.containers.addToCartPriceBox.show();
             }, this));
@@ -132,10 +130,8 @@ define([
          */
         _updateQtyFromFrequency: function () {
             var currentFrequency = $(this.options.frequencyInputSelector + ':checked'),
-                qtyInput = $(this.options.qtyInputSelector),
-                qtyInputHidden = $(this.options.qtyInputSelectorHidden);
+                qtyInput = $(this.options.qtyInputSelector);
             qtyInput.val(Number(currentFrequency.data('preset-qty')));
-            qtyInputHidden.val(Number(currentFrequency.data('preset-qty')));
         },
 
         /**
@@ -282,82 +278,6 @@ define([
             } else {
                 periodControl.show();
             }
-        },
-
-        /**
-         * Submit product form
-         */
-        _submitForm: function () {
-            var self = this,
-                form = $(this.options.formSelector);
-            
-            if (form.validation() && form.validation('isValid')) {
-
-                self.disableCartButton(form);
-
-                $.ajax({
-                    url: this.options.subscribeUrl,
-                    data: form.serialize(),
-                    type: 'post',
-                    dataType: 'json',
-
-                    /**
-                     * Called when request succeeds
-                     *
-                     * @param {Object} response
-                     */
-                    success: function(response) {
-                        if (response.redirectUrl) {
-                            window.location = response.redirectUrl;
-                            return;
-                        }
-                        /*if (response.message) {
-                            $(self.options.messagesSelector).html(response.message);
-                        }*/
-                        if (response.minicart) {
-                            $(self.options.minicartSelector).replaceWith(response.minicart);
-                            $(self.options.minicartSelector).trigger('contentUpdated');
-                        }
-                        if (response.product && response.product.statusText) {
-                            $(self.options.productStatusSelector)
-                                .removeClass('available')
-                                .addClass('unavailable')
-                                .find('span')
-                                .html(response.product.statusText);
-                        }
-                        self.enableCartButton(form);
-                    }
-                });
-            }
-        },
-
-        disableCartButton: function(form) {
-            var textWhileAdding = this.options.buttonTextWhileAdding || $t('Adding...'),
-                subscribeButton = $(form).find(this.options.subscribeButtonSelector),
-                addToCartButton = $(form).find(this.options.addToCartButtonSelector);
-
-            subscribeButton.addClass(this.options.buttonDisabledClass);
-            subscribeButton.find('span').text(textWhileAdding);
-            subscribeButton.attr('title', textWhileAdding);
-            addToCartButton.addClass(this.options.buttonDisabledClass);
-        },
-
-        enableCartButton: function(form) {
-            var textAdded = this.options.buttonTextAdded || $t('Added');
-            var self = this,
-                subscribeButton = $(form).find(this.options.subscribeButtonSelector),
-                addToCartButton = $(form).find(this.options.addToCartButtonSelector);
-
-            subscribeButton.find('span').text(textAdded);
-            subscribeButton.attr('title', textAdded);
-
-            setTimeout(function() {
-                var textDefault = self.options.buttonTextDefault || $t('Add to Cart');
-                subscribeButton.removeClass(self.options.buttonDisabledClass);
-                subscribeButton.find('span').text(textDefault);
-                subscribeButton.attr('title', textDefault);
-                addToCartButton.removeClass(self.options.buttonDisabledClass);
-            }, 1000);
         }
     });
 

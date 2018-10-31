@@ -105,7 +105,7 @@ class DescriptionCreator
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $description[] = __('%1 for %2 and then ', $formattedPrice, $frequencyTrialPeriod);
         } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
-            $description[] = __("%1 initial payment and then ", $formattedPrice);
+            $description[] = __('%1 initial payment and then ', $formattedPrice);
         }
 
         $description[] = __('%1 / every %2. ',
@@ -125,6 +125,84 @@ class DescriptionCreator
         $description[] = __('Products %1 every %2 starting %3.', $shipOrUse, $frequencyUnit, $startDate);
 
         return implode(' ', $description);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getDescriptionByGroup($groupItems)
+    {
+        $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
+        return $this->getDescription($fullSubscriptionData);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
+     *
+     * @return string
+     */
+    public function getDescribedPriceHtmlByGroup($groupItems)
+    {
+        $fullSubscriptionData = $this->fullSubscriptionData($groupItems);
+        return $this->getDescribedItemPriceHtml(
+            $fullSubscriptionData['non_unique']['price'],
+            $fullSubscriptionData,
+            $fullSubscriptionData['non_unique']['initialPrice']
+        );
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item[] $groupItems
+     *
+     * @return array
+     */
+    private function fullSubscriptionData($groupItems)
+    {
+        $fullSubscriptionData = null;
+
+        $isVirtual = true;
+        $initialFee = $subtotal = 0;
+        foreach ($groupItems as $item) {
+            if (!$fullSubscriptionData) {
+                $fullSubscriptionData['unique'] = \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+            }
+
+            $subtotal += $item->getRowTotal();
+            $initialFee += $this->getInitialFeeFromItem($item);
+
+            if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getProduct()->getIsVirtual()) {
+                $isVirtual = false;
+            }
+        }
+
+        $fullSubscriptionData['non_unique']['price'] = $subtotal;
+        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal + $initialFee;
+        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
+        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
+        $fullSubscriptionData['non_unique']['isVirtual'] = $isVirtual;
+
+        return $fullSubscriptionData;
+    }
+
+    /**
+     * Returns initial fee from item.
+     *
+     * @param \Magento\Quote\Model\Quote\Item $item
+     * @return int
+     */
+    private function getInitialFeeFromItem($item)
+    {
+        $initialFees = $item->getExtensionAttributes()
+            ? $item->getExtensionAttributes()->getSubsInitialFees()
+            : null;
+        if ($initialFees) {
+            $initialFee = $initialFees->getSubsInitialFee();
+        }
+
+        return !empty($initialFee) ? $initialFee : 0;
     }
 
     /**
@@ -155,7 +233,7 @@ class DescriptionCreator
             $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
             $lastPhrase = __('trial');
         } elseif ($initialFee) {
-            $middlePhrase = '';
+            $middlePhrase = ' ';
             $lastPhrase = __('initial payment');
         }
 
@@ -172,11 +250,12 @@ class DescriptionCreator
         }
 
         $total = $this->addContainer(
-            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']),
+            $this->formatPrice($itemTotal),
             'price'
         );
+
         $frequencyUnit = $this->addContainer(
-            '/' .$this->getFrequencyWithUnit( $subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
+            '/' .$this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
             'unit'
         );
 
@@ -186,6 +265,20 @@ class DescriptionCreator
             implode(' ', $priceClasses),
             $thenPhrase,
             $total . $frequencyUnit
+        );
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item $quoteItem
+     *
+     * @return string
+     */
+    public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
+    {
+        return $this->getDescribedItemPriceHtml(
+            $quoteItem->getRowTotal(),
+            [CreateProfile::UNIQUE => \Zend_Json::decode($quoteItem->getOptionByCode('subscription')->getValue())],
+            $this->getInitialFeeFromItem($quoteItem)
         );
     }
 
@@ -257,7 +350,7 @@ class DescriptionCreator
      * @param $price
      * @return float
      */
-    private function formatPrice($price)
+    public function formatPrice($price)
     {
         return $this->context->getPriceCurrency()->format(
             $price,

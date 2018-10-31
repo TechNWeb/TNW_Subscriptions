@@ -27,4 +27,10 @@
     <event name="sales_quote_load_after">
         <observer name="tnw_subscription_quote_load_after" instance="TNW\Subscriptions\Observer\SalesQuoteLoadAfter" />
     </event>
+    <event name="payment_method_is_active">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\PaymentMethodIsActive"/>
+    </event>
+    <event name="checkout_cart_add_product_complete">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\CheckoutCartAddProduct"/>
+    </event>
 </config>

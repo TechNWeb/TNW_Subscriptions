@@ -144,34 +144,6 @@ class Subscribe extends View
     }
 
     /**
-     * Retrieve old quote item id
-     *
-     * @return mixed
-     */
-    private function getOldQuoteItemId()
-    {
-        return $this->_coreRegistry->registry('old_quote_item_id');
-    }
-
-    /**
-     * Get subscribe url.
-     *
-     * @return string
-     */
-    public function getSubscribeUrl()
-    {
-        $oldQuoteItemId = $this->getOldQuoteItemId();
-        $params = ['product_id' => $this->getProduct()->getId()];
-        if ($oldQuoteItemId) {
-            $params['old_quote_item_id'] = $oldQuoteItemId;
-        }
-        return $this->_urlBuilder->getUrl(
-            'tnw_subscriptions/cart/add',
-            $params
-        );
-    }
-
-    /**
      * Get "Enable Subscriptions" config value for current website.
      *
      * @return bool
@@ -179,7 +151,6 @@ class Subscribe extends View
     public function isSubscribeAvailable()
     {
         return $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
-
     }
 
     /**
@@ -213,13 +184,18 @@ class Subscribe extends View
         /** @var ProductBillingFrequencyInterface $productFrequency */
         foreach ($this->getProductBillingFrequencies() as $productFrequency) {
             $frequency = $this->frequencyRepository->getById($productFrequency->getBillingFrequencyId());
-            $label = $frequency->getLabel();
+
+            $preconfigured = $this->preconfiguredValue('subscription_data/unique/billing_frequency');
+            $isDefault = null === $preconfigured
+                ? $productFrequency->getDefaultBillingFrequency()
+                : $preconfigured == $productFrequency->getBillingFrequencyId();
+
             $data = [
-                'label' => $label,
+                'label' => $frequency->getLabel(),
                 'value' => $productFrequency->getBillingFrequencyId(),
                 'frequency_unit' => $frequency->getFrequency(),
                 'frequency_unit_type' => $frequency->getUnit(),
-                'is_default' => $productFrequency->getDefaultBillingFrequency(),
+                'is_default' => $isDefault,
             ];
 
             if (!$this->getAllowEditSubscribeQty()) {
@@ -285,7 +261,8 @@ class Subscribe extends View
                 }
             }
         }
-        return 1;
+
+        return $this->preconfiguredValue('qty') ?: 1;
     }
 
     /**
@@ -295,7 +272,8 @@ class Subscribe extends View
      */
     public function getDefaultUntilCancelled()
     {
-        return $this->getIsInfiniteSubscriptions() ?: $this->config->isUntilCanceledChecked();
+        $term = $this->preconfiguredValue('subscription_data/unique/term') ?? $this->config->isUntilCanceledChecked();
+        return $this->getIsInfiniteSubscriptions() ?: $term;
     }
 
     /**
@@ -308,7 +286,6 @@ class Subscribe extends View
         return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
     }
 
-
     /**
      * Get default period value
      *
@@ -316,8 +293,11 @@ class Subscribe extends View
      */
     public function getDefaultPeriod()
     {
-        $period = \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
-        return $period ? (string)$period : '';
+        $period = $this->preconfiguredValue('subscription_data/unique/period');
+
+        return null !== $period
+            ? (string)$period :
+            \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
     }
 
     /**
@@ -344,7 +324,11 @@ class Subscribe extends View
      */
     public function getDefaultStartOn()
     {
-        return $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
+        $startOn = $this->preconfiguredValue('subscription_data/unique/start_on');
+
+        return null !== $startOn
+            ? (string)$startOn :
+            $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
     }
 
     /**
@@ -439,7 +423,6 @@ class Subscribe extends View
                 break;
             default:
                 throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
-                break;
         }
 
         return $this->_jsonEncoder->encode($result);
@@ -466,5 +449,17 @@ class Subscribe extends View
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return mixed
+     */
+    private function preconfiguredValue($field)
+    {
+        return $this->getProduct()->hasPreconfiguredValues()
+            ? $this->getProduct()->getPreconfiguredValues()->getData($field)
+            : null;
     }
 }

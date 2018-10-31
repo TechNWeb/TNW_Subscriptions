@@ -1,0 +1,106 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+// @codingStandardsIgnoreFile
+
+/**  @var $block \TNW\Subscriptions\Block\Cart\Grid */
+?>
+<form action="<?= /* @escapeNotVerified */ $block->getUrl('tnw_subscriptions/cart/updatePost') ?>"
+      method="post"
+      id="form-validate"
+      data-mage-init='{"validation":{}}'
+      class="form form-cart subscriptions-cart">
+    <?= $block->getBlockHtml('formkey') ?>
+
+    <?php foreach ($block->groupQuoteItems() as $groupItems) : ?>
+        <table class="data table">
+            <caption class="table-caption">
+                <h2><?= $block->escapeHtml($block->getCaption($groupItems)) ?></h2>
+                <p><?= /* @escapeNotVerified */ $block->frequencyDescription($groupItems) ?></p>
+            </caption>
+            <colgroup>
+                <col width="20%" />
+                <col />
+            </colgroup>
+            <tbody class="items">
+            <?php foreach ($groupItems as $groupItem) : ?>
+                <tr class="item-info">
+                    <td class="col image">
+                        <div class="image-wrapper">
+                            <?php echo $block->getItemImage($block->getItemPurchaseProduct($groupItem), 'cart_page_product_thumbnail')->toHtml() ?>
+                        </div>
+                        <div class="buttons">
+                            <?php if ($groupItem->getProduct()->isVisibleInSiteVisibility()): ?>
+                                <a class="action action-edit"
+                                   href="<?= /* @escapeNotVerified */ $block->getItemConfigureUrl($groupItem) ?>"
+                                   title="<?= $block->escapeHtml(__('Edit item parameters')) ?>">
+                                    <span>
+                                        <?= $block->escapeHtml(__('Edit')) ?>
+                                    </span>
+                                </a>
+                            <?php endif ?>
+                            <a class="action action-delete"
+                               title="<?= $block->escapeHtml(__('Remove item')) ?>"
+                               href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($groupItem) ?>">
+                                <span>
+                                    <?= $block->escapeHtml(__('Remove item')) ?>
+                                </span>
+                            </a>
+                        </div>
+                    </td>
+                    <td class="col item">
+                        <div class="details">
+                            <h3 class="name">
+                                <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($groupItem) ?>"><?php echo $block->escapeHtml($block->getItemName($groupItem)) ?></a>
+                            </h3>
+                            <div class="description"><?= /* @escapeNotVerified */ $block->getItemDescription($groupItem) ?></div>
+                            <div class="price-wrapper">
+                                <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($groupItem) ?></div>
+                            </div>
+                            <dl class="options">
+                                <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
+                                <dd class="control qty">
+                                    <input name="cart[<?php echo $groupItem->getItemId() ?>][qty]"
+                                           value="<?php echo $groupItem->getQty() ?>"
+                                           size="4"
+                                           title="<?= $block->escapeHtml(__('Qty')) ?>"
+                                           class="input-text qty"
+                                           data-validate="{required:true,'validate-greater-than-zero':true}"
+                                           data-role="cart-item-qty"
+                                           <?php if (!$block->allowEditSubscribeQty($groupItem)) : ?>
+                                           readonly="readonly"
+                                           <?php endif ?>
+                                           type="number">
+                                </dd>
+                                <?php foreach ($block->getItemOptions($groupItem) as $option) : ?>
+                                    <?php $_formatedOptionValue = $block->getFormatedOptionValue($option) ?>
+                                    <dt><?php echo $block->escapeHtml($option['label']); ?></dt>
+                                    <dd>
+                                        <?php if (isset($_formatedOptionValue['full_view'])): ?>
+                                            <?= /* @escapeNotVerified */ $_formatedOptionValue['full_view'] ?>
+                                        <?php else: ?>
+                                            <?= /* @escapeNotVerified */ $_formatedOptionValue['value'] ?>
+                                        <?php endif; ?>
+                                    </dd>
+                                <?php endforeach; ?>
+                            </dl>
+                            <div style="clear: both"></div>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <div class="cart main actions">
+            <button type="submit"
+                    name="update_cart_action"
+                    value="update_qty"
+                    title="<?= $block->escapeHtml(__('Update Shopping Cart')) ?>"
+                    class="action update">
+                <span><?= /* @escapeNotVerified */ __('Update Shopping Cart') ?></span>
+            </button>
+        </div>
+    <?php endforeach; ?>
+</form>

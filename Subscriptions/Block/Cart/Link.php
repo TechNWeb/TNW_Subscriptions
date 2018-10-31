@@ -16,8 +16,32 @@ class Link extends \Magento\Framework\View\Element\Template
      *
      * @return string
      */
-    public function getCartUrl()
+    public function getCheckoutUrl()
     {
-        return $this->_urlBuilder->getUrl('tnw_subscriptions/cart/index');
+        return $this->_urlBuilder->getUrl('tnw_subscriptions/checkout');
+    }
+
+    /**
+     * Get shopping cart page url
+     *
+     * @return string
+     */
+    public function getShoppingCartUrl()
+    {
+        return $this->getUrl('tnw_subscriptions/cart');
+    }
+
+    /**
+     * @return string
+     */
+    public function getSerializedConfig()
+    {
+        return \Zend_Json::encode([
+            'websiteId' => $this->_storeManager->getStore()->getWebsiteId(),
+            'shoppingCartUrl' => $this->getShoppingCartUrl(),
+            'checkoutUrl' => $this->getCheckoutUrl(),
+            'isRedirectRequired' => true,
+            'customerLoginUrl' => $this->getUrl('customer/account/login'),
+        ]);
     }
 }

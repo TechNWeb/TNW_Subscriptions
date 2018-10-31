@@ -135,15 +135,14 @@ class Manager
     /**
      * Returns list of main profile products created from quote items.
      *
-     * @param Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
      * @return array
      */
-    public function populateProductsData(Quote $quote)
+    public function populateProductsData($quoteItems)
     {
-        $items = $quote->getAllVisibleItems();
         $profileProducts = [];
         /** @var Item $item */
-        foreach ($items as $item) {
+        foreach ($quoteItems as $item) {
             $product = $this->reset()
                 ->populateProductDataFromQuoteItem($item)
                 ->getProfileProduct();
@@ -157,16 +156,15 @@ class Manager
     /**
      * Returns list of profile child products created from quote items.
      *
-     * @param Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
      * @param ProductSubscriptionProfileInterface[] $products
      * @return array
      */
-    public function populateChildProductsData(Quote $quote, array $products)
+    public function populateChildProductsData($quoteItems, array $products)
     {
         $childProducts = [];
-        $items = $quote->getAllVisibleItems();
         /** @var Item $item */
-        foreach ($items as $item) {
+        foreach ($quoteItems as $item) {
             switch ($item->getProductType()) {
                 case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
                 case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:

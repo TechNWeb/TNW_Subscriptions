@@ -7,15 +7,7 @@
 /* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
-<div class="subscribe-container"
-     data-mage-init='{"tnwSubscribeContainer":{
-        "subscribeUrl": "<?php echo $block->escapeUrl($block->getSubscribeUrl()) ?>",
-        "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
-        "canShowSubscribePriceBlock" : "true",
-        "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
-        "product" : <?php echo $block->getProductDataArray() ?>
-    }}'
->
+<div class="subscribe-container">
     <div class="fieldset">
         <div class="field required">
             <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
@@ -118,33 +110,33 @@
                        value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
                        title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
                        class="input-text qty"
-                       data-validate='<?php echo $block->escapeHtml(json_encode($block->getQtyValidators())) ?>'
+                       data-validate='<?php echo $block->escapeHtml(\json_encode($block->getQtyValidators())) ?>'
                     <?php if (!$block->getAllowEditSubscribeQty()): ?>
-                       disabled="disabled"
+                       readonly="readonly"
                     <?php endif ?>
                 />
-                <?php if (!$block->getAllowEditSubscribeQty()): ?>
-                    <input type="hidden"
-                           name="subscribe_qty"
-                           id="subscribe_qty_hidden"
-                           value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
-                    />
-                <?php endif ?>
-
             </div>
         </div>
     </div>
-    <button type="button"
+    <button type="submit"
             id="product-subscribe-button"
-            title="<?php echo $block->escapeHtml(__('Subscribe')) ?>"
-            class="action primary subscribe"
-            >
+            title="<?php /* @escapeNotVerified */ echo __('Subscribe') ?>"
+            class="action primary tocart">
         <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
     </button>
 </div>
-
-
-
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "tnwSubscribeContainer": {
+                "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
+                "canShowSubscribePriceBlock" : true,
+                "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
+                "product" : <?php echo $block->getProductDataArray() ?>
+            }
+        }
+    }
+</script>
 <?php if ($block->getIsVisibleStartOn()): ?>
 <script type="text/javascript">
     require([

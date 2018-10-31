@@ -7,42 +7,96 @@
 /* @var $block \TNW\Subscriptions\Block\Cart\Link */
 
 ?>
-<div data-role="tnw-subscriptions-cart-link"
-     data-bind="scope: 'subscriptionCart'"
-     class="tnw-subscriptions-cart-link__container"
->
-    <a class="tnw-subscriptions-cart-link"
-       href="<?php echo $block->escapeUrl($block->getCartUrl()) ?>"
+<div data-block="tnw-subscriptions-minicart" class="tnw-subscriptions-cart-link__container">
+    <a class="action tnw-subscriptions-cart-link" href="<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"
        title="<?php /* @noEscape */ echo __('Shopping Cart') ?>"
-       data-bind="attr: {href: subscriptionCart().href}, click: showPopup"
-    >
+       data-bind="scope: 'subscriptionCart'">
         <img src="<?php /* @noEscape */ echo $block->getViewFileUrl('TNW_Subscriptions/images/cart-link.svg'); ?>"
-            width="24"
-            height="24"
-            class="tnw-subscriptions-minicart"
-        >
-        <span class="no-display"
-              data-bind="text: subscriptionCart().itemsCount, css: {'no-display': !subscriptionCart().itemsCount}">
+            width="24" height="24" class="tnw-subscriptions-minicart">
+        <span class="counter qty no-display"
+              data-bind="css: { 'no-display': !!getCartParam('summary_count') == false }, blockLoader: isLoading">
+            <span class="counter-number"><!-- ko text: getCartParam('summary_count') --><!-- /ko --></span>
         </span>
     </a>
-    <div class="tnw-subscriptions-cart-empty no-display">
-        <div id="subscription-minicart-content-wrapper">
+    <div class="block tnw-subscriptions-cart-empty no-display"
+         data-role="dropdownDialog"
+         data-mage-init='{"dropdownDialog":{
+                "appendTo":"[data-block=tnw-subscriptions-minicart]",
+                "triggerTarget":".tnw-subscriptions-cart-link",
+                "timeout": "2000",
+                "closeOnMouseLeave": false,
+                "closeOnEscape": true,
+                "triggerClass":"active",
+                "parentClass":"active",
+                "buttons":[]}}'>
+        <div id="subscription-minicart-content-wrapper" data-bind="scope: 'subscriptionCart'">
             <div class="block-content">
                 <button type="button"
-                    id="btn-subscriptions-cart-close"
-                    class="action close"
-                    data-action="close"
-                    data-bind="attr: { title: $t('Close') }, click: hidePopup">
+                        id="btn-subscriptions-cart-close"
+                        class="action close"
+                        data-action="close"
+                        data-bind="attr: { title: $t('Close') }, click: closeMinicart">
                 </button>
-                <span><?php /* @noEscape */ echo __('You have no items in your shopping cart.') ?></span>
+                <!-- ko if: getCartParam('summary_count') -->
+                <div class="items-total">
+                    <span class="count" data-bind="text: getCartLineItemsCount()"></span>
+                    <!-- ko if: getCartLineItemsCount() === 1 -->
+                    <span data-bind="i18n: 'Item in Cart'"></span>
+                    <!-- /ko -->
+                    <!-- ko if: getCartLineItemsCount() > 1 -->
+                    <span data-bind="i18n: 'Items in Cart'"></span>
+                    <!-- /ko -->
+                </div>
+                <!-- ko if: getCartParam('possible_onepage_checkout') -->
+                <div class="actions">
+                    <div class="primary">
+                        <button id="top-cart-btn-checkout"
+                                type="button"
+                                class="action primary checkout"
+                                data-action="close"
+                                data-bind="attr: { title: $t('Proceed to Checkout') }, click: actionCheckout, i18n: 'Proceed to Checkout'"></button>
+                        <div data-bind="html: getCartParam('extra_actions')"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko ifnot: (getCartParam('summary_count')) -->
+                    <strong class="subtitle empty"
+                            data-bind="i18n: 'You have no items in your shopping cart.'"></strong>
+                    <!-- ko if: (getCartParam('cart_empty_message')) -->
+                    <p class="minicart empty text" data-bind="text: getCartParam('cart_empty_message')"></p>
+                    <div class="actions">
+                        <div class="secondary">
+                            <a class="action viewcart" data-bind="attr: {href: shoppingCartUrl}">
+                                <span data-bind="i18n: 'View and Edit Cart'"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: getCartParam('summary_count') -->
+                <div class="actions">
+                    <div class="secondary">
+                        <a class="action viewcart" data-bind="attr: {href: shoppingCartUrl}">
+                            <span data-bind="i18n: 'View and Edit Cart'"></span>
+                        </a>
+                    </div>
+                </div>
+                <!-- /ko -->
             </div>
         </div>
     </div>
-</div>
-<script type="text/x-magento-init">
-    {
-        "[data-role=tnw-subscriptions-cart-link]": {
-            "Magento_Ui/js/core/app": <?php /* @noEscape */ echo $block->getJsLayout();?>
+    <script>
+        window.subcheckout = <?= /* @escapeNotVerified */ $block->getSerializedConfig() ?>;
+    </script>
+    <script type="text/x-magento-init">
+        {
+            "[data-block=tnw-subscriptions-minicart]": {
+                "Magento_Ui/js/core/app": <?php /* @noEscape */ echo $block->getJsLayout();?>
+            },
+            "*": {
+                "Magento_Ui/js/block-loader": "<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>"
+            }
         }
-    }
-</script>
+    </script>
+</div>

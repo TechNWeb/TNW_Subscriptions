@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\Queue;
 
-use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Quote\Api\CartRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config;
@@ -26,13 +28,6 @@ class Manager
      * @var CollectionFactory
      */
     private $collectionFactory;
-
-    /**
-     * Date conversion model.
-     *
-     * @var DateTime
-     */
-    private $date;
 
     /**
      * Config model.
@@ -87,8 +82,12 @@ class Manager
     private $profileStatus;
 
     /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\Queue
+     */
+    private $resourceQueue;
+
+    /**
      * @param CollectionFactory $collectionFactory
-     * @param DateTime $date
      * @param Config $config
      * @param SubscriptionProfile\Manager $profileManager
      * @param RelationManager $relationManager
@@ -96,10 +95,11 @@ class Manager
      * @param SubscriptionProfileRepository $profileRepository
      * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
      * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
+     * @param ProfileStatus $profileStatus
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
      */
     public function __construct(
         CollectionFactory $collectionFactory,
-        DateTime $date,
         Config $config,
         SubscriptionProfile\Manager $profileManager,
         RelationManager $relationManager,
@@ -107,10 +107,10 @@ class Manager
         SubscriptionProfileRepository $profileRepository,
         SubscriptionProfile\Status\HistoryManager $statusHistoryManager,
         SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger,
-        ProfileStatus $profileStatus
+        ProfileStatus $profileStatus,
+        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
     ) {
         $this->collectionFactory = $collectionFactory;
-        $this->date = $date;
         $this->config = $config;
         $this->profileManager = $profileManager;
         $this->relationManager = $relationManager;
@@ -119,6 +119,7 @@ class Manager
         $this->statusHistoryManager = $statusHistoryManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->profileStatus = $profileStatus;
+        $this->resourceQueue = $resourceQueue;
     }
 
     /**
@@ -190,102 +191,41 @@ class Manager
      *
      * @param array $relationIds - ids from "tnw_subscriptions_subscription_profile_order" table
      * @param null|bool $makeProcessed
+     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated
+     * @see \TNW\Subscriptions\Model\ResourceModel\Queue::insertItems
      */
     public function insertItems(
         $relationIds,
         $makeProcessed = null
     ) {
-        if (!is_array($relationIds)) {
-            $relationIds = [$relationIds];
-        }
-        $fields = [];
-        $itemIds = [];
-        $status = $makeProcessed ? QueueStatus::QUEUE_STATUS_RUNNING : QueueStatus::QUEUE_STATUS_PENDING;
-        foreach ($relationIds as $relationId) {
-            $fields[] = [
-                Queue::PROFILE_ORDER_ID => $relationId,
-                Queue::STATUS => $status,
-                Queue::MESSAGE => '',
-                Queue::CREATED_AT => $this->date->gmtDate(),
-                Queue::UPDATED_AT => $this->date->gmtDate()
-            ];
-        }
-        if (!empty($fields)) {
-            /** @var Collection $collection */
-            $collection = $this->collectionFactory->create();
-            $collection->getConnection()->insertOnDuplicate(
-                $collection->getTable(Queue::SUBSCRIPTION_PROFILE_QUEUE_TABLE),
-                $fields,
-                [Queue::MESSAGE, Queue::CREATED_AT, Queue::UPDATED_AT]
-            );
-            $itemIds = $collection->addFieldToFilter(
-                Queue::PROFILE_ORDER_ID,
-                ['in' => $relationIds]
-            )->getAllIds();
-        }
-
-        return $itemIds;
+        return $this->resourceQueue->insertItems($relationIds, $makeProcessed);
     }
 
     /**
      * @param int[]|int $ids
-     * @param string $status
-     * @param string $message
-     */
-    protected function makeStatus($ids, $status, $message = '')
-    {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!\is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getConnection()->update(
-            $collection->getMainTable(),
-            [
-                'status' => $status,
-                'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
-                'message' => $message,
-                'updated_at' => $this->date->gmtDate(),
-            ],
-            [Queue::ID . ' in (?)' => $ids]
-        );
-    }
-
-    /**
-     * @param int[]|int $ids
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @deprecated
+     * @see \TNW\Subscriptions\Model\ResourceModel\Queue::deleteIds
      */
     public function makeDelete($ids)
     {
-        if (empty($ids)) {
-            return;
-        }
-
-        if (!\is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        /** @var Collection $collection */
-        $collection = $this->collectionFactory->create();
-        $collection->getConnection()->delete(
-            $collection->getMainTable(),
-            [Queue::ID . ' in (?)' => $ids]
-        );
+        return $this->resourceQueue->deleteIds($ids);
     }
 
     /**
      * Changes status to running for queue items.
      *
      * @param array|int $ids
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function makeRunning($ids)
     {
-        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_RUNNING);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_RUNNING);
     }
 
     /**
@@ -293,10 +233,12 @@ class Manager
      *
      * @param array|int $ids
      * @param string $message
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function makeError($ids, $message)
     {
-        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message);
     }
 
     /**
@@ -304,10 +246,12 @@ class Manager
      *
      * @param array|int $ids
      * @param string $message
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function makeCompleted($ids, $message = '')
     {
-        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_COMPLETE, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_COMPLETE, $message);
     }
 
     /**
@@ -315,10 +259,12 @@ class Manager
      *
      * @param array|int $ids
      * @param string $message
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function makeSkipped($ids, $message = '')
     {
-        $this->makeStatus($ids, QueueStatus::QUEUE_STATUS_SKIPPED, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_SKIPPED, $message);
     }
 
     /**
