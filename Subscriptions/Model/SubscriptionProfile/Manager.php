@@ -698,10 +698,15 @@ class Manager
 
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
-            $quote->addProduct(
+            $quoteItem = $quote->addProduct(
                 $profileProduct->getMagentoProduct(),
                 $this->getProductAddRequest($profileProduct)
             );
+
+            $profileItemIds = $quoteItem->getData('profile_item_ids');
+            $profileItemIds[] = $profileProduct->getId();
+
+            $quoteItem->setData('profile_item_ids', $profileItemIds);
         }
 
         //Set shipping address
@@ -1018,6 +1023,7 @@ class Manager
      * @param Quote $quote
      * @param $quoteItems
      *
+     * @return SubscriptionProfileInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -1103,5 +1109,7 @@ class Manager
 
         $this->assignOrderToProfile($relation, $order);
         $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
+
+        return $profile;
     }
 }

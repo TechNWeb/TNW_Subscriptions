@@ -6,24 +6,19 @@
 
 namespace TNW\Subscriptions\Model\Sales\Total;
 
+use Magento\Quote\Api\Data\CartItemExtensionInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
-use Magento\Quote\Model\Quote\Item\AbstractItem;
-use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
+use TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem;
 
 /**
  * Subscription initial fee totals collector.
  */
 class InitialFee extends AbstractTotal
 {
-    /**
-     * Constants for subscription initial fee tax object.
-     */
-    const ITEM_TYPE = 'subs_initial_fee';
-    const ITEM_CODE = 'subs_initial_fee';
-
     /**
      * Subscription initial fee totals collector.
      * Adds initial fee to grand total amount (without taxes).
@@ -35,32 +30,23 @@ class InitialFee extends AbstractTotal
      * @param Total $total
      * @return $this
      */
-    public function collect(
-        Quote $quote,
-        ShippingAssignmentInterface $shippingAssignment,
-        Total $total
-    ) {
-        $items = $shippingAssignment->getItems();
-        if (!count($items) || !$quote->getId()) {
+    public function collect(Quote $quote, ShippingAssignmentInterface $shippingAssignment, Total $total)
+    {
+        if (!$shippingAssignment->getItems()) {
             return $this;
         }
+
         $totalInitialFee = 0;
         $baseTotalInitialFee = 0;
-        /** @var AbstractItem $item */
-        foreach ($items as $item) {
-            $associatedTaxables = $item->getAssociatedTaxables();
-            list($initialFee, $baseInitialFee) = $this->getItemInitialFees($item);
-            $totalInitialFee += $initialFee;
-            $baseTotalInitialFee += $baseInitialFee;
-            $associatedTaxables[] = [
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => self::ITEM_TYPE,
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_CODE => self::ITEM_TYPE,
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $initialFee,
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $baseInitialFee,
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_QUANTITY => 1,
-                CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TAX_CLASS_ID => $item->getProduct()->getTaxClassId(),
-            ];
-            $item->setAssociatedTaxables($associatedTaxables);
+
+        foreach ($shippingAssignment->getItems() as $item) {
+            $itemInitialFees = $this->getItemInitialFees($item);
+            if (null === $itemInitialFees) {
+                continue;
+            }
+
+            $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
+            $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
         }
 
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
@@ -72,21 +58,21 @@ class InitialFee extends AbstractTotal
     /**
      * Returns quote item subscription initial fees extension attribute.
      *
-     * @param AbstractItem $item
-     * @return array
+     * @param CartItemInterface $item
+     * @return QuoteItem
      */
-    private function getItemInitialFees(AbstractItem $item)
+    private function getItemInitialFees(CartItemInterface $item)
     {
-        $initialFee = 0;
-        $baseInitialFee = 0;
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
-            $baseInitialFee = $initialFees->getBaseSubsInitialFee();
+        $extensionAttributes = $item->getExtensionAttributes();
+        if (!$extensionAttributes instanceof CartItemExtensionInterface) {
+            return null;
         }
 
-        return [$initialFee, $baseInitialFee];
+        $initialFees = $extensionAttributes->getSubsInitialFees();
+        if (!$initialFees instanceof QuoteItem) {
+            return null;
+        }
+
+        return $initialFees;
     }
 }

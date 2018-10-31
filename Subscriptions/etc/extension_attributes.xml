@@ -8,22 +8,58 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\Quote\Api\Data\CartItemInterface">
         <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem">
-            <join reference_table="tnw_subscriptions_quote_item_extension_entity"
-                  join_on_field="item_id"
-                  reference_field="item_id"
-            >
+            <join reference_table="tnw_subscriptions_quote_item_extension_entity" join_on_field="item_id" reference_field="item_id">
                 <field>subs_initial_fee</field>
                 <field>base_subs_initial_fee</field>
             </join>
         </attribute>
     </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="subscription_initial_fee_refunded" type="float">
+            <join reference_table="tnw_subscriptions_order_extension_entity" join_on_field="entity_id" reference_field="entity_id">
+                <field>subscription_initial_fee_refunded</field>
+            </join>
+        </attribute>
+        <attribute code="base_subscription_initial_fee_refunded" type="float">
+            <join reference_table="tnw_subscriptions_order_extension_entity" join_on_field="entity_id" reference_field="entity_id">
+                <field>base_subscription_initial_fee_refunded</field>
+            </join>
+        </attribute>
+    </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem"/>
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem">
+            <join reference_table="tnw_subscriptions_order_item_extension_entity" join_on_field="item_id" reference_field="item_id">
+                <field>subs_initial_fee</field>
+                <field>base_subs_initial_fee</field>
+            </join>
+        </attribute>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\InvoiceItem"/>
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\InvoiceItem">
+            <join reference_table="tnw_subscriptions_invoice_item_extension_entity" join_on_field="entity_id" reference_field="item_id">
+                <field>subs_initial_fee</field>
+                <field>base_subs_initial_fee</field>
+            </join>
+        </attribute>
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\CreditmemoInterface">
+        <attribute code="subscription_initial_fee" type="float">
+            <join reference_table="tnw_subscriptions_creditmemo_extension_entity" join_on_field="entity_id" reference_field="entity_id">
+                <field>subscription_initial_fee</field>
+            </join>
+        </attribute>
+        <attribute code="base_subscription_initial_fee" type="float">
+            <join reference_table="tnw_subscriptions_creditmemo_extension_entity" join_on_field="entity_id" reference_field="entity_id">
+                <field>base_subscription_initial_fee</field>
+            </join>
+        </attribute>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\CreditmemoItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\CreditmemoItem"/>
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\CreditmemoItem">
+            <join reference_table="tnw_subscriptions_creditmemo_item_extension_entity" join_on_field="entity_id" reference_field="item_id">
+                <field>subs_initial_fee</field>
+                <field>base_subs_initial_fee</field>
+            </join>
+        </attribute>
     </extension_attributes>
 </config>

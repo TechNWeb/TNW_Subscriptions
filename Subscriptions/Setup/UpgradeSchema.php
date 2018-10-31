@@ -31,20 +31,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $setup->startSetup();
 
-        if (version_compare($context->getVersion(), "2.0.3", "<")) {
+        if (version_compare($context->getVersion(), '2.0.3', '<')) {
             $this->addInvoiceItemExtensionAttributeTable($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.4", "<")) {
+        if (version_compare($context->getVersion(), '2.0.4', '<')) {
             $this->addCreditmemoItemExtensionAttributeTable($setup);
             $this->addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.0.6", "<")) {
+        if (version_compare($context->getVersion(), '2.0.6', '<')) {
             $this->removeUniqueProductEntityKey($setup);
         }
 
-        if (version_compare($context->getVersion(), "2.1.0", "<")) {
+        if (version_compare($context->getVersion(), '2.1.0', '<')) {
             $this->addProductSubscriptionProfileAttributeTable($setup);
             $this->addProfilePaymentTable($setup);
             $this->dropProfileColumns($setup);
@@ -57,6 +57,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.1.7', '<')) {
             $this->addIsSubscriptionColumn($setup);
             $this->dropUniqueKeyProfileOrder($setup);
+            $this->createProfileItemSalesItemTable($setup);
+            $this->createOrderExtensionTable($setup);
+            $this->createCreditMemoExtensionTable($setup);
         }
 
         $setup->endSetup();
@@ -66,45 +69,29 @@ class UpgradeSchema implements UpgradeSchemaInterface
      * Create table 'tnw_subscriptions_invoice_item_extension_entity'.
      *
      * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
      */
     private function addInvoiceItemExtensionAttributeTable(SchemaSetupInterface $setup)
     {
-        if (!$setup->tableExists(SalesExtensionAttributesInterface::INVOICE_ITEM_EXTENSION_TABLE)) {
-            $table = $setup->getConnection()->newTable(
-                SalesExtensionAttributesInterface::INVOICE_ITEM_EXTENSION_TABLE
-            )->addColumn(
-                SalesExtensionAttributesInterface::MAGENTO_ITEM_ID,
-                Table::TYPE_INTEGER,
-                null,
-                [
-                    'identity' => true,
-                    'unsigned' => true,
-                    'nullable' => false,
-                    'primary' => true
-                ],
-                'Magento quote item ID'
-            )->addColumn(
-                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE,
-                Table::TYPE_DECIMAL,
-                '12,4',
-                [
-                    'nullable' => false,
-                    'default' => '0.0000'
-                ],
-                'Initial fee'
-            )->addColumn(
-                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE,
-                Table::TYPE_DECIMAL,
-                '12,4',
-                [
-                    'nullable' => false,
-                    'default' => '0.0000'
-                ],
-                'Base initial fee'
-            );
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_invoice_item_extension_entity'))
+            ->addColumn('item_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true
+            ], 'Magento quote item ID')
+            ->addColumn('subs_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000'
+            ], 'Initial fee')
+            ->addColumn('base_subs_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000'
+            ], 'Base initial fee');
 
-            $setup->getConnection()->createTable($table);
-        }
+        $setup->getConnection()->createTable($table);
     }
 
     /**
@@ -113,45 +100,29 @@ class UpgradeSchema implements UpgradeSchemaInterface
      * to table 'tnw_subscriptions_order_item_extension_entity'.
      *
      * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
      */
     private function addCreditmemoItemExtensionAttributeTable(SchemaSetupInterface $setup)
     {
-        if (!$setup->tableExists(SalesExtensionAttributesInterface::CREDITMEMO_ITEM_EXTENSION_TABLE)) {
-            $table = $setup->getConnection()->newTable(
-                SalesExtensionAttributesInterface::CREDITMEMO_ITEM_EXTENSION_TABLE
-            )->addColumn(
-                SalesExtensionAttributesInterface::MAGENTO_ITEM_ID,
-                Table::TYPE_INTEGER,
-                null,
-                [
-                    'identity' => true,
-                    'unsigned' => true,
-                    'nullable' => false,
-                    'primary' => true
-                ],
-                'Magento quote item ID'
-            )->addColumn(
-                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE,
-                Table::TYPE_DECIMAL,
-                '12,4',
-                [
-                    'nullable' => false,
-                    'default' => '0.0000'
-                ],
-                'Initial fee'
-            )->addColumn(
-                SalesExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE,
-                Table::TYPE_DECIMAL,
-                '12,4',
-                [
-                    'nullable' => false,
-                    'default' => '0.0000'
-                ],
-                'Base initial fee'
-            );
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_creditmemo_item_extension_entity'))
+            ->addColumn('item_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true
+            ], 'Magento quote item ID')
+            ->addColumn('subs_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000'
+            ], 'Initial fee')
+            ->addColumn('base_subs_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000'
+            ], 'Base initial fee');
 
-            $setup->getConnection()->createTable($table);
-        }
+        $setup->getConnection()->createTable($table);
     }
 
     /**
@@ -163,50 +134,43 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
     ) {
-        $setup->getConnection()->addColumn(
-            $setup->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
-            OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE_INVOICED,
-            [
+        $table = $setup->getTable('tnw_subscriptions_order_item_extension_entity');
+
+        $setup->getConnection()
+            ->addColumn($table, 'subs_initial_fee_invoiced', [
                 'type' => Table::TYPE_DECIMAL,
                 'length' => '12,4',
                 'nullable' => false,
                 'default' => '0.0000',
                 'comment' => 'Invoiced initial fee'
-            ]
-        );
-        $setup->getConnection()->addColumn(
-            $setup->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
-            OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED,
-            [
+            ]);
+
+        $setup->getConnection()
+            ->addColumn($table, 'base_subs_initial_fee_invoiced', [
                 'type' => Table::TYPE_DECIMAL,
                 'length' => '12,4',
                 'nullable' => false,
                 'default' => '0.0000',
                 'comment' => 'Base invoiced initial fee'
-            ]
-        );
-        $setup->getConnection()->addColumn(
-            $setup->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
-            OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED,
-            [
+            ]);
+
+        $setup->getConnection()
+            ->addColumn($table, 'subs_initial_fee_refunded', [
                 'type' => Table::TYPE_DECIMAL,
                 'length' => '12,4',
                 'nullable' => false,
                 'default' => '0.0000',
                 'comment' => 'Refunded initial fee'
-            ]
-        );
-        $setup->getConnection()->addColumn(
-            $setup->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE),
-            OrderItemExtensionAttributesInterface::EXT_ATTRIBUTE_BASE_INITIAL_FEE_REFUNDED,
-            [
+            ]);
+
+        $setup->getConnection()
+            ->addColumn($table, 'base_subs_initial_fee_refunded', [
                 'type' => Table::TYPE_DECIMAL,
                 'length' => '12,4',
                 'nullable' => false,
                 'default' => '0.0000',
                 'comment' => 'Base refunded initial fee'
-            ]
-        );
+            ]);
     }
 
     /**
@@ -218,12 +182,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function removeUniqueProductEntityKey(SchemaSetupInterface $setup)
     {
         $setup->getConnection()->dropIndex(
-            $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+            $setup->getTable('tnw_subscriptions_product_subscription_profile_entity'),
             $setup->getIdxName(
-                $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE),
+                $setup->getTable('tnw_subscriptions_product_subscription_profile_entity'),
                 [
-                    ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID,
-                    ProductSubscriptionProfile::MAGENTO_PRODUCT_ID
+                    'subscription_profile_id',
+                    'magento_product_id'
                 ]
             )
         );
@@ -240,23 +204,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
          * Create table 'customer_eav_attribute'
          */
         $table = $setup->getConnection()
-            ->newTable(
-                $setup->getTable('tnw_subscriptions_product_subscription_profile_eav_attribute')
-            )
-            ->addColumn(
-                'attribute_id',
-                \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
-                null,
-                ['unsigned' => true, 'nullable' => false, 'primary' => true],
-                'Attribute ID'
-            )
-            ->addColumn(
-                'is_visible_on_front',
-                \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
-                null,
-                ['unsigned' => true, 'nullable' => false, 'default' => '0'],
-                'Is Visible On Front'
-            )
+            ->newTable($setup->getTable('tnw_subscriptions_product_subscription_profile_eav_attribute'))
+            ->addColumn('attribute_id', Table::TYPE_SMALLINT, null, [
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true
+            ], 'Attribute ID')
+            ->addColumn('is_visible_on_front', Table::TYPE_SMALLINT, null, [
+                'unsigned' => true,
+                'nullable' => false,
+                'default' => '0'
+            ], 'Is Visible On Front')
             ->addForeignKey(
                 $setup->getFkName(
                     'tnw_subscriptions_product_subscription_profile_eav_attribute',
@@ -267,11 +225,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'attribute_id',
                 $setup->getTable('eav_attribute'),
                 'attribute_id',
-                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+                Table::ACTION_CASCADE
             )
-            ->setComment(
-                'Product Subscription Profile EAV Attribute Table'
-            );
+            ->setComment('Product Subscription Profile EAV Attribute Table');
 
         $setup->getConnection()
             ->createTable($table);
@@ -284,67 +240,51 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addProfilePaymentTable(SchemaSetupInterface $setup)
     {
-        $tableName = $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE);
-
-        if (!$setup->tableExists($tableName)) {
-            $table = $setup->getConnection()->newTable($tableName);
-
-            $table->addColumn(
-                SubscriptionProfilePaymentInterface::PAYMENT_ID,
-                Table::TYPE_INTEGER,
-                null,
-                ['identity' => true, 'nullable' => false, 'primary' => true, 'unsigned' => true],
-                'Payment ID'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::PROFILE_ID,
-                Table::TYPE_INTEGER,
-                null,
-                ['nullable' => false, 'unsigned' => true],
-                'Profile ID'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::ENGINE_CODE,
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                255,
-                ['nullable' => false],
-                'Engine Code'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::TOKEN_HASH,
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                128,
-                ['nullable' => true, 'default' => null],
-                'Token Hash'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::PAYMENT_ADDITIONAL_INFO,
-                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                null,
-                ['nullable' => true, 'default' => null],
-                'Payment Additional Info'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::CREATED_AT,
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-                null,
-                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
-                'Created at'
-            )->addColumn(
-                SubscriptionProfilePaymentInterface::UPDATED_AT,
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-                null,
-                ['nullable' => false, 'default' => Table::TIMESTAMP_INIT_UPDATE],
-                'Updated at'
-            )->addForeignKey(
-                $setup->getConnection()->getForeignKeyName(
-                    $tableName,
-                    SubscriptionProfilePaymentInterface::PROFILE_ID,
-                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
-                    SubscriptionProfile::ID
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_subscription_profile_payment'))
+            ->addColumn('payment_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'nullable' => false,
+                'primary' => true,
+                'unsigned' => true
+            ], 'Payment ID')
+            ->addColumn('subscription_profile_id', Table::TYPE_INTEGER, null, [
+                'nullable' => false,
+                'unsigned' => true
+            ], 'Profile ID')
+            ->addColumn('engine_code', Table::TYPE_TEXT, 255, [
+                'nullable' => false
+            ], 'Engine Code')
+            ->addColumn('token_hash', Table::TYPE_TEXT, 128, [
+                'nullable' => true,
+                'default' => null
+            ], 'Token Hash')
+            ->addColumn('payment_additional_info', Table::TYPE_TEXT, null, [
+                'nullable' => true,
+                'default' => null
+            ], 'Payment Additional Info')
+            ->addColumn('created_at', Table::TYPE_TIMESTAMP, null, [
+                'nullable' => false,
+                'default' => Table::TIMESTAMP_INIT
+            ], 'Created at')
+            ->addColumn('updated_at', Table::TYPE_TIMESTAMP, null, [
+                'nullable' => false,
+                'default' => Table::TIMESTAMP_INIT_UPDATE
+            ], 'Updated at')
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_subscription_profile_payment',
+                    'subscription_profile_id',
+                    'tnw_subscriptions_subscription_profile_entity',
+                    'entity_id'
                 ),
-                SubscriptionProfilePaymentInterface::PROFILE_ID,
-                $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
-                SubscriptionProfile::ID,
-                \Magento\Framework\DB\Adapter\AdapterInterface::FK_ACTION_CASCADE
+                'subscription_profile_id',
+                $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
+                'entity_id',
+                Table::ACTION_CASCADE
             );
-            $setup->getConnection()->createTable($table);
-        }
+
+        $setup->getConnection()->createTable($table);
     }
 
     /**
@@ -353,7 +293,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function dropProfileColumns(SchemaSetupInterface $setup)
     {
-        $subscriptionTable = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $subscriptionTable = $setup->getTable('tnw_subscriptions_subscription_profile_entity');
         $setup->getConnection()
             ->dropColumn($subscriptionTable, 'engine_code');
         $setup->getConnection()
@@ -370,7 +310,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addMessageTable(SchemaSetupInterface $setup)
     {
         $table = $setup->getConnection()
-            ->newTable('tnw_subscriptions_message')
+            ->newTable($setup->getTable('tnw_subscriptions_message'))
             ->addColumn('message_id', Table::TYPE_INTEGER, null, [
                 'identity' => true,
                 'unsigned' => true,
@@ -417,16 +357,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addIsSubscriptionColumn(SchemaSetupInterface $setup)
     {
-        $setup->getConnection()->addColumn(
-            $setup->getTable('quote'),
-            'is_tnw_subscription',
-            [
+        $setup->getConnection()
+            ->addColumn($setup->getTable('quote'), 'is_tnw_subscription', [
                 'type' => Table::TYPE_BOOLEAN,
                 'nullable' => false,
                 'default' => 0,
                 'comment' => 'Is TNW Subscription Quote'
-            ]
-        );
+            ]);
     }
 
     /**
@@ -439,5 +376,170 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $tableName,
             $setup->getIdxName($tableName, ['magento_order_id'])
         );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function createProfileItemSalesItemTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_profile_item_sales_item'))
+            ->addColumn('profile_item_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => true,
+                'default' => null,
+            ], 'Profile Item')
+            ->addColumn('quote_item_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => true,
+                'default' => null,
+            ], 'Quote Item')
+            ->addColumn('order_item_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => true,
+                'default' => null,
+            ], 'Order Item')
+            ->addIndex(
+                $setup->getIdxName(
+                    'tnw_subscriptions_profile_item_sales_item',
+                    ['profile_item_id', 'quote_item_id', 'order_item_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['profile_item_id', 'quote_item_id', 'order_item_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_profile_item_sales_item',
+                    'profile_item_id',
+                    'tnw_subscriptions_product_subscription_profile_entity',
+                    'entity_id'
+                ),
+                'profile_item_id',
+                $setup->getTable('tnw_subscriptions_product_subscription_profile_entity'),
+                'entity_id',
+                Table::ACTION_CASCADE
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_profile_item_sales_item',
+                    'quote_item_id',
+                    'quote_item',
+                    'item_id'
+                ),
+                'quote_item_id',
+                $setup->getTable('quote_item'),
+                'item_id',
+                Table::ACTION_CASCADE
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_profile_item_sales_item',
+                    'order_item_id',
+                    'sales_order_item',
+                    'item_id'
+                ),
+                'order_item_id',
+                $setup->getTable('sales_order_item'),
+                'item_id',
+                Table::ACTION_CASCADE
+            );
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function createOrderExtensionTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_order_extension_entity'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => false,
+            ], 'Profile Item')
+            ->addColumn('subscription_initial_fee_refunded', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Refunded initial fee')
+            ->addColumn('base_subscription_initial_fee_refunded', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Base refunded initial fee')
+            ->addIndex(
+                $setup->getIdxName(
+                    'tnw_subscriptions_order_extension_entity',
+                    ['entity_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['entity_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_order_extension_entity',
+                    'entity_id',
+                    'sales_order',
+                    'entity_id'
+                ),
+                'entity_id',
+                $setup->getTable('sales_order'),
+                'entity_id',
+                Table::ACTION_CASCADE
+            );
+
+        $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function createCreditMemoExtensionTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_creditmemo_extension_entity'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'unsigned' => true,
+                'nullable' => false,
+            ], 'Profile Item')
+            ->addColumn('subscription_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Initial fee')
+            ->addColumn('base_subscription_initial_fee', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => false,
+                'default' => '0.0000',
+            ], 'Base initial fee')
+            ->addIndex(
+                $setup->getIdxName(
+                    'tnw_subscriptions_creditmemo_extension_entity',
+                    ['entity_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['entity_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+            )
+            ->addForeignKey(
+                $setup->getFkName(
+                    'tnw_subscriptions_creditmemo_extension_entity',
+                    'entity_id',
+                    'sales_creditmemo',
+                    'entity_id'
+                ),
+                'entity_id',
+                $setup->getTable('sales_creditmemo'),
+                'entity_id',
+                Table::ACTION_CASCADE
+            );
+
+        $setup->getConnection()->createTable($table);
     }
 }

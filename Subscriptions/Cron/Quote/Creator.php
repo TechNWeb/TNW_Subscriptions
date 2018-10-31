@@ -122,7 +122,7 @@ class Creator extends Base
             }
 
             foreach ($cycles as $cycleDate) {
-                $quote = $this->processQuote($profile, $this->getEmptyQuote());
+                $quote = $this->processQuote($profile, $this->getEmptyQuote($profile));
                 $relations[] = $this->assignQuoteToProfile(
                     $profile,
                     $quote,
@@ -335,11 +335,14 @@ class Creator extends Base
     /**
      * Returns empty quote object.
      *
+     * @param SubscriptionProfileInterface $profile
+     *
      * @return Quote
      */
-    private function getEmptyQuote()
+    private function getEmptyQuote(SubscriptionProfileInterface $profile)
     {
-        return $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        return $this->quoteFactory->create(['data' => ['is_active' => false]])
+            ->assignCustomer($profile->getCustomer());
     }
 
     /**

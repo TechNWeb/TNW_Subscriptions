@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order;
 
 use Magento\Framework\DataObject;
@@ -16,6 +15,13 @@ use Magento\Sales\Model\Order\Item;
  */
 class Totals extends Template
 {
+    public function __construct(
+        Template\Context $context,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+    }
+
     /**
      * Get totals source object
      *
@@ -41,7 +47,7 @@ class Totals extends Template
             $total = new DataObject(
                 [
                     'code' => $this->getNameInLayout(),
-                    'label' => __('Initial Fee'),
+                    'label' => __('Initial Fee(s)'),
                     'value' => $initialFeeTotal,
                     'base_value' => $initialFeeBaseTotal
                 ]
@@ -67,8 +73,21 @@ class Totals extends Template
         $result = 0;
         $baseResult = 0;
         foreach ($items as $item) {
-            $result +=  $this->getItemInitialFee($item);
-            $baseResult += $this->getItemBaseInitialFee($item);
+            switch (true) {
+                case $item instanceof \Magento\Sales\Model\Order\Item:
+                    $qty = $item->getQtyOrdered();
+                    break;
+
+                case $item instanceof \Magento\Sales\Model\Order\Invoice\Item:
+                    $qty = $item->getQty();
+                    $item = $item->getOrderItem();
+                    break;
+                default:
+                    continue 2;
+            }
+
+            $result +=  $this->getItemInitialFee($item) * $qty;
+            $baseResult += $this->getItemBaseInitialFee($item) * $qty;
         }
 
         return [$result, $baseResult];

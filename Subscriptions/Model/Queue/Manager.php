@@ -97,6 +97,11 @@ class Manager
     private $quoteFactory;
 
     /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     */
+    private $relationResource;
+
+    /**
      * @param CollectionFactory $collectionFactory
      * @param Config $config
      * @param SubscriptionProfile\Manager $profileManager
@@ -122,7 +127,8 @@ class Manager
         ProfileStatus $profileStatus,
         \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
@@ -136,6 +142,7 @@ class Manager
         $this->resourceQueue = $resourceQueue;
         $this->timezone = $timezone;
         $this->quoteFactory = $quoteFactory;
+        $this->relationResource = $relationResource;
     }
 
     /**
@@ -388,6 +395,30 @@ class Manager
                 ->getEngine()
                 ->getCartManagement()
                 ->submit($quote);
+
+            $insertData = [];
+            foreach ($quote->getAllVisibleItems() as $item) {
+                $profileItemIds = $item->getData('profile_item_ids');
+                if (empty($profileItemIds)) {
+                    continue;
+                }
+
+                $orderItem = $order->getItemByQuoteItemId($item->getId());
+                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                    continue;
+                }
+
+                foreach ($profileItemIds as $profileItemId) {
+                    $insertData[] = [
+                        'profile_item_id' => $profileItemId,
+                        'quote_item_id' => $item->getId(),
+                        'order_item_id' => $orderItem->getItemId(),
+                    ];
+                }
+            }
+
+            // Save Items Relation
+            $this->relationResource->insertSales($insertData);
 
             foreach ($groupQueue as $queue) {
                 $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));

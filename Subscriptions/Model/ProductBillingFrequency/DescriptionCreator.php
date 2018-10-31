@@ -191,18 +191,21 @@ class DescriptionCreator
      * Returns initial fee from item.
      *
      * @param \Magento\Quote\Model\Quote\Item $item
-     * @return int
+     * @return float
      */
     private function getInitialFeeFromItem($item)
     {
-        $initialFees = $item->getExtensionAttributes()
-            ? $item->getExtensionAttributes()->getSubsInitialFees()
-            : null;
-        if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
+        $extensionAttributes = $item->getExtensionAttributes();
+        if (!$extensionAttributes instanceof \Magento\Quote\Api\Data\CartItemExtensionInterface) {
+            return 0;
         }
 
-        return !empty($initialFee) ? $initialFee : 0;
+        $subsInitialFees = $extensionAttributes->getSubsInitialFees();
+        if (!$subsInitialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem) {
+            return 0;
+        }
+
+        return $subsInitialFees->getSubsInitialFee() * $item->getQty();
     }
 
     /**
@@ -221,7 +224,7 @@ class DescriptionCreator
         $thenPhrase = '';
         $priceClasses = ['base-price'];
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = ($itemTotal + $initialFee)
+        $formattedPrice = ($itemTotal + $initialFee) > 0
             ? $this->formatPrice($itemTotal + $initialFee)
             : __('Free');
         $formattedPrice = $this->addContainer(
@@ -272,6 +275,7 @@ class DescriptionCreator
      * @param \Magento\Quote\Model\Quote\Item $quoteItem
      *
      * @return string
+     * @throws \Zend_Json_Exception
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {
