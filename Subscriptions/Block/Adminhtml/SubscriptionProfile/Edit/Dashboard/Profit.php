@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
@@ -17,9 +16,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 class Profit extends Template
 {
     /**
-     * @var SubscriptionProfile
+     * @var Registry
      */
-    private $subscriptionProfile;
+    private $registry;
 
     /**
      * Calculate different profit values for given subscription profile.
@@ -42,12 +41,14 @@ class Profit extends Template
         SubscriptionProfile\ProfitCalculator $profitCalculator,
         array $data = []
     ) {
-        $this->setTemplate('TNW_Subscriptions::subscription_profile/dashboard/profit.phtml');
-        if ($this->subscriptionProfile === null) {
-            $this->subscriptionProfile = $registry->registry('tnw_subscription_profile');
-        }
-        $this->profitCalculator = $profitCalculator;
         parent::__construct($context, $data);
+        $this->registry = $registry;
+        $this->profitCalculator = $profitCalculator;
+    }
+
+    public function subscriptionProfile()
+    {
+        return $this->registry->registry('tnw_subscription_profile');
     }
 
     /**
@@ -55,10 +56,21 @@ class Profit extends Template
      * As of today profit equals (product price - product cost) * product amount from paid quotes(has order).
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getAsOfTodayProfit()
     {
-        return $this->profitCalculator->getRenderedAsOfTodayProfit($this->subscriptionProfile);
+        return (float)$this->profitCalculator->getAsOfTodayProfit($this->subscriptionProfile());
+    }
+
+    /**
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getRenderedAsOfTodayProfit($includeContainer = true)
+    {
+        return $this->profitCalculator
+            ->getRenderedAsOfTodayProfit($this->subscriptionProfile(), $includeContainer);
     }
 
     /**
@@ -66,24 +78,35 @@ class Profit extends Template
      * Remaining profit equals (product price - product cost) * product amount form non paid quotes(has no order).
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRemainingProfit()
     {
-        return $this->profitCalculator->getRenderedRemainingProfit($this->subscriptionProfile);
+        return (float)$this->profitCalculator->getRemainingProfit($this->subscriptionProfile());
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getRenderedRemainingProfit($includeContainer = true)
+    {
+        return $this->profitCalculator
+            ->getRenderedRemainingProfit($this->subscriptionProfile(), $includeContainer);
     }
 
     /**
      * Get can hide Remaining profit row
-     * 
+     *
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getHideRemainingProfit()
     {
         return
             (
-                $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_COMPLETE
-                && floatval($this->profitCalculator->getRemainingProfit($this->subscriptionProfile)) === 0.0
+                $this->subscriptionProfile()->getStatus() == ProfileStatus::STATUS_COMPLETE
+                && empty($this->profitCalculator->getRemainingProfit($this->subscriptionProfile()))
             )
-            || $this->subscriptionProfile->getStatus() == ProfileStatus::STATUS_CANCELED;
+            || $this->subscriptionProfile()->getStatus() == ProfileStatus::STATUS_CANCELED;
     }
 }

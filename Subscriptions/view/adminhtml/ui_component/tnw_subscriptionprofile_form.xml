@@ -90,7 +90,7 @@
                     </argument>
                 </container>
                 <htmlContent name="html_content">
-                    <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Profit</argument>
+                    <block name="profit.chart" class="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\Profit" template="TNW_Subscriptions::subscription_profile/dashboard/profit.phtml" />
                 </htmlContent>
             </container>
         </fieldset>

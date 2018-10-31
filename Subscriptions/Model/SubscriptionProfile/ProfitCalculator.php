@@ -3,18 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
-use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Directory\Model\Currency;
-use Magento\Reports\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -28,23 +21,6 @@ class ProfitCalculator
     /** Profit types. */
     const AS_OF_TODAY = 'as_of_today';
     const REMAINING = 'remaining';
-
-    /**
-     * @var ProductCollectionFactory
-     */
-    private $productCollectionFactory;
-
-    /**
-     * @var QuoteItemCollectionFactory
-     */
-    private $quoteItemCollectionFactory;
-
-    /**
-     * Product list cache.
-     *
-     * @var ProductInterface[]
-     */
-    private $products;
 
     /**
      * @var float|int
@@ -74,21 +50,15 @@ class ProfitCalculator
     /**
      * ProfitCalculator constructor.
      *
-     * @param ProductCollectionFactory $productCollectionFactory
-     * @param QuoteItemCollectionFactory $quoteItemCollectionFactory
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Currency $currency
      */
     public function __construct(
-        ProductCollectionFactory $productCollectionFactory,
-        QuoteItemCollectionFactory $quoteItemCollectionFactory,
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Currency $currency
     ) {
-        $this->productCollectionFactory = $productCollectionFactory;
-        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
@@ -99,7 +69,9 @@ class ProfitCalculator
      * Total profit equals "as of today" profit + "remaining" profit.
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTotalProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -111,7 +83,9 @@ class ProfitCalculator
      *
      * @param SubscriptionProfile $subscriptionProfile
      * @param bool $addContainer
+     *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
     {
@@ -128,7 +102,9 @@ class ProfitCalculator
      * As of today profit equals (product price - product cost) * product amount from all paid quotes(has order).
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -143,12 +119,15 @@ class ProfitCalculator
      * Get rendered actual profit for today for given subscription profile.
      *
      * @param SubscriptionProfile $subscriptionProfile
+     * @param bool $includeContainer
+     *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
+    public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
         $profit = $this->getAsOfTodayProfit($subscriptionProfile);
-        return $this->renderPrice($profit, $subscriptionProfile);
+        return $this->renderPrice($profit, $subscriptionProfile, $includeContainer);
     }
 
     /**
@@ -156,7 +135,9 @@ class ProfitCalculator
      * Remaining profit equals (product price - product cost) * product amount from all non paid quotes(has no order).
      *
      * @param SubscriptionProfile $subscriptionProfile
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRemainingProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -171,153 +152,110 @@ class ProfitCalculator
      * Get rendered potential profit for given subscription profile.
      *
      * @param SubscriptionProfile $subscriptionProfile
+     * @param bool $includeContainer
+     *
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile)
+    public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
         $profit = $this->getRemainingProfit($subscriptionProfile);
-        return $this->renderPrice($profit, $subscriptionProfile);
+        return $this->renderPrice($profit, $subscriptionProfile, $includeContainer);
     }
 
     /**
      * Calculate profit for subscription profile depends on requested profit type.
      *
-     * @param SubscriptionProfile $subscriptionProfile
+     * @param SubscriptionProfile $profile
      * @param string $profitType
      * @return float|int
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getProfit(SubscriptionProfile $subscriptionProfile, $profitType)
+    private function getProfit(SubscriptionProfile $profile, $profitType)
     {
         $profit = 0;
-        $products = $this->getProducts($subscriptionProfile);
 
-        foreach ($products as $product) {
-            $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter(
-                    ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                    $product->getId()
-                )
-                ->addFilter(
-                    ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
-                    $subscriptionProfile->getBillingFrequencyId()
-                )
-                ->create();
+        $resource = $profile->getResource();
+        $connection = $resource->getConnection();
 
-            $recurringOptions = $this->recurringOptionRepository->getList($searchCriteria)->getItems();
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(
+                ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                array_map([$this, 'profileItemProductId'], $profile->getProducts()),
+                'in'
+            )
+            ->addFilter(ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID, $profile->getBillingFrequencyId())
+            ->create();
 
-            if (empty($recurringOptions)) {
+        $recurringOptions = $this->recurringOptionRepository
+            ->getList($searchCriteria)
+            ->getItems();
+
+        /** @var ProductSubscriptionProfileInterface $profileProduct */
+        foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $children = $profileProduct->getChildren();
+
+            if (!empty($children) &&
+                $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
+            ) {
+                $profileProduct = \reset($children);
+            }
+
+            $product = $profileProduct->getMagentoProduct();
+            $recurringOption = $this->searchRecurringOption($recurringOptions, $product->getId());
+
+            if (empty($recurringOption)) {
                 continue;
             }
 
+            $select = $connection->select()
+                ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
+                ->where('subscription_profile_id = ?', $profile->getId());
+
             switch ($profitType) {
                 case self::AS_OF_TODAY:
-                    $quoteIds = $this->getQuoteIds($subscriptionProfile, self::AS_OF_TODAY);
+                    $select->where('magento_order_id IS NOT NULL');
                     break;
+
                 case self::REMAINING:
                 default:
-                    $quoteIds = $this->getQuoteIds($subscriptionProfile, self::REMAINING);
+                    $select->where('magento_order_id IS NULL');
                     break;
             }
 
-            $amount = $this->getRequestedProductAmount($quoteIds, $product->getId());
-            $profit += (\reset($recurringOptions)->getPrice() - $product->getCost()) * $amount;
+            $qty = $profileProduct->getQty() * $connection->fetchOne($select);
+            $profit += ($recurringOption->getPrice() - $product->getCost()) * $qty;
         }
 
         return $profit;
     }
 
     /**
-     * Get products used in subscription profile.
+     * @param $recurringOptions
+     * @param $productId
      *
-     * @param SubscriptionProfile $subscriptionProfile
-     * @return ProductInterface[]
+     * @return ProductBillingFrequencyInterface|false
      */
-    private function getProducts(SubscriptionProfile $subscriptionProfile)
+    private function searchRecurringOption($recurringOptions, $productId)
     {
-        if ($this->products === null) {
-            $productIds = $this->getProductIds($subscriptionProfile);
-            $productCollection = $this->productCollectionFactory->create();
-            $productCollection->addAttributeToSelect('price');
-            $productCollection->addAttributeToSelect('cost');
-            $productCollection->addIdFilter($productIds);
-            $this->products = $productCollection->getItems();
-        }
-
-        return $this->products;
-    }
-
-    /**
-     * Get requested product qty for given quotes.
-     *
-     * @param array $quoteIds
-     * @param string $productId
-     * @return int
-     */
-    private function getRequestedProductAmount($quoteIds, $productId)
-    {
-        $quoteItemCollection = $this->quoteItemCollectionFactory->create();
-        $connection = $quoteItemCollection->getConnection();
-        $quoteItemCollection->addFieldToFilter('quote_id', ['in' => $quoteIds]);
-        $quoteItemCollection->addFieldToFilter('product_id', ['eq' => $productId]);
-        $quoteItemCollection->getSelect()
-            ->reset(\Zend_Db_Select::COLUMNS)
-            ->columns(new \Zend_Db_Expr('SUM(qty)'));
-        $quoteItemCollection->getSelect()->group('product_id');
-        $amount = $connection->fetchOne($quoteItemCollection->getSelect());
-
-        return (int) $amount;
-    }
-
-    /**
-     * Get magento product ids used in given subscription profile.
-     *
-     * @param SubscriptionProfile $subscriptionProfile
-     * @return array
-     */
-    private function getProductIds(SubscriptionProfile $subscriptionProfile)
-    {
-        $productIds = [];
-        /** @var ProductSubscriptionProfileInterface $profileProduct */
-        foreach ($subscriptionProfile->getProducts() as $profileProduct) {
-            if ($profileProduct->getChildren()) {
-                continue;
+        $filteredRecurringOptions = array_filter(
+            $recurringOptions,
+            function (ProductBillingFrequencyInterface $frequency) use ($productId) {
+                return (int)$frequency->getMagentoProductId() === (int)$productId;
             }
-            $productIds[] = $profileProduct->getMagentoProductId();
-        }
+        );
 
-        return $productIds;
+        return \reset($filteredRecurringOptions);
     }
 
     /**
-     * Get quote ids for given subscription profile depends on profit type.
+     * @param ProductSubscriptionProfileInterface $item
      *
-     * @param SubscriptionProfile $subscriptionProfile
-     * @param string $type
-     * @return array
+     * @return null|string
      */
-    private function getQuoteIds(SubscriptionProfile $subscriptionProfile, $type)
+    private function profileItemProductId(ProductSubscriptionProfileInterface $item)
     {
-        $resource = $subscriptionProfile->getResource();
-        $sql = $resource->getConnection()
-            ->select()->from(
-                $resource->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE),
-                [SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID]
-            )->where(SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID . '= ?', $subscriptionProfile->getId());
-        if ($type === self::AS_OF_TODAY) {
-            $sql->join(
-                ['sales_order' => $resource->getTable('sales_order')], 'sales_order.entity_id = '
-                . $resource->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)
-                . '.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
-                []
-            )->where(
-                new \Zend_Db_Expr(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is not null')
-            )->where('sales_order.' . OrderInterface::STATUS . ' != ?', Order::STATE_CANCELED);
-        } elseif ($type === self::REMAINING) {
-            $sql->where(new \Zend_Db_Expr(SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is null'));
-        }
-
-        return $resource->getConnection()->fetchCol($sql);
+        return $item->getMagentoProductId();
     }
 
     /**

@@ -11,20 +11,49 @@
 
 <div class="admin__fieldset profit-content">
     <div class="admin__profile-dashboard-profit-diagram">
-    <!--todo: add actual diagram.-->
+        <canvas id="profile-dashboard-profit-diagram"></canvas>
     </div>
-    <div class="admin__profile-dashboard-profit-diagram-legend">
-        <div class="admin__profile-dashboard-profit-diagram-legend-text">
-            <div class="profit-color profit-for-today-color"></div>
-            <span class="profit-text"><?php echo  __('%1 as of today', $block->getAsOfTodayProfit())?></span>
-        </div>
-        <?php if (!$block->getHideRemainingProfit()): ?>
-        <div class="admin__profile-dashboard-profit-diagram-legend-text">
-            <div class="profit-color profit-remaining-color"></div>
-            <span class="profit-text"><?php echo  __('%1 remaining', $block->getRemainingProfit())?></span>
-        </div>
-        <?php endif ?>
-    </div>
+    <script type="text/javascript">
+        require([
+            'TNW_Subscriptions/js/chart.min'
+        ], function(chart) {
+            var ctx = document.getElementById("profile-dashboard-profit-diagram").getContext('2d');
+            new chart(ctx, {
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        data: [
+                            <?= $block->getAsOfTodayProfit() ?>,
+                            <?php if (!$block->getHideRemainingProfit()): ?>
+                            <?= $block->getRemainingProfit() ?>
+                            <?php endif ?>
+                        ],
+                        backgroundColor: [
+                            "#b6d7a8",
+                            "#fffdcc"
+                        ],
+                        borderColor: [
+                            '#756859',
+                            '#756859'
+                        ],
+                        borderWidth: 1
+                    }],
+                    labels: [
+                        '<?php echo  __('%1 as of today', $block->getRenderedAsOfTodayProfit(false))?>',
+                        <?php if (!$block->getHideRemainingProfit()): ?>
+                        '<?php echo  __('%1 remaining', $block->getRenderedRemainingProfit(false))?>'
+                        <?php endif ?>
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            });
+        });
+    </script>
 </div>
 <?php if (!$block->getHideRemainingProfit()): ?>
 <span class="admin__field-note"><?php echo __('* The graph above accounts for a single product from the subscription profile.') ?></span>
