@@ -48,7 +48,7 @@
                     <item name="label" xsi:type="string" translate="true">Qty</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
-                    <item name="dataScope" xsi:type="string">qty</item>
+                    <item name="dataScope" xsi:type="string">subscribe_qty</item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-greater-than-zero" xsi:type="boolean">true</item>
                         <item name="required-entry" xsi:type="boolean">true</item>

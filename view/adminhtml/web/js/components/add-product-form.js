@@ -205,7 +205,7 @@ define(
                 if (rowIndex !== undefined){
                     grid.externalSource().set(
                         'data.items.' + rowIndex + '.input_qty',
-                        this.getModalForm().configurableData.qty
+                        this.getModalForm().configurableData.subscribe_qty
                     );
                     grid.externalSource().set(
                         'data.items.' + rowIndex + '.actions.view.label',
