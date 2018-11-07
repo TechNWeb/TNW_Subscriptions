@@ -1038,4 +1038,29 @@
             <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
         </arguments>
     </virtualType>
+
+    <virtualType name="Magento\Quote\Model\Api\SearchCriteria\CollectionProcessor\QuoteFilterProcessor" type="Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor">
+        <arguments>
+            <argument name="customFilters" xsi:type="array">
+                <item name="entity_id" xsi:type="object">TNW\Subscriptions\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor\QuoteEntityFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Quote\Model\Api\SearchCriteria\QuoteCollectionProcessor" type="Magento\Framework\Api\SearchCriteria\CollectionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="filters" xsi:type="object">Magento\Quote\Model\Api\SearchCriteria\CollectionProcessor\QuoteFilterProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Quote\Model\QuoteRepository">
+        <arguments>
+            <argument name="collectionProcessor" xsi:type="object">Magento\Quote\Model\Api\SearchCriteria\QuoteCollectionProcessor</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\QuoteRepository">
+        <arguments>
+            <argument name="collectionProcessor" xsi:type="object">Magento\Quote\Model\Api\SearchCriteria\QuoteCollectionProcessor</argument>
+        </arguments>
+    </type>
 </config>
