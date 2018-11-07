@@ -43,10 +43,19 @@
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" xsi:type="string" translate="true"></item>
+                <item name="label" xsi:type="string" translate="true" />
                 <item name="sortOrder" xsi:type="number">10</item>
             </item>
         </argument>
+        <field name="subscribe_active">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataScope" xsi:type="string">subscribe_active</item>
+                    <item name="formElement" xsi:type="string">hidden</item>
+                    <item name="value" xsi:type="string">1</item>
+                </item>
+            </argument>
+        </field>
         <field name="billing_frequency">
             <argument name="data" xsi:type="array">
                 <item name="multiple" xsi:type="boolean">false</item>
@@ -56,8 +65,7 @@
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">radioset</item>
                     <item name="dataScope" xsi:type="string">billing_frequency</item>
-                    <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend
-                        field-wide</item>
+                    <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend field-wide</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>

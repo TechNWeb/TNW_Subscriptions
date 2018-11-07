@@ -100,8 +100,7 @@ class ConfigurableForm extends AbstractDataProvider
         $this->pool = $pool;
         $this->formContext = $formContext;
         $this->scopeName = $scope ? $scope : self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM .'.'.  self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
     /**
@@ -133,7 +132,7 @@ class ConfigurableForm extends AbstractDataProvider
             }
         }
 
-        $data[self::FORM_DATA_VALUE]['qty'] = $qtyToShow;
+        $data[self::FORM_DATA_VALUE]['subscribe_qty'] = $qtyToShow;
 
         return $data;
     }
