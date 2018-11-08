@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Framework\App\RequestInterface;
@@ -13,11 +12,8 @@ use Magento\Customer\Model\Customer;
 use Magento\Customer\Api\AddressMetadataInterface;
 use Magento\Customer\Model\Attribute;
 use Magento\Customer\Model\AttributeMetadataDataProvider;
-use Magento\Customer\Model\ResourceModel\AddressRepository;
-use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Ui\Component\Form;
 use Magento\Customer\Model\Address\Mapper as AddressMapper;
-use Magento\Customer\Model\Customer\Mapper as CustomerMapper;
 use Magento\Framework\Json\Encoder;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
@@ -129,28 +125,11 @@ class SummaryAddressForm extends AbstractDataProvider
     private $addressAttributes;
 
     /**
-     * @var CustomerRepository
-     */
-    private $customerRepository;
-
-    /**
-     * @var AddressRepository
-     */
-    private $addressRepository;
-
-    /**
      * Converts Address Service Data Object to an array.
      *
      * @var AddressMapper
      */
     private $addressMapper;
-
-    /**
-     * Converts Customer Object to an array.
-     *
-     * @var CustomerMapper
-     */
-    private $customerMapper;
 
     /**
      * @var SubscriptionProfileRepositoryInterface
@@ -173,10 +152,7 @@ class SummaryAddressForm extends AbstractDataProvider
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param AttributeMetadataDataProvider $attributeMetadataDataProvider
-     * @param CustomerRepository $customerRepository
-     * @param AddressRepository $addressRepository
      * @param AddressMapper $addressMapper
-     * @param CustomerMapper $customerMapper
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param RequestInterface $request
      * @param Encoder $encoder
@@ -191,10 +167,7 @@ class SummaryAddressForm extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         AttributeMetadataDataProvider $attributeMetadataDataProvider,
-        CustomerRepository $customerRepository,
-        AddressRepository $addressRepository,
         AddressMapper $addressMapper,
-        CustomerMapper $customerMapper,
         SubscriptionProfileRepositoryInterface $profileRepository,
         RequestInterface $request,
         Encoder $encoder,
@@ -203,16 +176,12 @@ class SummaryAddressForm extends AbstractDataProvider
         array $data = []
     ) {
         $this->attributeMetadataDataProvider = $attributeMetadataDataProvider;
-        $this->customerRepository = $customerRepository;
-        $this->addressRepository = $addressRepository;
         $this->addressMapper = $addressMapper;
-        $this->customerMapper = $customerMapper;
         $this->profileRepository = $profileRepository;
         $this->request = $request;
         $this->jsonEncoder = $encoder;
         $this->isShipping = $isShipping;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
-
     }
 
     /**
@@ -222,30 +191,16 @@ class SummaryAddressForm extends AbstractDataProvider
     {
         $data =  [];
         $addressId = $this->getAddressId();
-        if ($addressId) {
-            $dataObject = $this->addressRepository->getById($addressId);
-            $dataArray = $this->addressMapper->toFlatArray($dataObject);
-        } else {
-            $dataArray = $this->addressMapper->toFlatArray($this->getProfileAddress()->exportCustomerAddress());
-        }
+
+        $dataArray = $this->addressMapper->toFlatArray($this->getProfileAddress()->exportCustomerAddress());
         if (count($dataArray)) {
-            $data = array_replace_recursive(
-                $data,
-                $this->getAddressData($dataArray, !$addressId)
-            );
+            $data = array_replace_recursive($data, $this->getAddressData($dataArray, true));
         }
-        $data = array_replace_recursive(
-            $data,
-            $this->modifyAddressIdData($addressId)
-        );
-        if (!$addressId) {
-            if (!isset($data[$this->getAddressDataFieldSetdataScope()]['country_id']) ||
-                !$data[$this->getAddressDataFieldSetdataScope()]['country_id']) {
-                $data = array_replace_recursive(
-                    $data,
-                    $this->modifyCountryIdData()
-                );
-            }
+
+        $data = array_replace_recursive($data, $this->modifyAddressIdData($addressId));
+
+        if (empty($data[$this->getAddressDataFieldSetdataScope()]['country_id'])) {
+            $data = array_replace_recursive($data, $this->modifyCountryIdData());
         }
 
         $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
