@@ -113,6 +113,11 @@ class CreateProfile extends BaseCreate
     private $profileStatus;
 
     /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     */
+    private $relationResource;
+
+    /**
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param Address $addressCreator
@@ -137,7 +142,8 @@ class CreateProfile extends BaseCreate
         MessageHistoryLogger $messageHistoryLogger,
         QueueManager $queueManager,
         QuoteGenerator $quoteGenerator,
-        ProfileStatus $profileStatus
+        ProfileStatus $profileStatus,
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
     ) {
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -149,6 +155,7 @@ class CreateProfile extends BaseCreate
         $this->queueManager = $queueManager;
         $this->quoteGenerator = $quoteGenerator;
         $this->profileStatus = $profileStatus;
+        $this->relationResource = $relationResource;
 
         parent::__construct($context, $session);
     }
@@ -537,6 +544,7 @@ class CreateProfile extends BaseCreate
         $profiles = [];
         $customer = $this->customerCreator->prepareCustomer();
 
+        $itemsRelationData = [];
         /** @var ModelQuote $subQuote */
         foreach ($this->getSubQuotes() as $subQuote) {
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
@@ -555,6 +563,7 @@ class CreateProfile extends BaseCreate
 
             try {
                 // Process profile
+                /** @var \Magento\Sales\Model\Order $order */
                 $order = $this->profileManager->processProfile($subQuote);
             } catch (\Exception $e) {
                 $success = array_map(function (SubscriptionProfileInterface $profile) {
@@ -624,12 +633,34 @@ class CreateProfile extends BaseCreate
                 ['order' => $order, 'quote' => $subQuote]
             );
 
+            /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
+            foreach ($profile->getProducts() as $product) {
+                $quoteItemId = $product->getData('quote_item_id');
+                if (empty($quoteItemId)) {
+                    continue;
+                }
+
+                $orderItem = $order->getItemByQuoteItemId($quoteItemId);
+                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                    continue;
+                }
+
+                $itemsRelationData[] = [
+                    'profile_item_id' => $product->getId(),
+                    'quote_item_id' => $quoteItemId,
+                    'order_item_id' => $orderItem->getId()
+                ];
+            }
+
             //Generate quote for next payment.
             $this->quoteGenerator->generateProfileQuotes($profile, 1);
 
             $profiles[] = $profile;
             //TODO add here email sending
         }
+
+        // Save Items Relation
+        $this->relationResource->insertSales($itemsRelationData);
 
         return $profiles;
     }
