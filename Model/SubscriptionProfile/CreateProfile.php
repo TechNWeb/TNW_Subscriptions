@@ -217,6 +217,8 @@ class CreateProfile extends BaseCreate
      */
     public function addToSubscription(array $productData)
     {
+        $productData['subscribe_active'] = true;
+
         $this->productModifier->reset();
         $result = false;
         $this->setSubQuotes($this->getSession()->getSubQuotes());
