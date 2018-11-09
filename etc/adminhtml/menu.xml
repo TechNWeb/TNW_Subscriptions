@@ -158,7 +158,7 @@
              action="tnw_subscriptions/message/view"
              title="Message Log"
              translate="title"
-             module="TNW_Salesforce"
+             module="TNW_Subscriptions"
              sortOrder="10"
              parent="TNW_Subscriptions::tools"
              resource="TNW_Subscriptions::tools_message"/>
