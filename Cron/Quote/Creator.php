@@ -122,7 +122,10 @@ class Creator extends Base
             }
 
             foreach ($cycles as $cycleDate) {
-                $quote = $this->processQuote($profile, $this->getEmptyQuote($profile));
+                $quote = $this->getEmptyQuote($profile);
+                $this->cartRepository->save($quote);
+
+                $quote = $this->processQuote($profile, $quote);
                 $relations[] = $this->assignQuoteToProfile(
                     $profile,
                     $quote,

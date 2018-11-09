@@ -172,7 +172,6 @@ abstract class Base implements ProcessInterface
      */
     protected function processQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
-        $this->cartRepository->save($quote);
         $this->profileManager->populateQuoteData($quote, $profile);
         $this->cartRepository->save($quote);
 
