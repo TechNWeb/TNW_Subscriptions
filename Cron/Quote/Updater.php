@@ -50,14 +50,22 @@ class Updater extends Base
             foreach ($this->getProfiles($websiteId) as $profile) {
                 $this->context->messageDebug("Update Quotes by Profile:\n%s", $profile);
                 try {
-                    foreach ($this->getProfileQuotes($profile) as $profileQuote) {
+                    foreach ($this->getProfileQuotes($profile) as $quoteId) {
+                        /** @var \Magento\Quote\Model\Quote $profileQuote */
+                        $profileQuote = $this->cartRepository->get($quoteId);
+
                         $this->context->messageDebug(
                             "Quote. Data Quote:\n%s\nData Quote Items:\n%s",
                             $profileQuote,
                             $profileQuote->getItemsCollection()
                         );
 
+                        // Clear
                         $this->prepareQuote($profileQuote);
+                        $this->cartRepository->save($profileQuote);
+
+                        // Fill
+                        $profileQuote = $this->cartRepository->get($quoteId);
                         $this->processQuote($profile, $profileQuote);
 
                         $this->context->messageDebug(
@@ -85,31 +93,22 @@ class Updater extends Base
      * Returns future profile quotes.
      *
      * @param SubscriptionProfileInterface $profile
-     * @return Quote[]
+     * @return int[]
      */
     private function getProfileQuotes(SubscriptionProfileInterface $profile)
     {
-        $result = [];
         $relations = $this->relationManager->getNextProfileRelation($profile, true);
-        $relations = $relations ?: [];
-        $quoteIds = array_map(
-            function (ProfileRelation $relation) {
-                return $relation->getMagentoQuoteId();
-            },
-            $relations
-        );
-        if (!empty($quoteIds)){
-            $this->criteriaBuilder->addFilter(
-                SubscriptionProfileInterface::ID,
-                $quoteIds,
-                'in'
-            );
-            /** @var SearchCriteria $searchCriteria */
-            $searchCriteria = $this->criteriaBuilder->create();
-            $result = $this->cartRepository->getList($searchCriteria)->getItems();
-        }
+        return array_map([$this, 'quoteIdByProfileRelation'], $relations ?: []);
+    }
 
-        return $result;
+    /**
+     * @param ProfileRelation $relation
+     *
+     * @return null|string
+     */
+    private function quoteIdByProfileRelation(ProfileRelation $relation)
+    {
+        return $relation->getMagentoQuoteId();
     }
 
     /**
