@@ -328,7 +328,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getShippingAddress()
     {
         $result = null;
-        $addresses = $this->getAddresses() ? $this->getAddresses() : [];
+        $addresses = $this->getAddresses() ?: [];
         foreach ($addresses as $address) {
             if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_SHIPPING) {
                 $result = $address;
@@ -345,7 +345,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getBillingAddress()
     {
         $result = null;
-        $addresses = $this->getAddresses() ? $this->getAddresses() : [];
+        $addresses = $this->getAddresses() ?: [];
         foreach ($addresses as $address) {
             if ($address->getAddressType() === SubscriptionProfileAddressInterface::ADDRESS_TYPE_BILLING) {
                 $result = $address;
