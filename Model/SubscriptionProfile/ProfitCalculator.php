@@ -210,7 +210,11 @@ class ProfitCalculator
 
             $select = $connection->select()
                 ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-                ->where('subscription_profile_id = ?', $profile->getId());
+                ->where('subscription_profile_id = ?', $profile->getId())
+                ->where($connection->prepareSqlCondition('scheduled_at', [
+                    'from' => $profile->getStartDate(),
+                    'date' => true
+                ]));
 
             switch ($profitType) {
                 case self::AS_OF_TODAY:
