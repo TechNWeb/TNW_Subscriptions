@@ -122,10 +122,14 @@ class Creator extends Base
             }
 
             foreach ($cycles as $cycleDate) {
+                // Create empty cart
                 $quote = $this->getEmptyQuote($profile);
                 $this->cartRepository->save($quote);
 
+                // Fill cart
+                $quote = $this->cartRepository->get($quote->getId());
                 $quote = $this->processQuote($profile, $quote);
+
                 $relations[] = $this->assignQuoteToProfile(
                     $profile,
                     $quote,
