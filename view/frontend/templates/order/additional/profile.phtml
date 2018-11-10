@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+/** @var TNW\Subscriptions\Block\Sales\Order\Additional\Profile $block */
+?>
+<?php if($profileIds = $block->getProfileIds()) : ?>
+<div class="sub-profile-option">
+    <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b><br>
+    <?php foreach ($profileIds as $profileId) :?>
+    <span><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></span>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>

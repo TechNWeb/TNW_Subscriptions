@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+/** @var TNW\Subscriptions\Block\Sales\Order\InitialFee $block */
+?>
+
+<tr class="totals-initial-fee">
+    <th <?= /* @escapeNotVerified */ $block->getLabelProperties() ?> scope="row">
+        <?= /* @escapeNotVerified */ __('Initial Fee(s)') ?>
+    </th>
+    <td <?= /* @escapeNotVerified */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtml(__('Initial Fee(s)')) ?>">
+        <?= /* @escapeNotVerified */ $block->getOrder()->formatPrice($block->calculateInitialFee()) ?>
+    </td>
+</tr>

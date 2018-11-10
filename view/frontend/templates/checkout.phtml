@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/** @var $block \TNW\Subscriptions\Block\Checkout */
+?>
+<div id="tnw-subscriptions-checkout" data-role="loader-container" data-bind="scope:'checkout'" class="tnw-subscriptions-checkout-container">
+    <div id="tnw-subscriptions-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
+        <div class="loader">
+            <img src="<?php echo $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif')) ?>"
+                 alt="<?php /* @noEscape */ echo __('Loading...') ?>"
+                 style="position: absolute;">
+        </div>
+    </div>
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#tnw-subscriptions-checkout": {
+                "Magento_Ui/js/core/app": <?php /* @noEscape */ echo $block->getJsLayout();?>
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        window.checkoutConfig = <?= /* @escapeNotVerified */ $block->getSerializedCheckoutConfig() ?>;
+        // Create aliases for customer.js model from customer module
+        window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+        window.customerData = window.checkoutConfig.customerData;
+        require([
+            'mage/url',
+            'Magento_Ui/js/block-loader'
+        ], function(url, blockLoader) {
+            blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+            return url.setBaseUrl('<?= /* @escapeNotVerified */ $block->getBaseUrl() ?>');
+        });
+
+        require.config({
+            map: {
+                '*': {
+                    'Magento_Checkout/js/action/place-order': 'TNW_Subscriptions/js/checkout/action/place-order',
+                    'Magento_Checkout/js/model/resource-url-manager': 'TNW_Subscriptions/js/checkout/model/resource-url-manager',
+                    'Magento_Checkout/js/checkout-data': 'TNW_Subscriptions/js/checkout/data',
+                    'Magento_Checkout/js/model/full-screen-loader': 'TNW_Subscriptions/js/checkout/model/full-screen-loader',
+                    'Magento_Checkout/js/model/shipping-save-processor/default': 'TNW_Subscriptions/js/checkout/model/shipping/save/processor',
+                    'Magento_Checkout/js/action/get-payment-information': 'TNW_Subscriptions/js/checkout/action/get-payment-information'
+                }
+            }
+        });
+    </script>
+</div>

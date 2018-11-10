@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info">
+            <!--<block class="TNW\Subscriptions\Block\Cart\Url\Add" name="subscription.checkout.cart.url.add"/>-->
+        </referenceBlock>
+        <referenceContainer name="product.info.form.content">
+            <block name="product.info.addtocart"  as="addtocart" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
+                <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="product.info.options.wrapper.bottom" >
+            <block name="product.info.addtocart.additional" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.additional.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
+                <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.additional.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
+            </block>
+        </referenceBlock>
+
+        <referenceContainer name="product.info.price">
+            <block class="Magento\Catalog\Pricing\Render" name="product.subscription.price.final" before="product.price.final">
+                <arguments>
+                    <argument name="price_render" xsi:type="string">product.price.render.default</argument>
+                    <argument name="price_type_code" xsi:type="string">subscription_price</argument>
+                    <argument name="zone" xsi:type="string">item_view</argument>
+                    <argument name="css_classes" xsi:type="string">subscription-price-container</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

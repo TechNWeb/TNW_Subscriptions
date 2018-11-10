@@ -1,0 +1,43 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \TNW\Subscriptions\Block\Checkout\Success */ ?>
+<div class="checkout-success">
+    <?php if ($block->getData('order_id')):?>
+        <?php if ($block->getData('can_view_order')) :?>
+            <ul>
+                <li><span><?= __('Order %1 placed', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->escapeHtml($block->getViewOrderUrl()), $block->escapeHtml($block->getOrderId()))) ?></span></li>
+                <?php foreach ($block->getProfileIds() as $profileId): ?>
+                    <li>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($block->getEditUrl($profileId)), $block->escapeHtml($block->getEditLabel($profileId)))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php  else :?>
+            <ul>
+                <li><span><?= __('Order %1 placed', $block->escapeHtml($block->getOrderId())) ?></span></li>
+                <?php foreach ($block->getProfileIds() as $profileId): ?>
+                    <li>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', $block->escapeHtml($block->getEditLabel($profileId))); ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <p></p>
+        <?php endif;?>
+        <p><?= /* @escapeNotVerified */ __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
+    <?php endif;?>
+
+    <?= $block->getAdditionalInfoHtml() ?>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <a class="action primary continue" href="<?= /* @escapeNotVerified */ $block->getContinueUrl() ?>"><span><?= /* @escapeNotVerified */ __('Continue Shopping') ?></span></a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<tr class="row" data-bind="click: element.selectShippingMethod.bind(element)">
+    <td class="col col-method">
+        <!-- ko ifnot: method.error_message -->
+        <input type="radio" class="radio"
+               data-bind="attr: {
+                 'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code,
+                 'checked': element.rates().length == 1 || element.isSelected
+               }, value: method.carrier_code + '_' + method.method_code, checked: element.isSelected" />
+        <!-- /ko -->
+    </td>
+    <td class="col col-price">
+        <!-- ko foreach: element.getRegion('price') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </td>
+    <td class="col col-method" data-bind="attr: {'id': 'label_method_' + method.method_code + '_' + method.carrier_code}, text: method.method_title"></td>
+    <td class="col col-carrier" data-bind="attr: {'id': 'label_carrier_' + method.method_code + '_' + method.carrier_code}, text: method.carrier_title"></td>
+</tr>
+<!-- ko if: method.error_message -->
+<tr class="row row-error">
+    <td class="col col-error" colspan="4">
+        <div role="alert" class="message error">
+            <div data-bind="text: method.error_message"></div>
+        </div>
+        <span class="no-display">
+            <input type="radio" data-bind="attr: {'value' : method.method_code, 'id': 's_method_' + method.method_code}" />
+        </span>
+    </td>
+</tr>
+<!-- /ko -->

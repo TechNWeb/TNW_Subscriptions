@@ -1,0 +1,157 @@
+<?xml version="1.0" ?>
+<!--
+/**
+* Copyright © 2018 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface" type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Quote"/>
+    <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
+
+    <type name="TNW\Subscriptions\Block\Cart">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Block\Cart\Grid">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </type>
+    <virtualType name="TS\CustomerData\Checkout\Cart" type="Magento\Checkout\CustomerData\Cart">
+        <arguments>
+            <argument name="checkoutCart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Session</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="tnw-subscriptions-subscription-cart" xsi:type="string">TS\CustomerData\Checkout\Cart</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Checkout\CustomerData\AbstractItem">
+        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\CustomerData\AbstractItem" />
+    </type>
+
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="shipping_address" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingAddressModifier</item>
+                    <item name="sortOrder" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="braintree" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Braintree</item>
+                    <item name="sortOrder" xsi:type="number">25</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details">
+        <arguments>
+            <argument name="requestProfileIdField" xsi:type="string">entity_id</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Wishlist\CustomerData\Wishlist">
+        <plugin name="subscriptions_reordered_products"
+                type="TNW\Subscriptions\Plugin\CustomerData\Wishlist"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Attributes">
+        <arguments>
+            <argument name="editAllow" xsi:type="boolean">false</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TS\Model\Model\Checkout\CompositeConfigProvider" type="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="checkout_default_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\DefaultConfigProvider</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Block\Checkout">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="addressFormAttributes" xsi:type="object">TNW\Subscriptions\Block\Checkout\AddressProcessor</item>
+            </argument>
+            <argument name="compositeConfigProvider" xsi:type="object">TS\Model\Model\Checkout\CompositeConfigProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Add">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Configure">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\Delete">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\UpdateItemOptions">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Cart\UpdatePost">
+        <arguments>
+            <argument name="cart" xsi:type="object">TS\Model\Checkout\Cart</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Checkout\Index">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="checkoutHelper" xsi:type="object">TS\Helper\Checkout\Data</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Controller\Checkout\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+            <argument name="successValidator" xsi:type="object">TS\Model\Checkout\Session\SuccessValidator</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Block\Checkout\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,47 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php /** @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\Creditmemo\InitialFee $block */
+$_source = $block->getSource();
+$baseInitialFee = $block->getInitialFeeAmount() * 1; ?>
+<?php if ($_source): ?>
+    <tr class="initial-fee-container">
+        <td class="label"><?= /* @escapeNotVerified */ $block->getInitialFeeLabel() ?><div id="subscription_initial_fee_adv"></div></td>
+        <td>
+            <input type="text"
+                   name="creditmemo[subscription_initial_fee]"
+                    <?php if (!$baseInitialFee):?>
+                        <?php echo ' disabled="disabled"'; ?>
+                    <?php endif;?>
+                   value="<?php /* @escapeNotVerified */ echo $baseInitialFee ?>"
+                   class="input-text admin__control-text not-negative-amount"
+                   id="subscription_initial_fee"/>
+            <script>
+                require(['prototype'], function() {
+                    var subscriptionInitialFee = $('subscription_initial_fee');
+
+                    if (subscriptionInitialFee.length) {
+                        subscriptionInitialFee.advaiceContainer = $('subscription_initial_fee_adv');
+                        unblockSubmit('subscription_initial_fee');
+                    }
+
+                    /**
+                     * Adds subscription initial fee bindings for submit button
+                     *
+                     * @param {String} id
+                     */
+                    function unblockSubmit(id) {
+                        $(id).observe('focus', function(event) {
+                            if ($$('button[class="scalable update-button disabled"]').size() > 0) {
+                                enableElements('submit-button');
+                            }
+                        });
+                    }
+                });
+            </script>
+        </td>
+    </tr>
+<?php endif; ?>

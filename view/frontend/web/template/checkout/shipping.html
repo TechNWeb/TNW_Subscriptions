@@ -1,0 +1,58 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
+    <div class="step-title" data-role="title"  data-bind="i18n: 'Shipping Address'"></div>
+    <div id="checkout-step-shipping" class="step-content" data-role="content">
+        <!-- ko if: (!quoteIsVirtual) -->
+            <!-- ko foreach: getRegion('customer-email') -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        <!--/ko-->
+        <!-- ko foreach: getRegion('address-list') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <!-- ko foreach: getRegion('address-list-additional-addresses') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <!-- Address form pop up -->
+        <!-- ko if: (!isFormInline) -->
+        <button type="button" class="action action-show-popup" data-bind="click: showFormPopUp, visible: !isNewAddressAdded()">
+            <span data-bind="i18n: 'New Address'"></span>
+        </button>
+        <div id="tsc-new-shipping-address" data-bind="visible: isFormPopUpVisible()">
+            <!--ko template: shippingFormTemplate--><!--/ko-->
+        </div>
+        <!--/ko-->
+
+        <!-- ko foreach: getRegion('before-form') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <!-- Inline address form -->
+        <!-- ko if: isFormInline -->
+            <!-- ko template: shippingFormTemplate --><!-- /ko -->
+        <!--/ko-->
+    </div>
+</li>
+
+<!--Shipping method template-->
+<li id="shipping-method" class="checkout-shipping-method" data-bind="fadeVisible: visible(), blockLoader: isLoading">
+    <div class="checkout-shipping-method">
+        <div class="step-title" data-role="title" data-bind="i18n: 'Shipping Methods'"></div>
+        <div id="checkout-step-shipping_method" class="step-content methods-shipping" data-role="content">
+            <!-- ko if: rates().length -->
+            <form id="co-shipping-method-form" class="form" novalidate="novalidate">
+                <!-- ko template: shippingMethodListTemplate --><!-- /ko -->
+            </form>
+            <!-- /ko -->
+            <!-- ko ifnot: rates().length -->
+            <div class="no-quotes-block" data-bind="i18n: 'Sorry, no quotes are available for this order at this time'"></div>
+            <!-- /ko -->
+        </div>
+    </div>
+</li>

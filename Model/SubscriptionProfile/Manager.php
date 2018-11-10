@@ -1,0 +1,1115 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Model\SubscriptionProfile;
+
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SimpleDataObjectConverter;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Payment\Model\Config as PaymentConfig;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item;
+use Magento\Quote\Model\Quote\Payment;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\Source\ShippingMethods;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
+use TNW\Subscriptions\Model\SubscriptionProfileFactory;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use Magento\Framework\DataObject;
+
+/**
+ * Class Manager
+ */
+class Manager
+{
+    /**
+     * Subscription profile.
+     *
+     * @var SubscriptionProfileInterface
+     */
+    private $profile;
+
+    /**
+     * Engine for subscription profile processing.
+     *
+     * @var EngineInterface
+     */
+    private $engine;
+
+    /**
+     * Pool with available engines.
+     *
+     * @var EnginePool
+     */
+    private $enginePool;
+
+    /**
+     * Repository for saving/retrieving subscription profiles.
+     *
+     * @var SubscriptionProfileRepository
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * Repository for retrieving billing Frequencies.
+     *
+     * @var BillingFrequencyRepositoryInterface
+     */
+    private $frequencyRepository;
+
+    /**
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
+     * Factory for creating profile addresses.
+     *
+     * @var AddressFactory
+     */
+    private $profileAddressFactory;
+
+    /**
+     * Profile product manager.
+     *
+     * @var ProductManager
+     */
+    private $productManager;
+
+    /**
+     * Profile relation manager.
+     *
+     * @var OrderRelationManager
+     */
+    private $orderRelationManager;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var SubscriptionProfileFactory
+     */
+    private $subscriptionProfileFactory;
+
+    /**
+     * Quote repository
+     *
+     * @var CartRepositoryInterface
+     */
+    private $quoteRepository;
+
+    /**
+     * Search criteria builder
+     *
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var ShippingMethods
+     */
+    private $shippingMethods;
+
+    /**
+     * @var MessageHistoryLogger
+     */
+    private $historyLogger;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var PaymentConfig
+     */
+    private $paymentConfig;
+
+    /**
+     * @var PaymentRepository
+     */
+    private $paymentRepository;
+
+    /**
+     * @var \TNW\Subscriptions\Model\ResourceModel\Queue
+     */
+    private $resourceQueue;
+
+    /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
+     * @var DataObject\Factory
+     */
+    private $dataObjectFactory;
+
+    /**
+     * @param EnginePool $enginePool
+     * @param SubscriptionProfileRepository $subscriptionProfileRepository
+     * @param PaymentRepository $paymentRepository
+     * @param SubscriptionProfileFactory $subscriptionProfileFactory
+     * @param BillingFrequencyRepositoryInterface $frequencyRepository
+     * @param DataObjectHelper $dataObjectHelper
+     * @param AddressFactory $profileAddressFactory
+     * @param ProductManager $productManager
+     * @param OrderRelationManager $orderRelationManager
+     * @param RequestInterface $request
+     * @param CartRepositoryInterface $quoteRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ShippingMethods $shippingMethods
+     * @param MessageHistoryLogger $historyLogger
+     * @param ScopeConfigInterface $scopeConfig
+     * @param PaymentConfig $paymentConfig
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param ProfileStatus $profileStatus
+     */
+    public function __construct(
+        EnginePool $enginePool,
+        SubscriptionProfileRepository $subscriptionProfileRepository,
+        PaymentRepository $paymentRepository,
+        SubscriptionProfileFactory $subscriptionProfileFactory,
+        BillingFrequencyRepositoryInterface $frequencyRepository,
+        DataObjectHelper $dataObjectHelper,
+        AddressFactory $profileAddressFactory,
+        ProductManager $productManager,
+        OrderRelationManager $orderRelationManager,
+        RequestInterface $request,
+        CartRepositoryInterface $quoteRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ShippingMethods $shippingMethods,
+        MessageHistoryLogger $historyLogger,
+        ScopeConfigInterface $scopeConfig,
+        PaymentConfig $paymentConfig,
+        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
+        ProfileStatus $profileStatus,
+        \Magento\Framework\DataObject\Factory $dataObjectFactory
+    ) {
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
+        $this->subscriptionProfileFactory = $subscriptionProfileFactory;
+        $this->enginePool = $enginePool;
+        $this->frequencyRepository = $frequencyRepository;
+        $this->dataObjectHelper = $dataObjectHelper;
+        $this->profileAddressFactory = $profileAddressFactory;
+        $this->productManager = $productManager;
+        $this->orderRelationManager = $orderRelationManager;
+        $this->request = $request;
+        $this->quoteRepository = $quoteRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->shippingMethods = $shippingMethods;
+        $this->historyLogger = $historyLogger;
+        $this->scopeConfig = $scopeConfig;
+        $this->paymentConfig = $paymentConfig;
+        $this->paymentRepository = $paymentRepository;
+        $this->resourceQueue = $resourceQueue;
+        $this->profileStatus = $profileStatus;
+        $this->dataObjectFactory = $dataObjectFactory;
+    }
+
+    /**
+     * @return SubscriptionProfileInterface
+     */
+    public function getProfile()
+    {
+        if (!$this->profile) {
+            $this->profile = $this->getEmptyProfile();
+        }
+
+        return $this->profile;
+    }
+
+    /**
+     * @param SubscriptionProfileInterface $profile
+     * @return $this
+     */
+    public function setProfile($profile)
+    {
+        $this->reset();
+        $this->profile = $profile;
+
+        return $this;
+    }
+
+    /**
+     * Load profile by id
+     *
+     * @param $profileId
+     * @return null|SubscriptionProfileInterface
+     */
+    public function loadProfile($profileId)
+    {
+        /** @var SubscriptionProfileInterface $model */
+        $model = null;
+        if ($profileId) {
+            try {
+                $model = $this->subscriptionProfileRepository->getById($profileId);
+                $this->setProfile($model);
+            } catch (\Exception $e) {
+                $model = null;
+            }
+        }
+
+        return $model;
+    }
+
+    /**
+     * Load profile from request by name
+     *
+     * @param $requestFieldName
+     * @return null|SubscriptionProfileInterface
+     */
+    public function loadProfileFromRequest($requestFieldName)
+    {
+        $profileId = (int)$this->request->getParam($requestFieldName, 0);
+        return $this->loadProfile($profileId);
+    }
+
+    /**
+     * Returns empty subscription profile object.
+     *
+     * @return SubscriptionProfileInterface
+     */
+    public function getEmptyProfile()
+    {
+        return $this->subscriptionProfileFactory->create();
+    }
+
+    /**
+     * Resets internal variables.
+     *
+     * @return $this
+     */
+    public function reset()
+    {
+        $this->profile = null;
+        $this->engine = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns engine for current subscription profile.
+     *
+     * @return EngineInterface
+     */
+    public function getEngine()
+    {
+        if (!$this->engine) {
+            $engineCode = $this->getProfile()->getPayment()->getEngineCode();
+            /** @var EngineInterface $engine */
+            $this->engine = $this->enginePool->getEngineByCode($engineCode);
+            $this->engine->setProfile($this->getProfile());
+        }
+
+        return $this->engine;
+    }
+
+    /**
+     * Saves subscription profile.
+     *
+     * @return SubscriptionProfileInterface
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     */
+    public function saveProfile()
+    {
+        $profile = $this->getProfile();
+        $this->subscriptionProfileRepository->save($profile);
+
+        $payment = $profile->getPayment()
+            ->setProfileId($profile->getId());
+        $this->paymentRepository->save($payment);
+
+        return $profile;
+    }
+
+    /**
+     * Sets to profile status "Holded".
+     */
+    public function setHoldedStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_HOLDED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Active".
+     */
+    public function setActiveStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_ACTIVE);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Suspended".
+     */
+    public function setSuspendedStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_SUSPENDED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Trial".
+     */
+    public function setTrialStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Canceled".
+     */
+    public function setCanceledStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_CANCELED);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Pending".
+     */
+    public function setPendingStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_PENDING);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Complete".
+     */
+    public function setCompleteStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_COMPLETE);
+        return $this;
+    }
+
+    /**
+     * Sets to profile status "Past Due".
+     */
+    public function setPastDueStatus()
+    {
+        $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
+        return $this;
+    }
+
+    /**
+     * Engine profile processing.
+     *
+     * @param Quote $quote
+     * @return OrderInterface
+     */
+    public function processProfile(Quote $quote)
+    {
+        return $this->getEngine()->processProfile($quote);
+    }
+
+    /**
+     * Processes payment method data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processPaymentMethod($requestData)
+    {
+        $engine = $this->getEngineFromRequestData($requestData);
+        if ($engine) {
+            $types = $this->paymentConfig->getCcTypes();
+            $additionalInfoOld = $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
+            $oldEngine = $this->getProfile()->getPayment()->getEngineCode();
+            $this->getProfile()->getPayment()->setEngineCode($engine);
+            $this->getEngine()->processProfileByRequestData($requestData);
+            $additionalInfo = $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
+            $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
+            $ccType = $ccType ? $types[$ccType] : $ccType;
+            $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
+            $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
+
+            if (strcasecmp($oldEngine, $engine) !== 0) {
+                if ($ccType) {
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                        $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                    $message .= '<br/>';
+                    $message .= __('Credit Card type was added <b>%1</b>', $ccType);
+                    $message .= '<br/>';
+                    $message .= __('Credit Card number was added <b>%1</b>', sprintf('XXXX%s', $ccNumber));
+                } else {
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                        $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                }
+
+                $this->historyLogger->log($message, $this->getProfile()->getId());
+            } else {
+                $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
+                $ccTypeOld = $ccTypeOld ? $types[$ccTypeOld] : $ccTypeOld;
+                if (strcasecmp($ccType, $ccTypeOld) !== 0) {
+                    $message = __('Card type was changed from <b>%1</b> to <b>%2</b>', $ccTypeOld, $ccType);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+                $ccNumberOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_last_4'] : null;
+                if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
+                    $message = __('Credit Card number was changed to <b>%1</b>', sprintf('XXXX%s', $ccNumber));
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+
+                $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
+                if (strcasecmp($ccExpOld, $ccExp) !== 0) {
+                    $message = __('Exp. Date was changed to <b>%1</b>', $ccExp);
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+
+                $ccVeri = $this->propertyAdditionalInfo($additionalInfo, 'cc_cid');
+                $ccVeriOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_cid');
+                if (strcasecmp($ccVeriOld, $ccVeri) !== 0) {
+                    $message = __('Card Verification Number was changed');
+                    $this->historyLogger->log($message, $this->getProfile()->getId());
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $additionalInfo
+     * @param $property
+     * @return mixed|null
+     */
+    private function propertyAdditionalInfo($additionalInfo, $property)
+    {
+        if (empty($additionalInfo)) {
+            return null;
+        }
+
+        if (is_string($additionalInfo)) {
+            $additionalInfo = (array)json_decode($additionalInfo);
+        }
+
+        if (empty($additionalInfo[$property])) {
+            return null;
+        }
+
+        return $additionalInfo[$property];
+    }
+
+    /**
+     * Processes shipping method data
+     *
+     * @param $requestData
+     * @return $this
+     */
+    public function processShippingMethod($requestData)
+    {
+        $shippingMethod = $this->getShippingMethodFromRequestData($requestData);
+        if ($shippingMethod) {
+            $this->getProfile()->setShippingMethod($shippingMethod);
+            $quote = $this->getNextQuote();
+            $shippingDescription = '';
+            if ($quote) {
+                $shippingMethodOptions = $this->shippingMethods->getShippingMethodOptions($quote, false);
+                foreach ($shippingMethodOptions as $shippingMethodOption) {
+                    if ($shippingMethodOption['value'] == $shippingMethod) {
+                        $shippingDescription = $shippingMethodOption['label'];
+                    }
+                }
+            }
+
+            $oldShippingDescription = $this->getProfile()->getShippingDescription();
+            $this->getProfile()->setShippingDescription($shippingDescription);
+
+            if (strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
+                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription,
+                    $shippingDescription);
+                $this->historyLogger->log($message, $this->getProfile()->getId());
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Assigns order to profile.
+     *
+     * @param SubscriptionProfileOrderInterface $relation
+     * @param OrderInterface $order
+     * @return null|SubscriptionProfileOrderInterface
+     */
+    public function assignOrderToProfile(
+        SubscriptionProfileOrderInterface $relation,
+        OrderInterface $order
+    ) {
+        $relation->setMagentoOrderId($order->getId());
+        return $this->orderRelationManager->saveRelation($relation);
+    }
+
+    /**
+     * Assigns quote to profile.
+     *
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     * @param null|string $date
+     * @return SubscriptionProfileOrderInterface
+     * @throws LocalizedException
+     */
+    public function assignQuoteToProfile(
+        Quote $quote,
+        SubscriptionProfileInterface $profile,
+        $date = null
+    ) {
+        if (!$date) {
+            $date = date_create()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        }
+
+        $relation = $this->orderRelationManager
+            ->getNewProfileOrderRelation()
+            ->setSubscriptionProfileId($profile->getId())
+            ->setMagentoQuoteId($quote->getId())
+            ->setScheduledAt($date);
+        return $this->orderRelationManager->saveRelation($relation);
+    }
+
+    /**
+     * Set data to profile from quote.
+     *
+     * @param Quote $quote
+     * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
+     * @param null|\DateTime $date
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Json_Exception
+     */
+    public function populateProfileData(Quote $quote, $quoteItems, $date = null)
+    {
+        $request = $this->getUniqueBuyRequest($quoteItems);
+        if (empty($request)) {
+            return $this;
+        }
+
+        $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
+        $startDate = $this->getFullStartDate($request['start_on'], $date);
+
+        $this->getProfile()
+            ->setCustomerId($quote->getCustomerId())
+            ->setWebsiteId($quote->getStore()->getWebsiteId())
+            ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
+            ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
+            ->setIsVirtual($quote->getIsVirtual())
+            ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
+            ->setTerm($request['term'])
+            ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
+            ->setStartDate($startDate)
+            ->setBillingFrequencyId($frequency->getId())
+            ->setFrequency($frequency->getFrequency())
+            ->setUnit($frequency->getUnit())
+            ->setStatus(ProfileStatus::STATUS_PENDING)
+            ->setTrialStartDate(null)
+            ->setTrialLength($request['trial_period'])
+            ->setTrialLengthUnit($request['trial_unit_id'])
+            ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
+
+        $this->getProfile()->getPayment()
+            ->setEngineCode($quote->getPayment()->getMethod());
+
+        //set trial start date to profile
+        if ($request['is_trial']) {
+            $this->getProfile()
+                ->setTrialStartDate($startDate)
+                ->setStartDate($this->calculateStartDate());
+
+            //set status "trial" if trial period starts immediately
+            if (strtotime($startDate) <= time()) {
+                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+            }
+        }
+
+        $profileProducts = $this->productManager->populateProductsData($quoteItems);
+        $profileChildProducts = $this->productManager->populateChildProductsData($quoteItems, $profileProducts);
+        $profileAddress = $this->populateAddressesData($quote);
+
+        $this->getProfile()
+            ->setAddresses($profileAddress)
+            ->setProducts(array_merge($profileProducts, $profileChildProducts));
+
+        return $this;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     *
+     * @throws LocalizedException
+     * @throws \Zend_Json_Exception
+     */
+    public function populateQuoteData(Quote $quote, SubscriptionProfileInterface $profile)
+    {
+        if (!$quote->getId()) {
+            throw new LocalizedException(__('Quote not saved'));
+        }
+
+        $this->setProfile($profile);
+
+        //Deactivate quote
+        $quote->setIsActive(false);
+        $quote->setData('ignore_old_qty', true);
+        $quote->setData('is_super_mode', true);
+        $quote->setData('scheduled', true);
+
+        //Set store
+        $quote->setStore(
+            $profile->getWebsite()->getDefaultStore()
+        );
+
+        //Set currency
+        $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
+
+        //Set customer
+        if (!$quote->getCustomerId()) {
+            $quote->assignCustomer($profile->getCustomer());
+        }
+
+        //Add products
+        foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $quoteItem = $quote->addProduct(
+                $profileProduct->getMagentoProduct(),
+                $this->getProductAddRequest($profileProduct)
+            );
+
+            $profileItemIds = $quoteItem->getData('profile_item_ids');
+            $profileItemIds[] = $profileProduct->getId();
+
+            $quoteItem->setData('profile_item_ids', $profileItemIds);
+        }
+
+        //Set shipping address
+        $quote->getShippingAddress()->addData(
+            $profile->getShippingAddress()->getData()
+        );
+        $quote->getShippingAddress()->setCustomerId(
+            $profile->getCustomerId()
+        );
+
+        //Set billing address
+        $quote->getBillingAddress()->addData(
+            $profile->getBillingAddress()->getData()
+        );
+        $quote->getBillingAddress()->setCustomerId(
+            $profile->getCustomerId()
+        );
+
+        // Set payment method
+        $quote->getPayment()
+            ->importData($this->getEngine()->getPaymentInfo($profile))
+            ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
+        //Set shipping method
+        $quote->getShippingAddress()
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->setShippingMethod($profile->getShippingMethod());
+
+        $quote->setTotalsCollectedFlag(false);
+        $quote->collectTotals();
+    }
+
+    /**
+     * Returns request for adding product to subscription quote.
+     *
+     * @param ProductSubscriptionProfileInterface $profileProduct
+     *
+     * @return DataObject
+     * @throws \Zend_Json_Exception
+     */
+    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct)
+    {
+        $data = [
+            'custom_price' => $profileProduct->getUnitPrice(),
+            'qty' => $profileProduct->getQty(),
+            Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
+                Create::UNIQUE => [
+                    'use_preset_qty' => $profileProduct->getTnwSubscrUnlockPresetQty(),
+                ],
+                Create::NON_UNIQUE => [
+                    'current_preset_qty_price' => $profileProduct->getPrice(),
+                ],
+                Create::FULL_REQUEST_PARAM_NAME => false,
+            ]
+        ];
+
+        $productType = $profileProduct->getMagentoProduct()->getTypeId();
+        switch ($productType) {
+            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                break;
+
+            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                $data = $this->addConfigurableOptions($profileProduct, $data);
+                break;
+
+            default:
+                throw new \InvalidArgumentException(__('Unsupported product type -' . $productType));
+        }
+
+        return $this->dataObjectFactory->create($data);
+    }
+
+    /**
+     * Adds conf. options to buy request.
+     *
+     * @param ProductSubscriptionProfileInterface $profileProduct
+     * @param array $data
+     *
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \Zend_Json_Exception
+     */
+    private function addConfigurableOptions(ProductSubscriptionProfileInterface $profileProduct, array $data)
+    {
+        $options = [];
+        /** @var ProductSubscriptionProfileInterface $child */
+        foreach ($profileProduct->getChildren() as $child) {
+            $options[] = \Zend_Json::decode($child->getCustomOptions()) ?: [];
+        }
+
+        if (empty($options)) {
+            throw new \InvalidArgumentException(__('Custom options must be set.')->render());
+        }
+
+        $data['super_attribute'] = array_replace(...$options);
+
+        return $data;
+    }
+
+    /**
+     * Sets payment information for a profile depending on the engine code.
+     *
+     * @param Payment $payment
+     * @return $this
+     */
+    public function populatePaymentData(Payment $payment)
+    {
+        $data = $this->getEngine()->getProfilePaymentInfo($payment);
+        foreach ($data as $key => $value) {
+            $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
+            $this->getProfile()->getPayment()->$method($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns next profile relation
+     *
+     * @return null|SubscriptionProfileOrderInterface
+     */
+    public function getNextProfileRelation()
+    {
+        return $this->orderRelationManager->getNextProfileRelation($this->getProfile());
+    }
+
+    /**
+     * Returns next profile relation
+     *
+     * @return null|Quote
+     */
+    public function getNextQuote()
+    {
+        $quote = null;
+        $nextProfileRelation = $this->getNextProfileRelation();
+        if ($nextProfileRelation) {
+            $quoteId = $nextProfileRelation->getMagentoQuoteId();
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(Quote::KEY_ENTITY_ID, $quoteId)->create();
+            $quotes = $this->quoteRepository->getList($searchCriteria)->getItems();
+            if (count($quotes)) {
+                $quote = reset($quotes);
+            }
+        }
+        return $quote;
+    }
+
+    /**
+     * Handles messages for subscription edit form
+     *
+     * @return array
+     */
+    public function handleMessages()
+    {
+        $messages = [];
+        /** @var SubscriptionProfile $profile */
+        $profile = $this->getProfile();
+        if ($profile->getNeedRecollect()) {
+            $messages[] = [
+                'index' => 'index = subscription_details_message',
+                'message' => $profile->getShippingBillingChangesMadeMessageForSubscriptionDetails()
+            ];
+        }
+        if ($profile->getProductNeedRecollect()) {
+            $messages[] = [
+                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
+                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
+            ];
+            $messages[] = [
+                'index' => 'index = profit_message',
+                'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        return $messages;
+    }
+
+    /**
+     * Returns list of profile addresses created from billing and shipping addresses.
+     *
+     * @param Quote $quote
+     * @return array
+     */
+    private function populateAddressesData(Quote $quote)
+    {
+        /** @var SubscriptionProfileAddressInterface $profileBillingAddress */
+        $profileBilling = $this->profileAddressFactory->create();
+        $this->dataObjectHelper->populateWithArray(
+            $profileBilling,
+            $quote->getBillingAddress()->toArray(),
+            SubscriptionProfileAddressInterface::class
+        );
+        /** @var SubscriptionProfileAddressInterface $profileShipping */
+        $profileShipping = $this->profileAddressFactory->create();
+        $this->dataObjectHelper->populateWithArray(
+            $profileShipping,
+            $quote->getShippingAddress()->toArray(),
+            SubscriptionProfileAddressInterface::class
+        );
+
+        return [
+            $profileBilling,
+            $profileShipping
+        ];
+    }
+
+    /**
+     * Returns unique subscription data from  buy request.
+     *
+     * @param Quote\Item[] $quoteItems
+     *
+     * @return array|null
+     * @throws \Zend_Json_Exception
+     */
+    private function getUniqueBuyRequest(array $quoteItems)
+    {
+        /** @var Item $item */
+        $item = reset($quoteItems);
+        if (!$item instanceof \Magento\Quote\Model\Quote\Item) {
+            return null;
+        }
+
+        return \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+    }
+
+    /**
+     * Calculates start date of subscription when trial period is set.
+     *
+     * @return null|string
+     * @throws LocalizedException
+     */
+    private function calculateStartDate()
+    {
+        $result = null;
+
+        if ($this->getProfile()->getTrialStartDate()) {
+            $startDate = new \DateTime($this->getProfile()->getTrialStartDate());
+
+            switch ($this->getProfile()->getTrialLengthUnit()) {
+                case TrialLengthUnitType::DAYS:
+                    $intervalUnit = 'D';
+                    break;
+                case TrialLengthUnitType::MONTHS:
+                    $intervalUnit = 'M';
+                    break;
+                default:
+                    throw new LocalizedException(__('Undefined trial length unit type.'));
+            }
+
+            $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
+            $result = $startDate->add(new \DateInterval($expression))
+                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns full start date.
+     *
+     * @param string $startOn
+     * @param null|\DateTime $date
+     * @return string
+     */
+    private function getFullStartDate($startOn, $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $startDate = new \DateTime($startOn);
+        //Add hours, minutes, and seconds to start date
+        $expression = 'PT' . $date->format('H') . 'H'
+            . $date->format('i') . 'M'
+            . $date->format('s') . 'S';
+        $startDate->add(new \DateInterval($expression));
+
+        return $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+    }
+
+    /**
+     * Returns engine code form request data
+     *
+     * @param array $requestData
+     * @return int|null|string
+     */
+    public function getEngineFromRequestData(array $requestData)
+    {
+        $engine = null;
+        $paymentPostData = $requestData['payment'] ?? [];
+        foreach ($paymentPostData as $code => $methodData) {
+            if ($methodData['method']) {
+                $engine = $code;
+                break;
+            }
+        }
+        return $engine;
+    }
+
+    /**
+     * Returns shipping method code form request data
+     *
+     * @param array $requestData
+     * @return int|null|string
+     */
+    public function getShippingMethodFromRequestData(array $requestData)
+    {
+        return $requestData['shipping_method_id'] ?? null;
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param Quote $quote
+     * @param $quoteItems
+     *
+     * @return SubscriptionProfileInterface
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems)
+    {
+        /** @var OrderPaymentInterface $orderPayment */
+        $orderPayment = $order->getPayment();
+        $quotePayment = $quote->getPayment()
+            ->addData([
+                'cc_type' => $orderPayment->getCcType(),
+                'cc_last_4' => $orderPayment->getCcLast4(),
+                'cc_exp_month' => $orderPayment->getCcExpMonth(),
+                'cc_exp_year' => $orderPayment->getCcExpYear(),
+            ]);
+
+        $this
+            ->reset()
+            ->populateProfileData($quote, $quoteItems)
+            ->populatePaymentData($quotePayment);
+
+        $profile = $this->getProfile();
+
+        //TODO: Необходимо использовать Vault Payment
+        if (($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
+            ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
+        ) {
+            /** @var $paymentToken PaymentTokenInterface */
+            $profile->getPayment()->setPaymentToken($paymentToken->getGatewayToken());
+        }
+
+        $oldStatus = $profile->getStatus();
+
+        $status = $this->profileStatus::STATUS_ACTIVE;
+        if ($profile->getTrialStartDate()) {
+            $startDate = $profile->getStartDate();
+            if (\date_create()->diff(\date_create($startDate))->invert === 0) {
+                $status = $this->profileStatus::STATUS_TRIAL;
+            }
+        }
+
+        $profile->setStatus($status);
+
+        // Save profile
+        $this->saveProfile();
+
+        // Add comment about profile creation.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
+            [
+                $profile->getLabel()
+            ],
+            $profile->getId()
+        );
+
+        //Add comment profile place.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+            [
+                $this->profileStatus->getLabelByValue($oldStatus),
+                $this->profileStatus->getLabelByValue($status)
+            ],
+            $profile->getId()
+        );
+
+        // Add comment profile place.
+        $this->historyLogger->message(
+            MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+            [
+                $order->getIncrementId(),
+                $this->historyLogger->getConvertedQuoteId($quote->getId())
+            ],
+            $profile->getId()
+        );
+
+        $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
+        //Assign quote to new profile
+        $relation = $this->assignQuoteToProfile($quote, $profile, $startDate);
+        //Add new relation to profile processing queue in "pending" state.
+        $queueItemIds = $this->resourceQueue->insertItems($relation->getId());
+        $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_RUNNING);
+
+        $this->assignOrderToProfile($relation, $order);
+        $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
+
+        return $profile;
+    }
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright © 2018 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="tnw_subscriptions_api_data_subscriptionprofileinterface_save_before">
+        <observer name="legacy_model_save" instance="Magento\Framework\EntityManager\Observer\BeforeEntitySave" />
+    </event>
+    <event name="tnw_subscriptions_api_data_subscriptionprofileinterface_save_after">
+        <observer name="legacy_model_save" instance="Magento\Framework\EntityManager\Observer\AfterEntitySave" />
+    </event>
+    <event name="tnw_subscriptions_api_data_subscriptionprofileinterface_delete_before">
+        <observer name="legacy_model_delete" instance="Magento\Framework\EntityManager\Observer\BeforeEntityDelete" />
+    </event>
+    <event name="tnw_subscriptions_api_data_subscriptionprofileinterface_delete_after">
+        <observer name="legacy_model_delete" instance="Magento\Framework\EntityManager\Observer\AfterEntityDelete" />
+    </event>
+    <event name="tnw_subscriptions_api_data_subscriptionprofileinterface_load_after">
+        <observer name="legacy_model_load" instance="Magento\Framework\EntityManager\Observer\AfterEntityLoad" />
+    </event>
+    <event name="sales_quote_save_before">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesQuoteSaveBefore" />
+    </event>
+    <event name="sales_quote_load_after">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesQuoteLoadAfter" />
+    </event>
+    <event name="payment_method_is_active">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\PaymentMethodIsActive"/>
+    </event>
+    <event name="checkout_cart_add_product_complete">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\CheckoutCartAddProduct"/>
+    </event>
+    <event name="sales_quote_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_quote_item_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_order_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
+    </event>
+    <event name="sales_order_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_order_item_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
+    </event>
+    <event name="sales_order_item_collection_load_before">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadCollectionExtensionAttributes"/>
+    </event>
+    <event name="sales_order_item_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_order_collection_load_before">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadCollectionExtensionAttributes"/>
+    </event>
+    <event name="sales_order_creditmemo_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
+    </event>
+    <event name="sales_order_creditmemo_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_creditmemo_item_load_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadExtensionAttributes"/>
+    </event>
+    <event name="sales_order_creditmemo_item_collection_load_before">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\LoadCollectionExtensionAttributes"/>
+    </event>
+    <event name="sales_creditmemo_item_save_after">
+        <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\SaveExtensionAttributes"/>
+    </event>
+    <event name="sales_order_creditmemo_refund">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesOrderCreditmemoRefund"/>
+    </event>
+    <event name="adminhtml_sales_order_creditmemo_register_before">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesOrderCreditmemoRegisterBefore"/>
+    </event>
+</config>

@@ -1,0 +1,17 @@
+{
+  "name": "tnw/subscriptions",
+  "description": "Magento 2 Subscriptions",
+  "require": {
+    "magento/framework": ">100"
+  },
+  "type": "magento2-module",
+  "version": "2.1.8",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "TNW\\Subscriptions\\": ""
+    }
+  }
+}
