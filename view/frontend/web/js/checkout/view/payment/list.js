@@ -5,6 +5,7 @@
 
 define([
     'underscore',
+    'jquery',
     'ko',
     'mageUtils',
     'uiComponent',
@@ -14,7 +15,7 @@ define([
     'Magento_Checkout/js/model/checkout-data-resolver',
     'mage/translate',
     'uiRegistry'
-], function (_, ko, utils, Component, paymentMethods, rendererList, layout, checkoutDataResolver, $t, registry) {
+], function (_, $, ko, utils, Component, paymentMethods, rendererList, layout, checkoutDataResolver, $t, registry) {
     'use strict';
 
     return Component.extend({
@@ -224,6 +225,17 @@ define([
                     }
                 });
             }, this);
+        },
+
+        /**
+         * @param {Array} elements
+         */
+        afterPaymentRender: function(elements) {
+            if (!elements.length) {
+                return;
+            }
+
+            $('input[name="vault[is_enabled]"]', elements).attr('disabled', 'disabled')
         }
     });
 });
