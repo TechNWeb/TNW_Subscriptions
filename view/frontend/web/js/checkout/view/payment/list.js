@@ -235,7 +235,9 @@ define([
                 return;
             }
 
-            $('input[name="vault[is_enabled]"]', elements).attr('disabled', 'disabled')
+            $('input[name="vault[is_enabled]"]', elements)
+                .attr('disabled', 'disabled')
+                .value(1);
         }
     });
 });
