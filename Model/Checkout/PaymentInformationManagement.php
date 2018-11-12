@@ -22,6 +22,11 @@ class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInform
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
         \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
     ) {
+        // TODO: Hard use Vault
+        $additionalData = $paymentMethod->getAdditionalData();
+        $additionalData['is_active_payment_token_enabler'] = 1;
+        $paymentMethod->setAdditionalData($additionalData);
+
         return parent::savePaymentInformationAndPlaceOrder($cartId, $paymentMethod, $billingAddress);
     }
 }

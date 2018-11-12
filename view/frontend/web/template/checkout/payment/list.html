@@ -12,7 +12,7 @@
         <div class="step-title" data-role="title" data-bind="i18n: getGroupTitle($group)"></div>
         <!-- /ko -->
         <!-- ko foreach: {data: getRegion($group().displayArea), as: 'method'} -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: {name: getTemplate(), afterRender: $parent.afterPaymentRender} --><!-- /ko -->
         <!-- /ko -->
     </div>
     <!-- /ko -->
