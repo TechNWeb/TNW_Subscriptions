@@ -174,4 +174,16 @@
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Observer\LoadCustomerQuote">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Observer\UnsetAllQuote">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
 </config>
