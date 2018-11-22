@@ -9,7 +9,7 @@
             <description value="Configure Sbscription"/>
             <severity value="CRITICAL"/>
             <testCaseId value="AdminSubscriptionConfigure_general"/>
-            <group value="subscription_configure"/>
+            <group value="tnw_subscriptions"/>
         </annotations>
         <!--Login admin -->
         <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin1"/>

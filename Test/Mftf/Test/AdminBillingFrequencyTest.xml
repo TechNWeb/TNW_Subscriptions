@@ -9,7 +9,7 @@
             <description value="Grid module test case create."/>
             <severity value="CRITICAL"/>
             <testCaseId value="AdminBillingFrequencyTest"/>
-            <group value="billing_frequency_create"/>
+            <group value="tnw_subscriptions"/>
         </annotations>
         <!--Login admin -->
         <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin1"/>
