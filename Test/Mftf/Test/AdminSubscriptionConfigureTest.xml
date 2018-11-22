@@ -8,7 +8,7 @@
             <title value="Configure Sbscription"/>
             <description value="Configure Sbscription"/>
             <severity value="CRITICAL"/>
-            <testCaseId value="AdminSubscriptionConfigure_general"/>
+            <testCaseId value="AdminSubscriptionConfigure"/>
             <group value="tnw_subscriptions"/>
         </annotations>
         <!--Login admin -->
@@ -19,7 +19,8 @@
         <wait time="2" stepKey="PageLoad1"/>
         <!--Click on grid add button-->
 
-        <click stepKey="toggle_general" selector="{{AdminSubscriptionConfigureSection.general}}"/>
+        <conditionalClick selector="{{AdminSubscriptionConfigureSection.general}}" dependentSelector="{{AdminSubscriptionConfigureSection.enable_subscriptions}}" visible="false" stepKey="toggle_general"/>
+
         <wait time="5" stepKey="toggle1"/>
         <selectOption userInput="{{AdminSubscriptionConfigureTestData.enable_subscriptions}}" selector="{{AdminSubscriptionConfigureSection.enable_subscriptions}}" stepKey="enable_subscriptions"/>
 
@@ -31,7 +32,7 @@
         <wait time="2" stepKey="PageLoad2"/>
         <!--Click on grid add button-->
 
-        <!--<click stepKey="toggle_payment" selector="{{AdminSubscriptionConfigureSection.payment}}"/>-->
+        <conditionalClick selector="{{AdminSubscriptionConfigureSection.payment}}" dependentSelector="{{AdminSubscriptionConfigureSection.enable_payments}}" visible="false" stepKey="toggle_payment"/>
         <wait time="5" stepKey="toggle2"/>
         <selectOption userInput="{{AdminSubscriptionConfigureTestData.enable_payment}}" selector="{{AdminSubscriptionConfigureSection.enable_payments}}" stepKey="enable_payments"/>
 
