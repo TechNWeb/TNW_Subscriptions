@@ -88,10 +88,30 @@
         </arguments>
     </type>
 
-    <virtualType name="TS\Model\Model\Checkout\CompositeConfigProvider" type="Magento\Checkout\Model\CompositeConfigProvider">
+    <virtualType name="TS\Model\Model\Checkout\CompositeConfigProvider" type="TNW\Subscriptions\Model\Checkout\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="checkout_default_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\DefaultConfigProvider</item>
+                <item name="checkout_summary_config_provider" xsi:type="object">Magento\Checkout\Model\Cart\CheckoutSummaryConfigProvider</item>
+
+                <item name="offline_payment_instructions_config_provider" xsi:type="object">Magento\OfflinePayments\Model\InstructionsConfigProvider</item>
+                <item name="offline_payment_checkmo_config_provider" xsi:type="object">Magento\OfflinePayments\Model\CheckmoConfigProvider</item>
+
+                <item name="ccform" xsi:type="object">Magento\Payment\Model\CcGenericConfigProvider</item>
+                <item name="cc_card_config_provider" xsi:type="object">Magento\Payment\Model\CcConfigProvider</item>
+
+                <item name="braintree_config_provider" xsi:type="object">Magento\Braintree\Model\Ui\ConfigProvider</item>
+                <item name="braintree_paypal_config_provider" xsi:type="object">Magento\Braintree\Model\Ui\PayPal\ConfigProvider</item>
+
+                <item name="tax_config_provider" xsi:type="object">Magento\Tax\Model\TaxConfigProvider</item>
+
+                <item name="vault_config_provider" xsi:type="object">Magento\Vault\Model\Ui\VaultConfigProvider</item>
+                <item name="vault_cards_config_provider" xsi:type="object">Magento\Vault\Model\Ui\TokensConfigProvider</item>
+
+                <item name="paypal_express_config_provider" xsi:type="object">Magento\Paypal\Model\ExpressConfigProvider</item>
+                <item name="paypal_iframe_config_provider" xsi:type="object">Magento\Paypal\Model\IframeConfigProvider</item>
+                <item name="paypal_billing_agreement_config_provider" xsi:type="object">Magento\Paypal\Model\BillingAgreementConfigProvider</item>
+                <item name="paypal_iframe_cc_config_provider" xsi:type="object">PaypalIframeCcConfigProvider</item>
             </argument>
         </arguments>
     </virtualType>
@@ -150,6 +170,18 @@
     </type>
 
     <type name="TNW\Subscriptions\Block\Checkout\Success">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Observer\LoadCustomerQuote">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
+        </arguments>
+    </type>
+
+    <type name="TNW\Subscriptions\Observer\UnsetAllQuote">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
         </arguments>

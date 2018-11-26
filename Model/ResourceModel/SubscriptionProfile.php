@@ -71,7 +71,7 @@ class SubscriptionProfile extends AbstractEntity
         return $connection->select()
             ->from(
                 ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
-                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+SUM(orderItemExtension.base_subs_initial_fee))')]
+                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
             )
             ->joinInner(
                 ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],

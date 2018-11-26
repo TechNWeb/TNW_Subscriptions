@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../../../../../vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/Test/etc/testSchema.xsd">
+    <test name="AdminBillingFrequencyTest">
+        <annotations>
+            <features value="BillingFrequency module test case."/>
+            <stories value="Add new BillingFrequency rows"/>
+            <title value="BillingFrequency module test case."/>
+            <description value="Grid module test case create."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="AdminBillingFrequencyTest"/>
+            <group value="tnw_subscriptions"/>
+        </annotations>
+        <!--Login admin -->
+        <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin1"/>
+
+        <!--CREATE DAILY BILLING FREQUENCY-->
+        <!--Open Grid list page -->
+        <amOnPage url="{{AdminBillingFrequencyPage.url}}" stepKey="gridListPageOpen1"/>
+        <wait time="2" stepKey="gridListPageLoad1"/>
+        <!--Click on grid add button-->
+        <click stepKey="addBtn1" selector="{{AdminBillingFrequencySection.addBtn}}"/>
+        <wait time="5" stepKey="addRowPageOpen1"/>
+        <!--data fill and save -->
+        <fillField userInput="{{AdminBillingFrequencyDayData.label}}" selector="{{AdminBillingFrequencySection.label}}" stepKey="label1"/>
+        <selectOption userInput="{{AdminBillingFrequencyDayData.unit}}" selector="{{AdminBillingFrequencySection.unit}}" stepKey="unit1"/>
+        <fillField userInput="{{AdminBillingFrequencyDayData.frequency}}" selector="{{AdminBillingFrequencySection.frequency}}" stepKey="frequency1"/>
+        <wait time="5" stepKey="BillingFrequencyDataSave1"/>
+        <click stepKey="save1" selector="{{AdminBillingFrequencySection.save}}"/>
+
+
+        <!--CREATE MONTHLY BILLING FREQUENCY-->
+        <!--Open Grid list page -->
+        <amOnPage url="{{AdminBillingFrequencyPage.url}}" stepKey="gridListPageOpen2"/>
+        <wait time="2" stepKey="gridListPageLoad2"/>
+        <!--Click on grid add button-->
+        <click stepKey="addBtn2" selector="{{AdminBillingFrequencySection.addBtn}}"/>
+        <wait time="5" stepKey="addRowPageOpen2"/>
+        <!--data fill and save -->
+        <fillField userInput="{{AdminBillingFrequencyMonthData.label}}" selector="{{AdminBillingFrequencySection.label}}" stepKey="label2"/>
+        <selectOption userInput="{{AdminBillingFrequencyMonthData.unit}}" selector="{{AdminBillingFrequencySection.unit}}" stepKey="unit2"/>
+        <fillField userInput="{{AdminBillingFrequencyMonthData.frequency}}" selector="{{AdminBillingFrequencySection.frequency}}" stepKey="frequency2"/>
+        <wait time="5" stepKey="BillingFrequencyDataSave2"/>
+        <click stepKey="save2" selector="{{AdminBillingFrequencySection.save}}"/>
+
+    </test>
+</tests>

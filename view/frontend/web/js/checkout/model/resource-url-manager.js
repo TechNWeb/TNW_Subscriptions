@@ -40,10 +40,10 @@ define([
          * @param {Object} quote
          * @return {*}
          */
-        getUrlForEstimationShippingMethodsByAddressId: function (quote) {
+        getUrlForEstimationShippingMethodsByAddressId: function () {
             return this.getUrl({
                 'default': '/tnw-subscriptions-carts/mine/estimate-shipping-methods-by-address-id'
-            }, {quoteId: quote.getQuoteId()});
+            }, {});
         },
 
         /**

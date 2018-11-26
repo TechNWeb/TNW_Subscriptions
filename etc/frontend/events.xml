@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_login">
+        <observer name="tnw_subscription_load_customer_quote" instance="TNW\Subscriptions\Observer\LoadCustomerQuote" />
+    </event>
+    <event name="customer_logout">
+        <observer name="tnw_subscription_unset_all_quote" instance="TNW\Subscriptions\Observer\UnsetAllQuote" />
+    </event>
+</config>

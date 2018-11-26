@@ -58,7 +58,7 @@ class Item
         InvoiceItem $subject,
         InvoiceItem $result
     ) {
-        $orderItem = $this->getOrderItem();
+        $orderItem = $result->getOrderItem();
         $orderInitialFees = $this->getOrderItemInitialFees($orderItem);
         $invoiceInitialFees = $this->getInvoiceItemInitialFees($result);
 
