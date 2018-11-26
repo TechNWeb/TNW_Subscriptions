@@ -22,8 +22,8 @@ class Collection
      */
     public function beforeLoad(OrderGridCollection $collection)
     {
-        $collection->join(
-            ['profile_table' => SubscriptionProfileOrderInterface::MAIN_TABLE],
+        $collection->getSelect()->joinLeft(
+            ['profile_table' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             'main_table.entity_id = profile_table.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
             []
         );
