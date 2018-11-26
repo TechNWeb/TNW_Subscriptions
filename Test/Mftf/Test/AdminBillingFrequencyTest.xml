@@ -43,6 +43,5 @@
         <wait time="5" stepKey="BillingFrequencyDataSave2"/>
         <click stepKey="save2" selector="{{AdminBillingFrequencySection.save}}"/>
 
-
     </test>
 </tests>
