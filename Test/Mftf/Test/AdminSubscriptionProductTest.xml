@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../../../../../vendor/magento/magento2-functional-testing-framework/src/Magento/FunctionalTestingFramework/Test/etc/testSchema.xsd">
+    <test name="AdminSubscriptionProductTest">
+        <annotations>
+            <features value="AdminSubscriptionProductTest module test case."/>
+            <stories value="Add new AdminSubscriptionProductrows"/>
+            <title value="AdminSubscriptionProductrows module test case."/>
+            <description value="AdminSubscriptionProductrows create."/>
+            <severity value="CRITICAL"/>
+            <testCaseId value="AdminSubscriptionProduct"/>
+            <group value="tnw_subscriptions"/>
+        </annotations>
+
+        <before>
+            <createData entity="_defaultCategory" stepKey="createPreReqCategory"/>
+            <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
+        </before>
+
+        <!-- Create a product to check the storefront -->
+        <actionGroup ref="FillAdminSimpleProductForm" stepKey="fillProductFieldsInAdmin">
+            <argument name="category" value="$$createPreReqCategory$$"/>
+            <argument name="simpleProduct" value="_defaultProduct"/>
+        </actionGroup>
+
+        <click stepKey="tnwSubscriptionsTab" selector=".tnw-subscriptions-tab"/>
+        <wait time="2" stepKey="PageLoad2"/>
+        <click stepKey="tnwSubscriptionsTabAdd1" selector='.tnw-subscriptions-tab button[data-index="button_add"]'/>
+        <wait time="5" stepKey="PageLoad3"/>
+        <waitForElementVisible selector='.tnw-subscriptions-tab button[data-index="button_add"]' stepKey="wait"/>
+        <wait time="3" stepKey="PageLoad4"/>
+
+        <scrollTo selector='.tnw-subscriptions-tab button[data-index="button_add"]' stepKey="ScrollToWebsites"/>
+
+        <click stepKey="tnwSubscriptionsTabAddFrequency1" selector='.tnw-subscriptions-tab .action-select.admin__action-multiselect'/>
+        <wait time="2" stepKey="PageLoad5"/>
+        <!--<click stepKey="tnwSubscriptionsTabAddFrequency2" selector='.tnw-subscriptions-tab .action-select.admin__action-multiselect li.admin__action-multiselect-menu-inner-item .action-menu-item'/>-->
+        <click stepKey="tnwSubscriptionsTabAddFrequency2" selector='Locator::firstElement(".tnw-subscriptions-tab li.admin__action-multiselect-menu-inner-item .action-menu-item")'/>
+        <!--//*[@id="TWB1YTO"]/div[2]/ul/li[3]/div/label/span-->
+
+
+        <!--<searchAndMultiSelectOption selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" parameterArray="['Day']" stepKey="searchAndSelectFrequency"/>-->
+        <!--<selectOption userInput="Daily frequency5bf6c0273ae32" selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" stepKey="searchFrequency"/>-->
+        <!--<searchAndMultiSelectOption selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" parameterArray="['Day']" stepKey="searchAndSelectFrequency"/>-->
+
+        <wait time="60" stepKey="PageLoad6"/>
+
+    </test>
+</tests>
