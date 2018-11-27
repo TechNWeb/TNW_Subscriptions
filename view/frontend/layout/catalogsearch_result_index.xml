@@ -37,7 +37,7 @@
         <!-- We must add reference from wishlist, becouse we change category product list block -->
         <referenceBlock name="catalogsearch.product.addto">
             <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
-                   name="category.product.addto.wishlist" as="wishlist" before="compare"
+                   name="catalogsearch.product.addto.wishlist" as="wishlist" before="compare"
                    template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
         </referenceBlock>
     </body>
