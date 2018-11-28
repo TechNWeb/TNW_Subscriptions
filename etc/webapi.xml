@@ -41,7 +41,7 @@
 
     <!-- My place order with payment information saving -->
     <route url="/V1/tnw-subscriptions-carts/mine/payment-information" method="POST">
-        <service class="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement" method="savePaymentInformationAndPlaceOrder"/>
+        <service class="TNW\Subscriptions\Api\PaymentInformationManagementInterface" method="savePaymentInformationAndPlaceOrder"/>
         <resources>
             <resource ref="self" />
         </resources>
@@ -63,7 +63,7 @@
 
     <!-- Guest place order with payment information saving -->
     <route url="/V1/guest-tnw-subscriptions-carts/:cartId/payment-information" method="POST">
-        <service class="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement" method="savePaymentInformationAndPlaceOrder"/>
+        <service class="TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface" method="savePaymentInformationAndPlaceOrder"/>
         <resources>
             <resource ref="anonymous" />
         </resources>
