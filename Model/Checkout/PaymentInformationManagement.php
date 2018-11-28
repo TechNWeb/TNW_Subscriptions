@@ -5,7 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInformationManagement
+class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInformationManagement implements \TNW\Subscriptions\Api\PaymentInformationManagementInterface
 {
     /**
      * Fix: param cartId type
