@@ -132,6 +132,12 @@
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="TNW\Subscriptions\Api\PaymentInformationManagementInterface"
+                type="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement"/>
+
+    <preference for="TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface"
+                type="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement"/>
+
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>

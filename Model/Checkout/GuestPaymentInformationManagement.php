@@ -5,7 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPaymentInformationManagement
+class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPaymentInformationManagement implements \TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface
 {
     /**
      * Fix: param cartId and email type
