@@ -19,21 +19,21 @@ class MessageHistoryFormatter implements MessageHistoryFormatterInterface
     private $url;
 
     /**
-     * @var string
+     * @var array
      */
-    private $urlPath;
+    private $matches;
 
     /**
      * MessageHistoryFomatter constructor.
      * @param UrlInterface $url
-     * @param string $urlPath
+     * @param array $matches
      */
     public function __construct(
         UrlInterface $url,
-        $urlPath = 'catalog/product/view'
+        array $matches
     ) {
         $this->url = $url;
-        $this->urlPath = $urlPath;
+        $this->matches = $matches;
     }
 
     /**
@@ -41,12 +41,17 @@ class MessageHistoryFormatter implements MessageHistoryFormatterInterface
      */
     public function format(MessageHistory $history)
     {
-        return preg_replace_callback(
-            '/\{productUrl\|(\d+)\}/i',
-            function ($matches) {
-                return $this->url->getUrl($this->urlPath, ['id' => $matches[1]]);
-            },
-            $history->getMessage()
-        );
+        $massage = $history->getMessage();
+        foreach ($this->matches as $match => $urlPath) {
+            $massage = preg_replace_callback(
+                '/\{'.preg_quote($match, '/').'\|(\d+)\}/i',
+                function ($matches) use ($urlPath) {
+                    return $this->url->getUrl(sprintf($urlPath, $matches[1]));
+                },
+                $massage
+            );
+        }
+
+        return $massage;
     }
 }

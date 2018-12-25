@@ -186,4 +186,20 @@
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
         </arguments>
     </type>
+
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\FrontendMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">
+        <arguments>
+            <argument name="url" xsi:type="object">Magento\Framework\Url</argument>
+            <argument name="matches" xsi:type="array">
+                <item name="productUrl" xsi:type="string">catalog/product/view/id/%d</item>
+                <item name="orderUrl" xsi:type="string">sales/order/view/order_id/%d</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory">
+        <arguments>
+            <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\FrontendMessageHistoryFormatter</argument>
+        </arguments>
+    </type>
 </config>

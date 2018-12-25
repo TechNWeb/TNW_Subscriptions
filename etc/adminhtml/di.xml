@@ -277,10 +277,13 @@
             <argument name="saveProcessor" xsi:type="object">TNW\Subscriptions\Model\Profile\Save\Processor</argument>
         </arguments>
     </type>
-    <virtualType  name="TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\AdminMessageHistoryFormatter" type="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryFormatter">
         <arguments>
-            <argument name="url" xsi:type="object">\Magento\Backend\Model\UrlInterface</argument>
-            <argument name="urlPath" xsi:type="string">catalog/product/edit</argument>
+            <argument name="url" xsi:type="object">Magento\Backend\Model\UrlInterface</argument>
+            <argument name="matches" xsi:type="array">
+                <item name="productUrl" xsi:type="string">catalog/product/edit/id/%d</item>
+                <item name="orderUrl" xsi:type="string">sales/order/view/order_id/%d</item>
+            </argument>
         </arguments>
     </virtualType>
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory">

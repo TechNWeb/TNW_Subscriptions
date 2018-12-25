@@ -615,6 +615,7 @@ class CreateProfile extends BaseCreate
             $this->messageHistoryLogger->message(
                 MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
                 [
+                    $order->getEntityId(),
                     $order->getIncrementId(),
                     $this->messageHistoryLogger->getConvertedQuoteId($subQuote->getId())
                 ],
