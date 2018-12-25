@@ -30,7 +30,7 @@ class MessageHistoryFormatter implements MessageHistoryFormatterInterface
      */
     public function __construct(
         UrlInterface $url,
-        array $matches
+        array $matches = []
     ) {
         $this->url = $url;
         $this->matches = $matches;
