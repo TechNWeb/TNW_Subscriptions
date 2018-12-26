@@ -56,19 +56,7 @@ class SubscriptionProfile extends AbstractEntity
      */
     public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $select = $this->currentValueSelect($object);
-        return (float)$this->getConnection()->fetchOne($select);
-    }
-
-    /**
-     * @param \Magento\Framework\Model\AbstractModel $object
-     *
-     * @return \Magento\Framework\DB\Select
-     */
-    private function currentValueSelect(\Magento\Framework\Model\AbstractModel $object)
-    {
-        $connection = $this->getConnection();
-        return $connection->select()
+        $select = $this->getConnection()->select()
             ->from(
                 ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
                 ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
@@ -89,6 +77,8 @@ class SubscriptionProfile extends AbstractEntity
                 []
             )
             ->where('profileItem.subscription_profile_id = ?', $object->getId());
+
+        return (float)$this->getConnection()->fetchOne($select);
     }
 
     /**
@@ -107,7 +97,27 @@ class SubscriptionProfile extends AbstractEntity
 
         $futureOrderCount = (float)$connection->fetchOne($sql);
 
-        $sql = $this->currentValueSelect($object)
+        $sql = $this->getConnection()->select()
+            ->from(
+                ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(orderItem.base_row_total_incl_tax)/SUM(orderItem.qty_ordered))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
+            )
+            ->joinInner(
+                ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
+                'profileItem.entity_id = salesRelative.profile_item_id',
+                []
+            )
+            ->joinInner(
+                ['orderItem' => $this->getTable('sales_order_item')],
+                'salesRelative.order_item_id = orderItem.item_id',
+                []
+            )
+            ->joinLeft(
+                ['orderItemExtension' => $this->getTable('tnw_subscriptions_order_item_extension_entity')],
+                'orderItem.item_id = orderItemExtension.item_id',
+                []
+            )
+            ->where('profileItem.subscription_profile_id = ?', $object->getId())
             ->limit(1);
 
         $profitOne = $connection->fetchOne($sql);
