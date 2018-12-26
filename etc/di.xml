@@ -421,6 +421,34 @@
             </argument>
         </arguments>
     </virtualType>
+    <virtualType name="Magento\Bundle\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="subscription_price" xsi:type="string">TNW\Subscriptions\Pricing\Price\SubscriptionPrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\ConfigurableProduct\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="subscription_price" xsi:type="string">TNW\Subscriptions\Pricing\Price\SubscriptionPrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Downloadable\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="subscription_price" xsi:type="string">TNW\Subscriptions\Pricing\Price\SubscriptionPrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\GroupedProduct\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="subscription_price" xsi:type="string">TNW\Subscriptions\Pricing\Price\SubscriptionPrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
 
     <virtualType name="TNW\Subscriptions\Model\Source\CustomerAddressProfileEdit"
                  type="TNW\Subscriptions\Model\Source\CustomerAddress">
