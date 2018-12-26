@@ -75,6 +75,11 @@ class SubscriptionPriceBox extends BasePriceBox
     private $productTypeResolver;
 
     /**
+     * @var \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView
+     */
+    private $subscriptionProductViewConfig;
+
+    /**
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -87,7 +92,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param DescriptionCreator $descriptionCreator
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
-     * @param array $data
+     * @param \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig
      */
     public function __construct(
         Template\Context $context,
@@ -102,6 +107,7 @@ class SubscriptionPriceBox extends BasePriceBox
         DescriptionCreator $descriptionCreator,
         ProfileManager $profileManager,
         ProductTypeManagerResolver $productTypeResolver,
+        \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -114,6 +120,7 @@ class SubscriptionPriceBox extends BasePriceBox
         $this->descriptionCreator = $descriptionCreator;
         $this->profileManager = $profileManager;
         $this->productTypeResolver = $productTypeResolver;
+        $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
     }
 
     /**
@@ -123,6 +130,10 @@ class SubscriptionPriceBox extends BasePriceBox
     {
         // Check catalog permissions
         if ($this->getSaleableItem()->getCanShowPrice() === false) {
+            return '';
+        }
+
+        if (!$this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct())) {
             return '';
         }
 
