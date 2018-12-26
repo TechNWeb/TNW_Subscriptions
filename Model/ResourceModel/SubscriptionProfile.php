@@ -22,6 +22,11 @@ class SubscriptionProfile extends AbstractEntity
     private $entityManager;
 
     /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    private $timezone;
+
+    /**
      * SubscriptionProfile constructor.
      * @param \Magento\Eav\Model\Entity\Context $context
      * @param \Magento\Framework\EntityManager\EntityManager $entityManager
@@ -30,10 +35,12 @@ class SubscriptionProfile extends AbstractEntity
     public function __construct(
         \Magento\Eav\Model\Entity\Context $context,
         \Magento\Framework\EntityManager\EntityManager $entityManager,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->entityManager = $entityManager;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -93,6 +100,10 @@ class SubscriptionProfile extends AbstractEntity
         $sql = $connection->select()
             ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
             ->where('subscription_profile_id = ?', $object->getId())
+            ->where($connection->prepareSqlCondition('scheduled_at', [
+                'to' => $this->timezone->date()->modify('+1 year'),
+                'datetime' => true
+            ]))
             ->where('magento_order_id IS NULL');
 
         $futureOrderCount = (float)$connection->fetchOne($sql);
@@ -117,11 +128,6 @@ class SubscriptionProfile extends AbstractEntity
             ->joinInner(
                 ['orderItem' => $this->getTable('sales_order_item')],
                 'salesRelative.order_item_id = orderItem.item_id',
-                []
-            )
-            ->joinLeft(
-                ['orderItemExtension' => $this->getTable('tnw_subscriptions_order_item_extension_entity')],
-                'orderItem.item_id = orderItemExtension.item_id',
                 []
             )
             ->where('profileItem.subscription_profile_id = ?', $object->getId())
