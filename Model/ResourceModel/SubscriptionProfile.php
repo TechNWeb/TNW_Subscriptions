@@ -97,10 +97,17 @@ class SubscriptionProfile extends AbstractEntity
 
         $futureOrderCount = (float)$connection->fetchOne($sql);
 
+        $lastOrder = $this->getConnection()->select()
+            ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['magento_order_id'])
+            ->where('subscription_profile_id = ?', $object->getId())
+            ->where('magento_order_id IS NOT NULL')
+            ->order('scheduled_at DESC')
+            ->limit(1);
+
         $sql = $this->getConnection()->select()
             ->from(
                 ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
-                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(orderItem.base_row_total_incl_tax)/SUM(orderItem.qty_ordered))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
+                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*(SUM(orderItem.base_row_total_incl_tax)/SUM(orderItem.qty_ordered))')]
             )
             ->joinInner(
                 ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
@@ -118,7 +125,7 @@ class SubscriptionProfile extends AbstractEntity
                 []
             )
             ->where('profileItem.subscription_profile_id = ?', $object->getId())
-            ->limit(1);
+            ->where('orderItem.order_id = ?', $lastOrder);
 
         $profitOne = $connection->fetchOne($sql);
         return $futureOrderCount * $profitOne;
