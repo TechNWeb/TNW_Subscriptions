@@ -152,6 +152,11 @@ class Attributes extends Base
      */
     private function getProductAttributesMeta()
     {
+        $attributesMeta = $this->getAttributesMeta();
+        if (empty($attributesMeta)) {
+            return [];
+        }
+
         return [
             'children' => [
                 'edit_attributes' => [
@@ -194,7 +199,7 @@ class Attributes extends Base
                             ],
                         ],
                     ],
-                    'children' => $this->getAttributesMeta(),
+                    'children' => $attributesMeta,
                 ],
             ],
         ];
