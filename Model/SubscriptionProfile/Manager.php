@@ -1080,15 +1080,17 @@ class Manager
             $profile->getId()
         );
 
-        //Add comment profile place.
-        $this->historyLogger->message(
-            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-            [
-                $this->profileStatus->getLabelByValue($oldStatus),
-                $this->profileStatus->getLabelByValue($status)
-            ],
-            $profile->getId()
-        );
+        if ($oldStatus != $status) {
+            //Add comment profile place.
+            $this->historyLogger->message(
+                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                [
+                    $this->profileStatus->getLabelByValue($oldStatus),
+                    $this->profileStatus->getLabelByValue($status)
+                ],
+                $profile->getId()
+            );
+        }
 
         // Add comment profile place.
         $this->historyLogger->message(
