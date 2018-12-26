@@ -1058,11 +1058,11 @@ class Manager
 
         $oldStatus = $profile->getStatus();
 
-        $status = $this->profileStatus::STATUS_ACTIVE;
+        $status = ProfileStatus::STATUS_ACTIVE;
         if ($profile->getTrialStartDate()) {
             $startDate = $profile->getStartDate();
             if (\date_create()->diff(\date_create($startDate))->invert === 0) {
-                $status = $this->profileStatus::STATUS_TRIAL;
+                $status = ProfileStatus::STATUS_TRIAL;
             }
         }
 
@@ -1094,6 +1094,7 @@ class Manager
         $this->historyLogger->message(
             MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
             [
+                $order->getEntityId(),
                 $order->getIncrementId(),
                 $this->historyLogger->getConvertedQuoteId($quote->getId())
             ],

@@ -347,6 +347,7 @@ class Manager
         $this->messageHistoryLogger->message(
             SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
             [
+                $order->getEntityId(),
                 $order->getIncrementId(),
                 $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
             ],
@@ -449,6 +450,7 @@ class Manager
                 $this->messageHistoryLogger->message(
                     SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
                     [
+                        $order->getEntityId(),
                         $order->getIncrementId(),
                         $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
                     ],
