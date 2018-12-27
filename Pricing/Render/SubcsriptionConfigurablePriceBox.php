@@ -75,6 +75,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         HelperProduct $helperProduct,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Swatches\Helper\Data $swatchHelper,
+        \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig,
         array $data = []
     ) {
         parent::__construct(
@@ -90,6 +91,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
             $descriptionCreator,
             $profileManager,
             $productTypeResolver,
+            $subscriptionProductViewConfig,
             $data
         );
 
