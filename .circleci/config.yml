@@ -342,42 +342,42 @@ workflows:
         filters:
           branches:
             only: /.*/
-    - m225_php71:
-        context: powersync
-        filters:
-          branches:
-            only:
-            - develop
-            - master
-            - /^hotfix*/
-            - /^release*/
-    - m224_php70:
-        context: powersync
-        filters:
-          branches:
-            only:
-            - develop
-            - master
-            - /^hotfix*/
-            - /^release*/
-    - m223_php70:
-        context: powersync
-        filters:
-          branches:
-            only:
-            - develop
-            - master
-            - /^hotfix*/
-            - /^release*/
-    - m222_php70:
-        context: powersync
-        filters:
-          branches:
-            only:
-            - develop
-            - master
-            - /^hotfix*/
-            - /^release*/
+#    - m225_php71:
+#        context: powersync
+#        filters:
+#          branches:
+#            only:
+#            - develop
+#            - master
+#            - /^hotfix*/
+#            - /^release*/
+#    - m224_php70:
+#        context: powersync
+#        filters:
+#          branches:
+#            only:
+#            - develop
+#            - master
+#            - /^hotfix*/
+#            - /^release*/
+#    - m223_php70:
+#        context: powersync
+#        filters:
+#          branches:
+#            only:
+#            - develop
+#            - master
+#            - /^hotfix*/
+#            - /^release*/
+#    - m222_php70:
+#        context: powersync
+#        filters:
+#          branches:
+#            only:
+#            - develop
+#            - master
+#            - /^hotfix*/
+#            - /^release*/
     - m221_php70:
         context: powersync
         filters:
@@ -391,10 +391,10 @@ workflows:
         context: powersync
         requires:
         - m226_php71
-        - m225_php71
-        - m224_php70
-        - m223_php70
-        - m222_php70
+#        - m225_php71
+#        - m224_php70
+#        - m223_php70
+#        - m222_php70
         - m221_php70
         filters:
           branches:
