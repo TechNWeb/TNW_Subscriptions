@@ -163,14 +163,16 @@ abstract class Base implements ProcessInterface
      */
     protected function addChangeStatusToHistory($profileId, $oldStatus, $newStatus)
     {
-        $message = sprintf(
-            $this->messageHistoryLogger->getMessage(
-                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED),
-            $this->statusSource->getLabelByValue($oldStatus),
-            $this->statusSource->getLabelByValue($newStatus)
-        );
-        $this->messageHistoryLogger->log(
-            $message,
+        if ($oldStatus == $newStatus) {
+            return;
+        }
+
+        $this->messageHistoryLogger->message(
+            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+            [
+                $this->statusSource->getLabelByValue($oldStatus),
+                $this->statusSource->getLabelByValue($newStatus)
+            ],
             $profileId,
             false,
             false,

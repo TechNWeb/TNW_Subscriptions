@@ -347,6 +347,7 @@ class Manager
         $this->messageHistoryLogger->message(
             SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
             [
+                $order->getEntityId(),
                 $order->getIncrementId(),
                 $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
             ],
@@ -432,23 +433,26 @@ class Manager
 
                 $this->profileRepository->save($profile);
 
-                //Add comment profile place.
-                $this->messageHistoryLogger->message(
-                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                    [
-                        $this->profileStatus->getLabelByValue($oldStatus),
-                        $this->profileStatus->getLabelByValue($profile->getStatus())
-                    ],
-                    $profile->getId(),
-                    false,
-                    false,
-                    true
-                );
+                if ($oldStatus != $profile->getStatus()) {
+                    //Add comment profile place.
+                    $this->messageHistoryLogger->message(
+                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                        [
+                            $this->profileStatus->getLabelByValue($oldStatus),
+                            $this->profileStatus->getLabelByValue($profile->getStatus())
+                        ],
+                        $profile->getId(),
+                        false,
+                        false,
+                        true
+                    );
+                }
 
                 //Add comment profile place.
                 $this->messageHistoryLogger->message(
                     SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
                     [
+                        $order->getEntityId(),
                         $order->getIncrementId(),
                         $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
                     ],
@@ -473,18 +477,20 @@ class Manager
                 $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
                 $this->profileRepository->save($profile);
 
-                //Add comment profile place.
-                $this->messageHistoryLogger->message(
-                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                    [
-                        $this->profileStatus->getLabelByValue($oldStatus),
-                        $this->profileStatus->getLabelByValue($profile->getStatus())
-                    ],
-                    $profile->getId(),
-                    false,
-                    false,
-                    true
-                );
+                if ($oldStatus != $profile->getStatus()) {
+                    //Add comment profile place.
+                    $this->messageHistoryLogger->message(
+                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                        [
+                            $this->profileStatus->getLabelByValue($oldStatus),
+                            $this->profileStatus->getLabelByValue($profile->getStatus())
+                        ],
+                        $profile->getId(),
+                        false,
+                        false,
+                        true
+                    );
+                }
             }
 
             throw $e;

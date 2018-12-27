@@ -25,6 +25,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Subscription Profile model.
+ * @method \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile getResource()
  */
 class SubscriptionProfile extends AbstractExtensibleModel implements SubscriptionProfileInterface
 {

@@ -1058,11 +1058,11 @@ class Manager
 
         $oldStatus = $profile->getStatus();
 
-        $status = $this->profileStatus::STATUS_ACTIVE;
+        $status = ProfileStatus::STATUS_ACTIVE;
         if ($profile->getTrialStartDate()) {
             $startDate = $profile->getStartDate();
             if (\date_create()->diff(\date_create($startDate))->invert === 0) {
-                $status = $this->profileStatus::STATUS_TRIAL;
+                $status = ProfileStatus::STATUS_TRIAL;
             }
         }
 
@@ -1080,20 +1080,23 @@ class Manager
             $profile->getId()
         );
 
-        //Add comment profile place.
-        $this->historyLogger->message(
-            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-            [
-                $this->profileStatus->getLabelByValue($oldStatus),
-                $this->profileStatus->getLabelByValue($status)
-            ],
-            $profile->getId()
-        );
+        if ($oldStatus != $status) {
+            //Add comment profile place.
+            $this->historyLogger->message(
+                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                [
+                    $this->profileStatus->getLabelByValue($oldStatus),
+                    $this->profileStatus->getLabelByValue($status)
+                ],
+                $profile->getId()
+            );
+        }
 
         // Add comment profile place.
         $this->historyLogger->message(
             MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
             [
+                $order->getEntityId(),
                 $order->getIncrementId(),
                 $this->historyLogger->getConvertedQuoteId($quote->getId())
             ],

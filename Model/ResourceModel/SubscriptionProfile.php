@@ -22,6 +22,11 @@ class SubscriptionProfile extends AbstractEntity
     private $entityManager;
 
     /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    private $timezone;
+
+    /**
      * SubscriptionProfile constructor.
      * @param \Magento\Eav\Model\Entity\Context $context
      * @param \Magento\Framework\EntityManager\EntityManager $entityManager
@@ -30,10 +35,12 @@ class SubscriptionProfile extends AbstractEntity
     public function __construct(
         \Magento\Eav\Model\Entity\Context $context,
         \Magento\Framework\EntityManager\EntityManager $entityManager,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->entityManager = $entityManager;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -56,19 +63,7 @@ class SubscriptionProfile extends AbstractEntity
      */
     public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $select = $this->currentValueSelect($object);
-        return (float)$this->getConnection()->fetchOne($select);
-    }
-
-    /**
-     * @param \Magento\Framework\Model\AbstractModel $object
-     *
-     * @return \Magento\Framework\DB\Select
-     */
-    private function currentValueSelect(\Magento\Framework\Model\AbstractModel $object)
-    {
-        $connection = $this->getConnection();
-        return $connection->select()
+        $select = $this->getConnection()->select()
             ->from(
                 ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
                 ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
@@ -89,6 +84,8 @@ class SubscriptionProfile extends AbstractEntity
                 []
             )
             ->where('profileItem.subscription_profile_id = ?', $object->getId());
+
+        return (float)$this->getConnection()->fetchOne($select);
     }
 
     /**
@@ -103,12 +100,38 @@ class SubscriptionProfile extends AbstractEntity
         $sql = $connection->select()
             ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
             ->where('subscription_profile_id = ?', $object->getId())
+            ->where($connection->prepareSqlCondition('scheduled_at', [
+                'to' => $this->timezone->date()->modify('+1 year'),
+                'datetime' => true
+            ]))
             ->where('magento_order_id IS NULL');
 
         $futureOrderCount = (float)$connection->fetchOne($sql);
 
-        $sql = $this->currentValueSelect($object)
+        $lastOrder = $this->getConnection()->select()
+            ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['magento_order_id'])
+            ->where('subscription_profile_id = ?', $object->getId())
+            ->where('magento_order_id IS NOT NULL')
+            ->order('scheduled_at DESC')
             ->limit(1);
+
+        $sql = $this->getConnection()->select()
+            ->from(
+                ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*(SUM(orderItem.base_row_total_incl_tax)/SUM(orderItem.qty_ordered))')]
+            )
+            ->joinInner(
+                ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
+                'profileItem.entity_id = salesRelative.profile_item_id',
+                []
+            )
+            ->joinInner(
+                ['orderItem' => $this->getTable('sales_order_item')],
+                'salesRelative.order_item_id = orderItem.item_id',
+                []
+            )
+            ->where('profileItem.subscription_profile_id = ?', $object->getId())
+            ->where('orderItem.order_id = ?', $lastOrder);
 
         $profitOne = $connection->fetchOne($sql);
         return $futureOrderCount * $profitOne;
