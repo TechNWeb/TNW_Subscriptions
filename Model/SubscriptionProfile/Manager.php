@@ -667,7 +667,6 @@ class Manager
      * @param SubscriptionProfileInterface $profile
      *
      * @throws LocalizedException
-     * @throws \Zend_Json_Exception
      */
     public function populateQuoteData(Quote $quote, SubscriptionProfileInterface $profile)
     {
@@ -702,6 +701,10 @@ class Manager
                 $profileProduct->getMagentoProduct(),
                 $this->getProductAddRequest($profileProduct)
             );
+
+            if (\is_string($quoteItem)) {
+                throw new LocalizedException(__($quoteItem));
+            }
 
             $profileItemIds = $quoteItem->getData('profile_item_ids');
             $profileItemIds[] = $profileProduct->getId();
@@ -746,7 +749,6 @@ class Manager
      * @param ProductSubscriptionProfileInterface $profileProduct
      *
      * @return DataObject
-     * @throws \Zend_Json_Exception
      */
     protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct)
     {
@@ -764,49 +766,12 @@ class Manager
             ]
         ];
 
-        $productType = $profileProduct->getMagentoProduct()->getTypeId();
-        switch ($productType) {
-            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
-            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
-                break;
-
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                $data = $this->addConfigurableOptions($profileProduct, $data);
-                break;
-
-            default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $productType));
+        $customOptions = $profileProduct->getCustomOptions();
+        if (isset($customOptions['info_buyRequest'])) {
+            $data = array_replace_recursive($customOptions['info_buyRequest'], $data);
         }
 
         return $this->dataObjectFactory->create($data);
-    }
-
-    /**
-     * Adds conf. options to buy request.
-     *
-     * @param ProductSubscriptionProfileInterface $profileProduct
-     * @param array $data
-     *
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws \Zend_Json_Exception
-     */
-    private function addConfigurableOptions(ProductSubscriptionProfileInterface $profileProduct, array $data)
-    {
-        $options = [];
-        /** @var ProductSubscriptionProfileInterface $child */
-        foreach ($profileProduct->getChildren() as $child) {
-            $options[] = \Zend_Json::decode($child->getCustomOptions()) ?: [];
-        }
-
-        if (empty($options)) {
-            throw new \InvalidArgumentException(__('Custom options must be set.')->render());
-        }
-
-        $data['super_attribute'] = array_replace(...$options);
-
-        return $data;
     }
 
     /**

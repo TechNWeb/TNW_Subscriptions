@@ -159,10 +159,8 @@ class Edit extends \Magento\Framework\App\Action\Action
         $params = new \Magento\Framework\DataObject();
         $customData = $subscriprionProduct->getCustomOptions();
 
-        if ($this->contextModel->isJson($customData)) {
-            $buyRequest = new \Magento\Framework\DataObject();
-            $customData = \Zend_Json::decode($customData);
-            $buyRequest->setSuperAttribute($customData);
+        if (!empty($customData)) {
+            $buyRequest = new \Magento\Framework\DataObject($customData);
             $params->setBuyRequest($buyRequest);
         }
 

@@ -21,8 +21,11 @@
                         <dt class="qty"><?php echo __('Qty') ?></dt>
                         <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
-                    <?php echo $block->renderProductOptions($item);?>
                     <dl class="item-options custom-attributes">
+                    <?php foreach ($block->productOptions($item) as $option): ?>
+                        <dt><?php echo $block->escapeHtml($option['label']) ?></dt>
+                        <dd><?php echo $block->escapeHtml($option['value']) ?></dd>
+                    <?php endforeach; ?>
                     <?php foreach ($block->customAttributes($item) as $attribute): ?>
                         <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
                         <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>

@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Configuration\Item\OptionFactory;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
@@ -48,6 +49,11 @@ class ProductSubscriptionProfile
     private $metadataService;
 
     /**
+     * @var OptionFactory
+     */
+    private $itemOprionFactory;
+
+    /**
      * Attributes are that part of interface
      *
      * @var array
@@ -84,6 +90,7 @@ class ProductSubscriptionProfile
      * @param AttributeValueFactory $customAttributeFactory
      * @param ProductRepositoryInterface $productRepository
      * @param ProductSubscriptionProfileAttributeRepositoryInterface $metadataService
+     * @param OptionFactory $itemOprionFactory
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -95,6 +102,7 @@ class ProductSubscriptionProfile
         AttributeValueFactory $customAttributeFactory,
         ProductRepositoryInterface $productRepository,
         ProductSubscriptionProfileAttributeRepositoryInterface $metadataService,
+        OptionFactory $itemOprionFactory,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -111,6 +119,7 @@ class ProductSubscriptionProfile
 
         $this->productRepository = $productRepository;
         $this->metadataService = $metadataService;
+        $this->itemOprionFactory = $itemOprionFactory;
     }
 
     /**
@@ -487,10 +496,20 @@ class ProductSubscriptionProfile
 
     /**
      * @inheritdoc
+     * @throws
      */
     public function getCustomOptions()
     {
-        return $this->getData(self::CUSTOM_OPTIONS);
+        $options = $this->getData(self::CUSTOM_OPTIONS);
+        if (empty($options)) {
+            return [];
+        }
+
+        try {
+            return \Zend_Json::decode($options);
+        } catch (\Zend_Json_Exception $e) {
+            return [];
+        }
     }
 
     /**
@@ -498,7 +517,7 @@ class ProductSubscriptionProfile
      */
     public function setCustomOptions($customOptions)
     {
-        $this->setData(self::CUSTOM_OPTIONS, $customOptions);
+        $this->setData(self::CUSTOM_OPTIONS, \Zend_Json::encode($customOptions));
         return $this;
     }
 
@@ -517,5 +536,47 @@ class ProductSubscriptionProfile
     {
         $this->setData(self::CHILDREN, $children);
         return $this;
+    }
+
+    /**
+     * Retrieve associated product
+     *
+     * @return \Magento\Catalog\Model\Product
+     */
+    public function getProduct()
+    {
+        return $this->getMagentoProduct();
+    }
+
+    /**
+     * Get item option by code
+     *
+     * @param   string $code
+     * @return  \Magento\Catalog\Model\Product\Configuration\Item\Option\OptionInterface
+     */
+    public function getOptionByCode($code)
+    {
+        $customOptions = $this->getCustomOptions();
+        if (empty($customOptions[$code])) {
+            return null;
+        }
+
+        return $this->itemOprionFactory->create(['data' => [
+            'value' => \Zend_Json::encode($customOptions[$code])
+        ]]);
+    }
+
+    /**
+     * Returns special download params (if needed) for custom option with type = 'file''
+     * Return null, if not special params needed'
+     * Or return \Magento\Framework\DataObject with any of the following indexes:
+     *  - 'url' - url of controller to give the file
+     *  - 'urlParams' - additional parameters for url (custom option id, or item id, for example)
+     *
+     * @return null|\Magento\Framework\DataObject
+     */
+    public function getFileDownloadParams()
+    {
+        return null;
     }
 }

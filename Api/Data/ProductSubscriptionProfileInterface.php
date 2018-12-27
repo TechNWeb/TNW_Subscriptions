@@ -7,12 +7,13 @@
 namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Configuration\Item\ItemInterface;
 use Magento\Framework\Api\CustomAttributesDataInterface;
 
 /**
  * Interface for subscription profile products.
  */
-interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterface
+interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterface, ItemInterface
 {
     /**
      * Entity table.
@@ -371,7 +372,7 @@ interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterf
     /**
      * Gets custom options.
      *
-     * @return int|null
+     * @return array
      */
     public function getCustomOptions();
 

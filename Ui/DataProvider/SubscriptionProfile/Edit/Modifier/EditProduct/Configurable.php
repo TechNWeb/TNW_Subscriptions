@@ -167,6 +167,8 @@ class Configurable extends Base
         $currentFormName = $this->registry->registry('form_full_name');
         $leftContainerName = $currentFormName . '.description_fieldset.left_container';
 
+        $customOptions = $this->getItem()->getCustomOptions();
+
         return [
             'children' => [
                 'edit_options' => [
@@ -188,7 +190,9 @@ class Configurable extends Base
                                             $this->getProduct()->getId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
-                                            $this->getItem()->getCustomOptions() //super attributes data
+                                            isset($customOptions['info_buyRequest']['super_attribute'])
+                                                ? $customOptions['info_buyRequest']['super_attribute']
+                                                : '', //super attributes data
                                         ],
                                     ],
                                 ],
@@ -210,8 +214,8 @@ class Configurable extends Base
         $attributes = [];
         $attributesData = $this->getItem()->getCustomOptions();
 
-        if ($this->contextModel->isJson($attributesData)) {
-            $attributes = \Zend_Json::decode($attributesData);
+        if (isset($attributesData['info_buyRequest']['super_attribute'])) {
+            $attributes = $attributesData['info_buyRequest']['super_attribute'];
         }
 
         $params['attributes'] = $attributes;

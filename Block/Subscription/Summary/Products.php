@@ -58,6 +58,11 @@ class Products extends BaseSummary
     private $productAttributeRepository;
 
     /**
+     * @var \Magento\Catalog\Helper\Product\ConfigurationPool
+     */
+    private $configurationPool;
+
+    /**
      * @param Template\Context $context
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
@@ -75,6 +80,7 @@ class Products extends BaseSummary
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
         \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
+        \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -84,6 +90,7 @@ class Products extends BaseSummary
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
         $this->productAttributeRepository = $productAttributeRepository;
+        $this->configurationPool = $configurationPool;
     }
 
     /**
@@ -272,11 +279,31 @@ class Products extends BaseSummary
         return in_array($product->getTypeId(), self::CONFIGURE_TYPES);
     }
 
+    public function productOptions(ProductSubscriptionProfileInterface $item)
+    {
+        $optionsData = [];
+        $options = $this->configurationPool->getByProductType($item->getProduct()->getTypeId())->getOptions($item);
+        foreach ($options as $index => $optionValue) {
+            /* @var $helper \Magento\Catalog\Helper\Product\Configuration */
+            $helper = $this->configurationPool->getByProductType('default');
+            $params = [
+                'max_length' => 55,
+                'cut_replacer' => ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>'
+            ];
+            $option = $helper->getFormattedOptionValue($optionValue, $params);
+            $optionsData[$index] = $option;
+            $optionsData[$index]['label'] = $optionValue['label'];
+        }
+
+        return $optionsData;
+    }
+
     /**
      * Render item product options.
      *
      * @param ProductSubscriptionProfileInterface $item
      * @return string
+     * @deprecated
      */
     public function renderProductOptions(ProductSubscriptionProfileInterface $item)
     {
