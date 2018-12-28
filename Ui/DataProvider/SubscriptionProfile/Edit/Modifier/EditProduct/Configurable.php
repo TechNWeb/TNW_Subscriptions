@@ -191,7 +191,7 @@ class Configurable extends Base
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
                                             isset($customOptions['info_buyRequest']['super_attribute'])
-                                                ? $customOptions['info_buyRequest']['super_attribute']
+                                                ? \Zend_Json::encode($customOptions['info_buyRequest']['super_attribute'])
                                                 : '', //super attributes data
                                         ],
                                     ],
