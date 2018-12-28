@@ -709,7 +709,7 @@ class Manager
             $profileItemIds = $quoteItem->getData('profile_item_ids');
             $profileItemIds[] = $profileProduct->getId();
 
-            $quoteItem->setData('profile_item_ids', $profileItemIds);
+            $quoteItem->setData('profile_item_ids', array_unique($profileItemIds));
         }
 
         //Set shipping address
