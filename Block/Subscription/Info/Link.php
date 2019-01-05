@@ -52,4 +52,17 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
     {
         return $this->getUrl($this->getPath(), ['entity_id' => $this->getSubscription()->getId()]);
     }
+
+    /**
+     * @return string|void
+     */
+    protected function _toHtml()
+    {
+        if ($this->getPath() == 'tnw_subscriptions/subscription/shipment' && $this->getSubscription()->getIsVirtual()) {
+            return;
+        }
+
+        return parent::_toHtml();
+    }
+
 }
