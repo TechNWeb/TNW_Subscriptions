@@ -22,17 +22,20 @@ class Collection
      */
     public function beforeLoad(OrderGridCollection $collection)
     {
-        $collection->getSelect()->joinLeft(
-            ['profile_table' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-            'main_table.entity_id = profile_table.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
-            []
-        );
+        if (!$collection->isLoaded()) {
 
-        $collection->addExpressionFieldToSelect('profiles', 'GROUP_CONCAT(profile_table.{{profileId}})', [
-            'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
-        ]);
+            $collection->getSelect()->joinLeft(
+                ['profile_table' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+                'main_table.entity_id = profile_table.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                []
+            );
 
-        $collection->getSelect()->group($collection->getIdFieldName());
+            $collection->addExpressionFieldToSelect('profiles', 'GROUP_CONCAT(profile_table.{{profileId}})', [
+                'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
+            ]);
+
+            $collection->getSelect()->group($collection->getIdFieldName());
+        }
 
         return null;
     }
