@@ -188,42 +188,42 @@ class ManagerConfigurable
             if ($updatedSubProduct) {
                 $magentoProduct = $updatedSubProduct->getMagentoProduct();
 
-                if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE) {
-                    if (isset($request['subscribe_qty'])) {
-                        $request['qty'] = $request['subscribe_qty'];
-                    }
-                    $request = $this->objectFactory->create($request);
-                    $candidates =  $magentoProduct->getTypeInstance()
-                        ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
+                if (isset($request['subscribe_qty'])) {
+                    $request['qty'] = $request['subscribe_qty'];
+                }
 
-                    /** $candidates is error message */
-                    if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
-                        return strval($candidates);
-                    }
+                $request = $this->objectFactory->create($request);
+                $candidates =  $magentoProduct->getTypeInstance()
+                    ->prepareForCartAdvanced($request, $magentoProduct, AbstractType::PROCESS_MODE_FULL);
 
-                    $price = $this->getSubscriptionItemPrice($request, $profile, $magentoProduct);
+                /** $candidates is error message */
+                if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
+                    return strval($candidates);
+                }
 
-                    foreach ($candidates as $candidate) {
-                        if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
-                            //if $candidate is current updated product
-                            $updatedSubProduct
-                                ->setDataChanges(false)
-                                ->setQty($candidate->getQty())
-                                ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
-                                ->setPrice($price);
-                            $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
-                        } else {
-                            //if $candidate is a configurable child product.
-                            foreach ($profileProducts as $profileProduct) {
-                                if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
-                                    $profileProduct->setMagentoProductId($candidate->getId())
-                                        ->setSku($candidate->getSku())
-                                        ->setName($candidate->getName())
-                                        ->setCustomOptions(\Zend_Json::encode($request->getSuperAttribute()))
-                                        ->setQty($candidate->getQty());
-                                    $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
-                                    break;
-                                }
+                $price = $this->getSubscriptionItemPrice($request, $profile, $magentoProduct);
+
+                /** @var \Magento\Catalog\Model\Product $candidate */
+                foreach ($candidates as $candidate) {
+                    if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
+                        //if $candidate is current updated product
+                        $updatedSubProduct
+                            ->setDataChanges(false)
+                            ->setQty($candidate->getQty())
+                            ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
+                            ->setPrice($price);
+                        $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
+                    } else {
+                        //if $candidate is a configurable child product.
+                        foreach ($profileProducts as $profileProduct) {
+                            if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
+                                $profileProduct->setMagentoProductId($candidate->getId())
+                                    ->setSku($candidate->getSku())
+                                    ->setName($candidate->getName())
+                                    ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
+                                    ->setQty($candidate->getQty());
+                                $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
+                                break;
                             }
                         }
                     }

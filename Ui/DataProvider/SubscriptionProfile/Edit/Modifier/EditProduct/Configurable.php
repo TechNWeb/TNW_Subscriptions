@@ -204,22 +204,4 @@ class Configurable extends Base
             ],
         ];
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUrlParams()
-    {
-        $params = parent::getUrlParams();
-        $attributes = [];
-        $attributesData = $this->getItem()->getCustomOptions();
-
-        if (isset($attributesData['info_buyRequest']['super_attribute'])) {
-            $attributes = $attributesData['info_buyRequest']['super_attribute'];
-        }
-
-        $params['attributes'] = $attributes;
-
-        return $params;
-    }
 }

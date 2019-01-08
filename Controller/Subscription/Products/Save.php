@@ -8,10 +8,7 @@ namespace TNW\Subscriptions\Controller\Subscription\Products;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Registry;
-use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -67,38 +64,51 @@ class Save extends Action
     /**
      * Execute save profile data on edit configurable product super attributes page.
      *
-     * @return \Magento\Framework\Controller\Result\Json
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return \Magento\Framework\Controller\Result\Redirect
      */
     public function execute()
     {
-        $errors = [];
         $request = $this->getRequest()->getParams();
-        $subProduct = $this->getSubProduct($request);
 
-        if ($subProduct) {
-            try {
-                $this->currentProfile = $this->configurableManager->processProfileUpdate($request);
-
-                if ($this->currentProfile instanceof SubscriptionProfile) {
-                    if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
-                        $this->currentProfile->setNeedRecollect(true);
-                    }
-                    $this->profileManager->saveProfile();
-                } elseif ( is_string($this->currentProfile)) {
-                    $errors[] = __($this->currentProfile);
-                }
-            } catch (\Exception $e) {
-                $errors[] = $e->getMessage();
+        try {
+            $subProduct = $this->getSubProduct($request);
+            if (empty($subProduct)) {
+                throw new LocalizedException(__('Subscription profile item wasn\'t loaded'));
             }
-        } else {
-            $errors[] = __('Subscription profile item wasn\'t loaded');
+
+            $this->currentProfile = $this->configurableManager->processProfileUpdate($request);
+
+            if ($this->currentProfile instanceof SubscriptionProfile) {
+                if ($this->currentProfile && $this->currentProfile->hasDataChanges()) {
+                    $this->currentProfile->setNeedRecollect(true);
+                }
+                $this->profileManager->saveProfile();
+            } elseif ( is_string($this->currentProfile)) {
+                throw new LocalizedException(__($this->currentProfile));
+            }
+        } catch (\Exception $e) {
+            $this->messageManager->addExceptionMessage($e, __('We can\'t update the item right now.'));
+            return $this->goBack();
         }
 
-        $response = $this->getJsonResponse($errors);
+        return $this->goBack($this->getRedirectUrl());
+    }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_JSON)
-            ->setData($response);
+    /**
+     * Set back redirect url to response
+     *
+     * @param null|string $backUrl
+     *
+     * @return \Magento\Framework\Controller\Result\Redirect
+     */
+    protected function goBack($backUrl = null)
+    {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if ($backUrl || $backUrl = $this->_redirect->getRefererUrl()) {
+            $resultRedirect->setUrl($backUrl);
+        }
+
+        return $resultRedirect;
     }
 
     /**
@@ -120,40 +130,9 @@ class Save extends Action
     }
 
     /**
-     * Return response array.
-     *
-     * @param array $errors
-     * @return array
-     */
-    private function getJsonResponse(array $errors)
-    {
-        $response = ['data' => [], 'error' => false];
-        if (!empty($errors)) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                if (!empty($error)) {
-                    if (is_array($error)) {
-                        $errorMessages[] = reset($error);
-                    } else {
-                        $errorMessages[] = $error;
-                    }
-                }
-            }
-            $response = [
-                'error_messages' => $errorMessages,
-                'error' => true,
-            ];
-        } else {
-            $response['redirectUrl'] = $this->getRedirectUrl();
-        }
-
-        return $response;
-    }
-
-    /**
      * Return redirect url.
      *
-     * @return string
+     * @return string|null
      */
     private function getRedirectUrl()
     {
@@ -163,5 +142,7 @@ class Save extends Action
                 ['entity_id' => $this->currentProfile->getId()]
             );
         }
+
+        return null;
     }
 }
