@@ -8,10 +8,8 @@ namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObject\Factory as DataObjectFactory;
-use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Configurable as ConfigurableTypeManager;
@@ -49,21 +47,45 @@ class ManagerConfigurable
     private $configurableTypeManager;
 
     /**
+     * @var Product\OptionFactory
+     */
+    private $productOptionFactory;
+
+    /**
+     * @var \Magento\Framework\Stdlib\StringUtils
+     */
+    private $stringUtils;
+
+    /**
+     * @var \Magento\Framework\Filter\FilterManager
+     */
+    private $filterManager;
+
+    /**
      * @param ProfileManager $profileManager
      * @param ProductSubscriptionProfileRepository $subproductRepository
      * @param DataObjectFactory $objectFactory
      * @param ConfigurableTypeManager $configurableTypeManager
+     * @param Product\OptionFactory $productOptionFactory
+     * @param \Magento\Framework\Stdlib\StringUtils $stringUtils
+     * @param \Magento\Framework\Filter\FilterManager $filterManager
      */
     public function __construct(
         ProfileManager $profileManager,
         ProductSubscriptionProfileRepository $subproductRepository,
         DataObjectFactory $objectFactory,
-        ConfigurableTypeManager $configurableTypeManager
+        ConfigurableTypeManager $configurableTypeManager,
+        \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory,
+        \Magento\Framework\Stdlib\StringUtils $stringUtils,
+        \Magento\Framework\Filter\FilterManager $filterManager
     ) {
         $this->profileManager = $profileManager;
         $this->subproductRepository = $subproductRepository;
         $this->objectFactory = $objectFactory;
         $this->configurableTypeManager = $configurableTypeManager;
+        $this->productOptionFactory = $productOptionFactory;
+        $this->stringUtils = $stringUtils;
+        $this->filterManager = $filterManager;
     }
 
     /**
@@ -75,77 +97,95 @@ class ManagerConfigurable
     public function getConfigurableOptionsData(ProductSubscriptionProfile $item)
     {
         $result = [];
-        $itemChildren = $item->getChildren();
+        foreach ($this->getItemOptions($item) as $itemOption) {
+            $value = $this->getFormatedOptionValue($itemOption);
 
-        if ($itemChildren) {
-            $magentoProduct = $this->getProductFromItem($item);
-
-            if ($magentoProduct !== null) {
-                $productSuperAttributes = $this->getProductSuperAttributes($magentoProduct);
-                $storeId = $magentoProduct->getStoreId();
-
-                if ($magentoProduct->getTypeId() === ConfigurableProduct::TYPE_CODE
-                    && $productSuperAttributes->getSize() > 0)
-                {
-                    //We have to get custom options from child items
-                    foreach ($itemChildren as $itemChild) {
-                        $customOptions = $itemChild->getCustomOptions();
-
-                        if (isset($customOptions['info_buyRequest']['super_attribute'])) {
-                            $decodedOptions = $customOptions['info_buyRequest']['super_attribute'];
-
-                            foreach ($productSuperAttributes as $attribute) {
-                                $productAttribute = $attribute->getProductAttribute();
-                                $attributeId = $productAttribute->getId();
-
-                                if (isset($decodedOptions[$attributeId])) {
-                                    foreach ($attribute->getOptions() as $option) {
-                                        if ($option['value_index'] == $decodedOptions[$attributeId]) {
-                                            $optionLabel = $option['store_label'];
-                                            break;
-                                        }
-                                    }
-
-                                    $result[] = [
-                                        'attributeId' => $attributeId,
-                                        'attributeLabel' => $productAttribute->getStoreLabel($storeId),
-                                        'optionLabel' => $optionLabel,
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            $result[] = [
+                'attributeLabel' => $itemOption['label'],
+                'optionLabel' => isset($formatedOptionValue['full_view']) ? $value['full_view'] : $value['value'],
+            ];
         }
 
         return $result;
     }
 
     /**
-     * Return product from subscription profile item.
-     *
-     * @param ProductSubscriptionProfileInterface $item
-     * @return \Magento\Catalog\Model\Product|null
+     * @param $optionValue
+     * @return array
      */
-    private function getProductFromItem(ProductSubscriptionProfileInterface $item)
+    public function getFormatedOptionValue($optionValue)
     {
-        try {
-            return $item->getMagentoProduct();
-        } catch (NoSuchEntityException $e) {
-            return null;
+        $optionInfo = [];
+
+        // define input data format
+        if (is_array($optionValue)) {
+            if (isset($optionValue['option_id'])) {
+                $optionInfo = $optionValue;
+                if (isset($optionInfo['value'])) {
+                    $optionValue = $optionInfo['value'];
+                }
+            } elseif (isset($optionValue['value'])) {
+                $optionValue = $optionValue['value'];
+            }
         }
+
+        // render customized option view
+        if (isset($optionInfo['custom_view']) && $optionInfo['custom_view']) {
+            $default = ['value' => $optionValue];
+            if (isset($optionInfo['option_type'])) {
+                try {
+                    $group = $this->productOptionFactory->create()->groupFactory($optionInfo['option_type']);
+                    return ['value' => $group->getCustomizedView($optionInfo)];
+                } catch (\Exception $e) {
+                    return $default;
+                }
+            }
+            return $default;
+        }
+
+        // truncate standard view
+        if (is_array($optionValue)) {
+            $truncatedValue = implode("\n", $optionValue);
+            $truncatedValue = nl2br($truncatedValue);
+            return ['value' => $truncatedValue];
+        }
+
+        $truncatedValue = $this->filterManager->truncate($optionValue, ['length' => 55, 'etc' => '']);
+        $truncatedValue = nl2br($truncatedValue);
+
+        $result = ['value' => $truncatedValue];
+        if ($this->stringUtils->strlen($optionValue) > 55) {
+            $result['value'] .= ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>';
+            $optionValue = nl2br($optionValue);
+            $result = array_merge($result, ['full_view' => $optionValue]);
+        }
+
+        return $result;
     }
 
     /**
-     * Return current product super attributes.
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute\Collection
+     * @param ProductSubscriptionProfileInterface $item
+     * @return array
      */
-    private function getProductSuperAttributes(\Magento\Catalog\Model\Product $product)
+    public function getItemOptions(ProductSubscriptionProfileInterface $item)
     {
-        return $product->getTypeInstance()->getConfigurableAttributes($product);
+        $result = [];
+        $options = $item->getCustomOptions();
+        if ($options) {
+            if (isset($options['options'])) {
+                $result = array_merge($result, $options['options']);
+            }
+
+            if (isset($options['additional_options'])) {
+                $result = array_merge($result, $options['additional_options']);
+            }
+
+            if (isset($options['attributes_info'])) {
+                $result = array_merge($result, $options['attributes_info']);
+            }
+        }
+
+        return $result;
     }
 
     /**

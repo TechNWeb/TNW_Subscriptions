@@ -136,7 +136,7 @@ class Configurable extends Base
 
         foreach ($attributesData as $attributeData) {
             $iterator++;
-            $result[self::CONTAINER_PREFIX . $attributeData['attributeId']] = [
+            $result[] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
