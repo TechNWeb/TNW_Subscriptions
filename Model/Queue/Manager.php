@@ -369,7 +369,6 @@ class Manager
      *
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
      * @throws \Exception
      */
     public function placeOrderByGroupQueue($groupQueue)

@@ -206,6 +206,11 @@ class Manager
         foreach ($this->getProductAttributesMap() as $profileProductField => $productField) {
             $this->getProfileProduct()->setData($profileProductField, $product->getData($productField));
         }
+
+        $options = $item->getProduct()->getTypeInstance()->getOrderOptions($item->getProduct());
+        unset($options['info_buyRequest']['subscription_data']);
+        $this->getProfileProduct()->setCustomOptions($options);
+
         $buyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
         if (!empty($buyRequest)) {
             $initialFee = !$zeroPrices ? $this->getInitialFeeFromItem($item) : 0;
@@ -308,8 +313,6 @@ class Manager
         ProductSubscriptionProfileInterface $subscriptionProduct
     ) {
         $products = [];
-        $confOptions = $item->getBuyRequest()->getDataByPath('super_attribute');
-        $subscriptionProduct->setCustomOptions(\Zend_Json::encode($confOptions));
 
         $productObject = new DataObject($item->getProduct()->getData());
         $productObject
@@ -321,7 +324,6 @@ class Manager
             $product = $this->reset()
                 ->populateProductDataFromQuoteItem($child, $productObject, true)
                 ->getProfileProduct();
-            $product->setCustomOptions(\Zend_Json::encode($confOptions));
             $products[] = $product;
         }
 

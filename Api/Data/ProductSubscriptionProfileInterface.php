@@ -371,7 +371,7 @@ interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterf
     /**
      * Gets custom options.
      *
-     * @return int|null
+     * @return array
      */
     public function getCustomOptions();
 
