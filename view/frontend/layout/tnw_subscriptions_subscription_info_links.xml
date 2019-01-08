@@ -22,13 +22,13 @@
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.shipping">
                     <arguments>
                         <argument name="path" xsi:type="string">tnw_subscriptions/subscription/shipment</argument>
-                        <argument name="label" xsi:type="string" translate="true">Shipping information</argument>
+                        <argument name="label" xsi:type="string" translate="true">Shipping Information</argument>
                     </arguments>
                 </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.billing">
                     <arguments>
                         <argument name="path" xsi:type="string">tnw_subscriptions/subscription/billing</argument>
-                        <argument name="label" xsi:type="string" translate="true">Billing information</argument>
+                        <argument name="label" xsi:type="string" translate="true">Billing Information</argument>
                     </arguments>
                 </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.items">
