@@ -204,11 +204,7 @@ class ProductsForm extends SummaryProductsForm
     {
         return (
             null !== $this->currentProduct
-            && !(
-                $this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
-                && count($this->getProductBillingFrequencies($this->currentProduct->getId())) <= 1
-            )
+            && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
         );
     }
-
 }
