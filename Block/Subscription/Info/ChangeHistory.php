@@ -61,9 +61,33 @@ class ChangeHistory extends ContentAbstract
                 $this->getSubscriptionProfile()->getId()
             )
                 ->addFieldToFilter('is_visible_on_front', 1);
+
+            foreach ($this->messagesCollection as $message) {
+                $this->prepareMessageHistoryData($message);
+            }
         }
 
+
         return $this->messagesCollection;
+    }
+
+    /**
+     * @param $messageHistoryData
+     * @return array
+     */
+    private function prepareMessageHistoryData($messageHistoryData)
+    {
+        $convertedData = [];
+        $convertedData['is_message_comment'] = $messageHistoryData['is_comment'] ? 1 : 0;
+        $convertedData['comment_type'] = $messageHistoryData['is_comment'] ? __('Comment') : '';
+
+        $convertedData['message'] = $messageHistoryData['is_comment']
+            ? sprintf('"%s"', $messageHistoryData['message'])
+            : $messageHistoryData['message'];
+
+        $messageHistoryData->addData($convertedData);
+
+        return $messageHistoryData;
     }
 
     /**

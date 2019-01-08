@@ -14,7 +14,11 @@
             <ul>
                 <?php foreach ($messagesCollection as $messageItem): ?>
                     <li class="history-row">
-                        <div class="message-text">
+                        <div class="message-type">
+                            <?php echo $messageItem->getCommentType();?>
+                        </div>
+
+                        <div class="message-text <?php echo $messageItem->getIsComment()?'comment':''; ?>">
                             <?php echo $messageItem->formatMessage();?>
                         </div>
                         <div class="message-source">
