@@ -12,7 +12,7 @@
             <block class="Magento\Framework\View\Element\Js\Components" name="checkout_cart_configure_head_components" template="Magento_Checkout::js/components.phtml"/>
         </referenceBlock>
         <referenceBlock name="product.info">
-            <block class="Magento\Checkout\Block\Cart\Item\Configure" name="checkout.cart.item.configure.block"/>
+            <block class="TNW\Subscriptions\Block\Subscription\Url\Configure" name="checkout.cart.item.configure.block"/>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart">
             <action method="setTemplate">
@@ -24,7 +24,7 @@
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart-tabs.phtml</argument>
             </action>
-            <block class="TNW\Subscriptions\Block\Subscription\Product\Edit" name="product.info.updatecart.subscription" as="updatecart_subscribe" template="TNW_Subscriptions::product/view/updatesubscription/subscribe.phtml"/>
+            <block class="TNW\Subscriptions\Block\Subscription\Product\Edit" name="product.info.updatecart.subscription.additional" as="updatecart_subscribe" template="TNW_Subscriptions::product/view/updatesubscription/subscribe.phtml"/>
         </referenceBlock>
         <referenceBlock name="reviews.tab" remove="true"/>
         <referenceBlock name="view.addto.compare" remove="true"/>

@@ -49,14 +49,9 @@ class Products extends BaseSummary
     private $productAttributeRepository;
 
     /**
-     * @var \Magento\Catalog\Model\Product\OptionFactory
+     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable
      */
-    private $productOptionFactory;
-
-    /**
-     * @var \Magento\Framework\Stdlib\StringUtils
-     */
-    private $stringUtils;
+    private $managerConfigurable;
 
     /**
      * @param Template\Context $context
@@ -66,9 +61,7 @@ class Products extends BaseSummary
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
      * @param FormContext $formContext
      * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
-     * @param \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory
-     * @param \Magento\Framework\Stdlib\StringUtils $stringUtils
-     * @param array $data
+     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable
      */
     public function __construct(
         Template\Context $context,
@@ -78,8 +71,7 @@ class Products extends BaseSummary
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
         \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
-        \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory,
-        \Magento\Framework\Stdlib\StringUtils $stringUtils,
+        \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -89,8 +81,7 @@ class Products extends BaseSummary
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
         $this->productAttributeRepository = $productAttributeRepository;
-        $this->productOptionFactory = $productOptionFactory;
-        $this->stringUtils = $stringUtils;
+        $this->managerConfigurable = $managerConfigurable;
     }
 
     /**
@@ -273,73 +264,16 @@ class Products extends BaseSummary
      */
     public function getItemOptions(ProductSubscriptionProfileInterface $item)
     {
-        $result = [];
-        $options = $item->getCustomOptions();
-        if ($options) {
-            if (isset($options['options'])) {
-                $result = array_merge($result, $options['options']);
-            }
-
-            if (isset($options['additional_options'])) {
-                $result = array_merge($result, $options['additional_options']);
-            }
-
-            if (isset($options['attributes_info'])) {
-                $result = array_merge($result, $options['attributes_info']);
-            }
-        }
-
-        return $result;
+        return $this->managerConfigurable->getItemOptions($item);
     }
 
+    /**
+     * @param $optionValue
+     * @return array
+     */
     public function getFormatedOptionValue($optionValue)
     {
-        $optionInfo = [];
-
-        // define input data format
-        if (is_array($optionValue)) {
-            if (isset($optionValue['option_id'])) {
-                $optionInfo = $optionValue;
-                if (isset($optionInfo['value'])) {
-                    $optionValue = $optionInfo['value'];
-                }
-            } elseif (isset($optionValue['value'])) {
-                $optionValue = $optionValue['value'];
-            }
-        }
-
-        // render customized option view
-        if (isset($optionInfo['custom_view']) && $optionInfo['custom_view']) {
-            $default = ['value' => $optionValue];
-            if (isset($optionInfo['option_type'])) {
-                try {
-                    $group = $this->productOptionFactory->create()->groupFactory($optionInfo['option_type']);
-                    return ['value' => $group->getCustomizedView($optionInfo)];
-                } catch (\Exception $e) {
-                    return $default;
-                }
-            }
-            return $default;
-        }
-
-        // truncate standard view
-        if (is_array($optionValue)) {
-            $truncatedValue = implode("\n", $optionValue);
-            $truncatedValue = nl2br($truncatedValue);
-            return ['value' => $truncatedValue];
-        }
-
-        $truncatedValue = $this->filterManager->truncate($optionValue, ['length' => 55, 'etc' => '']);
-        $truncatedValue = nl2br($truncatedValue);
-
-        $result = ['value' => $truncatedValue];
-        if ($this->stringUtils->strlen($optionValue) > 55) {
-            $result['value'] .= ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>';
-            $optionValue = nl2br($optionValue);
-            $result = array_merge($result, ['full_view' => $optionValue]);
-        }
-
-        return $result;
+        return $this->managerConfigurable->getFormatedOptionValue($optionValue);
     }
 
     /**

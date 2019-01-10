@@ -5,16 +5,11 @@
  */
 namespace TNW\Subscriptions\Controller\Subscription\Products;
 
-use Magento\Customer\Model\Session as CustomerSession;
-use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
-use Magento\Quote\Model\Quote\ItemFactory;
-use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Model\Context as ContextModel;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
@@ -28,11 +23,6 @@ class Edit extends \Magento\Framework\App\Action\Action
      * @var ProductSubscriptionProfileRepository
      */
     private $productSubscriptionRepository;
-
-    /**
-     * @var DataPersistorInterface
-     */
-    private $dataPersistor;
 
     /**
      * Core registry
@@ -49,40 +39,21 @@ class Edit extends \Magento\Framework\App\Action\Action
     private $profileManager;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var ContextModel
-     */
-    private $contextModel;
-
-    /**
      * @param Context $context
      * @param ProductSubscriptionProfileRepository $productSubscriptionRepository
-     * @param DataPersistorInterface $dataPersistor
      * @param Registry $registry
      * @param ProfileManager $profileManager
-     * @param LoggerInterface $logger
-     * @param ContextModel $contextModel
      */
     public function __construct(
         Context $context,
         ProductSubscriptionProfileRepository $productSubscriptionRepository,
-        DataPersistorInterface $dataPersistor,
         Registry $registry,
-        ProfileManager $profileManager,
-        LoggerInterface $logger,
-        ContextModel $contextModel
+        ProfileManager $profileManager
     ) {
         parent::__construct($context);
         $this->productSubscriptionRepository = $productSubscriptionRepository;
-        $this->dataPersistor = $dataPersistor;
         $this->coreRegistry = $registry;
         $this->profileManager = $profileManager;
-        $this->logger = $logger;
-        $this->contextModel = $contextModel;
     }
 
     /**
@@ -95,14 +66,16 @@ class Edit extends \Magento\Framework\App\Action\Action
         // Extract subscription profile and product to configure
         $subscriprionProductId = (int)$this->getRequest()->getParam('id');
         $productId = (int)$this->getRequest()->getParam('product_id');
-        $subscriprionProduct = null;
-        if ($subscriprionProductId) {
+
+        try {
             $subscriprionProduct = $this->productSubscriptionRepository->getById($subscriprionProductId);
             $subscriptionProfile = $this->profileManager->loadProfile($subscriprionProduct->getSubscriptionProfileId());
-        } else {
-            $this->messageManager->addError(
+        } catch (NoSuchEntityException $e) {
+            $this->messageManager->addExceptionMessage(
+                $e,
                 __('Product with ID %1 could not be found. Cannot Edit the product on the Subscription Profile.', $productId)
             );
+
             return $this->goBack('customer/account');
         }
 
@@ -119,13 +92,12 @@ class Edit extends \Magento\Framework\App\Action\Action
 
             return $resultPage;
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->messageManager->addError(__('We cannot configure the product.'));
-            $this->logger->critical($e);
+            $this->messageManager->addExceptionMessage($e, __('We cannot configure the product.'));
             if ($subscriptionProfile->getId()) {
                 return $this->goBack('tnw_subscriptions/subscription/items', $subscriptionProfile->getId());
-            } else {
-                return $this->goBack('customer/account/');
             }
+
+            return $this->goBack('customer/account/');
         }
     }
 
@@ -159,8 +131,8 @@ class Edit extends \Magento\Framework\App\Action\Action
         $params = new \Magento\Framework\DataObject();
         $customData = $subscriprionProduct->getCustomOptions();
 
-        if (!empty($customData)) {
-            $buyRequest = new \Magento\Framework\DataObject($customData);
+        if (!empty($customData['info_buyRequest'])) {
+            $buyRequest = new \Magento\Framework\DataObject($customData['info_buyRequest']);
             $params->setBuyRequest($buyRequest);
         }
 

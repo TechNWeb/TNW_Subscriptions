@@ -64,7 +64,8 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     protected function isUsedModifier()
     {
         if ($this->getProduct()) {
-            return $this->getProduct()->getTypeId() === $this::PRODUCT_TYPE;
+            $options = $this->getProduct()->getOptions();
+            return !empty($options) || $this->getProduct()->getTypeId() === $this::PRODUCT_TYPE;
         }
 
         return false;
@@ -111,7 +112,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
         $url = $this->urlFactory->create();
         $params = $this->getUrlParams();
 
-        return $url->getUrl('tnw_subscriptions/subscription_products/edit'). '?' . http_build_query($params);
+        return $url->getUrl('tnw_subscriptions/subscription_products/edit', $params);
     }
 
     /**
