@@ -131,13 +131,13 @@ define([
                      * @param {Object} response
                      */
                     onError: function (response) {
-                        self.processErrors(response.message);
+                        self.processErrors([response.message]);
                         $('body').trigger('processStop');
                     }
                 });
             } catch (e) {
                 $('body').trigger('processStop');
-                this.processErrors(e.message);
+                this.processErrors([e.message]);
             }
         },
 

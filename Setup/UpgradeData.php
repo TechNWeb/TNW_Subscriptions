@@ -99,6 +99,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->fillProfileItemSalesItemTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.15', '<')) {
+            $this->upgradeProfileProductCustomOptions($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -370,5 +374,36 @@ class UpgradeData implements UpgradeDataInterface
 
         $query = $connection->insertFromSelect($select, $setup->getTable('tnw_subscriptions_profile_item_sales_item'));
         $connection->query($query);
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     */
+    private function upgradeProfileProductCustomOptions(ModuleDataSetupInterface $setup)
+    {
+        $productSubscriptionTable = $setup->getTable('tnw_subscriptions_product_subscription_profile_entity');
+
+        $connection = $setup->getConnection();
+        $select = $connection->select()
+            ->from($productSubscriptionTable, ['entity_id', 'custom_options'])
+            ->where('custom_options IS NOT NULL');
+
+        foreach ($connection->fetchPairs($select) as $entityId => $options) {
+            try {
+                $options = \Zend_Json::decode($options);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            if (isset($options['info_buyRequest'])) {
+                continue;
+            }
+
+            $connection->update(
+                $productSubscriptionTable,
+                ['custom_options' => \Zend_Json::encode(['info_buyRequest' => ['super_attribute' => $options]])],
+                $connection->prepareSqlCondition('entity_id', $entityId)
+            );
+        }
     }
 }

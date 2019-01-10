@@ -21,8 +21,18 @@
                         <dt class="qty"><?php echo __('Qty') ?></dt>
                         <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
-                    <?php echo $block->renderProductOptions($item);?>
                     <dl class="item-options custom-attributes">
+                    <?php foreach ($block->getItemOptions($item) as $option): ?>
+                        <dt><?= $block->escapeHtml($option['label']) ?></dt>
+                        <?php $formatedOptionValue = $block->getFormatedOptionValue($option) ?>
+                        <dd>
+                            <?php if (isset($formatedOptionValue['full_view'])): ?>
+                                <?= /* @escapeNotVerified */ $formatedOptionValue['full_view'] ?>
+                            <?php else: ?>
+                                <?= /* @escapeNotVerified */ $formatedOptionValue['value'] ?>
+                            <?php endif; ?>
+                        </dd>
+                    <?php endforeach; ?>
                     <?php foreach ($block->customAttributes($item) as $attribute): ?>
                         <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
                         <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>

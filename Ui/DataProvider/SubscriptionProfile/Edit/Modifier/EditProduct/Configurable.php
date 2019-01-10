@@ -136,7 +136,7 @@ class Configurable extends Base
 
         foreach ($attributesData as $attributeData) {
             $iterator++;
-            $result[self::CONTAINER_PREFIX . $attributeData['attributeId']] = [
+            $result[] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
@@ -167,6 +167,8 @@ class Configurable extends Base
         $currentFormName = $this->registry->registry('form_full_name');
         $leftContainerName = $currentFormName . '.description_fieldset.left_container';
 
+        $customOptions = $this->getItem()->getCustomOptions();
+
         return [
             'children' => [
                 'edit_options' => [
@@ -188,7 +190,9 @@ class Configurable extends Base
                                             $this->getProduct()->getId(), //product id
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
-                                            $this->getItem()->getCustomOptions() //super attributes data
+                                            isset($customOptions['info_buyRequest']['super_attribute'])
+                                                ? \Zend_Json::encode($customOptions['info_buyRequest']['super_attribute'])
+                                                : '', //super attributes data
                                         ],
                                     ],
                                 ],
@@ -199,23 +203,5 @@ class Configurable extends Base
                 ],
             ],
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getUrlParams()
-    {
-        $params = parent::getUrlParams();
-        $attributes = [];
-        $attributesData = $this->getItem()->getCustomOptions();
-
-        if ($this->contextModel->isJson($attributesData)) {
-            $attributes = \Zend_Json::decode($attributesData);
-        }
-
-        $params['attributes'] = $attributes;
-
-        return $params;
     }
 }

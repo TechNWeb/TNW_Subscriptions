@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Api\AttributeInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
@@ -20,13 +18,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
  */
 class Products extends BaseSummary
 {
-    /**
-     * Product types that can be configured.
-     */
-    const CONFIGURE_TYPES = [
-        ConfigurableProduct::TYPE_CODE,
-    ];
-
     /**
      * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
      */
@@ -58,6 +49,11 @@ class Products extends BaseSummary
     private $productAttributeRepository;
 
     /**
+     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable
+     */
+    private $managerConfigurable;
+
+    /**
      * @param Template\Context $context
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
@@ -65,7 +61,7 @@ class Products extends BaseSummary
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
      * @param FormContext $formContext
      * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
-     * @param array $data
+     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable
      */
     public function __construct(
         Template\Context $context,
@@ -75,6 +71,7 @@ class Products extends BaseSummary
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
         \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
+        \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -84,6 +81,7 @@ class Products extends BaseSummary
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
         $this->productAttributeRepository = $productAttributeRepository;
+        $this->managerConfigurable = $managerConfigurable;
     }
 
     /**
@@ -257,44 +255,25 @@ class Products extends BaseSummary
     public function formatPrice($value)
     {
         $currency = $this->currency->getCurrency($this->getSubscriptionProfile()->getProfileCurrencyCode());
-        return $currency->toCurrency(sprintf("%f", $value));
+        return $currency->toCurrency(sprintf('%f', $value));
     }
 
     /**
-     * Check if product options can be shown.
-     * Depend on product type.
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return bool
-     */
-    public function canShowProductOptions(\Magento\Catalog\Model\Product $product)
-    {
-        return in_array($product->getTypeId(), self::CONFIGURE_TYPES);
-    }
-
-    /**
-     * Render item product options.
-     *
      * @param ProductSubscriptionProfileInterface $item
-     * @return string
+     * @return array
      */
-    public function renderProductOptions(ProductSubscriptionProfileInterface $item)
+    public function getItemOptions(ProductSubscriptionProfileInterface $item)
     {
-        $product = $this->getProductFromItem($item);
+        return $this->managerConfigurable->getItemOptions($item);
+    }
 
-        if ($product && $this->canShowProductOptions($product)) {
-            $productType = $product->getTypeId();
-
-            $childBlock = $this->getChildBlock($productType . '.product');
-
-            if ($childBlock && $childBlock instanceof \Magento\Framework\View\Element\Template) {
-                $childBlock->setItem($item);
-
-                return $childBlock->toHtml();
-            }
-        }
-
-        return '';
+    /**
+     * @param $optionValue
+     * @return array
+     */
+    public function getFormatedOptionValue($optionValue)
+    {
+        return $this->managerConfigurable->getFormatedOptionValue($optionValue);
     }
 
     /**

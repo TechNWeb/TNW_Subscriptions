@@ -12,6 +12,7 @@ use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
  * Class Address
+ * @package TNW\Subscriptions\Block\Subscription\Summary
  */
 class Address extends BaseSummary
 {
@@ -93,5 +94,19 @@ class Address extends BaseSummary
         $params['shipping_address'] = 1;
 
         return parent::getEditUrl($tabName, $params);
+    }
+
+    /**
+     * Render block HTML
+     *
+     * @return string
+     */
+    protected function _toHtml()
+    {
+        if ($this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING && $this->getSubscriptionProfile()->getIsVirtual()) {
+            return;
+        }
+
+        return parent::_toHtml();
     }
 }

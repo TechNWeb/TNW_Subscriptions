@@ -271,11 +271,11 @@ class SummaryInsertForm extends BaseFormModifier
         $result = true;
         switch ($formType) {
             case self::SHIPPING_METHODS_INSERT_FORM:
-                if ((bool)$this->getProfile()->getIsVirtual()) {
+            case self::SHIPPING_INFORMATION_INSERT_FORM:
+            if ((bool)$this->getProfile()->getIsVirtual()) {
                     $result = false;
                 }
                 break;
-            case self::SHIPPING_INFORMATION_INSERT_FORM:
             case self::BILLING_INFORMATION_INSERT_FORM:
             case self::PAYMENT_METHODS_INSERT_FORM:
             case self::PRODUCTS_INSERT_FORM:
