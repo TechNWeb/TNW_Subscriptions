@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Api\AttributeInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
@@ -20,13 +18,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
  */
 class Products extends BaseSummary
 {
-    /**
-     * Product types that can be configured.
-     */
-    const CONFIGURE_TYPES = [
-        ConfigurableProduct::TYPE_CODE,
-    ];
-
     /**
      * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
      */
@@ -58,6 +49,16 @@ class Products extends BaseSummary
     private $productAttributeRepository;
 
     /**
+     * @var \Magento\Catalog\Model\Product\OptionFactory
+     */
+    private $productOptionFactory;
+
+    /**
+     * @var \Magento\Framework\Stdlib\StringUtils
+     */
+    private $stringUtils;
+
+    /**
      * @param Template\Context $context
      * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
      * @param \Magento\Framework\Locale\CurrencyInterface $currency
@@ -65,6 +66,8 @@ class Products extends BaseSummary
      * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
      * @param FormContext $formContext
      * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
+     * @param \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory
+     * @param \Magento\Framework\Stdlib\StringUtils $stringUtils
      * @param array $data
      */
     public function __construct(
@@ -75,6 +78,8 @@ class Products extends BaseSummary
         \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
         FormContext $formContext,
         \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
+        \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory,
+        \Magento\Framework\Stdlib\StringUtils $stringUtils,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -84,6 +89,8 @@ class Products extends BaseSummary
         $this->descriptionCreator = $descriptionCreator;
         $this->formContext = $formContext;
         $this->productAttributeRepository = $productAttributeRepository;
+        $this->productOptionFactory = $productOptionFactory;
+        $this->stringUtils = $stringUtils;
     }
 
     /**
@@ -257,44 +264,82 @@ class Products extends BaseSummary
     public function formatPrice($value)
     {
         $currency = $this->currency->getCurrency($this->getSubscriptionProfile()->getProfileCurrencyCode());
-        return $currency->toCurrency(sprintf("%f", $value));
+        return $currency->toCurrency(sprintf('%f', $value));
     }
 
     /**
-     * Check if product options can be shown.
-     * Depend on product type.
-     *
-     * @param \Magento\Catalog\Model\Product $product
-     * @return bool
-     */
-    public function canShowProductOptions(\Magento\Catalog\Model\Product $product)
-    {
-        return in_array($product->getTypeId(), self::CONFIGURE_TYPES);
-    }
-
-    /**
-     * Render item product options.
-     *
      * @param ProductSubscriptionProfileInterface $item
-     * @return string
+     * @return array
      */
-    public function renderProductOptions(ProductSubscriptionProfileInterface $item)
+    public function getItemOptions(ProductSubscriptionProfileInterface $item)
     {
-        $product = $this->getProductFromItem($item);
+        $result = [];
+        $options = $item->getCustomOptions();
+        if ($options) {
+            if (isset($options['options'])) {
+                $result = array_merge($result, $options['options']);
+            }
 
-        if ($product && $this->canShowProductOptions($product)) {
-            $productType = $product->getTypeId();
+            if (isset($options['additional_options'])) {
+                $result = array_merge($result, $options['additional_options']);
+            }
 
-            $childBlock = $this->getChildBlock($productType . '.product');
-
-            if ($childBlock && $childBlock instanceof \Magento\Framework\View\Element\Template) {
-                $childBlock->setItem($item);
-
-                return $childBlock->toHtml();
+            if (isset($options['attributes_info'])) {
+                $result = array_merge($result, $options['attributes_info']);
             }
         }
 
-        return '';
+        return $result;
+    }
+
+    public function getFormatedOptionValue($optionValue)
+    {
+        $optionInfo = [];
+
+        // define input data format
+        if (is_array($optionValue)) {
+            if (isset($optionValue['option_id'])) {
+                $optionInfo = $optionValue;
+                if (isset($optionInfo['value'])) {
+                    $optionValue = $optionInfo['value'];
+                }
+            } elseif (isset($optionValue['value'])) {
+                $optionValue = $optionValue['value'];
+            }
+        }
+
+        // render customized option view
+        if (isset($optionInfo['custom_view']) && $optionInfo['custom_view']) {
+            $default = ['value' => $optionValue];
+            if (isset($optionInfo['option_type'])) {
+                try {
+                    $group = $this->productOptionFactory->create()->groupFactory($optionInfo['option_type']);
+                    return ['value' => $group->getCustomizedView($optionInfo)];
+                } catch (\Exception $e) {
+                    return $default;
+                }
+            }
+            return $default;
+        }
+
+        // truncate standard view
+        if (is_array($optionValue)) {
+            $truncatedValue = implode("\n", $optionValue);
+            $truncatedValue = nl2br($truncatedValue);
+            return ['value' => $truncatedValue];
+        }
+
+        $truncatedValue = $this->filterManager->truncate($optionValue, ['length' => 55, 'etc' => '']);
+        $truncatedValue = nl2br($truncatedValue);
+
+        $result = ['value' => $truncatedValue];
+        if ($this->stringUtils->strlen($optionValue) > 55) {
+            $result['value'] .= ' <a href="#" class="dots tooltip toggle" onclick="return false">...</a>';
+            $optionValue = nl2br($optionValue);
+            $result = array_merge($result, ['full_view' => $optionValue]);
+        }
+
+        return $result;
     }
 
     /**

@@ -91,8 +91,8 @@ class ManagerConfigurable
                     foreach ($itemChildren as $itemChild) {
                         $customOptions = $itemChild->getCustomOptions();
 
-                        if ($customOptions) {
-                            $decodedOptions = \Zend_Json::decode($customOptions);
+                        if (isset($customOptions['info_buyRequest']['super_attribute'])) {
+                            $decodedOptions = $customOptions['info_buyRequest']['super_attribute'];
 
                             foreach ($productSuperAttributes as $attribute) {
                                 $productAttribute = $attribute->getProductAttribute();

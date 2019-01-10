@@ -38,17 +38,8 @@
                         <argument name="show_title" xsi:type="boolean">true</argument>
                     </arguments>
                 </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Products"
-                       name="subscription.info.view.products" as="products"
-                       template="TNW_Subscriptions::subscription_profile/summary/products.phtml" >
-                    <block class="TNW\Subscriptions\Block\Subscription\Summary\Products\Configurable"
-                           name="subscription.info.view.products.configurable" as="configurable.product"
-                           template="TNW_Subscriptions::subscription_profile/summary/products/configurable.phtml" />
-                </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone"
-                       name="subscription.info.view.danger_zone"
-                       template="TNW_Subscriptions::subscription_profile/summary/overview/danger-zone.phtml"
-                       as="danger-zone" cacheable="false" />
+                <block name="subscription.info.view.products" as="products" class="TNW\Subscriptions\Block\Subscription\Summary\Products" template="TNW_Subscriptions::subscription_profile/summary/products.phtml" />
+                <block name="subscription.info.view.danger_zone" as="danger-zone" class="TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone" template="TNW_Subscriptions::subscription_profile/summary/overview/danger-zone.phtml" cacheable="false" />
             </block>
         </referenceContainer>
     </body>

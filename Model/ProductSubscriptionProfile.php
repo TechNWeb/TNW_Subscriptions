@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
-use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
@@ -487,10 +485,20 @@ class ProductSubscriptionProfile
 
     /**
      * @inheritdoc
+     * @throws
      */
     public function getCustomOptions()
     {
-        return $this->getData(self::CUSTOM_OPTIONS);
+        $options = $this->getData(self::CUSTOM_OPTIONS);
+        if (empty($options)) {
+            return [];
+        }
+
+        try {
+            return \Zend_Json::decode($options);
+        } catch (\Zend_Json_Exception $e) {
+            return [];
+        }
     }
 
     /**
@@ -498,7 +506,7 @@ class ProductSubscriptionProfile
      */
     public function setCustomOptions($customOptions)
     {
-        $this->setData(self::CUSTOM_OPTIONS, $customOptions);
+        $this->setData(self::CUSTOM_OPTIONS, \Zend_Json::encode($customOptions));
         return $this;
     }
 
