@@ -9,7 +9,7 @@
 <div class="sub-profile-option">
     <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b><br>
     <?php foreach ($profileIds as $profileId) :?>
-    <span><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></span>
+    <span><a href="<?= /* @escapeNotVerified */ $block->linkProfileId($profileId) ?>" target="_blank"><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></a></span>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
