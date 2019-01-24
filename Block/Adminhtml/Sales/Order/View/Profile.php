@@ -1,13 +1,7 @@
 <?php
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
-namespace TNW\Subscriptions\Block\Sales\Order\Additional;
+namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\View;
 
-use Magento\Framework\View\Element\Template;
-
-class Profile extends \Magento\Framework\View\Element\Template
+class Profile extends \Magento\Backend\Block\Template
 {
     /**
      * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
@@ -15,29 +9,22 @@ class Profile extends \Magento\Framework\View\Element\Template
     private $itemRelationResource;
 
     public function __construct(
-        Template\Context $context,
+        \Magento\Backend\Block\Template\Context $context,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,
         array $data = []
     ) {
         parent::__construct($context, $data);
-
         $this->itemRelationResource = $itemRelationResource;
     }
 
     /**
+     * Get order item object from parent block
+     *
      * @return \Magento\Sales\Model\Order\Item
      */
-    private function getItem()
+    public function getItem()
     {
         return $this->getParentBlock()->getData('item');
-    }
-
-    /**
-     * @return \Magento\Sales\Model\Order
-     */
-    public function getOrder()
-    {
-        return $this->getItem()->getOrder();
     }
 
     /**
@@ -55,12 +42,12 @@ class Profile extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * @param int $profileId
+     * @param $profileId
      * @return string
      */
     public function linkProfileId($profileId)
     {
-        return $this->_urlBuilder->getUrl('tnw_subscriptions/subscription/edit', ['entity_id' => $profileId]);
+        return $this->_urlBuilder->getUrl('tnw_subscriptions/subscriptionprofile/edit', ['entity_id' => $profileId]);
     }
 
     /**

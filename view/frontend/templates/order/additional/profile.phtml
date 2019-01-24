@@ -7,9 +7,9 @@
 ?>
 <?php if($profileIds = $block->getProfileIds()) : ?>
 <div class="sub-profile-option">
-    <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b><br>
+    <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b>
     <?php foreach ($profileIds as $profileId) :?>
-    <span><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></span>
+    <br><span><a href="<?= /* @escapeNotVerified */ $block->linkProfileId($profileId) ?>" target="_blank"><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></a></span>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>

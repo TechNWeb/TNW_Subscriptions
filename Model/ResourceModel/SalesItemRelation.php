@@ -71,6 +71,6 @@ class SalesItemRelation extends AbstractDb
             ->where('relation.order_item_id = ?', $orderItemId)
         ;
 
-        return $connection->fetchRow($select);
+        return $connection->fetchCol($select);
     }
 }

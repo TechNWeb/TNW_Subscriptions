@@ -14,5 +14,8 @@
                 </action>
             </block>
         </referenceBlock>
+        <referenceBlock name="order_item_extra_info">
+            <block class="TNW\Subscriptions\Block\Adminhtml\Sales\Order\View\Profile" name="gift_options_link" template="TNW_Subscriptions::sales/order/view/profile.phtml" />
+        </referenceBlock>
     </body>
 </page>
