@@ -196,6 +196,23 @@ class AccountInformation extends Template
     }
 
     /**
+     * Return customer url
+     *
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getCustomerUrl()
+    {
+        if ($this->getCustomer()->getId()) {
+            $url = $this->_urlBuilder->getUrl('admin/customer/view', ['id' => $this->getCustomer()->getId()]);
+        } else {
+            $url = '#';
+        }
+
+        return $url;
+    }
+
+    /**
      * Return customer email
      *
      * @return string
