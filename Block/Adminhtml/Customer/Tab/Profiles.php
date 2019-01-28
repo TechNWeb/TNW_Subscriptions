@@ -3,6 +3,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\Customer\Tab;
 
 use Magento\Customer\Controller\RegistryConstants;
@@ -35,6 +36,10 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
     protected $collectionFactory;
 
     /**
+     * @var \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options
+     */
+    protected $profileStatusOption;
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
      * @param \Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory $collectionFactory
@@ -48,11 +53,14 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
         \Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory $collectionFactory,
         \Magento\Sales\Helper\Reorder $salesReorder,
         \Magento\Framework\Registry $coreRegistry,
+        \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options $profileStatusOption,
         array $data = []
-    ) {
+    )
+    {
         $this->_coreRegistry = $coreRegistry;
         $this->_salesReorder = $salesReorder;
         $this->_collectionFactory = $collectionFactory;
+        $this->profileStatusOption = $profileStatusOption;
         parent::__construct($context, $backendHelper, $data);
     }
 
@@ -80,7 +88,9 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
             'customer_id'
         )->addFieldToSelect(
             'created_at'
-        )->addFieldToFilter(
+        );
+
+        $collection->addFieldToFilter(
             'main_table.customer_id',
             $this->_coreRegistry->registry(RegistryConstants::CURRENT_CUSTOMER_ID)
         );
@@ -96,13 +106,49 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
     {
 
         $this->addColumn(
-            'entity_id',
-            ['header' => __('#'), 'index' => 'entity_id']
+            'label',
+            ['header' => __('Label'), 'index' => 'label']
+        );
+
+        $this->addColumn(
+            'frequency_label',
+            ['header' => __('Billing Frequency'), 'index' => 'frequency_label']
+        );
+
+        $this->addColumn(
+            'start_date',
+            ['header' => __('Trial End Date'), 'index' => 'start_date', 'type' => 'date']
+        );
+
+        $this->addColumn(
+            'next_billing_cycle_date',
+            ['header' => __('Next Bill Date'), 'index' => 'next_billing_cycle_date', 'type' => 'date']
+        );
+
+        $this->addColumn(
+            'grand_total',
+            ['header' => __('Next Payment'), 'index' => 'grand_total', 'type' => 'currency']
+        );
+
+        $this->addColumn(
+            'current_value',
+            ['header' => __('Current Value'), 'index' => 'current_value', 'type' => 'currency']
+        );
+
+        $this->addColumn(
+            'status',
+            [
+                'header' => __('Status'),
+                'index' => 'status',
+                'type' => 'options',
+                'source' =>\TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options::class,
+                'options' => $this->profileStatusOption->getAllOptions()
+            ]
         );
 
         $this->addColumn(
             'created_at',
-            ['header' => __('Purchased'), 'index' => 'created_at', 'type' => 'datetime']
+            ['header' => __('Purchased'), 'index' => 'created_at', 'type' => 'date']
         );
 
         return parent::_prepareColumns();
