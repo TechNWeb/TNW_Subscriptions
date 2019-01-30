@@ -6,32 +6,19 @@
  */
 -->
 
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="category.products">
-            <block class="TNW\Subscriptions\Block\Product\ListProduct" name="category.products.list" as="product_list" template="TNW_Subscriptions::product/list.phtml" before="-">
-                <container name="category.product.list.additional" as="additional" />
-                <block class="Magento\Framework\View\Element\RendererList" name="category.product.type.details.renderers" as="details.renderers">
-                    <block class="Magento\Framework\View\Element\Template" as="default"/>
-                </block>
-                <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="category.product.addto" as="addto">
-                    <block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
-                           name="category.product.addto.compare" as="compare"
-                           template="Magento_Catalog::product/list/addto/compare.phtml"/>
-                </block>
-                <block class="Magento\Catalog\Block\Product\ProductList\Toolbar" name="product_list_toolbar" template="Magento_Catalog::product/list/toolbar.phtml">
-                    <block class="Magento\Theme\Block\Html\Pager" name="product_list_toolbar_pager"/>
-                </block>
-                <action method="setToolbarBlockName">
-                    <argument name="name" xsi:type="string">product_list_toolbar</argument>
-                </action>
-            </block>
+        <referenceBlock name="category.products.list">
+
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/list.phtml</argument>
+            </action>
+
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.category.products.list"
+                   as="helper.category.products.list"/>
         </referenceBlock>
-        <!-- We must add reference from wishlist, becouse we change category product list block -->
-        <referenceBlock name="category.product.addto">
-            <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
-                   name="category.product.addto.wishlist" as="wishlist" before="compare"
-                   template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
-        </referenceBlock>
+
     </body>
 </page>

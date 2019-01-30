@@ -74,14 +74,14 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         <div class="product-item-inner">
                             <div class="product actions product-item-actions"<?php echo strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
-                                $block->prepareParamsToButtonsBlock(
+                                $block->getChildBlock('helper.category.products.list')->prepareParamsToButtonsBlock(
                                         $_product,
                                         $pos,
                                         $viewMode,
                                         $position,
                                         $block->getAddToCartPostParams($_product)
                                 );
-                                echo $block->getButtonsHtml();
+                                echo $block->getChildBlock('helper.category.products.list')->getButtonsHtml();
                                 ?>
                                 <div data-role="add-to-links" class="actions-secondary"<?php echo strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
                                     <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
