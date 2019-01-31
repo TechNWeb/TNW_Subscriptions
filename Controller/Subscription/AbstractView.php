@@ -67,15 +67,20 @@ abstract class AbstractView extends AbstractAccount
      */
     public function execute()
     {
-        $subscriptionProfileId = $this->getSubscriptionId();
+        $subscriptionProfileId = $this->getRequest()->getParam('entity_id');
 
-        if (!$subscriptionProfileId) {
+        try {
+            /** @var SubscriptionProfile $subscription */
+            $subscription = $this->subscriptionRepository->getById($subscriptionProfileId);
+            $this->registry->register('tnw_subscription_profile', $subscription);
+        } catch (NoSuchEntityException $e) {
+            $this->messageManager->addExceptionMessage($e);
             return $this->noRoutRedirect();
         }
 
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Subscription (#S-' . $subscriptionProfileId . ')'));
+        $resultPage->getConfig()->getTitle()->set($this->titleSubscription($subscription));
 
         /** @var \Magento\Framework\View\Element\Html\Links $navigationBlock */
         $navigationBlock = $resultPage->getLayout()->getBlock('customer_account_navigation');
@@ -87,29 +92,17 @@ abstract class AbstractView extends AbstractAccount
     }
 
     /**
-     * Get subscription Id and set subscription model (if it exists) to registry.
-     *
-     * @return bool|int|string
+     * @param SubscriptionProfile $subscription
+     * @return string
      */
-    private function getSubscriptionId()
+    public function titleSubscription($subscription)
     {
-        $subscriptionId = (int)$this->getRequest()->getParam('entity_id');
-        if (!$subscriptionId) {
-            return false;
+        $products = $subscription->getVisibleProducts();
+        if (count($products) === 1) {
+            return __('%1 Subscription (#S-%2)', reset($products)->getName(), $subscription->getId());
         }
 
-        try {
-            /** @var SubscriptionProfile $subscription */
-            $subscription = $this->subscriptionRepository->getById($subscriptionId);
-        } catch (NoSuchEntityException $e) {
-            $subscription = null;
-
-            return false;
-        }
-
-        $this->registry->register('tnw_subscription_profile', $subscription);
-
-        return $subscription->getId();
+        return __('Subscription (#S-%1) - %2 products', $subscription->getId(), count($products));
     }
 
     /**
