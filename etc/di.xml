@@ -49,6 +49,9 @@
             </argument>
         </arguments>
     </type>
+
+    <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
+
     <preference for="TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface"
                 type="TNW\Subscriptions\Model\BillingFrequencyRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\BillingFrequencyInterface"

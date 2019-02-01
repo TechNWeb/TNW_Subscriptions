@@ -103,6 +103,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->upgradeProfileProductCustomOptions($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.18', '<')) {
+            $this->addNextPaymentAttributes($eavSetup);
+        }
+
         $setup->endSetup();
     }
 
@@ -403,6 +407,46 @@ class UpgradeData implements UpgradeDataInterface
                 $productSubscriptionTable,
                 ['custom_options' => \Zend_Json::encode(['info_buyRequest' => ['super_attribute' => $options]])],
                 $connection->prepareSqlCondition('entity_id', $entityId)
+            );
+        }
+    }
+
+
+    /**
+     * Adds attributes for the next payment calculation.
+     *
+     * @param EavSetup $eavSetup
+     */
+    private function addNextPaymentAttributes(EavSetup $eavSetup)
+    {
+        $nextPaymentAttributes = [
+            'subtotal',
+            'shipping',
+            'discount',
+            'tax',
+            'grand_total'
+        ];
+
+        foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
+
+            $eavSetup->addAttribute(
+                SubscriptionProfile::ENTITY,
+                $nextPaymentAttribute,
+                [
+                    'type' => 'decimal',
+                    'backend' => '',
+                    'frontend' => '',
+                    'label' => $nextPaymentAttribute,
+                    'input' => '',
+                    'class' => '',
+                    'visible' => false,
+                    'required' => false,
+                    'user_defined' => false,
+                    'default' => null,
+                    'unique' => false,
+                    'system' => 1,
+                    'sort_order' => 10,
+                ]
             );
         }
     }
