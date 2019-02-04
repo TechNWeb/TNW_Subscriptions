@@ -142,10 +142,8 @@ class History extends \Magento\Framework\View\Element\Template
         if (!$this->subscriptions) {
             $collection = $this->subscriptionCollectionFactory->create();
             $this->subscriptions = $collection
-                ->addFieldToFilter(
-                    'main_table.customer_id',
-                    ['eq' => $customerId]
-                )->setOrder(
+                ->addAttributeToFilter('customer_id', $customerId)
+                ->setOrder(
                     'created_at',
                     'desc'
                 );

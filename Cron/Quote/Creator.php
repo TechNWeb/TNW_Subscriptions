@@ -95,10 +95,16 @@ class Creator extends Base
      */
     public function process(array $data)
     {
-        $this->context->log('Process quote creator');
+        $this->context->messageDebug('Process quote creator');
         foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
-                $this->generateProfileQuotes($profile);
+                try {
+                    $this->context->messageDebug('Profile #%s', $profile->getId());
+
+                    $this->generateProfileQuotes($profile);
+                } catch (\Exception $e) {
+                    $this->context->messageError('Quote creator error. %s', $e->getMessage());
+                }
             }
         }
     }
