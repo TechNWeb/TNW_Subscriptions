@@ -41,4 +41,14 @@ class Options implements OptionSourceInterface
     {
         return $this->profileStatus->getAllOptions();
     }
+
+    /**
+     * Get options
+     *
+     * @return array
+     */
+    public function getAllOptions()
+    {
+        return $this->profileStatus->toOptionArray();
+    }
 }
