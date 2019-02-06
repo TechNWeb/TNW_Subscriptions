@@ -27,23 +27,6 @@ class SubscriptionProfile extends AbstractEntity
     private $timezone;
 
     /**
-     * Retrieve default entity attributes
-     *
-     * @return string[]
-     */
-    protected function _getDefaultAttributes()
-    {
-        return [
-            'website_id',
-            'status',
-            'trial_start_date',
-            'start_date',
-            'created_at',
-            'updated_at',
-        ];
-    }
-
-    /**
      * SubscriptionProfile constructor.
      * @param \Magento\Eav\Model\Entity\Context $context
      * @param \Magento\Framework\EntityManager\EntityManager $entityManager
@@ -54,8 +37,7 @@ class SubscriptionProfile extends AbstractEntity
         \Magento\Framework\EntityManager\EntityManager $entityManager,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct($context, $data);
         $this->entityManager = $entityManager;
         $this->timezone = $timezone;
@@ -158,7 +140,7 @@ class SubscriptionProfile extends AbstractEntity
             $result = $this->getConnection()->query($select)->fetch();
         }
 
-        return $result ?: [];
+        return $result ? : [];
     }
 
     /**
@@ -187,7 +169,7 @@ class SubscriptionProfile extends AbstractEntity
                 ->fetch();
         }
 
-        return $result ?: [];
+        return $result ? : [];
     }
 
     /**

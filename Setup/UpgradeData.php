@@ -411,7 +411,6 @@ class UpgradeData implements UpgradeDataInterface
         }
     }
 
-
     /**
      * Adds attributes for the next payment calculation.
      *
@@ -433,8 +432,7 @@ class UpgradeData implements UpgradeDataInterface
                 SubscriptionProfile::ENTITY,
                 $nextPaymentAttribute,
                 [
-                    'type' => 'decimal',
-                    'backend' => '',
+                    'type' => 'static',
                     'frontend' => '',
                     'label' => $nextPaymentAttribute,
                     'input' => '',

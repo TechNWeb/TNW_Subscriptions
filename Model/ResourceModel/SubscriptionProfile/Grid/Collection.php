@@ -6,59 +6,98 @@
 
 namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid;
 
+use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
+use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
+use Psr\Log\LoggerInterface as Logger;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Class Grid Collection
  */
-class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection implements \Magento\Framework\Api\Search\SearchResultInterface
+class Collection extends SearchResult
 {
     /**
-     * @var Api\Search\AggregationInterface
+     * Collection constructor.
+     * @param EntityFactory $entityFactory
+     * @param Logger $logger
+     * @param FetchStrategy $fetchStrategy
+     * @param EventManager $eventManager
+     * @param string $mainTable
+     * @param string $resourceModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected $aggregations;
-
-    /**
-     * @var Api\Search\SearchCriteriaInterface
-     */
-    protected $searchCriteria;
-
-    /**
-     * @var int
-     */
-    protected $totalCount;
-
-    /**
-     * Define resource model
-     *
-     * @return void
-     */
-    protected function _construct()
-    {
-        $this->_init(
-            \TNW\Subscriptions\Model\SubscriptionProfile::class,
-            \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile::class
+    public function __construct(
+        EntityFactory $entityFactory,
+        Logger $logger,
+        FetchStrategy $fetchStrategy,
+        EventManager $eventManager,
+        $mainTable = SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
+        $resourceModel = Resource::class
+    ) {
+        parent::__construct(
+            $entityFactory,
+            $logger,
+            $fetchStrategy,
+            $eventManager,
+            $mainTable,
+            $resourceModel
         );
     }
 
     /**
-     * @return $this|\Magento\Eav\Model\Entity\Collection\AbstractCollection
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @inheritdoc
+     */
+    protected function _initInitialFieldsToSelect()
+    {
+        parent::_initInitialFieldsToSelect();
+
+        $this->_initialFieldsToSelect = array_merge(
+            $this->_initialFieldsToSelect,
+            [
+                'website_id',
+                'status',
+                'trial_start_date',
+                'start_date',
+                'created_at',
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Init collection select
+     *
+     * @return $this
      */
     protected function _initSelect()
     {
         parent::_initSelect();
         $connection = $this->getConnection();
 
-        $this->addAttributeToSelect('grand_total');
+        $this->addFieldToSelect(
+            [
+                'label' => $connection->getConcatSql(
+                    [
+                        $connection->quote(SubscriptionProfileInterface::LABEL_PREFIX),
+                        'main_table.entity_id',
+                    ]
+                ),
+            ]
+        );
 
         $this->getSelect()
             ->joinLeft(
                 ['frequency' => $this->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
-                'billing_frequency_id = frequency.id',
+                'main_table.billing_frequency_id = frequency.id',
                 ['frequency_label' => 'frequency.label']
             )
             ->joinLeft(
@@ -67,8 +106,13 @@ class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection
                 ['next_billing_cycle_date' => 'relation.scheduled_at']
             )
             ->joinLeft(
+                ['quotes' => $this->getTable('quote')],
+                'quotes.entity_id = relation.magento_quote_id',
+                ['grand_total' => 'quotes.grand_total']
+            )
+            ->joinLeft(
                 ['customer' => $this->getTable('customer_entity')],
-                'customer_id = customer.entity_id',
+                'customer.entity_id = main_table.customer_id',
                 [
                     'customer_name' => $connection->getConcatSql(
                         [
@@ -82,7 +126,7 @@ class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection
             )
             ->joinLeft(
                 ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
-                'e.entity_id = payment.subscription_profile_id',
+                'main_table.entity_id = payment.subscription_profile_id',
                 [
                     'engine_code' => 'payment.engine_code',
                     'payment_additional_info' => 'payment.payment_additional_info',
@@ -104,11 +148,11 @@ class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection
             [$this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
             [SubscriptionProfileOrderInterface::ID]
         )->where(
-            'e.entity_id=' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
+            'main_table.entity_id=' . SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
         )->where(
             SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NULL'
         )->where(
-            'e.status not in (?)', [
+            'main_table.status not in (?)', [
                 ProfileStatus::STATUS_COMPLETE,
                 ProfileStatus::STATUS_CANCELED,
             ]
@@ -117,75 +161,5 @@ class Collection extends \Magento\Eav\Model\Entity\Collection\AbstractCollection
         )->limit(1);
 
         return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setItems(array $items = null)
-    {
-        if ($items) {
-            foreach ($items as $item) {
-                $this->addItem($item);
-            }
-
-            unset($this->totalCount);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAggregations()
-    {
-        return $this->aggregations;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAggregations($aggregations)
-    {
-        $this->aggregations = $aggregations;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSearchCriteria()
-    {
-        return $this->searchCriteria;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setSearchCriteria(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
-    {
-        $this->searchCriteria = $searchCriteria;
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTotalCount()
-    {
-        if (!$this->totalCount) {
-            $this->totalCount = $this->getSize();
-        }
-        return $this->totalCount;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setTotalCount($totalCount)
-    {
-        $this->totalCount = $totalCount;
-        return $this;
     }
 }
