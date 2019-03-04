@@ -11,6 +11,7 @@
         <tnw_subscriptions_general>
             <general>
                 <active>0</active>
+                <show_magento_cart>0</show_magento_cart>
             </general>
             <advanced>
                 <generated_quotes_count>30</generated_quotes_count>
