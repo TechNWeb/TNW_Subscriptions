@@ -32,7 +32,7 @@ class InitialFee extends AbstractTotal
      */
     public function collect(Quote $quote, ShippingAssignmentInterface $shippingAssignment, Total $total)
     {
-        if (!$shippingAssignment->getItems()) {
+        if (!$shippingAssignment->getItems() || $quote->getScheduled()) {
             return $this;
         }
 
