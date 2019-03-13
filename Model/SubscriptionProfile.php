@@ -55,6 +55,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     const STATE_CREATE = 'create';
 
     /**
+     * Prefix of model events names
+     *
+     * @var string
+     */
+    protected $_eventPrefix = 'subscription_profile';
+
+    /**
      * Repository for retrieving customers.
      *
      * @var CustomerRepositoryInterface
