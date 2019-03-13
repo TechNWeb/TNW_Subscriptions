@@ -183,7 +183,7 @@ define([
             var button = this.buttonAdd();
             button.set('disabled', false);
             if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
-                // button.set('disabled', true);
+                 button.set('disabled', true);
             }
         },
 
