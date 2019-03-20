@@ -51,6 +51,11 @@ class SummaryProductsForm extends ModifyForm
     const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'edit_modal_edit_product_options_form';
 
     /**
+     * Data scope for child element
+     */
+    const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID = 'edit_modal_add_product_grid';
+
+    /**
      * Layout handle for form
      */
     const EDIT_PRODUCT_OPTIONS_FORM_HANDLE = 'tnw_subscriptions_subscriptionprofile_edit_product_edit_options';
@@ -189,15 +194,26 @@ class SummaryProductsForm extends ModifyForm
                                 'label' => __('Products'),
                                 'collapsible' => false,
                                 'componentType' => UiForm\Fieldset::NAME,
+                                'component' => 'TNW_Subscriptions/js/form/element/fieldset-buttons',
                                 'additionalClasses' => 'subscription-container',
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                                 'dataScope' => '',
-                                'sortOrder' => $iterator
+                                'sortOrder' => $iterator,
+                                'buttons' => [
+                                    [
+                                        'label' => __('Add products'),
+                                        'action' => [
+                                            'targetName' => '1',
+                                            'actionName' => '',
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
                 ],
                 'editOptionsModal' => $this->getEditOptionsModal(),
+                'addProductModal' => $this->addProductModal()
             ];
         }
 
@@ -265,6 +281,43 @@ class SummaryProductsForm extends ModifyForm
                 ],
             ],
         ];
+    }
+
+    /**
+     * Returns meta data for add product modal window.
+     *
+     * @return array
+     */
+    private function addProductModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'component' => 'TNW_Subscriptions/js/modal/add-product-modal',
+                        'options' => [
+                            'title' => 'Add product',
+                            'modalClass' => 'subscriptions-add-product-modal',
+                        ]
+                    ],
+                ],
+            ],
+            /*'children' => [
+                self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID => $this->getAddProductGrid(),
+            ]*/
+        ];
+    }
+
+    /**
+     * Returns meta data for add product form.
+     *
+     * @return array
+     */
+    private function getAddProductGrid()
+    {
+        return [];
     }
 
     /**
