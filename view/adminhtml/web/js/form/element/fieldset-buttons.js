@@ -15,7 +15,17 @@ define([
             buttons: []
         },
 
-        buttonAction: function (action) {
+        buttonAction: function (actions) {
+            actions.forEach(this.applyAction, this);
+        },
+
+        /**
+         * Apply action on target component,
+         * but previously create this component from template if it is not existed
+         *
+         * @param {Object} action - action configuration
+         */
+        applyAction: function (action) {
             var targetName = action.targetName,
                 params = utils.copy(action.params) || [],
                 actionName = action.actionName,

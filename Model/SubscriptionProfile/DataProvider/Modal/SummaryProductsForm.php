@@ -53,7 +53,7 @@ class SummaryProductsForm extends ModifyForm
     /**
      * Data scope for child element
      */
-    const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID = 'edit_modal_add_product_grid';
+    const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID = 'tnw_subscriptionprofile_summary_add_product_listing';
 
     /**
      * Layout handle for form
@@ -141,6 +141,8 @@ class SummaryProductsForm extends ModifyForm
         $data = [];
         foreach ($this->getObjects() as $subQuote) {
             $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
+            $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
+
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
@@ -202,9 +204,16 @@ class SummaryProductsForm extends ModifyForm
                                 'buttons' => [
                                     [
                                         'label' => __('Add products'),
-                                        'action' => [
-                                            'targetName' => '1',
-                                            'actionName' => '',
+                                        'actions' => [
+                                            [
+                                                'targetName' => '${ $.parentName }.addProductModal',
+                                                'actionName' => 'openModal',
+                                            ],
+                                            [
+                                                'targetName' => '${ $.parentName }.addProductModal.' .
+                                                    self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID,
+                                                'actionName' => 'render',
+                                            ]
                                         ]
                                     ]
                                 ]
@@ -300,13 +309,28 @@ class SummaryProductsForm extends ModifyForm
                         'options' => [
                             'title' => 'Add product',
                             'modalClass' => 'subscriptions-add-product-modal',
+                            'buttons' => [
+                                [
+                                    'text' => __('Cancel'),
+                                    'actions' => [
+                                        'closeModal'
+                                    ]
+                                ],
+                                [
+                                    'text' => __('Add Selected Products'),
+                                    'class' => 'action-primary',
+                                    'actions' => [
+                                        'closeModal'
+                                    ]
+                                ],
+                            ],
                         ]
                     ],
                 ],
             ],
-            /*'children' => [
-                self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID => $this->getAddProductGrid(),
-            ]*/
+            'children' => [
+                static::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID => $this->getAddProductGrid(),
+            ]
         ];
     }
 
@@ -317,7 +341,36 @@ class SummaryProductsForm extends ModifyForm
      */
     private function getAddProductGrid()
     {
-        return [];
+        $listingTarget = static::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_ADD_PRODUCT_GRID;
+
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'autoRender' => false,
+                        'componentType' => 'insertListing',
+                        'dataScope' => $listingTarget,
+                        'externalProvider' => $listingTarget . '.' . $listingTarget . '_data_source',
+                        'selectionsProvider' => $listingTarget . '.' . $listingTarget . '.tnw_subscriptionprofile_product_columns.ids',
+                        'ns' => $listingTarget,
+                        'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'realTimeLink' => true,
+                        'dataLinks' => [
+                            'imports' => false,
+                            'exports' => true
+                        ],
+                        'behaviourType' => 'simple',
+                        'externalFilterMode' => true,
+                        'imports' => [
+                            'billingfrequencyId' => '${ $.provider }:data.billing_frequency_id',
+                        ],
+                        'exports' => [
+                            'billingfrequencyId' => '${ $.externalProvider }:params.billing_frequency_id',
+                        ]
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
