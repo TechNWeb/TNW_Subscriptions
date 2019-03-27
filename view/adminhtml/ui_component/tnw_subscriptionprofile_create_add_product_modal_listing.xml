@@ -28,6 +28,9 @@
                 <item name="config" xsi:type="array">
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
                     <item name="update_url" path="mui/index/render" xsi:type="url"/>
+                    <item name="filter_url_params" xsi:type="array">
+                        <item name="billing_frequency_id" xsi:type="string">*</item>
+                    </item>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">id</item>
                         <item name="cacheRequests" xsi:type="boolean">false</item>

@@ -41,6 +41,14 @@
                </span>
             </span>
         </strong>
+        <div class="actions" if="buttons">
+            <button repeat="foreach: buttons, item: '$button'"
+                    class="action-secondary"
+                    data-bind="click: function(data, event) { buttonAction($button().actions) }"
+                    type="button">
+                <span text="$button().label"/>
+            </button>
+        </div>
     </div>
 
     <div class="admin__fieldset-wrapper-content"

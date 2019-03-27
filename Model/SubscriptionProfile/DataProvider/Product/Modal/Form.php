@@ -310,7 +310,7 @@ class Form extends AbstractDataProvider
      *
      * @return array
      */
-    private function getAdditionalConfig()
+    public function getAdditionalConfig()
     {
         return [
             'subProductListing' => Product::DATA_SCOPE_SUBSCRIPTION_LISTING,

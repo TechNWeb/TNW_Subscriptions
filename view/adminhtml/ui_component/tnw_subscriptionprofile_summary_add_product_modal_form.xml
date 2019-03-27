@@ -1,0 +1,178 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2019 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form_data_source</item>
+        </item>
+        <item name="label" translate="true" xsi:type="string">Select a product</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="ajaxSaveType" xsi:type="string">simple</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/add-product-form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_summary_add_product_modal_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_summary_add_product_modal_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\AddForm</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_summary_add_product_modal_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">add_product_modal_form_data</argument>
+            <argument name="requestFieldName" xsi:type="string">add_product_modal_form_data</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" path="tnw_subscriptions/subscriptionprofile_create_product/save" xsi:type="url"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true" />
+                <item name="sortOrder" xsi:type="number">10</item>
+            </item>
+        </argument>
+        <field name="subscribe_active">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataScope" xsi:type="string">subscribe_active</item>
+                    <item name="formElement" xsi:type="string">hidden</item>
+                    <item name="value" xsi:type="string">1</item>
+                </item>
+            </argument>
+        </field>
+        <field name="billing_frequency">
+            <argument name="data" xsi:type="array">
+                <item name="multiple" xsi:type="boolean">false</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Billing Frequency:</item>
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="source" xsi:type="string">AddProduct</item>
+                    <item name="formElement" xsi:type="string">radioset</item>
+                    <item name="dataScope" xsi:type="string">billing_frequency</item>
+                    <item name="additionalClasses" xsi:type="string">radio-options-one-column sub-legend field-wide</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/add-product-form-frequency</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="onPriceUpdate" xsi:type="string">index = price:value</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="term">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="source" xsi:type="string">AddProduct</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="number">1</item>
+                        <item name="false" xsi:type="number">0</item>
+                    </item>
+                    <item name="default" xsi:type="number">0</item>
+                    <item name="description" xsi:type="string" translate="true">Until canceled</item>
+                    <item name="label" xsi:type="string" translate="true">Term:</item>
+                    <item name="dataScope" xsi:type="string">term</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
+                </item>
+            </argument>
+        </field>
+        <field name="period">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide sub-period-input</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="source" xsi:type="string">AddProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/period-input</item>
+                    <item name="first_phrase" xsi:type="string" translate="true">&amp; bill</item>
+                    <item name="last_phrase" xsi:type="string" translate="true">times</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="validate-greater-than-zero" xsi:type="boolean">true</item>
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="required" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </field>
+        <field name="start_on">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Start on:</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide admin__field-date</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="source" xsi:type="string">AddProduct</item>
+                    <item name="formElement" xsi:type="string">date</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="options" xsi:type="array">
+                        <item name="minDate" xsi:type="string">new Date()</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="trial_period">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Trial Period</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
+                </item>
+            </argument>
+        </field>
+        <field name="initial_fee">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Initial Fee</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/add-product-form-initial-fee</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="changeValue" xsi:type="string">${ $.parentName}.billing_frequency:value</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="price">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="source" xsi:type="string">AddProduct</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">price</item>
+                    <item name="additionalClasses" xsi:type="string">field-wide</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="required" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>
