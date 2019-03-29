@@ -144,9 +144,11 @@ class SummaryProductsForm extends ModifyForm
     public function getData()
     {
         $data = [];
+        /** @var SubscriptionProfileInterface $subQuote */
         foreach ($this->getObjects() as $subQuote) {
             $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
             $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
+            $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
 
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
@@ -388,7 +390,15 @@ class SummaryProductsForm extends ModifyForm
                         'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_form',
                         'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form_data_source',
                         'toolbarContainer' => '${ $.parentName }',
-                        'formSubmitType' => 'ajax'
+                        'formSubmitType' => 'ajax',
+                        'imports' => [
+                            'billingFrequencyId' => '${ $.provider }:data.billing_frequency_id',
+                            'subscriptionProfileId' => '${ $.provider }:data.subscription_profile_id',
+                        ],
+                        'exports' => [
+                            'billingFrequencyId' => '${ $.externalProvider }:data.billing_frequency',
+                            'subscriptionProfileId' => '${ $.externalProvider }:data.subscription_profile_id',
+                        ]
                     ],
                 ],
             ]

@@ -4,6 +4,11 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal
 class AddForm extends Form
 {
     /**
+     * Form data scope.
+     */
+    const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_summary_add_product_modal_form';
+
+    /**
      * Returns additional list of Ui component names.
      *
      * @return array
@@ -11,7 +16,7 @@ class AddForm extends Form
     public function getAdditionalConfig()
     {
         return [
-            'subProductListing' => 'tnw_subscriptionprofile_create_product_listing',
+            'productIndertForm' => 'products_insert_form',
             'insertForm' => 'add_product_modal_form',
             'configurableModal' => 'configurableModal',
             'mainModal' => 'addProductsModal',

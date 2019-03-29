@@ -131,7 +131,7 @@ class Form extends AbstractDataProvider
         $this->priceCalculator = $priceCalculator;
         $this->context = $context;
         $this->formContext = $formContext;
-        $this->scopeName = $scope ? $scope : self::DATA_SCOPE_MODAL_FORM . '.' . self::DATA_SCOPE_MODAL_FORM;
+        $this->scopeName = $scope ? $scope : static::DATA_SCOPE_MODAL_FORM . '.' . static::DATA_SCOPE_MODAL_FORM;
         $this->trialPeriod = [];
         $this->productBillingFrequencies = [];
         $this->pool = $pool;
