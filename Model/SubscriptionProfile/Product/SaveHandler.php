@@ -51,6 +51,10 @@ class SaveHandler implements ExtensionInterface
         });
 
         foreach ($products as $product) {
+            if ($product->isDeleted()) {
+                continue;
+            }
+
             $product->setSubscriptionProfileId($entity->getId());
             $this->productProfileRepository->save($product);
 

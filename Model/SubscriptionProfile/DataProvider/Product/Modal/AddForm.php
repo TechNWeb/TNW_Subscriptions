@@ -23,6 +23,7 @@ class AddForm extends Form
             'insertConfigurableForm' => 'add_product_modal_configurable_form',
             'configurableForm' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form',
             'modalGrid' => 'add_product_modal_grid',
+            'profileErrorAria' => 'tnw_subscriptionprofile_form.areas.summary'
         ];
     }
 }

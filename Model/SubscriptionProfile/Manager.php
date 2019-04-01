@@ -27,6 +27,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
@@ -660,6 +661,95 @@ class Manager
             ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
         return $this;
+    }
+
+    /**
+     * @param $requestData
+     * @param \Magento\Catalog\Model\Product $product
+     * @throws LocalizedException
+     */
+    public function addProduct($requestData, $product)
+    {
+        /** @var \Magento\Catalog\Model\Product[] $cartCandidates */
+        $cartCandidates = $product->getTypeInstance()
+            ->prepareForCartAdvanced($requestData, $product);
+
+        /**
+         * Error message
+         */
+        if (is_string($cartCandidates) || $cartCandidates instanceof \Magento\Framework\Phrase) {
+            throw new LocalizedException(__((string)$cartCandidates));
+        }
+
+        /**
+         * If prepare process return one object
+         */
+        if (!is_array($cartCandidates)) {
+            $cartCandidates = [$cartCandidates];
+        }
+
+        $profileProducts = $this->getProfile()->getProducts();
+
+        $parentItem = null;
+        foreach ($cartCandidates as $candidate) {
+            $item = $this->productManager->reset()->getEmptyProduct()
+                ->setQty($cartCandidates[0]->getQty())
+                ->setMagentoProductId($candidate->getId())
+                ->setSubscriptionProfileId($this->getProfile()->getId())
+                ->setPurchaseType($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE))
+                ->setTrialStatus($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS))
+                ->setLockProductPriceStatus($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE))
+                ->setOfferFlatDiscountStatus($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT))
+                ->setDiscountAmount($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT))
+                ->setDiscountType($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE))
+                ->setSku($candidate->getSku())
+                ->setName($candidate->getName())
+                ->setTnwSubscrUnlockPresetQty($cartCandidates[0]->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY));
+
+            $options = $candidate->getTypeInstance()->getOrderOptions($candidate);
+            unset($options['info_buyRequest']['subscription_data']);
+            $item->setCustomOptions($options);
+
+            $buyRequest = $requestData->getData(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+
+            $presetQtyPrice = !empty($buyRequest[Create::NON_UNIQUE]['preset_qty_price'])
+                ? $buyRequest[Create::NON_UNIQUE]['preset_qty_price']
+                : 0;
+
+            $productPrice = !empty($buyRequest[Create::NON_UNIQUE]['price'])
+                ? $buyRequest[Create::NON_UNIQUE]['price']
+                : 0;
+
+            $subscribedPrice = !empty($buyRequest[Create::UNIQUE]['use_preset_qty'])
+                ? $presetQtyPrice
+                : $productPrice;
+
+            $item->setInitialFee(0);
+            //if subscription has trial period then current item price is trial price
+            $item->setTrialPrice(null);
+            $item->setPrice(null === $parentItem ? $productPrice : 0);
+            if ($buyRequest[Create::UNIQUE]['is_trial']) {
+                $item->setTrialPrice(null === $parentItem ? $productPrice : 0);
+                $item->setPrice(null === $parentItem ? $subscribedPrice : 0);
+            }
+
+            /**
+             * As parent item we should always use the item of first added product
+             */
+            if (!$parentItem) {
+                $parentItem = $item;
+            }
+            if ($parentItem && $candidate->getParentProductId() && !$item->getParentId()) {
+                $children = $parentItem->getChildren();
+                $children[] = $item;
+
+                $parentItem->setChildren($children);
+            }
+
+            $profileProducts[] = $item;
+        }
+
+        $this->getProfile()->setProducts($profileProducts);
     }
 
     /**

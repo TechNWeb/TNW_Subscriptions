@@ -90,7 +90,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
             throw new CouldNotSaveException(__(
                 'Could not save the productSubscriptionProfile: %1',
                 $exception->getMessage()
-            ));
+            ), $exception);
         }
         return $productSubscriptionProfile;
     }

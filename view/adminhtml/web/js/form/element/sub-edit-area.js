@@ -58,6 +58,15 @@ define([
         },
 
         /**
+         * Clean Message
+         * @returns {exports}
+         */
+        cleanMessageData: function () {
+            this.messagesData([]);
+            return this;
+        },
+
+        /**
          * Setting message.
          *
          * @param message
