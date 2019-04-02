@@ -724,6 +724,15 @@ class Manager
             $profileProducts[] = $item;
         }
 
+        $this->historyLogger->log(
+            __(
+                '<a href="{productUrl|%1}" target="_blank">%2</a> product added',
+                $cartCandidates[0]->getId(),
+                $cartCandidates[0]->getName()
+            ),
+            $this->getProfile()->getId()
+        );
+
         $this->getProfile()->setProducts($profileProducts);
     }
 
