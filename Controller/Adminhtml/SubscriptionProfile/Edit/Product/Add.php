@@ -5,12 +5,9 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\DataObject\Factory as ObjectFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use Magento\Backend\App\Action;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
-use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
-use TNW\Subscriptions\Model\Product\Attribute;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 
 class Add extends Action
@@ -19,11 +16,6 @@ class Add extends Action
      * @var ProfileManager
      */
     private $profileManager;
-
-    /**
-     * @var ProductSubscriptionProfileFactory
-     */
-    private $productProfileFactory;
 
     /**
      * @var ProductRepositoryInterface
@@ -39,20 +31,17 @@ class Add extends Action
      * Add constructor.
      * @param Action\Context $context
      * @param ProfileManager $profileManager
-     * @param ProductSubscriptionProfileFactory $productProfileFactory
      * @param ProductRepositoryInterface $productRepository
      * @param ObjectFactory $objectFactory
      */
     public function __construct(
         Action\Context $context,
         ProfileManager $profileManager,
-        ProductSubscriptionProfileFactory $productProfileFactory,
         ProductRepositoryInterface $productRepository,
         ObjectFactory $objectFactory
     ) {
         parent::__construct($context);
         $this->profileManager = $profileManager;
-        $this->productProfileFactory = $productProfileFactory;
         $this->productRepository = $productRepository;
         $this->objectFactory = $objectFactory;
     }
@@ -63,8 +52,6 @@ class Add extends Action
      * Note: Request will be added as operation argument in future
      *
      * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
