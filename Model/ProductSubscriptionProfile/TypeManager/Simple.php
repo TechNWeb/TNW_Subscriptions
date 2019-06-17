@@ -29,19 +29,20 @@ class Simple extends Base
                 $buyRequestValue = OptionValueResolver::getDecodedValue($request->getValue());
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
-                $result = array_merge_recursive(
-                    $buyRequestValue,
-                    [
-                        Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
-                            Create::NON_UNIQUE => [
-                                'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
-                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
-                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
-                            ],
-                        ],
-                    ]
+
+                $updateNonUnique = [
+                    'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
+                    'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
+                    'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
+                ];
+
+                $originalNonUnique = isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE])? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]: [];
+
+                $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] = array_merge(
+                    $originalNonUnique,
+                    $updateNonUnique
                 );
-                $request->setValue(OptionValueResolver::getEncodedValue($result, $valueFormat));
+                $request->setValue(OptionValueResolver::getEncodedValue($buyRequestValue, $valueFormat));
             }
         }
     }
