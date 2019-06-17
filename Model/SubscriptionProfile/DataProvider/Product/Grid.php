@@ -42,12 +42,24 @@ class Grid extends ProductDataProvider
     private $stockItemRepository;
 
     /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var \Magento\Framework\Api\FilterBuilder
+     */
+    private $filterBuilder;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory
      * @param StockItemRepositoryInterface $stockItemRepository
+     * @param \Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
      * @param array $addFieldStrategies
      * @param array $addFilterStrategies
      * @param array $meta
@@ -60,31 +72,58 @@ class Grid extends ProductDataProvider
         CollectionFactory $collectionFactory,
         StockItemCriteriaInterfaceFactory $stockItemCriteriaFactory,
         StockItemRepositoryInterface $stockItemRepository,
+        \Magento\Framework\App\RequestInterface $request,
+        \Magento\Framework\Api\FilterBuilder $filterBuilder,
         $addFieldStrategies = [],
         $addFilterStrategies = [],
         array $meta = [],
         array $data = []
     ) {
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $collectionFactory,
-            $addFieldStrategies, $addFilterStrategies, $meta, $data
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $collectionFactory,
+            $addFieldStrategies,
+            $addFilterStrategies,
+            $meta,
+            $data
         );
+
         $this->addField('tnw_subscr_unlock_preset_qty');
         $this->stockItemCriteriaFactory = $stockItemCriteriaFactory;
         $this->stockItemRepository = $stockItemRepository;
+        $this->request = $request;
+        $this->filterBuilder = $filterBuilder;
+        $this->prepareUpdateUrl();
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function getData()
+    protected function prepareUpdateUrl()
     {
-        $collection = $this->getCurrentCollection();
-        $items = $collection->toArray();
+        if (!isset($this->data['config']['filter_url_params'])) {
+            return;
+        }
 
-        return [
-            'totalRecords' => $this->getCollection()->getSize(),
-            'items' => array_values($items),
-        ];
+        foreach ($this->data['config']['filter_url_params'] as $paramName => $paramValue) {
+            if ('*' === $paramValue) {
+                $paramValue = $this->request->getParam($paramName);
+            }
+
+            if ($paramValue) {
+                $this->data['config']['update_url'] = sprintf(
+                    '%s%s/%s/',
+                    $this->data['config']['update_url'],
+                    $paramName,
+                    $paramValue
+                );
+                $this->addFilter(
+                    $this->filterBuilder->setField($paramName)->setValue($paramValue)->setConditionType('eq')->create()
+                );
+            }
+        }
     }
 
     /**
@@ -92,20 +131,20 @@ class Grid extends ProductDataProvider
      *
      * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
      */
-    private function getCurrentCollection()
+    public function getCollection()
     {
-        if (!$this->getCollection()->isLoaded() && !$this->formedCollection) {
-            $this->getCollection()
+        if (!$this->formedCollection && !parent::getCollection()->isLoaded()) {
+            parent::getCollection()
                 ->getSelect()
                 ->join(
                     ['sub_table' =>
-                        $this->getCollection()->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)],
+                        parent::getCollection()->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)],
                     'e.entity_id = sub_table.' . ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
                     []
                 )
                 ->join(
                     ['sub_frequency_table' =>
-                        $this->getCollection()->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
+                        parent::getCollection()->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
                     'sub_frequency_table.' . BillingFrequencyInterface::ID.' = sub_table.'
                     . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID
                     . ' AND sub_frequency_table.'. BillingFrequencyInterface::STATUS .' = 1',
@@ -116,7 +155,7 @@ class Grid extends ProductDataProvider
             $this->formedCollection = true;
         }
 
-        return $this->getCollection();
+        return parent::getCollection();
     }
 
     /**
@@ -203,7 +242,7 @@ class Grid extends ProductDataProvider
      */
     private function getStockItems()
     {
-        $collection = $this->getCurrentCollection();
+        $collection = $this->getCollection();
         $productIds = $collection->getAllIds();
         if (empty($productIds)) {
             return [];

@@ -1144,7 +1144,7 @@ class ModifyForm extends Form
      *
      * @return array
      */
-    private function getAdditionalConfig()
+    public function getAdditionalConfig()
     {
         return [
             'editOptionsModal' => 'editOptionsModal',

@@ -4,12 +4,12 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
+namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
-class SubmitButton extends GenericButton implements ButtonProviderInterface
+class SubmitButton implements ButtonProviderInterface
 {
     /**
      * @return array
@@ -28,7 +28,7 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
                                 'actionName' => 'toggleModal',
                             ],
                             [
-                                'targetName' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM,
+                                'targetName' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form',
                                 'actionName' => 'setConfigurableData',
                             ]
                         ]

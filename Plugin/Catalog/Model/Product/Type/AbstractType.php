@@ -59,7 +59,7 @@ class AbstractType
             $this->productModifier->setData($buyRequest->getData());
             $this->productModifier->setProduct($product);
 
-            $preparedBuyRequest = $this->productModifier->getPreparedBuyRequest();
+            $preparedBuyRequest = $this->productModifier->getPreparedBuyRequest(true);
             $buyRequest->setData($preparedBuyRequest->getData());
 
             $product->addCustomOption(

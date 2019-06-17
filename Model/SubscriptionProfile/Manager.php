@@ -27,6 +27,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
@@ -660,6 +661,79 @@ class Manager
             ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
         return $this;
+    }
+
+    /**
+     * @param \Magento\Framework\DataObject $requestData
+     * @param \Magento\Catalog\Model\Product $product
+     * @throws LocalizedException
+     */
+    public function addProduct($requestData, $product)
+    {
+        /** @var \Magento\Catalog\Model\Product[] $cartCandidates */
+        $cartCandidates = $product->getTypeInstance()
+            ->prepareForCartAdvanced($requestData, $product);
+
+        /**
+         * Error message
+         */
+        if (is_string($cartCandidates) || $cartCandidates instanceof \Magento\Framework\Phrase) {
+            throw new LocalizedException(__((string)$cartCandidates));
+        }
+
+        /**
+         * If prepare process return one object
+         */
+        if (!is_array($cartCandidates)) {
+            $cartCandidates = [$cartCandidates];
+        }
+
+        $profileProducts = $this->getProfile()->getProducts();
+
+        $productObject = new DataObject($cartCandidates[0]->getData());
+
+        $parentItem = null;
+        foreach ($cartCandidates as $candidate) {
+            $productObject
+                ->setData('name', $candidate->getName())
+                ->setData('sku', $candidate->getData('sku'))
+                ->setData('entity_id', $candidate->getId());
+
+            $item = $this->productManager->reset()
+                ->populateProductDataFromCartCandidate(
+                    $candidate,
+                    $requestData,
+                    $productObject,
+                    null !== $parentItem
+                )
+                ->getProfileProduct();
+
+            /**
+             * As parent item we should always use the item of first added product
+             */
+            if (!$parentItem) {
+                $parentItem = $item;
+            }
+            if ($parentItem && $candidate->getParentProductId() && !$item->getParentId()) {
+                $children = $parentItem->getChildren();
+                $children[] = $item;
+
+                $parentItem->setChildren($children);
+            }
+
+            $profileProducts[] = $item;
+        }
+
+        $this->historyLogger->log(
+            __(
+                '<a href="{productUrl|%1}" target="_blank">%2</a> product added',
+                $cartCandidates[0]->getId(),
+                $cartCandidates[0]->getName()
+            ),
+            $this->getProfile()->getId()
+        );
+
+        $this->getProfile()->setProducts($profileProducts);
     }
 
     /**

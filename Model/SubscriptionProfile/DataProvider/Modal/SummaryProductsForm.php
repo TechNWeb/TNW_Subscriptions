@@ -21,6 +21,9 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
@@ -49,6 +52,13 @@ class SummaryProductsForm extends ModifyForm
      * Data scope for child element
      */
     const DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM = 'edit_modal_edit_product_options_form';
+
+    /**
+     * Data scope for child element
+     */
+    const DATA_SCOPE_ADD_PRODUCT_MODAL_GRID = 'add_product_modal_grid';
+    const DATA_SCOPE_ADD_PRODUCT_MODAL_FORM = 'add_product_modal_form';
+    const DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM = 'add_product_modal_configurable_form';
 
     /**
      * Layout handle for form
@@ -134,8 +144,12 @@ class SummaryProductsForm extends ModifyForm
     public function getData()
     {
         $data = [];
+        /** @var SubscriptionProfileInterface $subQuote */
         foreach ($this->getObjects() as $subQuote) {
             $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
+            $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
+            $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
+
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
@@ -189,15 +203,34 @@ class SummaryProductsForm extends ModifyForm
                                 'label' => __('Products'),
                                 'collapsible' => false,
                                 'componentType' => UiForm\Fieldset::NAME,
+                                'component' => 'TNW_Subscriptions/js/form/element/fieldset-buttons',
                                 'additionalClasses' => 'subscription-container',
-                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset-buttons',
                                 'dataScope' => '',
-                                'sortOrder' => $iterator
+                                'sortOrder' => $iterator,
+                                'buttons' => [
+                                    [
+                                        'label' => __('Add products'),
+                                        'actions' => [
+                                            [
+                                                'targetName' => '${ $.parentName }.addProductsModal',
+                                                'actionName' => 'openModal',
+                                            ],
+                                            [
+                                                'targetName' => '${ $.parentName }.addProductsModal.grid_container.' .
+                                                    self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
+                                                'actionName' => 'render',
+                                            ]
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
                 ],
                 'editOptionsModal' => $this->getEditOptionsModal(),
+                'addProductsModal' => $this->addProductModal(),
+                'configurableModal' => $this->getConfigurableModal(),
             ];
         }
 
@@ -264,6 +297,215 @@ class SummaryProductsForm extends ModifyForm
                     ],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Returns meta data for add product modal window.
+     *
+     * @return array
+     */
+    private function addProductModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'options' => [
+                            'title' => 'Add product',
+                            'modalClass' => 'subscriptions-add-product-modal',
+                        ]
+                    ],
+                ],
+            ],
+            'children' => [
+                'form_container' => [
+                    'children' => [
+                        self::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM => $this->getProductModalForm()
+                    ],
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => null,
+                                'collapsible' => false,
+                                'visible' => true,
+                                'opened' => true,
+                                'additionalClasses' => 'subscriptions-add-product-modal-form-container',
+                                'componentType' => UiForm\Fieldset::NAME,
+                                'sortOrder' => 1
+                            ],
+                        ],
+                    ]
+                ],
+                'grid_container' => [
+                    'children' => [
+                        self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID => $this->getProductModalGrid(),
+                    ],
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => null,
+                                'collapsible' => false,
+                                'visible' => true,
+                                'opened' => true,
+                                'additionalClasses' => 'subscriptions-add-product-modal-grid-container',
+                                'componentType' => UiForm\Fieldset::NAME,
+                                'sortOrder' => 1
+                            ],
+                        ],
+                    ]
+                ],
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for form in "Add product" modal window.
+     *
+     * @return array
+     */
+    private function getProductModalForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => false,
+                        'label' => '',
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'dataScope' => '',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => 'tnw_subscriptions_subscriptionprofile_summary_add_product',
+                                'buttons' => 1,
+                                Form::FORM_DATA_KEY => Form::FORM_DATA_VALUE
+                            ]
+                        ),
+                        'autoRender' => true,
+                        'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_form',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form_data_source',
+                        'toolbarContainer' => '${ $.parentName }',
+                        'formSubmitType' => 'ajax',
+                        'imports' => [
+                            'billingFrequencyId' => '${ $.provider }:data.billing_frequency_id',
+                            'subscriptionProfileId' => '${ $.provider }:data.subscription_profile_id',
+                        ],
+                        'exports' => [
+                            'billingFrequencyId' => '${ $.externalProvider }:data.billing_frequency',
+                            'subscriptionProfileId' => '${ $.externalProvider }:data.subscription_profile_id',
+                        ]
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for products grid in "Add product" modal window.
+     *
+     * @return array
+     */
+    private function getProductModalGrid()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'autoRender' => false,
+                        'componentType' => 'insertListing',
+                        'dataScope' => 'tnw_subscriptionprofile_summary_add_product_modal_listing',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_listing.tnw_subscriptionprofile_summary_add_product_modal_listing_data_source',
+                        'selectionsProvider' => '${ $.ns }.${ $.ns }.tnw_subscriptionprofile_product_columns.ids',
+                        'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_listing',
+                        'immediateUpdateBySelection' => true,
+                        'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'realTimeLink' => true,
+                        'dataLinks' => [
+                            'imports' => false,
+                            'exports' => true
+                        ],
+                        'behaviourType' => 'simple',
+                        'externalFilterMode' => true,
+                        'formProvider' => 'ns = ${ $.namespace }, index = ' . self::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
+                        'groupCode' => 'products_grid',
+                        'groupName' => 'Products grid',
+                        'groupSortOrder' => 10,
+                        'loading' => false,
+                        'imports' => [
+                            'billingfrequencyId' => '${ $.provider }:data.billing_frequency_id',
+                        ],
+                        'exports' => [
+                            'billingfrequencyId' => '${ $.externalProvider }:params.billing_frequency_id',
+                        ]
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Returns meta data for configurable modal window.
+     *
+     * @return array
+     */
+    private function getConfigurableModal()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'isTemplate' => false,
+                        'componentType' => Modal::NAME,
+                        'options' => [
+                            'title' => 'Configure product',
+                            'modalClass' => 'subscriptions-add-product-configurable-modal',
+                        ]
+                    ],
+                ],
+            ],
+            'children' => [
+                self::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM => $this->getConfigurableForm()
+            ]
+        ];
+    }
+
+    /**
+     * Returns meta data for configurable form.
+     *
+     * @return array
+     */
+    private function getConfigurableForm()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => true,
+                        'label' => '',
+                        'componentType' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'dataScope' => '',
+                        'update_url' => $this->urlBuilder->getUrl('mui/index/render'),
+                        'render_url' => $this->urlBuilder->getUrl(
+                            'mui/index/render_handle',
+                            [
+                                'handle' => 'tnw_subscriptions_subscriptionprofile_summary_add_product_configurable',
+                                'buttons' => 1,
+                                ConfigurableForm::FORM_DATA_KEY => ConfigurableForm::FORM_DATA_VALUE
+                            ]
+                        ),
+                        'autoRender' => false,
+                        'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form.tnw_subscriptionprofile_summary_add_product_modal_configurable_form_data_source',
+                        'toolbarContainer' => '${ $.parentName }'
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -626,7 +868,7 @@ class SummaryProductsForm extends ModifyForm
      *
      * @return array
      */
-    private function getAdditionalConfig()
+    public function getAdditionalConfig()
     {
         return [
             'editOptionsModal' => 'editOptionsModal',
