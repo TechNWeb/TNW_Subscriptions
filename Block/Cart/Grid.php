@@ -149,11 +149,14 @@ class Grid extends Template
      *
      * @return string
      */
-    public function getItemDeleteUrl($item)
+    public function getItemDeletePostJson($item)
     {
-        return $this->getUrl('tnw_subscriptions/cart/delete', [
-            'id' => $item->getId(),
-            'form_key' => $this->formKey->getFormKey()
+        return json_encode([
+            'action' => $this->getUrl('tnw_subscriptions/cart/delete'),
+            'data' => [
+                'id' => $item->getId(),
+                'form_key' => $this->formKey->getFormKey()
+            ]
         ]);
     }
 
