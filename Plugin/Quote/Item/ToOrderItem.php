@@ -54,7 +54,8 @@ class ToOrderItem
         $quoteInitialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
-        if ($quoteInitialFees) {
+        /** initial fee should be applied for the first order only */
+        if ($quoteInitialFees && !$item->getQuote()->getScheduled()) {
             $orderInitialFees = $this->extensionManager->convertQuoteItemToOrderItem($quoteInitialFees);
             $orderExtAttributes = $orderItem->getExtensionAttributes()
                 ?: $this->extensionManager->getEmptyOrderItemExtension();

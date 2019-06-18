@@ -106,6 +106,13 @@ define([
                 this.showSpinner(true);
                 this.addChild(ctx, index, prop);
 
+                // scroll to the added row
+                var rows = $$('.tnw-subscriptions-tab .admin__dynamic-rows tr.data-row');
+                if (rows.length > 0) {
+                    var lastElement = rows[rows.length - 1];
+
+                    $('html,body').animate({scrollTop: $(lastElement).offset().top}, 300);
+                }
                 return;
             }
 
@@ -176,7 +183,7 @@ define([
             var button = this.buttonAdd();
             button.set('disabled', false);
             if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
-                button.set('disabled', true);
+                 button.set('disabled', true);
             }
         },
 

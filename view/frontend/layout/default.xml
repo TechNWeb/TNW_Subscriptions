@@ -22,10 +22,10 @@
                 </arguments>
             </block>
         </referenceContainer>
-        <!--<referenceBlock name="wishlist_sidebar">-->
-            <!--<action method="setTemplate">-->
-                <!--<argument name="template" xsi:type="string">TNW_Subscriptions::wishlist/sidebar.phtml</argument>-->
-            <!--</action>-->
-        <!--</referenceBlock>-->
+
+        <referenceContainer name="header-wrapper">
+            <block class="Magento\Checkout\Block\Cart\Sidebar" ifconfig="tnw_subscriptions_general/general/show_magento_cart" name="minicart" as="minicart" after="logo" template="Magento_Checkout::cart/minicart.phtml"/>
+        </referenceContainer>
+
     </body>
 </page>
