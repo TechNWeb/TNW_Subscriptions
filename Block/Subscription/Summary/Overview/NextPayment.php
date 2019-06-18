@@ -124,15 +124,7 @@ class NextPayment extends Template
      */
     public function getCost()
     {
-        if ($this->grandTotal === null) {
-            $quote = $this->getNextQuote();
-            if (!$quote || !$quote->getId()) {
-                $this->grandTotal = false;
-            } else {
-                $this->grandTotal = (float)$quote->getGrandTotal();
-            }
-        }
-        return $this->grandTotal;
+        return $this->getSubscriptionProfile()->getGrandTotal();
     }
 
     /**

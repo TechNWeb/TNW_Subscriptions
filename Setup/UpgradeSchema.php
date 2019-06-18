@@ -62,6 +62,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->createCreditMemoExtensionTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.1.18', '<')) {
+            $this->addNextPaymentAttributes($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -133,7 +137,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
-    ) {
+    )
+    {
         $table = $setup->getTable('tnw_subscriptions_order_item_extension_entity');
 
         $setup->getConnection()
@@ -346,8 +351,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ->addForeignKey(
                 $setup->getFkName('tnw_subscriptions_message', 'website_id', 'store_website', 'website_id'),
                 'website_id', $setup->getTable('store_website'), 'website_id', Table::ACTION_CASCADE
-            )
-        ;
+            );
 
         $setup->getConnection()->createTable($table);
     }
@@ -541,5 +545,33 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
         $setup->getConnection()->createTable($table);
+    }
+
+
+    /**
+     * Adds attributes for the next payment calculation.
+     *
+     * @param EavSetup $eavSetup
+     */
+    private function addNextPaymentAttributes(SchemaSetupInterface $setup)
+    {
+        $nextPaymentAttributes = [
+            'subtotal',
+            'shipping',
+            'discount',
+            'tax',
+            'grand_total'
+        ];
+
+        foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
+
+            $setup->getConnection()
+                ->addColumn($setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY), $nextPaymentAttribute, [
+                    'type' => Table::TYPE_DECIMAL,
+                    'nullable' => false,
+                    'default' => 0,
+                    'comment' => $nextPaymentAttribute
+                ]);
+        }
     }
 }

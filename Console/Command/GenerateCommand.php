@@ -93,7 +93,12 @@ class GenerateCommand extends Base
             $this->setAreaCode();
             $websiteIds = array_keys($this->getStoreManager()->getWebsites());
             foreach ($this->quoteProcessorsPool->getProcessorsInstances() as $instance) {
-                $instance->process($websiteIds);
+                try {
+                    $instance->process($websiteIds);
+                } catch (\Exception $e) {
+                    $output->writeln($this->getDateTime() . ': ' . $e->getMessage());
+                    $this->unlockProcess($fileStream);
+                }
             }
             $this->unlockProcess($fileStream);
         } catch (\Exception $e) {

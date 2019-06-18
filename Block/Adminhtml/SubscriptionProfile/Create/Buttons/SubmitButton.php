@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 class SubmitButton extends GenericButton implements ButtonProviderInterface
 {
@@ -17,11 +16,6 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
      */
     public function getButtonData()
     {
-        $configurableModal = Product::DATA_SCOPE_SUBSCRIPTION_LISTING . '.'
-            . Product::DATA_SCOPE_SUBSCRIPTION_LISTING
-            . '.' . Product::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS
-            . '.configurableModal';
-
         return [
             'label' => __('Ok'),
             'class' => 'primary',
@@ -30,7 +24,7 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => $configurableModal,
+                                'targetName' => 'index = configurableModal',
                                 'actionName' => 'toggleModal',
                             ],
                             [

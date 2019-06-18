@@ -27,6 +27,8 @@ class Config
      * Config xml path for General section
      */
     private $xmlIsActive = 'tnw_subscriptions_general/general/active';
+    private $xmlHideMagentoCart = 'tnw_subscriptions_general/general/hide_magento_cart';
+
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
@@ -147,6 +149,17 @@ class Config
         }
 
         return $result;
+    }
+
+    /**
+     * Get "Enable Subscriptions" config value for website or for all websites.
+     *
+     * @param int|null $websiteId
+     * @return bool|mixed|null|string
+     */
+    public function hideMagentoCart($websiteId = null)
+    {
+        return $this->getStoreConfig($this->xmlHideMagentoCart, $websiteId);
     }
 
     /**

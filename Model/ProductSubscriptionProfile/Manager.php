@@ -190,6 +190,47 @@ class Manager
     }
 
     /**
+     * @param \Magento\Catalog\Model\Product $cartCandidate
+     * @param \Magento\Framework\DataObject $requestData
+     * @param DataObject|null $product
+     * @param bool $zeroPrices
+     * @return $this
+     */
+    public function populateProductDataFromCartCandidate(
+        $cartCandidate,
+        $requestData,
+        DataObject $product = null,
+        $zeroPrices = false
+    ) {
+        $product = $product ?: $cartCandidate;
+        foreach ($this->getProductAttributesMap() as $profileProductField => $productField) {
+            $this->getProfileProduct()->setData($profileProductField, $product->getData($productField));
+        }
+
+        $options = $cartCandidate->getTypeInstance()->getOrderOptions($cartCandidate);
+        unset($options['info_buyRequest']['subscription_data']);
+        $this->getProfileProduct()->setCustomOptions($options);
+
+        $buyRequest = $requestData->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+        if (!empty($buyRequest)) {
+            $subscribedPrice = $this->getProductSubscribedPrice($zeroPrices, $buyRequest);
+            $productPrice = $requestData->getData('custom_price');
+
+            $this->getProfileProduct()->setInitialFee(0);
+            //if subscription has trial period then current item price is trial price
+            $this->getProfileProduct()->setTrialPrice(null);
+            $this->getProfileProduct()->setPrice(!$zeroPrices ? $productPrice : 0);
+            if ($buyRequest[Create::UNIQUE]['is_trial']) {
+                $this->getProfileProduct()->setTrialPrice(!$zeroPrices ? $productPrice : 0);
+                $this->getProfileProduct()->setPrice($subscribedPrice);
+            }
+        }
+        $this->getProfileProduct()->setQty($cartCandidate->getQty());
+
+        return $this;
+    }
+
+    /**
      * Sets to profile product data from quote item.
      *
      * @param Item $item
@@ -256,8 +297,20 @@ class Manager
                         $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : [];
                         if ($remove) {
                             $product->delete();
-                            $this->historyLogger->log(__('Deleted product %1.',
-                                $product->getMagentoProduct()->getName()), $profileModel->getId());
+                            $this->historyLogger->log(
+                                __('Deleted product %1.', $product->getMagentoProduct()->getName()),
+                                $profileModel->getId()
+                            );
+
+                            foreach ($product->getChildren() as $children) {
+                                foreach ($profileProducts as $profileProduct) {
+                                    if ($profileProduct->getId() != $children->getId()) {
+                                        continue;
+                                    }
+
+                                    $profileProduct->delete();
+                                }
+                            }
                         } else {
                             if (!empty($requestData['price'])) {
                                 $product->setPrice(number_format($requestData['price'], 4));

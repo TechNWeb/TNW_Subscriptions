@@ -41,9 +41,10 @@
                                     </span>
                                 </a>
                             <?php endif ?>
-                            <a class="action action-delete"
+                            <a href="#"
+                               class="action action-delete"
                                title="<?= $block->escapeHtml(__('Remove item')) ?>"
-                               href="<?= /* @escapeNotVerified */ $block->getItemDeleteUrl($groupItem) ?>">
+                               data-post='<?= /* @escapeNotVerified */ $block->getItemDeletePostJson($groupItem) ?>'>
                                 <span>
                                     <?= $block->escapeHtml(__('Remove item')) ?>
                                 </span>

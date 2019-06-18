@@ -41,7 +41,7 @@
                 <tbody>
                 <tr class="col-0">
                     <td class="label"><?php echo __("Customer Name") ?></td>
-                    <td><span class="text"><?php echo $block->getCustomerName() ?></span></td>
+                    <td><span class="text"><a href="<?php echo $this->getCustomerUrl(); ?>" ><?php echo $block->getCustomerName() ?></a></span></td>
                 </tr>
                 <tr class="col-1">
                     <td class="label"><?php echo __('Email') ?></td>

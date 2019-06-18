@@ -179,7 +179,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
             throw new CouldNotSaveException(__(
                 'Could not save the subscriptionProfile: %1',
                 $exception->getMessage()
-            ));
+            ), $exception);
         }
 
         $newStatus = $subscriptionProfile->getStatus();

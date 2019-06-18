@@ -95,19 +95,52 @@ class Creator extends Base
      */
     public function process(array $data)
     {
-        $this->context->log('Process quote creator');
+        $this->context->messageDebug('Process quote creator');
         foreach ($data as $websiteId) {
             foreach ($this->getProfiles($websiteId) as $profile) {
-                $this->generateProfileQuotes($profile);
+                try {
+                    $this->context->messageDebug('Profile #%s', $profile->getId());
+
+                    $this->generateProfileQuotes($profile);
+                } catch (\Exception $e) {
+                    $this->context->messageError('Quote creator error. %s', $e->getMessage());
+                }
             }
         }
+    }
+
+    /**
+     * @param SubscriptionProfileInterface $profile
+     * @return \Magento\Quote\Api\Data\CartInterface|Quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    public function generateProfileQuote(SubscriptionProfileInterface $profile)
+    {
+        // Create empty cart
+        $quote = $this->getEmptyQuote($profile);
+        $this->cartRepository->save($quote);
+
+        // Fill cart
+        $quote = $this->cartRepository->get($quote->getId());
+        $quote = $this->processQuote($profile, $quote);
+
+        $this->context->messageDebug(
+            "Created Quote . Data Quote:\n%s\nData Quote Items:\n%s",
+            $quote,
+            $quote->getItemsCollection()
+        );
+
+        return $quote;
     }
 
     /**
      * Generates future quotes for profile.
      *
      * @param SubscriptionProfileInterface $profile
-     * @param null|int $quotesCount
+     * @param null $quotesCount
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function generateProfileQuotes(SubscriptionProfileInterface $profile, $quotesCount = null)
     {
@@ -122,25 +155,13 @@ class Creator extends Base
             }
 
             foreach ($cycles as $cycleDate) {
-                // Create empty cart
-                $quote = $this->getEmptyQuote($profile);
-                $this->cartRepository->save($quote);
 
-                // Fill cart
-                $quote = $this->cartRepository->get($quote->getId());
-                $quote = $this->processQuote($profile, $quote);
+                $quote = $this->generateProfileQuote($profile);
 
                 $relations[] = $this->assignQuoteToProfile(
                     $profile,
                     $quote,
                     $cycleDate
-                );
-
-                $this->context->messageDebug(
-                    "Created Quote by Cycle Date %s. Data Quote:\n%s\nData Quote Items:\n%s",
-                    $cycleDate,
-                    $quote,
-                    $quote->getItemsCollection()
                 );
             }
 

@@ -321,4 +321,12 @@
             <argument name="pool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions\Modifier\Pool</argument>
         </arguments>
     </type>
+
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid">
+        <arguments>
+            <argument name="addFilterStrategies" xsi:type="array">
+                <item name="billing_frequency_id" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\Product\AddBillingFrequencyIdFieldToCollection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

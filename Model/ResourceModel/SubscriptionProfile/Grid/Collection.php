@@ -94,6 +94,8 @@ class Collection extends SearchResult
             ]
         );
 
+        $this->addFieldToSelect('grand_total');
+
         $this->getSelect()
             ->joinLeft(
                 ['frequency' => $this->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
@@ -104,11 +106,6 @@ class Collection extends SearchResult
                 ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
                 ['next_billing_cycle_date' => 'relation.scheduled_at']
-            )
-            ->joinLeft(
-                ['quotes' => $this->getTable('quote')],
-                'quotes.entity_id = relation.magento_quote_id',
-                ['grand_total' => 'quotes.grand_total']
             )
             ->joinLeft(
                 ['customer' => $this->getTable('customer_entity')],
