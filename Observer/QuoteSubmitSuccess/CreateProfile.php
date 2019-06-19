@@ -109,7 +109,7 @@ class CreateProfile implements ObserverInterface
             }
 
             //Generate quote for next payment.
-            //$this->quoteGenerator->generateProfileQuotes($profile, 1);
+            $this->quoteGenerator->generateProfileQuotes($profile, 1);
         }
 
         // Save Items Relation

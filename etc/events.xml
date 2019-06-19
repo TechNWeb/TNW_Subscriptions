@@ -79,6 +79,7 @@
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesOrderCreditmemoRegisterBefore"/>
     </event>
 
+<!--    Need it to collect totals for our profile-->
     <event name="subscription_profile_save_before">
         <observer name="tnw_subscription_extension_attributes" instance="TNW\Subscriptions\Observer\Save\SubscriptionProfile"/>
     </event>
