@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Magento\Authorization\Model\UserContextInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
@@ -91,6 +92,11 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $paymentCollectionFactory;
 
     /**
+     * @var UserContextInterface $userContext
+     */
+    private $userContext;
+
+    /**
      * Attributes are that part of interface
      *
      * @var array
@@ -143,6 +149,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         WebsiteRepositoryInterface $websiteRepository,
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         PaymentCollectionFactory $paymentCollectionFactory,
+        UserContextInterface $userContext,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -161,6 +168,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->websiteRepository = $websiteRepository;
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
+        $this->userContext = $userContext;
+
     }
 
 
@@ -564,7 +573,12 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getCustomer()
     {
-        return $this->customerRepository->getById($this->getCustomerId());
+        $customer = $this->customerRepository->getById($this->getCustomerId());
+
+        if ($this->userContext->getUserType() == UserContextInterface::USER_TYPE_GUEST) {
+            $customer->setId(null);
+        }
+        return $customer;
     }
 
     /**
