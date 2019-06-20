@@ -60,6 +60,10 @@ define([
         sendCheckEmailAjax: function (url) {
             var self = this;
 
+            if (url == '') {
+                return false;
+            }
+
             $j.ajax({
                 showLoader: true,
                 url: url,
