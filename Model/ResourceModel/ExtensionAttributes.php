@@ -108,10 +108,13 @@ class ExtensionAttributes
         if (empty($columns)) {
             return;
         }
-
+        $dataSelect = $connection->fetchRow($select);
+        if (!$dataSelect) {
+            $dataSelect = [];
+        }
         $data = $this->joinProcessor->extractExtensionAttributes(
             $extensibleEntityClass,
-            $connection->fetchRow($select)
+            $dataSelect
         );
 
         if (empty($data[$entity::EXTENSION_ATTRIBUTES_KEY])) {
