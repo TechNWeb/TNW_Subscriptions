@@ -245,36 +245,39 @@ class ProductSubscriptionProfile
     /**
      * @param $subscriptionProfile
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getTaxAmount($subscriptionProfile)
     {
-        $taxClassKey = $this->taxClassKeyFactory->create();
-        $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
-            ->setValue($this->getMagentoProduct()->getTaxClassId());
+        $taxDetails = [];
+        try {
+            $taxClassKey = $this->taxClassKeyFactory->create();
+            $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+                ->setValue($this->getMagentoProduct()->getTaxClassId());
 
-        $customerTaxClassKey = $this->taxClassKeyFactory->create();
-        $customerTaxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
-            ->setValue($subscriptionProfile->getCustomer()->getGroupId());
+            $customerTaxClassKey = $this->taxClassKeyFactory->create();
+            $customerTaxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+                ->setValue($subscriptionProfile->getCustomer()->getGroupId());
 
-        $quoteDetails = $this->quoteDetailsFactory->create();
-        $item = $this->quoteDetailsItemFactory->create();
-        $item->setQuantity($this->getQty())
-            ->setCode($this->getSku())
-            ->setShortDescription($this->getMagentoProduct()->getShortDescription())
-            ->setTaxClassKey($taxClassKey)
-            ->setIsTaxIncluded(false)
-            ->setType('product')
-            ->setUnitPrice($this->getUnitPrice());
+            $quoteDetails = $this->quoteDetailsFactory->create();
+            $item = $this->quoteDetailsItemFactory->create();
+            $item->setQuantity($this->getQty())
+                ->setCode($this->getSku())
+                ->setShortDescription($this->getMagentoProduct()->getShortDescription())
+                ->setTaxClassKey($taxClassKey)
+                ->setIsTaxIncluded(false)
+                ->setType('product')
+                ->setUnitPrice($this->getUnitPrice());
 
-        $quoteDetails->setShippingAddress($subscriptionProfile->getShippingAddress()->exportCustomerAddress())
-            ->setBillingAddress($subscriptionProfile->getBillingAddress()->exportCustomerAddress())
-            ->setCustomerTaxClassKey($customerTaxClassKey)
-            ->setItems([$item])
-            ->setCustomerId($subscriptionProfile->getCustomerId());
-
-        $storeId = null;
-        $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
+            $quoteDetails->setShippingAddress($subscriptionProfile->getShippingAddress()->exportCustomerAddress())
+                ->setBillingAddress($subscriptionProfile->getBillingAddress()->exportCustomerAddress())
+                ->setCustomerTaxClassKey($customerTaxClassKey)
+                ->setItems([$item])
+                ->setCustomerId($subscriptionProfile->getCustomerId());
+            $storeId = null;
+            $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
+        } catch (\Exception $e) {
+            //empty catch for backward compatibility
+        }
         return isset($taxDetails['tax_amount']) ? $taxDetails['tax_amount'] : 0;
     }
 
