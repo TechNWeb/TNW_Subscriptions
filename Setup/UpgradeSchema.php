@@ -66,6 +66,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addNextPaymentAttributes($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.6', '<')) {
+            $this->updateNextPaymentAttributes($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -572,6 +576,39 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'default' => 0,
                     'comment' => $nextPaymentAttribute
                 ]);
+        }
+    }
+
+    /**
+     * Updates attributes for the next payment calculation.
+     *
+     * @param EavSetup $eavSetup
+     */
+    private function updateNextPaymentAttributes(SchemaSetupInterface $setup)
+    {
+        $nextPaymentAttributes = [
+            'subtotal',
+            'shipping',
+            'discount',
+            'tax',
+            'grand_total'
+        ];
+
+        foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
+            $setup->getConnection()
+                ->changeColumn(
+                    $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY),
+                    $nextPaymentAttribute,
+                    $nextPaymentAttribute,
+                    [
+                        'type' => Table::TYPE_DECIMAL,
+                        'nullable' => false,
+                        'scale' => 4,
+                        'precision' => 20,
+                        'default' => 0,
+                        'comment' => $nextPaymentAttribute
+                    ]
+                );
         }
     }
 }

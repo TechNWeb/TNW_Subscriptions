@@ -34,6 +34,34 @@ class ProductSubscriptionProfile
     const DEFAULT_GROUP_CODE = 'additional-information';
 
     /**
+     * Quote details factory
+     *
+     * @var \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory
+     */
+    protected $quoteDetailsFactory;
+
+    /**
+     * Tax calculation service interface
+     *
+     * @var \Magento\Tax\Api\TaxCalculationInterface
+     */
+    protected $taxCalculationService;
+
+    /**
+     * Quote details item factory
+     *
+     * @var \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory
+     */
+    protected $quoteDetailsItemFactory;
+
+    /**
+     * Tax class key factory
+     *
+     * @var \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory
+     */
+    protected $taxClassKeyFactory;
+
+    /**
      * Repository for retrieving products.
      *
      * @var ProductRepositoryInterface
@@ -82,6 +110,10 @@ class ProductSubscriptionProfile
      * @param AttributeValueFactory $customAttributeFactory
      * @param ProductRepositoryInterface $productRepository
      * @param ProductSubscriptionProfileAttributeRepositoryInterface $metadataService
+     * @param \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory $quoteDetailsFactory
+     * @param \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService
+     * @param \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory
+     * @param \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -93,6 +125,10 @@ class ProductSubscriptionProfile
         AttributeValueFactory $customAttributeFactory,
         ProductRepositoryInterface $productRepository,
         ProductSubscriptionProfileAttributeRepositoryInterface $metadataService,
+        \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory $quoteDetailsFactory,
+        \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService,
+        \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory,
+        \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -107,6 +143,10 @@ class ProductSubscriptionProfile
             $data
         );
 
+        $this->taxClassKeyFactory = $taxClassKeyFactory;
+        $this->quoteDetailsItemFactory = $quoteDetailsItemFactory;
+        $this->quoteDetailsFactory = $quoteDetailsFactory;
+        $this->taxCalculationService = $taxCalculationService;
         $this->productRepository = $productRepository;
         $this->metadataService = $metadataService;
     }
@@ -200,6 +240,42 @@ class ProductSubscriptionProfile
         }
 
         return $result;
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @return int
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getTaxAmount($subscriptionProfile)
+    {
+        $taxClassKey = $this->taxClassKeyFactory->create();
+        $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+            ->setValue($this->getMagentoProduct()->getTaxClassId());
+
+        $customerTaxClassKey = $this->taxClassKeyFactory->create();
+        $customerTaxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+            ->setValue($subscriptionProfile->getCustomer()->getGroupId());
+
+        $quoteDetails = $this->quoteDetailsFactory->create();
+        $item = $this->quoteDetailsItemFactory->create();
+        $item->setQuantity($this->getQty())
+            ->setCode($this->getSku())
+            ->setShortDescription($this->getMagentoProduct()->getShortDescription())
+            ->setTaxClassKey($taxClassKey)
+            ->setIsTaxIncluded(false)
+            ->setType('product')
+            ->setUnitPrice($this->getUnitPrice());
+
+        $quoteDetails->setShippingAddress($subscriptionProfile->getShippingAddress()->exportCustomerAddress())
+            ->setBillingAddress($subscriptionProfile->getBillingAddress()->exportCustomerAddress())
+            ->setCustomerTaxClassKey($customerTaxClassKey)
+            ->setItems([$item])
+            ->setCustomerId($subscriptionProfile->getCustomerId());
+
+        $storeId = null;
+        $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
+        return isset($taxDetails['tax_amount']) ? $taxDetails['tax_amount'] : 0;
     }
 
     /**
