@@ -234,6 +234,19 @@
                 disabled="false"/>
     </type>
 
+    <type name="Magento\Config\Model\Config\Structure">
+        <plugin name="tnw_subscriptions_add_config_field"
+                type="TNW\Subscriptions\Plugin\Config\Model\Structure"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+    <type name="Magento\Config\Controller\Adminhtml\System\Config\Save">
+        <plugin name="tnw_subscriptions_add_config_field_data"
+                type="TNW\Subscriptions\Plugin\Config\Controller\System\Config\Save"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
     <virtualType name="TNW\Subscriptions\Model\Payflow\Service\Response\Transaction"
                  type="Magento\Paypal\Model\Payflow\Service\Response\Transaction">
         <arguments>
