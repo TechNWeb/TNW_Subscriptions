@@ -25,6 +25,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory 
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Repository for subscription profiles.
@@ -120,6 +121,12 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $statusHistoryLogger;
 
     /**
+     * @var MessageHistoryLogger
+     */
+    private $messageHistoryLogger;
+
+    /**
+     * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
      * @param SubscriptionProfileInterfaceFactory $dataSubscriptionProfileFactory
@@ -132,6 +139,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param HistoryManager $statusHistoryManager
      * @param HistoryLogger $statusHistoryLogger
+     * @param MessageHistoryLogger $messageHistoryLogger
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -145,8 +153,10 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         ProductSubscriptionProfileRepository $productProfileRepository,
         SearchCriteriaBuilder $criteriaBuilder,
         HistoryManager $statusHistoryManager,
-        HistoryLogger $statusHistoryLogger
+        HistoryLogger $statusHistoryLogger,
+        MessageHistoryLogger $messageHistoryLogger
     ) {
+        $this->messageHistoryLogger = $messageHistoryLogger;
         $this->resource = $resource;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->subscriptionProfileCollectionFactory = $subscriptionProfileCollectionFactory;
@@ -172,6 +182,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         SubscriptionProfileInterface $subscriptionProfile
     ) {
         $oldStatus = $this->statusHistoryManager->getProfileOldStatus($subscriptionProfile);
+        $oldConfigOption = $this->statusHistoryManager->getProfileOldConfigOption($subscriptionProfile);
 
         try {
             $this->entityManager->save($subscriptionProfile);
@@ -180,6 +191,26 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 'Could not save the subscriptionProfile: %1',
                 $exception->getMessage()
             ), $exception);
+        }
+
+        $newConfigOption = '';
+        $parentProductName = '';
+        foreach ($subscriptionProfile->getProducts() as $product) {
+            if ($product->getParentId()) {
+                $newConfigOption = $product->getName();
+            } else {
+                $parentProductName = $product->getName();
+            }
+        }
+        if ($newConfigOption && $parentProductName && $oldConfigOption != $newConfigOption) {
+            $this->messageHistoryLogger->message(
+                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED,
+                [
+                    $parentProductName . ' ' . $oldConfigOption,
+                    $parentProductName . ' ' . $newConfigOption
+                ],
+                $subscriptionProfile->getId()
+            );
         }
 
         $newStatus = $subscriptionProfile->getStatus();
