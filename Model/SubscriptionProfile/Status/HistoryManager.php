@@ -158,6 +158,31 @@ class HistoryManager
     }
 
     /**
+     * @param SubscriptionProfileInterface $profile
+     * @return |null
+     */
+    public function getProfileOldConfigOption(SubscriptionProfileInterface $profile)
+    {
+        $result = null;
+        if ($profile) {
+            $profileProducts = $profile->getProducts();
+            foreach ($profileProducts as $product) {
+                if ($product->getParentId()) {
+                    $origData = $product->getOrigData();
+                    $storedData = $product->getData();
+                }
+            }
+            if (isset($origData) && isset($origData['name'])) {
+                $result = $origData['name'];
+            } elseif (isset($storedData) && isset($storedData['name'])) {
+                $result = $storedData['name'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Get subscription profile current status from DB.
      *
      * @param int|string $profileId
