@@ -342,4 +342,11 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Config\Model\Config\Structure\Element\Field">
+        <plugin name="tnw_subscriptions_add_config_field_modification_for_ss_mode"
+                type="TNW\Subscriptions\Plugin\Config\Model\Structure\Element\Field"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
 </config>
