@@ -141,7 +141,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         $configurableDefaults = [];
         foreach ($priceMap as $frequencyId => $productPrices) {
             $minPrice = array_filter($productPrices);
-            $minPrices = array_keys($productPrices, min($minPrice));
+            $minPrice = $minPrice ? min($minPrice) : 0;
+            $minPrices = array_keys($productPrices, $minPrice);
             $configurableDefaults[$frequencyId] = !empty($minPrices) ? reset($minPrices) : 'config';
         }
         $result['default'] = $configurableDefaults;
