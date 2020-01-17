@@ -294,17 +294,24 @@ class Creator extends Base
         switch ($unit) {
             case BillingFrequencyUnitType::DAYS:
                 $intervalUnit = 'D';
+                $expression = 'P' . $length . $intervalUnit;
+                $date = $date->add(new \DateInterval($expression));
                 break;
             case BillingFrequencyUnitType::MONTHS:
-                $intervalUnit = 'M';
+                $nextPeriodMonth = $date->format('m') + $length;
+                $dayOfMonth = $date->format('d');
+                $nextFullDate = $date->format('Y-') . $nextPeriodMonth . '-' . '01 ' . $date->format('H:i:s');
+                $dayForPeriod = 'd';
+                if ((int) $dayOfMonth != 1){
+                    $dayForPeriod = 't';
+                }
+                $date = new \DateTime(date('Y-m-' . $dayForPeriod . ' H:i:s', strtotime($nextFullDate)));
                 break;
             default:
                 throw new \Exception('Undefined length unit type.');
         }
 
-        $expression = 'P' . $length . $intervalUnit;
-
-        return $date->add(new \DateInterval($expression));
+        return $date;
     }
 
     /**
