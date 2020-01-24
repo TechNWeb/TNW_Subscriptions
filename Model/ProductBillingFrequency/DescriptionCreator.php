@@ -162,15 +162,28 @@ class DescriptionCreator
     private function fullSubscriptionData($groupItems)
     {
         $fullSubscriptionData = null;
-
+        $isTrial = false;
         $isVirtual = true;
-        $initialFee = $subtotal = 0;
+        $initialFee = $subtotal = $initialSubtotal = 0;
         foreach ($groupItems as $item) {
             if (!$fullSubscriptionData) {
-                $fullSubscriptionData['unique'] = \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+                $fullSubscriptionData[CreateProfile::UNIQUE] =
+                    \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+                $isTrial = $fullSubscriptionData[CreateProfile::UNIQUE]['is_trial'];
             }
 
-            $subtotal += $item->getRowTotal();
+            if ($isTrial) {
+                $infoBuyRequestData = \Zend_Json::decode($item->getOptionByCode('info_buyRequest')->getValue());
+                $infoBuyRequestData = $infoBuyRequestData[CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME];
+                $price = $infoBuyRequestData[CreateProfile::NON_UNIQUE]['price'];
+                if (is_array($price)) {
+                    $price = $price[0];
+                }
+                $subtotal += $price * $item->getQty();
+                $initialSubtotal += $item->getRowTotal();
+            } else {
+                $subtotal += $item->getRowTotal();
+            }
             $initialFee += $this->getInitialFeeFromItem($item);
 
             if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getProduct()->getIsVirtual()) {
@@ -178,11 +191,13 @@ class DescriptionCreator
             }
         }
 
-        $fullSubscriptionData['non_unique']['price'] = $subtotal;
-        $fullSubscriptionData['non_unique']['totalPrice'] = $subtotal + $initialFee;
-        $fullSubscriptionData['non_unique']['initialPrice'] = $initialFee;
-        $fullSubscriptionData['non_unique']['initialFee'] = $initialFee > 0;
-        $fullSubscriptionData['non_unique']['isVirtual'] = $isVirtual;
+        $fullSubscriptionData[CreateProfile::NON_UNIQUE] = [
+            'price' => $subtotal,
+            'totalPrice' => ($isTrial ? $initialSubtotal : $subtotal) + $initialFee,
+            'initialPrice' => $initialFee,
+            'initialFee' => $initialFee > 0,
+            'isVirtual' => $isVirtual,
+        ];
 
         return $fullSubscriptionData;
     }
@@ -224,8 +239,9 @@ class DescriptionCreator
         $thenPhrase = '';
         $priceClasses = ['base-price'];
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = ($itemTotal + $initialFee) > 0
-            ? $this->formatPrice($itemTotal + $initialFee)
+        $initialItemTotal = $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'];
+        $formattedPrice = $initialItemTotal > 0
+            ? $this->formatPrice($initialItemTotal)
             : __('Free');
         $formattedPrice = $this->addContainer(
             $formattedPrice,
@@ -279,10 +295,12 @@ class DescriptionCreator
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {
+        $subscriptionData = $this->fullSubscriptionData([$quoteItem]);
+
         return $this->getDescribedItemPriceHtml(
-            $quoteItem->getRowTotal(),
-            [CreateProfile::UNIQUE => \Zend_Json::decode($quoteItem->getOptionByCode('subscription')->getValue())],
-            $this->getInitialFeeFromItem($quoteItem)
+            $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
+            $subscriptionData,
+            $subscriptionData[CreateProfile::NON_UNIQUE]['initialPrice']
         );
     }
 
