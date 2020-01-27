@@ -3,7 +3,7 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-define(['underscore', 'mageUtils'], function (_, utils) {
+define(['underscore', 'mageUtils', 'mage/translate'], function (_, utils, $t) {
     'use strict';
 
     return {
