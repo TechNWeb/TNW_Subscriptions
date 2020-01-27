@@ -249,8 +249,11 @@ class DescriptionCreator
         );
 
         if ($isTrial) {
-            $middlePhrase = ($itemTotal + $initialFee) ? __('for the') : '';
-            $lastPhrase = __('trial');
+            $middlePhrase = ($itemTotal + $initialFee) ? __('for') : '';
+            $lastPhrase = $this->getFrequencyTrialWithUnit(
+                $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
+                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']
+            );
         } elseif ($initialFee) {
             $middlePhrase = ' ';
             $lastPhrase = __('initial payment');
