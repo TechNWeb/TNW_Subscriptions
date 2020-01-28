@@ -35,18 +35,22 @@ class CreateProfile implements ObserverInterface
      */
     private $relationResource;
 
+    private $customerFactory;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
         \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService,
         \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
+        \Magento\Customer\Model\CustomerFactory $customerFactory
     ) {
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->orderCustomerService = $orderCustomerService;
         $this->quoteGenerator = $quoteGenerator;
         $this->relationResource = $relationResource;
+        $this->customerFactory = $customerFactory;
     }
 
     /**
@@ -81,7 +85,10 @@ class CreateProfile implements ObserverInterface
 
         // Create customer
         if ($order->getCustomerIsGuest()) {
-            $quote->setCustomer($this->orderCustomerService->create($order->getEntityId()));
+            $customer = $this->orderCustomerService->create($order->getEntityId());
+            //ISSUE: https://github.com/magento/magento2/issues/7597
+            $this->customerFactory->create()->setId($customer->getId())->reindex();
+            $quote->setCustomer($customer);
         }
 
         // Create profile

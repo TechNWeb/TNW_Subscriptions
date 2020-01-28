@@ -382,9 +382,14 @@ class Manager
         $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
         $this->cartRepository->save($quote);
 
-        foreach ($groupQueue as $queue) {
+        $countGroupQueue = count($groupQueue) - 1;
+        $needTotalCount = false;
+        foreach ($groupQueue as $index => $queue) {
             $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
-            $this->profileManager->populateQuoteData($quote, $profile);
+            if ($countGroupQueue == $index) {
+                $needTotalCount = true;
+            }
+            $this->profileManager->populateQuoteData($quote, $profile, $needTotalCount);
         }
 
         $this->cartRepository->save($quote);

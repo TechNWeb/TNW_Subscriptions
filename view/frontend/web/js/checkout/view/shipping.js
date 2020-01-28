@@ -24,6 +24,7 @@ define([
     'Magento_Checkout/js/action/select-shipping-address',
     'Magento_Checkout/js/action/select-shipping-method',
     'Magento_Checkout/js/action/set-shipping-information',
+    'TNW_Subscriptions/js/checkout/model/shipping/rate/validation/rules',
     'Magento_Checkout/js/model/shipping-rate-service'
 ], function (
     ko,
@@ -45,7 +46,8 @@ define([
     rateValidator,
     selectShippingAddress,
     selectShippingMethod,
-    setShippingInformation
+    setShippingInformation,
+    shippingRateValidationRules
 ) {
     'use strict';
 
@@ -75,13 +77,13 @@ define([
 
             this._super();
 
-            quote.shippingMethod.subscribe(function () {
-                if (self.validateShippingInformation(false)) {
-                    setShippingInformation();
-                }
+            dataResolver.resolveShippingAddress();
+
+            quote.shippingAddress.subscribe(function () {
+                self.validateAndSetShippingInformation();
             });
 
-            dataResolver.resolveShippingAddress();
+            this.rates.subscribe(this.ratesCallback, this);
 
             hasNewAddress = addressList.some(function (address) {
                 return address.getType() === 'new-customer-address';
@@ -113,6 +115,58 @@ define([
             });
 
             return this;
+        },
+
+        /**
+         * If only one shipping method is available and required for shipping fields are already set,
+         * trigger setting shipping information action
+         * @param rates
+         */
+        ratesCallback: function(rates) {
+            if (rates.length === 1) {
+                var requiredFields = shippingRateValidationRules.getObservableFields(),
+                    address = addressConverter.quoteAddressToFormAddressData(quote.shippingAddress()),
+                    regionRequired = registry.get(this.name + '.shipping-address-fieldset.country_id')
+                    .get('indexedOptions.' + address.country_id +'.is_region_required'),
+                    validationResult = true;
+
+                requiredFields = regionRequired ? requiredFields : _.without(requiredFields, 'region_id');
+                _.each(requiredFields, function (field) {
+                    if (!address[field]) {
+                        validationResult = false;
+                    }
+                });
+                if (validationResult) {
+                    _.debounce(setShippingInformation, 500)();
+                }
+            }
+        },
+
+        /**
+         * Validate email & shipping info.
+         * Set shipping info if email was set after shipping address.
+         */
+        validateAndSetShippingInformation: function() {
+            var loginFormSelector = 'form[data-role=email-with-possible-login]';
+
+            if (!$(loginFormSelector).length && !customer.isLoggedIn()) {
+                _.debounce(this.validateAndSetShippingInformation.bind(this), 300)();
+                return;
+            }
+            if (this.validateShippingInformation(false)) {
+                setShippingInformation();
+                quote.billingAddress(null);
+                dataResolver.resolveBillingAddress();
+            } else {
+                registry.get(this.name + ".customer-email").email
+                    .subscribe(_.debounce(function () {
+                        if (this.validateShippingInformation(false)) {
+                            setShippingInformation();
+                            quote.billingAddress(null);
+                            dataResolver.resolveBillingAddress();
+                        }
+                    }.bind(this), 2100));
+            }
         },
 
         /**
