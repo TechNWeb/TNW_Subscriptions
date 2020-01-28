@@ -61,9 +61,9 @@ define([
         defaults: {
             activeMethod: '',
             selectedAddress: null,
-            isAddressDetailsVisible: quote.billingAddress() != null,
-            isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length === 1,
-            isAddressSameAsShipping: true,
+            isAddressDetailsVisible: addressOptions.length !== 1,
+            isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length < 2,
+            isAddressSameAsShipping: customer.isLoggedIn() && !quote.isVirtual(),
             saveInAddressBook: 1
         },
         isLoading: paymentService.isLoading,
@@ -94,7 +94,11 @@ define([
                 ]);
 
             quote.shippingAddress.subscribe(function (shippingAddress) {
-                if (this.isAddressSameAsShipping()) {
+                if (
+                    this.isAddressSameAsShipping()
+                    && shippingAddress !== null
+                    && shippingAddress.city !== undefined
+                ) {
                     selectBillingAddress(shippingAddress);
                 }
             }, this);
@@ -195,7 +199,7 @@ define([
                 }
 
                 if (!this.source.get('params.invalid')) {
-                    addressData = this.source.get(this.dataScopePrefix);
+                    addressData = this.source.get('billingAddress');
 
                     if (customer.isLoggedIn() && !this.customerHasAddresses) {
                         this.saveInAddressBook(1);

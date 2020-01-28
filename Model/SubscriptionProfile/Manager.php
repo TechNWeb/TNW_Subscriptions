@@ -739,11 +739,15 @@ class Manager
     /**
      * @param Quote $quote
      * @param SubscriptionProfileInterface $profile
+     * @param bool $collectQuoteTotals
      *
      * @throws LocalizedException
      */
-    public function populateQuoteData(Quote $quote, SubscriptionProfileInterface $profile)
-    {
+    public function populateQuoteData(
+        Quote $quote,
+        SubscriptionProfileInterface $profile,
+        $collectQuoteTotals = true
+    ) {
         if (!$quote->getId()) {
             throw new LocalizedException(__('Quote not saved'));
         }
@@ -786,35 +790,37 @@ class Manager
             $quoteItem->setData('profile_item_ids', array_unique($profileItemIds));
         }
 
-        //Set shipping address
-        $quote->getShippingAddress()->addData(
-            $profile->getShippingAddress()->getData()
-        );
-        $quote->getShippingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
+        if ($collectQuoteTotals) {
+            //Set shipping address
+            $quote->getShippingAddress()->addData(
+                $profile->getShippingAddress()->getData()
+            );
+            $quote->getShippingAddress()->setCustomerId(
+                $profile->getCustomerId()
+            );
 
-        //Set billing address
-        $quote->getBillingAddress()->addData(
-            $profile->getBillingAddress()->getData()
-        );
-        $quote->getBillingAddress()->setCustomerId(
-            $profile->getCustomerId()
-        );
+            //Set billing address
+            $quote->getBillingAddress()->addData(
+                $profile->getBillingAddress()->getData()
+            );
+            $quote->getBillingAddress()->setCustomerId(
+                $profile->getCustomerId()
+            );
 
-        // Set payment method
-        $quote->getPayment()
-            ->importData($this->getEngine()->getPaymentInfo($profile))
-            ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+            // Set payment method
+            $quote->getPayment()
+                ->importData($this->getEngine()->getPaymentInfo($profile))
+                ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
-        //Set shipping method
-        $quote->getShippingAddress()
-            ->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod($profile->getShippingMethod());
+            //Set shipping method
+            $quote->getShippingAddress()
+                ->setCollectShippingRates(true)
+                ->collectShippingRates()
+                ->setShippingMethod($profile->getShippingMethod());
 
-        $quote->setTotalsCollectedFlag(false);
-        $quote->collectTotals();
+            $quote->setTotalsCollectedFlag(false);
+            $quote->collectTotals();
+        }
     }
 
     /**
