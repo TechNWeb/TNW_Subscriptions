@@ -10,6 +10,7 @@ namespace TNW\Subscriptions\Observer\Save;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 class SubscriptionProfile implements ObserverInterface
@@ -52,6 +53,15 @@ class SubscriptionProfile implements ObserverInterface
         $quote = $this->quoteGenerator->generateProfileQuote($profile);
 
         $totals = $quote->getTotals();
+        if ($profile->getStatus() == ProfileStatus::STATUS_TRIAL) {
+            $profileProduct = $profile->getProfileProducts()[0];
+            $price = $profileProduct->getPrice();
+            $totals['grand_total']->setValue(
+                $totals['grand_total']->getValue() - $totals['subtotal']->getValue() + $price
+            );
+            $totals['subtotal']->setValue($price);
+        }
+
         foreach ($totals as $total) {
             $profile->setData($total->getCode(), $total->getValue());
         }
