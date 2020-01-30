@@ -45,8 +45,11 @@ class PaymentMethodIsActive implements ObserverInterface
         if (!$quote instanceof \Magento\Quote\Model\Quote) {
             return;
         }
-
-        if ($quote->hasData('is_tnw_subscription') && $quote->getData('is_tnw_subscription')) {
+        if (
+            $quote->hasData('is_tnw_subscription')
+            && $quote->getData('is_tnw_subscription')
+            && !($quote->getSubscriptionPaymentData() && $paymentMethod->getCode() == 'free')
+        ) {
             $checkResult->setData(
                 'is_available',
                 $this->config->isPaymentAvailable($paymentMethod->getCode(), $quote->getStore()->getWebsiteId())

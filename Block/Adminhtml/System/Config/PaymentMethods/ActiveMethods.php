@@ -117,25 +117,27 @@ class ActiveMethods extends Fieldset
         $paymentMethods = $this->getActivePaymentMethodsList();
 
         foreach ($paymentMethods as $method) {
-            $path = self::SECTION_ID . '/' . self::GROUP_ID . '/' . $method['code'];
+            if ($method['code'] != 'free') {
+                $path = self::SECTION_ID . '/' . self::GROUP_ID . '/' . $method['code'];
 
-            $inherit = true;
-            $data = null;
+                $inherit = true;
+                $data = null;
 
-            if (array_key_exists($path, $configData)) {
-                $data = $configData[$path];
-                $inherit = false;
-            } else {
-                $data = $this->getForm()->getConfigValue($path);
+                if (array_key_exists($path, $configData)) {
+                    $data = $configData[$path];
+                    $inherit = false;
+                } else {
+                    $data = $this->getForm()->getConfigValue($path);
+                }
+
+                $element->addField(
+                    $method['code'],
+                    'select',
+                    $this->getFieldConfig($method, $data, $inherit)
+                )->setRenderer(
+                    $this->getFieldRenderer()
+                );
             }
-
-            $element->addField(
-                $method['code'],
-                'select',
-                $this->getFieldConfig($method, $data, $inherit)
-            )->setRenderer(
-                $this->getFieldRenderer()
-            );
         }
     }
 
