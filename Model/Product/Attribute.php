@@ -26,6 +26,7 @@ class Attribute
     const SUBSCRIPTION_TRIAL_START_DATE = 'tnw_subscr_trial_start_date';
     const SUBSCRIPTION_START_DATE = 'tnw_subscr_start_date';
     const SUBSCRIPTION_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
+    const SUBSCRIPTION_HIDE_QTY = 'tnw_subscr_hide_qty';
     const SUBSCRIPTION_SAVINGS_CALCULATION = 'tnw_subscr_savings_calculation';
     const SUBSCRIPTION_INFINITE_SUBSCRIPTIONS = 'tnw_subscr_inf_subscriptions';
     const SUBSCRIPTION_SCHEDULE = 'tnw_subscr_schedule';
@@ -48,6 +49,7 @@ class Attribute
             self::SUBSCRIPTION_TRIAL_START_DATE,
             self::SUBSCRIPTION_START_DATE,
             self::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            self::SUBSCRIPTION_HIDE_QTY,
             self::SUBSCRIPTION_SAVINGS_CALCULATION,
             self::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
             self::SUBSCRIPTION_SCHEDULE

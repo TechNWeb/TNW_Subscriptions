@@ -24,7 +24,12 @@
         <?php foreach ($groupItems as $item) : ?>
         <tr class="totals">
             <th class="mark" colspan="2">
-                <span class="label product-name"><?php echo $item->getQty() ?>x <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>"><?php echo $block->escapeHtml($block->getItemName($item)) ?></a></span>
+                <span class="label product-name">
+                    <?php echo $block->getSubscribeQty($item); ?>
+                    <a href="<?= /* @escapeNotVerified */ $block->getItemProductUrl($item) ?>">
+                        <?php echo $block->escapeHtml($block->getItemName($item)) ?>
+                    </a>
+                </span>
             </th>
         </tr>
         <?php endforeach; ?>

@@ -107,6 +107,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->addNextPaymentAttributes($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.12', '<')) {
+            $this->addHideQtyProductAttributes($eavSetup);
+        }
+
         $setup->endSetup();
     }
 
@@ -144,6 +148,44 @@ class UpgradeData implements UpgradeDataInterface
                 'system' => 1,
                 'group' => 'Subscription Options',
                 'sort_order' => 130,
+            ]
+        );
+    }
+
+    /**
+     * Adds 'hide qty' product attribute.
+     *
+     * @param EavSetup $eavSetup
+     * @return void
+     */
+    private function addHideQtyProductAttributes(EavSetup $eavSetup)
+    {
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_HIDE_QTY,
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Hide Qty',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => false,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => true,
+                'unique' => false,
+                'apply_to' => 'simple,virtual,downloadable,configurable',
+                'system' => 1,
+                'group' => 'Subscription Options',
+                'sort_order' => 125,
             ]
         );
     }
@@ -236,6 +278,7 @@ class UpgradeData implements UpgradeDataInterface
             Attribute::SUBSCRIPTION_TRIAL_PRICE,
             Attribute::SUBSCRIPTION_TRIAL_START_DATE,
             Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            Attribute::SUBSCRIPTION_HIDE_QTY,
             Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
         ];
         $searchCriteria = $this->searchCriteriaBuilder

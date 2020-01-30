@@ -280,4 +280,29 @@ class Grid extends Template
         $product = $item->getProduct();
         return !(bool)$product->getData('tnw_subscr_unlock_preset_qty');
     }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item $item
+     *
+     * @return bool
+     */
+    public function allowDisplaySubscribeQty($item)
+    {
+        $item->setData('product', null);
+        $product = $item->getProduct();
+        return !(bool)$product->getData('tnw_subscr_hide_qty');
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item $item
+     *
+     * @return string|null
+     */
+    public function getSubscribeQty($item){
+        $itemQty = null;
+        if ($this->allowDisplaySubscribeQty($item) && $this->allowEditSubscribeQty($item)) {
+            $itemQty = $item->getQty() . "x";
+        }
+        return $itemQty;
+    }
 }
