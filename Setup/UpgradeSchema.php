@@ -70,6 +70,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateNextPaymentAttributes($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.11', '<')) {
+            $this->addPaymentSubscriptionColumn($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -371,6 +375,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => false,
                 'default' => 0,
                 'comment' => 'Is TNW Subscription Quote'
+            ]);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addPaymentSubscriptionColumn(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()
+            ->addColumn($setup->getTable('quote'), 'subscription_payment_data', [
+                'type' => Table::TYPE_TEXT,
+                'nullable' => true,
+                'default' => '',
+                'comment' => 'Subscription Payment Data'
             ]);
     }
 
