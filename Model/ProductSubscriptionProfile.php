@@ -234,9 +234,9 @@ class ProductSubscriptionProfile
      */
     public function getPrice()
     {
-        $result = $this->getData(self::PRICE);
+        $result = (float) $this->getData(self::PRICE);
         if (!$this->getTnwSubscrUnlockPresetQty()) {
-            $result *= $this->getQty();
+            $result *= (int) $this->getQty();
         }
 
         return $result;

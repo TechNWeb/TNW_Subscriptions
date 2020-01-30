@@ -29,6 +29,16 @@ class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPay
         $additionalData['is_active_payment_token_enabler'] = 1;
         $paymentMethod->setAdditionalData($additionalData);
 
+        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+        $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
+
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            $quote->setData('subscription_payment_data', json_encode($paymentMethod->getData()));
+            $paymentMethod->setMethod('free');
+        } else {
+            $quote->unsetData('subscription_payment_data');
+        }
+
         return parent::savePaymentInformationAndPlaceOrder($cartId, $email, $paymentMethod, $billingAddress);
     }
 }

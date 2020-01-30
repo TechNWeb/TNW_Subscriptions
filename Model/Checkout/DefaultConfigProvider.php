@@ -206,6 +206,9 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
         $output['paymentMethods'] = $this->getPaymentMethods();
 
         $output['originCountryCode'] = $this->getOriginCountryCode();
+
+        //TODO: payflow implementation
+        $output['msp_recaptcha']['enabled']['paypal'] = false;
         return $output;
     }
 

@@ -1078,13 +1078,24 @@ class Manager
     {
         /** @var OrderPaymentInterface $orderPayment */
         $orderPayment = $order->getPayment();
-        $quotePayment = $quote->getPayment()
-            ->addData([
-                'cc_type' => $orderPayment->getCcType(),
-                'cc_last_4' => $orderPayment->getCcLast4(),
-                'cc_exp_month' => $orderPayment->getCcExpMonth(),
-                'cc_exp_year' => $orderPayment->getCcExpYear(),
-            ]);
+        $quotePayment = $quote->getPayment();
+        if ($subscriptionData = $quote->getSubscriptionPaymentData()) {
+            $quotePayment->addData(json_decode($quote->getSubscriptionPaymentData(), true));
+            $quotePayment->unsetData('additional_data');
+        }
+        $quote->setSubscriptionPaymentData('');
+        $orderPaymentDataToAdd = [
+            'cc_type' => $orderPayment->getCcType(),
+            'cc_last_4' => $orderPayment->getCcLast4(),
+            'cc_exp_month' => $orderPayment->getCcExpMonth(),
+            'cc_exp_year' => $orderPayment->getCcExpYear(),
+        ];
+        foreach ($orderPaymentDataToAdd as $key => $data) {
+            if ($data) {
+                $quotePayment->setData($key, $data);
+            }
+        }
+
 
         $this
             ->reset()

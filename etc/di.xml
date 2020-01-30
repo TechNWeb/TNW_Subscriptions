@@ -869,6 +869,11 @@
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
+                <item name="free" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\FreeFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
+                </item>
             </argument>
         </arguments>
     </type>
