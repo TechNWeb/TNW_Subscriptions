@@ -70,7 +70,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateNextPaymentAttributes($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.2.11', '<')) {
+        if (version_compare($context->getVersion(), '2.2.12', '<')) {
             $this->addPaymentSubscriptionColumn($setup);
         }
 
