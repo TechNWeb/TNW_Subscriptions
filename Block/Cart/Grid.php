@@ -288,9 +288,8 @@ class Grid extends Template
      */
     public function allowDisplaySubscribeQty($item)
     {
-        $item->setData('product', null);
         $product = $item->getProduct();
-        return !(bool)$product->getData('tnw_subscr_hide_qty');
+        return !(bool) $product->getData('tnw_subscr_hide_qty');
     }
 
     /**
@@ -298,11 +297,8 @@ class Grid extends Template
      *
      * @return string|null
      */
-    public function getSubscribeQty($item){
-        $itemQty = null;
-        if ($this->allowDisplaySubscribeQty($item) && $this->allowEditSubscribeQty($item)) {
-            $itemQty = $item->getQty() . "x";
-        }
-        return $itemQty;
+    public function getSubscribeQty($item)
+    {
+        return $this->allowDisplaySubscribeQty($item) ? $item->getQty() . "x" : null;
     }
 }

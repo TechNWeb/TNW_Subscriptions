@@ -43,10 +43,9 @@
             </div>
         </div>
     </div>
-    <div class="fieldset<?php if (!$block->getAllowDisplaySubscribeQty() && !$block->getAllowEditSubscribeQty()) {
-        echo " hidden";
-    }?>">
-        <?php $block->getAllowDisplaySubscribeQty();?>
+    <div class="fieldset <?php if (!$block->getAllowDisplaySubscribeQty() && !$block->getAllowEditSubscribeQty()): ?>
+        hidden
+    <?php endif; ?>">
         <div class="field required">
             <label class="label" for="subscribe_qty"><span><?php echo __('Qty') ?>:</span></label>
             <div class="control">

@@ -245,7 +245,7 @@ class Subscribe extends View
     public function getAllowDisplaySubscribeQty()
     {
         $product = $this->getProduct();
-        return !(bool)$product->getData(Attribute::SUBSCRIPTION_HIDE_QTY);
+        return !(bool) $product->getData(Attribute::SUBSCRIPTION_HIDE_QTY);
     }
 
     /**

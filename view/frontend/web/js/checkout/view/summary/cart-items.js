@@ -74,7 +74,7 @@ define([
         allowDisplayQtyItem: function (item) {
             var quoteItem = quote.getItem(item['item_id']);
             if (null !== quoteItem) {
-                return !(quoteItem['tnw_subscr_unlock_preset_qty'] && quoteItem['tnw_subscr_hide_qty']);
+                return quoteItem['tnw_subscr_hide_qty'] == "0" ? true : false;
             }
             return true;
         },

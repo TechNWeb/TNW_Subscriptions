@@ -107,7 +107,7 @@ class UpgradeData implements UpgradeDataInterface
             $this->addNextPaymentAttributes($eavSetup);
         }
 
-        if (version_compare($context->getVersion(), '2.2.12', '<')) {
+        if (version_compare($context->getVersion(), '2.2.13', '<')) {
             $this->addHideQtyProductAttributes($eavSetup);
         }
 
@@ -183,7 +183,6 @@ class UpgradeData implements UpgradeDataInterface
                 'used_in_product_listing' => true,
                 'unique' => false,
                 'apply_to' => 'simple,virtual,downloadable,configurable',
-                'system' => 1,
                 'group' => 'Subscription Options',
                 'sort_order' => 125,
             ]
