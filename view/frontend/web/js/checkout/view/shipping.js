@@ -83,7 +83,37 @@ define([
                 self.validateAndSetShippingInformation();
             });
 
-            this.rates.subscribe(this.ratesCallback, this);
+            if (!customer.isLoggedIn()) {
+                registry.async(this.name + ".customer-email")(function (customerEmailComponent) {
+                    customerEmailComponent.email.subscribe(_.debounce(function () {
+                        if (quote.shippingMethod()) {
+                            dataResolver.resolveShippingAddress();
+                        }
+                    }.bind(this), 2100))
+                });
+            }
+
+            if (this.isFormInline) {
+                var rateFields = shippingRateValidationRules.getObservableFields(),
+                    debouncedResolve = _.debounce(dataResolver.resolveShippingAddress.bind(dataResolver), 2000);
+
+                registry.async(this.name + '.shipping-address-fieldset')(function (fieldset) {
+                    _.each(fieldset.elems(), function (element) {
+                        if (_.contains(rateFields, element.index)) {
+                            return;
+                        }
+                        element.on('value', function () {
+                            if (quote.shippingMethod()) {
+                                debouncedResolve();
+                            }
+                        })
+                    })
+                });
+            }
+
+            quote.shippingMethod.subscribe(function () {
+                self.validateAndSetShippingInformation();
+            });
 
             hasNewAddress = addressList.some(function (address) {
                 return address.getType() === 'new-customer-address';
@@ -118,54 +148,23 @@ define([
         },
 
         /**
-         * If only one shipping method is available and required for shipping fields are already set,
-         * trigger setting shipping information action
-         * @param rates
-         */
-        ratesCallback: function(rates) {
-            if (rates.length === 1) {
-                var requiredFields = shippingRateValidationRules.getObservableFields(),
-                    address = addressConverter.quoteAddressToFormAddressData(quote.shippingAddress()),
-                    regionRequired = registry.get(this.name + '.shipping-address-fieldset.country_id')
-                    .get('indexedOptions.' + address.country_id +'.is_region_required'),
-                    validationResult = true;
-
-                requiredFields = regionRequired ? requiredFields : _.without(requiredFields, 'region_id');
-                _.each(requiredFields, function (field) {
-                    if (!address[field]) {
-                        validationResult = false;
-                    }
-                });
-                if (validationResult) {
-                    _.debounce(setShippingInformation, 500)();
-                }
-            }
-        },
-
-        /**
          * Validate email & shipping info.
          * Set shipping info if email was set after shipping address.
          */
         validateAndSetShippingInformation: function() {
             var loginFormSelector = 'form[data-role=email-with-possible-login]';
 
+            if (!data.getShippingAddressFromData() && this.isFormInline) {
+                return;
+            }
             if (!$(loginFormSelector).length && !customer.isLoggedIn()) {
                 _.debounce(this.validateAndSetShippingInformation.bind(this), 300)();
                 return;
             }
-            if (this.validateShippingInformation(false)) {
+            if (quote.shippingMethod() && this.validateShippingInformation(false)) {
                 setShippingInformation();
                 quote.billingAddress(null);
                 dataResolver.resolveBillingAddress();
-            } else {
-                registry.get(this.name + ".customer-email").email
-                    .subscribe(_.debounce(function () {
-                        if (this.validateShippingInformation(false)) {
-                            setShippingInformation();
-                            quote.billingAddress(null);
-                            dataResolver.resolveBillingAddress();
-                        }
-                    }.bind(this), 2100));
             }
         },
 
@@ -268,7 +267,7 @@ define([
          * @return {Boolean}
          */
         selectShippingMethod: function (shippingMethod) {
-            if (!this.validateShippingInformation(true)) {
+            if (!this.validateShippingInformation(false)) {
                 return false;
             }
 
