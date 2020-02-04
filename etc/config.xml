@@ -26,6 +26,17 @@
                 <attempt_interval>1</attempt_interval>
                 <grace_period>14</grace_period>
             </past_due_profile_options>
+            <emails>
+                <email_identity>support</email_identity>
+                <comment_added>tnw_subscriptions_profile_options_emails_comment_added</comment_added>
+                <profile_status_change>tnw_subscriptions_profile_options_emails_profile_status_change</profile_status_change>
+                <card_expire>tnw_subscriptions_profile_options_emails_card_expire</card_expire>
+                <payment_failed>tnw_subscriptions_profile_options_emails_payment_failed</payment_failed>
+                <renewal>tnw_subscriptions_profile_options_emails_renewal</renewal>
+            </emails>
+            <notifications>
+                <renewals>1</renewals>
+            </notifications>
         </tnw_subscriptions_profile_options>
         <tnw_subscriptions_product>
             <general>

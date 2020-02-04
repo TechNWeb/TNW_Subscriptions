@@ -104,6 +104,46 @@
                     <comment>The number of days before suspending a profile due to a failed payment.</comment>
                 </field>
             </group>
+            <group id="emails" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Email Config</label>
+                <field id="email_identity" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="comment_added" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Subscription Profile Comment Add</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="profile_status_change" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Subscription Profile Status Change</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="card_expire" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Subscription Profile Card Expire</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="payment_failed" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Subscription Profile Profile Failed</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="renewal" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Subscription Profile Renewal</label>
+                    <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+            <group id="notifications" translate="label" sortOrder="75" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Notifications</label>
+                <field id="renewals" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0">
+                    <label>Renewals</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <comment>The number of days before sending the customer an email notification to tell them about an upcoming renewal.</comment>
+                </field>
+            </group>
         </section>
 
         <section id="tnw_subscriptions_product" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1"
