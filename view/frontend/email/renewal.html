@@ -1,0 +1,18 @@
+<!--@subject {{trans "Subscription Renewal"}} @-->
+<!--@vars {
+"template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
+"template config_path=\"design\/email\/header_template\"":"Email Header Template"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+Dear FIRST_NAME LAST_NAME,
+
+You have an upcoming order on {{ date, eg. January 1st, 2020 }}
+
+You can check the status of your subscription profile(s) by logging into your account.
+
+If you have questions about your subscription profile(s), you can email us at customer_support_email.
+
+{{ standard display of the subscription profile, just like the order email… with products }}
+
+{{template config_path="design/email/footer_template"}}

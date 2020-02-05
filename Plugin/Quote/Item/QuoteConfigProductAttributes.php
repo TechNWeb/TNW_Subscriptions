@@ -39,6 +39,7 @@ class QuoteConfigProductAttributes
                 Attribute::SUBSCRIPTION_TRIAL_START_DATE,
                 Attribute::SUBSCRIPTION_START_DATE,
                 Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+                Attribute::SUBSCRIPTION_HIDE_QTY,
                 Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
                 Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
                 'short_description',

@@ -1,0 +1,11 @@
+<!--@subject {{trans "Subscription Status Change"}} @-->
+<!--@vars {
+"template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
+"template config_path=\"design\/email\/header_template\"":"Email Header Template"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+{{trans "The Status of your subscription have changed"}}
+{{trans 'You can check the status of your order by <a href="%account_url">logging into your account</a>.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+
+{{template config_path="design/email/footer_template"}}

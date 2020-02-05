@@ -342,8 +342,8 @@ class Product extends Create
 
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = new \DateTime();
-                    $result->add(new \DateInterval('P1M'));
-                    $result = $result->format('Y-m-15');
+                    $nextPeriodMonth = $result->format('m') + 1;
+                    $result = $result->format('Y-') . $nextPeriodMonth . '-' . '15';
                 }
                 break;
 

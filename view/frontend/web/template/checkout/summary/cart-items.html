@@ -22,7 +22,9 @@
                             <div class="product-item-details">
                                 <div class="product-item-inner">
                                     <div class="produoptionsct-item-name-block">
+                                        <!-- ko if: ($parents[1].allowDisplayQtyItem(item))-->
                                         <span class="qty" data-bind="text: item.qty+'x'"></span>
+                                        <!-- /ko -->
                                         <span class="product-item-name" data-bind="text: item.name"></span>
                                     </div>
                                 </div>

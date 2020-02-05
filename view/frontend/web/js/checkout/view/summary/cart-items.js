@@ -67,6 +67,18 @@ define([
             return [];
         },
 
+        /**
+         * @param {Object} item
+         * @return {boolean}
+         */
+        allowDisplayQtyItem: function (item) {
+            var quoteItem = quote.getItem(item['item_id']);
+            if (null !== quoteItem) {
+                return quoteItem['tnw_subscr_hide_qty'] == "0" ? true : false;
+            }
+            return true;
+        },
+
         getProfileName: function (group) {
             return group.caption;
         },
