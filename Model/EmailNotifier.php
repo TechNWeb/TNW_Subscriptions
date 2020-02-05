@@ -63,6 +63,14 @@ class EmailNotifier
     }
 
     /**
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function execute()
+    {
+        $this->logResource->clearLast();
+    }
+
+    /**
      * @param $subscriptionProfile
      * @param $oldStatus
      * @param $newStatus
