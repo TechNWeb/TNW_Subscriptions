@@ -347,6 +347,13 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
                     'width' => $imageHelper->getWidth(),
                     'height' => $imageHelper->getHeight(),
                 ];
+
+                $quoteItemData[$index]['tnw_subscr_unlock_preset_qty'] = $quoteItem->getProduct()->getData(
+                    'tnw_subscr_unlock_preset_qty'
+                );
+                $quoteItemData[$index]['tnw_subscr_hide_qty'] = $quoteItem->getProduct()->getData(
+                    'tnw_subscr_hide_qty'
+                );
             }
         }
 
