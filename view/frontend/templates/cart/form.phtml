@@ -61,20 +61,24 @@
                                 <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($groupItem) ?></div>
                             </div>
                             <dl class="options">
-                                <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
-                                <dd class="control qty">
-                                    <input name="cart[<?php echo $groupItem->getItemId() ?>][qty]"
-                                           value="<?php echo $groupItem->getQty() ?>"
-                                           size="4"
-                                           title="<?= $block->escapeHtml(__('Qty')) ?>"
-                                           class="input-text qty"
-                                           data-validate="{required:true,'validate-greater-than-zero':true}"
-                                           data-role="cart-item-qty"
-                                           <?php if (!$block->allowEditSubscribeQty($groupItem)) : ?>
-                                           readonly="readonly"
-                                           <?php endif ?>
-                                           type="number">
-                                </dd>
+                                <div <?php if (!$block->allowDisplaySubscribeQty($groupItem) && !$block->allowEditSubscribeQty($groupItem)): ?>
+                                     class="hidden"
+                                <?php endif; ?>>
+                                    <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
+                                    <dd class="control qty">
+                                        <input name="cart[<?php echo $groupItem->getItemId() ?>][qty]"
+                                               value="<?php echo $groupItem->getQty() ?>"
+                                               size="4"
+                                               title="<?= $block->escapeHtml(__('Qty')) ?>"
+                                               class="input-text qty"
+                                               data-validate="{required:true,'validate-greater-than-zero':true}"
+                                               data-role="cart-item-qty"
+                                            <?php if (!$block->allowEditSubscribeQty($groupItem)) : ?>
+                                                readonly="readonly"
+                                            <?php endif ?>
+                                               type="number">
+                                    </dd>
+                                </div>
                                 <?php foreach ($block->getItemOptions($groupItem) as $option) : ?>
                                     <?php $_formatedOptionValue = $block->getFormatedOptionValue($option) ?>
                                     <dt><?php echo $block->escapeHtml($option['label']); ?></dt>

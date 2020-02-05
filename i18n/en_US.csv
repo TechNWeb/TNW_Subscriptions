@@ -179,6 +179,7 @@ Status,Status
 "Recurring schedule to be picked by the customer","Recurring schedule to be picked by the customer"
 Default,Default
 Price,Price
+"Product quantity is hidden for the customer and cannot be changed.","Product quantity is hidden for the customer and cannot be changed."
 "Product quantity is preset for the customer and cannot be changed.","Product quantity is preset for the customer and cannot be changed."
 "Subscription should be linked to the existing account for <b>' . . '</b>","Subscription should be linked to the existing account for <b>' . . '</b>"
 "I will re-enter the email address","I will re-enter the email address"
