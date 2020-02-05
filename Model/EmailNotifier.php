@@ -88,7 +88,7 @@ class EmailNotifier
                 ],
                 [
                     'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
+                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
                 ]
             );
         }
