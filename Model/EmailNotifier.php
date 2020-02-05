@@ -38,18 +38,25 @@ class EmailNotifier
      */
     protected $inlineTranslation;
 
+    /**
+     * @var Source\ProfileStatusFactory
+     */
+    protected $profileStatusFactory;
 
     /**
      * EmailNotifier constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
      * @param \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
+     * @param Source\ProfileStatusFactory $profileStatusFactory
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
-        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
+        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
+        Source\ProfileStatusFactory $profileStatusFactory
     ) {
+        $this->profileStatusFactory = $profileStatusFactory;
         $this->transportBuilder = $transportBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->inlineTranslation = $inlineTranslation;
@@ -66,6 +73,7 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_STATUS_CHANGE_TEMPLATE)) {
             $customer = $subscriptionProfile->getCustomer();
+            $statusModel = $this->profileStatusFactory->create();
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_STATUS_CHANGE_TEMPLATE,
@@ -74,8 +82,8 @@ class EmailNotifier
                 $customer->getStoreId(),
                 [
                     'subscription' => $subscriptionProfile,
-                    'oldStatus' => $oldStatus ,
-                    'newStatus' => $newStatus,
+                    'oldStatus' => $statusModel->getLabelByValue($oldStatus),
+                    'newStatus' => $statusModel->getLabelByValue($newStatus),
                     'customer' => $customer
                 ],
                 [

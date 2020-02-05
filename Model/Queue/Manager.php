@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\EmailNotifierFactory;
 
 /**
  * Class Manager
@@ -102,6 +103,12 @@ class Manager
     private $relationResource;
 
     /**
+     * @var EmailNotifierFactory
+     */
+    private $emailNotifierFactory;
+
+    /**
+     * Manager constructor.
      * @param CollectionFactory $collectionFactory
      * @param Config $config
      * @param SubscriptionProfile\Manager $profileManager
@@ -114,6 +121,8 @@ class Manager
      * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+     * @param EmailNotifierFactory $emailNotifierFactory
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -128,8 +137,10 @@ class Manager
         \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
+        EmailNotifierFactory $emailNotifierFactory
     ) {
+        $this->emailNotifierFactory = $emailNotifierFactory;
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
         $this->profileManager = $profileManager;
@@ -494,6 +505,9 @@ class Manager
                         false,
                         true
                     );
+                }
+                if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
+                    $this->emailNotifierFactory->create()->paymentFailed($profile);
                 }
             }
 
