@@ -238,14 +238,16 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                     $exception->getMessage()
                 ));
             }
-            try {
-                $this->emailNotifierFactory->create()->profileStatusChange(
-                    $subscriptionProfile,
-                    $oldStatus,
-                    $newStatus
-                );
-            } catch (\Exception $exception) {
-                //TODO: add this to log, as it should not prevent the current process
+            if ($oldStatus) {
+                try {
+                    $this->emailNotifierFactory->create()->profileStatusChange(
+                        $subscriptionProfile,
+                        $oldStatus,
+                        $newStatus
+                    );
+                } catch (\Exception $exception) {
+                    //TODO: add this to log, as it should not prevent the current process
+                }
             }
         }
 
