@@ -126,6 +126,11 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $messageHistoryLogger;
 
     /**
+     * @var EmailNotifierFactory
+     */
+    private $emailNotifierFactory;
+
+    /**
      * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
@@ -140,6 +145,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param HistoryManager $statusHistoryManager
      * @param HistoryLogger $statusHistoryLogger
      * @param MessageHistoryLogger $messageHistoryLogger
+     * @param EmailNotifierFactory $emailNotifierFactory
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -154,7 +160,8 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         SearchCriteriaBuilder $criteriaBuilder,
         HistoryManager $statusHistoryManager,
         HistoryLogger $statusHistoryLogger,
-        MessageHistoryLogger $messageHistoryLogger
+        MessageHistoryLogger $messageHistoryLogger,
+        EmailNotifierFactory $emailNotifierFactory
     ) {
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->resource = $resource;
@@ -169,6 +176,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->criteriaBuilder = $criteriaBuilder;
         $this->statusHistoryManager = $statusHistoryManager;
         $this->statusHistoryLogger = $statusHistoryLogger;
+        $this->emailNotifierFactory = $emailNotifierFactory;
     }
 
     /**
@@ -229,6 +237,17 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                     $subscriptionProfile->getId(),
                     $exception->getMessage()
                 ));
+            }
+            if ($oldStatus) {
+                try {
+                    $this->emailNotifierFactory->create()->profileStatusChange(
+                        $subscriptionProfile,
+                        $oldStatus,
+                        $newStatus
+                    );
+                } catch (\Exception $exception) {
+                    //TODO: add this to log, as it should not prevent the current process
+                }
             }
         }
 
