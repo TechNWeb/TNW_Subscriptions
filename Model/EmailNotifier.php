@@ -12,6 +12,9 @@ namespace TNW\Subscriptions\Model;
 class EmailNotifier
 {
     const XML_PATH_EMAIL_IDENTITY = 'tnw_subscriptions_profile_options/emails/email_identity';
+    const XML_PATH_RENEWAL_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/renewals';
+    const XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/expired_card';
+
     const XML_PATH_STATUS_CHANGE_TEMPLATE = 'tnw_subscriptions_profile_options/emails/profile_status_change';
     const XML_PATH_COMMENT_ADDED_TEMPLATE = 'tnw_subscriptions_profile_options/emails/comment_added';
     const XML_PATH_CARD_EXPIRE = 'tnw_subscriptions_profile_options/emails/card_expire';
@@ -56,6 +59,8 @@ class EmailNotifier
      * @param $subscriptionProfile
      * @param $oldStatus
      * @param $newStatus
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
      */
     public function profileStatusChange($subscriptionProfile, $oldStatus, $newStatus)
     {

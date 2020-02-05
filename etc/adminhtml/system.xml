@@ -143,6 +143,11 @@
                     <frontend_class>validate-number</frontend_class>
                     <comment>The number of days before sending the customer an email notification to tell them about an upcoming renewal.</comment>
                 </field>
+                <field id="expired_card" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0">
+                    <label>Expired Card</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <comment>The period in days to notify customer on expired card for Active scubscription.</comment>
+                </field>
             </group>
         </section>
 

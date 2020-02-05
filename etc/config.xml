@@ -36,6 +36,7 @@
             </emails>
             <notifications>
                 <renewals>1</renewals>
+                <expired_card>1</expired_card>
             </notifications>
         </tnw_subscriptions_profile_options>
         <tnw_subscriptions_product>
