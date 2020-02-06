@@ -133,7 +133,7 @@ class EmailNotifier
                     ],
                     [
                         'email' => $customer->getEmail(),
-                        'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
+                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
                     ]
                 );
             }
@@ -161,7 +161,7 @@ class EmailNotifier
                 ],
                 [
                     'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
+                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
                 ]
             );
         }
@@ -203,23 +203,32 @@ class EmailNotifier
     public function renewal($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
-            $customer = $subscriptionProfile->getCustomer();
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_RENEWAL,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $customer->getStoreId(),
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customer' => $customer,
-                    'date' => $date
-                ],
-                [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
-                ]
-            );
+            if (is_numeric($subscriptionProfile)) {
+                try {
+                    $subscriptionProfile = $this->subscriptionProfileRepository->getById($subscriptionProfile);
+                } catch (\Exception $e) {
+                    $subscriptionProfile = null;
+                }
+            }
+            if ($subscriptionProfile) {
+                $customer = $subscriptionProfile->getCustomer();
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_RENEWAL,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $customer->getStoreId(),
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customer' => $customer,
+                        'date' => $date
+                    ],
+                    [
+                        'email' => $customer->getEmail(),
+                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                    ]
+                );
+            }
         }
     }
 

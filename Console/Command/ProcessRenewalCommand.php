@@ -1,0 +1,61 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+namespace TNW\Subscriptions\Console\Command;
+
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * Class Products
+ * @package Babenkocommerce\Catalog\Console\Command
+ */
+class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
+{
+    /**
+     * @var \Magento\Framework\App\State
+     */
+    protected $appState;
+
+    protected $notificationProcessor;
+
+    public function __construct(
+        \Magento\Framework\App\State $appState,
+        \TNW\Subscriptions\Cron\NotificationProcessor $notificationProcessor
+    ) {
+        $this->appState = $appState;
+        $this->notificationProcessor = $notificationProcessor;
+        parent::__construct();
+    }
+
+    /**
+     * Configure
+     */
+    protected function configure()
+    {
+        $this->setName('tnw_subscriptions:notify:renewal')
+            ->setDescription('Send Renewal Notifications');
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        try {
+            $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
+            $this->notificationProcessor->sendRenewalNotifications();
+        } catch (\Exception $e) {
+            $output->writeln("<error>{$e->getMessage()}</error>");
+            // we must have an exit code higher than zero to indicate something was wrong
+            return \Magento\Framework\Console\Cli::RETURN_FAILURE;
+        }
+        $output->write("\n");
+        $output->writeln("<info>Renewal Notification Successfully Sent</info>");
+    }
+}

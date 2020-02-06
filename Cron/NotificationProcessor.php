@@ -5,79 +5,83 @@
  */
 namespace TNW\Subscriptions\Cron;
 
-use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
-use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
 
+/**
+ * Class NotificationProcessor
+ * @package TNW\Subscriptions\Cron
+ */
 class NotificationProcessor
 {
     /**
-     * Subscriptions context.
-     *
-     * @var Context
+     * @var EmailNotifierFactory
      */
-    private $context;
-
-    /**
-     * Profile process queue manager.
-     *
-     * @var Manager
-     */
-    private $queueManager;
-
-    /**
-     * Poll of subscription profile status modifiers.
-     *
-     * @var PoolInterface
-     */
-    private $statusProcessorsPool;
-
-    /**
-     * Profile Repository
-     *
-     * @var SubscriptionProfileRepository
-     */
-    private $profileRepository;
-
     private $emailNotifierFactory;
 
+    /**
+     * @var CollectionFactory
+     */
+    private $subscriptionProfileFactory;
+
+    /**
+     * @var ScopeConfigInterface
+     */
     private $scopeConfig;
 
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     */
     public function __construct(
-        Context $context,
-        Manager $queueManager,
-        PoolInterface $statusProcessorsPool,
-        SubscriptionProfileRepository $profileRepository,
         EmailNotifierFactory $emailNotifierFactory,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $subscriptionProfileFactory,
+        TimezoneInterface $timezone
     ) {
+        $this->timezone = $timezone;
+        $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
-        $this->context = $context;
-        $this->queueManager = $queueManager;
-        $this->statusProcessorsPool = $statusProcessorsPool;
-        $this->profileRepository = $profileRepository;
         $this->scopeConfig = $scopeConfig;
     }
 
-    /**
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
     public function execute()
     {
-        $activeCollection = $this->queueManager->getBaseCollection()
-            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_ACTIVE)
-            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING);
-        // Queue collection
-        $collectionToday = $this->queueManager->getCollectionForDate(
-            $this->scopeConfig->getValue(\TNW\Subscriptions\Model\EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
-        );
-        $notificator = $this->emailNotifierFactory->create();
-        foreach ($activeCollection as $group) {
-            
+        $this->sendRenewalNotifications();
+    }
+
+    public function sendRenewalNotifications()
+    {
+        $dayModifier = '+'
+            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
+            . ' day';
+        $currentDate = $this->timezone->date()->modify($dayModifier);
+        $orderCollection = $this->subscriptionProfileFactory->create()
+            ->addFieldToFilter('scheduled_at', [
+                'date' => true,
+                'from' => $currentDate->format('Y-m-d 00:00:00'),
+                'to' => $currentDate->format('Y-m-d 23:59:59')
+            ])
+            ->addFieldToFilter('magento_order_id', ['null' => true])
+            ->addFieldToSelect('subscription_profile_id')
+            ->addFieldToSelect('scheduled_at')
+        ;
+        foreach ($orderCollection->getItems() as $item) {
+            $this->emailNotifierFactory->create()->renewal(
+                $item->getSubscriptionProfileId(),
+                $item->getScheduledAt()
+            );
         }
     }
 }
