@@ -1,18 +1,28 @@
 <!--@subject {{trans "New Subscription Comment"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
-"template config_path=\"design\/email\/header_template\"":"Email Header Template"
+"template config_path=\"design\/email\/header_template\"":"Email Header Template",
+"var store_email":"Store Email",
+"var customer":"Customer",
+"var comment":"Comment",
+"var subscription":"Subscription Profile"
 } @-->
 {{template config_path="design/email/header_template"}}
-
-Dear FIRST_NAME LAST_NAME,
-
-The following comment was added to your subscription profile #S-13.
-
-{{comment }}
-
-You can all comments on your subscription profile by logging into your account.
-
-If you have questions about your subscription profile, you can email us at {customer_support_email}.
-
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p>
+                {{trans 'The following comment was added to your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a>.
+            </p>
+            <p><strong>{{var comment}}</strong></p>
+            <p>
+                {{trans 'You can view all comments on your subscription profile by <a href="%account_url">logging into your account</a>.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+            </p>
+            <p>
+                {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}
+            </p>
+        </td>
+    </tr>
+</table>
 {{template config_path="design/email/footer_template"}}
