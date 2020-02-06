@@ -56,7 +56,7 @@ class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Comma
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
+            $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
             $this->notificationProcessor->sendExpiredCardsNotifications();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");

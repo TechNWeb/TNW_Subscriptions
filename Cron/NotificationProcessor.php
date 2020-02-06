@@ -55,8 +55,21 @@ class NotificationProcessor
      */
     private $loadedCollections = [];
 
+    /**
+     * @var State
+     */
     private $appState;
 
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param State $appState
+     */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
@@ -80,6 +93,11 @@ class NotificationProcessor
      */
     public function execute()
     {
+        try {
+            $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            //NOTHING TO SET
+        }
         $this->sendRenewalNotifications();
         $this->sendExpiredCardsNotifications();
     }
