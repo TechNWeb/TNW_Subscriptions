@@ -10,6 +10,8 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
+use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
  * Class NotificationProcessor
@@ -38,50 +40,114 @@ class NotificationProcessor
     private $timezone;
 
     /**
+     * @var ProfileCcUtilsFactory
+     */
+    private $ccUtilsFactory;
+
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * @var array
+     */
+    private $loadedCollections = [];
+
+    /**
      * NotificationProcessor constructor.
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param ScopeConfigInterface $scopeConfig
      * @param CollectionFactory $subscriptionProfileFactory
      * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $subscriptionProfileFactory,
-        TimezoneInterface $timezone
+        TimezoneInterface $timezone,
+        ProfileCcUtilsFactory $ccUtilsFactory,
+        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
     ) {
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
+        $this->ccUtilsFactory = $ccUtilsFactory;
         $this->timezone = $timezone;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->scopeConfig = $scopeConfig;
     }
 
+    /**
+     *
+     */
     public function execute()
     {
         $this->sendRenewalNotifications();
+        $this->sendExpiredCardsNotifications();
     }
 
+    /**
+     *
+     */
     public function sendRenewalNotifications()
     {
         $dayModifier = '+'
             . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
             . ' day';
-        $currentDate = $this->timezone->date()->modify($dayModifier);
-        $orderCollection = $this->subscriptionProfileFactory->create()
-            ->addFieldToFilter('scheduled_at', [
-                'date' => true,
-                'from' => $currentDate->format('Y-m-d 00:00:00'),
-                'to' => $currentDate->format('Y-m-d 23:59:59')
-            ])
-            ->addFieldToFilter('magento_order_id', ['null' => true])
-            ->addFieldToSelect('subscription_profile_id')
-            ->addFieldToSelect('scheduled_at')
-        ;
+        $orderCollection = $this->getFutureOrderCollection($dayModifier);
         foreach ($orderCollection->getItems() as $item) {
             $this->emailNotifierFactory->create()->renewal(
                 $item->getSubscriptionProfileId(),
                 $item->getScheduledAt()
             );
         }
+    }
+
+    /**
+     *
+     */
+    public function sendExpiredCardsNotifications()
+    {
+        $dayModifier = '+'
+            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD)
+            . ' day';
+        $orderCollection = $this->getFutureOrderCollection($dayModifier);
+        foreach ($orderCollection->getItems() as $item) {
+            try {
+                $profile = $this->subscriptionProfileRepository->getById($item->getSubscriptionProfileId());
+            } catch (\Exception $e) {
+                $profile = null;
+            }
+            if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt())) {
+                $this->emailNotifierFactory->create()->cardExpire($profile);
+            }
+        }
+    }
+
+    /**
+     * @param $dayModifier
+     * @return mixed
+     */
+    private function getFutureOrderCollection($dayModifier)
+    {
+        if (!$dayModifier || !isset($this->loadedCollections[$dayModifier])) {
+            $currentDate = $this->timezone->date();
+            if ($dayModifier) {
+                $currentDate->modify($dayModifier);
+            }
+            $this->loadedCollections[$dayModifier] = $this->subscriptionProfileFactory->create()
+                ->addFieldToFilter('scheduled_at', [
+                    'date' => true,
+                    'from' => $currentDate->format('Y-m-d 00:00:00'),
+                    'to' => $currentDate->format('Y-m-d 23:59:59')
+                ])
+                ->addFieldToFilter('magento_order_id', ['null' => true])
+                ->addFieldToSelect('subscription_profile_id')
+                ->addFieldToSelect('scheduled_at')
+            ;
+        }
+        return $this->loadedCollections[$dayModifier];
     }
 }

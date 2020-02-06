@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class Products
  * @package Babenkocommerce\Catalog\Console\Command
  */
-class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
+class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Command
 {
     /**
      * @var \Magento\Framework\App\State
@@ -44,8 +44,8 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
      */
     protected function configure()
     {
-        $this->setName('tnw_subscriptions:notify:renewal')
-            ->setDescription('Send Renewal Notifications');
+        $this->setName('tnw_subscriptions:notify:expire')
+            ->setDescription('Send Card Expiration Notifications');
     }
 
     /**
@@ -57,13 +57,13 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
-            $this->notificationProcessor->sendRenewalNotifications();
+            $this->notificationProcessor->sendExpiredCardsNotifications();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
             // we must have an exit code higher than zero to indicate something was wrong
             return \Magento\Framework\Console\Cli::RETURN_FAILURE;
         }
         $output->write("\n");
-        $output->writeln("<info>Renewal Notifications Successfully Sent</info>");
+        $output->writeln("<info>Expired Card Notifications Successfully Sent</info>");
     }
 }
