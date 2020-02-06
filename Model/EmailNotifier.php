@@ -221,7 +221,7 @@ class EmailNotifier
                     [
                         'subscription' => $subscriptionProfile,
                         'customer' => $customer,
-                        'date' => $date
+                        'date' => date('F jS, Y', strtotime($date))
                     ],
                     [
                         'email' => $customer->getEmail(),
