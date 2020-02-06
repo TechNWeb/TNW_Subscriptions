@@ -45,18 +45,22 @@ class NotificationProcessor
 
     private $emailNotifierFactory;
 
+    private $scopeConfig;
+
     public function __construct(
         Context $context,
         Manager $queueManager,
         PoolInterface $statusProcessorsPool,
         SubscriptionProfileRepository $profileRepository,
-        EmailNotifierFactory $emailNotifierFactory
+        EmailNotifierFactory $emailNotifierFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->context = $context;
         $this->queueManager = $queueManager;
         $this->statusProcessorsPool = $statusProcessorsPool;
         $this->profileRepository = $profileRepository;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -64,11 +68,16 @@ class NotificationProcessor
      */
     public function execute()
     {
-        $canceledCollection = $this->queueManager->getBaseCollection()
+        $activeCollection = $this->queueManager->getBaseCollection()
             ->addFieldToFilter('profile.status', ProfileStatus::STATUS_ACTIVE)
             ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING);
         // Queue collection
-        $collectionToday = $this->queueManager->getCollectionForDate(1);
+        $collectionToday = $this->queueManager->getCollectionForDate(
+            $this->scopeConfig->getValue(\TNW\Subscriptions\Model\EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
+        );
         $notificator = $this->emailNotifierFactory->create();
+        foreach ($activeCollection as $group) {
+            
+        }
     }
 }

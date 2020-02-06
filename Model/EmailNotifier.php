@@ -44,30 +44,30 @@ class EmailNotifier
     protected $profileStatusFactory;
 
     /**
+     * @var \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface
+     */
+    protected $subscriptionProfileRepository;
+
+    /**
      * EmailNotifier constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
      * @param \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
      * @param Source\ProfileStatusFactory $profileStatusFactory
+     * @param \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
-        Source\ProfileStatusFactory $profileStatusFactory
+        Source\ProfileStatusFactory $profileStatusFactory,
+        \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
     ) {
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->profileStatusFactory = $profileStatusFactory;
         $this->transportBuilder = $transportBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->inlineTranslation = $inlineTranslation;
-    }
-
-    /**
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function execute()
-    {
-        $this->logResource->clearLast();
     }
 
     /**
@@ -111,23 +111,32 @@ class EmailNotifier
     public function addComment($subscriptionProfile, $comment)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_COMMENT_ADDED_TEMPLATE)) {
-            $customer = $subscriptionProfile->getCustomer();
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_COMMENT_ADDED_TEMPLATE,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $customer->getStoreId(),
-                [
-                    'subscription' => $subscriptionProfile,
-                    'comment' => $comment ,
-                    'customer' => $customer
-                ],
-                [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
-                ]
-            );
+            if (is_numeric($subscriptionProfile)) {
+                try {
+                    $subscriptionProfile = $this->subscriptionProfileRepository->getById($subscriptionProfile);
+                } catch (\Exception $e) {
+                    $subscriptionProfile = null;
+                }
+            }
+            if ($subscriptionProfile) {
+                $customer = $subscriptionProfile->getCustomer();
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_COMMENT_ADDED_TEMPLATE,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $customer->getStoreId(),
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'comment' => $comment,
+                        'customer' => $customer
+                    ],
+                    [
+                        'email' => $customer->getEmail(),
+                        'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
+                    ]
+                );
+            }
         }
     }
 
@@ -179,7 +188,7 @@ class EmailNotifier
                 ],
                 [
                     'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getFirstname()
+                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
                 ]
             );
         }
