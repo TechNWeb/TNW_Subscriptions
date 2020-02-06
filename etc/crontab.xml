@@ -11,7 +11,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="tnw_subscriptions_send_notifications" instance="TNW\Subscriptions\Cron\NotificationProcessor" method="execute">
-            <schedule>0 0 * * *</schedule>
+            <schedule>* * * * *</schedule>
         </job>
     </group>
 </config>

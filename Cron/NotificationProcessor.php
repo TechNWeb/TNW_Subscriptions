@@ -12,6 +12,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
 use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
 /**
  * Class NotificationProcessor
@@ -54,23 +55,18 @@ class NotificationProcessor
      */
     private $loadedCollections = [];
 
-    /**
-     * NotificationProcessor constructor.
-     * @param EmailNotifierFactory $emailNotifierFactory
-     * @param ScopeConfigInterface $scopeConfig
-     * @param CollectionFactory $subscriptionProfileFactory
-     * @param TimezoneInterface $timezone
-     * @param ProfileCcUtilsFactory $ccUtilsFactory
-     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
-     */
+    private $appState;
+
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
         CollectionFactory $subscriptionProfileFactory,
         TimezoneInterface $timezone,
         ProfileCcUtilsFactory $ccUtilsFactory,
-        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        State $appState
     ) {
+        $this->appState = $appState;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->ccUtilsFactory = $ccUtilsFactory;
         $this->timezone = $timezone;
