@@ -1,0 +1,20 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\EmailOverview $block */ ?>
+<table class="order-details">
+    <tbody>
+    <tr>
+        <td>
+            <?php echo $block->getShippingInfoHtml() ?>
+        </td>
+        <td>
+            <?php if ($block->canShowShippingDetailsBlock()): ?>
+                <?php echo $block->getShippingDetailsHtml() ?>
+            <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $block->getBillingInfoHtml() ?></td>
+        <td><?php echo $block->getPaymentDetailsHtml() ?></td>
+    </tr>
+    </tbody>
+</table>
+<?php echo $block->getProductsHtml() ?>
