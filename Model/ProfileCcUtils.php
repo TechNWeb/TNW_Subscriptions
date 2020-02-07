@@ -81,7 +81,7 @@ class ProfileCcUtils
      */
     public function isCcExpireBy($object, $paymentDate)
     {
-        if ($this->isCcPayment($object->getPayment())) {
+        if ($object->getPayment() && $this->isCcPayment($object->getPayment())) {
             $paymentInfo = $object->getPayment()->getPaymentAdditionalInfo();
             if (!empty($paymentInfo) && is_string($paymentInfo)) {
                 $paymentInfo = $this->jsonHelper->jsonDecode($paymentInfo);
