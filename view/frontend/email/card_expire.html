@@ -13,10 +13,10 @@
         <td>
             <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
             <p>
-                {{trans 'The <strong>credit card</strong> associated with your subscription profile '}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'will <strong>expire</strong> before the next billing cycle.'}}
+                {{trans 'The <strong>credit card</strong> associated with your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'will <strong>expire</strong> before the next billing cycle.'}}
             </p>
             <p>
-                {{trans 'Log in to your account and update the payment method to prevent any interruptions in service.'}}
+                {{trans '<a href="%account_url">Log in to your account</a> and update the payment method to prevent any interruptions in service.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
             </p>
             <p>
                 {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}

@@ -184,7 +184,12 @@ class EmailNotifier
                 $customer->getStoreId(),
                 [
                     'subscription' => $subscriptionProfile,
-                    'customer' => $customer
+                    'customer' => $customer,
+                    'attempt_interval' => $this->scopeConfig->getValue(
+                        'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $customer->getStoreId()
+                    )
                 ],
                 [
                     'email' => $customer->getEmail(),
