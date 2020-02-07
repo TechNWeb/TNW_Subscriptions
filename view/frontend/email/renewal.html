@@ -1,18 +1,29 @@
 <!--@subject {{trans "Subscription Renewal"}} @-->
 <!--@vars {
+"template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
-"template config_path=\"design\/email\/header_template\"":"Email Header Template"
+"var store_email":"Store Email",
+"var date":"Upcoming Subscription Renewal Date",
+"var customer":"Customer",
+"var subscription":"Subscription Profile",
+"layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
 } @-->
 {{template config_path="design/email/header_template"}}
-
-Dear FIRST_NAME LAST_NAME,
-
-You have an upcoming order on {{ date, eg. January 1st, 2020 }}
-
-You can check the status of your subscription profile(s) by logging into your account.
-
-If you have questions about your subscription profile(s), you can email us at customer_support_email.
-
-{{ standard display of the subscription profile, just like the order email… with products }}
-
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p>
+                {{trans 'You have an upcoming order on'}} <strong>{{var date}}</strong>
+            </p>
+            <p>
+                {{trans 'You can check the status of your order by <a href="%account_url">logging into your account</a>.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+            </p>
+            <p>
+                {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}
+            </p>
+        </td>
+    </tr>
+</table>
+{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
 {{template config_path="design/email/footer_template"}}

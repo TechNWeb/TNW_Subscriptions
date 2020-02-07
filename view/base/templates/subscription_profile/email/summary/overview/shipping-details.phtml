@@ -1,0 +1,5 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details $block */ ?>
+<h3><?php echo __("Shipping Details") ?></h3>
+<strong><?php echo __("Shipping Method") ?></strong>
+<br>
+<?php echo $block->getShippingDescription() ?>: <?php echo $block->getShippingAmount() ?>
