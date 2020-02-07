@@ -1,0 +1,29 @@
+<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails $block */ ?>
+<h3><?php echo __("Payment Details") ?></h3>
+<p>
+    <strong><?php echo __('Payment Type') ?>:</strong>
+    <br>
+    <?php echo $block->getPaymentMethodTitle() ?>
+</p>
+<?php if ($block->getPaymentAdditionalInfo()) :?>
+    <p>
+        <strong><?php echo __('Card Type') ?></strong>
+        <br>
+        <?php echo $block->getCreditCardTypeLabel() ?>
+    </p>
+    <p>
+        <strong><?php echo __('Card Number') ?></strong>
+        <br>
+        <?php echo $block->getCreditCardNumber() ?>
+    </p>
+    <p>
+        <strong><?php echo __('Exp. Date') ?></strong>
+        <br>
+        <?php echo $block->getCreditCardExpDate() ?>
+    </p>
+<?php endif; ?>
+<p>
+    <strong><?php echo __('Currency') ?></strong>
+    <br>
+    <?php echo $block->getSubscriptionProfile()->getProfileCurrencyCode() ?>
+</p>

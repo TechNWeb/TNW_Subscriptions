@@ -312,6 +312,8 @@
             <argument name="commands" xsi:type="array">
                 <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
                 <item name="tnw_subscriptions_process_command" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessCommand</item>
+                <item name="tnw_subscriptions_renewal_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessRenewalCommand</item>
+                <item name="tnw_subscriptions_expire_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessExpiredCardCommand</item>
             </argument>
         </arguments>
     </type>

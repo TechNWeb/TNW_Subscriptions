@@ -11,6 +11,7 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\EmailNotifierFactory;
 
 /**
  * Add comment for subscription.
@@ -39,20 +40,29 @@ class AddComment extends Action
     private $messageHistoryLogger;
 
     /**
+     * @var EmailNotifierFactory
+     */
+    private $emailNotifierFactory;
+
+    /**
+     * AddComment constructor.
      * @param Action\Context $context
      * @param JsonFactory $jsonFactory
      * @param DataPersistorInterface $dataPersistor
      * @param MessageHistoryLogger $messageHistoryLogger
+     * @param EmailNotifierFactory $emailNotifierFactory
      */
     public function __construct(
         Action\Context $context,
         JsonFactory $jsonFactory,
         DataPersistorInterface $dataPersistor,
-        MessageHistoryLogger $messageHistoryLogger
+        MessageHistoryLogger $messageHistoryLogger,
+        EmailNotifierFactory $emailNotifierFactory
     ) {
         $this->resultJsonFactory = $jsonFactory;
         $this->dataPersistor = $dataPersistor;
         $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->emailNotifierFactory = $emailNotifierFactory;
 
         parent::__construct($context);
     }
@@ -74,6 +84,9 @@ class AddComment extends Action
                 $subscriptionId,
                 true
             );
+            if ($comment) {
+                $this->emailNotifierFactory->create()->addComment($subscriptionId, $comment);
+            }
         } else {
             $response->setData('result', false);
         }

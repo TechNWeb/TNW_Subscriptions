@@ -1,0 +1,32 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" label="Subscriptions Email Profile Items" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <block name="subscription.email.view" class="TNW\Subscriptions\Block\Subscription\Summary\EmailOverview"
+            template="TNW_Subscriptions::subscription_profile/email/summary/overview.phtml">
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
+                   name="subscription.email.view.shipping.information" as="shipping-information"
+                   template="TNW_Subscriptions::subscription_profile/email/summary/address.phtml">
+                <action method="setAddressType">
+                    <argument name="type" xsi:type="string">shipping</argument>
+                </action>
+            </block>
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details"
+                   name="subscription.email.view.shipping.details"
+                   template="TNW_Subscriptions::subscription_profile/email/summary/overview/shipping-details.phtml"
+                   as="shipping-details">
+            </block>
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
+                   name="subscription.email.view.billing.information" as="billing-information"
+                   template="TNW_Subscriptions::subscription_profile/email/summary/address.phtml">
+                <action method="setAddressType">
+                    <argument name="type" xsi:type="string">billing</argument>
+                </action>
+            </block>
+            <block class="TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails"
+                   name="subscription.email.view.payment.details"
+                   template="TNW_Subscriptions::subscription_profile/email/summary/overview/payment-details.phtml"
+                   as="payment-details" >
+            </block>
+            <block name="subscription.email.products" as="products" class="TNW\Subscriptions\Block\Subscription\Summary\Products" template="TNW_Subscriptions::subscription_profile/email/summary/products.phtml" />
+        </block>
+    </body>
+</page>

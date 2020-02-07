@@ -5,70 +5,163 @@
  */
 namespace TNW\Subscriptions\Cron;
 
-use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
-use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
+use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
+/**
+ * Class NotificationProcessor
+ * @package TNW\Subscriptions\Cron
+ */
 class NotificationProcessor
 {
     /**
-     * Subscriptions context.
-     *
-     * @var Context
+     * @var EmailNotifierFactory
      */
-    private $context;
-
-    /**
-     * Profile process queue manager.
-     *
-     * @var Manager
-     */
-    private $queueManager;
-
-    /**
-     * Poll of subscription profile status modifiers.
-     *
-     * @var PoolInterface
-     */
-    private $statusProcessorsPool;
-
-    /**
-     * Profile Repository
-     *
-     * @var SubscriptionProfileRepository
-     */
-    private $profileRepository;
-
     private $emailNotifierFactory;
 
+    /**
+     * @var CollectionFactory
+     */
+    private $subscriptionProfileFactory;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * @var ProfileCcUtilsFactory
+     */
+    private $ccUtilsFactory;
+
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * @var array
+     */
+    private $loadedCollections = [];
+
+    /**
+     * @var State
+     */
+    private $appState;
+
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param State $appState
+     */
     public function __construct(
-        Context $context,
-        Manager $queueManager,
-        PoolInterface $statusProcessorsPool,
-        SubscriptionProfileRepository $profileRepository,
-        EmailNotifierFactory $emailNotifierFactory
+        EmailNotifierFactory $emailNotifierFactory,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $subscriptionProfileFactory,
+        TimezoneInterface $timezone,
+        ProfileCcUtilsFactory $ccUtilsFactory,
+        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        State $appState
     ) {
+        $this->appState = $appState;
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
+        $this->ccUtilsFactory = $ccUtilsFactory;
+        $this->timezone = $timezone;
+        $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
-        $this->context = $context;
-        $this->queueManager = $queueManager;
-        $this->statusProcessorsPool = $statusProcessorsPool;
-        $this->profileRepository = $profileRepository;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
-     * @throws \Magento\Framework\Exception\LocalizedException
+     *
      */
     public function execute()
     {
-        $canceledCollection = $this->queueManager->getBaseCollection()
-            ->addFieldToFilter('profile.status', ProfileStatus::STATUS_ACTIVE)
-            ->addFieldToFilter('main_table.status', QueueStatus::QUEUE_STATUS_PENDING);
-        // Queue collection
-        $collectionToday = $this->queueManager->getCollectionForDate(1);
-        $notificator = $this->emailNotifierFactory->create();
+        try {
+            $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            //NOTHING TO SET
+        }
+        $this->sendRenewalNotifications();
+        $this->sendExpiredCardsNotifications();
+    }
+
+    /**
+     *
+     */
+    public function sendRenewalNotifications()
+    {
+        $dayModifier = '+'
+            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
+            . ' day';
+        $orderCollection = $this->getFutureOrderCollection($dayModifier);
+        foreach ($orderCollection->getItems() as $item) {
+            $this->emailNotifierFactory->create()->renewal(
+                $item->getSubscriptionProfileId(),
+                $item->getScheduledAt()
+            );
+        }
+    }
+
+    /**
+     *
+     */
+    public function sendExpiredCardsNotifications()
+    {
+        $dayModifier = '+'
+            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD)
+            . ' day';
+        $orderCollection = $this->getFutureOrderCollection($dayModifier);
+        foreach ($orderCollection->getItems() as $item) {
+            try {
+                $profile = $this->subscriptionProfileRepository->getById($item->getSubscriptionProfileId());
+            } catch (\Exception $e) {
+                $profile = null;
+            }
+            if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt())) {
+                $this->emailNotifierFactory->create()->cardExpire($profile);
+            }
+        }
+    }
+
+    /**
+     * @param $dayModifier
+     * @return mixed
+     */
+    private function getFutureOrderCollection($dayModifier)
+    {
+        if (!$dayModifier || !isset($this->loadedCollections[$dayModifier])) {
+            $currentDate = $this->timezone->date();
+            if ($dayModifier) {
+                $currentDate->modify($dayModifier);
+            }
+            $this->loadedCollections[$dayModifier] = $this->subscriptionProfileFactory->create()
+                ->addFieldToFilter('scheduled_at', [
+                    'date' => true,
+                    'from' => $currentDate->format('Y-m-d 00:00:00'),
+                    'to' => $currentDate->format('Y-m-d 23:59:59')
+                ])
+                ->addFieldToFilter('magento_order_id', ['null' => true])
+                ->addFieldToSelect('subscription_profile_id')
+                ->addFieldToSelect('scheduled_at')
+            ;
+        }
+        return $this->loadedCollections[$dayModifier];
     }
 }
