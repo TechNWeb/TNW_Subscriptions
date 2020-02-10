@@ -17,7 +17,9 @@
                     <strong class="product-item-name"><?php echo $block->getName($item) ?></strong>
                     <span class="product-item-qty">(x<?php echo (int)$item->getQty() ?>)</span>
                     <div class="product-item-description"><?php echo $block->getDescription($item) ?></div>
-                    <dl class="item-options">
+                    <dl class="item-options <?php if ((bool) $item->getMagentoProduct()->getData('tnw_subscr_hide_qty')): ?>
+                     hidden
+                     <?php endif; ?>">
                         <dt class="qty"><?php echo __('Qty') ?></dt>
                         <dd><?php echo (int)$item->getQty() ?></dd>
                     </dl>
