@@ -431,7 +431,7 @@ class ModifyForm extends Form
      */
     protected function getMiddleContainerDefinition()
     {
-        return [
+        $result =  [
             'arguments' => [
                 'data' => [
                     'config' => [
@@ -447,10 +447,15 @@ class ModifyForm extends Form
                 'name' => $this->getTextFieldDefenition('name'),
                 'remove_button' => $this->getRemoveButton(),
                 'description' => $this->getTextFieldDefenition('description'),
-                'qty_container' => $this->getQtyContainerDefinition(),
                 'update_button' => $this->getUpdateButton()
             ]
         ];
+
+        if (!(bool) $this->currentProduct->getData('tnw_subscr_hide_qty')) {
+            $result['children']['qty_container'] = $this->getQtyContainerDefinition();
+        }
+
+        return $result;
     }
 
     /**
