@@ -63,23 +63,6 @@ class UnlockPresetQty extends AbstractModifier
             ]
         );
 
-        $meta = $this->arrayManager->merge(
-            $this->arrayManager->findPath(
-                Attribute::SUBSCRIPTION_HIDE_QTY,
-                $meta,
-                null,
-                'children'
-            ) . static::META_CONFIG_PATH,
-            $meta,
-            [
-                'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY . ':checked',
-                ],
-                'notice' =>  __('Product quantity is hidden for the customer and cannot be changed.'),
-            ]
-        );
-
         return $meta;
     }
 
