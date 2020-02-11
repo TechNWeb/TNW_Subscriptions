@@ -61,7 +61,7 @@
                                 <div class="price-container"><?= /* @escapeNotVerified */ $block->getItemPrice($groupItem) ?></div>
                             </div>
                             <dl class="options">
-                                <div <?php if (!$block->allowDisplaySubscribeQty($groupItem) && !$block->allowEditSubscribeQty($groupItem)): ?>
+                                <div <?php if (!$block->allowDisplaySubscribeQty($groupItem)): ?>
                                      class="hidden"
                                 <?php endif; ?>>
                                     <dt><?= $block->escapeHtml(__('Qty')) ?></dt>
