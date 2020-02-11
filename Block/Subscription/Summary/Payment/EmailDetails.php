@@ -65,6 +65,9 @@ class EmailDetails extends BaseSummary
      */
     public function getPaymentMethodTitle()
     {
+        if (!$this->getSubscriptionProfile()) {
+            return null;
+        }
         $path = 'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title';
         return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->getStore());
     }
@@ -125,7 +128,7 @@ class EmailDetails extends BaseSummary
      */
     public function getPaymentAdditionalInfo()
     {
-        if (null === $this->additionalInfo) {
+        if (null === $this->additionalInfo && $this->getSubscriptionProfile()) {
             $this->additionalInfo = $this->getSubscriptionProfile()->getPayment()->getPaymentAdditionalInfo();
             if ($this->additionalInfo) {
                 $this->additionalInfo = (array)json_decode($this->additionalInfo);
