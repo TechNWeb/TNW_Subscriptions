@@ -9,7 +9,11 @@ namespace TNW\Subscriptions\Block\Product\ListProduct;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Model\Config;
 
 /**
  *  Subscription product list action buttons.
@@ -24,16 +28,40 @@ class ListProductButtons extends Template
     private $subscriptionProductViewConfig;
 
     /**
+     * @var FrequencyRepository
+     */
+    private $frequencyRepository;
+
+    /**
+     * @var FrequencyOptionRepository
+     */
+    private $frequencyOptionRepository;
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param Template\Context $context
      * @param SubscriptionProductView $subscriptionProductViewConfig
+     * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param FrequencyRepository $frequencyRepository
+     * @param Config $config
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         SubscriptionProductView $subscriptionProductViewConfig,
+        FrequencyOptionRepository $frequencyOptionRepository,
+        FrequencyRepository $frequencyRepository,
+        Config $config,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
+        $this->frequencyOptionRepository = $frequencyOptionRepository;
+        $this->frequencyRepository = $frequencyRepository;
+        $this->config = $config;
         parent::__construct($context, $data);
     }
 
@@ -107,5 +135,154 @@ class ListProductButtons extends Template
     public function isOnlySubscribePurchase(ProductInterface $product)
     {
         return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($product);
+    }
+
+    /**
+     * Returns product billing frequencies as array.
+     *
+     * @return array
+     */
+    public function getFrequencyOption()
+    {
+        $productFrequency = $this->getProductBillingFrequencies();
+
+        if (is_null($productFrequency)) {
+            return [];
+        }
+
+        $frequency = $this->frequencyRepository->getById($productFrequency['billing_frequency_id']);
+        $preconfigured = $this->preconfiguredValue('subscription_data/unique/billing_frequency');
+        $isDefault = null === $preconfigured
+            ? $productFrequency['default_billing_frequency']
+            : $preconfigured == $productFrequency['billing_frequency_id'];
+
+        $data = [
+            'label' => $frequency->getLabel(),
+            'value' => $productFrequency['billing_frequency_id'],
+            'frequency_unit' => $frequency->getFrequency(),
+            'frequency_unit_type' => $frequency->getUnit(),
+            'is_default' => $isDefault,
+        ];
+
+        if (!$this->getAllowEditSubscribeQty()) {
+            $data['preset_qty'] = $productFrequency['preset_qty'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns list of product billing frequencies.
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getProductBillingFrequencies()
+    {
+        if (!$this->hasData('product_billing_frequencies')) {
+            $productId = $this->getProduct()->getId();
+            $productBillingFrequencies = $this->frequencyOptionRepository
+                ->getListByProductId($productId)
+                ->getItems();
+            foreach ($productBillingFrequencies as $productBillingFrequency) {
+                if ($productBillingFrequency->getData()['default_billing_frequency'] ==  1) {
+                    $this->setData('product_billing_frequencies', $productBillingFrequency);
+                }
+            }
+        }
+
+        return $this->getData('product_billing_frequencies');
+    }
+
+    /**
+     * Can allow edit Subscribe Qty
+     *
+     * @return bool
+     */
+    public function getAllowEditSubscribeQty()
+    {
+        $product = $this->getProduct();
+        return !(bool)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+    }
+
+    /**
+     * Get default value for Subscribe Qty
+     *
+     * @return int
+     */
+    public function getDefaultSubscribeQty()
+    {
+        if (!$this->getAllowEditSubscribeQty()) {
+            if ($this->getFrequencyOption()['is_default'] && isset($option['preset_qty'])) {
+                return $this->getFrequencyOption()['preset_qty'] * 1;
+            }
+        }
+
+        return $this->preconfiguredValue('qty') ?: 1;
+    }
+
+    /**
+     * Get default period value
+     *
+     * @return string
+     */
+    public function getDefaultPeriod()
+    {
+        $period = $this->preconfiguredValue('subscription_data/unique/period');
+
+        return null !== $period
+            ? (string)$period :
+            \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
+    }
+
+    /**
+     * Get is need check until canceled by default
+     *
+     * @return string
+     */
+    public function getDefaultUntilCancelled()
+    {
+        $term = $this->preconfiguredValue('subscription_data/unique/term') ?? $this->config->isUntilCanceledChecked();
+        return $this->getIsInfiniteSubscriptions() ?: $term;
+    }
+
+    /**
+     * Get is only infinite subscriptions available.
+     *
+     * @return string
+     */
+    public function getIsInfiniteSubscriptions()
+    {
+        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return mixed
+     */
+    private function preconfiguredValue($field)
+    {
+        return $this->getProduct()->hasPreconfiguredValues()
+            ? $this->getProduct()->getPreconfiguredValues()->getData($field)
+            : null;
+    }
+
+    /**
+     * Get array of options to add in cart from category page
+     *
+     * @return array
+     */
+    public function getSubscribeOptions()
+    {
+        $data = $this->getFrequencyOption();
+        if($this->getIsInfiniteSubscriptions()) {
+            $data['term'] = $this->getIsInfiniteSubscriptions();
+        } else {
+            $data['term'] = $this->getDefaultUntilCancelled();
+        }
+        $data['period'] = $this->getDefaultPeriod();
+        $data['subscribe_qty'] = $this->getDefaultSubscribeQty();
+        return $data;
     }
 }

@@ -6,6 +6,9 @@
 namespace TNW\Subscriptions\Controller\Cart;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Locale\ResolverInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
 /**
  * Add product to existing quote, or to newly created one.
@@ -18,9 +21,19 @@ class Add extends \Magento\Checkout\Controller\Cart
     protected $productRepository;
 
     /**
-     * @var \Magento\Framework\Locale\ResolverInterface
+     * @var ResolverInterface
      */
     private $localeResolver;
+
+    /**
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
+    private $productBillingFrequencyRepositoryInterface;
+
+    /**
+     * @var ProductBillingFrequencyInterface
+     */
+    private $billingFrequency;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -30,7 +43,9 @@ class Add extends \Magento\Checkout\Controller\Cart
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \Magento\Checkout\Model\Cart $cart,
         ProductRepositoryInterface $productRepository,
-        \Magento\Framework\Locale\ResolverInterface $localeResolver
+        ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepositoryInterface,
+        ProductBillingFrequencyInterface $billingFrequency,
+        ResolverInterface $localeResolver
     ) {
         parent::__construct(
             $context,
@@ -42,6 +57,8 @@ class Add extends \Magento\Checkout\Controller\Cart
         );
 
         $this->productRepository = $productRepository;
+        $this->productBillingFrequencyRepositoryInterface = $productBillingFrequencyRepositoryInterface;
+        $this->billingFrequency = $billingFrequency;
         $this->localeResolver = $localeResolver;
     }
 
@@ -88,6 +105,20 @@ class Add extends \Magento\Checkout\Controller\Cart
             /** @var \Magento\Catalog\Model\Product $product */
             $product = $this->initProduct();
             $related = $this->getRequest()->getParam('related_product');
+
+            if (isset($params['subscribe_button'])) {
+                $subscribeOptions = json_decode($params['subscribe_options'], true);
+                $params = [
+                    'uenc' => $params['uenc'],
+                    'product' => $params['product'],
+                    'form_key'=> $params['form_key'],
+                    'subscribe_active' => $params['subscribe_active'],
+                    'billing_frequency' => $subscribeOptions['value'],
+                    'term' => $subscribeOptions['term'],
+                    'period' => $subscribeOptions['period'],
+                    'subscribe_qty' => $subscribeOptions['subscribe_qty']
+                ];
+            }
 
             /**
              * Check product availability

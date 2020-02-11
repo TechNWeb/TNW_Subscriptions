@@ -6,7 +6,19 @@
 
 namespace TNW\Subscriptions\Block\Product;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
+use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Framework\Data\Helper\PostHelper;
+use Magento\Framework\DataObject;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Url\Helper\Data;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
+use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 
 /**
  *  Subscription Product list.
@@ -19,6 +31,45 @@ class ListProduct extends OrigListProduct
      * @var array
      */
     private $postParamsToButtonsBlock = [];
+
+    /**
+     * @var TrialLengthUnitType
+     */
+    private $trialLengthUnitType;
+
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    /**
+     * @var PriceCalculator
+     */
+    private $priceCalculator;
+
+    /**
+     * @var FrequencyOptionRepository
+     */
+    private $frequencyOptionRepository;
+
+    public function __construct(
+        Context $context,
+        PostHelper $postDataHelper,
+        Resolver $layerResolver,
+        CategoryRepositoryInterface $categoryRepository,
+        Data $urlHelper,
+        TrialLengthUnitType $trialLengthUnitType,
+        PriceCurrencyInterface $priceCurrency,
+        PriceCalculator $priceCalculator,
+        FrequencyOptionRepository $frequencyOptionRepository,
+        array $data = []
+    ) {
+        parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
+        $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->priceCurrency = $priceCurrency;
+        $this->priceCalculator = $priceCalculator;
+        $this->frequencyOptionRepository = $frequencyOptionRepository;
+    }
 
     /**
      * Prepare params too add button block.
@@ -56,5 +107,104 @@ class ListProduct extends OrigListProduct
             $this->postParamsToButtonsBlock
         )->setTemplate('TNW_Subscriptions::product/list/buttons.phtml');
         return $buyButtonsBlock->toHtml();
+    }
+
+    /**
+     * Get length of trial period
+     *
+     * @param $product
+     * @return \Magento\Framework\Phrase
+     */
+    public function getTopMessage($product)
+    {
+        $productArray = $product->getData();
+        if ($productArray['tnw_subscr_trial_status'] != 0) {
+            $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
+                $productArray['tnw_subscr_trial_length'], $productArray['tnw_subscr_trial_length_unit']));
+        } else {
+            $topMessage = null;
+        }
+        return $topMessage;
+    }
+
+    /**
+     * Return Billing Frequency Trial with unit (e.g. "6 months")
+     *
+     * @param $period
+     * @param $unitId
+     * @return string
+     */
+    private function getFrequencyTrialWithUnit($period, $unitId)
+    {
+        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength((int)$unitId, $period);
+
+        return strtolower($period . ' ' . $unitLabel);
+    }
+
+    /**
+     * Get price of trial period
+     *
+     * @param $product
+     * @return float|string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getTrialPriceForCategory($product)
+    {
+        $productBillingFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($product->getId())
+            ->getItems();
+
+        if (empty($productBillingFrequencies)) {
+            return $this->formatCurrency($product->getPrice(), false);
+        }
+
+        foreach ($productBillingFrequencies as $productBillingFrequency) {
+            $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
+            $initialFee = $this->getInitialFee($productBillingFrequency, $product);
+            $price = $trialPrice + $initialFee;
+            $customPrice = $this->formatCurrency($price, false);
+            $subscriptionPrice = $product->getData()['price'] + $initialFee;
+
+            $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+            if ($price != 0) {
+                return $customPrice;
+            } elseif($trialStatus == 0){
+                return $this->formatCurrency($subscriptionPrice, false);
+            } else {
+                return sprintf('<span class="free">%s</span>', __('Free'));
+            }
+        }
+    }
+
+    /**
+     * Format price value
+     *
+     * @param float $amount
+     * @param bool $includeContainer
+     * @param int $precision
+     * @return float
+     */
+    public function formatCurrency(
+        $amount,
+        $includeContainer = true,
+        $precision = PriceCurrencyInterface::DEFAULT_PRECISION
+    ) {
+        return $this->priceCurrency->format($amount, $includeContainer, $precision);
+    }
+
+    /**
+     * Return product initial fee.
+     *
+     * @param ProductBillingFrequencyInterface $billingFrequency
+     * @param DataObject $product
+     * @return float
+     */
+    private function getInitialFee(ProductBillingFrequencyInterface $billingFrequency, DataObject $product)
+    {
+        return $this->priceCalculator->getInitialFee(
+            $billingFrequency->getBillingFrequencyId(),
+            $product->getId(),
+            false
+        );
     }
 }

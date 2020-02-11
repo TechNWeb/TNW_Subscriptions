@@ -331,6 +331,14 @@
                 disabled="false"/>
     </type>
 
+    <type name="Magento\Catalog\Block\Product\ListProduct">
+        <plugin
+                name="subscription_catalog_product_price"
+                type="TNW\Subscriptions\Plugin\Catalog\Block\Product\ListProduct"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
+
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
