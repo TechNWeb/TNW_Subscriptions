@@ -47,6 +47,10 @@ class EmailNotifier
      * @var \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface
      */
     protected $subscriptionProfileRepository;
+    /**
+     * @var SubscriptionProfileOrder\Manager
+     */
+    private $profileOrderManager;
 
     /**
      * EmailNotifier constructor.
@@ -55,19 +59,22 @@ class EmailNotifier
      * @param \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation
      * @param Source\ProfileStatusFactory $profileStatusFactory
      * @param \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param SubscriptionProfileOrder\Manager $profileOrderManager
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         Source\ProfileStatusFactory $profileStatusFactory,
-        \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+        \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        SubscriptionProfileOrder\Manager $profileOrderManager
     ) {
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->profileStatusFactory = $profileStatusFactory;
         $this->transportBuilder = $transportBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->inlineTranslation = $inlineTranslation;
+        $this->profileOrderManager = $profileOrderManager;
     }
 
     /**
@@ -82,6 +89,7 @@ class EmailNotifier
         if ($this->checkEmailTemplateSetting(self::XML_PATH_STATUS_CHANGE_TEMPLATE)) {
             $customer = $subscriptionProfile->getCustomer();
             $statusModel = $this->profileStatusFactory->create();
+            $date = $this->getNextProfileRelation($subscriptionProfile)->getScheduledAt();
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_STATUS_CHANGE_TEMPLATE,
@@ -92,6 +100,7 @@ class EmailNotifier
                     'subscription' => $subscriptionProfile,
                     'oldStatus' => $statusModel->getLabelByValue($oldStatus),
                     'newStatus' => $statusModel->getLabelByValue($newStatus),
+                    'date' => date('F jS, Y', strtotime($date)),
                     'customer' => $customer
                 ],
                 [
@@ -142,10 +151,11 @@ class EmailNotifier
 
     /**
      * @param $subscriptionProfile
+     * @param $date
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\MailException
      */
-    public function cardExpire($subscriptionProfile)
+    public function cardExpire($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
             $customer = $subscriptionProfile->getCustomer();
@@ -157,7 +167,8 @@ class EmailNotifier
                 $customer->getStoreId(),
                 [
                     'subscription' => $subscriptionProfile,
-                    'customer' => $customer
+                    'customer' => $customer,
+                    'date' => date('F jS, Y', strtotime($date))
                 ],
                 [
                     'email' => $customer->getEmail(),
@@ -289,5 +300,16 @@ class EmailNotifier
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns next profile relation instance.
+     *
+     * @param SubscriptionProfile $profile
+     * @return false|\TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface
+     */
+    private function getNextProfileRelation(SubscriptionProfile $profile)
+    {
+        return $this->profileOrderManager->getNextProfileRelation($profile, false);
     }
 }

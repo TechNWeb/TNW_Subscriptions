@@ -66,6 +66,9 @@ class Address extends BaseSummary
      */
     public function getAddressHtml()
     {
+        if (!$this->getSubscriptionProfile()) {
+            return '';
+        }
         $addressData = $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
             ? $this->getSubscriptionProfile()->getShippingAddress()->getData()
             : $this->getSubscriptionProfile()->getBillingAddress()->getData();
@@ -103,7 +106,11 @@ class Address extends BaseSummary
      */
     protected function _toHtml()
     {
-        if ($this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING && $this->getSubscriptionProfile()->getIsVirtual()) {
+        if (
+            $this->getSubscriptionProfile()
+                && $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
+                && $this->getSubscriptionProfile()->getIsVirtual()
+        ) {
             return;
         }
 

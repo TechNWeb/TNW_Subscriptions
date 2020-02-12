@@ -7,8 +7,8 @@
             <th class="item-info">
                 <?= $block->escapeHtml(__('Item')) ?>
             </th>
-            <th class="item-qty">
-                <?= $block->escapeHtml(__('Qty')) ?>
+            <th class="item-info">
+                <?= $block->escapeHtml(__('Details')) ?>
             </th>
             <th class="item-subscription">
                 <?= $block->escapeHtml(__('Subscription Details')) ?>
@@ -20,7 +20,12 @@
         <tr>
             <td class="item-info">
                 <p class="product-name"><?php echo $block->getName($item) ?></p>
+                <img class="product-image" src="<?php echo $block->getImageUrl($item) ?>" alt="<?php echo $block->getName($item) ?>"/>
+            </td>
+            <td class="item-additional">
                 <dl class="item-options custom-attributes">
+                    <dt class="qty"><?php echo __('Qty') ?></dt>
+                    <dd><?php echo (int)$item->getQty() ?></dd>
                     <?php foreach ($block->getItemOptions($item) as $option): ?>
                         <dt><?= $block->escapeHtml($option['label']) ?></dt>
                         <?php $formatedOptionValue = $block->getFormatedOptionValue($option) ?>
@@ -37,10 +42,6 @@
                         <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
                     <?php endforeach; ?>
                 </dl>
-            </td>
-            <td class="item-qty">
-                <span class="qty"><?php echo __('Qty') ?></span>:
-                <span><?php echo (int)$item->getQty() ?></span>
             </td>
             <td class="item-subscription-info">
                 <dt><?php echo __('Billing Frequency') ?></dt>

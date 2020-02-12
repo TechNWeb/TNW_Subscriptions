@@ -50,4 +50,12 @@ class BaseSummary extends Template
     {
         return $this->getData('subscription_profile');
     }
+
+    /**
+     * @return mixed|string|null
+     */
+    public function getProfileCurrencyCode()
+    {
+        return $this->getSubscriptionProfile() ? $this->getSubscriptionProfile()->getProfileCurrencyCode() : null;
+    }
 }
