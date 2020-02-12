@@ -1,4 +1,4 @@
-<!--@subject {{trans "Subscription Payment Failed"}} @-->
+<!--@subject {{trans "Could not process recurring order for %sub_label profile from" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
@@ -14,14 +14,14 @@
         <td>
             <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
             <p>
-                {{trans 'We were unable to process the payment for subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a>. {{trans 'We will make another attempt in %attempt_interval day(s)' attempt_interval=$attempt_interval}}
+                {{trans 'We were unable to process payment for the recurring order under'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'profile. We will try again in %attempt_interval day(s). Make sure the payment method on file has sufficient funds and up to date to prevent any interruption.' attempt_interval=$attempt_interval}}
             </p>
             <p>
-                {{trans '<a href="%account_url">Log in to your account</a> and verify that your payment details are up to date to prevent any interruption of service' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+                {{trans 'If this issue remains unresolved your recurring orders will stop and the profile %sub_label will be suspended.' sub_label=$subscription.getLabel()}}
             </p>
             <p>
-                {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}
-            </p>
+                {{trans '<a href="%account_url">Log in to your account</a> to make any changes to your recurring profile. You can find it under the My Subscriptions tab after you authenticate.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+           </p>
         </td>
     </tr>
 </table>

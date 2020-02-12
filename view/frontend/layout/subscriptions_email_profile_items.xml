@@ -26,7 +26,9 @@
                    template="TNW_Subscriptions::subscription_profile/email/summary/overview/payment-details.phtml"
                    as="payment-details" >
             </block>
-            <block name="subscription.email.products" as="products" class="TNW\Subscriptions\Block\Subscription\Summary\Products" template="TNW_Subscriptions::subscription_profile/email/summary/products.phtml" />
+            <block name="subscription.email.products" as="products"
+                   class="TNW\Subscriptions\Block\Subscription\Summary\Products"
+                   template="TNW_Subscriptions::subscription_profile/email/summary/products.phtml" />
         </block>
     </body>
 </page>

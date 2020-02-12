@@ -135,7 +135,7 @@ class NotificationProcessor
                 $profile = null;
             }
             if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt())) {
-                $this->emailNotifierFactory->create()->cardExpire($profile);
+                $this->emailNotifierFactory->create()->cardExpire($profile, $item->getScheduledAt());
             }
         }
     }
