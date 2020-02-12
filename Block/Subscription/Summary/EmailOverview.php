@@ -64,7 +64,7 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function canShowShippingDetailsBlock()
     {
-        return !(bool)$this->getSubscriptionProfile()->getIsVirtual();
+        return $this->getSubscriptionProfile() ? !(bool)$this->getSubscriptionProfile()->getIsVirtual() : false;
     }
 
     /**

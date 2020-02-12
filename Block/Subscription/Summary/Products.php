@@ -89,7 +89,7 @@ class Products extends BaseSummary
      */
     public function getItems()
     {
-        return $this->getSubscriptionProfile()->getVisibleProducts();
+        return $this->getSubscriptionProfile() ? $this->getSubscriptionProfile()->getVisibleProducts() : [];
     }
 
     /**
@@ -215,7 +215,9 @@ class Products extends BaseSummary
     public function getFrequencyDescription()
     {
         $profile = $this->getSubscriptionProfile();
-
+        if (!$profile) {
+            return '';
+        }
         $initialFee = $price = 0;
         foreach ($this->getItems() as $item) {
             $price += $this->getPrice($item);
