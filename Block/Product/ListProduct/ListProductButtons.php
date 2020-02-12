@@ -11,6 +11,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
@@ -135,6 +136,18 @@ class ListProductButtons extends Template
     public function isOnlySubscribePurchase(ProductInterface $product)
     {
         return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($product);
+    }
+
+    /**
+     * Check if subscription purchase type is "One time purchase only" only.
+     *
+     * @param ProductInterface $product
+     * @return bool
+     */
+    public function isOneTimePurchase(ProductInterface $product)
+    {
+        return ($product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE)
+            && $product->getIsSalable();
     }
 
     /**

@@ -16,7 +16,7 @@ $frequencyOptions = $block->getSubscribeOptions();
 
 <div class="actions-primary"<?php echo strpos($pos, $viewMode . '-primary') ? $position : ''; ?>>
     <?php if ($_product->isSaleable()): ?>
-        <?php if ($block->isSubscribeAvailable($_product)): ?>
+        <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product)): ?>
             <?php if ($block->isOnlySubscribePurchase($_product)): ?>
                 <div class="product-subscribe-button">
                     <?php $postParams = $block->getCurrentPostParams(); ?>
