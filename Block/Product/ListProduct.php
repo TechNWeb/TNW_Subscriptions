@@ -163,12 +163,12 @@ class ListProduct extends OrigListProduct
             $initialFee = $this->getInitialFee($productBillingFrequency, $product);
             $price = $trialPrice + $initialFee;
             $customPrice = $this->formatCurrency($price, false);
-            $subscriptionPrice = $product->getData()['price'] + $initialFee;
 
             $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
-            if ($price != 0) {
+            if ($price != 0 && $trialStatus == 1) {
                 return $customPrice;
-            } elseif($trialStatus == 0){
+            } elseif($trialStatus == 0 && $productBillingFrequency['default_billing_frequency'] == 1){
+                $subscriptionPrice = $productBillingFrequency['price'] + $initialFee;
                 return $this->formatCurrency($subscriptionPrice, false);
             } else {
                 return sprintf('<span class="free">%s</span>', __('Free'));
