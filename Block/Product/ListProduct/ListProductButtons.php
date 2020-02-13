@@ -15,6 +15,8 @@ use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
+use Magento\Framework\Json\Encoder;
 
 /**
  *  Subscription product list action buttons.
@@ -44,11 +46,17 @@ class ListProductButtons extends Template
     private $config;
 
     /**
+     * @var Encoder
+     */
+    private $encoder;
+
+    /**
      * @param Template\Context $context
      * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
      * @param Config $config
+     * @param Encoder $encoder
      * @param array $data
      */
     public function __construct(
@@ -57,12 +65,14 @@ class ListProductButtons extends Template
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         Config $config,
+        Encoder $encoder,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
         $this->config = $config;
+        $this->encoder = $encoder;
         parent::__construct($context, $data);
     }
 
@@ -192,7 +202,7 @@ class ListProductButtons extends Template
      */
     private function getProductBillingFrequencies()
     {
-        if (!$this->hasData('product_billing_frequencies')) {
+        if (is_null($this->getData('product_billing_frequencies'))) {
             $productId = $this->getProduct()->getId();
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($productId)
@@ -214,8 +224,7 @@ class ListProductButtons extends Template
      */
     public function getAllowEditSubscribeQty()
     {
-        $product = $this->getProduct();
-        return !(bool)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        return !(bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
     }
 
     /**
@@ -244,8 +253,8 @@ class ListProductButtons extends Template
         $period = $this->preconfiguredValue('subscription_data/unique/period');
 
         return null !== $period
-            ? (string)$period :
-            \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
+            ? (string) $period :
+            ModalForm::DEFAULT_PERIOD_VALUE;
     }
 
     /**
@@ -289,7 +298,7 @@ class ListProductButtons extends Template
     public function getSubscribeOptions()
     {
         $data = $this->getFrequencyOption();
-        if($this->getIsInfiniteSubscriptions()) {
+        if ($this->getIsInfiniteSubscriptions()) {
             $data['term'] = $this->getIsInfiniteSubscriptions();
         } else {
             $data['term'] = $this->getDefaultUntilCancelled();
@@ -297,5 +306,10 @@ class ListProductButtons extends Template
         $data['period'] = $this->getDefaultPeriod();
         $data['subscribe_qty'] = $this->getDefaultSubscribeQty();
         return $data;
+    }
+
+    public function getSubscribeOptionsJson($options)
+    {
+        return $this->encoder->encode($options);
     }
 }

@@ -35,6 +35,19 @@ class Add extends \Magento\Checkout\Controller\Cart
      */
     private $billingFrequency;
 
+    /**
+     * Add constructor.
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
+     * @param \Magento\Checkout\Model\Cart $cart
+     * @param ProductRepositoryInterface $productRepository
+     * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepositoryInterface
+     * @param ProductBillingFrequencyInterface $billingFrequency
+     * @param ResolverInterface $localeResolver
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -108,16 +121,8 @@ class Add extends \Magento\Checkout\Controller\Cart
 
             if (isset($params['subscribe_button'])) {
                 $subscribeOptions = json_decode($params['subscribe_options'], true);
-                $params = [
-                    'uenc' => $params['uenc'],
-                    'product' => $params['product'],
-                    'form_key'=> $params['form_key'],
-                    'subscribe_active' => $params['subscribe_active'],
-                    'billing_frequency' => $subscribeOptions['value'],
-                    'term' => $subscribeOptions['term'],
-                    'period' => $subscribeOptions['period'],
-                    'subscribe_qty' => $subscribeOptions['subscribe_qty']
-                ];
+                $billingFrequency['billing_frequency'] = $subscribeOptions['value'];
+                $params = array_merge($params, $billingFrequency, $subscribeOptions);
             }
 
             /**

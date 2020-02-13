@@ -113,16 +113,18 @@ class ListProduct extends OrigListProduct
      * Get length of trial period
      *
      * @param $product
-     * @return \Magento\Framework\Phrase
+     * @return \Magento\Framework\Phrase|string
      */
     public function getTopMessage($product)
     {
         $productArray = $product->getData();
         if (isset($productArray['tnw_subscr_trial_status']) && $productArray['tnw_subscr_trial_status'] != 0) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
-                $productArray['tnw_subscr_trial_length'], $productArray['tnw_subscr_trial_length_unit']));
+                $productArray['tnw_subscr_trial_length'],
+                $productArray['tnw_subscr_trial_length_unit'])
+            );
         } else {
-            $topMessage = null;
+            $topMessage = '';
         }
         return $topMessage;
     }
@@ -136,9 +138,7 @@ class ListProduct extends OrigListProduct
      */
     private function getFrequencyTrialWithUnit($period, $unitId)
     {
-        $unitLabel = $this->trialLengthUnitType->getLabelByValueAndLength((int)$unitId, $period);
-
-        return strtolower($period . ' ' . $unitLabel);
+        return strtolower($period . ' ' . $this->trialLengthUnitType->getLabelByValueAndLength((int) $unitId, $period));
     }
 
     /**
@@ -159,25 +159,26 @@ class ListProduct extends OrigListProduct
         }
 
         $result = null;
+        $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+        $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
+        if ($trialStatus == 1) {
+            $result = sprintf('<span class="free">%s</span>', __('Free'));
+        }
         foreach ($productBillingFrequencies as $productBillingFrequency) {
-            $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
             $initialFee = $this->getInitialFee($productBillingFrequency, $product);
-            $price = $trialPrice + $initialFee;
-            $customPrice = $this->formatCurrency($price, false);
-            $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
-
-            if ($price != 0 && $trialStatus == 1) {
-                $result = $customPrice;
-            }
 
             if ($trialStatus == 0 && $productBillingFrequency['default_billing_frequency'] == 1) {
                 $subscriptionPrice = $productBillingFrequency['price'] + $initialFee;
                 $result = $this->formatCurrency($subscriptionPrice, false);
+            } elseif ($trialStatus == 1 && $productBillingFrequency['default_billing_frequency'] == 1) {
+                $price = $trialPrice + $initialFee;
+                $customPrice = $this->formatCurrency($price, false);
+
+                if ($price != 0 && $trialStatus == 1) {
+                    $result = $customPrice;
+                }
             }
 
-            if ($price == 0 && $trialStatus == 1) {
-                $result = sprintf('<span class="free">%s</span>', __('Free'));
-            }
         }
         return $result;
     }
