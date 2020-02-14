@@ -52,6 +52,19 @@ class ListProduct extends OrigListProduct
      */
     private $frequencyOptionRepository;
 
+    /**
+     * ListProduct constructor.
+     * @param Context $context
+     * @param PostHelper $postDataHelper
+     * @param Resolver $layerResolver
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param Data $urlHelper
+     * @param TrialLengthUnitType $trialLengthUnitType
+     * @param PriceCurrencyInterface $priceCurrency
+     * @param PriceCalculator $priceCalculator
+     * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         PostHelper $postDataHelper,
@@ -145,7 +158,7 @@ class ListProduct extends OrigListProduct
      * Get price of trial period
      *
      * @param $product
-     * @return float|string
+     * @return float|string|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTrialPriceForCategory($product)

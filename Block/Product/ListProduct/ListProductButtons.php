@@ -253,8 +253,8 @@ class ListProductButtons extends Template
         $period = $this->preconfiguredValue('subscription_data/unique/period');
 
         return null !== $period
-            ? (string) $period :
-            ModalForm::DEFAULT_PERIOD_VALUE;
+            ? (string) $period
+            : ModalForm::DEFAULT_PERIOD_VALUE;
     }
 
     /**
@@ -269,18 +269,9 @@ class ListProductButtons extends Template
     }
 
     /**
-     * Get is only infinite subscriptions available.
+     * Check for preconfigured value
      *
-     * @return string
-     */
-    public function getIsInfiniteSubscriptions()
-    {
-        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
-    }
-
-    /**
      * @param string $field
-     *
      * @return mixed
      */
     private function preconfiguredValue($field)
@@ -288,6 +279,16 @@ class ListProductButtons extends Template
         return $this->getProduct()->hasPreconfiguredValues()
             ? $this->getProduct()->getPreconfiguredValues()->getData($field)
             : null;
+    }
+
+    /**
+     * Get is only infinite subscriptions available.
+     *
+     * @return string
+     */
+    public function getIsInfiniteSubscriptions()
+    {
+        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
     }
 
     /**
@@ -308,6 +309,12 @@ class ListProductButtons extends Template
         return $data;
     }
 
+    /**
+     * Encode subscribe options
+     *
+     * @param $options
+     * @return string
+     */
     public function getSubscribeOptionsJson($options)
     {
         return $this->encoder->encode($options);
