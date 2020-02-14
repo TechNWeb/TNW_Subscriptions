@@ -348,7 +348,11 @@ class Product extends Create
                 break;
 
             default:
-                $result = date_create($startOn)->format('Y-m-d');
+                $result = date_create($startOn);
+                if (!$result) {
+                    $result = date_create($nowDate);
+                }
+                $result = $result->format('Y-m-d');
 
                 if (strtotime($result) < strtotime($nowDate)) {
                     $result = $nowDate;

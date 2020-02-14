@@ -68,7 +68,18 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                             </a>
                         </strong>
                         <?php echo $block->getReviewsSummaryHtml($_product, $templateType); ?>
-                        <?php /* @escapeNotVerified */ echo $block->getProductPrice($_product) ?>
+                        <strong class="product name product-item-name">
+                            <?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTopMessage($_product) ?>
+                        </strong>
+                        <?php if($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
+                            <div class="price-box price-final_price">
+                            <span class="price-wrapper" data-role="priceBox">
+                                <span class="price"><?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTrialPriceForCategory($_product) ?></span>
+                            </span>
+                            </div>
+                        <?php else: ?>
+                            <?php /* @escapeNotVerified */ echo $block->getProductPrice($_product) ?>
+                        <?php endif; ?>
                         <?php echo $block->getProductDetailsHtml($_product); ?>
 
                         <div class="product-item-inner">
