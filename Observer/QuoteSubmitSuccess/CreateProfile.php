@@ -37,6 +37,11 @@ class CreateProfile implements ObserverInterface
 
     private $customerFactory;
 
+    /**
+     * @var array
+     */
+    private $trialPaymentData = [];
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
@@ -121,5 +126,13 @@ class CreateProfile implements ObserverInterface
 
         // Save Items Relation
         $this->relationResource->insertSales($insertData);
+    }
+
+    /**
+     * @param $data
+     */
+    public function setTrialPaymentData($data)
+    {
+        $this->trialPaymentData = $data;
     }
 }

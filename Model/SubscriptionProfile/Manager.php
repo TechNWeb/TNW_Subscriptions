@@ -1079,11 +1079,6 @@ class Manager
         /** @var OrderPaymentInterface $orderPayment */
         $orderPayment = $order->getPayment();
         $quotePayment = $quote->getPayment();
-        if ($subscriptionData = $quote->getSubscriptionPaymentData()) {
-            $quotePayment->addData(json_decode($quote->getSubscriptionPaymentData(), true));
-            $quotePayment->unsetData('additional_data');
-        }
-        $quote->setSubscriptionPaymentData('');
         $orderPaymentDataToAdd = [
             'cc_type' => $orderPayment->getCcType(),
             'cc_last_4' => $orderPayment->getCcLast4(),

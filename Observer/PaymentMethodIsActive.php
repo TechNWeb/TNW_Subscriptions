@@ -48,7 +48,7 @@ class PaymentMethodIsActive implements ObserverInterface
         if (
             $quote->hasData('is_tnw_subscription')
             && $quote->getData('is_tnw_subscription')
-            && !($quote->getSubscriptionPaymentData() && $paymentMethod->getCode() == 'free')
+            && !($paymentMethod->getCode() == 'free')
         ) {
             $checkResult->setData(
                 'is_available',
