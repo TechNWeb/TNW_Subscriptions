@@ -15,5 +15,12 @@ var config = {
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
             configurable: 'TNW_Subscriptions/js/configurable'
         }
+    },
+    config: {
+        mixins: {
+            'Magento_Catalog/js/catalog-add-to-cart': {
+                'TNW_Subscriptions/js/catalog-add-to-cart-mixin': true
+            }
+        }
     }
 };
