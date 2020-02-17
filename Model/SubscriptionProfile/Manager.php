@@ -886,7 +886,7 @@ class Manager
         $data = [
            'encoded_payment_additional_info' => [
                'cc_type' => $details['type'],
-               'cc_lat_4' => $details['maskedCC'],
+               'cc_last_4' => $details['maskedCC'],
                'cc_exp_month' => $expirationMonth,
                'cc_exp_year' => $expirationYear
            ],
