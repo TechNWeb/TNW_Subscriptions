@@ -6,14 +6,19 @@
 define([
     'jquery',
     'mage/translate',
-], function ($, $t,alert) {
+], function ($, $t) {
     'use strict';
 
     return function (widget) {
         $.widget('mage.catalogAddToCart', widget, {
 
             enableAddToCartButton: function (form) {
-                this.options.addToCartButtonTextDefault = this.options.addToCartButtonTextDefault || $t('Subscribe');
+                let tnwSubscribe = $(form).find(".tnw-subscribe");
+                if (tnwSubscribe.length == 1) {
+                    this.options.addToCartButtonTextDefault = this.options.addToCartButtonTextDefault || $t('Subscribe');
+                } else {
+                    this.options.addToCartButtonTextDefault = this.options.addToCartButtonTextDefault || $t('Add to cart');
+                }
                 this._super(form);
             }
         });
