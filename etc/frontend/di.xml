@@ -203,16 +203,4 @@
             <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\FrontendMessageHistoryFormatter</argument>
         </arguments>
     </type>
-
-    <type name="TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization">
-        <arguments>
-            <argument name="paymentProcessors" xsi:type="array">
-                <item name="braintree" xsi:type="array">
-                    <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
-                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
-                    <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
-                </item>
-            </argument>
-        </arguments>
-    </type>
 </config>

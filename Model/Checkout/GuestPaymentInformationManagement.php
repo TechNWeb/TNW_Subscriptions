@@ -14,9 +14,9 @@ class GuestPaymentInformationManagement
     implements \TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface
 {
     /**
-     * @var \TNW\Subscriptions\Observer\QuoteSubmitSuccess\CreateProfile
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
      */
-    private $createProfileObserver;
+    private $vaultPaymentAuthorization;
 
     /**
      * GuestPaymentInformationManagement constructor.
@@ -26,7 +26,7 @@ class GuestPaymentInformationManagement
      * @param \Magento\Checkout\Api\PaymentInformationManagementInterface $paymentInformationManagement
      * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \TNW\Subscriptions\Observer\QuoteSubmitSuccess\CreateProfile $createProfileObserver
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      * @param \Magento\Framework\App\ResourceConnection|null $connectionPool
      */
     public function __construct(
@@ -36,7 +36,7 @@ class GuestPaymentInformationManagement
         \Magento\Checkout\Api\PaymentInformationManagementInterface $paymentInformationManagement,
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \TNW\Subscriptions\Observer\QuoteSubmitSuccess\CreateProfile $createProfileObserver,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Framework\App\ResourceConnection $connectionPool = null
     ) {
         parent::__construct(
@@ -48,7 +48,7 @@ class GuestPaymentInformationManagement
             $cartRepository,
             $connectionPool
         );
-        $this->createProfileObserver = $createProfileObserver;
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
     }
 
     /**
@@ -77,8 +77,13 @@ class GuestPaymentInformationManagement
         $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
 
         if ($quote->getBaseGrandTotal() < 0.0001) {
-            $this->createProfileObserver->setTrialPaymentData($paymentMethod->getData());
+            $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                $paymentMethod->getData(),
+                $quote
+            );
+            $quote->setSubscriptionPaymentDataSet(true);
             $paymentMethod->setMethod('free');
+
         }
 
         return parent::savePaymentInformationAndPlaceOrder($cartId, $email, $paymentMethod, $billingAddress);

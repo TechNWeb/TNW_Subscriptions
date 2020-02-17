@@ -65,6 +65,7 @@ class PaymentInformationManagement
                 $paymentMethod->getData(),
                 $this->quoteRepository->get($cartId)
             );
+            $this->quoteRepository->get($cartId)->setSubscriptionPaymentDataSet(true);
             $paymentMethod->setMethod('free');
         }
 
