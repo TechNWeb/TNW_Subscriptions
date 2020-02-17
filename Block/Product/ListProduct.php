@@ -20,6 +20,7 @@ use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 
 /**
  *  Subscription Product list.
@@ -168,7 +169,10 @@ class ListProduct extends OrigListProduct
             ->getListByProductId($product->getId())
             ->getItems();
 
-        if (empty($productBillingFrequencies) || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == 1) {
+        if (
+            empty($productBillingFrequencies)
+            || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
+        ) {
             return $this->formatCurrency($product->getPrice(), false);
         }
 
