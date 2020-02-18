@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Observer\QuoteSubmitSuccess;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 class CreateProfile implements ObserverInterface
 {
@@ -37,14 +38,27 @@ class CreateProfile implements ObserverInterface
 
     private $customerFactory;
 
+    /**
+     * @var array
+     */
+    private $trialPaymentData = [];
+
+    private $paymentTokenManagement;
+
+    private $encryptor;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
         \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService,
         \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
-        \Magento\Customer\Model\CustomerFactory $customerFactory
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor
     ) {
+        $this->encryptor = $encryptor;
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->profileManager = $profileManager;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->orderCustomerService = $orderCustomerService;
@@ -91,10 +105,25 @@ class CreateProfile implements ObserverInterface
             $quote->setCustomer($customer);
         }
 
+        if ($this->trialPaymentData) {
+            $customer = $quote->getCustomer();
+            $paymentToken = $this->trialPaymentData['payment_token'];
+            if (!empty($paymentToken->getGatewayToken())) {
+                $paymentData = $this->trialPaymentData['payment_data'];
+                $paymentToken->setCustomerId($customer->getId());
+                $paymentToken->setIsActive(true);
+                $paymentToken->setPaymentMethodCode($paymentData['method']);
+                $paymentToken->setIsVisible(true);
+                $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+                $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $order->getPayment());
+                $this->trialPaymentData['vault_payment_token'] = $paymentToken;
+            }
+        }
+
         // Create profile
         $insertData = [];
         foreach ($groups as $groupKey => $quoteItems) {
-            $profile = $this->profileManager->createByOrder($order, $quote, $quoteItems);
+            $profile = $this->profileManager->createByOrder($order, $quote, $quoteItems, $this->trialPaymentData);
 
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
             foreach ($profile->getProducts() as $product) {
@@ -121,5 +150,33 @@ class CreateProfile implements ObserverInterface
 
         // Save Items Relation
         $this->relationResource->insertSales($insertData);
+    }
+
+    /**
+     * @param $data
+     */
+    public function setTrialPaymentData($data)
+    {
+        $this->trialPaymentData = $data;
+    }
+
+    /**
+     * Generate vault payment public hash
+     *
+     * @param PaymentTokenInterface $paymentToken
+     * @return string
+     */
+    protected function generatePublicHash(PaymentTokenInterface $paymentToken)
+    {
+        $hashKey = $paymentToken->getGatewayToken();
+        if ($paymentToken->getCustomerId()) {
+            $hashKey = $paymentToken->getCustomerId();
+        }
+
+        $hashKey .= $paymentToken->getPaymentMethodCode()
+            . $paymentToken->getType()
+            . $paymentToken->getTokenDetails();
+
+        return $this->encryptor->getHash($hashKey);
     }
 }

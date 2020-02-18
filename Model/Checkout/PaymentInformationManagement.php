@@ -5,12 +5,20 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInformationManagement implements \TNW\Subscriptions\Api\PaymentInformationManagementInterface
+/**
+ * Class PaymentInformationManagement
+ * @package TNW\Subscriptions\Model\Checkout
+ */
+class PaymentInformationManagement
+    extends \Magento\Checkout\Model\PaymentInformationManagement
+    implements \TNW\Subscriptions\Api\PaymentInformationManagementInterface
 {
     /**
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
+
+    protected $vaultPaymentAuthorization;
 
     public function __construct(
         \Magento\Quote\Api\BillingAddressManagementInterface $billingAddressManagement,
@@ -18,7 +26,8 @@ class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInform
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Checkout\Model\PaymentDetailsFactory $paymentDetailsFactory,
         \Magento\Quote\Api\CartTotalRepositoryInterface $cartTotalsRepository,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
         parent::__construct(
             $billingAddressManagement,
@@ -27,6 +36,7 @@ class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInform
             $paymentDetailsFactory,
             $cartTotalsRepository
         );
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->quoteRepository = $quoteRepository;
     }
 
@@ -36,9 +46,9 @@ class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInform
      * @param int $cartId
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
-     *
      * @return int
      * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function savePaymentInformationAndPlaceOrder(
         $cartId,
@@ -51,13 +61,12 @@ class PaymentInformationManagement extends \Magento\Checkout\Model\PaymentInform
         $paymentMethod->setAdditionalData($additionalData);
 
         if ($this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001) {
-            $this->quoteRepository->get($cartId)->setData(
-                'subscription_payment_data',
-                json_encode($paymentMethod->getData())
+            $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                $paymentMethod->getData(),
+                $this->quoteRepository->get($cartId)
             );
+            $this->quoteRepository->get($cartId)->setSubscriptionPaymentDataSet(true);
             $paymentMethod->setMethod('free');
-        } else {
-            $this->quoteRepository->get($cartId)->unsetData('subscription_payment_data');
         }
 
         return parent::savePaymentInformationAndPlaceOrder($cartId, $paymentMethod, $billingAddress);

@@ -5,8 +5,52 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPaymentInformationManagement implements \TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface
+/**
+ * Class GuestPaymentInformationManagement
+ * @package TNW\Subscriptions\Model\Checkout
+ */
+class GuestPaymentInformationManagement
+    extends \Magento\Checkout\Model\GuestPaymentInformationManagement
+    implements \TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface
 {
+    /**
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     */
+    private $vaultPaymentAuthorization;
+
+    /**
+     * GuestPaymentInformationManagement constructor.
+     * @param \Magento\Quote\Api\GuestBillingAddressManagementInterface $billingAddressManagement
+     * @param \Magento\Quote\Api\GuestPaymentMethodManagementInterface $paymentMethodManagement
+     * @param \Magento\Quote\Api\GuestCartManagementInterface $cartManagement
+     * @param \Magento\Checkout\Api\PaymentInformationManagementInterface $paymentInformationManagement
+     * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\App\ResourceConnection|null $connectionPool
+     */
+    public function __construct(
+        \Magento\Quote\Api\GuestBillingAddressManagementInterface $billingAddressManagement,
+        \Magento\Quote\Api\GuestPaymentMethodManagementInterface $paymentMethodManagement,
+        \Magento\Quote\Api\GuestCartManagementInterface $cartManagement,
+        \Magento\Checkout\Api\PaymentInformationManagementInterface $paymentInformationManagement,
+        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Framework\App\ResourceConnection $connectionPool = null
+    ) {
+        parent::__construct(
+            $billingAddressManagement,
+            $paymentMethodManagement,
+            $cartManagement,
+            $paymentInformationManagement,
+            $quoteIdMaskFactory,
+            $cartRepository,
+            $connectionPool
+        );
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
+    }
+
     /**
      * Fix: param cartId and email type
      *
@@ -14,9 +58,9 @@ class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPay
      * @param string $email
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
-     *
      * @return int
      * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function savePaymentInformationAndPlaceOrder(
         $cartId,
@@ -33,10 +77,13 @@ class GuestPaymentInformationManagement extends \Magento\Checkout\Model\GuestPay
         $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
 
         if ($quote->getBaseGrandTotal() < 0.0001) {
-            $quote->setData('subscription_payment_data', json_encode($paymentMethod->getData()));
+            $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                $paymentMethod->getData(),
+                $quote
+            );
+            $quote->setSubscriptionPaymentDataSet(true);
             $paymentMethod->setMethod('free');
-        } else {
-            $quote->unsetData('subscription_payment_data');
+
         }
 
         return parent::savePaymentInformationAndPlaceOrder($cartId, $email, $paymentMethod, $billingAddress);
