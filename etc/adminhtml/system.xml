@@ -267,6 +267,21 @@
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
+                <field id="trial_static_auth" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInStore="1">
+                    <label>Is Trial Static Pre-Auth</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="trial_static_auth_amount" translate="label" type="addon_text" sortOrder="40" showInDefault="1"
+                       showInStore="1">
+                    <label>Trial Pre-Auth Amount</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
+                    <comment>Default trial Pre-Auth amount.</comment>
+                    <depends>
+                        <field id="trial_static_auth">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
 

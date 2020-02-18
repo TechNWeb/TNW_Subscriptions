@@ -16,6 +16,7 @@ use \Magento\Braintree\Gateway\Request\VaultDataBuilder;
 use \Magento\Braintree\Gateway\Config\Config as BraintreeConfig;
 use \Magento\Braintree\Gateway\Request\KountPaymentDataBuilder;
 use \Magento\Braintree\Observer\DataAssignObserver;
+use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 
 class BraintreePaymentDataBuilder
 {
@@ -63,19 +64,16 @@ class BraintreePaymentDataBuilder
      */
     protected $braintreeConfig;
 
-    /**
-     * BraintreePaymentDataBuilder constructor.
-     * @param SubjectReader $subjectReader
-     * @param ProductMetadataInterface $productMetadata
-     * @param BraintreeConfig $braintreeConfig
-     * @param Config|null $config
-     */
+    private $subscriptionConfig;
+
     public function __construct(
        SubjectReader $subjectReader,
        ProductMetadataInterface $productMetadata,
        BraintreeConfig $braintreeConfig,
+       SubscriptionConfig $subscriptionConfig,
        Config $config = null
     ) {
+        $this->subscriptionConfig = $subscriptionConfig;
         $this->braintreeConfig = $braintreeConfig;
         $this->subjectReader = $subjectReader;
         $this->productMetadata = $productMetadata;
@@ -89,7 +87,7 @@ class BraintreePaymentDataBuilder
      */
     public function build($order, $paymentData)
     {
-        $amount = ['amount' => 1]; //TODO: configurable
+        $amount = $this->getAmount($order);
         $billingAddress = $order->getBillingAddress();
         $channel = $this->config->getValue('channel');
 
@@ -192,5 +190,16 @@ class BraintreePaymentDataBuilder
         }
 
         return true;
+    }
+
+    private function getAmount($order)
+    {
+        $result = ['amount' => 1];
+        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId())) {
+            $result['amount'] = $this->subscriptionConfig->getStaticAuthAmount($order->getStoreId());
+        } else {
+            //TODO: implement logic on amount get for next subscriptions from order
+        }
+        return $result;
     }
 }
