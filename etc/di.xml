@@ -1118,6 +1118,8 @@
                     <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
                     <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                 </item>
             </argument>
         </arguments>
