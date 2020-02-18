@@ -1107,4 +1107,17 @@
             <argument name="collectionProcessor" xsi:type="object">Magento\Quote\Model\Api\SearchCriteria\QuoteCollectionProcessor</argument>
         </arguments>
     </type>
+    <type name="TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization">
+        <arguments>
+            <argument name="paymentProcessors" xsi:type="array">
+                <item name="braintree" xsi:type="array">
+                    <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
