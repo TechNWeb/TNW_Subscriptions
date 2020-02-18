@@ -872,6 +872,36 @@ class Manager
     }
 
     /**
+     * @param $vaultData
+     * @return $this
+     */
+    public function populateCustomPaymentData($vaultData)
+    {
+        /** @var \Magento\Vault\Model\PaymentToken $vaultToken */
+        $vaultToken = $vaultData['vault_payment_token'];
+        $details = json_decode($vaultToken->getTokenDetails(), true);
+        $expiresAt = strtotime($vaultToken->getExpiresAt());
+        $expirationMonth = date('m', $expiresAt);
+        $expirationYear = date('Y', $expiresAt);
+        $data = [
+           'encoded_payment_additional_info' => [
+               'cc_type' => $details['type'],
+               'cc_last_4' => $details['maskedCC'],
+               'cc_exp_month' => $expirationMonth,
+               'cc_exp_year' => $expirationYear
+           ],
+            'token_hash' => null
+        ];
+        $this->getProfile()->getPayment()->setEngineCode($vaultToken->getPaymentMethodCode());
+        foreach ($data as $key => $value) {
+            $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
+            $this->getProfile()->getPayment()->$method($value);
+        }
+        $this->getProfile()->getPayment()->setPaymentToken($vaultToken->getGatewayToken());
+        return $this;
+    }
+
+    /**
      * Returns next profile relation
      *
      * @return null|SubscriptionProfileOrderInterface
@@ -1067,23 +1097,18 @@ class Manager
      * @param OrderInterface $order
      * @param Quote $quote
      * @param $quoteItems
-     *
+     * @param null $trialData
      * @return SubscriptionProfileInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Zend_Json_Exception
      */
-    public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems)
+    public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems, $trialData = null)
     {
         /** @var OrderPaymentInterface $orderPayment */
         $orderPayment = $order->getPayment();
         $quotePayment = $quote->getPayment();
-        if ($subscriptionData = $quote->getSubscriptionPaymentData()) {
-            $quotePayment->addData(json_decode($quote->getSubscriptionPaymentData(), true));
-            $quotePayment->unsetData('additional_data');
-        }
-        $quote->setSubscriptionPaymentData('');
         $orderPaymentDataToAdd = [
             'cc_type' => $orderPayment->getCcType(),
             'cc_last_4' => $orderPayment->getCcLast4(),
@@ -1096,20 +1121,24 @@ class Manager
             }
         }
 
-
+        //TODO: Необходимо использовать Vault Payment
         $this
             ->reset()
-            ->populateProfileData($quote, $quoteItems)
-            ->populatePaymentData($quotePayment);
+            ->populateProfileData($quote, $quoteItems);
 
-        $profile = $this->getProfile();
-
-        //TODO: Необходимо использовать Vault Payment
-        if (($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
-            ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
-        ) {
-            /** @var $paymentToken PaymentTokenInterface */
-            $profile->getPayment()->setPaymentToken($paymentToken->getGatewayToken());
+        if ($trialData) {
+            $this->populateCustomPaymentData($trialData);
+            $profile = $this->getProfile();
+        } else {
+            $this->populatePaymentData($quotePayment);
+            $profile = $this->getProfile();
+            if (
+                ($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
+                ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
+            ) {
+                /** @var $paymentToken PaymentTokenInterface */
+                $profile->getPayment()->setPaymentToken($paymentToken->getGatewayToken());
+            }
         }
 
         $oldStatus = $profile->getStatus();

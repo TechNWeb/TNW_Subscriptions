@@ -74,6 +74,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addPaymentSubscriptionColumn($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.18', '<')) {
+            $this->removePaymentSubscriptionColumn($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -390,6 +394,15 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'default' => '',
                 'comment' => 'Subscription Payment Data'
             ]);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function removePaymentSubscriptionColumn(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()
+            ->dropColumn($setup->getTable('quote'), 'subscription_payment_data');
     }
 
     /**
