@@ -206,4 +206,8 @@
             <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\FrontendMessageHistoryFormatter</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Checkout\Model\DefaultConfigProvider">
+        <plugin name="tnw_subscriptions_checkout_config_provider" type="TNW\Subscriptions\Plugin\Checkout\Model\DefaultConfigProvider" />
+    </type>
 </config>

@@ -15,5 +15,12 @@ var config = {
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
             configurable: 'TNW_Subscriptions/js/configurable'
         }
+    },
+    config: {
+        mixins: {
+            'Magento_Checkout/js/model/quote' : {
+                'TNW_Subscriptions/js/checkout/model/quote-mixin' : true
+            }
+        }
     }
 };
