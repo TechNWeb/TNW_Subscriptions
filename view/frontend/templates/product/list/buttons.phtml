@@ -28,7 +28,7 @@ $position = $block->getCurrentPosition();
                 <?php if ($block->isOnlySubscribePurchase($_product)): ?>
                     <div class="product-subscribe-button">
                         <?php $postParams = $block->getCurrentPostParams(); ?>
-                        <form data-role="tocart-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
+                        <form data-role="tocart-subscriptions-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
                             <input type="hidden" name="subscribe_active" value="1" />
                             <input type="hidden" name="subscribe_button" value="<?php /* @escapeNotVerified */ echo $postParams['subscribe_button'] = 1; ?>">
                             <input type="hidden" name="subscribe_options" value='<?php /* @escapeNotVerified */ echo $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
@@ -36,7 +36,7 @@ $position = $block->getCurrentPosition();
                             <?php echo $block->getBlockHtml('formkey')?>
                             <button type="submit"
                                     title="<?php echo $block->escapeHtml(__('Subscribe')); ?>"
-                                    class="action tocart primary tnw-subscribe">
+                                    class="action tocart primary">
                                 <span><?php /* @escapeNotVerified */ echo __('Subscribe') ?></span>
                             </button>
                         </form>
@@ -45,7 +45,7 @@ $position = $block->getCurrentPosition();
                     <div class="product-subscribe-addtocart-buttons-container">
                         <div class="product-subscribe-button">
                             <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
+                            <form data-role="tocart-subscriptions-form" action="<?php /* @escapeNotVerified */ echo $postParams['action']; ?>" method="post">
                                 <input type="hidden" name="subscribe_active" value="1" />
                                 <input type="hidden" name="subscribe_button" value="<?php /* @escapeNotVerified */ echo $postParams['subscribe_button'] = 1; ?>">
                                 <input type="hidden" name="subscribe_options" value='<?php /* @escapeNotVerified */ echo $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
@@ -53,7 +53,7 @@ $position = $block->getCurrentPosition();
                                 <?php echo $block->getBlockHtml('formkey')?>
                                 <button type="submit"
                                         title="<?php echo $block->escapeHtml(__('Subscribe')); ?>"
-                                        class="action tocart primary tnw-subscribe">
+                                        class="action tocart primary ">
                                     <span><?php /* @escapeNotVerified */ echo __('Subscribe') ?></span>
                                 </button>
                             </form>
