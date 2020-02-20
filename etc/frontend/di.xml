@@ -36,6 +36,9 @@
     <type name="Magento\Checkout\CustomerData\AbstractItem">
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\CustomerData\AbstractItem" />
     </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="add_subscription_params" type="TNW\Subscriptions\Plugin\Checkout\Model\Cart" />
+    </type>
 
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
