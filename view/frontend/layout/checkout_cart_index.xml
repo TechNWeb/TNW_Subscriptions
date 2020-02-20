@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.form" template="TNW_Subscriptions::cart/form.phtml" >
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.default" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.simple" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.virtual" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.downloadable" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.configurable" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>
