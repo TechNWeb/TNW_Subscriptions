@@ -44,4 +44,11 @@ class Link extends \Magento\Framework\View\Element\Template
             'customerLoginUrl' => $this->getUrl('customer/account/login'),
         ]);
     }
+
+    public function _toHtml()
+    {
+        if (!$this->_scopeConfig->isSetFlag('tnw_subscriptions_general/general/show_magento_cart')) {
+            return parent::_toHtml();
+        }
+    }
 }

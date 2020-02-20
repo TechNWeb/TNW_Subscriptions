@@ -15,13 +15,9 @@ class CheckoutCartAddProduct implements ObserverInterface
      */
     private $cart;
 
-    private $config;
-
     public function __construct(
-        \Magento\Checkout\Model\Cart $cart,
-        \TNW\Subscriptions\Model\Config $config
+        \Magento\Checkout\Model\Cart $cart
     ) {
-        $this->config =$config;
         $this->cart = $cart;
     }
 
@@ -39,17 +35,12 @@ class CheckoutCartAddProduct implements ObserverInterface
         /** @var \Magento\Framework\App\RequestInterface $request */
         $request = $observer->getData('request');
 
-        if (
-            !$request->getParam('subscribe_active', 0)
-            || !$this->config->hideMagentoCart()
-        ) {
-            // Add product
-            $this->cart->addProduct($product, $request->getParams());
+        // Add product
+        $this->cart->addProduct($product, $request->getParams());
 
-            $related = $request->getParam('related_product');
-            if (!empty($related)) {
-                $this->cart->addProductsByIds(explode(',', $related));
-            }
+        $related = $request->getParam('related_product');
+        if (!empty($related)) {
+            $this->cart->addProductsByIds(explode(',', $related));
         }
 
         // Save

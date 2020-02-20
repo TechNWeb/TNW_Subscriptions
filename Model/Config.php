@@ -27,7 +27,6 @@ class Config
      * Config xml path for General section
      */
     private $xmlIsActive = 'tnw_subscriptions_general/general/active';
-    private $xmlHideMagentoCart = 'tnw_subscriptions_general/general/show_magento_cart';
 
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
@@ -149,15 +148,6 @@ class Config
         }
 
         return $result;
-    }
-
-    /**
-     * @param null $websiteId
-     * @return bool
-     */
-    public function hideMagentoCart($websiteId = null)
-    {
-        return !$this->getStoreConfig($this->xmlHideMagentoCart, $websiteId);
     }
 
     /**

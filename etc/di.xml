@@ -183,10 +183,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Checkout\Helper\Cart">
-        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\Helper\Cart" />
-    </type>
-
     <type name="Magento\Sales\Model\Order\Creditmemo">
         <plugin name="tnw_subscriptions_extension_attributes" type="TNW\Subscriptions\Plugin\Model\ExtensionAttributes" />
     </type>
