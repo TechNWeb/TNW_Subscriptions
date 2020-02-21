@@ -208,6 +208,9 @@
     </type>
 
     <type name="Magento\Checkout\Model\DefaultConfigProvider">
-        <plugin name="tnw_subscriptions_checkout_config_provider" type="TNW\Subscriptions\Plugin\Checkout\Model\DefaultConfigProvider" />
+        <plugin name="tnw_subscriptions_checkout_config_provider" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig" />
+    </type>
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="tnw_subscriptions_cart_customer_data_group_config" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig" />
     </type>
 </config>

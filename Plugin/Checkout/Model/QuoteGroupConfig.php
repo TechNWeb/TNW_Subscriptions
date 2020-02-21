@@ -2,7 +2,7 @@
 
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
-class DefaultConfigProvider
+class QuoteGroupConfig
 {
 
     /**
@@ -18,6 +18,12 @@ class DefaultConfigProvider
      */
     private $quoteItemGroup;
 
+    /**
+     * QuoteGroupConfig constructor.
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository
+     * @param \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
+     */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository,
@@ -29,12 +35,37 @@ class DefaultConfigProvider
         $this->quoteItemGroup = $quoteItemGroup;
     }
 
+    /**
+     * @param \Magento\Checkout\Model\DefaultConfigProvider $subject
+     * @param $result
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function afterGetConfig(\Magento\Checkout\Model\DefaultConfigProvider $subject, $result)
     {
         $result['quoteGroupData'] = $this->getQuoteGroupData();
         return $result;
     }
 
+    /**
+     * @param \Magento\Checkout\CustomerData\Cart $subject
+     * @param $result
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function afterGetSectionData(\Magento\Checkout\CustomerData\Cart $subject, $result)
+    {
+        $result['quoteGroupData'] = $this->getQuoteGroupData();
+        return $result;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     private function getQuoteGroupData()
     {
         $quoteGroupData = [];

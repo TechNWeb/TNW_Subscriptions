@@ -20,6 +20,9 @@ var config = {
         mixins: {
             'Magento_Checkout/js/model/quote' : {
                 'TNW_Subscriptions/js/checkout/model/quote-mixin' : true
+            },
+            'Magento_Checkout/js/view/minicart' : {
+                'TNW_Subscriptions/js/checkout/view/minicart-mixin' : true
             }
         }
     }
