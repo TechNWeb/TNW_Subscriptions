@@ -107,8 +107,10 @@ class CreateProfile implements ObserverInterface
 
         if ($this->trialPaymentData) {
             $customer = $quote->getCustomer();
-            $paymentToken = $this->trialPaymentData['payment_token'];
-            if (!empty($paymentToken->getGatewayToken())) {
+            $paymentToken = isset($this->trialPaymentData['payment_token'])
+                ? $this->trialPaymentData['payment_token']
+                : null;
+            if ($paymentToken && !empty($paymentToken->getGatewayToken())) {
                 $paymentData = $this->trialPaymentData['payment_data'];
                 $paymentToken->setCustomerId($customer->getId());
                 $paymentToken->setIsActive(true);

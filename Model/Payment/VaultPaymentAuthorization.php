@@ -74,6 +74,8 @@ class VaultPaymentAuthorization
             ];
 
             $this->createProfileObserver->setTrialPaymentData($trialPaymentData);
+        } elseif ($paymentData['method'] == 'checkmo') {
+            $this->createProfileObserver->setTrialPaymentData($paymentData);
         }
     }
 
