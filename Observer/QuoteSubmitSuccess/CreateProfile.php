@@ -80,7 +80,7 @@ class CreateProfile implements ObserverInterface
     public function execute(Observer $observer)
     {
         $quote = $observer->getData('quote');
-        if (!$quote instanceof \Magento\Quote\Model\Quote || !$quote->getData('is_tnw_subscription')) {
+        if (!$quote instanceof \Magento\Quote\Model\Quote) {
             return;
         }
 
