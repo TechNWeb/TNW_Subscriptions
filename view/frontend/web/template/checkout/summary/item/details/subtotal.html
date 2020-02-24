@@ -24,11 +24,11 @@
           data-bind ="text: getValueExclTax($parents[1]), attr:{'data-label': $t('Excl. Tax')}">
     </span>
     <!-- /ko -->
-    <!-- ko if: isPriceExclTaxDisplayed() && getRegion('row_excl_tax') && $parents[1].subscription_price -->
-    <span class="subscription-price-excluding-tax" data-bind ="html: $parents[1].subscription_price, attr:{'data-label': $t('Excl. Tax')}">
+    <!-- ko if: isPriceExclTaxDisplayed() && getRegion('row_excl_tax') && getItemSubscriptionPrice($parents[1]) -->
+    <span class="subscription-price-excluding-tax" data-bind ="html: getItemSubscriptionPrice($parents[1]), attr:{'data-label': $t('Excl. Tax')}">
     </span>
     <!-- /ko -->
-    <!-- ko if: isPriceExclTaxDisplayed() && getRegion('row_excl_tax') && !$parents[1].subscription_price -->
+    <!-- ko if: isPriceExclTaxDisplayed() && getRegion('row_excl_tax') && !getItemSubscriptionPrice($parents[1]) -->
     <span class="price-excluding-tax" data-bind ="attr:{'data-label': $t('Excl. Tax')}">
             <!-- ko foreach: getRegion('row_excl_tax') -->
         <!-- ko template: getTemplate() --><!-- /ko -->

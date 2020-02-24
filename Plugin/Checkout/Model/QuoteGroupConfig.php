@@ -4,7 +4,6 @@ namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 class QuoteGroupConfig
 {
-
     /**
      * @var \Magento\Checkout\Model\Session
      */
@@ -54,7 +53,6 @@ class QuoteGroupConfig
      */
     public function afterGetConfig(\Magento\Checkout\Model\DefaultConfigProvider $subject, $result)
     {
-        $result['totalsData']['items'] = $this->modifyTotalsDataItems($result['totalsData']['items']);
         $result['quoteGroupData'] = $this->getQuoteGroupData();
         return $result;
     }
@@ -70,6 +68,26 @@ class QuoteGroupConfig
     {
         $result['quoteGroupData'] = $this->getQuoteGroupData();
         return $result;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Cart\Totals\ItemConverter $subject
+     * @param callable $proceed
+     * @param $quoteItem
+     * @return mixed
+     * @throws \Zend_Json_Exception
+     */
+    public function aroundModelToDataObject(
+        \Magento\Quote\Model\Cart\Totals\ItemConverter $subject,
+        callable $proceed,
+        $quoteItem
+    ) {
+        $totalsItem = $proceed($quoteItem);
+        if (null !== $quoteItem->getOptionByCode('subscription')) {
+            $totalsItem->getExtensionAttributes()->setTnwSubscriptionPrice(
+                $this->descriptionCreator->getDescribedItemPriceHtmlByQuoteItem($quoteItem));
+        }
+        return $totalsItem;
     }
 
     /**
@@ -91,30 +109,6 @@ class QuoteGroupConfig
             ];
         }
         return $quoteGroupData;
-    }
-
-    /**
-     * @param $totalsDataItems
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
-     */
-    public function modifyTotalsDataItems($totalsDataItems)
-    {
-        $quoteItems = $this->getQuoteItems();
-        foreach ($quoteItems as $quoteItem) {
-            if (null !== $quoteItem->getOptionByCode('subscription')) {
-                foreach ($totalsDataItems as $key => $totalsDataItem) {
-                    if ($totalsDataItem['item_id'] === $quoteItem->getItemId()) {
-                        $totalsDataItems[$key]['subscription_price'] =
-                            $this->descriptionCreator->getDescribedItemPriceHtmlByQuoteItem($quoteItem);
-                            break;
-                    }
-                }
-            }
-        }
-        return $totalsDataItems;
     }
 
     /**

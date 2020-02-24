@@ -23,6 +23,9 @@ var config = {
             },
             'Magento_Checkout/js/view/minicart' : {
                 'TNW_Subscriptions/js/checkout/view/minicart-mixin' : true
+            },
+            'Magento_Checkout/js/view/summary/item/details/subtotal' : {
+                'TNW_Subscriptions/js/checkout/view/summary/item/details/subtotal-mixin' : true
             }
         }
     }
