@@ -886,6 +886,9 @@
     <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
     </type>
+    <type name="Magento\Checkout\Model\PaymentInformationManagement">
+        <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement" />
+    </type>
 
     <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
         <arguments>
