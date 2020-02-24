@@ -7,7 +7,7 @@ define([
     'ko',
     'uiComponent',
     'Magento_Checkout/js/model/totals',
-    'TNW_Subscriptions/js/checkout/model/quote'
+    'Magento_Checkout/js/model/quote'
 ], function (ko, Component, totals, quote) {
     'use strict';
 
@@ -52,19 +52,6 @@ define([
             return group['itemIds'].map(function (itemId) {
                 return this.getTotalItem(itemId);
             }.bind(this));
-        },
-
-        /**
-         * @param {Object} item
-         * @return {Array}
-         */
-        getThumbnailItem: function (item) {
-            var quoteItem = quote.getItem(item['item_id']);
-            if (null !== quoteItem) {
-                return quoteItem['thumbnail'];
-            }
-
-            return [];
         },
 
         /**
