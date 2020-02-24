@@ -1125,17 +1125,14 @@ class Manager
         $this
             ->reset()
             ->populateProfileData($quote, $quoteItems);
-
-        if ($trialData) {
-            if ($trialData['method'] == 'checkmo') {
-                foreach ($trialData as $key => $data) {
-                    if ($data) {
-                        $quotePayment->setData($key, $data);
-                    }
-                }
-            } else {
-                $this->populateCustomPaymentData($trialData);
-            }
+        $notCCMethod = false;
+        if (isset($trialData['method']) && $trialData['method'] == 'checkmo') {
+            $notCCMethod = true;
+            $quotePayment->setMethod($trialData['method']);
+            $this->getProfile()->getPayment()->setEngineCode($trialData['method']);
+        }
+        if ($trialData && !$notCCMethod) {
+            $this->populateCustomPaymentData($trialData);
             $profile = $this->getProfile();
         } else {
             $this->populatePaymentData($quotePayment);
