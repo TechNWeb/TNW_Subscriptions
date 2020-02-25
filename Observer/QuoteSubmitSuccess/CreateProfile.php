@@ -9,6 +9,10 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
+/**
+ * Class CreateProfile
+ * @package TNW\Subscriptions\Observer\QuoteSubmitSuccess
+ */
 class CreateProfile implements ObserverInterface
 {
     /**
@@ -36,6 +40,9 @@ class CreateProfile implements ObserverInterface
      */
     private $relationResource;
 
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
     private $customerFactory;
 
     /**
@@ -43,12 +50,33 @@ class CreateProfile implements ObserverInterface
      */
     private $trialPaymentData = [];
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     */
     private $paymentTokenManagement;
 
+    /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
     private $encryptor;
 
+    /**
+     * @var \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl
+     */
     private $changeQuoteControl;
 
+    /**
+     * CreateProfile constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
+     * @param \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
+     * @param \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService
+     * @param \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,

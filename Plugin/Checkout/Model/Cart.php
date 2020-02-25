@@ -7,11 +7,17 @@
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Plugin for \Magento\Config\Model\Config
- * Need to validate and convert currency fields.
+ * Class Cart
+ * @package TNW\Subscriptions\Plugin\Checkout\Model
  */
 class Cart
 {
+    /**
+     * @param $subject
+     * @param $productInfo
+     * @param $requestInfo
+     * @return array
+     */
     public function beforeAddProduct(
         $subject,
         $productInfo,
