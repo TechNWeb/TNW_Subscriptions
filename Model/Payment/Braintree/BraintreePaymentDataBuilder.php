@@ -36,7 +36,7 @@ class BraintreePaymentDataBuilder
      * Currency is also determined by merchant account ID.
      * If no merchant account ID is specified, Braintree will use your default merchant account.
      */
-    private static $merchantAccountId = 'merchantAccountId';
+    protected static $merchantAccountId = 'merchantAccountId';
 
     /**
      * @var string
@@ -56,12 +56,12 @@ class BraintreePaymentDataBuilder
     /**
      * @var SubjectReader
      */
-    private $subjectReader;
+    protected $subjectReader;
 
     /**
      * @var BraintreeConfig
      */
-    private $braintreeConfig;
+    protected $braintreeConfig;
 
     /**
      * BraintreePaymentDataBuilder constructor.

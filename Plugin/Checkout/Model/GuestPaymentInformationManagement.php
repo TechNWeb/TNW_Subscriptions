@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
+/**
+ * Class GuestPaymentInformationManagement
+ * @package TNW\Subscriptions\Plugin\Checkout\Model
+ */
 class GuestPaymentInformationManagement
 {
     /**
@@ -17,8 +21,17 @@ class GuestPaymentInformationManagement
      */
     private $vaultPaymentAuthorization;
 
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
     private $cartRepository;
 
+    /**
+     * GuestPaymentInformationManagement constructor.
+     * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     */
     public function __construct(
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
@@ -29,6 +42,15 @@ class GuestPaymentInformationManagement
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
     }
 
+    /**
+     * @param $subject
+     * @param $cartId
+     * @param $email
+     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+     * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function beforeSavePaymentInformationAndPlaceOrder(
         $subject,
         $cartId,

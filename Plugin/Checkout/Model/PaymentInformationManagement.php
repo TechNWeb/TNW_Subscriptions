@@ -6,6 +6,10 @@
 
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
+/**
+ * Class PaymentInformationManagement
+ * @package TNW\Subscriptions\Plugin\Checkout\Model
+ */
 class PaymentInformationManagement
 {
     /**
@@ -13,8 +17,16 @@ class PaymentInformationManagement
      */
     protected $quoteRepository;
 
+    /**
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     */
     protected $vaultPaymentAuthorization;
 
+    /**
+     * PaymentInformationManagement constructor.
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     */
     public function __construct(
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
@@ -23,6 +35,14 @@ class PaymentInformationManagement
         $this->quoteRepository = $quoteRepository;
     }
 
+    /**
+     * @param $subject
+     * @param $cartId
+     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+     * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function beforeSavePaymentInformationAndPlaceOrder(
         $subject,
         $cartId,
