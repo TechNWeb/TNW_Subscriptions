@@ -47,6 +47,8 @@ class CreateProfile implements ObserverInterface
 
     private $encryptor;
 
+    private $changeQuoteControl;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
@@ -55,8 +57,10 @@ class CreateProfile implements ObserverInterface
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
     ) {
+        $this->changeQuoteControl = $changeQuoteControl;
         $this->encryptor = $encryptor;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->profileManager = $profileManager;
@@ -103,6 +107,7 @@ class CreateProfile implements ObserverInterface
             //ISSUE: https://github.com/magento/magento2/issues/7597
             $this->customerFactory->create()->setId($customer->getId())->reindex();
             $quote->setCustomer($customer);
+            $this->changeQuoteControl->setNewCustomer($customer);
         }
 
         if ($this->trialPaymentData) {

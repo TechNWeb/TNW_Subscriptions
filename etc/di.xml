@@ -135,12 +135,6 @@
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
 
-    <preference for="TNW\Subscriptions\Api\PaymentInformationManagementInterface"
-                type="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement"/>
-
-    <preference for="TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface"
-                type="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement"/>
-
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -849,6 +843,12 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="Magento\Quote\Model\ChangeQuoteControl">
+        <plugin name="tnw_profile_creation"
+                type="TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\EnginePool">
         <arguments>
             <argument name="engine" xsi:type="array">
@@ -888,6 +888,9 @@
     </type>
     <type name="Magento\Checkout\Model\PaymentInformationManagement">
         <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement" />
+    </type>
+    <type name="Magento\Checkout\Model\GuestPaymentInformationManagement">
+        <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\GuestPaymentInformationManagement" />
     </type>
 
     <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
@@ -1056,18 +1059,6 @@
             <argument name="checkoutSession" xsi:type="object">TS\Model\Checkout\Proxy\Session</argument>
         </arguments>
     </virtualType>
-
-    <type name="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement">
-        <arguments>
-            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
-        </arguments>
-    </type>
-
-    <type name="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement">
-        <arguments>
-            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\GuestQuoteManagement</argument>
-        </arguments>
-    </type>
 
     <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Subscription" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
         <arguments>
