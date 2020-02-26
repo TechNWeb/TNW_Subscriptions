@@ -34,21 +34,24 @@ class SaveHandler implements ExtensionInterface
      * @param object $entity
      * @param array $arguments
      * @return \Magento\Catalog\Api\Data\ProductInterface|object
+     * @throws \Magento\Framework\Exception\LocalizedException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function execute($entity, $arguments = [])
     {
-        /** @var ProductBillingFrequencyInterface $option */
-        foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option){
-            $this->recurringOptionRepository->delete($option);
-        }
-
+        $entityOptionIds = [];
         if ($entity->getRecurringOptions()) {
-            foreach ($entity->getRecurringOptions() as $option) {
-                $this->recurringOptionRepository->save($option);
+            /** @var ProductBillingFrequencyInterface $entityOption */
+            foreach ($entity->getRecurringOptions() as $entityOption) {
+                $entityOptionIds[] = $this->recurringOptionRepository->save($entityOption)->getId();
             }
         }
-
+        /** @var ProductBillingFrequencyInterface $option */
+        foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option){
+            if (!in_array($option->getId(), $entityOptionIds)) {
+                $this->recurringOptionRepository->delete($option);
+            }
+        }
         return $entity;
     }
 }
