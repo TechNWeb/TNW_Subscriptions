@@ -418,7 +418,13 @@ workflows:
           filters:
             branches:
               only: /.*/
-
+      - deploy:
+          context: powersync
+          requires:
+            - m233_commerce-php72
+          filters:
+            branches:
+              only: master
       - check-composer-installation:
           context: powersync
           requires:
