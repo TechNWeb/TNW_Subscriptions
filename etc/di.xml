@@ -1111,6 +1111,8 @@
                     <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
                     <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                 </item>
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
@@ -1118,11 +1120,16 @@
                     <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
                     <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                 </item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
         <plugin name="tnw_subscriptions_item_price" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig"/>
+    </type>
+    <type name="Magento\Braintree\Gateway\Validator\ErrorCodeProvider">
+        <plugin name="validator_fix" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Validator\ErrorCodeProvider"/>
     </type>
 </config>
