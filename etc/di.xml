@@ -140,6 +140,8 @@
 
     <preference for="TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface"
                 type="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement"/>
+    <preference for="Magento\Catalog\Pricing\Render"
+                type="TNW\Subscriptions\Pricing\Render\FinalPrice" />
 
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
