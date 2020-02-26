@@ -160,6 +160,23 @@
 }
 
 .catalog-product-view {
+    .tnw-addtocart-container {
+        input[name="addtocart_type"] {
+            &:not(:checked) {
+                & ~ .box-tocart {
+                    display: none;
+                }
+            }
+            &+label {
+                font-weight: bold;
+            }
+        }
+        .addtocart-onetime,
+        .addtocart-subscribe {
+            padding-bottom: 1.5rem;
+        }
+    }
+
   .addtocart-tabs {
     padding-top: 20px;
 

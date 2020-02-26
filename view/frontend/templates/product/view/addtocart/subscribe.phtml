@@ -110,7 +110,7 @@
                        id="subscribe_qty"
                        maxlength="12"
                        value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
-                       title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
+                       title="<?php /* @escapeNotVerified */ echo __('Qty') ?>"
                        class="input-text qty"
                        data-validate='<?php echo $block->escapeHtml(\json_encode($block->getQtyValidators())) ?>'
                     <?php if (!$block->getAllowEditSubscribeQty()): ?>
@@ -124,7 +124,7 @@
             id="product-subscribe-button"
             title="<?php /* @escapeNotVerified */ echo __('Subscribe') ?>"
             class="action primary tocart">
-        <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
+        <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></span>
     </button>
 </div>
 <script type="text/x-magento-init">
@@ -150,6 +150,7 @@
             dateFormat: "<?php echo $block->getDateFormat() ?>",
             buttonImage: "<?php echo $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
             buttonText: "<?php echo __('Select Date') ?>",
+            showOn: 'both',
             minDate: "<?php echo $block->getMinStartOn() ?>"
         });
     });
