@@ -18,9 +18,6 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-    environment:
-      MAGENTO_VERSION: "2.3.3"
-      MAGENTO_PLATFORM: "community"
     working_directory: ~/tnw_extension
     steps:
       - run:
@@ -161,9 +158,6 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-    environment:
-      MAGENTO_VERSION: "2.3.3"
-      MAGENTO_PLATFORM: "commerce"
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -221,17 +215,30 @@ jobs:
           name: Run Magento Coding Standard
           command: |
             /var/www/html/magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
-  #m233ee_php72:
-  #  <<: *php72-base
-  #  environment:
-  #    MAGENTO_VERSION: "2.3.3"
-  #    MAGENTO_PLATFORM: "enterprise"
+  m233-open_source-php72:
+    <<: *base-image
+    docker:
+      - image: powersync/magento-builds:m233-open_source-php72
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
 
 workflows:
   version: 2
 
   test-deploy-wiki:
     jobs:
+      - m233-commerce-php72:
+          context: powersync
+          filters:
+            branches:
+              only: /.*/
       - m233-commerce-php72:
           context: powersync
           filters:
@@ -244,6 +251,7 @@ workflows:
           filters:
             branches:
               only: master
+
       - check-composer-installation:
           context: powersync
           requires:
