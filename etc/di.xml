@@ -1129,4 +1129,7 @@
     <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
         <plugin name="tnw_subscriptions_item_price" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig"/>
     </type>
+    <type name="Magento\Braintree\Gateway\Validator\ErrorCodeProvider">
+        <plugin name="validator_fix" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Validator\ErrorCodeProvider"/>
+    </type>
 </config>
