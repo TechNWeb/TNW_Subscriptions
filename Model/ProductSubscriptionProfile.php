@@ -288,7 +288,11 @@ class ProductSubscriptionProfile
     {
         $result = $this->getData(self::PRICE);
         if ($this->getTnwSubscrUnlockPresetQty()) {
-            $result =  $this->getQty() ? round($result / $this->getQty()) : 0;
+            if (is_array($result)){
+                $result =  $this->getQty() ? round($result[0] / $this->getQty()) : 0;
+            } else {
+                $result =  $this->getQty() ? round($result / $this->getQty()) : 0;
+            }
         }
 
         return $result;
@@ -299,7 +303,13 @@ class ProductSubscriptionProfile
      */
     public function setPrice($price)
     {
-        return $this->setData(self::PRICE, $price);
+        $result = null;
+        if (is_array($price)){
+            $result = $this->setData(self::PRICE, $price[0]);
+        } else {
+            $result = $this->setData(self::PRICE, $price);
+        }
+        return $result;
     }
 
     /**
