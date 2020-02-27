@@ -103,7 +103,10 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
                                step="any"
                                title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
                                class="input-text qty"
-                                <?php if (!$groupsViewModel->allowEditSubscribeQty($_item)) : ?>
+                                <?php if (
+                                    $groupsViewModel->isSubscriptionItem($_item)
+                                    && !$groupsViewModel->allowEditSubscribeQty($_item)
+                                ) : ?>
                                     readonly="readonly"
                                 <?php endif ?>
                                data-validate="{required:true,'validate-greater-than-zero':true}"
