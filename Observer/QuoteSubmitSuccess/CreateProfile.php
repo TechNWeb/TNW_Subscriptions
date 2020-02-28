@@ -9,6 +9,10 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
+/**
+ * Class CreateProfile
+ * @package TNW\Subscriptions\Observer\QuoteSubmitSuccess
+ */
 class CreateProfile implements ObserverInterface
 {
     /**
@@ -36,6 +40,9 @@ class CreateProfile implements ObserverInterface
      */
     private $relationResource;
 
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
     private $customerFactory;
 
     /**
@@ -43,10 +50,33 @@ class CreateProfile implements ObserverInterface
      */
     private $trialPaymentData = [];
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     */
     private $paymentTokenManagement;
 
+    /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
     private $encryptor;
 
+    /**
+     * @var \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl
+     */
+    private $changeQuoteControl;
+
+    /**
+     * CreateProfile constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
+     * @param \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
+     * @param \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService
+     * @param \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
         \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
@@ -55,8 +85,10 @@ class CreateProfile implements ObserverInterface
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
     ) {
+        $this->changeQuoteControl = $changeQuoteControl;
         $this->encryptor = $encryptor;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->profileManager = $profileManager;
@@ -80,7 +112,7 @@ class CreateProfile implements ObserverInterface
     public function execute(Observer $observer)
     {
         $quote = $observer->getData('quote');
-        if (!$quote instanceof \Magento\Quote\Model\Quote || !$quote->getData('is_tnw_subscription')) {
+        if (!$quote instanceof \Magento\Quote\Model\Quote) {
             return;
         }
 
@@ -103,12 +135,15 @@ class CreateProfile implements ObserverInterface
             //ISSUE: https://github.com/magento/magento2/issues/7597
             $this->customerFactory->create()->setId($customer->getId())->reindex();
             $quote->setCustomer($customer);
+            $this->changeQuoteControl->setNewCustomer($customer);
         }
 
         if ($this->trialPaymentData) {
             $customer = $quote->getCustomer();
-            $paymentToken = $this->trialPaymentData['payment_token'];
-            if (!empty($paymentToken->getGatewayToken())) {
+            $paymentToken = isset($this->trialPaymentData['payment_token'])
+                ? $this->trialPaymentData['payment_token']
+                : null;
+            if ($paymentToken && !empty($paymentToken->getGatewayToken())) {
                 $paymentData = $this->trialPaymentData['payment_data'];
                 $paymentToken->setCustomerId($customer->getId());
                 $paymentToken->setIsActive(true);

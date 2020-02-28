@@ -27,7 +27,6 @@ class Config
      * Config xml path for General section
      */
     private $xmlIsActive = 'tnw_subscriptions_general/general/active';
-    private $xmlHideMagentoCart = 'tnw_subscriptions_general/general/hide_magento_cart';
 
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
@@ -59,6 +58,8 @@ class Config
     private $xmlTrialLengthUnit = 'tnw_subscriptions_product/trial/trial_length_unit';
     private $xmlTrialPrice = 'tnw_subscriptions_product/trial/trial_price';
     private $xmlTrialStartDateType = 'tnw_subscriptions_product/trial/trial_start_date_type';
+    private $xmlTrialStaticAuth = 'tnw_subscriptions_product/trial/trial_static_auth';
+    private $xmlTrialStaticAuthAmount = 'tnw_subscriptions_product/trial/trial_static_auth_amount';
     /**#@-*/
 
     /**#@+
@@ -152,20 +153,10 @@ class Config
     }
 
     /**
-     * Get "Enable Subscriptions" config value for website or for all websites.
-     *
-     * @param int|null $websiteId
-     * @return bool|mixed|null|string
-     */
-    public function hideMagentoCart($websiteId = null)
-    {
-        return $this->getStoreConfig($this->xmlHideMagentoCart, $websiteId);
-    }
-
-    /**
      * Get "Enable Subscriptions" config value for current website
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function isSubscriptionsActiveCurrent()
     {
@@ -646,6 +637,32 @@ class Config
         return min(
             self::MESSAGE_MAX_OBJECT_DEEP,
             (int)$this->scopeConfig->getValue('tnw_subscriptions_general/advanced/log_object_deep')
+        );
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function isStaticTrialAuth($storeId = null)
+    {
+        return  $this->scopeConfig->isSetFlag(
+            $this->xmlTrialStaticAuth,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
+    public function getStaticAuthAmount($storeId = null)
+    {
+        return  $this->scopeConfig->getValue(
+            $this->xmlTrialStaticAuthAmount,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
 }

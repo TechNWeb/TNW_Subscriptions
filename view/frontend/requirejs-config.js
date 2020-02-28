@@ -15,5 +15,18 @@ var config = {
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
             configurable: 'TNW_Subscriptions/js/configurable'
         }
+    },
+    config: {
+        mixins: {
+            'Magento_Checkout/js/model/quote' : {
+                'TNW_Subscriptions/js/checkout/model/quote-mixin' : true
+            },
+            'Magento_Checkout/js/view/minicart' : {
+                'TNW_Subscriptions/js/checkout/view/minicart-mixin' : true
+            },
+            'Magento_Checkout/js/view/summary/item/details/subtotal' : {
+                'TNW_Subscriptions/js/checkout/view/summary/item/details/subtotal-mixin' : true
+            }
+        }
     }
 };

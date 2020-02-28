@@ -70,8 +70,7 @@ class SubscriptionProductView
     {
         return
             $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequencies($product))
-            && $this->getRequest()->getRouteName() !== 'checkout';
+            && !empty($this->getProductBillingFrequencies($product));
     }
 
     /**
@@ -84,8 +83,7 @@ class SubscriptionProductView
     {
         return
             $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequenciesById($productId))
-            && $this->getRequest()->getRouteName() !== 'checkout';
+            && !empty($this->getProductBillingFrequenciesById($productId));
     }
 
 

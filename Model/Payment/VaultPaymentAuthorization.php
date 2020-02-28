@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Model\Payment;
 
 use TNW\Subscriptions\Observer\QuoteSubmitSuccess\CreateProfile;
+use Magento\Payment\Gateway\Validator\ResultInterface;
+use Magento\Payment\Gateway\Command\CommandException;
 
 /**
  * Class VaultPaymentAuthorization
@@ -24,21 +26,30 @@ class VaultPaymentAuthorization
     private $paymentProcessors;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * VaultPaymentAuthorization constructor.
      * @param CreateProfile $createProfileObserver
+     * @param \Psr\Log\LoggerInterface $logger
      * @param array $paymentProcessors
      */
     public function __construct(
         CreateProfile $createProfileObserver,
+        \Psr\Log\LoggerInterface $logger,
         $paymentProcessors = []
     ) {
         $this->createProfileObserver = $createProfileObserver;
         $this->paymentProcessors = $paymentProcessors;
+        $this->logger = $logger;
     }
 
     /**
      * @param $paymentData
      * @param $quote
+     * @throws CommandException
      */
     public function processPreAuthForTrial($paymentData, $quote)
     {
@@ -47,25 +58,36 @@ class VaultPaymentAuthorization
             $dataBuilder = $this->paymentProcessors[$paymentData['method']]['dataBuilder'];
             $client = $this->paymentProcessors[$paymentData['method']]['authClient'];
             $cancelClient = $this->paymentProcessors[$paymentData['method']]['cancelClient'];
+            $validator = $this->paymentProcessors[$paymentData['method']]['validator'];
+            $voidValidator = $this->paymentProcessors[$paymentData['method']]['voidValidator'];
             $paymentTransactionData = $dataBuilder->build($quote, $paymentData);
             $transferO = $transferFactory->create($paymentTransactionData);
+
             $response = $client->placeRequest($transferO);
 
-            //TODO: handle success and failure with exception throw
-            try {
-                $paymentTokenData = $this->paymentProcessors[$paymentData['method']]['vaultTokenExtractor']
-                    ->getPaymentTokenWithTransactionId($response);
-            } catch (\Exception $e) {
-                //TODO: populate  $paymentTokenData['transaction_id'] with transaction id from above to void the amount
-                //TODO: add a flag to throw exception afterwards
-            } finally {
-                $transferCancelObject = $transferFactory->create(
-                    [
-                        'transaction_id' => $paymentTokenData['transaction_id'],
-                        'store_id' => $paymentTransactionData['store_id']
-                    ]
-                );
-                $responseCancel = $cancelClient->placeRequest($transferCancelObject);
+            $result = $validator->validate(
+                array_merge($paymentData, ['response' => $response])
+            );
+            if (!$result->isValid()) {
+                $this->processErrors($result);
+            }
+
+            $paymentTokenData = $this->paymentProcessors[$paymentData['method']]['vaultTokenExtractor']
+                ->getPaymentTokenWithTransactionId($response);
+
+            $transferCancelObject = $transferFactory->create(
+                [
+                    'transaction_id' => $paymentTokenData['transaction_id'],
+                    'store_id' => $paymentTransactionData['store_id']
+                ]
+            );
+            $responseCancel = $cancelClient->placeRequest($transferCancelObject);
+
+            $voidResult = $voidValidator->validate(
+                array_merge($paymentData, ['response' => $responseCancel])
+            );
+            if (!$voidResult->isValid()) {
+                $this->processErrors($voidResult, true);
             }
 
             $trialPaymentData = [
@@ -74,16 +96,36 @@ class VaultPaymentAuthorization
             ];
 
             $this->createProfileObserver->setTrialPaymentData($trialPaymentData);
+        } elseif ($paymentData['method'] == 'checkmo') {
+            $this->createProfileObserver->setTrialPaymentData($paymentData);
         }
     }
 
     /**
-     * @param $response
-     * @return bool
+     * Tries to map error messages from validation result and logs processed message.
+     * Throws an exception with mapped message or default error.
+     *
+     * @param ResultInterface $result
+     * @param bool $withoutException
+     * @return $this
+     * @throws CommandException
      */
-    private function validateResponseResult($response)
+    private function processErrors(ResultInterface $result, $withoutException = false)
     {
-        //TODO: implement exception throw on failed transactions
-        return true;
+        $messages = [];
+        $errorsSource = array_merge($result->getErrorCodes(), $result->getFailsDescription());
+        foreach ($errorsSource as $errorCodeOrMessage) {
+            $errorCodeOrMessage = (string) $errorCodeOrMessage;
+            $this->logger->critical('Payment Error: ' . $errorCodeOrMessage);
+        }
+
+        if ($withoutException) {
+            return $this;
+        }
+        throw new CommandException(
+            !empty($messages)
+                ? __(implode(PHP_EOL, $messages))
+                : __('Transaction has been declined. Please try again later.')
+        );
     }
 }
