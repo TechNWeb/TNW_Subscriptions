@@ -134,7 +134,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\PaymentRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
-
+    <preference for="Magento\Catalog\Pricing\Render"
+                type="TNW\Subscriptions\Pricing\Render\FinalPrice" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>

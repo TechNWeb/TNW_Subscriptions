@@ -443,4 +443,26 @@ class History extends \Magento\Framework\View\Element\Template
             ? $this->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG)
             : '';
     }
+
+    /**
+     * Get term.
+     *
+     * @param int $id
+     * @return string
+     */
+    public function getTerm($id)
+    {
+        $label = '';
+        $profile = $this->subscriptionProfileManager->loadProfile($id);
+        if ($profile) {
+            if ($profile->getTerm()) {
+                $label = __('Until canceled');
+            } elseif ((int)$profile->getTotalBillingCycles() === 1) {
+                $label = __('Bill once');
+            } else {
+                $label = __('Bill %1 times', $profile->getTotalBillingCycles());
+            }
+        }
+        return $label;
+    }
 }
