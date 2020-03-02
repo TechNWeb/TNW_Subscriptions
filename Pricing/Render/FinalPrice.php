@@ -16,7 +16,7 @@ class FinalPrice extends Render
         $result = parent::_toHtml();
         if (
             $this->getProduct()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == "1"
-            && (bool) stripos($result, 'price-subscription_price')
+            && stripos($result, 'price-subscription_price') !== false
         ) {
             $result = '';
         }
