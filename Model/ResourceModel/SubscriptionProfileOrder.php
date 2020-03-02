@@ -25,19 +25,4 @@ class SubscriptionProfileOrder extends AbstractDb
             SubscriptionProfileOrderInterface::ID
         );
     }
-
-    /**
-     * @param int $orderId
-     *
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function profileIdsByOrderId($orderId)
-    {
-        $select = $this->getConnection()->select()
-            ->from(['main' => $this->getMainTable()], ['subscription_profile_id'])
-            ->where('main.magento_order_id = ?', $orderId);
-
-        return $this->getConnection()->fetchCol($select);
-    }
 }

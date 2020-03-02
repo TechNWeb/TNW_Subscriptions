@@ -51,6 +51,14 @@ class ActiveMethods extends Fieldset
     private $enginePool;
 
     /**
+     * @var array
+     */
+    private $excludedSystemPaymentMethods = [
+        'free',
+        'braintree_cc_vault',
+    ];
+
+    /**
      * ActiveMethods constructor.
      * @param Context $context
      * @param Session $authSession
@@ -117,7 +125,7 @@ class ActiveMethods extends Fieldset
         $paymentMethods = $this->getActivePaymentMethodsList();
 
         foreach ($paymentMethods as $method) {
-            if ($method['code'] != 'free') {
+            if (!in_array($method['code'], $this->excludedSystemPaymentMethods)) {
                 $path = self::SECTION_ID . '/' . self::GROUP_ID . '/' . $method['code'];
 
                 $inherit = true;

@@ -7,24 +7,28 @@
 // @codingStandardsIgnoreFile
 
 ?>
-<?php /** @var $block \TNW\Subscriptions\Block\Checkout\Success */ ?>
+<?php
+/** @var $block \Magento\Checkout\Block\Onepage\Success */
+/** @var $profileSuccessViewModel \TNW\Subscriptions\Block\Checkout\ProfileSuccessViewModel */
+$profileSuccessViewModel = $block->getProfileSuccessViewModel();
+?>
 <div class="checkout-success">
     <?php if ($block->getData('order_id')):?>
         <?php if ($block->getData('can_view_order')) :?>
             <ul>
                 <li><span><?= __('Order %1 placed', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->escapeHtml($block->getViewOrderUrl()), $block->escapeHtml($block->getOrderId()))) ?></span></li>
-                <?php foreach ($block->getProfileIds() as $profileId): ?>
+                <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
-                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($block->getEditUrl($profileId)), $block->escapeHtml($block->getEditLabel($profileId)))); ?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($profileSuccessViewModel->getEditUrl($profileOrder)), $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder)))); ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php  else :?>
             <ul>
                 <li><span><?= __('Order %1 placed', $block->escapeHtml($block->getOrderId())) ?></span></li>
-                <?php foreach ($block->getProfileIds() as $profileId): ?>
+                <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
-                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', $block->escapeHtml($block->getEditLabel($profileId))); ?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))); ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>

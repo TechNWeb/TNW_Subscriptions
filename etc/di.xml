@@ -134,13 +134,8 @@
                 type="TNW\Subscriptions\Model\SubscriptionProfile\PaymentRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentSearchResultsInterface"
                 type="Magento\Framework\Api\SearchResults"/>
-
-    <preference for="TNW\Subscriptions\Api\PaymentInformationManagementInterface"
-                type="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement"/>
-
-    <preference for="TNW\Subscriptions\Api\GuestPaymentInformationManagementInterface"
-                type="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement"/>
-
+    <preference for="Magento\Catalog\Pricing\Render"
+                type="TNW\Subscriptions\Pricing\Render\FinalPrice" />
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
@@ -181,10 +176,6 @@
                 type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"
                 sortOrder="10"
                 disabled="false"/>
-    </type>
-
-    <type name="Magento\Checkout\Helper\Cart">
-        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Checkout\Helper\Cart" />
     </type>
 
     <type name="Magento\Sales\Model\Order\Creditmemo">
@@ -853,6 +844,12 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="Magento\Quote\Model\ChangeQuoteControl">
+        <plugin name="tnw_profile_creation"
+                type="TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\EnginePool">
         <arguments>
             <argument name="engine" xsi:type="array">
@@ -868,6 +865,11 @@
                 </item>
                 <item name="braintree" xsi:type="array">
                     <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="braintree_cc_vault" xsi:type="array">
+                    <item name="code" xsi:type="string">braintree_cc_vault</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
@@ -889,6 +891,12 @@
     </type>
     <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
+    </type>
+    <type name="Magento\Checkout\Model\PaymentInformationManagement">
+        <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement" />
+    </type>
+    <type name="Magento\Checkout\Model\GuestPaymentInformationManagement">
+        <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\GuestPaymentInformationManagement" />
     </type>
 
     <virtualType name="TNW\Subscriptions\Logger" type="Monolog\Logger">
@@ -1058,18 +1066,6 @@
         </arguments>
     </virtualType>
 
-    <type name="TNW\Subscriptions\Model\Checkout\PaymentInformationManagement">
-        <arguments>
-            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\QuoteManagement</argument>
-        </arguments>
-    </type>
-
-    <type name="TNW\Subscriptions\Model\Checkout\GuestPaymentInformationManagement">
-        <arguments>
-            <argument name="cartManagement" xsi:type="object">TS\Model\Quote\GuestQuoteManagement</argument>
-        </arguments>
-    </type>
-
     <virtualType name="TS\Observer\QuoteSubmitSuccess\RemoveItems\Subscription" type="TNW\Subscriptions\Observer\QuoteSubmitSuccess\RemoveItems">
         <arguments>
             <argument name="isSubscription" xsi:type="boolean">true</argument>
@@ -1116,8 +1112,25 @@
                     <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
                     <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                </item>
+                <item name="braintree_cc_vault" xsi:type="array">
+                    <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                 </item>
             </argument>
         </arguments>
+    </type>
+    <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
+        <plugin name="tnw_subscriptions_item_price" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig"/>
+    </type>
+    <type name="Magento\Braintree\Gateway\Validator\ErrorCodeProvider">
+        <plugin name="validator_fix" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Validator\ErrorCodeProvider"/>
     </type>
 </config>

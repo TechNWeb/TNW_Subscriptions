@@ -8,6 +8,10 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Class PaymentMethodIsActive
+ * @package TNW\Subscriptions\Observer
+ */
 class PaymentMethodIsActive implements ObserverInterface
 {
     /**
@@ -46,8 +50,7 @@ class PaymentMethodIsActive implements ObserverInterface
             return;
         }
         if (
-            $quote->hasData('is_tnw_subscription')
-            && $quote->getData('is_tnw_subscription')
+            $this->checkIsSubscriptionQuote($quote)
             && !($quote->getSubscriptionPaymentDataSet() && $paymentMethod->getCode() == 'free')
         ) {
             $checkResult->setData(
@@ -55,5 +58,23 @@ class PaymentMethodIsActive implements ObserverInterface
                 $this->config->isPaymentAvailable($paymentMethod->getCode(), $quote->getStore()->getWebsiteId())
             );
         }
+    }
+
+    /**
+     * @param $quote
+     * @return bool
+     */
+    private function checkIsSubscriptionQuote($quote)
+    {
+        $result = false;
+        foreach ($quote->getAllVisibleItems() as $item)
+        {
+            $option = $item->getOptionByCode('subscription');
+            if (null !== $option) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
     }
 }

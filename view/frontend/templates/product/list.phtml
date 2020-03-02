@@ -118,6 +118,11 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
     <?php if (!$block->isRedirectToCartEnabled()) : ?>
         <script type="text/x-magento-init">
         {
+            "[data-role=tocart-subscriptions-form]": {
+                "catalogAddToCart": {
+                    "addToCartButtonTextDefault" : "<?php echo __('Subscribe') ?>"
+                    }
+            },
             "[data-role=tocart-form], .form.map.checkout": {
                 "catalogAddToCart": {}
             },
