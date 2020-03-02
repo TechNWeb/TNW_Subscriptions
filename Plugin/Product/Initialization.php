@@ -60,7 +60,9 @@ class Initialization
                     $recurringOption = $this->productBillingFrequencyInterfaceFactory->create(['data' => $recurringOptionData]);
                     $recurringOption->setProductSku($product->getSku());
                     $recurringOption->setMagentoProductId($product->getId());
-                    $recurringOption->setId(null);
+                    if ($recurringOption->getId() === '') {
+                        $recurringOption->setId(null);
+                    }
                     $recurringOptions[] = $recurringOption;
                 }
             }

@@ -16,6 +16,7 @@
                 <th scope="col" class="col icon"></th>
                 <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Subscription #') ?></th>
                 <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Next Payment On') ?></th>
+                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Term') ?></th>
                 <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
                 <th scope="col" class="col next-payment"><?php /* @escapeNotVerified */ echo __('Next Payment') ?></th>
                 <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Action') ?></th>
@@ -39,6 +40,9 @@
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Next Payment On')) ?>" class="col date">
                         <?php /* @escapeNotVerified */ echo $block->getNextPaymentFormatted($subscription); ?>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Term')) ?>" class="col date">
+                        <?php /* @escapeNotVerified */ echo $block->getTerm($subscription->getId()); ?>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>"
                         class="col status <?php echo $block->getStatusClass($subscription->getStatus())?>">
