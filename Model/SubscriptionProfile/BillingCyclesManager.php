@@ -1,0 +1,223 @@
+<?php
+namespace TNW\Subscriptions\Model\SubscriptionProfile;
+
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Quote\Api\CartRepositoryInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+
+/**
+ * Class BillingCyclesManager
+ * @package TNW\Subscriptions\Model\SubscriptionProfile
+ */
+class BillingCyclesManager
+{
+    /**
+     * Repository for retrieving subscription profiles.
+     *
+     * @var SubscriptionProfileRepository
+     */
+    protected $profileRepository;
+
+    /**
+     * Search criteria builder.
+     *
+     * @var SearchCriteriaBuilder
+     */
+    protected $criteriaBuilder;
+
+    /**
+     * Subscriptions context.
+     *
+     * @var Context
+     */
+    protected $context;
+
+    /**
+     * Subscriptions config.
+     *
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * Repository fore saving/retrieving quotes.
+     *
+     * @var CartRepositoryInterface
+     */
+    protected $cartRepository;
+
+    /**
+     * Factory for creating subscription collection.
+     *
+     * @var CollectionFactory
+     */
+    protected $collectionFactory;
+
+    /**
+     * Profile relation manager.
+     *
+     * @var RelationManager
+     */
+    protected $relationManager;
+
+    /**
+     * BillingCyclesManager constructor.
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param Context $context
+     * @param Config $config
+     * @param CartRepositoryInterface $cartRepository
+     * @param CollectionFactory $collectionFactory
+     * @param RelationManager $relationManager
+     */
+    public function __construct(
+        SubscriptionProfileRepository $profileRepository,
+        SearchCriteriaBuilder $criteriaBuilder,
+        Context $context,
+        Config $config,
+        CartRepositoryInterface $cartRepository,
+        CollectionFactory $collectionFactory,
+        RelationManager $relationManager
+    ) {
+        $this->profileRepository = $profileRepository;
+        $this->criteriaBuilder = $criteriaBuilder;
+        $this->context = $context;
+        $this->config = $config;
+        $this->cartRepository = $cartRepository;
+        $this->collectionFactory = $collectionFactory;
+        $this->relationManager = $relationManager;
+    }
+
+    /**
+     * @param SubscriptionProfileInterface $profile
+     * @param int $count
+     * @param bool $withRequiredRelations
+     * @return array
+     * @throws \Exception
+     */
+    public function getBillingCycles(SubscriptionProfileInterface $profile, $count = 0, $withRequiredRelations = false)
+    {
+        $neededDates = [];
+        $nowDate = new \DateTime();
+        $formattedNowDate = $this->format($nowDate);
+        $startDate = new \DateTime($profile->getStartDate());
+        $formattedStartDate = $this->format($startDate);
+        //Add to list start date.
+        $neededDates[] = $formattedStartDate;
+        //Profile has a infinite count of cycles
+        if ($profile->getTerm()) {
+            //Generate quotes for the year ahead
+            $endDate = new \DateTime($formattedNowDate);
+            if (strtotime($formattedStartDate) > strtotime($formattedNowDate)) {
+                $endDate = new \DateTime($formattedStartDate);
+            }
+            $endDate->add(new \DateInterval('P1Y'));
+            $dateDiff = $startDate->diff($endDate, true);
+            switch ($profile->getUnit()) {
+                case BillingFrequencyUnitType::DAYS:
+                    $cyclesCount = floor($dateDiff->days / $profile->getFrequency());
+                    break;
+                case BillingFrequencyUnitType::MONTHS:
+                    $months = $dateDiff->y * 12 + $dateDiff->m;
+                    $cyclesCount = floor($months / $profile->getFrequency());
+                    break;
+                default:
+                    throw new \Exception('Undefined length unit type.');
+            }
+        } else {
+            // Profile has a finite count of cycles
+            $cyclesCount = (int)$profile->getTotalBillingCycles() - 1;
+        }
+        //Calculate the list of dates for profile
+        for ($i = 1; $i <= $cyclesCount; $i++) {
+            $date = $this->calculateScheduledDate(
+                $startDate,
+                $profile->getUnit(),
+                $profile->getFrequency()
+            );
+            $neededDates[] = $this->format($date);
+        }
+        //get already generated dates
+        $existDates = array_map(
+            function (SubscriptionProfileOrderInterface $relation) {
+                return $relation->getScheduledAt();
+            },
+            $this->relationManager->getAllProfileRelations($profile->getId())
+        );
+        $neededDates = array_diff($neededDates, $existDates);
+        //generate only future dates
+        $resultDates = array_filter(
+            $neededDates,
+            function ($neededDate) use ($formattedNowDate) {
+                return (strtotime($neededDate) > strtotime($formattedNowDate));
+            }
+        );
+        if ($count > 0) {
+            $resultDates = array_slice($resultDates, 0, $count);
+        }
+        $needMore = count($neededDates) > count($resultDates);
+
+        $result = [$resultDates, $needMore];
+        if ($withRequiredRelations) {
+            array_push($result, $existDates);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Calculates subscription date for billing cycle.
+     *
+     * @param \DateTime $date
+     * @param string $unit
+     * @param int $length
+     * @return \DateTime
+     * @throws \Exception
+     */
+    private function calculateScheduledDate(\DateTime $date, $unit, $length)
+    {
+        switch ($unit) {
+            case BillingFrequencyUnitType::DAYS:
+                $intervalUnit = 'D';
+                $expression = 'P' . $length . $intervalUnit;
+                $date = $date->add(new \DateInterval($expression));
+                break;
+            case BillingFrequencyUnitType::MONTHS:
+                $nextPeriodMonth = (int) $date->format('m') + $length;
+                $dayOfMonth = $date->format('d');
+                $nextFullDate = $date->format('Y-')
+                    . $nextPeriodMonth
+                    . '-'
+                    . '01 '
+                    . $date->format('H:i:s');
+                $dayForPeriod = 'd';
+                if ((int) $dayOfMonth != 1){
+                    $dayForPeriod = 't';
+                }
+                $date = new \DateTime(date('Y-m-' . $dayForPeriod . ' H:i:s', strtotime($nextFullDate)));
+                break;
+            default:
+                throw new \Exception('Undefined length unit type.');
+        }
+
+        return $date;
+    }
+
+    /**
+     * Returns formatted date.
+     *
+     * @param \DateTime $date
+     * @return string
+     */
+    private function format(\DateTime $date)
+    {
+        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+    }
+}
