@@ -109,8 +109,29 @@ class Manager
      */
     private $emailNotifierFactory;
 
+    /**
+     * @var BillingCyclesManagerFactory
+     */
     private $billingCyclesManagerFactory;
 
+    /**
+     * Manager constructor.
+     * @param CollectionFactory $collectionFactory
+     * @param Config $config
+     * @param SubscriptionProfile\Manager $profileManager
+     * @param RelationManager $relationManager
+     * @param CartRepositoryInterface $cartRepository
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
+     * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
+     * @param ProfileStatus $profileStatus
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
+     */
     public function __construct(
         CollectionFactory $collectionFactory,
         Config $config,
@@ -183,7 +204,7 @@ class Manager
                 'from' => $currentDate->format('Y-m-d 00:00:00'),
                 'to' => $currentDate->format('Y-m-d 23:59:59')
             ]),
-            $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_ERROR),
+            $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
         ]);
 
         $otherCondition = implode(' AND ', [
@@ -208,6 +229,10 @@ class Manager
         return $collection;
     }
 
+    /**
+     * @param $daysBefore
+     * @return Collection
+     */
     public function getCollectionForDate($daysBefore)
     {
         $collection = $this->getBaseCollection();
@@ -506,9 +531,21 @@ class Manager
 
                 /** @var BillingCyclesManager $billingCyclesManager */
                 $billingCyclesManager = $this->billingCyclesManagerFactory->create();
-                list($cycles, $needMore, $requiredDates) =
+                list($cycles, $needMore, $existingCycles) =
                     $billingCyclesManager->getBillingCycles($profile, 1, true);
-                $a = 1;
+                if ($needMore && $cycles) {
+                    $relations = [];
+                    foreach ($cycles as $cycle) {
+                        $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                            ->setSubscriptionProfileId($profile->getId())
+                            ->setMagentoQuoteId($quote->getId())
+                            ->setScheduledAt($cycle);
+                        $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+                    }
+                    if ($relations) {
+                        $this->insertItems($relations);
+                    }
+                }
             }
         } catch (\Exception $e) {
             foreach ($groupQueue as $queue) {

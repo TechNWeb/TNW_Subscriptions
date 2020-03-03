@@ -98,11 +98,11 @@ class BillingCyclesManager
     /**
      * @param SubscriptionProfileInterface $profile
      * @param int $count
-     * @param bool $withRequiredRelations
+     * @param bool $existingCycles
      * @return array
      * @throws \Exception
      */
-    public function getBillingCycles(SubscriptionProfileInterface $profile, $count = 0, $withRequiredRelations = false)
+    public function getBillingCycles(SubscriptionProfileInterface $profile, $count = 0, $existingCycles = false)
     {
         $neededDates = [];
         $nowDate = new \DateTime();
@@ -165,7 +165,7 @@ class BillingCyclesManager
         $needMore = count($neededDates) > count($resultDates);
 
         $result = [$resultDates, $needMore];
-        if ($withRequiredRelations) {
+        if ($existingCycles) {
             array_push($result, $existDates);
         }
 
