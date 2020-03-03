@@ -431,7 +431,7 @@ class Manager
             if ($countGroupQueue == $index) {
                 $needTotalCount = true;
             }
-            $this->profileManager->populateQuoteData($quote, $profile, $needTotalCount);
+            $this->profileManager->populateQuoteData($quote, $profile, $needTotalCount, true);
         }
 
         $this->cartRepository->save($quote);
