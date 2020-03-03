@@ -8,13 +8,13 @@ define([], function () {
 
             getItemsByGroup: function (group) {
                 var cartItems = this.getCartItems();
-                return group['itemIds'].map(function (itemId) {
+                return _.compact(group['itemIds'].map(function (itemId) {
                     for (let i in cartItems) {
                         if (parseInt(cartItems[i]['item_id']) === parseInt(itemId)) {
                             return cartItems[i];
                         }
                     }
-                }.bind(this));
+                }.bind(this)));
             },
 
             getGroupCaption: function (group) {
