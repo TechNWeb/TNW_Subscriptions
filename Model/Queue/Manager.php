@@ -11,6 +11,8 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
 use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -108,6 +110,11 @@ class Manager
     private $emailNotifierFactory;
 
     /**
+     * @var BillingCyclesManagerFactory
+     */
+    private $billingCyclesManagerFactory;
+
+    /**
      * Manager constructor.
      * @param CollectionFactory $collectionFactory
      * @param Config $config
@@ -123,6 +130,7 @@ class Manager
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
      * @param EmailNotifierFactory $emailNotifierFactory
+     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -138,8 +146,10 @@ class Manager
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
-        EmailNotifierFactory $emailNotifierFactory
+        EmailNotifierFactory $emailNotifierFactory,
+        BillingCyclesManagerFactory $billingCyclesManagerFactory
     ) {
+        $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
@@ -219,6 +229,10 @@ class Manager
         return $collection;
     }
 
+    /**
+     * @param $daysBefore
+     * @return Collection
+     */
     public function getCollectionForDate($daysBefore)
     {
         $collection = $this->getBaseCollection();
@@ -514,6 +528,24 @@ class Manager
                     ->setMagentoOrderId($order->getId());
 
                 $this->relationManager->saveRelation($relation);
+
+                /** @var BillingCyclesManager $billingCyclesManager */
+                $billingCyclesManager = $this->billingCyclesManagerFactory->create();
+                list($cycles, $needMore, $existingCycles) =
+                    $billingCyclesManager->getBillingCycles($profile, 1, true);
+                if ($needMore && $cycles) {
+                    $relations = [];
+                    foreach ($cycles as $cycle) {
+                        $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                            ->setSubscriptionProfileId($profile->getId())
+                            ->setMagentoQuoteId($quote->getId())
+                            ->setScheduledAt($cycle);
+                        $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+                    }
+                    if ($relations) {
+                        $this->insertItems($relations);
+                    }
+                }
             }
         } catch (\Exception $e) {
             foreach ($groupQueue as $queue) {
