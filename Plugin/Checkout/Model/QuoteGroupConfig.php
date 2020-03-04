@@ -97,8 +97,11 @@ class QuoteGroupConfig
      */
     private function getQuoteGroupData()
     {
-        $quoteGroupData = [];
         $quoteItems = $this->getQuoteItems();
+        if (!$quoteItems) {
+            return [];
+        }
+        $quoteGroupData = [];
         foreach ($this->quoteItemGroup->groups($quoteItems) as $group) {
             $quoteGroupData[] = [
                 'caption' => $this->quoteItemGroup->caption($group),

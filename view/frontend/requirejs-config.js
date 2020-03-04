@@ -26,6 +26,9 @@ var config = {
             },
             'Magento_Checkout/js/view/summary/item/details/subtotal' : {
                 'TNW_Subscriptions/js/checkout/view/summary/item/details/subtotal-mixin' : true
+            },
+            'Magento_Checkout/js/view/summary/cart-items' : {
+                'TNW_Subscriptions/js/checkout/view/summary/cart-items-mixin' : true
             }
         }
     }

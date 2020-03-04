@@ -736,17 +736,11 @@ class Manager
         $this->getProfile()->setProducts($profileProducts);
     }
 
-    /**
-     * @param Quote $quote
-     * @param SubscriptionProfileInterface $profile
-     * @param bool $collectQuoteTotals
-     *
-     * @throws LocalizedException
-     */
     public function populateQuoteData(
         Quote $quote,
         SubscriptionProfileInterface $profile,
-        $collectQuoteTotals = true
+        $collectQuoteTotals = true,
+        $isReBill = false
     ) {
         if (!$quote->getId()) {
             throw new LocalizedException(__('Quote not saved'));
@@ -775,8 +769,13 @@ class Manager
 
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
+            $magentoProduct = $profileProduct->getMagentoProduct();
+            if ($isReBill) {
+                $profileProduct->setTrialStatus(0);
+                $magentoProduct->setTnwSubscrTrialStatus(0);
+            }
             $quoteItem = $quote->addProduct(
-                $profileProduct->getMagentoProduct(),
+                $magentoProduct,
                 $this->getProductAddRequest($profileProduct)
             );
 
@@ -791,34 +790,53 @@ class Manager
         }
 
         if ($collectQuoteTotals) {
-            //Set shipping address
-            $quote->getShippingAddress()->addData(
-                $profile->getShippingAddress()->getData()
-            );
-            $quote->getShippingAddress()->setCustomerId(
-                $profile->getCustomerId()
-            );
+            $profileBillingAddressData = $profile->getBillingAddress()->getData();
+            unset($profileBillingAddressData['id']);
+            $profileBillingAddressData = array_filter($profileBillingAddressData);
 
             //Set billing address
-            $quote->getBillingAddress()->addData(
-                $profile->getBillingAddress()->getData()
-            );
+            $quote->getBillingAddress()->addData($profileBillingAddressData);
             $quote->getBillingAddress()->setCustomerId(
                 $profile->getCustomerId()
             );
+
+
+            if (!$quote->isVirtual()) {
+                $profileShippingAddressData = $profile->getShippingAddress()->getData();
+                unset($profileShippingAddressData['id']);
+                $profileShippingAddressData = array_filter($profileShippingAddressData);
+
+                //Set shipping address
+                $quote->getShippingAddress()->addData($profileShippingAddressData);
+                $quote->getShippingAddress()->setCustomerId(
+                    $profile->getCustomerId()
+                );
+
+                //Set shipping method
+                $quote->getShippingAddress()
+                    ->setCollectShippingRates(true)
+                    ->collectShippingRates()
+                    ->setShippingMethod($profile->getShippingMethod());
+            }
 
             // Set payment method
             $quote->getPayment()
                 ->importData($this->getEngine()->getPaymentInfo($profile))
                 ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
-            //Set shipping method
-            $quote->getShippingAddress()
-                ->setCollectShippingRates(true)
-                ->collectShippingRates()
-                ->setShippingMethod($profile->getShippingMethod());
+            $this->quoteRepository->save($quote);
+
+            foreach ($quote->getAllAddresses() as $address) {
+                $address->unsetData('cached_items_all');
+            }
+            foreach ($quote->getAllItems() as $item) {
+                foreach ($quote->getAllAddresses() as $address) {
+                    $address->addItem($item, $item->getQty());
+                }
+            }
 
             $quote->setTotalsCollectedFlag(false);
+            $quote->getShippingAddressesItems();
             $quote->collectTotals();
         }
     }

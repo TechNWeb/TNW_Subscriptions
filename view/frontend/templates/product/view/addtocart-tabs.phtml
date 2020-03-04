@@ -24,6 +24,13 @@
                 </div>
             </div>
         </div>
+        <script type="text/x-magento-init">
+            {
+                "#product_addtocart_form": {
+                    "Magento_Catalog/js/validate-product": {}
+                }
+            }
+        </script>
     <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="1" />
         <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
