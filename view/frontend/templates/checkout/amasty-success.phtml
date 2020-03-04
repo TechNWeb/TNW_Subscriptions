@@ -1,0 +1,51 @@
+<?php
+/** @var $block \Magento\Checkout\Block\Onepage\Success */
+/** @var $profileSuccessViewModel \TNW\Subscriptions\Block\Checkout\ProfileSuccessViewModel */
+$profileSuccessViewModel = $block->getProfileSuccessViewModel();
+?>
+<div class="checkout-success">
+    <?php if ($block->getOrderId()) :?>
+        <div class="success-messages">
+            <?php if ($block->getCanViewOrder()) :?>
+                <p><?= $block->escapeHtml(__('Your order number is:')) ?>
+                    <a href="<?= /* @noEscape */$block->getViewOrderUrl() ?>"
+                       class="order-number">
+                        <strong>
+                            <?= /* @noEscape */$block->getOrderId() ?>
+                        </strong>
+                    </a>
+                </p>
+                <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
+                    <p>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($profileSuccessViewModel->getEditUrl($profileOrder)), $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder)))); ?></span>
+                    </p>
+                <?php endforeach; ?>
+            <?php  else : ?>
+                <p>
+                    <?= $block->escapeHtml(__('Your order # is:')) ?>
+                    <span>
+                        <?= /* @noEscape */$block->getOrderId() ?>
+                    </span>
+                </p>
+                <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
+                    <p>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created', $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))); ?></span>
+                    </p>
+                <?php endforeach; ?>
+            <?php endif;?>
+            <p><?= $block->escapeHtml(__('We\'ll email you an order confirmation with details and tracking info.')) ?></p>
+        </div>
+        <?= $block->getChildHtml('details') ?>
+    <?php endif;?>
+
+    <?= $block->getAdditionalInfoHtml() ?>
+    <?= $block->getChildHtml('cms') ?>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <a class="action primary continue" href="<?= /* @noEscape */$block->getUrl() ?>">
+                <span><?= $block->escapeHtml(__('Continue Shopping')) ?></span>
+            </a>
+        </div>
+    </div>
+</div>

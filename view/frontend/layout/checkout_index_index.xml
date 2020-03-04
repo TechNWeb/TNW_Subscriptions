@@ -12,7 +12,6 @@
                                         <item name="summary" xsi:type="array">
                                             <item name="children" xsi:type="array">
                                                 <item name="cart_items" xsi:type="array">
-                                                    <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/view/summary/cart-items</item>
                                                     <item name="config" xsi:type="array">
                                                         <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/cart-items</item>
                                                     </item>

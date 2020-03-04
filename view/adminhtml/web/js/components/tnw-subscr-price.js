@@ -48,7 +48,7 @@ define([
             }
 
             if (trialPrice != 0) {
-                var productPriceComponent = registry.get('index=price');
+                var productPriceComponent = registry.get('index=price, dataScope=data.product.price');
                 var productPrice = 0;
                 var commentPrice = 0;
 

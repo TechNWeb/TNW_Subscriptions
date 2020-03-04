@@ -13,7 +13,6 @@ use Magento\Quote\Model\QuoteFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
@@ -48,6 +47,11 @@ class Creator extends Base
     private $messageHistoryLogger;
 
     /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory
+     */
+    private $billingCyclesManagerFactory;
+
+    /**
      * Creator constructor.
      * @param SubscriptionProfileRepository $profileRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
@@ -57,6 +61,8 @@ class Creator extends Base
      * @param QuoteFactory $quoteFactory
      * @param CollectionFactory $collectionFactory
      * @param RelationManager $relationManager
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory $billingCyclesManagerFactory
      * @param Manager $queueManager
      * @param MessageHistoryLogger $messageHistoryLogger
      */
@@ -70,9 +76,11 @@ class Creator extends Base
         CollectionFactory $collectionFactory,
         RelationManager $relationManager,
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
+        \TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory $billingCyclesManagerFactory,
         Manager $queueManager,
         MessageHistoryLogger $messageHistoryLogger
     ) {
+        $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->quoteFactory = $quoteFactory;
         $this->queueManager = $queueManager;
         $this->messageHistoryLogger = $messageHistoryLogger;
@@ -89,9 +97,8 @@ class Creator extends Base
     }
 
     /**
-     * Generates future quotes for profiles and adds them to queue.
-     *
      * @param array $data
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function process(array $data)
     {
@@ -147,7 +154,7 @@ class Creator extends Base
         $relations = [];
         try {
             $count = $quotesCount ?: $this->config->getGeneratedQuotesCount();
-            list($cycles, $needMore) = $this->getBillingCycles($profile, $count);
+            list($cycles, $needMore) = $this->billingCyclesManagerFactory->create()->getBillingCycles($profile, $count);
 
             if (!empty($cycles)) {
                 $this->context->messageDebug("Create Quotes by Profile:\n%s", $profile);
@@ -207,111 +214,6 @@ class Creator extends Base
             ->addFieldToFilter('products_need_recollect', 0);
 
         return $collection->getAllIds();
-    }
-
-    /**
-     * Returns list of billing cycle dates and flag to generate more quotes.
-     *
-     * @param SubscriptionProfileInterface $profile
-     * @param int $count
-     * @return array
-     * @throws \Exception
-     */
-    private function getBillingCycles(SubscriptionProfileInterface $profile, $count)
-    {
-        $neededDates = [];
-        $nowDate = new \DateTime();
-        $formattedNowDate = $this->format($nowDate);
-        $startDate = new \DateTime($profile->getStartDate());
-        $formattedStartDate = $this->format($startDate);
-        //Add to list start date.
-        $neededDates[] = $formattedStartDate;
-        //Profile has a infinite count of cycles
-        if ($profile->getTerm()) {
-            //Generate quotes for the year ahead
-            $endDate = new \DateTime($formattedNowDate);
-            if (strtotime($formattedStartDate) > strtotime($formattedNowDate)) {
-                $endDate = new \DateTime($formattedStartDate);
-            }
-            $endDate->add(new \DateInterval('P1Y'));
-            $dateDiff = $startDate->diff($endDate, true);
-            switch ($profile->getUnit()) {
-                case BillingFrequencyUnitType::DAYS:
-                    $cyclesCount = floor($dateDiff->days / $profile->getFrequency());
-                    break;
-                case BillingFrequencyUnitType::MONTHS:
-                    $months = $dateDiff->y * 12 + $dateDiff->m;
-                    $cyclesCount = floor($months / $profile->getFrequency());
-                    break;
-                default:
-                    throw new \Exception('Undefined length unit type.');
-            }
-        } else {
-            // Profile has a finite count of cycles
-            $cyclesCount = (int)$profile->getTotalBillingCycles() - 1;
-        }
-        //Calculate the list of dates for profile
-        for ($i = 1; $i <= $cyclesCount; $i++) {
-            $date = $this->calculateScheduledDate(
-                $startDate,
-                $profile->getUnit(),
-                $profile->getFrequency()
-            );
-            $neededDates[] = $this->format($date);
-        }
-        //get already generated dates
-        $existDates = array_map(
-            function (SubscriptionProfileOrderInterface $relation) {
-                return $relation->getScheduledAt();
-            },
-            $this->relationManager->getAllProfileRelations($profile->getId())
-        );
-        $neededDates = array_diff($neededDates, $existDates);
-        //generate only future dates
-        $resultDates = array_filter(
-            $neededDates,
-            function ($neededDate) use ($formattedNowDate) {
-                return (strtotime($neededDate) > strtotime($formattedNowDate));
-            }
-        );
-        $resultDates = array_slice($resultDates, 0, $count);
-        $needMore = count($neededDates) > count($resultDates);
-
-        return [$resultDates, $needMore];
-    }
-
-    /**
-     * Calculates subscription date for billing cycle.
-     *
-     * @param \DateTime $date
-     * @param string $unit
-     * @param int $length
-     * @return \DateTime
-     * @throws \Exception
-     */
-    private function calculateScheduledDate(\DateTime $date, $unit, $length)
-    {
-        switch ($unit) {
-            case BillingFrequencyUnitType::DAYS:
-                $intervalUnit = 'D';
-                $expression = 'P' . $length . $intervalUnit;
-                $date = $date->add(new \DateInterval($expression));
-                break;
-            case BillingFrequencyUnitType::MONTHS:
-                $nextPeriodMonth = $date->format('m') + $length;
-                $dayOfMonth = $date->format('d');
-                $nextFullDate = $date->format('Y-') . $nextPeriodMonth . '-' . '01 ' . $date->format('H:i:s');
-                $dayForPeriod = 'd';
-                if ((int) $dayOfMonth != 1){
-                    $dayForPeriod = 't';
-                }
-                $date = new \DateTime(date('Y-m-' . $dayForPeriod . ' H:i:s', strtotime($nextFullDate)));
-                break;
-            default:
-                throw new \Exception('Undefined length unit type.');
-        }
-
-        return $date;
     }
 
     /**
@@ -416,16 +318,5 @@ class Creator extends Base
     public function getErrors()
     {
         return [];
-    }
-
-    /**
-     * Returns formatted date.
-     *
-     * @param \DateTime $date
-     * @return string
-     */
-    private function format(\DateTime $date)
-    {
-        return $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 }
