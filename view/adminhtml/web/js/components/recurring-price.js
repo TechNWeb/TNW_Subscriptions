@@ -43,7 +43,7 @@ define([
                 discountTypeValue = '',
                 recurringPrice = this.value(), //Get current component integer value,
                 productPrice = this.getProductPriceComponentValue(),
-                productPriceComponent = registry.get('index=price'),
+                productPriceComponent = registry.get('index=price, dataScope=data.product.price'),
                 lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price'),
                 offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount'),
                 discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
@@ -139,7 +139,7 @@ define([
         getProductPriceComponentValue: function() {
             var priceFormat = this.getPriceFormat();
             var productPrice = 0;
-            var productPriceComponent = registry.get('index=price');
+            var productPriceComponent = registry.get('index=price, dataScope=data.product.price');
 
             if ((typeof productPriceComponent != 'undefined')
                 && (typeof productPriceComponent.value() != 'undefined')) {

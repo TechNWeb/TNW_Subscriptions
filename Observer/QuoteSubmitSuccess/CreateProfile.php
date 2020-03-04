@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Observer\QuoteSubmitSuccess;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
@@ -64,6 +65,10 @@ class CreateProfile implements ObserverInterface
      * @var \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl
      */
     private $changeQuoteControl;
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
 
     /**
      * CreateProfile constructor.
@@ -76,6 +81,7 @@ class CreateProfile implements ObserverInterface
      * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
@@ -86,7 +92,8 @@ class CreateProfile implements ObserverInterface
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
+        \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->changeQuoteControl = $changeQuoteControl;
         $this->encryptor = $encryptor;
@@ -97,6 +104,7 @@ class CreateProfile implements ObserverInterface
         $this->quoteGenerator = $quoteGenerator;
         $this->relationResource = $relationResource;
         $this->customerFactory = $customerFactory;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -134,6 +142,13 @@ class CreateProfile implements ObserverInterface
             $customer = $this->orderCustomerService->create($order->getEntityId());
             //ISSUE: https://github.com/magento/magento2/issues/7597
             $this->customerFactory->create()->setId($customer->getId())->reindex();
+            $quote->setCustomer($customer);
+            $this->changeQuoteControl->setNewCustomer($customer);
+        }
+
+        // Compatibility with third-party modules which convert guest to customer
+        if (!$order->getCustomerIsGuest() && $order->getCustomerId() && $quote->getCustomerIsGuest()) {
+            $customer = $this->customerRepository->getById($order->getCustomerId());
             $quote->setCustomer($customer);
             $this->changeQuoteControl->setNewCustomer($customer);
         }

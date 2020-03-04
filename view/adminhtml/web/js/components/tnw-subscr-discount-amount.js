@@ -174,7 +174,7 @@ define([
         getProductPriceComponentValue: function() {
             var priceFormat = this.getPriceFormat();
             var productPrice = 0;
-            var productPriceComponent = registry.get('index=price');
+            var productPriceComponent = registry.get('index=price, dataScope=data.product.price');
 
             if ((typeof productPriceComponent != 'undefined')
                 && (typeof productPriceComponent.value() != 'undefined')) {
