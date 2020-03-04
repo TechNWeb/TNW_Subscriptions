@@ -6,5 +6,10 @@
                 <argument xsi:type="object" name="profile_success_view_model">TNW\Subscriptions\Block\Checkout\ProfileSuccessViewModel</argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="amasty.checkout.success" template="TNW_Subscriptions::checkout/amasty-success.phtml">
+            <arguments>
+                <argument xsi:type="object" name="profile_success_view_model">TNW\Subscriptions\Block\Checkout\ProfileSuccessViewModel</argument>
+            </arguments>
+        </referenceBlock>
     </body>
 </page>
