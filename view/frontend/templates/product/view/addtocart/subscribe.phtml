@@ -8,21 +8,20 @@
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
+    <div class="subscription-price-with-savings"></div>
     <div class="fieldset">
         <div class="field required">
             <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
             <div class="control">
                 <div class="options-list nested">
-                <?php foreach ($block->getFrequencyOptions() as $option): ?>
-                    <div class="field choice required">
-                        <input type="radio"
-                               class="radio required"
-                               name="billing_frequency"
-                               id="billing_frequency_<?php echo $option['value'] ?>"
-                               value="<?php echo $option['value'] ?>"
-                               aria-required="true"
+                    <select name="billing_frequency"
+                            id="billing_frequency"
+                            class="required">
+                    <?php foreach ($block->getFrequencyOptions() as $option): ?>
+                        <option id="billing_frequency_<?php echo $option['value'] ?>"
+                                value="<?php echo $option['value'] ?>"
                             <?php if ($option['is_default']): ?>
-                               checked="checked"
+                                selected
                             <?php endif ?>
                             <?php if (isset($option['preset_qty'])): ?>
                                 data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
@@ -33,14 +32,19 @@
                             <?php if (isset($option['frequency_unit_type'])): ?>
                                 data-frequency-unit-type="<?php echo $option['frequency_unit_type'] * 1 ?>"
                             <?php endif ?>
-                        />
-                        <label class="label"
-                               for="billing_frequency_<?php echo $option['value'] ?>"
-                               data-default-label="<?php echo $option['label'] ?>">
-                            <span><?php echo $option['label'] ?></span>
-                        </label>
-                    </div>
-                <?php endforeach ?>
+                                data-default-label="
+                                <?php echo $option['label'] ?>
+                                <?php if ($option['is_default']): ?>
+                                &nbsp;<?php echo __('(most common)'); ?>
+                                <?php endif ?>"
+                        >
+                            <?php echo $option['label'] ?>
+                            <?php if ($option['is_default']): ?>
+                                &nbsp;<?php echo __('(most common)'); ?>
+                            <?php endif ?>
+                        </option>
+                    <?php endforeach ?>
+                    </select>
                 </div>
             </div>
         </div>
@@ -49,52 +53,55 @@
         <div class="field term required">
             <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
-                <input
-                    <?php if ($block->getIsInfiniteSubscriptions()): ?>
-                       type="hidden"
-                    <?php else: ?>
-                       type="checkbox"
-                    <?php endif;?>
-                       class="checkbox"
-                       name="term"
-                       id="term"
-                       value="1"
-                    <?php if ($block->getDefaultUntilCancelled()): ?>
-                       checked="checked"
-                    <?php endif ?>
-                />
-                <label class="label" for="term">
+                <?php if ($block->getIsInfiniteSubscriptions()): ?>
                     <span><?php echo __('Until canceled') ?></span>
-                </label>
-            </div>
-        </div>
-        <div class="field required period" id="period-field"
-             <?php if ($block->getDefaultUntilCancelled()): ?>style="display:none"<?php endif ?>
-        >
-            <div class="control">
-                <label for="period"><span><?php echo __('& bill') ?></span></label>
-                <input type="number"
-                       name="period"
-                       id="period"
-                       class="input-text qty"
-                       data-validate='{"required-number":true}'
-                       value="<?php echo $block->getDefaultPeriod() ?>"
-                >
-                <label for="period" class="after-input"><span><?php echo __('times') ?></span></label>
+                <?php else: ?>
+                    <div>
+                        <input type="radio" id="term1" name="term" value="1"
+                            <?php if ($block->getDefaultUntilCancelled()): ?>
+                                checked="checked"
+                            <?php endif ?>
+                        />
+                        <label class="label" for="term1">
+                            <span><?php echo __('Until canceled') ?></span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="radio" id="term0" name="term" value="0"/>
+                        <label class="label" for="term0">
+                            <span><?php echo __('Stop after') ?></span>
+                            <input type="number"
+                                   name="period"
+                                   id="period"
+                                   class="input-text qty"
+                                   data-validate='{"required-number":true}'
+                                   value="<?php echo $block->getDefaultPeriod() ?>"
+                            >
+                            <span><?php echo __('payment(s)') ?></span>
+                        </label>
+                    </div>
+                <?php endif;?>
             </div>
         </div>
     </div>
     <?php if ($block->getIsVisibleStartOn()): ?>
     <div class="fieldset">
         <div class="field date required">
-            <label class="label" for="start_at"><span><?php echo __('Start On') ?>:</span></label>
-            <div class="control">
-                <input type="text"
-                       name="start_on"
-                       id="start_at"
-                       class="required"
-                       value="<?php echo $block->getDefaultStartOn() ?>"
-                />
+            <label class="label"><span><?php echo __('Delivery Schedule') ?>:</span></label>
+            <div class="control delivery-schedule">
+                <span><?php echo __('First delivery on'); ?></span>
+                <span class="delivery-schedule-date"></span>
+                <input type="hidden" name="start_on_alt" id="start_on_alt"/>
+                <a href="#" class="action change-delivery-date"><?php echo __('change') ?></a>
+                <span class="start-on-wrapper hidden">
+                    <input type="text"
+                           name="start_on"
+                           id="start_at"
+                           class="required"
+                           value="<?php echo $block->getDefaultStartOn() ?>"
+                    />
+                    <a href="#" class="action update-delivery-date"><?php echo __('Update') ?></a>
+                </span>
             </div>
         </div>
     </div>
@@ -151,8 +158,11 @@
             buttonImage: "<?php echo $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
             buttonText: "<?php echo __('Select Date') ?>",
             showOn: 'both',
-            minDate: "<?php echo $block->getMinStartOn() ?>"
-        });
+            minDate: "<?php echo $block->getMinStartOn() ?>",
+            altField: "#start_on_alt",
+            altFormat: "MM dd"
+        }).datepicker('setDate', '<?php echo $block->getDefaultStartOn() ?>');
+        $('.delivery-schedule-date').html($('#start_on_alt').val());
     });
 </script>
 <?php endif ?>

@@ -163,7 +163,7 @@
     .tnw-addtocart-container {
         input[name="addtocart_type"] {
             &:not(:checked) {
-                & ~ .box-tocart {
+                & ~ .addtocart-wrapper {
                     display: none;
                 }
             }
@@ -174,6 +174,19 @@
         .addtocart-onetime,
         .addtocart-subscribe {
             padding-bottom: 1.5rem;
+            padding-top: 1.5rem;
+            border-bottom: 1px solid #777;
+            .addtocart-wrapper {
+                padding-left: 2.2rem;
+            }
+        }
+        #start_at {
+            width: 100px;
+
+        }
+        .action.update-delivery-date {
+            .lib-link-as-button();
+            .lib-button-primary();
         }
     }
 

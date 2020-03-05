@@ -20,7 +20,7 @@ define([
             untilCancelledInputSelector: '#term',
             periodControlSelector: '#period-field',
             setQtyFromFrequency: false,
-            frequencyInputSelector: 'input[name="billing_frequency"]',
+            frequencyInputSelector: 'select[name="billing_frequency"]',
             activeInputSelector: 'input[name="subscribe_active"]',
             qtyInputSelector: '#subscribe_qty',
             minicartSelector: '[data-block="minicart"]',
@@ -38,7 +38,9 @@ define([
             savingsCalculationType: 0,
             product: {},
             selectSimpleProduct: '[name="selected_configurable_option"]',
-            childrenSelector: '.super-attribute-select'
+            childrenSelector: '.super-attribute-select',
+            subscriptionPriceBoxWithSavings: '.subscription-price-with-savings',
+            oneTimePriceBox: '.onetime-final-price'
         },
 
         containers: {
@@ -62,6 +64,7 @@ define([
          */
         _initialize: function () {
             this._updateFrequencyLabel();
+            this._updateAuxPrices();
             this.containers.addToCartPriceBox.show();
             this.containers.subscriptionPriceBox.hide();
 
@@ -69,6 +72,13 @@ define([
                 this.containers.addToCartPriceBox.hide();
                 this.containers.subscriptionPriceBox.show();
             }
+        },
+
+        _updateAuxPrices: function() {
+            var priceWithSaving = $(this.options.frequencyInputSelector + ' option:selected')
+                .data('price-with-saving');
+            $(this.options.subscriptionPriceBoxWithSavings).html(priceWithSaving);
+            $(this.options.oneTimePriceBox).html(this.containers.addToCartPriceBox.html());
         },
 
         /**
@@ -90,17 +100,37 @@ define([
                 frequencyInput = $(this.options.frequencyInputSelector),
                 activeInput = $(this.options.activeInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
-                childrenSelect = $(this.options.childrenSelector);
+                childrenSelect = $(this.options.childrenSelector),
+                changeDeliveryDateLink = $('.action.change-delivery-date'),
+                updateDeliverDateButton = $('.action.update-delivery-date'),
+                startOnWrapper = $('.start-on-wrapper'),
+                startOnFormattedInput = $('#start_on_alt');
+
+            changeDeliveryDateLink.on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                startOnWrapper.show();
+                changeDeliveryDateLink.hide();
+            });
+
+            updateDeliverDateButton.on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                changeDeliveryDateLink.show();
+                startOnWrapper.hide();
+                $('.delivery-schedule-date').html(startOnFormattedInput.val());
+            });
 
             untilCancelledInput.on('change', $.proxy(function() {
                 widget._togglePeriod();
             }, this));
 
-            if (this.options.setQtyFromFrequency) {
-                frequencyInput.on('change', $.proxy(function () {
+            frequencyInput.on('change', $.proxy(function () {
+                if (this.options.setQtyFromFrequency) {
                     widget._updateQtyFromFrequency();
-                }, this));
-            }
+                }
+                widget._updateAuxPrices();
+            }, this));
 
             this.containers.subscriptionTab.on('click', $.proxy(function() {
                 activeInput.val(1);
@@ -129,7 +159,7 @@ define([
          * Set preset qty from frequency into qty input
          */
         _updateQtyFromFrequency: function () {
-            var currentFrequency = $(this.options.frequencyInputSelector + ':checked'),
+            var currentFrequency = $(this.options.frequencyInputSelector + ' option:selected'),
                 qtyInput = $(this.options.qtyInputSelector);
             qtyInput.val(Number(currentFrequency.data('preset-qty')));
         },
@@ -139,7 +169,7 @@ define([
          */
         _updateFrequencyLabel: function () {
             var widget = this,
-                frequencies = $(this.options.frequencyInputSelector),
+                frequencies = $(this.options.frequencyInputSelector + ' option'),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
                 savingsCalculationType = parseInt(this.options.savingsCalculationType),
@@ -162,32 +192,36 @@ define([
                     frequencyUnitType = $(option).data('frequency-unit-type'),
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
                     saveString = ' %p (SAVE ~%s%)';
-                $.each(option.labels, function (key, label) {
-                    resultLabel = $(label).data('default-label');
-                    if (isNeedStopCalculating === false) {
-                        var discount = 0;
-                        qtyValue = presetQty ? presetQty : qtyValue;
-                        if (savingsCalculationType === 2) {
-                            //formula for service
-                            discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * qtyValue * 100)
-                                / (productPrice * calculatedUnit);
-                        } else if (savingsCalculationType === 1) {
-                            //formula for any retail / physical product with preset qty
-                            discount = ((productPrice * qtyValue - currentFrequencyPrice) * 100)
-                                / (productPrice * qtyValue);
-                        } else {
-                            //formula for any retail / physical product
-                            discount = ((productPrice - currentFrequencyPrice) * qtyValue * 100) / productPrice;
-                        }
-                        discount = parseInt(discount);
-                        if (discount > 0) {
-                            resultLabel += $t(saveString)
-                                .replace('%p', utils.formatPrice(currentFrequencyPrice, {}))
-                                .replace('%s', discount);
-                        }
+
+                resultLabel = $(option).data('default-label');
+                if (isNeedStopCalculating === false) {
+                    var discount = 0,
+                        priceWithSaving = '';
+                    qtyValue = presetQty ? presetQty : qtyValue;
+                    if (savingsCalculationType === 2) {
+                        //formula for service
+                        discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * qtyValue * 100)
+                            / (productPrice * calculatedUnit);
+                    } else if (savingsCalculationType === 1) {
+                        //formula for any retail / physical product with preset qty
+                        discount = ((productPrice * qtyValue - currentFrequencyPrice) * 100)
+                            / (productPrice * qtyValue);
+                    } else {
+                        //formula for any retail / physical product
+                        discount = ((productPrice - currentFrequencyPrice) * qtyValue * 100) / productPrice;
                     }
-                    label.innerText = resultLabel;
-                });
+                    discount = parseInt(discount);
+                    if (discount > 0) {
+                        priceWithSaving = $t(saveString)
+                        .replace('%p', utils.formatPrice(currentFrequencyPrice, {}))
+                        .replace('%s', discount);
+                        resultLabel += priceWithSaving;
+                    } else {
+                        priceWithSaving = utils.formatPrice(currentFrequencyPrice, {});
+                    }
+                    $(option).data('price-with-saving', priceWithSaving);
+                }
+                option.innerText = resultLabel;
             });
         },
 

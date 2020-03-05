@@ -9,6 +9,7 @@
 
 <?php if ($block->isSubscribeAvailable()): ?>
     <?php if ($block->IsOnlySubscribePurchase()): ?>
+        <input type="hidden" name="subscribe_active" value="1" />
         <div class="tnw-addtocart-container">
             <div class="addtocart-subscribe">
                 <div class="box-tocart">
@@ -27,15 +28,20 @@
         <input type="hidden" name="subscribe_active" value="1" />
         <div class="tnw-addtocart-container">
             <div class="addtocart-onetime">
-                <input type="radio" id="addtocart_onetime" name="addtocart_type"/>
-                <label for="addtocart_onetime"><?php /* @escapeNotVerified */ echo __('One Time Purchase') ?></label>
-                <?php echo $block->getChildHtml('addtocart_orig') ?>
+                    <input type="radio" id="addtocart_onetime" name="addtocart_type"/>
+                    <label for="addtocart_onetime"><?php /* @escapeNotVerified */ echo __('One Time Purchase') ?></label>
+                <div class="addtocart-wrapper">
+                    <div class="onetime-final-price"></div>
+                    <?php echo $block->getChildHtml('addtocart_orig') ?>
+                </div>
             </div>
             <div class="addtocart-subscribe">
+                <div class="box-tocart">
                 <input type="radio" id="addtocart_subscribe" name="addtocart_type" checked/>
                 <label for="addtocart_subscribe"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></label>
-                <div class="box-tocart">
-                    <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                    <div class="addtocart-wrapper">
+                        <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                    </div>
                 </div>
             </div>
         </div>
