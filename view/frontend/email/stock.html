@@ -1,0 +1,28 @@
+<!--@subject {{trans "Out Of Stock Products For %sub_label profile" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
+<!--@vars {
+"template config_path=\"design\/email\/header_template\"":"Email Header Template",
+"template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
+"var store_email":"Store Email",
+"var customer":"Customer",
+"var subscription":"Subscription Profile",
+"layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p>
+                {{trans '<a href="%account_url">Log into your account</a> to make any changes to your recurring profile. You can find it under the My Subscriptions tab after you authenticate.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+            </p>
+            <p>
+                {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}
+            </p>
+        </td>
+    </tr>
+</table>
+{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
+<p>
+    {{trans 'To make changes to your recurring order <a href="%account_url">log into your account</a>' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+</p>
+{{template config_path="design/email/footer_template"}}

@@ -5,4 +5,5 @@
     <template id="tnw_subscriptions_profile_options_emails_card_expire" label="Subscription Card Expire" file="card_expire.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_options_emails_payment_failed" label="Subscription Payment Failed" file="payment_failed.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_options_emails_renewal" label="Subscription Renewal" file="renewal.html" type="html" module="TNW_Subscriptions" area="frontend"/>
+    <template id="tnw_subscriptions_profile_options_emails_out_of_stock" label="Subscription Out Of Stock" file="stock.html" type="html" module="TNW_Subscriptions" area="frontend"/>
 </config>

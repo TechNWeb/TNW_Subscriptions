@@ -32,6 +32,7 @@
                 <card_expire>tnw_subscriptions_profile_options_emails_card_expire</card_expire>
                 <payment_failed>tnw_subscriptions_profile_options_emails_payment_failed</payment_failed>
                 <renewal>tnw_subscriptions_profile_options_emails_renewal</renewal>
+                <out_of_stock>tnw_subscriptions_profile_options_emails_out_of_stock</out_of_stock>
             </emails>
             <notifications>
                 <renewals>1</renewals>
