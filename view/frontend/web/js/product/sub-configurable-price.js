@@ -101,7 +101,7 @@ define([
                     priceHtml,
                     currentFrequency;
                 if (!optionIndex) {
-                    currentFrequency = $(this.options.billingFrequencyOptionsSelector + ':checked').get(0);
+                    currentFrequency = $(this.options.billingFrequencyOptionsSelector + ' option:selected').get(0);
                     if (typeof currentFrequency !== 'undefined') {
                         optionIndex = currentFrequency.value;
                     } else {
@@ -112,9 +112,9 @@ define([
                     }
                 }
 
-            if (!selectedProduct) {
-                selectedProduct = this.options.subscriptionPricesData['default'][optionIndex];
-            }
+                if (!selectedProduct) {
+                    selectedProduct = this.options.subscriptionPricesData['default'][optionIndex];
+                }
 
                 if ((typeof this.options.subscriptionPricesData[selectedProduct] !== 'undefined')
                     && (typeof this.options.subscriptionPricesData[selectedProduct][optionIndex] !== 'undefined')
@@ -125,6 +125,7 @@ define([
                 }
 
                 subscriptionPriceContainer.html(priceHtml);
+                $('.subscription-price-with-savings').html(priceHtml);
             } else {
                 setTimeout(this._insertPriseBox.bind(this), 500);
             }

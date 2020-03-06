@@ -17,7 +17,6 @@ define([
             addToCartButtonSelector: '#product-addtocart-button',
             subscribeButtonSelector: '#product-subscribe-button',
             subscribeUrl: '#',
-            untilCancelledInputSelector: '#term',
             periodControlSelector: '#period-field',
             setQtyFromFrequency: false,
             frequencyInputSelector: 'select[name="billing_frequency"]',
@@ -77,8 +76,10 @@ define([
         _updateAuxPrices: function() {
             var priceWithSaving = $(this.options.frequencyInputSelector + ' option:selected')
                 .data('price-with-saving');
-            $(this.options.subscriptionPriceBoxWithSavings).html(priceWithSaving);
             $(this.options.oneTimePriceBox).html(this.containers.addToCartPriceBox.html());
+            if (this.options.product.type !== 'configurable') {
+                $(this.options.subscriptionPriceBoxWithSavings).html(priceWithSaving);
+            }
         },
 
         /**
@@ -91,12 +92,25 @@ define([
             this.containers.addToCartPriceBox = $(this.options.addToCartPriceBlockSelector);
         },
 
+        _bindSuperAttributesEvent: function() {
+            var widget = this;
+
+            if ($(widget.options.childrenSelector).length) {
+                $.each($(widget.options.childrenSelector), $.proxy(function (index, element) {
+                    $(element).on('change', function () {
+                        widget._updateAuxPrices();
+                    });
+                }));
+            } else {
+                setTimeout(this._bindSuperAttributesEvent.bind(this), 500);
+            }
+        },
+
         /**
          * Event binding
          */
         _bind: function () {
             var widget = this,
-                untilCancelledInput = $(this.options.untilCancelledInputSelector),
                 frequencyInput = $(this.options.frequencyInputSelector),
                 activeInput = $(this.options.activeInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
@@ -105,6 +119,8 @@ define([
                 updateDeliverDateButton = $('.action.update-delivery-date'),
                 startOnWrapper = $('.start-on-wrapper'),
                 startOnFormattedInput = $('#start_on_alt');
+
+            this._bindSuperAttributesEvent();
 
             changeDeliveryDateLink.on('click', function (e) {
                 e.stopImmediatePropagation();
@@ -120,10 +136,6 @@ define([
                 startOnWrapper.hide();
                 $('.delivery-schedule-date').html(startOnFormattedInput.val());
             });
-
-            untilCancelledInput.on('change', $.proxy(function() {
-                widget._togglePeriod();
-            }, this));
 
             frequencyInput.on('change', $.proxy(function () {
                 if (this.options.setQtyFromFrequency) {
@@ -300,19 +312,6 @@ define([
 
             return result;
         },
-
-        /**
-         * Show/hide period input
-         */
-        _togglePeriod: function () {
-            var untilCancelledInput = $(this.options.untilCancelledInputSelector),
-                periodControl = $(this.options.periodControlSelector);
-            if (untilCancelledInput.is(':checked')) {
-                periodControl.hide();
-            } else {
-                periodControl.show();
-            }
-        }
     });
 
     return $.mage.tnwSubscribeContainer;
