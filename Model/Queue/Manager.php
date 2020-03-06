@@ -320,6 +320,19 @@ class Manager
     }
 
     /**
+     * Changes status to pending and sets error message for queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function makePending($ids, $message)
+    {
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_PENDING, $message);
+    }
+
+    /**
      * Changes status to synced queue items.
      *
      * @param array|int $ids
@@ -421,11 +434,13 @@ class Manager
     }
 
     /**
-     * @param \TNW\Subscriptions\Model\Queue[] $groupQueue
-     *
+     * @param $groupQueue
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Exception
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws \TNW\Subscriptions\Exception\ProfileProductsUnsaleableException
      */
     public function placeOrderByGroupQueue($groupQueue)
     {
@@ -438,6 +453,7 @@ class Manager
         $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
         $this->cartRepository->save($quote);
 
+        $outOfStockProducts = [];
         $countGroupQueue = count($groupQueue) - 1;
         $needTotalCount = false;
         foreach ($groupQueue as $index => $queue) {
@@ -445,136 +461,170 @@ class Manager
             if ($countGroupQueue == $index) {
                 $needTotalCount = true;
             }
-            $this->profileManager->populateQuoteData($quote, $profile, $needTotalCount, true);
+            $outOfStockProducts[$profile->getId()] =
+                $this->profileManager->populateQuoteData($quote, $profile, $needTotalCount, true);
         }
 
-        $this->cartRepository->save($quote);
-
-        try {
-            /** @var \Magento\Sales\Model\Order $order */
-            $order = $this->profileManager
-                ->getEngine()
-                ->getCartManagement()
-                ->submit($quote);
-
-            $insertData = [];
-            foreach ($quote->getAllVisibleItems() as $item) {
-                $profileItemIds = $item->getData('profile_item_ids');
-                if (empty($profileItemIds)) {
-                    continue;
+        foreach ($outOfStockProducts as $profileId => $outOfStockProductData) {
+            $profile = $this->profileRepository->getById($profileId);
+            if ($outOfStockProductData && is_array($outOfStockProductData)) {
+                try {
+                    $this->emailNotifierFactory->create()->outOfStockProducts($profile, $outOfStockProductData);
+                } catch (\Exception $e) {
+                    //TODO: log the email sending failure?
                 }
-
-                $orderItem = $order->getItemByQuoteItemId($item->getId());
-                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
-                    continue;
-                }
-
-                foreach ($profileItemIds as $profileItemId) {
-                    $insertData[] = [
-                        'profile_item_id' => $profileItemId,
-                        'quote_item_id' => $item->getId(),
-                        'order_item_id' => $orderItem->getItemId(),
-                    ];
-                }
-            }
-
-            // Save Items Relation
-            $this->relationResource->insertSales($insertData);
-
-            foreach ($groupQueue as $queue) {
-                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
-
-                $oldStatus = $profile->getStatus();
-
-                $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
-                if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
-                    $profile->setStatus(ProfileStatus::STATUS_TRIAL);
-                }
-
-                $this->profileRepository->save($profile);
-
-                if ($oldStatus != $profile->getStatus()) {
-                    //Add comment profile place.
-                    $this->messageHistoryLogger->message(
-                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                        [
-                            $this->profileStatus->getLabelByValue($oldStatus),
-                            $this->profileStatus->getLabelByValue($profile->getStatus())
-                        ],
-                        $profile->getId(),
-                        false,
-                        false,
-                        true
-                    );
-                }
-
-                //Add comment profile place.
                 $this->messageHistoryLogger->message(
-                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK,
                     [
-                        $order->getEntityId(),
-                        $order->getIncrementId(),
-                        $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
+                        implode(', ', $outOfStockProductData)
                     ],
                     $profile->getId(),
                     false,
-                    false,
+                    true,
                     true
                 );
+            }
+        }
+        if ($quote->getAllVisibleItems()) {
+            $this->cartRepository->save($quote);
+            try {
+                /** @var \Magento\Sales\Model\Order $order */
+                $order = $this->profileManager
+                    ->getEngine()
+                    ->getCartManagement()
+                    ->submit($quote);
 
-                $relation = $this->relationManager
-                    ->getRelationById($queue->getProfileOrderId())
-                    ->setMagentoQuoteId($quote->getId())
-                    ->setMagentoOrderId($order->getId());
-
-                $this->relationManager->saveRelation($relation);
-
-                /** @var BillingCyclesManager $billingCyclesManager */
-                $billingCyclesManager = $this->billingCyclesManagerFactory->create();
-                list($cycles, $needMore, $existingCycles) =
-                    $billingCyclesManager->getBillingCycles($profile, 1, true);
-                if ($needMore && $cycles) {
-                    $relations = [];
-                    foreach ($cycles as $cycle) {
-                        $newRelation = $this->relationManager->getNewProfileOrderRelation()
-                            ->setSubscriptionProfileId($profile->getId())
-                            ->setMagentoQuoteId($quote->getId())
-                            ->setScheduledAt($cycle);
-                        $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+                $insertData = [];
+                foreach ($quote->getAllVisibleItems() as $item) {
+                    $profileItemIds = $item->getData('profile_item_ids');
+                    if (empty($profileItemIds)) {
+                        continue;
                     }
-                    if ($relations) {
-                        $this->insertItems($relations);
+
+                    $orderItem = $order->getItemByQuoteItemId($item->getId());
+                    if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                        continue;
+                    }
+
+                    foreach ($profileItemIds as $profileItemId) {
+                        $insertData[] = [
+                            'profile_item_id' => $profileItemId,
+                            'quote_item_id' => $item->getId(),
+                            'order_item_id' => $orderItem->getItemId(),
+                        ];
                     }
                 }
-            }
-        } catch (\Exception $e) {
-            foreach ($groupQueue as $queue) {
-                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 
-                $oldStatus = $profile->getStatus();
-                $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
-                $this->profileRepository->save($profile);
+                // Save Items Relation
+                $this->relationResource->insertSales($insertData);
 
-                if ($oldStatus != $profile->getStatus()) {
+                foreach ($groupQueue as $queue) {
+                    $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                    $oldStatus = $profile->getStatus();
+
+                    $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
+                    if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
+                        $profile->setStatus(ProfileStatus::STATUS_TRIAL);
+                    }
+
+                    $this->profileRepository->save($profile);
+
+                    if ($oldStatus != $profile->getStatus()) {
+                        //Add comment profile place.
+                        $this->messageHistoryLogger->message(
+                            SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                            [
+                                $this->profileStatus->getLabelByValue($oldStatus),
+                                $this->profileStatus->getLabelByValue($profile->getStatus())
+                            ],
+                            $profile->getId(),
+                            false,
+                            false,
+                            true
+                        );
+                    }
+
                     //Add comment profile place.
                     $this->messageHistoryLogger->message(
-                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
                         [
-                            $this->profileStatus->getLabelByValue($oldStatus),
-                            $this->profileStatus->getLabelByValue($profile->getStatus())
+                            $order->getEntityId(),
+                            $order->getIncrementId(),
+                            $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
                         ],
                         $profile->getId(),
                         false,
                         false,
                         true
                     );
-                }
-                if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
-                    $this->emailNotifierFactory->create()->paymentFailed($profile);
-                }
-            }
 
-            throw $e;
+                    $relation = $this->relationManager
+                        ->getRelationById($queue->getProfileOrderId())
+                        ->setMagentoQuoteId($quote->getId())
+                        ->setMagentoOrderId($order->getId());
+
+                    $this->relationManager->saveRelation($relation);
+                    $this->createNewRelation($queue, $profile);
+                }
+            } catch (\Exception $e) {
+                foreach ($groupQueue as $queue) {
+                    $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                    $oldStatus = $profile->getStatus();
+                    $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
+                    $this->profileRepository->save($profile);
+
+                    if ($oldStatus != $profile->getStatus()) {
+                        //Add comment profile place.
+                        $this->messageHistoryLogger->message(
+                            SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                            [
+                                $this->profileStatus->getLabelByValue($oldStatus),
+                                $this->profileStatus->getLabelByValue($profile->getStatus())
+                            ],
+                            $profile->getId(),
+                            false,
+                            false,
+                            true
+                        );
+                    }
+                    if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
+                        $this->emailNotifierFactory->create()->paymentFailed($profile);
+                    }
+                }
+
+                throw $e;
+            }
+        } else {
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+                $this->createNewRelation($queue, $profile);
+            }
+            throw new \TNW\Subscriptions\Exception\ProfileProductsUnsaleableException(
+                __('There were no saleable products in queue profiles.')
+            );
+        }
+    }
+
+    private function createNewRelation($queue, $profile)
+    {
+        /** @var BillingCyclesManager $billingCyclesManager */
+        $billingCyclesManager = $this->billingCyclesManagerFactory->create();
+        list($cycles, $needMore, $existingCycles) =
+            $billingCyclesManager->getBillingCycles($profile, 1, true);
+        if ($needMore && $cycles) {
+            $relations = [];
+            foreach ($cycles as $cycle) {
+                $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                    ->setSubscriptionProfileId($profile->getId())
+                    ->setMagentoQuoteId($queue->getData('magento_quote_id'))
+                    ->setScheduledAt($cycle);
+                $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+            }
+            if ($relations) {
+                $this->insertItems($relations);
+            }
         }
     }
 
