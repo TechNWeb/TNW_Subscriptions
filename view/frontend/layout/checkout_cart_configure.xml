@@ -8,9 +8,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="catalog_product_view"/>
     <body>
-        <referenceBlock name="head.components">
-            <block class="Magento\Framework\View\Element\Js\Components" name="checkout_cart_configure_head_components" template="Magento_Checkout::js/components.phtml"/>
-        </referenceBlock>
         <referenceBlock name="product.info.addtocart">
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/addtocart-tabs.phtml</argument>

@@ -5,7 +5,7 @@
     "magento/framework": ">100"
   },
   "type": "magento2-module",
-  "version": "2.2.20",
+  "version": "2.2.21",
   "autoload": {
     "files": [
       "registration.php"

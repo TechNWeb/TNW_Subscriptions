@@ -19,6 +19,7 @@ class EmailNotifier
     const XML_PATH_COMMENT_ADDED_TEMPLATE = 'tnw_subscriptions_profile_options/emails/comment_added';
     const XML_PATH_CARD_EXPIRE = 'tnw_subscriptions_profile_options/emails/card_expire';
     const XML_PATH_PAYMENT_FAILED = 'tnw_subscriptions_profile_options/emails/payment_failed';
+    const XML_PATH_OUT_OF_STOCK = 'tnw_subscriptions_profile_options/emails/out_of_stock';
     const XML_PATH_RENEWAL = 'tnw_subscriptions_profile_options/emails/renewal';
 
     /**
@@ -201,6 +202,35 @@ class EmailNotifier
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                         $customer->getStoreId()
                     )
+                ],
+                [
+                    'email' => $customer->getEmail(),
+                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                ]
+            );
+        }
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @param $products
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
+     */
+    public function outOfStockProducts($subscriptionProfile, $products)
+    {
+        if ($this->checkEmailTemplateSetting(self::XML_PATH_OUT_OF_STOCK)) {
+            $customer = $subscriptionProfile->getCustomer();
+            $this->sendNotificationEmail(
+                $this->scopeConfig->getValue(
+                    self::XML_PATH_OUT_OF_STOCK,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ),
+                $customer->getStoreId(),
+                [
+                    'subscription' => $subscriptionProfile,
+                    'customer' => $customer,
+                    'products' => implode(', ', $products)
                 ],
                 [
                     'email' => $customer->getEmail(),

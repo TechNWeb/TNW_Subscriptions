@@ -17,6 +17,9 @@ class UpdateCartItem
         $request = null,
         $processMode = \Magento\Catalog\Model\Product\Type\AbstractType::PROCESS_MODE_FULL
     ) {
+        if ($request->getAddtocartType()) {
+            return [$product, $request, $processMode];
+        }
         $modifiedRequest = $request;
         $currentConfig = $request->getDataByPath('_processing_params/current_config');
         if ($currentConfig && $currentConfig->getSubscriptionData()) {

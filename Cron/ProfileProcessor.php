@@ -93,6 +93,9 @@ class ProfileProcessor
             try {
                 $this->queueManager->placeOrderByGroupQueue($queues);
                 $this->queueManager->makeCompleted($queueIds);
+            } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
+                $this->context->messageError($e->getMessage());
+                $this->queueManager->makeCompleted($queueIds, $e->getMessage());
             } catch (\Exception $e) {
                 $this->context->messageError('Error on processing profile: %s', $e);
                 $this->queueManager->makeError($queueIds, $e->getMessage());
