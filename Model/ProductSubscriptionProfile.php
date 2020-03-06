@@ -286,9 +286,15 @@ class ProductSubscriptionProfile
      */
     public function getUnitPrice()
     {
-        $result = $this->getData(self::PRICE);
+        $result = null;
+        if (is_array($this->getData(self::PRICE))){
+            $result = $this->getData(self::PRICE)[0];
+        } else {
+            $result = $this->getData(self::PRICE);
+        }
+
         if ($this->getTnwSubscrUnlockPresetQty()) {
-            $result =  $this->getQty() ? round($result / $this->getQty()) : 0;
+            $result = $this->getQty() ? round($result / $this->getQty()) : 0;
         }
 
         return $result;
@@ -299,7 +305,13 @@ class ProductSubscriptionProfile
      */
     public function setPrice($price)
     {
-        return $this->setData(self::PRICE, $price);
+        $result = null;
+        if (is_array($price)){
+            $result = $this->setData(self::PRICE, $price[0]);
+        } else {
+            $result = $this->setData(self::PRICE, $price);
+        }
+        return $result;
     }
 
     /**
