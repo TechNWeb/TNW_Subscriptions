@@ -17,10 +17,9 @@ define([
             addToCartButtonSelector: '#product-addtocart-button',
             subscribeButtonSelector: '#product-subscribe-button',
             subscribeUrl: '#',
-            untilCancelledInputSelector: '#term',
             periodControlSelector: '#period-field',
             setQtyFromFrequency: false,
-            frequencyInputSelector: 'input[name="billing_frequency"]',
+            frequencyInputSelector: 'select[name="billing_frequency"]',
             activeInputSelector: 'input[name="subscribe_active"]',
             qtyInputSelector: '#subscribe_qty',
             minicartSelector: '[data-block="minicart"]',
@@ -30,15 +29,17 @@ define([
             buttonTextWhileAdding: '',
             buttonTextAdded: '',
             buttonTextDefault: '',
-            subscribeTabSelector: '#subscribe-tab-head',
+            subscribeTabSelector: '#addtocart_subscribe',
             subscribePriceBlockSelector: 'div.price-subscription_price',
-            addToCartTabSelector: '#addtocart-tab-head',
+            addToCartTabSelector: '#addtocart_onetime',
             addToCartPriceBlockSelector: 'div.price-final_price',
             canShowSubscribePriceBlock: false,
             savingsCalculationType: 0,
             product: {},
             selectSimpleProduct: '[name="selected_configurable_option"]',
-            childrenSelector: '.super-attribute-select'
+            childrenSelector: '.super-attribute-select',
+            subscriptionPriceBoxWithSavings: '.subscription-price-with-savings',
+            oneTimePriceBox: '.onetime-final-price'
         },
 
         containers: {
@@ -62,12 +63,22 @@ define([
          */
         _initialize: function () {
             this._updateFrequencyLabel();
+            this._updateAuxPrices();
             this.containers.addToCartPriceBox.show();
             this.containers.subscriptionPriceBox.hide();
 
             if (this.options.canShowSubscribePriceBlock) {
                 this.containers.addToCartPriceBox.hide();
                 this.containers.subscriptionPriceBox.show();
+            }
+        },
+
+        _updateAuxPrices: function() {
+            var product = this.options.product,
+                priceWithSaving = $(this.options.frequencyInputSelector + ' option:selected').data('price-with-saving');
+            $(this.options.oneTimePriceBox).html(this.containers.addToCartPriceBox.html());
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
+                $(this.options.subscriptionPriceBoxWithSavings).html(priceWithSaving);
             }
         },
 
@@ -81,26 +92,57 @@ define([
             this.containers.addToCartPriceBox = $(this.options.addToCartPriceBlockSelector);
         },
 
+        _bindSuperAttributesEvent: function() {
+            var widget = this;
+
+            if ($(widget.options.childrenSelector).length) {
+                $.each($(widget.options.childrenSelector), $.proxy(function (index, element) {
+                    $(element).on('change', function () {
+                        widget._updateAuxPrices();
+                    });
+                }));
+            } else {
+                setTimeout(this._bindSuperAttributesEvent.bind(this), 500);
+            }
+        },
+
         /**
          * Event binding
          */
         _bind: function () {
             var widget = this,
-                untilCancelledInput = $(this.options.untilCancelledInputSelector),
                 frequencyInput = $(this.options.frequencyInputSelector),
                 activeInput = $(this.options.activeInputSelector),
                 qtyInput = $(this.options.qtyInputSelector),
-                childrenSelect = $(this.options.childrenSelector);
+                childrenSelect = $(this.options.childrenSelector),
+                changeDeliveryDateLink = $('.action.change-delivery-date'),
+                updateDeliverDateButton = $('.action.update-delivery-date'),
+                startOnWrapper = $('.start-on-wrapper'),
+                startOnFormattedInput = $('#start_on_alt');
 
-            untilCancelledInput.on('change', $.proxy(function() {
-                widget._togglePeriod();
-            }, this));
+            this._bindSuperAttributesEvent();
 
-            if (this.options.setQtyFromFrequency) {
-                frequencyInput.on('change', $.proxy(function () {
+            changeDeliveryDateLink.on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                startOnWrapper.show();
+                changeDeliveryDateLink.hide();
+            });
+
+            updateDeliverDateButton.on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                changeDeliveryDateLink.show();
+                startOnWrapper.hide();
+                $('.delivery-schedule-date').html(startOnFormattedInput.val());
+            });
+
+            frequencyInput.on('change', $.proxy(function () {
+                if (this.options.setQtyFromFrequency) {
                     widget._updateQtyFromFrequency();
-                }, this));
-            }
+                }
+                widget._updateAuxPrices();
+            }, this));
 
             this.containers.subscriptionTab.on('click', $.proxy(function() {
                 activeInput.val(1);
@@ -129,7 +171,7 @@ define([
          * Set preset qty from frequency into qty input
          */
         _updateQtyFromFrequency: function () {
-            var currentFrequency = $(this.options.frequencyInputSelector + ':checked'),
+            var currentFrequency = $(this.options.frequencyInputSelector + ' option:selected'),
                 qtyInput = $(this.options.qtyInputSelector);
             qtyInput.val(Number(currentFrequency.data('preset-qty')));
         },
@@ -139,7 +181,7 @@ define([
          */
         _updateFrequencyLabel: function () {
             var widget = this,
-                frequencies = $(this.options.frequencyInputSelector),
+                frequencies = $(this.options.frequencyInputSelector + ' option'),
                 qtyInput = $(this.options.qtyInputSelector),
                 qtyValue = qtyInput.val(),
                 savingsCalculationType = parseInt(this.options.savingsCalculationType),
@@ -162,33 +204,66 @@ define([
                     frequencyUnitType = $(option).data('frequency-unit-type'),
                     calculatedUnit = widget.getCalculatedUnit(frequencyUnit, frequencyUnitType),
                     saveString = ' %p (SAVE ~%s%)';
-                $.each(option.labels, function (key, label) {
-                    resultLabel = $(label).data('default-label');
-                    if (isNeedStopCalculating === false) {
-                        var discount = 0;
-                        qtyValue = presetQty ? presetQty : qtyValue;
-                        if (savingsCalculationType === 2) {
-                            //formula for service
-                            discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * qtyValue * 100)
-                                / (productPrice * calculatedUnit);
-                        } else if (savingsCalculationType === 1) {
-                            //formula for any retail / physical product with preset qty
-                            discount = ((productPrice * qtyValue - currentFrequencyPrice) * 100)
-                                / (productPrice * qtyValue);
-                        } else {
-                            //formula for any retail / physical product
-                            discount = ((productPrice - currentFrequencyPrice) * qtyValue * 100) / productPrice;
-                        }
-                        discount = parseInt(discount);
-                        if (discount > 0) {
-                            resultLabel += $t(saveString)
-                                .replace('%p', utils.formatPrice(currentFrequencyPrice, {}))
-                                .replace('%s', discount);
-                        }
+
+                resultLabel = $(option).data('default-label');
+                if (isNeedStopCalculating === false) {
+                    var discount = 0,
+                        priceWithSaving = '';
+                    qtyValue = presetQty ? presetQty : qtyValue;
+                    if (savingsCalculationType === 2) {
+                        //formula for service
+                        discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * qtyValue * 100)
+                            / (productPrice * calculatedUnit);
+                    } else if (savingsCalculationType === 1) {
+                        //formula for any retail / physical product with preset qty
+                        discount = ((productPrice * qtyValue - currentFrequencyPrice) * 100)
+                            / (productPrice * qtyValue);
+                    } else {
+                        //formula for any retail / physical product
+                        discount = ((productPrice - currentFrequencyPrice) * qtyValue * 100) / productPrice;
                     }
-                    label.innerText = resultLabel;
-                });
+                    discount = parseInt(discount);
+                    if (discount > 0) {
+                        priceWithSaving = $t(saveString)
+                        .replace('%p', utils.formatPrice(currentFrequencyPrice, {}))
+                        .replace('%s', discount);
+                        resultLabel += priceWithSaving;
+                    } else {
+                        priceWithSaving = utils.formatPrice(currentFrequencyPrice, {});
+                    }
+
+                    if (widget.getProductTrialLabel()) {
+                        $(option).data('price-with-saving', widget.getProductTrialLabel());
+                    } else {
+                        $(option).data('price-with-saving', priceWithSaving);
+                    }
+                }
+                option.innerText = resultLabel;
             });
+        },
+
+        /**
+         * Returns product trial label
+         * @returns {boolean|string}
+         */
+        getProductTrialLabel: function() {
+            var product = this.options.product,
+                trialLabelString = $t('Try for %p %u%p'),
+                trialData = product.trial_data,
+                trialPrice = $t(' FREE');
+            if (
+                (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable')
+                && trialData
+            ) {
+                trialPrice = trialData.trial_price
+                    ? $t(', starting at ') + utils.formatPrice(trialData.trial_price, {})
+                    : trialPrice;
+                return trialLabelString
+                    .replace('%p', trialData.trial_length)
+                    .replace('%u', trialData.trial_label)
+                    .replace('%p', trialPrice)
+            }
+            return false;
         },
 
         /**
@@ -202,9 +277,9 @@ define([
                 selectedValue,
                 result = 0;
 
-            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
                 result = product.product_price;
-            } else if (product.type == 'configurable') {
+            } else if (product.type === 'configurable') {
                 selectedProduct = $(this.options.selectSimpleProduct).val();
                 selectedValue = $(this.options.childrenSelector).val();
 
@@ -228,9 +303,9 @@ define([
                 selectedProduct,
                 selectedValue,
                 frequencyData;
-            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
                 result = product.frequency_data[optionValue];
-            } else if (product.type == 'configurable') {
+            } else if (product.type === 'configurable') {
                 selectedProduct = parseInt($(this.options.selectSimpleProduct).val());
                 selectedValue = $(this.options.childrenSelector).val();
                 if (selectedProduct && selectedValue) {
@@ -266,19 +341,6 @@ define([
 
             return result;
         },
-
-        /**
-         * Show/hide period input
-         */
-        _togglePeriod: function () {
-            var untilCancelledInput = $(this.options.untilCancelledInputSelector),
-                periodControl = $(this.options.periodControlSelector);
-            if (untilCancelledInput.is(':checked')) {
-                periodControl.hide();
-            } else {
-                periodControl.show();
-            }
-        }
     });
 
     return $.mage.tnwSubscribeContainer;

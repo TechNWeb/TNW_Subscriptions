@@ -10,16 +10,9 @@
 <?php if ($block->isSubscribeAvailable()): ?>
     <?php if ($block->IsOnlySubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="1" />
-        <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
-            <div class="title-container">
-                <div class="tab-title" data-role="collapsible" tabindex="0">
-                    <a href="#subscribe-tab">
-                        <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
-                    </a>
-                </div>
-            </div>
-            <div class="content-container">
-                <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
+        <div class="tnw-addtocart-container">
+            <div class="addtocart-subscribe">
+                <div class="box-tocart">
                     <?php echo $block->getChildHtml('addtocart_subscribe') ?>
                 </div>
             </div>
@@ -33,25 +26,23 @@
         </script>
     <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="1" />
-        <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
-            <div class="title-container">
-                <div class="tab-title" id="subscribe-tab-head" data-role="collapsible" tabindex="0">
-                    <a href="#subscribe-tab">
-                        <?php /* @escapeNotVerified */ echo __('Subscribe') ?>
-                    </a>
-                </div>
-                <div class="tab-title" id="addtocart-tab-head" data-role="collapsible" tabindex="1">
-                    <a href="#addtocart-tab">
-                        <?php /* @escapeNotVerified */ echo __('One Time Purchase') ?>
-                    </a>
+        <div class="tnw-addtocart-container">
+            <div class="addtocart-onetime">
+                <input type="radio" id="addtocart_onetime" name="addtocart_type"/>
+                <label for="addtocart_onetime"><?php /* @escapeNotVerified */ echo __('One Time Purchase') ?></label>
+                <div class="onetime-final-price"></div>
+                <div class="addtocart-wrapper">
+                    <?php echo $block->getChildHtml('addtocart_orig') ?>
                 </div>
             </div>
-            <div class="content-container">
-                <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
+            <div class="addtocart-subscribe">
+                <div class="box-tocart">
+                <input type="radio" id="addtocart_subscribe" name="addtocart_type" checked/>
+                <label for="addtocart_subscribe"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></label>
+                <div class="subscription-price-with-savings"></div>
+                <div class="addtocart-wrapper">
                     <?php echo $block->getChildHtml('addtocart_subscribe') ?>
                 </div>
-                <div class="tab-content" id="addtocart-tab" data-role="content" style="display:none">
-                    <?php echo $block->getChildHtml('addtocart_orig') ?>
                 </div>
             </div>
         </div>

@@ -57,6 +57,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param SavingsCalculation $savingsCalculation
      * @param ProductTypeManagerResolver $subscriptionTypeResolver
      * @param PriceCalculator $priceCalculator
+     * @param Config\Source\TrialLengthUnitType $trialLengthUnitType
      * @param ProfileManager $profileManager
      * @param array $data
      */
@@ -78,6 +79,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         SavingsCalculation $savingsCalculation,
         ProductTypeManagerResolver $subscriptionTypeResolver,
         PriceCalculator $priceCalculator,
+        Config\Source\TrialLengthUnitType $trialLengthUnitType,
         ProfileManager $profileManager,
         array $data = []
     ) {
@@ -85,7 +87,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
             $config, $frequencyOptionRepository, $frequencyRepository, $savingsCalculation, $subscriptionTypeResolver,
-            $priceCalculator, $data);
+            $priceCalculator, $trialLengthUnitType, $data);
     }
 
     /**

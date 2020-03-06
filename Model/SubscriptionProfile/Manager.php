@@ -736,6 +736,13 @@ class Manager
         $this->getProfile()->setProducts($profileProducts);
     }
 
+    /**
+     * @param Quote $quote
+     * @param SubscriptionProfileInterface $profile
+     * @param bool $collectQuoteTotals
+     * @param bool $isReBill
+     * @throws LocalizedException
+     */
     public function populateQuoteData(
         Quote $quote,
         SubscriptionProfileInterface $profile,
@@ -746,6 +753,7 @@ class Manager
             throw new LocalizedException(__('Quote not saved'));
         }
 
+        $outOfStockProducts = [];
         $this->setProfile($profile);
 
         //Deactivate quote
@@ -774,71 +782,80 @@ class Manager
                 $profileProduct->setTrialStatus(0);
                 $magentoProduct->setTnwSubscrTrialStatus(0);
             }
-            $quoteItem = $quote->addProduct(
-                $magentoProduct,
-                $this->getProductAddRequest($profileProduct)
-            );
-
-            if (\is_string($quoteItem)) {
-                throw new LocalizedException(__($quoteItem));
+            $quoteItemCreated = true;
+            try {
+                $quoteItem = $quote->addProduct(
+                    $magentoProduct,
+                    $this->getProductAddRequest($profileProduct)
+                );
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                $quoteItemCreated = false;
+                $outOfStockProducts[$magentoProduct->getId()] = $magentoProduct->getName();
             }
+            if ($quoteItemCreated) {
+                if (\is_string($quoteItem)) {
+                    throw new LocalizedException(__($quoteItem));
+                }
 
-            $profileItemIds = $quoteItem->getData('profile_item_ids');
-            $profileItemIds[] = $profileProduct->getId();
+                $profileItemIds = $quoteItem->getData('profile_item_ids');
+                $profileItemIds[] = $profileProduct->getId();
 
-            $quoteItem->setData('profile_item_ids', array_unique($profileItemIds));
+                $quoteItem->setData('profile_item_ids', array_unique($profileItemIds));
+            }
         }
+        if (count($quote->getAllVisibleItems())) {
+            if ($collectQuoteTotals) {
+                $profileBillingAddressData = $profile->getBillingAddress()->getData();
+                unset($profileBillingAddressData['id']);
+                $profileBillingAddressData = array_filter($profileBillingAddressData);
 
-        if ($collectQuoteTotals) {
-            $profileBillingAddressData = $profile->getBillingAddress()->getData();
-            unset($profileBillingAddressData['id']);
-            $profileBillingAddressData = array_filter($profileBillingAddressData);
-
-            //Set billing address
-            $quote->getBillingAddress()->addData($profileBillingAddressData);
-            $quote->getBillingAddress()->setCustomerId(
-                $profile->getCustomerId()
-            );
-
-
-            if (!$quote->isVirtual()) {
-                $profileShippingAddressData = $profile->getShippingAddress()->getData();
-                unset($profileShippingAddressData['id']);
-                $profileShippingAddressData = array_filter($profileShippingAddressData);
-
-                //Set shipping address
-                $quote->getShippingAddress()->addData($profileShippingAddressData);
-                $quote->getShippingAddress()->setCustomerId(
+                //Set billing address
+                $quote->getBillingAddress()->addData($profileBillingAddressData);
+                $quote->getBillingAddress()->setCustomerId(
                     $profile->getCustomerId()
                 );
 
-                //Set shipping method
-                $quote->getShippingAddress()
-                    ->setCollectShippingRates(true)
-                    ->collectShippingRates()
-                    ->setShippingMethod($profile->getShippingMethod());
-            }
 
-            // Set payment method
-            $quote->getPayment()
-                ->importData($this->getEngine()->getPaymentInfo($profile))
-                ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+                if (!$quote->isVirtual()) {
+                    $profileShippingAddressData = $profile->getShippingAddress()->getData();
+                    unset($profileShippingAddressData['id']);
+                    $profileShippingAddressData = array_filter($profileShippingAddressData);
 
-            $this->quoteRepository->save($quote);
+                    //Set shipping address
+                    $quote->getShippingAddress()->addData($profileShippingAddressData);
+                    $quote->getShippingAddress()->setCustomerId(
+                        $profile->getCustomerId()
+                    );
 
-            foreach ($quote->getAllAddresses() as $address) {
-                $address->unsetData('cached_items_all');
-            }
-            foreach ($quote->getAllItems() as $item) {
-                foreach ($quote->getAllAddresses() as $address) {
-                    $address->addItem($item, $item->getQty());
+                    //Set shipping method
+                    $quote->getShippingAddress()
+                        ->setCollectShippingRates(true)
+                        ->collectShippingRates()
+                        ->setShippingMethod($profile->getShippingMethod());
                 }
-            }
 
-            $quote->setTotalsCollectedFlag(false);
-            $quote->getShippingAddressesItems();
-            $quote->collectTotals();
+                // Set payment method
+                $quote->getPayment()
+                    ->importData($this->getEngine()->getPaymentInfo($profile))
+                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
+                $this->quoteRepository->save($quote);
+
+                foreach ($quote->getAllAddresses() as $address) {
+                    $address->unsetData('cached_items_all');
+                }
+                foreach ($quote->getAllItems() as $item) {
+                    foreach ($quote->getAllAddresses() as $address) {
+                        $address->addItem($item, $item->getQty());
+                    }
+                }
+
+                $quote->setTotalsCollectedFlag(false);
+                $quote->getShippingAddressesItems();
+                $quote->collectTotals();
+            }
         }
+        return $outOfStockProducts;
     }
 
     /**
