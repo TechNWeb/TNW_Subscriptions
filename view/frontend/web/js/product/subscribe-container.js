@@ -74,10 +74,10 @@ define([
         },
 
         _updateAuxPrices: function() {
-            var priceWithSaving = $(this.options.frequencyInputSelector + ' option:selected')
-                .data('price-with-saving');
+            var product = this.options.product,
+                priceWithSaving = $(this.options.frequencyInputSelector + ' option:selected').data('price-with-saving');
             $(this.options.oneTimePriceBox).html(this.containers.addToCartPriceBox.html());
-            if (this.options.product.type !== 'configurable') {
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
                 $(this.options.subscriptionPriceBoxWithSavings).html(priceWithSaving);
             }
         },
@@ -231,10 +231,39 @@ define([
                     } else {
                         priceWithSaving = utils.formatPrice(currentFrequencyPrice, {});
                     }
-                    $(option).data('price-with-saving', priceWithSaving);
+
+                    if (widget.getProductTrialLabel()) {
+                        $(option).data('price-with-saving', widget.getProductTrialLabel());
+                    } else {
+                        $(option).data('price-with-saving', priceWithSaving);
+                    }
                 }
                 option.innerText = resultLabel;
             });
+        },
+
+        /**
+         * Returns product trial label
+         * @returns {boolean|string}
+         */
+        getProductTrialLabel: function() {
+            var product = this.options.product,
+                trialLabelString = $t('Try for %p %u%p'),
+                trialData = product.trial_data,
+                trialPrice = $t(' FREE');
+            if (
+                (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable')
+                && trialData
+            ) {
+                trialPrice = trialData.trial_price
+                    ? $t(', starting at ') + utils.formatPrice(trialData.trial_price, {})
+                    : trialPrice;
+                return trialLabelString
+                    .replace('%p', trialData.trial_length)
+                    .replace('%u', trialData.trial_label)
+                    .replace('%p', trialPrice)
+            }
+            return false;
         },
 
         /**
@@ -248,9 +277,9 @@ define([
                 selectedValue,
                 result = 0;
 
-            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
                 result = product.product_price;
-            } else if (product.type == 'configurable') {
+            } else if (product.type === 'configurable') {
                 selectedProduct = $(this.options.selectSimpleProduct).val();
                 selectedValue = $(this.options.childrenSelector).val();
 
@@ -274,9 +303,9 @@ define([
                 selectedProduct,
                 selectedValue,
                 frequencyData;
-            if (product.type == 'simple' || product.type == 'virtual' || product.type == 'downloadable') {
+            if (product.type === 'simple' || product.type === 'virtual' || product.type === 'downloadable') {
                 result = product.frequency_data[optionValue];
-            } else if (product.type == 'configurable') {
+            } else if (product.type === 'configurable') {
                 selectedProduct = parseInt($(this.options.selectSimpleProduct).val());
                 selectedValue = $(this.options.childrenSelector).val();
                 if (selectedProduct && selectedValue) {

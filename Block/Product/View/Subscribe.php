@@ -79,6 +79,11 @@ class Subscribe extends View
     private $priceCalculator;
 
     /**
+     * @var Config\Source\TrialLengthUnitType
+     */
+    private $trialLengthUnitType;
+
+    /**
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
@@ -95,6 +100,8 @@ class Subscribe extends View
      * @param FrequencyRepository $frequencyRepository
      * @param SavingsCalculation $savingsCalculation
      * @param ProductTypeManagerResolver $subscriptionTypeResolver
+     * @param PriceCalculator $priceCalculator
+     * @param Config\Source\TrialLengthUnitType $trialLengthUnitType
      * @param array $data
      */
     public function __construct(
@@ -115,6 +122,7 @@ class Subscribe extends View
         SavingsCalculation $savingsCalculation,
         ProductTypeManagerResolver $subscriptionTypeResolver,
         PriceCalculator $priceCalculator,
+        Config\Source\TrialLengthUnitType $trialLengthUnitType,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
@@ -124,6 +132,7 @@ class Subscribe extends View
         $this->savingsCalculation = $savingsCalculation;
         $this->subscriptionTypeResolver = $subscriptionTypeResolver;
         $this->priceCalculator = $priceCalculator;
+        $this->trialLengthUnitType = $trialLengthUnitType;
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
@@ -399,13 +408,13 @@ class Subscribe extends View
     {
         $type = $this->getProduct()->getTypeId();
         $subsProductType = $this->subscriptionTypeResolver->resolve($type);
+        $productData = $subsProductType->getProductDataObject($this->getProduct());
 
         $result = [
             'type' => $type,
             'product_price' => $this->getProduct()->getFinalPrice(),
-            'frequency_data' => $this->getFrequencyPricesByProduct(
-                $subsProductType->getProductDataObject($this->getProduct())
-            ),
+            'frequency_data' => $this->getFrequencyPricesByProduct($productData),
+            'trial_data' => $this->getTrialDataByProduct($productData),
         ];
 
         switch ($type) {
@@ -426,6 +435,9 @@ class Subscribe extends View
                         ['child_product' => $childProduct]
                     );
                     $childArray[$childProduct->getId()]['frequency_data'] = $this->getFrequencyPricesByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['trial_data'] = $this->getTrialDataByProduct(
                         $productDataObject
                     );
                 }
@@ -460,6 +472,27 @@ class Subscribe extends View
         }
 
         return $result;
+    }
+
+    /**
+     * Return trial data array if product has trial
+     * @param DataObject $productDataObject
+     * @return array|null
+     */
+    protected function getTrialDataByProduct(DataObject $productDataObject)
+    {
+        if ($productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
+            return [
+                'trial_price' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
+                'trial_length' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
+                'trial_length_unit' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                'trial_label' => strtolower($this->trialLengthUnitType->getLabelByValueAndLength(
+                    (int)$productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                    $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH))
+                )
+            ];
+        }
+        return null;
     }
 
     /**
