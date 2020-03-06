@@ -54,6 +54,20 @@
             <div class="control">
                 <?php if ($block->getIsInfiniteSubscriptions()): ?>
                     <span><?php echo __('Until canceled') ?></span>
+                    <input type="hidden"
+                           name="term"
+                           class="input-text qty"
+                           data-validate='{"required-number":true}'
+                           value="1"
+                           checked="checked"
+                    >
+                    <input type="hidden"
+                           name="period"
+                           id="period"
+                           class="input-text qty"
+                           data-validate='{"required-number":true}'
+                           value="<?php echo $block->getDefaultPeriod() ?>"
+                    >
                 <?php else: ?>
                     <div>
                         <input type="radio" id="term1" name="term" value="1"
