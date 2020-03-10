@@ -144,6 +144,10 @@ class Subscribe extends View
      */
     public function getProduct()
     {
+        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+            $productId = $this->getItem()->getProduct()->getId();
+            return $this->productRepository->getById($productId);
+        }
         if (!$this->_coreRegistry->registry('product')) {
             $productId = $this->getRequest()->getParam('id');
             $product = $this->productRepository->getById($productId);
@@ -224,15 +228,15 @@ class Subscribe extends View
      */
     private function getProductBillingFrequencies()
     {
-        if (!$this->hasData('product_billing_frequencies')) {
+        if (!$this->getProduct()->hasData('product_billing_frequencies')) {
             $productId = $this->getProduct()->getId();
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($productId)
                 ->getItems();
-            $this->setData('product_billing_frequencies', $productBillingFrequencies);
+            $this->getProduct()->setData('product_billing_frequencies', $productBillingFrequencies);
         }
 
-        return $this->getData('product_billing_frequencies');
+        return $this->getProduct()->getData('product_billing_frequencies');
     }
 
     /**
