@@ -159,6 +159,46 @@
   }
 }
 
+.checkout-cart-index {
+    .addtocart-subscribe,
+    .addtocart-onetime {
+        .addtocart-wrapper {
+            padding: 1rem 0 1rem 2.2rem;
+            .fieldset {
+                margin-bottom: 1rem;
+            }
+            .period {
+                width: 54px;
+            }
+            .subscribe-container {
+                padding: 1rem;
+                background: #eee;
+                border-radius: 0.5rem;
+            }
+            .start-on {
+                width: 100px;
+            }
+        }
+
+        >input:not([type=hidden]):not(:checked) ~ .addtocart-wrapper {
+            display: none;
+        }
+
+        >input:checked ~ label {
+            font-weight: bold;
+        }
+
+        >input[type=hidden] {
+            ~ label {
+                display: none;
+            }
+            ~ .addtocart-wrapper {
+                padding-left: 0;
+            }
+        }
+    }
+}
+
 .catalog-product-view {
     .tnw-addtocart-container {
         input[name="addtocart_type"] {
