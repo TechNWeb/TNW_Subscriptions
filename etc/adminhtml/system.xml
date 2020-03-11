@@ -28,6 +28,11 @@
                     <source_model>TNW\Subscriptions\Model\Config\Source\Enabledisable</source_model>
                     <comment>Enable or disable recurring subscription capabilites in Magento.</comment>
                 </field>
+                <field id="allow_edit_cart" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1">
+                    <label>Allow edit in cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable or disable edit of recurring subscription in cart.</comment>
+                </field>
             </group>
 
             <group id="advanced" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
@@ -54,7 +59,7 @@
                     <field id="db_log_limit" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0">
                         <label>DB Log Limit</label>
                         <config_path>tnw_subscriptions_general/advanced/db_log_limit</config_path>
-                        <comment>Maximum number of rows to retain in the database before data is purged.</comment>  
+                        <comment>Maximum number of rows to retain in the database before data is purged.</comment>
                         <depends>
                             <field id="db_status">1</field>
                         </depends>

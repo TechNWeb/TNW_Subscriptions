@@ -58,12 +58,7 @@ class TokenExtractor
         $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
     }
 
-    /**
-     * @param $response
-     * @return array
-     * @throws \Exception
-     */
-    public function getPaymentTokenWithTransactionId($response)
+    public function getPaymentTokenWithTransactionId($response, $quote = null)
     {
         $transaction = $this->subjectReader->readTransaction($response);
         return [

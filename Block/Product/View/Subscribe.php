@@ -141,9 +141,21 @@ class Subscribe extends View
      * Retrieve current product model.
      *
      * @return ProductInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getProduct()
     {
+        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+            $productId = $this->getItem()->getProduct()->getId();
+            $product = $this->productRepository->getById($productId);
+            if (!$product->hasPreconfiguredValues() || $product->getQuoteItemId() !== $this->getItem()->getId()) {
+                $buyRequest = $this->getItem()->getBuyRequest();
+                $optionValues = $product->processBuyRequest($buyRequest);
+                $product->setPreconfiguredValues($optionValues);
+                $product->setQuoteItemId($this->getItem()->getId());
+            }
+            return $product;
+        }
         if (!$this->_coreRegistry->registry('product')) {
             $productId = $this->getRequest()->getParam('id');
             $product = $this->productRepository->getById($productId);
@@ -224,15 +236,15 @@ class Subscribe extends View
      */
     private function getProductBillingFrequencies()
     {
-        if (!$this->hasData('product_billing_frequencies')) {
+        if (!$this->getProduct()->hasData('product_billing_frequencies')) {
             $productId = $this->getProduct()->getId();
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($productId)
                 ->getItems();
-            $this->setData('product_billing_frequencies', $productBillingFrequencies);
+            $this->getProduct()->setData('product_billing_frequencies', $productBillingFrequencies);
         }
 
-        return $this->getData('product_billing_frequencies');
+        return $this->getProduct()->getData('product_billing_frequencies');
     }
 
     /**
@@ -349,6 +361,26 @@ class Subscribe extends View
         return null !== $startOn
             ? (string)$startOn :
             $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
+    }
+
+    /**
+     * Get preconfigured options for configurable product
+     * @return array|null
+     */
+    public function getPreconfiguredOptions()
+    {
+        $options = $this->preconfiguredValue('super_attribute');
+        return null !== $options ? $options : null;
+    }
+
+    /**
+     * Get preconfigured custom options for configurable product
+     * @return array|null
+     */
+    public function getPreconfiguredCustomOptions()
+    {
+        $options = $this->preconfiguredValue('options');
+        return null !== $options ? $options : null;
     }
 
     /**

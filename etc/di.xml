@@ -1114,6 +1114,17 @@
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
                     <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
                     <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="extendedVoid" xsi:type="boolean">false</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\DataBuilder</item>
+                    <item name="authClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="cancelClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Paypal\TokenExtractor</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                    <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                    <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
                 </item>
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
@@ -1123,9 +1134,13 @@
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
                     <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
                     <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="extendedVoid" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </arguments>
+    </type>
+    <type name="Magento\Payment\Model\Checks\ZeroTotal">
+        <plugin name="tnw_trial_validator" type="TNW\Subscriptions\Plugin\Payment\Model\Checks\ZeroTotal"/>
     </type>
     <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
         <plugin name="tnw_subscriptions_item_price" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig"/>
@@ -1134,6 +1149,12 @@
         <plugin name="validator_fix" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Validator\ErrorCodeProvider"/>
     </type>
     <type name="Magento\Quote\Model\Quote">
-        <plugin name="tnw_subscriptions_update_cart_item" type="TNW\Subscriptions\Plugin\Quote\Model\UpdateCartItem"/>
+        <plugin name="tnw_subscriptions_update_quote_item" type="TNW\Subscriptions\Plugin\Quote\Model\UpdateQuoteItem"/>
+    </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="tnw_subscriptions_update_cart_items" type="TNW\Subscriptions\Plugin\Checkout\Model\UpdateCartItems"/>
+    </type>
+    <type name="Magento\Vault\Model\PaymentTokenManagement">
+        <plugin name="token_save_fix" type="TNW\Subscriptions\Plugin\Vault\Model\PaymentTokenManagement"/>
     </type>
 </config>

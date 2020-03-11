@@ -920,8 +920,8 @@ class Manager
         $expirationYear = date('Y', $expiresAt);
         $data = [
            'encoded_payment_additional_info' => [
-               'cc_type' => $details['type'],
-               'cc_last_4' => $details['maskedCC'],
+               'cc_type' => isset($details['type']) ? $details['type'] : $details['cc_type'],
+               'cc_last_4' => isset($details['maskedCC']) ? $details['maskedCC'] : $details['cc_last_4'],
                'cc_exp_month' => $expirationMonth,
                'cc_exp_year' => $expirationYear
            ],
