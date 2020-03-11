@@ -29,6 +29,9 @@
                                                     </item>
                                                     <item name="children" xsi:type="array">
                                                         <item name="details" xsi:type="array">
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/item/details</item>
+                                                            </item>
                                                             <item name="children" xsi:type="array">
                                                                 <item name="subtotal" xsi:type="array">
                                                                     <item name="config" xsi:type="array">

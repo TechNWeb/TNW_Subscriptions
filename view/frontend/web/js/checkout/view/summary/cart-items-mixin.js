@@ -61,8 +61,8 @@ define([
              */
             allowDisplayQtyItem: function (item) {
                 var quoteItem = quote.getItem(item['item_id']);
-                if (null !== quoteItem) {
-                    return quoteItem['tnw_subscr_hide_qty'] == "0" ? true : false;
+                if (null !== quoteItem && quoteItem['product']['tnw_subscr_hide_qty'] !== undefined) {
+                    return Number.parseInt(quoteItem['product']['tnw_subscr_hide_qty']) === 0;
                 }
                 return true;
             },
