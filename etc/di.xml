@@ -1154,4 +1154,7 @@
     <type name="Magento\Checkout\Model\Cart">
         <plugin name="tnw_subscriptions_update_cart_items" type="TNW\Subscriptions\Plugin\Checkout\Model\UpdateCartItems"/>
     </type>
+    <type name="Magento\Vault\Model\PaymentTokenManagement">
+        <plugin name="token_save_fix" type="TNW\Subscriptions\Plugin\Vault\Model\PaymentTokenManagement"/>
+    </type>
 </config>
