@@ -1,0 +1,182 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+namespace TNW\Subscriptions\Model\Payment\Paypal;
+
+use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+
+/**
+ * Class DataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Paypal
+ */
+class DataBuilder
+{
+    use \Magento\Payment\Helper\Formatter;
+
+    /**
+     * @var \Magento\Paypal\Model\PayflowConfigFactory
+     */
+    private $configFactory;
+
+    /**
+     * @var
+     */
+    private $methodCode;
+
+    /**
+     * Core store config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var Manager
+     */
+    private $manager;
+
+    /**
+     * @var SubscriptionConfig
+     */
+    private $subscriptionConfig;
+
+    /**
+     * DataBuilder constructor.
+     * @param \Magento\Paypal\Model\PayflowConfigFactory $configFactory
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param SubscriptionConfig $subscriptionConfig
+     * @param Manager $manager
+     */
+    public function __construct(
+        \Magento\Paypal\Model\PayflowConfigFactory $configFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        SubscriptionConfig $subscriptionConfig,
+        Manager $manager
+    ) {
+        $this->manager = $manager;
+        $this->subscriptionConfig = $subscriptionConfig;
+        $this->scopeConfig = $scopeConfig;
+        $this->configFactory = $configFactory;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @param $paymentData
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    public function build($quote, $paymentInfo)
+    {
+        $paymentData = $quote->getPayment()->getData();
+        $amount = $this->getAmount($quote);
+        $storeId = $quote->getStoreId();
+        $this->methodCode = $quote->getPayment()->getMethod();
+        $config = $this->configFactory->create();
+        $config->setStoreId($storeId);
+        $config->setMethodInstance($quote->getPayment()->getMethodInstance());
+        $config->setMethod($this->methodCode);
+        $orderIncrementId = $quote->getReservedOrderId();
+        $billing = $quote->getBillingAddress();
+        $totals = $quote->getTotals();
+        $token = $paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF];
+        $requestData = [
+            'user' => $this->getConfigData('user'),
+            'vendor' => $this->getConfigData('vendor'),
+            'partner' => $this->getConfigData('partner'),
+            'pwd' => $this->getConfigData('pwd'),
+            'verbosity' => $this->getConfigData('verbosity'),
+            'BUTTONSOURCE' => $config->getBuildNotationCode(),
+            'tender' => \Magento\Paypal\Model\Payflowpro::TENDER_CC,
+            'custref' => $orderIncrementId,
+            'invnum' => $orderIncrementId,
+            'comment1' => $orderIncrementId,
+            'email' => $quote->getCustomerEmail(),
+            'firstname' => $billing->getFirstname(),
+            'lastname' => $billing->getLastname(),
+            'street' =>  implode(' ', $billing->getStreet()),
+            'city' => $billing->getCity(),
+            'state' =>  $billing->getRegionCode(),
+            'zip' => $billing->getPostcode(),
+            'county' => $billing->getCountryId(),
+            'trxtype' => \Magento\Paypal\Model\Payflowpro::TRXTYPE_AUTH_ONLY,
+            'origid' => $token,
+            'amt' => $this->formatPrice($amount),
+            'currency' => $quote->getBaseCurrencyCode(),
+            'itemamt' => $this->formatPrice($amount),
+            'taxamt' => $this->formatPrice($totals['tax']->getValue()),
+            'freightamt' => $this->formatPrice($totals['shipping']->getValue()),
+            'discount' => $this->formatPrice(0)
+        ];
+        $shipping = $quote->getShippingAddress();
+        if (!empty($shipping)) {
+            $requestData['shiptofirstname'] =
+                $shipping->getFirstname();
+            $requestData['shiptolastname'] =
+                $shipping->getLastname();
+            $requestData['shiptostreet'] =
+                implode(' ', $shipping->getStreet());
+            $requestData['shiptocity'] =
+                $shipping->getCity();
+            $requestData['shiptostate'] =
+                $shipping->getRegionCode();
+            $requestData['shiptozip'] =
+                $shipping->getPostcode();
+            $requestData['shiptocountry'] =
+                $shipping->getCountryId();
+        }
+        return [
+            'requestData' => $requestData,
+            'config' => $config
+        ];
+    }
+
+
+    /**
+     * @param $field
+     * @param null $storeId
+     * @return mixed
+     */
+    private function getConfigData($field, $storeId = null)
+    {
+        $path = 'payment/' . $this->methodCode . '/' . $field;
+        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $order
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    private function getAmount($order)
+    {
+        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId())) {
+            $result = $this->subscriptionConfig->getStaticAuthAmount($order->getStoreId());
+        } else {
+            $subscriptionItems = [];
+            foreach ($order->getAllVisibleItems() as $item) {
+                $option = $item->getOptionByCode('subscription');
+                if (null !== $option) {
+                    $subscriptionItems[] = $item;
+                }
+            }
+            if ($subscriptionItems) {
+                $this->manager->populateProfileData($order, $subscriptionItems);
+            }
+            $profile = $this->manager->getProfile();
+            $products = $profile->getProfileProducts();
+            $amount = 0;
+            foreach ($products as $product) {
+                $amount += (float)$product->getPrice();
+            }
+            $result = $amount;
+        }
+        return $result;
+    }
+}
