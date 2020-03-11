@@ -35,23 +35,16 @@ class PaymentTokenManagement
      */
     public function aroundSaveTokenWithPaymentLink($subject, $proceed, $token, $payment)
     {
-        $tokenDuplicate = $subject->getByPublicHash(
-            $token->getPublicHash(),
+        $tokenDuplicate = $subject->getByGatewayToken(
+            $token->getGatewayToken(),
+            $token->getPaymentMethodCode(),
             $token->getCustomerId()
         );
-        if (empty($tokenDuplicate)) {
-            $tokenDuplicate = $subject->getByGatewayToken(
-                $token->getGatewayToken(),
-                $token->getPaymentMethodCode(),
-                $token->getCustomerId()
-            );
-        } else {
-            return $proceed($token, $payment);
-        }
 
         if (!empty($tokenDuplicate)) {
             if ($token->getIsVisible() || $tokenDuplicate->getIsVisible()) {
                 $token->setEntityId($tokenDuplicate->getEntityId());
+                $token->setPublicHash($tokenDuplicate->getPublicHash());
                 $token->setIsVisible(true);
             } elseif ($token->getIsVisible() === $tokenDuplicate->getIsVisible()) {
                 $token->setEntityId($tokenDuplicate->getEntityId());
