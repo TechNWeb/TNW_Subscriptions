@@ -2,7 +2,7 @@
 
 namespace TNW\Subscriptions\Plugin\Quote\Model;
 
-class UpdateCartItem
+class UpdateQuoteItem
 {
     /**
      * @param \Magento\Quote\Model\Quote $subject

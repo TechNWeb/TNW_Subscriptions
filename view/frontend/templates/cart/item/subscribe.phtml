@@ -11,14 +11,37 @@ $block->getProduct()->setPriceCalculation();
 $_item = $block->getItem();
 $_itemId = $_item->getId();
 $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
+$configurableOptions = $block->getPreconfiguredOptions();
+$customOptions = $block->getPreconfiguredCustomOptions();
 ?>
 <?php if ($block->isSubscribeAvailable()) : ?>
-    <?php if ($block->IsOneTimeAndSubscribePurchase()): ?>
+    <?php if ($block->IsOneTimeAndSubscribePurchase() || $block->IsOnlySubscribePurchase()) : ?>
     <div class="product-item-subscription-details">
-        <input type="hidden" name="subscribe_active" value="1" />
         <div class="tnw-addtocart-container">
+            <input type="hidden" name="cart[<?= $_itemId; ?>][addtocart_type]" value="1"/>
+            <?php if (is_array($configurableOptions)) : ?>
+                <?php foreach ($configurableOptions as $attributeId => $attributeValue) : ?>
+                    <input type="hidden"
+                           name="cart[<?= $_itemId; ?>][super_attribute][<?= $attributeId; ?>]"
+                           value="<?= $attributeValue; ?>"
+                    >
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <?php if (is_array($customOptions)) : ?>
+                <?php foreach ($customOptions as $optionId => $optionValue) : ?>
+                    <input type="hidden"
+                           name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>]"
+                           value="<?= $optionValue; ?>"
+                    >
+                <?php endforeach; ?>
+            <?php endif; ?>
             <div class="addtocart-subscribe">
-                <input type="radio"
+                <input
+                    <?php if ($block->IsOnlySubscribePurchase()) : ?>
+                       type="hidden"
+                    <?php else : ?>
+                       type="radio"
+                    <?php endif; ?>
                        id="cart-<?= $_itemId; ?>-subscribe"
                        name="cart[<?= $_itemId; ?>][subscribe_active]"
                        value="1"
@@ -30,11 +53,10 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                 <div class="addtocart-wrapper">
                     <div class="subscribe-container">
                         <div class="fieldset">
-                            <div class="field required">
+                            <div class="field">
                                 <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
                                 <select name="cart[<?= $_itemId; ?>][billing_frequency]"
-                                        id="cart[<?= $_itemId; ?>][billing_frequency]"
-                                        class="required">
+                                        id="cart[<?= $_itemId; ?>][billing_frequency]">
                                     <?php foreach ($block->getFrequencyOptions() as $option): ?>
                                         <option id="billing_frequency_<?php echo $option['value'] ?>"
                                                 value="<?php echo $option['value'] ?>"
@@ -50,23 +72,15 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                                             <?php if (isset($option['frequency_unit_type'])): ?>
                                                 data-frequency-unit-type="<?php echo $option['frequency_unit_type'] * 1 ?>"
                                             <?php endif ?>
-                                                data-default-label="
-                                            <?php echo $option['label'] ?>
-                                            <?php if ($option['is_default']): ?>
-                                            &nbsp;<?php echo __('(most common)'); ?>
-                                            <?php endif ?>"
                                         >
                                             <?php echo $option['label'] ?>
-                                            <?php if ($option['is_default']): ?>
-                                                &nbsp;<?php echo __('(most common)'); ?>
-                                            <?php endif ?>
                                         </option>
                                     <?php endforeach ?>
                                 </select>
                             </div>
                         </div>
                         <div class="fieldset">
-                            <div class="field term required">
+                            <div class="field term">
                                 <label class="label"><span><?php echo __('Term') ?>:</span></label>
                                 <div class="control">
                                     <?php if ($block->getIsInfiniteSubscriptions()): ?>
@@ -104,13 +118,16 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                                                    id="cart-<?= $_itemId ?>-term0"
                                                    name="cart[<?= $_itemId ?>][term]"
                                                    value="0"
+                                                <?php if (!$block->getDefaultUntilCancelled()): ?>
+                                                    checked="checked"
+                                                <?php endif ?>
                                             />
                                             <label class="label" for="cart-<?= $_itemId ?>-term0">
                                                 <span><?php echo __('Stop after') ?></span>
                                                 <input type="number"
                                                        name="cart[<?= $_itemId ?>][period]"
                                                        id="cart-<?= $_itemId ?>-period"
-                                                       class="input-text qty"
+                                                       class="input-text period"
                                                        data-validate='{"required-number":true}'
                                                        value="<?php echo $block->getDefaultPeriod() ?>"
                                                 >
@@ -123,7 +140,7 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                         </div>
                         <?php if ($block->getIsVisibleStartOn()): ?>
                             <div class="fieldset">
-                                <div class="field date required">
+                                <div class="field date">
                                     <label class="label"><span><?php echo __('Delivery Schedule') ?>:</span></label>
                                     <div class="control delivery-schedule">
                                         <span><?php echo __('First delivery on'); ?></span>
@@ -132,15 +149,15 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                                                name="cart[<?= $_itemId ?>][start_on_alt]"
                                                id="cart-<?= $_itemId ?>-start_on_alt"
                                         />
-                                        <a href="#" class="action change-delivery-date"><?php echo __('change') ?></a>
-                                        <span class="start-on-wrapper hidden">
+                                        <a href="#" class="action change-delivery-date-<?= $_itemId ?>"><?php echo __('change') ?></a>
+                                        <span class="start-on-wrapper-<?= $_itemId ?> hidden">
                                             <input type="text"
                                                    name="cart[<?= $_itemId ?>][start_on]"
+                                                   class="start-on"
                                                    id="cart-<?= $_itemId ?>-start_at"
-                                                   class="required"
                                                    value="<?php echo $block->getDefaultStartOn() ?>"
                                             />
-                                            <a href="#" class="action update-delivery-date"><?php echo __('Update') ?></a>
+                                            <a href="#" class="action update-delivery-date-<?= $_itemId ?>"><?php echo __('Update') ?></a>
                                         </span>
                                     </div>
                                 </div>
@@ -153,6 +170,11 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                                 "jquery",
                                 "mage/calendar"
                             ], function($) {
+                                var changeDeliveryDateLink = $('.action.change-delivery-date-<?= $_itemId ?>'),
+                                    updateDeliverDateButton = $('.action.update-delivery-date-<?= $_itemId ?>'),
+                                    startOnWrapper = $('.start-on-wrapper-<?= $_itemId ?>'),
+                                    startOnFormattedInput = $('#cart-<?= $_itemId ?>-start_on_alt'),
+                                    deliveryScheduleDate = $('.cart-<?= $_itemId ?>-delivery-schedule-date');
                                 $("#cart-<?= $_itemId ?>-start_at").calendar({
                                     showsTime: false,
                                     dateFormat: "<?php echo $block->getDateFormat() ?>",
@@ -163,12 +185,27 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                                     altField: "#cart-<?= $_itemId ?>-start_on_alt",
                                     altFormat: "MM dd"
                                 }).datepicker('setDate', '<?php echo $block->getDefaultStartOn() ?>');
-                                $('.cart-<?= $_itemId ?>-delivery-schedule-date').html($('#cart-<?= $_itemId ?>-start_on_alt').val());
+                                deliveryScheduleDate.html($('#cart-<?= $_itemId ?>-start_on_alt').val());
+                                changeDeliveryDateLink.on('click', function (e) {
+                                    e.stopImmediatePropagation();
+                                    e.preventDefault();
+                                    startOnWrapper.show();
+                                    changeDeliveryDateLink.hide();
+                                });
+                                updateDeliverDateButton.on('click', function (e) {
+                                    e.stopImmediatePropagation();
+                                    e.preventDefault();
+                                    changeDeliveryDateLink.show();
+                                    startOnWrapper.hide();
+                                    deliveryScheduleDate.html(startOnFormattedInput.val());
+                                });
                             });
                         </script>
                     <?php endif ?>
                 </div>
             </div>
+    <?php endif; ?>
+    <?php if ($block->IsOneTimeAndSubscribePurchase()): ?>
             <div class="addtocart-onetime">
                 <input type="radio"
                        id="cart-<?= $_itemId; ?>-onetime"
@@ -180,9 +217,7 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
                 />
                 <label for="cart-<?= $_itemId; ?>-onetime"><?php /* @escapeNotVerified */ echo __('One Time Purchase') ?></label>
             </div>
+    <?php endif; ?>
         </div>
     </div>
-    <?php elseif ($block->IsOnlySubscribePurchase()) : ?>
-
-    <?php endif; ?>
 <?php endif; ?>
