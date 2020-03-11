@@ -4,6 +4,7 @@
 /** @var $groupsViewModel \TNW\Subscriptions\Block\Cart\Groups */
 $groupsViewModel = $block->getGroupsViewModel();
 $_item = $block->getItem();
+$_itemId = $_item->getId();
 $product = $_item->getProduct();
 $isVisibleProduct = $product->isVisibleInSiteVisibility();
 /** @var \Magento\Msrp\Helper\Data $helper */
@@ -61,6 +62,9 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
                 <?php if ($addInfoBlock) :?>
                     <?= $addInfoBlock->setItem($_item)->toHtml() ?>
                 <?php endif;?>
+                <?php if ($block->getChildBlock('subscribe-renderer')) : ?>
+                    <?= $block->getChildBlock('subscribe-renderer')->setItem($_item)->toHtml(); ?>
+                <?php endif; ?>
             </div>
         </td>
 

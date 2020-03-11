@@ -10,26 +10,31 @@
             <arguments>
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
+            <block name="checkout.cart.item.renderers.default.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
         <referenceBlock name="checkout.cart.item.renderers.simple" template="TNW_Subscriptions::cart/item/default.phtml">
             <arguments>
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
+            <block name="checkout.cart.item.renderers.simple.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
         <referenceBlock name="checkout.cart.item.renderers.virtual" template="TNW_Subscriptions::cart/item/default.phtml">
             <arguments>
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
+            <block name="checkout.cart.item.renderers.virtual.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
         <referenceBlock name="checkout.cart.item.renderers.downloadable" template="TNW_Subscriptions::cart/item/default.phtml">
             <arguments>
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
+            <block name="checkout.cart.item.renderers.downloadable.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
         <referenceBlock name="checkout.cart.item.renderers.configurable" template="TNW_Subscriptions::cart/item/default.phtml">
             <arguments>
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
+            <block name="checkout.cart.item.renderers.configurable.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
     </body>
 </page>

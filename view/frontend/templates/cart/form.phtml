@@ -5,8 +5,8 @@
  */
 // @codingStandardsIgnoreFile
 
-/**  @var $block \TNW\Subscriptions\Block\Cart\Grid */
-/**  @var $groupsViewModel \TNW\Subscriptions\Block\Cart\Groups */
+/**  @var $block Magento\Checkout\Block\Cart\Grid */
+/**  @var $groupsViewModel TNW\Subscriptions\Block\Cart\Groups */
 $groupsViewModel = $block->getGroupsViewModel();
 ?>
 <?php $mergedCells = ($this->helper(Magento\Tax\Helper\Data::class)->displayCartBothPrices() ? 2 : 1); ?>
@@ -52,6 +52,7 @@ $groupsViewModel = $block->getGroupsViewModel();
                 </tbody>
         </table>
     </div>
+    <?php endforeach; ?>
     <div class="cart main actions">
         <button type="submit"
                 name="update_cart_action"
@@ -61,7 +62,6 @@ $groupsViewModel = $block->getGroupsViewModel();
             <span><?= /* @escapeNotVerified */ __('Update Shopping Cart') ?></span>
         </button>
     </div>
-    <?php endforeach; ?>
 </form>
 <?= $block->getChildHtml('checkout.cart.order.actions') ?>
 <?= $block->getChildHtml('shopping.cart.table.after') ?>
