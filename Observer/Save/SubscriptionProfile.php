@@ -54,7 +54,8 @@ class SubscriptionProfile implements ObserverInterface
 
         $totals = $quote->getTotals();
         if ($profile->getStatus() == ProfileStatus::STATUS_TRIAL) {
-            $profileProduct = $profile->getProfileProducts()[0];
+            $profileProducts = array_values($profile->getProfileProducts());
+            $profileProduct = array_shift($profileProducts);
             $price = $profileProduct->getPrice();
             $totals['grand_total']->setValue(
                 $totals['grand_total']->getValue() - $totals['subtotal']->getValue() + $price
