@@ -178,15 +178,6 @@
             </argument>
         </insertForm>
     </fieldset>
-    <fieldset name="upcoming_orders">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="collapsible" xsi:type="boolean">false</item>
-                <item name="label" translate="true" xsi:type="string">Future Orders</item>
-                <item name="tabLabel" translate="true" xsi:type="string">Upcoming Orders</item>
-            </item>
-        </argument>
-    </fieldset>
     <fieldset name="order_history">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
