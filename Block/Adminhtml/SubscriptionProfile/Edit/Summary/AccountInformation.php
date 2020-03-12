@@ -204,7 +204,7 @@ class AccountInformation extends Template
     public function getCustomerUrl()
     {
         if ($this->getCustomer()->getId()) {
-            $url = $this->_urlBuilder->getUrl('admin/customer/edit', ['id' => $this->getCustomer()->getId()]);
+            $url = $this->_urlBuilder->getUrl('customer/index/edit', ['id' => $this->getCustomer()->getId()]);
         } else {
             $url = '#';
         }
