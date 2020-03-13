@@ -29,10 +29,19 @@ $customOptions = $block->getPreconfiguredCustomOptions();
             <?php endif; ?>
             <?php if (is_array($customOptions)) : ?>
                 <?php foreach ($customOptions as $optionId => $optionValue) : ?>
-                    <input type="hidden"
-                           name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>]"
-                           value="<?= $optionValue; ?>"
-                    >
+                    <?php if (is_array($optionValue)) : ?>
+                        <?php foreach ($optionValue as $checkboxValue) : ?>
+                        <input type="hidden"
+                               name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>][]"
+                               value="<?= $checkboxValue; ?>"
+                        >
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <input type="hidden"
+                                   name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>]"
+                                   value="<?= $optionValue; ?>"
+                            >
+                    <?php endif; ?>
                 <?php endforeach; ?>
             <?php endif; ?>
             <div class="addtocart-subscribe">
