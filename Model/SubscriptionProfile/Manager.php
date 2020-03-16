@@ -618,12 +618,21 @@ class Manager
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
 
+        $isVirtual = 0;
+        foreach ($quoteItems as $item) {
+            if ($item->getData()['is_virtual'] != 0) {
+                $isVirtual = 1;
+            } else {
+                break;
+            }
+        }
+
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
-            ->setIsVirtual($quote->getIsVirtual())
+            ->setIsVirtual($isVirtual)
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
