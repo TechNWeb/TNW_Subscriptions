@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\SaleableInterface;
@@ -36,18 +37,26 @@ abstract class Base implements TypeInterface
     protected $searchCriteriaBuilder;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * @param PriceCalculator $priceCalculator
      * @param ProductFrequencyRepository $productFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
         PriceCalculator $priceCalculator,
         ProductFrequencyRepository $productFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->priceCalculator = $priceCalculator;
         $this->productFrequencyRepository = $productFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->productRepository = $productRepository;
     }
 
     /**

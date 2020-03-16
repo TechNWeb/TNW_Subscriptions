@@ -53,10 +53,10 @@ class Simple extends Base
     public function getProductDataObject(SaleableInterface $product, array $arguments = null)
     {
         $productData = parent::getProductDataObject($product, $arguments);
-
+        $productId = $product->getId();
         $data = [
-            'child_product_id' => $product->getId(),
-            'child_product_price' => $product->getOrigData('price'),
+            'child_product_id' => $productId,
+            'child_product_price' => $this->productRepository->getById($productId)->getFinalPrice(),
         ];
         $productData->addData($data);
 
