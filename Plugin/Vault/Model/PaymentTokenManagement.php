@@ -40,6 +40,15 @@ class PaymentTokenManagement
             $token->getPaymentMethodCode(),
             $token->getCustomerId()
         );
+        if ($token->getDetails() == "null" && $payment->getMethod() == "payflowpro") {
+            $token->setDetails(json_encode([
+                'cc_type' => $payment->getCcType(),
+                'cc_exp_year' => $payment->getCcExpYear(),
+                'cc_exp_month' => $payment->getCcExpMonth(),
+                'cc_last_4' => $payment->getCcLast4()
+            ]));
+
+        }
 
         if (!empty($tokenDuplicate)) {
             if ($token->getIsVisible() || $tokenDuplicate->getIsVisible()) {
