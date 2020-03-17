@@ -751,6 +751,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Braintree</item>
                     <item name="sortOrder" xsi:type="number">25</item>
                 </item>
+                <item name="chcybersource" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Cybersource</item>
+                    <item name="sortOrder" xsi:type="number">35</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -871,6 +875,11 @@
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="code" xsi:type="string">braintree_cc_vault</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="chcybersource" xsi:type="array">
+                    <item name="code" xsi:type="const">CyberSource\Core\Model\Config::CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSourceFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
                 <item name="free" xsi:type="array">
