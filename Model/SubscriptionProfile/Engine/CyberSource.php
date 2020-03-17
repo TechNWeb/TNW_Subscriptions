@@ -14,9 +14,6 @@ use Magento\Framework\Exception\PaymentException;
 
 class CyberSource extends Base
 {
-    /**
-     * @var \CyberSource\Core\Gateway\Http\TransferFactory
-     */
     private $transferFactory;
 
     /**
@@ -30,7 +27,7 @@ class CyberSource extends Base
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \CyberSource\Core\Gateway\Http\TransferFactory $transferFactory,
+        $transferFactory,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
         \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
     ) {

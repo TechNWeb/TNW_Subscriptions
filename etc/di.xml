@@ -1169,4 +1169,14 @@
     <type name="CyberSource\SecureAcceptance\Gateway\Config\Config">
         <plugin name="get_config_cybersource" type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config"/>
     </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\CyberSource">
+        <arguments>
+            <argument name="cybersourceConfig" xsi:type="object">CyberSource\SecureAcceptance\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSource">
+        <arguments>
+            <argument name="transferFactory" xsi:type="object">CyberSource\Core\Gateway\Http\TransferFactory</argument>
+        </arguments>
+    </type>
 </config>
