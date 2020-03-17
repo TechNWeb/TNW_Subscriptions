@@ -878,7 +878,7 @@
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
                 <item name="chcybersource" xsi:type="array">
-                    <item name="code" xsi:type="const">CyberSource\Core\Model\Config::CODE</item>
+                    <item name="code" xsi:type="string">chcybersource</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSourceFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
@@ -1165,5 +1165,8 @@
     </type>
     <type name="Magento\Vault\Model\PaymentTokenManagement">
         <plugin name="token_save_fix" type="TNW\Subscriptions\Plugin\Vault\Model\PaymentTokenManagement"/>
+    </type>
+    <type name="CyberSource\SecureAcceptance\Gateway\Config\Config">
+        <plugin name="get_config_cybersource" type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config"/>
     </type>
 </config>

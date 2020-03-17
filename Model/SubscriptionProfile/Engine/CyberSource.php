@@ -24,16 +24,6 @@ class CyberSource extends Base
      */
     private $transactionCustomer;
 
-    /**
-     * CyberSource constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \CyberSource\Core\Gateway\Http\TransferFactory $transferFactory
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
-     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -41,7 +31,8 @@ class CyberSource extends Base
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
         \CyberSource\Core\Gateway\Http\TransferFactory $transferFactory,
-        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
+        \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
     ) {
         parent::__construct(
             $config,
@@ -50,7 +41,7 @@ class CyberSource extends Base
             $persistor,
             $zeroTotalValidator
         );
-
+        $cyberSourceConfig->reBillProcess();
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -61,12 +52,13 @@ class CyberSource extends Base
     public function getProfilePaymentInfo(Payment $payment)
     {
         return [
-            'token_hash' => $payment->getAdditionalInformation('token_hash'),
+            'token_hash' => $payment->getAdditionalInformation('cybersourse_token'),
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
                 OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear(),
+                'cybersource_data' => $payment->getAdditionalInformation()
             ]
         ];
     }
@@ -90,9 +82,13 @@ class CyberSource extends Base
      */
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
-        return [
-            'token_hash' => $profile->getPayment()->getTokenHash(),
-        ];
+        $result = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
+            ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
+            : [];
+        return array_merge(
+            $result['cybersource_data'],
+            [OrderPaymentInterface::METHOD => ConfigProvider::CODE]
+        );
     }
 
     public function processProfileByRequestData($requestData)
