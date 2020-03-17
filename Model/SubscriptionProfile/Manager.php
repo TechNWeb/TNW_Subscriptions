@@ -20,6 +20,7 @@ use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Tests\NamingConvention\true\bool;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
@@ -617,22 +618,12 @@ class Manager
 
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
-
-        $isVirtual = 0;
-        foreach ($quoteItems as $item) {
-            if ($item->getIsVirtual() == 0 && $item->getProductType() != 'virtual') {
-                break;
-            } else {
-                $isVirtual = 1;
-            }
-        }
-
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
-            ->setIsVirtual($isVirtual)
+            ->setIsVirtual($this->isVirtual($quoteItems))
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
@@ -1248,5 +1239,23 @@ class Manager
         $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
 
         return $profile;
+    }
+
+    /**
+     * Check products type in subscription
+     *
+     * @param $quoteItems
+     * @return bool
+     */
+    public function isVirtual($quoteItems)
+    {
+        foreach ($quoteItems as $item) {
+            if (!$item->getIsVirtual() && $item->getProductType() != 'virtual') {
+                return false;
+            } else {
+                continue;
+            }
+        }
+        return true;
     }
 }
