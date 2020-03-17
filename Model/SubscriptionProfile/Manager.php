@@ -985,10 +985,6 @@ class Manager
         }
         if ($profile->getProductNeedRecollect()) {
             $messages[] = [
-                'index' => 'name = tnw_subscriptionprofile_form.areas.' . UpcomingOrders::GROUP_UPCOMING_ORDERS,
-                'message' => $profile->getShippingBillingChangesMadeMessageForUpcomingOrders()
-            ];
-            $messages[] = [
                 'index' => 'index = profit_message',
                 'message' => $profile->getProductChangesMadeMessageForProfit()
             ];
