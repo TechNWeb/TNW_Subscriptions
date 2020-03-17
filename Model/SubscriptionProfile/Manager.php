@@ -620,10 +620,10 @@ class Manager
 
         $isVirtual = 0;
         foreach ($quoteItems as $item) {
-            if ($item->getData()['is_virtual'] != 0) {
-                $isVirtual = 1;
-            } else {
+            if ($item->getIsVirtual() == 0 && $item->getProductType() != 'virtual') {
                 break;
+            } else {
+                $isVirtual = 1;
             }
         }
 
