@@ -97,9 +97,10 @@ class Configurable extends Base
 
         $data = [];
         if ($childProduct) {
+            $childProductId = $childProduct->getId();
             $data = [
-                'child_product_id' => $childProduct->getId(),
-                'child_product_price' => $childProduct->getOrigData('price'),
+                'child_product_id' => $childProductId,
+                'child_product_price' => $this->productRepository->getById($childProductId)->getFinalPrice(),
             ];
         }
 
