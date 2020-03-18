@@ -68,12 +68,15 @@ class InitialFee extends AbstractTotal
     public function fetch(Quote $quote, Total $total)
     {
         $amount = 0;
-        foreach ($quote->getItems() as $item) {
-            $itemInitialFees = $this->getItemInitialFees($item);
-            if (null === $itemInitialFees) {
-                continue;
+        $quoteItems = $quote->getItems();
+        if (is_array($quoteItems)) {
+            foreach ($quote->getItems() as $item) {
+                $itemInitialFees = $this->getItemInitialFees($item);
+                if (null === $itemInitialFees) {
+                    continue;
+                }
+                $amount += $itemInitialFees->getSubsInitialFee() * $item->getQty();
             }
-            $amount += $itemInitialFees->getSubsInitialFee() * $item->getQty();
         }
         return [
             'code'  => 'subs_initial_fee',
