@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\Sales\Total;
 
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Api\Data\CartItemExtensionInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
@@ -20,6 +21,11 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem;
 class InitialFee extends AbstractTotal
 {
     /**
+     * @var float
+     */
+    protected $initialFeeAmount;
+
+    /**
      * Subscription initial fee totals collector.
      * Adds initial fee to grand total amount (without taxes).
      * Taxes calculated as separated tax object.
@@ -32,6 +38,7 @@ class InitialFee extends AbstractTotal
      */
     public function collect(Quote $quote, ShippingAssignmentInterface $shippingAssignment, Total $total)
     {
+        parent::collect($quote, $shippingAssignment, $total);
         if (!$shippingAssignment->getItems() || $quote->getScheduled()) {
             return $this;
         }
@@ -45,14 +52,28 @@ class InitialFee extends AbstractTotal
                 continue;
             }
 
+            if (Configurable::TYPE_CODE === $item->getProductType()) {
+                $totalInitialFee -= $itemInitialFees->getSubsInitialFee();
+                $baseTotalInitialFee -= $itemInitialFees->getBaseSubsInitialFee();
+            }
+
             $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
             $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
         }
 
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
         $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
-
+        $this->initialFeeAmount = $totalInitialFee;
         return $this;
+    }
+
+    public function fetch(Quote $quote, Total $total)
+    {
+        return [
+            'code'  => 'subs_initial_fee',
+            'title' => __('Initial Fee'),
+            'value' => $this->initialFeeAmount
+        ];
     }
 
     /**
