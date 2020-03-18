@@ -617,6 +617,7 @@ class Manager
 
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
+
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
