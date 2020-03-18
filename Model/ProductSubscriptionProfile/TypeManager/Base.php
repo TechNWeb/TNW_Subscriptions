@@ -164,13 +164,22 @@ abstract class Base implements TypeInterface
         $productQty  = !empty($productData['qty']) ? $productData['qty'] : 0;
             $usePresetQty = !empty($productData['use_preset_qty']) && $productQty;
         //Calculate product Price
+        $lockProductPriceStatus =
+            (bool) $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE);
         $price = $this->priceCalculator->getUnitPrice(
             $product,
             $productData['billing_frequency'],
             isset($productData['price']) ? $productData['price'] : null,
             $full
         );
-
+        if ($lockProductPriceStatus && $productQty) {
+            $tierPrice = $this->productRepository
+                ->getById($product->getData('child_product_id'))
+                ->getTierPrice($productQty);
+            if ($tierPrice) {
+                $price = min($tierPrice, $price);
+            }
+        }
         if (!$rowPrice && $usePresetQty) {
             $price = $productQty ? round($price / $productQty, 4) : 0;
         } elseif ($rowPrice && !$usePresetQty) {
