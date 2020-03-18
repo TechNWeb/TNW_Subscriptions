@@ -11,6 +11,18 @@
                                     <item name="children" xsi:type="array">
                                         <item name="summary" xsi:type="array">
                                             <item name="children" xsi:type="array">
+                                                <item name="totals" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="initial_fee" xsi:type="array">
+                                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/cart/totals/initial-fee</item>
+                                                            <item name="sortOrder" xsi:type="string">20</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">TNW_Subscriptions/checkout/cart/totals/initial-fee</item>
+                                                                <item name="title" translate="true" xsi:type="string">Initial Fee</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
                                                 <item name="cart_items" xsi:type="array">
                                                     <item name="config" xsi:type="array">
                                                         <item name="template" xsi:type="string">TNW_Subscriptions/checkout/summary/cart-items</item>
