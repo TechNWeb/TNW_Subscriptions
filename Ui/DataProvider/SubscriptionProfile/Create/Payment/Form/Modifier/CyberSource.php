@@ -26,9 +26,6 @@ class CyberSource extends Base
      */
     private $paymentConfig;
 
-    /**
-     * @var \CyberSource\SecureAcceptance\Gateway\Config\Config
-     */
     private $cybersourceConfig;
 
     /**
@@ -36,23 +33,13 @@ class CyberSource extends Base
      */
     private $clientToken = '';
 
-    /**
-     * CyberSource constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $session
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \CyberSource\SecureAcceptance\Gateway\Config\Config $cybersourceConfig
-     * @param Config $paymentConfig
-     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \CyberSource\SecureAcceptance\Gateway\Config\Config $cybersourceConfig,
+        $cybersourceConfig,
         Config $paymentConfig
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
