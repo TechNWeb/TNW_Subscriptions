@@ -11,6 +11,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
@@ -81,7 +82,7 @@ class History extends \Magento\Framework\View\Element\Template
      * @var ProfileCcUtils
      */
     private $utils;
-    
+
     /**
      * Subscription profile status manager.
      *
@@ -115,6 +116,7 @@ class History extends \Magento\Framework\View\Element\Template
         Config $config,
         ProfileCcUtils $utils,
         StatusManager $statusManager,
+        BillingFrequencyRepository $billingFrequencyRepository,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -126,6 +128,7 @@ class History extends \Magento\Framework\View\Element\Template
         $this->config = $config;
         $this->utils = $utils;
         $this->statusManager = $statusManager;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
         parent::__construct($context, $data);
     }
 
@@ -464,5 +467,24 @@ class History extends \Magento\Framework\View\Element\Template
             }
         }
         return $label;
+    }
+
+    /**
+     * Get billing frequency label
+     *
+     * @param $id
+     * @return string|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getBillingFrequency($id)
+    {
+        $profile = $this->subscriptionProfileManager->loadProfile($id);
+        if ($profile) {
+            $billingFrequencyId = $profile->getBillingFrequencyId();
+            $result = $this->billingFrequencyRepository->getById($billingFrequencyId)->getLabel();
+        } else {
+            $result = null;
+        }
+        return $result;
     }
 }
