@@ -21,11 +21,6 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem;
 class InitialFee extends AbstractTotal
 {
     /**
-     * @var float
-     */
-    protected $initialFeeAmount;
-
-    /**
      * Subscription initial fee totals collector.
      * Adds initial fee to grand total amount (without taxes).
      * Taxes calculated as separated tax object.
@@ -60,20 +55,41 @@ class InitialFee extends AbstractTotal
             $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
             $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
         }
-
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
         $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
-        $this->initialFeeAmount = $totalInitialFee;
         return $this;
     }
 
+    /**
+     * @param Quote $quote
+     * @param Total $total
+     * @return array
+     */
     public function fetch(Quote $quote, Total $total)
     {
+        $amount = 0;
+        foreach ($quote->getItems() as $item) {
+            $itemInitialFees = $this->getItemInitialFees($item);
+            if (null === $itemInitialFees) {
+                continue;
+            }
+            $amount += $itemInitialFees->getSubsInitialFee() * $item->getQty();
+        }
         return [
             'code'  => 'subs_initial_fee',
             'title' => __('Initial Fee'),
-            'value' => $this->initialFeeAmount
+            'value' => $amount ? $amount : NULL
         ];
+    }
+
+    /**
+     * Get label
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getLabel()
+    {
+        return __('Initial Fee');
     }
 
     /**

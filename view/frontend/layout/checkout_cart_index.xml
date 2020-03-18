@@ -36,5 +36,25 @@
             </arguments>
             <block name="checkout.cart.item.renderers.configurable.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
+        <referenceBlock name="checkout.cart.totals">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="block-totals" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="initial_fee" xsi:type="array">
+                                    <item name="component" xsi:type="string">TNW_Subscriptions/js/checkout/cart/totals/initial-fee</item>
+                                    <item name="sortOrder" xsi:type="string">20</item>
+                                    <item name="config" xsi:type="array">
+                                        <item name="template" xsi:type="string">TNW_Subscriptions/checkout/cart/totals/initial-fee</item>
+                                        <item name="title" translate="true" xsi:type="string">Initial Fee</item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
     </body>
 </page>
