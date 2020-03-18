@@ -91,6 +91,11 @@ class History extends \Magento\Framework\View\Element\Template
     private $statusManager;
 
     /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
+
+    /**
      * @param Session                    $customerSession
      * @param PriceCurrencyInterface     $priceFormatter
      * @param ProfileStatus              $profileStatus
@@ -101,6 +106,7 @@ class History extends \Magento\Framework\View\Element\Template
      * @param Config                     $config
      * @param ProfileCcUtils             $utils
      * @param StatusManager              $statusManager
+     * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param array                      $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -479,12 +485,8 @@ class History extends \Magento\Framework\View\Element\Template
     public function getBillingFrequency($id)
     {
         $profile = $this->subscriptionProfileManager->loadProfile($id);
-        if ($profile) {
-            $billingFrequencyId = $profile->getBillingFrequencyId();
-            $result = $this->billingFrequencyRepository->getById($billingFrequencyId)->getLabel();
-        } else {
-            $result = null;
-        }
-        return $result;
+        return $profile
+            ? $this->billingFrequencyRepository->getById($profile->getBillingFrequencyId())->getLabel()
+            : null;
     }
 }
