@@ -54,7 +54,10 @@ class PaymentInformationManagement
         $additionalData['is_active_payment_token_enabler'] = 1;
         $paymentMethod->setAdditionalData($additionalData);
 
-        if ($this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001) {
+        if (
+            $this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001
+            && $paymentMethod->getMethod() != 'chcybersource'
+        ) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),
                 $this->quoteRepository->get($cartId)
