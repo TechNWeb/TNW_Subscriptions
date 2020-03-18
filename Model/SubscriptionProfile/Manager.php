@@ -623,7 +623,7 @@ class Manager
             ->setWebsiteId($quote->getStore()->getWebsiteId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
-            ->setIsVirtual($this->checkVirtualProductsFromQuote($quoteItems))
+            ->setIsVirtual($this->isQuoteHasVirtualProducts($quoteItems))
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
@@ -1247,7 +1247,7 @@ class Manager
      * @param $quoteItems
      * @return bool
      */
-    public function checkVirtualProductsFromQuote(array $quoteItems)
+    public function isQuoteHasVirtualProducts(array $quoteItems)
     {
         foreach ($quoteItems as $item) {
             if (!$item->getIsVirtual() && $item->getProductType() != 'virtual') {
