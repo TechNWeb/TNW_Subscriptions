@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\Sales\Total;
 
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Api\Data\CartItemExtensionInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
@@ -32,6 +33,7 @@ class InitialFee extends AbstractTotal
      */
     public function collect(Quote $quote, ShippingAssignmentInterface $shippingAssignment, Total $total)
     {
+        parent::collect($quote, $shippingAssignment, $total);
         if (!$shippingAssignment->getItems() || $quote->getScheduled()) {
             return $this;
         }
@@ -45,14 +47,49 @@ class InitialFee extends AbstractTotal
                 continue;
             }
 
+            if (Configurable::TYPE_CODE === $item->getProductType()) {
+                $totalInitialFee -= $itemInitialFees->getSubsInitialFee();
+                $baseTotalInitialFee -= $itemInitialFees->getBaseSubsInitialFee();
+            }
+
             $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
             $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
         }
-
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
         $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
-
         return $this;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param Total $total
+     * @return array
+     */
+    public function fetch(Quote $quote, Total $total)
+    {
+        $amount = 0;
+        foreach ($quote->getItems() as $item) {
+            $itemInitialFees = $this->getItemInitialFees($item);
+            if (null === $itemInitialFees) {
+                continue;
+            }
+            $amount += $itemInitialFees->getSubsInitialFee() * $item->getQty();
+        }
+        return [
+            'code'  => 'subs_initial_fee',
+            'title' => __('Initial Fee'),
+            'value' => $amount ? $amount : NULL
+        ];
+    }
+
+    /**
+     * Get label
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getLabel()
+    {
+        return __('Initial Fee');
     }
 
     /**
