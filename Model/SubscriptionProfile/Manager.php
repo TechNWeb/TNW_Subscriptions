@@ -900,7 +900,9 @@ class Manager
         $data = $this->getEngine()->getProfilePaymentInfo($payment);
         foreach ($data as $key => $value) {
             $method = 'set' . SimpleDataObjectConverter::snakeCaseToUpperCamelCase($key);
-            $this->getProfile()->getPayment()->$method($value);
+            if ($value != null) {
+                $this->getProfile()->getPayment()->$method($value);
+            }
         }
 
         return $this;
@@ -1150,6 +1152,26 @@ class Manager
             'cc_exp_month' => $orderPayment->getCcExpMonth(),
             'cc_exp_year' => $orderPayment->getCcExpYear(),
         ];
+        if (
+            $orderPaymentDataToAdd['cc_type'] == null
+            && $orderPayment->getExtensionAttributes()
+        ) {
+            $extensionAttributes =  $orderPayment->getExtensionAttributes();
+            $vaultPaymentToken = $extensionAttributes->getVaultPaymentToken();
+            if ($vaultPaymentToken) {
+                $details = $vaultPaymentToken->getDetails();
+                if ($details) {
+                    try {
+                        $details = json_decode($details);
+                    } catch (\Exception $e) {
+                        $details = [];
+                    }
+                    if ($details) {
+                        $orderPaymentDataToAdd = $details;
+                    }
+                }
+            }
+        }
         foreach ($orderPaymentDataToAdd as $key => $data) {
             if ($data) {
                 $quotePayment->setData($key, $data);
