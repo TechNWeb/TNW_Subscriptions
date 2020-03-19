@@ -867,6 +867,11 @@
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
+                <item name="payflowpro_cc_vault" xsi:type="array">
+                    <item name="code" xsi:type="string">payflowpro_cc_vault</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
                 <item name="braintree" xsi:type="array">
                     <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
@@ -1131,6 +1136,16 @@
                     <item name="extendedVoid" xsi:type="boolean">false</item>
                 </item>
                 <item name="payflowpro" xsi:type="array">
+                    <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\DataBuilder</item>
+                    <item name="authClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="cancelClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Paypal\TokenExtractor</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                    <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                    <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                </item>
+                <item name="payflowpro_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
                     <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\DataBuilder</item>
                     <item name="authClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>

@@ -76,6 +76,10 @@ class DataBuilder
         $amount = $this->getAmount($quote);
         $storeId = $quote->getStoreId();
         $this->methodCode = $quote->getPayment()->getMethod();
+        if (!$quote->getPayment()->getMethod()) {
+            $this->methodCode = $paymentInfo['method'];
+            $quote->getPayment()->setMethod($this->methodCode);
+        }
         $config = $this->configFactory->create();
         $config->setStoreId($storeId);
         $config->setMethodInstance($quote->getPayment()->getMethodInstance());
