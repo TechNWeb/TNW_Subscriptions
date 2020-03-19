@@ -39,12 +39,14 @@ class CyberSource extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        $cybersourceConfig,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         Config $paymentConfig
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-
-        $this->cybersourceConfig = $cybersourceConfig;
+        if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
+            $this->cybersourceConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+        }
         $this->paymentConfig = $paymentConfig;
     }
 
@@ -53,7 +55,7 @@ class CyberSource extends Base
      */
     protected function getPaymentCode()
     {
-        return BraintreeConfigProvider::CODE;
+        return 'chcybersource';
     }
 
     /**
@@ -214,7 +216,13 @@ class CyberSource extends Base
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->cybersourceConfig->getCcTypes(),
-            'ccTypesMapper' => $this->cybersourceConfig->getCcTypesMapper(),
+            'ccTypesMapper' => array_flip([
+                'VI' => 'visa',
+                'MC' => 'masterCard',
+                'AE' => 'amex',
+                'DI' => 'discover',
+                'JCB' => 'jcb'
+            ]),
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
@@ -286,7 +294,7 @@ class CyberSource extends Base
         ];
 
         $types = $this->paymentConfig->getCcTypes();
-        $availableTypes = $this->cybersourceConfig->getCcTypes();
+        $availableTypes = explode(',', $this->cybersourceConfig->getCcTypes());
 
         if ($availableTypes) {
             foreach ($types as $code => $name) {
