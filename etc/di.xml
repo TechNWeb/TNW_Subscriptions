@@ -867,6 +867,11 @@
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
+                <item name="payflowpro_cc_vault" xsi:type="array">
+                    <item name="code" xsi:type="string">payflowpro_cc_vault</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
                 <item name="braintree" xsi:type="array">
                     <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
@@ -875,6 +880,11 @@
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="code" xsi:type="string">braintree_cc_vault</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="chcybersource_cc_vault" xsi:type="array">
+                    <item name="code" xsi:type="string">chcybersource_cc_vault</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSourceFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
                 <item name="chcybersource" xsi:type="array">
@@ -1135,6 +1145,16 @@
                     <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
                     <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
                 </item>
+                <item name="payflowpro_cc_vault" xsi:type="array">
+                    <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\DataBuilder</item>
+                    <item name="authClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="cancelClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Paypal\TokenExtractor</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                    <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                    <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                </item>
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
                     <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
@@ -1168,15 +1188,5 @@
     </type>
     <type name="CyberSource\SecureAcceptance\Gateway\Config\Config">
         <plugin name="get_config_cybersource" type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config"/>
-    </type>
-    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\CyberSource">
-        <arguments>
-            <argument name="cybersourceConfig" xsi:type="object">CyberSource\SecureAcceptance\Gateway\Config\Config</argument>
-        </arguments>
-    </type>
-    <type name="TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSource">
-        <arguments>
-            <argument name="transferFactory" xsi:type="object">CyberSource\Core\Gateway\Http\TransferFactory</argument>
-        </arguments>
     </type>
 </config>
