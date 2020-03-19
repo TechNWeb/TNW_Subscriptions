@@ -678,6 +678,11 @@
             overflow: hidden;
             position: absolute;
             vertical-align: top;
+              &:disabled {
+                  +label {
+                      opacity: 0.5;
+                  }
+              }
           }
 
           label {

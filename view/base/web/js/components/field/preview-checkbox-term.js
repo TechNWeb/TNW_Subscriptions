@@ -30,7 +30,7 @@ define([
          */
         getPreviewLabel: function () {
             var result;
-            if (this.checked()) {
+            if (this.value() === '1') {
                 result = this.previewLabel;
             } else {
                 result = this.periodPreviewLabel;

@@ -50,12 +50,18 @@ define([
          * @param value
          */
         onShowPreviewChanged: function (value) {
+            var result = Date.parse(this.shiftedValue()),
+                currentDate = Date.parse(this.current_date);
             if (value){
                 this.visible(true);
                 if (this.initialValue && this.value() !== this.initialValue){
                     this.reset();
                 }
             } else {
+                if (currentDate >= result) {
+                    this.showPreview(true);
+                    this.visibleOnEdit = true;
+                }
                 this.visibleOnEdit ? this.visible(true) : this.visible(false);
             }
         }

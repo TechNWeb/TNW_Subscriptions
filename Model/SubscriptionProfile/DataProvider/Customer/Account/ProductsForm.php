@@ -202,9 +202,6 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function isEditButtonVisible()
     {
-        return (
-            null !== $this->currentProduct
-            && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
-        );
+        return null !== $this->currentProduct;
     }
 }

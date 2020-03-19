@@ -5,30 +5,25 @@
 define([
     'TNW_Subscriptions/js/components/field/preview-field',
     'jquery',
+    'underscore',
     'mage/translate'
-], function (Component, $j) {
+], function (Component, $j, _) {
     'use strict';
 
     return Component.extend({
-        defaults: {
-            previewLabelOnce: ''
-        },
+
         /**
          * Sets complete preview label.
          *
          * @param value
          */
         setCompletePreviewLabel: function (value) {
-            if (parseInt(value) === 0) return;
-            var label = (parseInt(value) === 1)
-                ? $j.mage.__(this.previewLabelOnce)
-                : $j.mage.__(this.previewLabel).replace('%s', value);
+            var label = value,
+                indexedOptions = _.indexBy(this.options, 'value');
+            if (indexedOptions[value] !== undefined) {
+                label = indexedOptions[value].label;
+            }
             this.completePreviewLabel(label);
-        },
-
-        onTermChange: function (value) {
-            var result = this.visibleOnEdit ? !parseInt(value) : false;
-            this.visible(result);
         }
     });
 });

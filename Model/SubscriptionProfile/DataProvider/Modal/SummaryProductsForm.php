@@ -18,6 +18,7 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
@@ -146,7 +147,6 @@ class SummaryProductsForm extends ModifyForm
         $data = [];
         /** @var SubscriptionProfileInterface $subQuote */
         foreach ($this->getObjects() as $subQuote) {
-            $billingFrequencyLabel = $this->getBillingFrequencyLabel($subQuote->getBillingFrequencyId());
             $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
             $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
 
@@ -154,14 +154,15 @@ class SummaryProductsForm extends ModifyForm
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
-                $presetQty = (int)$item->getTnwSubscrUnlockPresetQty();
+                $presetQty = (int)$product->getTnwSubscrUnlockPresetQty();
                 $itemPrice = $item->getPrice();
                 $term = !empty($subQuote->getTerm()) ? 1 : 0;
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => (string)$itemPrice,
-                    'billing_frequency' => $billingFrequencyLabel,
+                    'billing_frequency' => $subQuote->getBillingFrequencyId(),
+                    'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
                     'unlock_preset_qty' => $presetQty,
@@ -574,15 +575,23 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getTermDefinition()
     {
+        $infiniteSubscriptions = $this->currentProduct->getData(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        );
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'multiple' => false,
                         'dataType' => 'boolean',
-                        'formElement' => UiForm\Element\Checkbox::NAME,
-                        'componentType' => UiForm\Element\Checkbox::NAME,
-                        'valueMap' => ['true' => '1', 'false' => '0'],
-                        'default' => '0',
+                        'formElement' => UiForm\Element\RadioSet::NAME,
+                        'componentType' => UiForm\Element\RadioSet::NAME,
+                        'options' => [
+                            ['value' => 1, 'label' => __('Until canceled')],
+                            ['value' => 0, 'label' => __('Stop after')],
+                        ],
+                        'default' => '1',
+                        'disabled' => $infiniteSubscriptions,
                         'description' => __('Until canceled'),
                         'label' => __('Term:'),
                         'dataScope' => 'term',
@@ -590,8 +599,11 @@ class SummaryProductsForm extends ModifyForm
                         'additionalClasses' => 'field-wide',
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'showPreview' => $this->getCurrentFormName() . ':previewMode'
+                        'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
+                        'links' => [
+                            'showPreview' => '${ $.parentFormName }:previewMode'
+                        ],
+                        'parentFormName' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -603,6 +615,9 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getPeriodDefenition()
     {
+        $infiniteSubscriptions = $this->currentProduct->getData(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        );
         return [
             'arguments' => [
                 'data' => [
@@ -614,24 +629,26 @@ class SummaryProductsForm extends ModifyForm
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
                         'elementTmpl' => 'TNW_Subscriptions/form/element/period-input',
-                        'first_phrase' => __('& bill'),
+                        'first_phrase' => '',
                         'last_phrase' => __('times'),
                         'validation' => [
                             'validate-greater-than-zero' => true,
                             'required-entry' => true
                         ],
                         'imports' => [
-                            'visible' => '!' . $this->getCurrentFormName() . '.edit_fieldset.term' . ':checked',
+                            'onTermChange' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':value',
+                            'showPreview' => '${ $.parentFormName }:previewMode'
                         ],
                         'exports' => [
                             'completePreviewLabel' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':periodPreviewLabel'
                         ],
+                        'visibleOnEdit' => !$infiniteSubscriptions,
                         'previewLabelVisible' => false,
                         'previewLabel' => __('Bill %s times'),
                         'previewLabelOnce' => __('Bill once'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'showPreview' => $this->getCurrentFormName() . ':previewMode'
+                        'parentFormName' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -662,7 +679,13 @@ class SummaryProductsForm extends ModifyForm
                         'component' => 'TNW_Subscriptions/js/components/field/preview-date',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'visibleOnEdit' => $visibleOnEdit,
-                        'showPreview' => $this->getCurrentFormName() . ':previewMode'
+                        'parentFormName' => $this->currentFormName,
+                        'imports' => [
+                            'showPreview' => '${ $.parentFormName }:previewMode'
+                        ],
+                        'options' => [
+                            'minDate' => $nowDate->add(new \DateInterval('P1D'))->format('m/d/Y'),
+                        ]
                     ]
                 ]
             ]
@@ -681,18 +704,24 @@ class SummaryProductsForm extends ModifyForm
                     'config' => [
                         'label' => __('Billing Frequency:'),
                         'dataType' => 'text',
-                        'formElement' => UiForm\Element\Input::NAME,
-                        'componentType' => UiForm\Element\Input::NAME,
+                        'formElement' => UiForm\Element\Select::NAME,
+                        'componentType' => UiForm\Field::NAME,
+                        'elementTmpl' => 'ui/form/element/select',
+                        'caption' => __('-- Please Select --'),
+                        'options' => $this->getProductBillingFrequenciesAsOptionArray($this->currentProduct->getId()),
                         'dataScope' => 'billing_frequency',
                         'additionalClasses' => 'field-wide',
                         'additionalForGroup' => false,
                         'validation' => ['required-entry' => true],
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-frequency',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'showPreview' => $this->getCurrentFormName() . ':previewMode',
                         'previewLabel' => '%s',
                         'imports' => [
                             'onPriceUpdate' => '${ $.parentName}.price:value'
+                        ],
+                        'parentFormName' => $this->currentFormName,
+                        'links' => [
+                            'showPreview' => '${ $.parentFormName }:previewMode'
                         ],
                         'parentForm' => $this->getCurrentFormName(),
                         'priceFormat' => $this->getPriceFormatData(),
@@ -847,8 +876,7 @@ class SummaryProductsForm extends ModifyForm
         /** @var SubscriptionProfile $currentProfile */
         $currentProfile = $this->getCurrentProfile();
 
-        if ($currentProfile && $currentProfile->canEditProfile()
-            && !$this->currentItem->getTnwSubscrUnlockPresetQty()) {
+        if ($currentProfile && $currentProfile->canEditProfile()) {
             $canEdit = true;
         }
 

@@ -198,7 +198,7 @@ class ModifyForm extends Form
      * @param CartItemInterface $item
      * @return array
      */
-    private function getAdditionalDataForProduct(CartItemInterface $item)
+    protected function getAdditionalDataForProduct(CartItemInterface $item)
     {
         $product = $this->getProductFromItem($item);
 
