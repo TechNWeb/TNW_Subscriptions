@@ -56,6 +56,7 @@ class ActiveMethods extends Fieldset
     private $excludedSystemPaymentMethods = [
         'free',
         'braintree_cc_vault',
+        'chcybersource_cc_vault'
     ];
 
     /**
