@@ -27,7 +27,8 @@ class CyberSource extends Base
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \Magento\Payment\Gateway\Http\TransferFactoryInterface $transferFactory,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
         \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
     ) {
@@ -39,7 +40,9 @@ class CyberSource extends Base
             $zeroTotalValidator
         );
         $cyberSourceConfig->reBillProcess();
-        $this->transferFactory = $transferFactory;
+        if ($moduleManager->isEnabled("CyberSource_Core")) {
+            $this->transferFactory = $objectManager->get("CyberSource\Core\Gateway\Http\TransferFactory");
+        }
         $this->transactionCustomer = $transactionCustomer;
     }
 

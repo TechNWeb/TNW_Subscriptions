@@ -39,12 +39,14 @@ class CyberSource extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Payment\Gateway\Config\Config $cybersourceConfig,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         Config $paymentConfig
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-
-        $this->cybersourceConfig = $cybersourceConfig;
+        if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
+            $this->cybersourceConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+        }
         $this->paymentConfig = $paymentConfig;
     }
 
