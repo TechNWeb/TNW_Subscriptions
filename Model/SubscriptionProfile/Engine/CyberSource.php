@@ -27,7 +27,7 @@ class CyberSource extends Base
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        $transferFactory,
+        \Magento\Payment\Gateway\Http\TransferFactoryInterface $transferFactory,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
         \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
     ) {
