@@ -755,6 +755,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\CyberSource</item>
                     <item name="sortOrder" xsi:type="number">35</item>
                 </item>
+                <item name="tnw_authorize_cim" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
+                    <item name="sortOrder" xsi:type="number">45</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -890,6 +894,16 @@
                 <item name="chcybersource" xsi:type="array">
                     <item name="code" xsi:type="string">chcybersource</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CyberSourceFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="tnw_authorize_cim" xsi:type="array">
+                    <item name="code" xsi:type="string">tnw_authorize_cim</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\AuthorizenetFactory</item>
+                    <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="tnw_authorize_cim_vault" xsi:type="array">
+                    <item name="code" xsi:type="string">tnw_authorize_cim_vault</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\AuthorizenetFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
                 <item name="free" xsi:type="array">
