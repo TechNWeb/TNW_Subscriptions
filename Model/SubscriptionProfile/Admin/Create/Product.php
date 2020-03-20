@@ -209,6 +209,8 @@ class Product extends Create
             // add preset qty param to product request array
             $productData['use_preset_qty'] = (bool) $this->getProduct()
                 ->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+            $productData['hide_qty'] = (bool) $this->getProduct()
+                ->getData(Attribute::SUBSCRIPTION_HIDE_QTY);
             $product = $this->getProduct();
             $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
             $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
@@ -254,6 +256,7 @@ class Product extends Create
                         'trial_period' => $trialPeriod,
                         'trial_unit_id' => $trialUnitId,
                         'use_preset_qty' => $productData['use_preset_qty'],
+                        'hide_qty' => $productData['hide_qty'],
                     ],
                     static::FULL_REQUEST_PARAM_NAME => true,
                 ],
