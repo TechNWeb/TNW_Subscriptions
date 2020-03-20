@@ -623,7 +623,7 @@ class Manager
             ->setWebsiteId($quote->getStore()->getWebsiteId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
-            ->setIsVirtual($quote->getIsVirtual())
+            ->setIsVirtual($this->isQuoteHasVirtualProducts($quoteItems))
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
@@ -1257,5 +1257,23 @@ class Manager
         $this->resourceQueue->updateStatus($queueItemIds, QueueStatus::QUEUE_STATUS_COMPLETE);
 
         return $profile;
+    }
+
+    /**
+     * Check products type in subscription
+     *
+     * @param $quoteItems
+     * @return bool
+     */
+    public function isQuoteHasVirtualProducts(array $quoteItems)
+    {
+        foreach ($quoteItems as $item) {
+            if (!$item->getIsVirtual() && $item->getProductType() != 'virtual') {
+                return false;
+            } else {
+                continue;
+            }
+        }
+        return true;
     }
 }
