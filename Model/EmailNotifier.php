@@ -90,7 +90,9 @@ class EmailNotifier
         if ($this->checkEmailTemplateSetting(self::XML_PATH_STATUS_CHANGE_TEMPLATE)) {
             $customer = $subscriptionProfile->getCustomer();
             $statusModel = $this->profileStatusFactory->create();
-            $date = $this->getNextProfileRelation($subscriptionProfile)->getScheduledAt();
+            $date = $this->getNextProfileRelation($subscriptionProfile)
+                ? date('F jS, Y', strtotime($this->getNextProfileRelation($subscriptionProfile)->getScheduledAt()))
+                : null;
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_STATUS_CHANGE_TEMPLATE,
@@ -101,7 +103,7 @@ class EmailNotifier
                     'subscription' => $subscriptionProfile,
                     'oldStatus' => $statusModel->getLabelByValue($oldStatus),
                     'newStatus' => $statusModel->getLabelByValue($newStatus),
-                    'date' => date('F jS, Y', strtotime($date)),
+                    'date' => $date,
                     'customer' => $customer
                 ],
                 [

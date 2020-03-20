@@ -11,6 +11,7 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\Config\Source\StartDateType;
 
 /**
  * Class BillingCyclesManager
@@ -108,6 +109,7 @@ class BillingCyclesManager
         $nowDate = new \DateTime();
         $formattedNowDate = $this->format($nowDate);
         $startDate = new \DateTime($profile->getStartDate());
+        $startDay = $startDate->format('j');
         $formattedStartDate = $this->format($startDate);
         //Add to list start date.
         $neededDates[] = $formattedStartDate;
@@ -137,10 +139,13 @@ class BillingCyclesManager
         }
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
-            $date = $this->calculateScheduledDate(
+            list($product) = $profile->getProducts();
+             $date = $this->calculateScheduledDate(
                 $startDate,
                 $profile->getUnit(),
-                $profile->getFrequency()
+                $profile->getFrequency(),
+                $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
+                $startDay
             );
             $neededDates[] = $this->format($date);
         }
@@ -178,10 +183,12 @@ class BillingCyclesManager
      * @param \DateTime $date
      * @param string $unit
      * @param int $length
+     * @param string $startDateType
+     * @param string $startDay
      * @return \DateTime
      * @throws \Exception
      */
-    private function calculateScheduledDate(\DateTime $date, $unit, $length)
+    private function calculateScheduledDate(\DateTime $date, $unit, $length, $startDateType, $startDay)
     {
         switch ($unit) {
             case BillingFrequencyUnitType::DAYS:
@@ -192,7 +199,16 @@ class BillingCyclesManager
             case BillingFrequencyUnitType::MONTHS:
                 $intervalUnit = 'M';
                 $expression = 'P' . $length . $intervalUnit;
+                $date->modify('first day of this month');
                 $date = $date->add(new \DateInterval($expression));
+                if ($startDateType == StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH) {
+                    $date->modify('last day of this month');
+                    break;
+                }
+                if ($startDay > $date->format('t')) {
+                    $startDay = $date->format('t');
+                }
+                $date->setDate($date->format('Y'), $date->format('n'), $startDay);
                 break;
             default:
                 throw new \Exception('Undefined length unit type.');

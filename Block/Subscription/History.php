@@ -11,6 +11,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid\CollectionFactory;
@@ -81,13 +82,18 @@ class History extends \Magento\Framework\View\Element\Template
      * @var ProfileCcUtils
      */
     private $utils;
-    
+
     /**
      * Subscription profile status manager.
      *
      * @var StatusManager
      */
     private $statusManager;
+
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
 
     /**
      * @param Session                    $customerSession
@@ -100,6 +106,7 @@ class History extends \Magento\Framework\View\Element\Template
      * @param Config                     $config
      * @param ProfileCcUtils             $utils
      * @param StatusManager              $statusManager
+     * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param array                      $data
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -115,6 +122,7 @@ class History extends \Magento\Framework\View\Element\Template
         Config $config,
         ProfileCcUtils $utils,
         StatusManager $statusManager,
+        BillingFrequencyRepository $billingFrequencyRepository,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
@@ -126,6 +134,7 @@ class History extends \Magento\Framework\View\Element\Template
         $this->config = $config;
         $this->utils = $utils;
         $this->statusManager = $statusManager;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
         parent::__construct($context, $data);
     }
 
@@ -464,5 +473,20 @@ class History extends \Magento\Framework\View\Element\Template
             }
         }
         return $label;
+    }
+
+    /**
+     * Get billing frequency label
+     *
+     * @param $id
+     * @return string|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getBillingFrequency($id)
+    {
+        $profile = $this->subscriptionProfileManager->loadProfile($id);
+        return $profile
+            ? $this->billingFrequencyRepository->getById($profile->getBillingFrequencyId())->getLabel()
+            : null;
     }
 }
