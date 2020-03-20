@@ -76,6 +76,7 @@
                 <!-- /ko -->
                 <!-- /ko -->
 
+                <!-- ko ifnot: (item.subscription && item.subscription.hide_qty) -->
                 <div class="details-qty qty">
                     <label class="label" data-bind="i18n: 'Qty', attr: {
                            for: 'cart-item-'+item_id+'-qty'}"></label>
@@ -99,6 +100,7 @@
                         <span data-bind="i18n: 'Update'"></span>
                     </button>
                 </div>
+                <!-- /ko -->
             </div>
 
             <div class="product actions">
