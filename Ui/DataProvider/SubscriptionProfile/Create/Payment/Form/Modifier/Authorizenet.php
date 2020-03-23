@@ -229,17 +229,11 @@ class Authorizenet extends Base
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
-            'sdkUrl' => $this->authorizenetConfig->getSopServiceUrl(),
+            'sdkUrl' => $this->authorizenetConfig->getSdkUrl(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
-            'availableCardTypes' => $this->authorizenetConfig->getCcTypes(),
-            'ccTypesMapper' => array_flip([
-                'VI' => 'visa',
-                'MC' => 'masterCard',
-                'AE' => 'amex',
-                'DI' => 'discover',
-                'JCB' => 'jcb'
-            ]),
+            'availableCardTypes' => $this->authorizenetConfig->getAvailableCardTypes(),
+            'ccTypesMapper' => $this->authorizenetConfig->getCcTypesMapper(),
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
@@ -311,7 +305,7 @@ class Authorizenet extends Base
         ];
 
         $types = $this->paymentConfig->getCcTypes();
-        $availableTypes = explode(',', $this->authorizenetConfig->getCcTypes());
+        $availableTypes = $this->authorizenetConfig->getAvailableCardTypes();
 
         if ($availableTypes) {
             foreach ($types as $code => $name) {
@@ -351,7 +345,7 @@ class Authorizenet extends Base
      */
     private function hasVerification()
     {
-        return $this->authorizenetConfig->isCvvEnabled();
+        return $this->authorizenetConfig->isCcvEnabled();
     }
 
     /**
