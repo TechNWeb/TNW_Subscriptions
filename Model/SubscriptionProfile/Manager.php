@@ -834,6 +834,7 @@ class Manager
                     //Set shipping method
                     $quote->getShippingAddress()
                         ->setCollectShippingRates(true)
+                        ->setItemQty($quote->getItemsSummaryQty())
                         ->collectShippingRates()
                         ->setShippingMethod($profile->getShippingMethod());
                 }
