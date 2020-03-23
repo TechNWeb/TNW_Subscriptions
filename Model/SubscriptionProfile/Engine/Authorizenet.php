@@ -26,15 +26,10 @@ class Authorizenet extends Base
      */
     private $transactionCustomer;
 
-    /**
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
-     */
+    private $isRebill = false;
+
+    private $paymentTokenManagement;
+
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -43,7 +38,8 @@ class Authorizenet extends Base
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
     ) {
         parent::__construct(
             $config,
@@ -52,7 +48,7 @@ class Authorizenet extends Base
             $persistor,
             $zeroTotalValidator
         );
-
+        $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
         }
@@ -71,6 +67,7 @@ class Authorizenet extends Base
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH],
                 OrderPaymentInterface::CC_EXP_YEAR => $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR],
+                'authorizenet_data' => $additionalInfo
             ]
         ];
     }
@@ -85,8 +82,19 @@ class Authorizenet extends Base
             : [];
 
         $result[OrderPaymentInterface::METHOD] = $this->getPaymentMethodCode();
-
         return $result;
+    }
+
+    public function setPaymentExtensionAttributes(Payment $payment, SubscriptionProfileInterface $profile)
+    {
+        $publicHash = $this->paymentTokenManagement->getByGatewayToken(
+            $profile->getPayment()->getPaymentToken(),
+            $this->getPaymentMethodCode(),
+            $profile->getCustomerId()
+        )->getPublicHash();
+        $payment->setData('method', $this->getPaymentMethodCode() . '_vault');
+        $payment->setData('public_hash', $publicHash);
+        return $this;
     }
 
     /**
@@ -94,9 +102,23 @@ class Authorizenet extends Base
      */
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
-        return [
-            'token_hash' => $profile->getPayment()->getTokenHash(),
-        ];
+        $addtionalInfo = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
+            ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
+            : [];
+        $publicHash = $this->paymentTokenManagement->getByGatewayToken(
+            $profile->getPayment()->getPaymentToken(),
+            $this->getPaymentMethodCode(),
+            $profile->getCustomerId()
+        )->getPublicHash();
+        $result =  $addtionalInfo['authorizenet_data'];
+        if ($this->isRebill) {
+            $result = [
+                'is_active_payment_token_enabler' => true,
+                'public_hash' => $publicHash,
+                'customer_id' => $profile->getCustomerId()
+            ];
+        }
+        return $result;
     }
 
     public function getPaymentMethodCode()
@@ -104,6 +126,11 @@ class Authorizenet extends Base
         //TODO: resolve if vault method
         return 'tnw_authorize_cim';
     }
+
+     public function setRebillProcessFlag()
+     {
+         $this->isRebill = true;
+     }
 
     /**
      * @inheritdoc
