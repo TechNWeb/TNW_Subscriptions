@@ -12,33 +12,39 @@
         <referenceContainer name="content">
             <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview"
                    name="subscription.info.view" after="subscription.info.links" cacheable="false">
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
-                       name="subscription.info.view.shipping.information" as="shipping-information"
-                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
-                    <action method="setAddressType">
-                        <argument name="type" xsi:type="string">shipping</argument>
-                    </action>
-                </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details"
-                       name="subscription.info.view.shipping.details"
-                       template="TNW_Subscriptions::subscription_profile/summary/overview/shipping-details.phtml"
-                       as="shipping-details" />
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Address"
-                       name="subscription.info.view.billing.information" as="billing-information"
-                       template="TNW_Subscriptions::subscription_profile/summary/address.phtml">
-                    <action method="setAddressType">
-                        <argument name="type" xsi:type="string">billing</argument>
-                    </action>
-                </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details"
-                       name="subscription.info.view.payment.details"
-                       template="TNW_Subscriptions::subscription_profile/summary/overview/payment-details.phtml"
-                       as="payment-details" >
+                <block class="TNW\Subscriptions\Block\Subscription\Info\Items"
+                       name="subscription.info.items"
+                       as="products"
+                       after="subscription.info.links"
+                       cacheable="false"
+                >
                     <arguments>
-                        <argument name="show_title" xsi:type="boolean">true</argument>
+                        <argument name="jsLayout" xsi:type="array">
+                            <item name="components" xsi:type="array">
+                                <item name="products" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="config" xsi:type="array">
+                                        <item name="template" xsi:type="string">TNW_Subscriptions/container</item>
+                                    </item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="products_insert_form" xsi:type="array">
+                                            <item name="component" xsi:type="string">TNW_Subscriptions/js/subscription-profile/items/insert-form</item>
+                                            <item name="autoRender" xsi:type="boolean">true</item>
+                                            <item name="formSubmitType" xsi:type="string">ajax</item>
+                                            <item name="sortOrder" xsi:type="string">0</item>
+                                            <item name="externalProvider" xsi:type="string">tnw_subscriptionprofile_products_and_services_form.tnw_subscriptionprofile_products_and_services_form_data_source</item>
+                                            <item name="ns" xsi:type="string">tnw_subscriptionprofile_products_and_services_form</item>
+                                            <item name="label" xsi:type="boolean">false</item>
+                                            <item name="config" xsi:type="array">
+                                                <item name="template" xsi:type="string">TNW_Subscriptions/form/insert</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </argument>
                     </arguments>
                 </block>
-                <block name="subscription.info.view.products" as="products" class="TNW\Subscriptions\Block\Subscription\Summary\Products" template="TNW_Subscriptions::subscription_profile/summary/products.phtml" />
                 <block name="subscription.info.view.danger_zone" as="danger-zone" class="TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone" template="TNW_Subscriptions::subscription_profile/summary/overview/danger-zone.phtml" cacheable="false" />
             </block>
         </referenceContainer>

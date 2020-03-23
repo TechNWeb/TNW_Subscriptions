@@ -610,7 +610,7 @@ class ModifyForm extends Form
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
                         'additionalClasses' => $additionalClasses,
-                        'title' => '',
+                        'title' => 'Modify',
                         'actions' => [
                             [
                                 'targetName' => $this->currentFormName,

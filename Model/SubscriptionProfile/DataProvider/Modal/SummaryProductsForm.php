@@ -745,8 +745,9 @@ class SummaryProductsForm extends ModifyForm
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
                         'additionalClasses' => 'action-primary action primary sub-button-right',
+                        'sortOrder' => 150,
                         'subButtonRight' => true,
-                        'title' => __('Save Changes'),
+                        'title' => __('Update'),
                         'actions' => [
                             [
                                 'targetName' => $this->getCurrentFormName(),
