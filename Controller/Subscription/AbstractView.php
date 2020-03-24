@@ -12,8 +12,15 @@ use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Sales\Controller\AbstractController\OrderViewAuthorizationInterface;
+use Magento\Sales\Model\OrderFactory;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\FilterBuilder;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\SubscriptionProfileOrderRepository;
 
 /**
  * Abstract controller for subscription information pages.
@@ -41,6 +48,41 @@ abstract class AbstractView extends AbstractAccount
     private $subscriptionRepository;
 
     /**
+     * @var OrderViewAuthorizationInterface
+     */
+    private $orderAuthorization;
+
+    /**
+     * @var OrderFactory
+     */
+    private $orderFactory;
+
+    /**
+     * @var SubscriptionProfileOrderRepository
+     */
+    private $subscriptionProfileOrder;
+
+    /**
+     * @var \Magento\Framework\Controller\Result\Redirect
+     */
+    private $redirect;
+
+    /**
+     * @var UrlInterface
+     */
+    private $url;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $criteriaBuilder;
+
+    /**
+     * @var FilterBuilder
+     */
+    private $filterBuilder;
+
+    /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param ForwardFactory $resultForwardFactory
@@ -52,12 +94,26 @@ abstract class AbstractView extends AbstractAccount
         PageFactory $resultPageFactory,
         ForwardFactory $resultForwardFactory,
         Registry $registry,
-        SubscriptionProfileRepository $subscriptionProfileRepository
+        SubscriptionProfileRepository $subscriptionProfileRepository,
+        OrderViewAuthorizationInterface $orderAuthorization,
+        OrderFactory $orderFactory,
+        SubscriptionProfileOrderRepository $subscriptionProfileOrder,
+        RedirectFactory $redirectFactory,
+        UrlInterface $url,
+        SearchCriteriaBuilder $criteriaBuilder,
+        FilterBuilder $filterBuilder
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->resultForwardFactory = $resultForwardFactory;
         $this->registry = $registry;
         $this->subscriptionRepository = $subscriptionProfileRepository;
+        $this->orderAuthorization = $orderAuthorization;
+        $this->orderFactory = $orderFactory;
+        $this->subscriptionProfileOrder = $subscriptionProfileOrder;
+        $this->redirect = $redirectFactory->create();
+        $this->url = $url;
+        $this->criteriaBuilder = $criteriaBuilder;
+        $this->filterBuilder = $filterBuilder;
 
         parent::__construct($context);
     }
@@ -70,12 +126,15 @@ abstract class AbstractView extends AbstractAccount
         $subscriptionProfileId = $this->getRequest()->getParam('entity_id');
 
         try {
+            if (!$this->canViewSubscriptionById($subscriptionProfileId)) {
+                return $this->redirect->setUrl($this->url->getUrl('*/*/history'));
+            }
             /** @var SubscriptionProfile $subscription */
             $subscription = $this->subscriptionRepository->getById($subscriptionProfileId);
             $this->registry->register('tnw_subscription_profile', $subscription);
         } catch (NoSuchEntityException $e) {
             $this->messageManager->addExceptionMessage($e);
-            return $this->noRoutRedirect();
+            return $this->redirect->setUrl($this->url->getUrl('*/*/history'));
         }
 
         /** @var \Magento\Framework\View\Result\Page $resultPage */
@@ -116,5 +175,45 @@ abstract class AbstractView extends AbstractAccount
         $resultForward = $this->resultForwardFactory->create();
 
         return $resultForward->forward('noroute');
+    }
+
+    /**
+     * Verifying user access to the profile
+     *
+     * @param $subscriptionProfileId
+     * @return bool
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function canViewSubscriptionById($subscriptionProfileId)
+    {
+        $subscriptionData = $this->subscriptionProfileOrder->getList(
+            $this->getFilterByProfileId($subscriptionProfileId)
+        )->getItems();
+        $subscriptionProfile = array_shift($subscriptionData);
+        if(is_null($subscriptionProfile)){
+            throw new NoSuchEntityException();
+        }
+        $magentoOrder = $this->orderFactory->create()->load($subscriptionProfile->getMagentoOrderId());
+        return $this->orderAuthorization->canView($magentoOrder);
+    }
+    /**
+     * Get criteria filter for Subscription Profile Order Repository
+     *
+     * @param $subscriptionProfileId
+     * @return \Magento\Framework\Api\SearchCriteria
+     */
+    private function getFilterByProfileId($subscriptionProfileId)
+    {
+        $this->criteriaBuilder->addFilters([
+            $this->filterBuilder
+                ->setField('magento_order_id')
+                ->setValue(null)
+                ->setConditionType('neq')
+                ->create()
+        ]);
+        return $this->criteriaBuilder
+            ->addFilter('subscription_profile_id', $subscriptionProfileId)
+            ->create();
     }
 }
