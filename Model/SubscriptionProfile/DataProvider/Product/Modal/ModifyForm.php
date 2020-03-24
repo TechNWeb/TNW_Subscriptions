@@ -867,6 +867,7 @@ class ModifyForm extends Form
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
+                            'priceInclTax' => '${ $.provider }'
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                         'modifySubscription' => true,

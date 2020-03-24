@@ -881,83 +881,142 @@
     }
 }
 
-#my-subscriptions-table {
-    .sub-icons-container {
-        .lib-tooltip(bottom);
-        @media (max-width: 639px) {
-            &:before {
-                content: normal;
-            }
+.tnw_subscriptions-subscription-history {
 
-            .sub-message {
-                display: inline-block;
-                background: none;
-                max-width: none;
-                max-height: none;
-                padding: 0;
-                border: none;
-                margin-top: 0;
-                position: inherit;
-            }
-
-            .sub-message:before {
-                content: normal;
-            }
-
-            .sub-message:after {
-                content: normal;
-            }
-
-            .sub-icon {
-                float: left;
-                margin-right: 0.5rem;
-                width: 2rem;
-                height: 2px;
-            }
+    .admin__data-grid-wrap {
+        padding-top: 0;
+        border-top: 2px solid @color-gray-middle3;
+        thead {
+            display: none;
+        }
+        td {
+            border-left: 0;
+            border-right: 0;
         }
     }
-    td {
-        .sub-icon {
-            position: relative;
-        }
-        .sub-icon:before {
-            background: none;
-            border: 0;
-            font-family: @icons-subscription__font-name;
-            font-size: 1.9rem;
-            font-style: normal;
-            font-weight: 400;
-            height: auto;
-            left: 0rem;
-            line-height: inherit;
-            margin-top: -0.5rem;
-            position: absolute;
-            speak: none;
-            text-shadow: none;
-            top: 50%;
-            width: auto;
-        }
-        .sub-icon-warning-orange:before {
-            color: #ff5501;
-            content: @icon-warning-subscription__content;
-        }
-        .sub-icon-warning-red:before {
-            color: #CF2A27;
-            content: @icon-warning-subscription__content;
-        }
-        .sub-icon-active-green:before {
-            color: #009e0f;
-            content: @icon-active-subscription__content;
+    .admin__data-grid-pager-wrap {
+        .selectmenu {
+            padding: 0 1rem 0 1rem;
         }
     }
-    .status.green {
-        color: #009e0f;
+    .admin__data-grid-pager {
+        button {
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+        }
     }
-    .status.orange {
-        color: #ff5501;
-    }
-    .status.red {
-        color: #CF2A27
+
+    .sub-details {
+        .lib-vendor-prefix-display(flex);
+        .thumb-wrapper {
+            .lib-vendor-prefix-flex-basis(15%);
+            .lib-vendor-prefix-display(flex);
+            .lib-vendor-prefix-flex-direction(column);
+            .lib-vendor-box-align(center);
+
+            img {
+                width: 100%;
+                margin-bottom: 1.5rem;
+            }
+        }
+        .details-wrapper {
+            .lib-vendor-prefix-flex-basis(85%);
+
+            .name-actions-descr-price-wrapper,
+            .term-frequency-date-wrapper {
+                .lib-vendor-prefix-display(flex);
+                .lib-vendor-prefix-flex-wrap(wrap);
+                >div {
+                    .lib-vendor-prefix-flex-grow(1);
+                    .lib-vendor-prefix-flex-basis(50%);
+                }
+                .sub-product-name {
+                    font-size: @font-size__l;
+                }
+                .sub-actions {
+                    text-align: right;
+                    font-size: @font-size__l;
+                }
+                .price {
+                    text-align: right;
+                    font-weight: @font-weight__bold;
+                    font-size: 2rem;
+                }
+                .sub-next-order-on {
+                    margin-top: 2rem;
+
+                    .title {
+
+                    }
+                    .date {
+                        font-weight: @font-weight__bold;
+                        color: @color-red11;
+                    }
+                }
+            }
+            .additional-information-wrapper {
+                padding: 1.5rem 0 1rem;
+                margin-top: 1.5rem;
+                border-top: 1px solid @color-gray-middle3;
+
+                .additional-information-title {
+                    cursor: pointer;
+                    font-size: @font-size__l;
+                    .lib-button-as-link();
+                    .lib-icon-font(
+                        @_icon-font-content: @icon-expand,
+                        @_icon-font-size: @font-size__xs
+                    );
+                }
+
+                &.opened {
+                    .additional-information-title {
+                        .lib-icon-font(
+                            @_icon-font-content: @icon-collapse,
+                            @_icon-font-size: @font-size__xs
+                        );
+                    }
+                }
+
+                .additional-information-content {
+                    .lib-vendor-prefix-display(flex);
+                    .lib-vendor-prefix-flex-wrap(wrap);
+                    >div {
+                        .lib-vendor-prefix-flex-grow(1);
+                        .lib-vendor-prefix-flex-basis(50%);
+                    }
+
+                    .shipping-information-wrapper,
+                    .payment-information-wrapper {
+                        margin-bottom: 1.5rem;
+                    }
+
+                    .payment-method-title,
+                    .shipping-method-title,
+                    .billing-address-title,
+                    .shipping-address-title {
+                        font-weight: @font-weight__bold;
+                        padding: 1rem 0;
+                    }
+                    .payment-method-table {
+                        .lib-vendor-prefix-display(flex);
+                        .lib-vendor-prefix-flex-wrap(wrap);
+
+                        dd,
+                        dt {
+                            margin-bottom: 0;
+                            font-weight: @font-weight__regular;
+                            .lib-vendor-prefix-flex-grow(1);
+                            .lib-vendor-prefix-flex-basis(35%);
+                        }
+                        dd {
+                            padding-left: 1rem;
+                            .lib-vendor-prefix-flex-basis(65%);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
