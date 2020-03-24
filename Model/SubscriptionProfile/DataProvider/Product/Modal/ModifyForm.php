@@ -959,7 +959,7 @@ class ModifyForm extends Form
                         'additionalClasses' => 'field-qty abs-field-size-x-small',
                         'dataScope' => 'qty',
                         'validation' => [
-                            'validate-zero-or-greater' => true,
+                            'validate-greater-than-zero' => true,
                             'required-entry' => true
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
@@ -985,6 +985,10 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'validation' => [
+                            'validate-greater-than-zero' => true,
+                            'required-entry' => true
+                        ],
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
