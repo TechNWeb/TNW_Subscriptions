@@ -1209,7 +1209,7 @@ class Manager
             $this->populatePaymentData($quotePayment);
             $profile = $this->getProfile();
             if (
-                ($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
+                $extensionAttributes instanceof OrderPaymentExtensionInterface &&
                 ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
             ) {
                 /** @var $paymentToken PaymentTokenInterface */
