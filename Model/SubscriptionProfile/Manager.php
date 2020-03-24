@@ -815,10 +815,6 @@ class Manager
                     $profile->getCustomerId()
                 );
 
-                //Set payment method
-                $quote->getPayment()
-                    ->importData($this->getEngine()->getPaymentInfo($profile))
-                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
                 if (!$quote->isVirtual()) {
                     $profileShippingAddressData = $profile->getShippingAddress()->getData();
@@ -834,10 +830,14 @@ class Manager
                     //Set shipping method
                     $quote->getShippingAddress()
                         ->setCollectShippingRates(true)
-                        ->setItemQty($quote->getItemsSummaryQty())
                         ->collectShippingRates()
                         ->setShippingMethod($profile->getShippingMethod());
                 }
+
+                // Set payment method
+                $quote->getPayment()
+                    ->importData($this->getEngine()->getPaymentInfo($profile))
+                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
                 $this->quoteRepository->save($quote);
 
