@@ -57,8 +57,7 @@ class ActiveMethods extends Fieldset
         'free',
         'braintree_cc_vault',
         'chcybersource_cc_vault',
-        'payflowpro_cc_vault',
-        'tnw_authorize_cim_vault'
+        'payflowpro_cc_vault'
     ];
 
     /**
