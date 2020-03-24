@@ -32,9 +32,11 @@ class TokenExtractor
     /**
      * @param $response
      * @param null $quote
+     * @param null $paymentData
      * @return array
+     * @throws \Exception
      */
-    public function getPaymentTokenWithTransactionId($response, $quote = null)
+    public function getPaymentTokenWithTransactionId($response, $quote = null, $paymentData = null)
     {
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create();
