@@ -1156,11 +1156,11 @@ class Manager
             'cc_exp_month' => $orderPayment->getCcExpMonth(),
             'cc_exp_year' => $orderPayment->getCcExpYear(),
         ];
+        $extensionAttributes = $orderPayment->getExtensionAttributes();
         if (
             $orderPaymentDataToAdd['cc_type'] == null
-            && $orderPayment->getExtensionAttributes()
+            && $extensionAttributes
         ) {
-            $extensionAttributes =  $orderPayment->getExtensionAttributes();
             $vaultPaymentToken = $extensionAttributes->getVaultPaymentToken();
             if ($vaultPaymentToken) {
                 $details = $vaultPaymentToken->getDetails();
@@ -1175,6 +1175,11 @@ class Manager
                     }
                 }
             }
+        } elseif ($extensionAttributes->getVaultPaymentToken()) {
+            $quotePayment->setAdditionalInformation(
+                'extension_attributes',
+                $extensionAttributes->getVaultPaymentToken()->getTokenDetails()
+            );
         }
         foreach ($orderPaymentDataToAdd as $key => $data) {
             if ($data) {
@@ -1199,7 +1204,7 @@ class Manager
             $this->populatePaymentData($quotePayment);
             $profile = $this->getProfile();
             if (
-                ($extensionAttributes = $orderPayment->getExtensionAttributes()) instanceof OrderPaymentExtensionInterface &&
+                $extensionAttributes instanceof OrderPaymentExtensionInterface &&
                 ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
             ) {
                 /** @var $paymentToken PaymentTokenInterface */
