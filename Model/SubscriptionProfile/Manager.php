@@ -834,10 +834,18 @@ class Manager
                         ->setShippingMethod($profile->getShippingMethod());
                 }
 
+                if ($isReBill && method_exists($this->getEngine(), 'setRebillProcessFlag')) {
+                    $this->getEngine()->setRebillProcessFlag();
+                }
+
                 // Set payment method
                 $quote->getPayment()
                     ->importData($this->getEngine()->getPaymentInfo($profile))
                     ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
+                if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
+                    $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
+                }
 
                 $this->quoteRepository->save($quote);
 
