@@ -73,7 +73,7 @@ class VaultPaymentAuthorization
             }
 
             $paymentTokenData = $this->paymentProcessors[$paymentData['method']]['vaultTokenExtractor']
-                ->getPaymentTokenWithTransactionId($response, $quote);
+                ->getPaymentTokenWithTransactionId($response, $quote, $paymentData);
 
             $cancelRequest =  [
                 'transaction_id' => $paymentTokenData['transaction_id'],

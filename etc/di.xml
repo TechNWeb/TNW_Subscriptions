@@ -1179,6 +1179,16 @@
                     <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                     <item name="extendedVoid" xsi:type="boolean">false</item>
                 </item>
+                <item name="tnw_authorize_cim" xsi:type="array">
+                    <item name="factory" xsi:type="object">TNW\AuthorizeCim\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\AuthorizenetPaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="object">TNW\AuthorizeCim\Gateway\Http\Client\TransactionAuthorize</item>
+                    <item name="cancelClient" xsi:type="object">TNW\AuthorizeCim\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\TokenExtractor</item>
+                    <item name="validator" xsi:type="object">TNW\AuthorizeCim\Gateway\Validator\TransactionResponseValidator</item>
+                    <item name="voidValidator" xsi:type="object">TNW\AuthorizeCim\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="extendedVoid" xsi:type="boolean">false</item>
+                </item>
             </argument>
         </arguments>
     </type>

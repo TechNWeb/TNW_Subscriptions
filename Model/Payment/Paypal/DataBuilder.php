@@ -12,7 +12,7 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
  * Class DataBuilder
  * @package TNW\Subscriptions\Model\Payment\Paypal
  */
-class DataBuilder
+class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
     use \Magento\Payment\Helper\Formatter;
 
@@ -34,16 +34,6 @@ class DataBuilder
     private $scopeConfig;
 
     /**
-     * @var Manager
-     */
-    private $manager;
-
-    /**
-     * @var SubscriptionConfig
-     */
-    private $subscriptionConfig;
-
-    /**
      * DataBuilder constructor.
      * @param \Magento\Paypal\Model\PayflowConfigFactory $configFactory
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -60,6 +50,7 @@ class DataBuilder
         $this->subscriptionConfig = $subscriptionConfig;
         $this->scopeConfig = $scopeConfig;
         $this->configFactory = $configFactory;
+        parent::__construct($subscriptionConfig, $manager);
     }
 
     /**
@@ -139,7 +130,6 @@ class DataBuilder
         ];
     }
 
-
     /**
      * @param $field
      * @param null $storeId
@@ -149,38 +139,5 @@ class DataBuilder
     {
         $path = 'payment/' . $this->methodCode . '/' . $field;
         return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-    }
-
-    /**
-     * @param \Magento\Quote\Model\Quote $order
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
-     */
-    private function getAmount($order)
-    {
-        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId())) {
-            $result = $this->subscriptionConfig->getStaticAuthAmount($order->getStoreId());
-        } else {
-            $subscriptionItems = [];
-            foreach ($order->getAllVisibleItems() as $item) {
-                $option = $item->getOptionByCode('subscription');
-                if (null !== $option) {
-                    $subscriptionItems[] = $item;
-                }
-            }
-            if ($subscriptionItems) {
-                $this->manager->populateProfileData($order, $subscriptionItems);
-            }
-            $profile = $this->manager->getProfile();
-            $products = $profile->getProfileProducts();
-            $amount = 0;
-            foreach ($products as $product) {
-                $amount += (float)$product->getPrice();
-            }
-            $result = $amount;
-        }
-        return $result;
     }
 }
