@@ -137,9 +137,11 @@ class BillingCyclesManager
             // Profile has a finite count of cycles
             $cyclesCount = (int)$profile->getTotalBillingCycles() - 1;
         }
+
+        $products = $profile->getProducts();
+        $product = array_shift($products);
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
-            list($product) = $profile->getProducts();
              $date = $this->calculateScheduledDate(
                 $startDate,
                 $profile->getUnit(),
