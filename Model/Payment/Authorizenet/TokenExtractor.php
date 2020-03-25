@@ -56,7 +56,7 @@ class TokenExtractor
                 "TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction"
             );
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
-            $this->subjectReader = $objectManager->get("TNW\AuthorizeCim\Gateway\Helper\SubjectReader ");
+            $this->subjectReader = $objectManager->get("TNW\AuthorizeCim\Gateway\Helper\SubjectReader");
             $this->config = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
         }
     }
