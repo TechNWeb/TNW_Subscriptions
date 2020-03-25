@@ -116,12 +116,20 @@ class Authorizenet extends Base
         $addtionalInfo = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
-        $publicHash = $this->paymentTokenManagement->getByGatewayToken(
+        $gateWayToken = $this->paymentTokenManagement->getByGatewayToken(
             $profile->getPayment()->getPaymentToken(),
             $this->getPaymentMethodCode(),
             $profile->getCustomerId()
-        )->getPublicHash();
-        $result =  $addtionalInfo['authorizenet_data'];
+        );
+        if (!$gateWayToken) {
+            $gateWayToken = $this->paymentTokenManagement->getByGatewayToken(
+                $profile->getPayment()->getPaymentToken(),
+                $this->getPaymentMethodCode(),
+                0
+            );
+        }
+        $publicHash = $gateWayToken ? $gateWayToken->getPublicHash() : '';
+        $result = $addtionalInfo['authorizenet_data'];
         if ($this->isRebill) {
             $result = [
                 'is_active_payment_token_enabler' => true,
