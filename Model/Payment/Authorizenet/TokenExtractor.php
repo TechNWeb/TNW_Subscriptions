@@ -76,7 +76,7 @@ class TokenExtractor
 
         $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
             'type' => $paymentData['additional_data']['cc_type'],
-            'maskedCC' => $maskedCC,
+            'maskedCC' => str_replace('XXXX', '', $maskedCC),
             'expirationDate' => sprintf(
                 '%s/%s',
                 $paymentData['additional_data']['cc_exp_month'],
