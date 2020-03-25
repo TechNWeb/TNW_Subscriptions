@@ -7,43 +7,66 @@ namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
-use TNW\AuthorizeCim\Gateway\Config\Config;
-use TNW\AuthorizeCim\Gateway\Helper\SubjectReader;
-use TNW\AuthorizeCim\Gateway\Http\TransferFactory;
-use \TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction;
 
+/**
+ * Class TokenExtractor
+ * @package TNW\Subscriptions\Model\Payment\Authorizenet
+ */
 class TokenExtractor
 {
-    /** @var CreditCardTokenFactory */
+    /**
+     * @var CreditCardTokenFactory
+     */
     private $paymentTokenFactory;
 
-
-    /** @var SubjectReader */
+    /**
+     * @var mixed
+     */
     private $subjectReader;
 
-    /** @var Config */
+    /**
+     * @var mixed
+     */
     private $config;
 
-
+    /**
+     * @var mixed
+     */
     private $transferFactory;
 
+    /**
+     * @var mixed
+     */
     private $client;
 
+    /**
+     * TokenExtractor constructor.
+     * @param CreditCardTokenFactory $creditCardTokenFactory
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         CreditCardTokenFactory $creditCardTokenFactory,
-        Config $config,
-        SubjectReader $subjectReader,
-        TransferFactory $transferFactory,
-        CreateCustomerProfileFromTransaction $client
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
-        $this->client = $client;
-        $this->transferFactory = $transferFactory;
         $this->paymentTokenFactory = $creditCardTokenFactory;
-        $this->subjectReader = $subjectReader;
-        $this->config = $config;
-
+        if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
+            $this->client = $objectManager->get(
+                "TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction"
+            );
+            $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
+            $this->subjectReader = $objectManager->get("TNW\AuthorizeCim\Gateway\Helper\SubjectReader");
+            $this->config = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
+        }
     }
 
+    /**
+     * @param $response
+     * @param null $quote
+     * @param null $paymentData
+     * @return array
+     */
     public function getPaymentTokenWithTransactionId($response, $quote = null, $paymentData = null)
     {
         $transactionAuth = $this->subjectReader->readTransaction($response);
@@ -63,6 +86,12 @@ class TokenExtractor
         ];
     }
 
+    /**
+     * @param $transaction
+     * @param $paymentData
+     * @param $maskedCC
+     * @return PaymentTokenInterface
+     */
     private function getVaultPaymentToken($transaction, $paymentData, $maskedCC)
     {
         $profileId = $transaction->getCustomerProfileId();
@@ -104,6 +133,10 @@ class TokenExtractor
             ->format('Y-m-d 00:00:00');
     }
 
+    /**
+     * @param $details
+     * @return string
+     */
     private function _convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);
