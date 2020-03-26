@@ -100,7 +100,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      */
     public function build($order, $paymentData)
     {
-        $amount = $this->getAmount($order);
+        $amount = ['amount' => $this->getAmount($order)];
         $billingAddress = $order->getBillingAddress();
         $channel = $this->config->getValue('channel');
 

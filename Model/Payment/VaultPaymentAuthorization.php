@@ -165,7 +165,7 @@ class VaultPaymentAuthorization
     private function checkRequiredObjects($method)
     {
         $result = true;
-        $paymentMethodConfig = clone $this->paymentProcessors[$method];
+        $paymentMethodConfig = $this->paymentProcessors[$method];
         foreach ($paymentMethodConfig as $name => $configObject) {
             if (in_array($name, $this->requiredObjects)) {
                 if (is_string($configObject)) {
