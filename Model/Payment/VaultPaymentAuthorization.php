@@ -31,16 +31,37 @@ class VaultPaymentAuthorization
     private $logger;
 
     /**
+     * @var array
+     */
+    private $requiredObjects = [
+        "factory",
+        "dataBuilder",
+        "authClient",
+        "cancelClient",
+        "vaultTokenExtractor",
+        "validator",
+        "voidValidator"
+    ];
+
+    /**
+     * @var \Magento\Framework\ObjectManagerInterface
+     */
+    private $objectManager;
+
+    /**
      * VaultPaymentAuthorization constructor.
      * @param CreateProfile $createProfileObserver
      * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param array $paymentProcessors
      */
     public function __construct(
         CreateProfile $createProfileObserver,
         \Psr\Log\LoggerInterface $logger,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         $paymentProcessors = []
     ) {
+        $this->objectManager = $objectManager;
         $this->createProfileObserver = $createProfileObserver;
         $this->paymentProcessors = $paymentProcessors;
         $this->logger = $logger;
@@ -54,6 +75,10 @@ class VaultPaymentAuthorization
     public function processPreAuthForTrial($paymentData, $quote)
     {
         if (isset($this->paymentProcessors[$paymentData['method']])) {
+            if (!$this->checkRequiredObjects($paymentData['method'])) {
+                $this->logger->critical(__('Trial payment could not be processed.'));
+                throw new CommandException(__('Transaction has been declined. Please try again later.'));
+            }
             $transferFactory = $this->paymentProcessors[$paymentData['method']]['factory'];
             $dataBuilder = $this->paymentProcessors[$paymentData['method']]['dataBuilder'];
             $client = $this->paymentProcessors[$paymentData['method']]['authClient'];
@@ -131,5 +156,27 @@ class VaultPaymentAuthorization
                 ? __(implode(PHP_EOL, $messages))
                 : __('Transaction has been declined. Please try again later.')
         );
+    }
+
+    /**
+     * @param $method
+     * @return bool
+     */
+    private function checkRequiredObjects($method)
+    {
+        $result = true;
+        $paymentMethodConfig = $this->paymentProcessors[$method];
+        foreach ($paymentMethodConfig as $name => $configObject) {
+            if (in_array($name, $this->requiredObjects)) {
+                if (is_string($configObject)) {
+                    if (class_exists($configObject)) {
+                        $this->paymentProcessors[$method][$name] = $this->objectManager->create($configObject);
+                    } else {
+                        $result = false;
+                    }
+                }
+            }
+        }
+        return $result;
     }
 }
