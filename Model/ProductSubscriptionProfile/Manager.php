@@ -16,7 +16,6 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-
 /**
  * Class Manager
  */
@@ -70,6 +69,7 @@ class Manager
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
+     * @param ProductTypeManagerResolver $productTypeResolver
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
@@ -312,6 +312,7 @@ class Manager
                                 }
                             }
                         } else {
+                            $oldQty = $product->getQty();
                             if (!empty($requestData['price'])) {
                                 $product->setPrice(number_format($requestData['price'], 4));
                             }
@@ -326,6 +327,33 @@ class Manager
 
                                     $product->setCustomAttribute($attributeCode, $attributeValue);
                                 }
+                            }
+                            if (isset($data['item_' . $product->getId()]['period'])) {
+                                $periodValue = $data['item_' . $product->getId()]['period'];
+                                if ($periodValue <= 0 && $data['item_' . $product->getId()]['term'] == 0) {
+                                    return strval(__('Bill times must be greater than 0.'));
+                                }
+                                $profileModel->setTotalBillingCycles($periodValue);
+                            }
+                            if (isset($data['item_' . $product->getId()]['billing_frequency'])) {
+                                $billingFrequency = $data['item_' . $product->getId()]['billing_frequency'];
+                                $profileModel->setBillingFrequencyId($billingFrequency);
+                            }
+                            if (isset($data['item_' . $product->getId()]['qty']) || $profileModel->hasDataChanges()) {
+                                $product->setPrice(number_format(
+                                    ($product->getPrice() / $oldQty) * $data['item_' . $product->getId()]['qty']
+                                ));
+                            }
+                            if (isset($data['item_' . $product->getId()]['start_on'])) {
+                                $startOn = $data['item_' . $product->getId()]['start_on'];
+                                $date = new \DateTime();
+                                $startDate = new \DateTime($startOn);
+                                $expression = 'PT' . $date->format('H') . 'H'
+                                    . $date->format('i') . 'M'
+                                    . $date->format('s') . 'S';
+                                $startDate->add(new \DateInterval($expression));
+                                $startOn = $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                $profileModel->setStartDate($startOn);
                             }
                         }
                         if ($product->hasDataChanges()) {
