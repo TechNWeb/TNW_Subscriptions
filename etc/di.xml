@@ -1194,6 +1194,17 @@
                     <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\VoidDataBuilder</item>
                     <item name="extendedVoid" xsi:type="boolean">true</item>
                 </item>
+                <item name="tnw_authorize_vault" xsi:type="array">
+                    <item name="factory" xsi:type="string">TNW\AuthorizeCim\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\AuthorizenetPaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="string">TNW\AuthorizeCim\Gateway\Http\Client\TransactionAuthorize</item>
+                    <item name="cancelClient" xsi:type="string">TNW\AuthorizeCim\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\TokenExtractor</item>
+                    <item name="validator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\TransactionResponseValidator</item>
+                    <item name="voidValidator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\VoidDataBuilder</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                </item>
             </argument>
         </arguments>
     </type>

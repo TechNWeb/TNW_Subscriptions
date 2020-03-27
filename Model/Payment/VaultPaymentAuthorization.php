@@ -67,13 +67,7 @@ class VaultPaymentAuthorization
         $this->logger = $logger;
     }
 
-    /**
-     * @param $paymentData
-     * @param $quote
-     * @param $email
-     * @throws CommandException
-     */
-    public function processPreAuthForTrial($paymentData, $quote, $email)
+    public function processPreAuthForTrial($paymentData, $quote, $email = null)
     {
         if (isset($this->paymentProcessors[$paymentData['method']])) {
             if (!$this->checkRequiredObjects($paymentData['method'])) {
