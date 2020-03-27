@@ -15,6 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Controller\Subscription\Items;
 
 /**
  * Controller for subscription history at customer account dashboard.
@@ -50,23 +51,33 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     private $messageHistoryLogger;
 
     /**
+     * Subscription items at customer account
+     *
+     * @var Items
+     */
+    private $subscriptionItems;
+
+    /**
      * @param Context $context
      * @param SubscriptionProfileRepository $profileRepository
      * @param StatusManager $statusManager
      * @param ProfileStatus $statusSource
      * @param MessageHistoryLogger $messageHistoryLogger
+     * @param Items $subscriptionItems
      */
     public function __construct(
         Context $context,
         SubscriptionProfileRepository $profileRepository,
         StatusManager $statusManager,
         ProfileStatus $statusSource,
-        MessageHistoryLogger $messageHistoryLogger
+        MessageHistoryLogger $messageHistoryLogger,
+        Items $subscriptionItems
     ) {
         $this->profileRepository = $profileRepository;
         $this->statusManager = $statusManager;
         $this->statusSource = $statusSource;
         $this->messageHistoryLogger = $messageHistoryLogger;
+        $this->subscriptionItems = $subscriptionItems;
         parent::__construct($context);
     }
 
@@ -79,6 +90,9 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
         $newStatus = $this->getRequest()->getParam('status');
 
         try {
+            if(!$this->subscriptionItems->canViewSubscriptionById($profileId)){
+                throw new \Magento\Framework\Exception\NoSuchEntityException();
+            }
             /* @var SubscriptionProfile $model */
             $model = $this->profileRepository->getById($profileId);
 
