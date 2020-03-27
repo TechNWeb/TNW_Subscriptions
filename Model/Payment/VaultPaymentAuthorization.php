@@ -70,9 +70,10 @@ class VaultPaymentAuthorization
     /**
      * @param $paymentData
      * @param $quote
+     * @param $email
      * @throws CommandException
      */
-    public function processPreAuthForTrial($paymentData, $quote)
+    public function processPreAuthForTrial($paymentData, $quote, $email)
     {
         if (isset($this->paymentProcessors[$paymentData['method']])) {
             if (!$this->checkRequiredObjects($paymentData['method'])) {
@@ -86,9 +87,12 @@ class VaultPaymentAuthorization
             $validator = $this->paymentProcessors[$paymentData['method']]['validator'];
             $voidValidator = $this->paymentProcessors[$paymentData['method']]['voidValidator'];
             $voidDataBuilder = $this->paymentProcessors[$paymentData['method']]['voidDataBuilder'];
-            $paymentTransactionData = $dataBuilder->build($quote, $paymentData);
-            $transferO = $transferFactory->create($paymentTransactionData);
 
+            $paymentData['customer_guest_email'] = $email;
+            $paymentTransactionData = $dataBuilder->build($quote, $paymentData);
+            unset($paymentData['customer_guest_email']);
+
+            $transferO = $transferFactory->create($paymentTransactionData);
             $response = $client->placeRequest($transferO);
 
             $result = $validator->validate(
