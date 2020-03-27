@@ -1163,7 +1163,7 @@
                 </item>
                 <item name="payflowpro_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
-                    <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\DataBuilder</item>
+                    <item name="dataBuilder" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\VaultDataBuilder</item>
                     <item name="authClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
                     <item name="cancelClient" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Client</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Paypal\TokenExtractor</item>
