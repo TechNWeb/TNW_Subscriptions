@@ -85,6 +85,7 @@ class VaultPaymentAuthorization
             $cancelClient = $this->paymentProcessors[$paymentData['method']]['cancelClient'];
             $validator = $this->paymentProcessors[$paymentData['method']]['validator'];
             $voidValidator = $this->paymentProcessors[$paymentData['method']]['voidValidator'];
+            $voidDataBuilder = $this->paymentProcessors[$paymentData['method']]['voidDataBuilder'];
             $paymentTransactionData = $dataBuilder->build($quote, $paymentData);
             $transferO = $transferFactory->create($paymentTransactionData);
 
@@ -100,7 +101,7 @@ class VaultPaymentAuthorization
             $paymentTokenData = $this->paymentProcessors[$paymentData['method']]['vaultTokenExtractor']
                 ->getPaymentTokenWithTransactionId($response, $quote, $paymentData);
 
-            $cancelRequest =  [
+            $cancelRequest = [
                 'transaction_id' => $paymentTokenData['transaction_id'],
             ];
             if (isset($paymentTransactionData['store_id'])) {
@@ -109,6 +110,7 @@ class VaultPaymentAuthorization
             if ($this->paymentProcessors[$paymentData['method']]['extendedVoid']) {
                 $cancelRequest['paymentTransactionData'] = $paymentTransactionData;
             }
+            $cancelRequest = $voidDataBuilder->build($cancelRequest);
             $transferCancelObject = $transferFactory->create($cancelRequest);
             $responseCancel = $cancelClient->placeRequest($transferCancelObject);
 
