@@ -60,7 +60,7 @@ class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\Da
             'transaction_request' => [
                 'customer' => [
                     'type' => 'individual',
-                    'email' => $billingAddress->getEmail()
+                    'email' => $billingAddress->getEmail() ? : $paymentData['customer_guest_email']
                 ],
                 'amount' => $this->formatPrice($this->getAmount($order)),
                 'currency_code' => $order->getCurrencyCode(),

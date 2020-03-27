@@ -72,7 +72,8 @@ class GuestPaymentInformationManagement
         ) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),
-                $quote
+                $quote,
+                $email
             );
             $quote->setSubscriptionPaymentDataSet(true);
             $paymentMethod->setMethod('free');
