@@ -1148,6 +1148,7 @@
                     <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
                     <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                     <item name="extendedVoid" xsi:type="boolean">false</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                 </item>
                 <item name="payflowpro" xsi:type="array">
                     <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
@@ -1158,6 +1159,7 @@
                     <item name="extendedVoid" xsi:type="boolean">true</item>
                     <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
                     <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                 </item>
                 <item name="payflowpro_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\TransferFactory</item>
@@ -1168,6 +1170,7 @@
                     <item name="extendedVoid" xsi:type="boolean">true</item>
                     <item name="validator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
                     <item name="voidValidator" xsi:type="object">\TNW\Subscriptions\Model\Payment\Paypal\Validator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                 </item>
                 <item name="braintree_cc_vault" xsi:type="array">
                     <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
@@ -1177,6 +1180,7 @@
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
                     <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
                     <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                     <item name="extendedVoid" xsi:type="boolean">false</item>
                 </item>
                 <item name="tnw_authorize_cim" xsi:type="array">
@@ -1187,7 +1191,8 @@
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\TokenExtractor</item>
                     <item name="validator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\TransactionResponseValidator</item>
                     <item name="voidValidator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\GeneralResponseValidator</item>
-                    <item name="extendedVoid" xsi:type="boolean">false</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\VoidDataBuilder</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
                 </item>
             </argument>
         </arguments>
