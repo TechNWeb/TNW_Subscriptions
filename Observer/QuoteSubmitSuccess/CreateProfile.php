@@ -160,9 +160,16 @@ class CreateProfile implements ObserverInterface
                 : null;
             if ($paymentToken && !empty($paymentToken->getGatewayToken())) {
                 $paymentData = $this->trialPaymentData['payment_data'];
+                $paymentMethodCode = $paymentData['method'];
+
+                //TODO: make it more dynamic
+                if ($paymentMethodCode == 'tnw_authorize_cim_vault') {
+                    $paymentMethodCode = 'tnw_authorize_cim';
+                }
+
                 $paymentToken->setCustomerId($customer->getId());
                 $paymentToken->setIsActive(true);
-                $paymentToken->setPaymentMethodCode($paymentData['method']);
+                $paymentToken->setPaymentMethodCode($paymentMethodCode);
                 $paymentToken->setIsVisible(true);
                 $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
                 $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $order->getPayment());

@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
+use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
  * Class TokenExtractor
@@ -40,17 +41,18 @@ class TokenExtractor
     private $client;
 
     /**
-     * TokenExtractor constructor.
-     * @param CreditCardTokenFactory $creditCardTokenFactory
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @var PaymentTokenManagementInterface
      */
+    private $tokenManagement;
+
     public function __construct(
+        PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         $this->paymentTokenFactory = $creditCardTokenFactory;
+        $this->tokenManagement = $tokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->client = $objectManager->get(
                 "TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction"
@@ -78,40 +80,40 @@ class TokenExtractor
         ];
         $transferObject = $this->transferFactory->create($data);
         $responseCC = $this->client->placeRequest($transferObject);
-
+        $customerId = $quote ? $quote->getCustomerId() : 0;
         $transaction = $this->subjectReader->readTransaction($responseCC);
         return [
-            'payment_token' => $this->getVaultPaymentToken($transaction, $paymentData, $maskedCC),
+            'payment_token' => $this->getVaultPaymentToken($transaction, $paymentData, $maskedCC, $customerId),
             'transaction_id' => $transactionId
         ];
     }
 
-    /**
-     * @param $transaction
-     * @param $paymentData
-     * @param $maskedCC
-     * @return PaymentTokenInterface
-     */
-    private function getVaultPaymentToken($transaction, $paymentData, $maskedCC)
+    private function getVaultPaymentToken($transaction, $paymentData, $maskedCC, $customerId = 0)
     {
         $profileId = $transaction->getCustomerProfileId();
         $paymentProfileIdList = $transaction->getCustomerPaymentProfileIdList() ? : [];
         $gateWayToken = sprintf('%s/%s', $profileId, reset($paymentProfileIdList));
 
-        /** @var PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create()
-            ->setExpiresAt($this->_getExpirationDate($paymentData))
-            ->setGatewayToken($gateWayToken);
+        if (!$paymentToken = $this->tokenManagement->getByGatewayToken(
+            $gateWayToken,
+            'tnw_authorize_cim',
+            $customerId
+        )) {
+            /** @var PaymentTokenInterface $paymentToken */
+            $paymentToken = $this->paymentTokenFactory->create()
+                ->setExpiresAt($this->_getExpirationDate($paymentData))
+                ->setGatewayToken($gateWayToken);
 
-        $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
-            'type' => $paymentData['additional_data']['cc_type'],
-            'maskedCC' => str_replace('XXXX', '', $maskedCC),
-            'expirationDate' => sprintf(
-                '%s/%s',
-                $paymentData['additional_data']['cc_exp_month'],
-            $paymentData['additional_data']['cc_exp_year']
-            )
-        ]));
+            $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
+                'type' => $paymentData['additional_data']['cc_type'],
+                'maskedCC' => str_replace('XXXX', '', $maskedCC),
+                'expirationDate' => sprintf(
+                    '%s/%s',
+                    $paymentData['additional_data']['cc_exp_month'],
+                    $paymentData['additional_data']['cc_exp_year']
+                )
+            ]));
+        }
 
         return $paymentToken;
     }
