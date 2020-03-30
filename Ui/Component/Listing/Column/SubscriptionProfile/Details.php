@@ -4,7 +4,6 @@ namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image;
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Customer\Model\Address\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -12,11 +11,10 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Ui\Component\Form\Element\Input;
-use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 class Details extends Column
@@ -57,10 +55,16 @@ class Details extends Column
     private $paymentConfig;
 
     /**
+     * @var ManagerConfigurable
+     */
+    private $managerConfigurable;
+
+    /**
      * Details constructor.
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param ProductRepositoryInterface $productRepository
      * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerConfigurable $managerConfigurable
      * @param ProfileStatus $profileStatus
      * @param PaymentConfig $paymentConfig
      * @param Config $addressConfig
@@ -74,6 +78,7 @@ class Details extends Column
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         ProductRepositoryInterface $productRepository,
         ScopeConfigInterface $scopeConfig,
+        ManagerConfigurable $managerConfigurable,
         ProfileStatus $profileStatus,
         PaymentConfig $paymentConfig,
         Config $addressConfig,
@@ -85,12 +90,13 @@ class Details extends Column
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
-        $this->imageHelper = $imageHelper;
         $this->productRepository = $productRepository;
-        $this->profileStatus = $profileStatus;
-        $this->addressConfig = $addressConfig;
         $this->scopeConfig = $scopeConfig;
+        $this->managerConfigurable = $managerConfigurable;
+        $this->profileStatus = $profileStatus;
         $this->paymentConfig = $paymentConfig;
+        $this->addressConfig = $addressConfig;
+        $this->imageHelper = $imageHelper;
     }
 
     /**
@@ -114,7 +120,8 @@ class Details extends Column
                         'qty' => $profileProduct->getQty(),
                         'short_description' => $product->getShortDescription(),
                         'img_src' => $imageHelper->getUrl(),
-                        'img_alt' => $profileProduct->getName()
+                        'img_alt' => $profileProduct->getName(),
+                        'configurable_options' => $this->managerConfigurable->getConfigurableOptionsData($profileProduct)
                     ];
                     $item['term_label'] = $this->getTerm($itemId);
                     $item['status_label'] = $this->profileStatus->getLabelByValue($item['status']);

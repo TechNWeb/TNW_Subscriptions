@@ -28,6 +28,11 @@ define([
             return row.subscription_product.short_description;
         },
 
+        getProductOptions: function (row) {
+            if (!row.subscription_product || !row.subscription_product.configurable_options.length) return false;
+            return row.subscription_product.configurable_options;
+        },
+
         getIsVirtual: function(row) {
             return row.is_virtual;
         },

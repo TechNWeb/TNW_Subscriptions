@@ -41,6 +41,16 @@
             <div class="price">
                 <span text="$col.getPaymentAmount($row())"/>
             </div>
+            <!-- ko if: $col.getProductOptions($row()) -->
+            <div class="sub-configurable-options">
+                <!-- ko foreach: {data: $col.getProductOptions($row()), as: 'option'}-->
+                <div class="option">
+                    <strong text="option.attributeLabel"/>:&nbsp;
+                    <span text="option.optionLabel"/>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
         </div>
         <div class="term-frequency-date-wrapper">
             <div class="sub-billing-frequency">
