@@ -7,7 +7,12 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
+/**
+ * Class VaultDataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Paypal
+ */
 class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
     use \Magento\Payment\Helper\Formatter;
@@ -18,9 +23,9 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     private $configFactory;
 
     /**
-     * @var
+     * @var string
      */
-    private $methodCode;
+    private $methodCode = 'payflowpro';
 
     /**
      * Core store config
@@ -30,18 +35,26 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     private $scopeConfig;
 
     /**
-     * DataBuilder constructor.
+     * @var PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * VaultDataBuilder constructor.
      * @param \Magento\Paypal\Model\PayflowConfigFactory $configFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param SubscriptionConfig $subscriptionConfig
      * @param Manager $manager
      */
     public function __construct(
         \Magento\Paypal\Model\PayflowConfigFactory $configFactory,
+        PaymentTokenManagementInterface $paymentTokenManagement,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         SubscriptionConfig $subscriptionConfig,
         Manager $manager
     ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
         $this->scopeConfig = $scopeConfig;
@@ -59,12 +72,9 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
      */
     public function build($quote, $paymentInfo)
     {
-        $paymentData = $quote->getPayment()->getData();
         $amount = $this->getAmount($quote);
         $storeId = $quote->getStoreId();
-        $this->methodCode = $quote->getPayment()->getMethod();
         if (!$quote->getPayment()->getMethod()) {
-            $this->methodCode = $paymentInfo['method'];
             $quote->getPayment()->setMethod($this->methodCode);
         }
         $config = $this->configFactory->create();
@@ -74,7 +84,12 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         $orderIncrementId = $quote->getReservedOrderId();
         $billing = $quote->getBillingAddress();
         $totals = $quote->getTotals();
-        $token = $paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF];
+        $token = $this->paymentTokenManagement->getByPublicHash(
+            $paymentInfo['additional_data']['public_hash'],
+            $quote->getCustomerId()
+        )->getGatewayToken();
+
+        [\Magento\Paypal\Model\Payflowpro::PNREF];
         $requestData = [
             'user' => $this->getConfigData('user'),
             'vendor' => $this->getConfigData('vendor'),
