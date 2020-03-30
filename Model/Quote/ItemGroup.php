@@ -31,7 +31,8 @@ class ItemGroup
             if (null === $option) {
                 $group['no_option'][] = $item;
             } else {
-                $group[$option->getValue()][] = $item;
+                $optionValuesWithId[] = json_decode($option->getValue())->product_id = $option->getProductId();
+                $group[json_encode($optionValuesWithId)][] = $item;
             }
         }
 
