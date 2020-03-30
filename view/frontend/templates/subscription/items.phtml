@@ -6,22 +6,14 @@
 
 /* @var $block \TNW\Subscriptions\Block\Subscription\Info\Items */
 ?>
-<div id="subscription-data-wrapper" class="subscription-data-wrapper"
+<div id="subscription-products-data-wrapper" class="subscription-products-data-wrapper"
      data-role="loader-container"
      data-bind="scope:'products'">
     <?php echo $block->getTabMessagesHtml(); ?>
-    <div class="items-details-view">
-        <div class="block">
-            <div class="block-title">
-                <strong><?php echo __('Products') ?></strong>
-            </div>
-        </div>
-    </div>
-
     <!-- ko template: getTemplate() --><!-- /ko -->
     <script type="text/x-magento-init">
             {
-                "#subscription-data-wrapper": {
+                "#subscription-products-data-wrapper": {
                     "Magento_Ui/js/core/app": <?php /* @noEscape */ echo $block->getJsLayout(); ?>
                 }
             }

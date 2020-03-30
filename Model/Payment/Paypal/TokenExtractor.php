@@ -7,10 +7,11 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
  * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Braintree
+ * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class TokenExtractor
 {
@@ -20,35 +21,56 @@ class TokenExtractor
     private $paymentTokenFactory;
 
     /**
+     * @var PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
      * TokenExtractor constructor.
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
      */
     public function __construct(
-        PaymentTokenFactoryInterface $paymentTokenFactory
+        PaymentTokenFactoryInterface $paymentTokenFactory,
+        PaymentTokenManagementInterface $paymentTokenManagement
     ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->paymentTokenFactory = $paymentTokenFactory;
     }
 
     /**
      * @param $response
      * @param null $quote
+     * @param null $paymentData
      * @return array
+     * @throws \Exception
      */
-    public function getPaymentTokenWithTransactionId($response, $quote = null)
+    public function getPaymentTokenWithTransactionId($response, $quote = null, $paymentData = null)
     {
-        /** @var PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create();
         $token = $response->getData(\Magento\Paypal\Model\Payflowpro::PNREF);
-        $paymentToken->setGatewayToken($token);
-        $payment = $quote->getPayment();
-        $paymentToken->setTokenDetails(
-            json_encode($payment
-                ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
-            )
-        );
-        $paymentToken->setExpiresAt(
-            $this->getExpirationDate($payment)
-        );
+        $paymentToken = false;
+        if ($quote->getCustomerId() && isset($paymentData['additional_data']['public_hash'])) {
+            $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+                $paymentData['additional_data']['public_hash'],
+                $quote->getCustomerId()
+            );
+        }
+
+        if (!$paymentToken) {
+            /** @var PaymentTokenInterface $paymentToken */
+            $paymentToken = $this->paymentTokenFactory->create();
+
+            $paymentToken->setGatewayToken($token);
+            $payment = $quote->getPayment();
+            $paymentToken->setTokenDetails(
+                json_encode($payment
+                    ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
+                )
+            );
+            $paymentToken->setExpiresAt(
+                $this->getExpirationDate($payment)
+            );
+        }
 
         return [
             'payment_token' => $paymentToken,

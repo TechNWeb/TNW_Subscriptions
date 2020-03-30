@@ -317,18 +317,7 @@ class CreateProfile extends BaseCreate
      */
     private function getSubQuote()
     {
-        $result = null;
-        $subQuotes = $this->getSubQuotes();
-        /** @var ModelQuote $subQuote */
-        foreach ($subQuotes as $subQuote) {
-            if ($this->canAddProduct($subQuote)) {
-                $result = $subQuote;
-                break;
-            }
-        }
-        $result = $result ?: $this->createSubCart();
-
-        return $result;
+        return $this->createSubCart();
     }
 
     /**

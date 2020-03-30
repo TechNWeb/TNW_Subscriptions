@@ -1,0 +1,101 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="sub-details">
+    <div class="thumb-wrapper">
+        <div class="sub-product-thumbnail">
+            <img data-bind="
+            attr: {
+                src: $col.getProudctThumbnailSrc($row()),
+                alt: $col.getProudctThumbnailAlt($row())
+            }">
+        </div>
+        <div class="sub-status-label">
+            <strong text="$col.getStatusLabel($row())"data-bind="css: $col.getStatusCssClass($row())"/>
+        </div>
+    </div>
+    <div class="details-wrapper">
+        <div class="name-actions-descr-price-wrapper">
+            <div class="sub-product-name">
+                <span class="qty" text="$col.getProductQty($row())"/>x&nbsp;
+                <a class="name" data-bind="
+                    attr: {
+                        href: $col.getSubscriptionEditLink($row()),
+                    },
+                    text:$col.getProductName($row())"
+                />
+            </div>
+            <div class="sub-actions">
+                <a class="name" data-bind="
+                    attr: {
+                        href: $col.getSubscriptionEditLink($row()),
+                    }" translate="'Edit'"
+                />
+            </div>
+            <div class="sub-product-description">
+                <div html="$col.getProductDescription($row())"/>
+            </div>
+            <div class="price">
+                <span text="$col.getPaymentAmount($row())"/>
+            </div>
+        </div>
+        <div class="term-frequency-date-wrapper">
+            <div class="sub-billing-frequency">
+                <strong><span translate="'Billing Frequency'"/></strong><br/>
+                <span text="$col.getSubBillingFrequency($row())"/>
+            </div>
+            <div class="sub-term">
+                <strong><span translate="'Term'"/></strong><br/>
+                <span text="$col.getProductTerm($row())"/>
+            </div>
+            <div class="sub-next-order-on">
+                <span class="title" translate="'Next order on'"/>
+                <span class="date" text="$col.getNextOrderOn($row())"/>
+            </div>
+        </div>
+        <div class="additional-information-wrapper" data-bind="mageInit: {'collapsible':{'openedState':'opened'}}">
+            <div class="additional-information-title" data-role="title">
+                <span translate="'More details'"/>
+            </div>
+            <div class="additional-information-content" data-role="content">
+
+                <!-- ko ifnot: $col.getIsVirtual($row()) -->
+                <div class="shipping-information-wrapper">
+                    <div class="shipping-address-title" translate="'Shipping address'"/>
+                    <div class="shipping-address" html="$col.getShippingAddress($row())"/>
+                </div>
+                <!-- /ko -->
+                <div class="payment-information-wrapper">
+                    <div class="billing-address-title" translate="'Billing address'"/>
+                    <div class="billing-address" html="$col.getBillingAddress($row())"/>
+                </div>
+                <!-- ko ifnot: $col.getIsVirtual($row()) -->
+                <div class="shipping-method-wrapper">
+                    <div class="shipping-method-title" translate="'Shipping method'"/>
+                    <div class="shipping-method" html="$col.getShippingMethod($row())"/>
+                </div>
+                <!-- /ko -->
+                <div class="payment-method-wrapper">
+                    <div class="payment-method-title" translate="'Payment information'"/>
+                    <dl class="payment-method-table">
+                        <dt class="label" translate="'Payment method'"/>
+                        <dd class="right" html="$col.getPaymentMethodTitle($row())"/>
+                        <!-- ko if: $col.getPaymentDescription($row()) -->
+                        <dt class="label" translate="'Card Type'"/>
+                        <dd class="right" text="$col.getCcType($row())"/>
+                        <dt class="label" translate="'Card Number'"/>
+                        <dd class="right" text="$col.getCcNumber($row())"/>
+                        <dt class="label" translate="'Exp. Date'"/>
+                        <dd class="right" text="$col.getCcExp($row())"/>
+                        <dt class="label" translate="'Currency'"/>
+                        <dd class="right" text="$col.getCurrency($row())"/>
+                        <!-- /ko -->
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

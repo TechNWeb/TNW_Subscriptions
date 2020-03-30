@@ -50,11 +50,13 @@
                         <dt><?php echo __('Start on') ?></dt>
                         <dd><?php echo $block->getStartOnFormatted() ?></dd>
                         <dt><?php echo __('Price') ?></dt>
-                        <dd><?php echo $block->formatPrice($item->getPrice()) ?></dd>
-                        <?php if ($taxAmount = $item->getTaxAmount($block->getSubscriptionProfile())): ?>
-                            <dt><?php echo __('Tax') ?></dt>
-                            <dd><?php echo $block->formatPrice($taxAmount) ?></dd>
-                        <?php endif; ?>
+                        <?php $taxAmount = (float) $item->getTaxAmount($block->getSubscriptionProfile()) ?>
+                        <dd>
+                            <?php echo $block->formatPrice($item->getPrice() + $taxAmount) ?>
+                            <?php if ($taxAmount): ?>
+                                <?php echo '(' .  __('Incl. Tax') . ')' ?>
+                            <?php endif; ?>
+                        </dd>
                     </dl>
                 </div>
             </li>

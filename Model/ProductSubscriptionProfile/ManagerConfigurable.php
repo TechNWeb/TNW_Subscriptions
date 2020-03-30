@@ -271,7 +271,36 @@ class ManagerConfigurable
             }
             $profile->setDataChanges($profileChanged);
         }
-
+        if (isset($request['item_' . $request['subscription_profile_id']]['period'])) {
+            $periodValue = $request['item_' . $request['subscription_profile_id']]['period'];
+            if ($periodValue <= 0 && $request['item_' . $request['subscription_profile_id']]['term'] == 0) {
+                return strval(__('Bill times must be greater than 0.'));
+            }
+            $profile->setTotalBillingCycles($periodValue);
+        }
+        if (isset($request['item_' . $request['subscription_profile_id']]['billing_frequency'])) {
+            $billingFrequency = $request['item_' . $request['subscription_profile_id']]['billing_frequency'];
+            $profile->setBillingFrequencyId($billingFrequency);
+        }
+        if (isset($request['item_' . $request['subscription_profile_id']]['qty'])) {
+            $products = $profile->getProducts();
+            $request = $this->objectFactory->create($request);
+            foreach ($products as $product) {
+                $price = $this->getSubscriptionItemPrice($request, $profile, $product->getMagentoProduct());
+                $product->setPrice($price * $request['item_' . $request['subscription_profile_id']]['qty']);
+            }
+        }
+        if (isset($request['item_' . $request['subscription_profile_id']]['start_on'])) {
+            $startOn = $request['item_' . $request['subscription_profile_id']]['start_on'];
+            $date = new \DateTime();
+            $startDate = new \DateTime($startOn);
+            $expression = 'PT' . $date->format('H') . 'H'
+                . $date->format('i') . 'M'
+                . $date->format('s') . 'S';
+            $startDate->add(new \DateInterval($expression));
+            $startOn = $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            $profile->setStartDate($startOn);
+        }
         return $profile;
     }
 
