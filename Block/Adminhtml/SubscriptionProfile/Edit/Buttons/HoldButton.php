@@ -21,7 +21,7 @@ class HoldButton extends ChangeStatusButton implements ButtonProviderInterface
      */
     public function getButtonData()
     {
-        if (!$this->canChangeStatus()) {
+        if (!$this->canChangeStatus() || $this->isProfileTrial()) {
             return [];
         }
 
