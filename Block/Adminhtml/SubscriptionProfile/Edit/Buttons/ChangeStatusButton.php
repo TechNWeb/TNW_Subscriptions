@@ -11,6 +11,7 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\GenericButton;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Abstract class of change status button block on Subscription Profile edit form
@@ -83,5 +84,19 @@ abstract class ChangeStatusButton extends GenericButton
         $profile = $this->getCurrentSubscriptionProfile();
         
         return $this->statusManager->canChangeStatus($profile, $this->getStatus());
+    }
+
+    /**
+     * Is profile trial
+     *
+     * @return bool
+     */
+    protected function isProfileTrial()
+    {
+        $profile = $this->getCurrentSubscriptionProfile();
+        if($profile->getData('status') == ProfileStatus::STATUS_TRIAL) {
+            return true;
+        }
+        return false;
     }
 }
