@@ -25,10 +25,13 @@ define([
 
         changeBillingFrequency: function(value) {
             var form = this.parentForm();
-            if (form) {
-                var frequenciesData = form.source.data['item_' + form.additionalData.objectItemId].frequency_data.product_frequencies;
+            if (form && value) {
+                var frequenciesData = form.source.data['item_' + form.additionalData.objectItemId]
+                        .frequency_data.product_frequencies,
+                    unlockPresetQty = !!parseInt(form.source.data['item_' + form.additionalData.objectItemId]
+                        .unlock_preset_qty);
 
-                if (frequenciesData && value && frequenciesData[value]){
+                if (unlockPresetQty && frequenciesData && value && frequenciesData[value]){
                     this.value(frequenciesData[value].preset_qty);
                 }
             }

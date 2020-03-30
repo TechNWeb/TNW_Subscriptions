@@ -6,9 +6,13 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="TNW_Subscriptions::css/backend.css"/>
+    </head>
     <update handle="customer_account"/>
-    <referenceContainer name="content">
-        <block class="TNW\Subscriptions\Block\Subscription\History" name="subscription_order_history"
-               template="subscription/sub-history.phtml" cacheable="false"/>
-    </referenceContainer>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="tnw_subscriptionprofile_account_index"/>
+        </referenceContainer>
+    </body>
 </page>

@@ -198,7 +198,7 @@ class ModifyForm extends Form
      * @param CartItemInterface $item
      * @return array
      */
-    private function getAdditionalDataForProduct(CartItemInterface $item)
+    protected function getAdditionalDataForProduct(CartItemInterface $item)
     {
         $product = $this->getProductFromItem($item);
 
@@ -610,7 +610,7 @@ class ModifyForm extends Form
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
                         'additionalClasses' => $additionalClasses,
-                        'title' => '',
+                        'title' => 'Modify',
                         'actions' => [
                             [
                                 'targetName' => $this->currentFormName,
@@ -867,6 +867,7 @@ class ModifyForm extends Form
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
+                            'priceInclTax' => '${ $.provider }'
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                         'modifySubscription' => true,

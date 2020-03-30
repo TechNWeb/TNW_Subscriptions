@@ -19,10 +19,16 @@ define([
          * @param value
          */
         setCompletePreviewLabel: function (value) {
+            if (parseInt(value) === 0) return;
             var label = (parseInt(value) === 1)
                 ? $j.mage.__(this.previewLabelOnce)
                 : $j.mage.__(this.previewLabel).replace('%s', value);
             this.completePreviewLabel(label);
+        },
+
+        onTermChange: function (value) {
+            var result = this.visibleOnEdit ? !parseInt(value) : false;
+            this.visible(result);
         }
     });
 });
