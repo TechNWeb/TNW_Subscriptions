@@ -115,7 +115,10 @@ class ShippingMethods
     {
         $options = [];
         if ($quote && $quote->getId()) {
-            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
+            $quote->getShippingAddress()
+                ->setCollectShippingRates(true)
+                ->setItemQty($quote->getItemsSummaryQty())
+                ->collectShippingRates();
             $options = $this->setQuote($quote)->getShippingMethodsAsOptionArray($withPrice);
         }
         return $options;
