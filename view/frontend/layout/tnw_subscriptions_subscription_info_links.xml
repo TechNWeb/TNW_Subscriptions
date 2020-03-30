@@ -31,12 +31,6 @@
                         <argument name="label" xsi:type="string" translate="true">Billing Information</argument>
                     </arguments>
                 </block>
-                <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.items">
-                    <arguments>
-                        <argument name="path" xsi:type="string">tnw_subscriptions/subscription/items</argument>
-                        <argument name="label" xsi:type="string" translate="true">Products &amp; Services</argument>
-                    </arguments>
-                </block>
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Link" name="subscription.info.links.order.history">
                     <arguments>
                         <argument name="path" xsi:type="string">tnw_subscriptions/subscription/orderhistory</argument>

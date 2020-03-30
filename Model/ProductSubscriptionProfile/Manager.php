@@ -16,7 +16,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Simple as SimpleTypeManager;
 /**
  * Class Manager
  */
@@ -67,18 +67,26 @@ class Manager
     ];
 
     /**
+     * @var SimpleTypeManager
+     */
+    private $simpleTypeManager;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
+     * @param SimpleTypeManager $simpleTypeManager
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
-        MessageHistoryLogger $historyLogger
+        MessageHistoryLogger $historyLogger,
+        SimpleTypeManager $simpleTypeManager
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
+        $this->simpleTypeManager = $simpleTypeManager;
     }
 
     public function reset()
@@ -326,6 +334,35 @@ class Manager
 
                                     $product->setCustomAttribute($attributeCode, $attributeValue);
                                 }
+                            }
+                            if (isset($data['item_' . $product->getId()]['period'])) {
+                                $periodValue = $data['item_' . $product->getId()]['period'];
+                                if ($periodValue <= 0 && $data['item_' . $product->getId()]['term'] == 0) {
+                                    return strval(__('Bill times must be greater than 0.'));
+                                }
+                                $profileModel->setTotalBillingCycles($periodValue);
+                            }
+                            if (isset($data['item_' . $product->getId()]['billing_frequency'])) {
+                                $billingFrequency = $data['item_' . $product->getId()]['billing_frequency'];
+                                $profileModel->setBillingFrequencyId($billingFrequency);
+                            }
+                            if (isset($data['item_' . $product->getId()]['qty'])) {
+                                $price = $this->simpleTypeManager
+                                    ->getSubscriptionPrice(
+                                        $product->getMagentoProduct(), $data['item_' . $product->getId()]
+                                    );
+                                $product->setPrice(number_format($price * $product->getQty(), 4));
+                            }
+                            if (isset($data['item_' . $product->getId()]['start_on'])) {
+                                $startOn = $data['item_' . $product->getId()]['start_on'];
+                                $date = new \DateTime();
+                                $startDate = new \DateTime($startOn);
+                                $expression = 'PT' . $date->format('H') . 'H'
+                                    . $date->format('i') . 'M'
+                                    . $date->format('s') . 'S';
+                                $startDate->add(new \DateInterval($expression));
+                                $startOn = $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                $profileModel->setStartDate($startOn);
                             }
                         }
                         if ($product->hasDataChanges()) {

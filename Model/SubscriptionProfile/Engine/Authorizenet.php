@@ -129,7 +129,7 @@ class Authorizenet extends Base
             );
         }
         $publicHash = $gateWayToken ? $gateWayToken->getPublicHash() : '';
-        $result = $addtionalInfo['authorizenet_data'];
+        $result = isset($addtionalInfo['authorizenet_data']) ? $addtionalInfo['authorizenet_data'] : $addtionalInfo;
         if ($this->isRebill) {
             $result = [
                 'is_active_payment_token_enabler' => true,

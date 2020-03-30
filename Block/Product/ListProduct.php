@@ -133,7 +133,11 @@ class ListProduct extends OrigListProduct
     public function getTopMessage($product)
     {
         $productArray = $product->getData();
-        if (isset($productArray['tnw_subscr_trial_status']) && $productArray['tnw_subscr_trial_status'] != 0) {
+        if (
+            isset($productArray['tnw_subscr_trial_status'])
+            && $productArray['tnw_subscr_trial_status'] != 0
+            && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
+        ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
                 $productArray['tnw_subscr_trial_length'],
                 $productArray['tnw_subscr_trial_length_unit'])

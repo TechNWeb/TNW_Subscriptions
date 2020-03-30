@@ -6,6 +6,10 @@
 
 namespace TNW\Subscriptions\Controller\Ui;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Customer\Model\Session;
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Ui\Controller\Adminhtml\AbstractAction;
 use Magento\Framework\View\Element\UiComponentInterface;
 use Magento\Ui\Controller\UiActionInterface;
@@ -15,11 +19,32 @@ use Magento\Ui\Controller\UiActionInterface;
  */
 class Render extends AbstractAction implements UiActionInterface
 {
+    /**
+     * @var PageFactory
+     */
+    private $pageFactory;
+
+    /**
+     * @var Session
+     */
+    private $customerSession;
+
+    public function __construct(
+        Context $context,
+        UiComponentFactory $factory,
+        PageFactory $pageFactory,
+        Session $customerSession
+    ) {
+        $this->pageFactory = $pageFactory;
+        $this->customerSession = $customerSession;
+        parent::__construct($context, $factory);
+    }
 
     /**
      * Action for AJAX request
      *
      * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {

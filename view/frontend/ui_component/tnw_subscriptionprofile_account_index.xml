@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider"
+                  xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_grid_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_grid_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">tnw_subscriptionprofile_columns</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_grid_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">
+                TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Grid
+            </argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_grid_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">entity_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="direction" xsi:type="string">DESC</item>
+                    <item name="update_url" path="tnw_subscriptions/ui/render" xsi:type="url"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sticky" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+        <filters name="listing_filters"/>
+    </listingToolbar>
+    <columns name="tnw_subscriptionprofile_columns">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="childDefaults" xsi:type="array">
+                    <item name="fieldAction" xsi:type="array">
+                        <item name="provider"
+                              xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_columns_editor</item>
+                        <item name="target" xsi:type="string">startEdit</item>
+                        <item name="params" xsi:type="array">
+                            <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                            <item name="1" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                </item>
+            </item>
+        </argument>
+        <column name="entity_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="sorting" xsi:type="string">desc</item>
+                    <item name="label" translate="true" xsi:type="string">ID</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn name="label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Label">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="number">1</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Label</item>
+                </item>
+            </argument>
+        </actionsColumn>
+        <column name="frequency_label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Details">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Frequency\Options</item>
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/subscription-details</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/subscription-profile/grid/column/subscription-details</item>
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" translate="true" xsi:type="string">Billing frequency</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="draggable" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </column>
+        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Next Payment</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+    <listingToolbar name="listing_bottom">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sticky" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+</listing>

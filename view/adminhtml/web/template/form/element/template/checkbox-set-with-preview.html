@@ -33,7 +33,7 @@
                     value: value,
                     type: $parent.multiple ? 'checkbox' : 'radio'"/>
 
-                <label class="admin__field-label" text="$parent.getCurrentLabel(value)" attr="for: ko.uid"/>
+                <label class="admin__field-label" text="label" attr="for: ko.uid"/>
             </div>
 
             <label class="admin__field-error" if="error" attr="for: uid" text="error"/>
