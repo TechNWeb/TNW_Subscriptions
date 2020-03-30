@@ -70,6 +70,11 @@ class CreateProfile implements ObserverInterface
      */
     private $customerRepository;
 
+    private $vaultTrialPaymentMap = [
+        'tnw_authorize_cim_vault' => 'tnw_authorize_cim',
+        'payflowpro_cc_vault' => 'payflowpro'
+    ];
+
     /**
      * CreateProfile constructor.
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
@@ -162,15 +167,14 @@ class CreateProfile implements ObserverInterface
                 $paymentData = $this->trialPaymentData['payment_data'];
                 $paymentMethodCode = $paymentData['method'];
 
-                //TODO: make it more dynamic
-                if ($paymentMethodCode == 'tnw_authorize_cim_vault') {
-                    $paymentMethodCode = 'tnw_authorize_cim';
+                if (isset($this->vaultTrialPaymentMap[$paymentMethodCode])) {
+                    $paymentMethodCode = $this->vaultTrialPaymentMap[$paymentMethodCode];
                 }
-
                 $paymentToken->setCustomerId($customer->getId());
                 $paymentToken->setIsActive(true);
                 $paymentToken->setPaymentMethodCode($paymentMethodCode);
                 $paymentToken->setIsVisible(true);
+                $paymentToken->setType('card');
                 $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
                 $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $order->getPayment());
                 $this->trialPaymentData['vault_payment_token'] = $paymentToken;
