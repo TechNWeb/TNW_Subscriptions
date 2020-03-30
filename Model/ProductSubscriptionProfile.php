@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use Magento\Customer\Model\ResourceModel\GroupRepository;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
@@ -74,6 +75,11 @@ class ProductSubscriptionProfile
     private $metadataService;
 
     /**
+     * @var GroupRepository;
+     */
+    private $groupRepository;
+
+    /**
      * Attributes are that part of interface
      *
      * @var array
@@ -114,6 +120,7 @@ class ProductSubscriptionProfile
      * @param \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService
      * @param \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory
      * @param \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory
+     * @param GroupRepository $groupRepository
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -129,6 +136,7 @@ class ProductSubscriptionProfile
         \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService,
         \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory,
         \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory,
+        GroupRepository $groupRepository,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -149,6 +157,7 @@ class ProductSubscriptionProfile
         $this->taxCalculationService = $taxCalculationService;
         $this->productRepository = $productRepository;
         $this->metadataService = $metadataService;
+        $this->groupRepository = $groupRepository;
     }
 
     /**
@@ -254,9 +263,10 @@ class ProductSubscriptionProfile
             $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
                 ->setValue($this->getMagentoProduct()->getTaxClassId());
 
+            $group = $this->groupRepository->getById($subscriptionProfile->getCustomer()->getGroupId());
             $customerTaxClassKey = $this->taxClassKeyFactory->create();
             $customerTaxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
-                ->setValue($subscriptionProfile->getCustomer()->getGroupId());
+                ->setValue($group->getTaxClassId());
 
             $quoteDetails = $this->quoteDetailsFactory->create();
             $item = $this->quoteDetailsItemFactory->create();

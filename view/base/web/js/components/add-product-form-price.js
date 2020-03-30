@@ -105,7 +105,17 @@ define([
          * @returns {boolean, string}
          */
         getPreviewLabel: function () {
-            return this.previewLabelVisible ? this.completePreviewLabel() : false;
+            var priceInclTaxLabel = '0',
+                parent;
+            if (this.modifySubscription && this.getParentForm()) {
+                parent = this.getParentForm();
+                if (parent) {
+                    priceInclTaxLabel = parent.source.data['item_' + parent.additionalData.objectItemId].price_incl_tax;
+                }
+            }
+            return this.previewLabelVisible
+                ? (priceInclTaxLabel ? priceInclTaxLabel : this.completePreviewLabel())
+                : false;
         },
 
         /**

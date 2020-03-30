@@ -879,6 +879,37 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns price incl. tax field definition.
+     *
+     * @return array
+     */
+    protected function getPriceInclTaxDefinition()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Price Incl.Tax') . ':',
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Input::NAME,
+                        'componentType' => UiForm\Element\Input::NAME,
+                        'dataScope' => 'price_incl_tax',
+                        'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
+                        'additionalClasses' => 'field-wide',
+                        'visible' => false,
+                        'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'imports' => [
+                            'showPreview' => $this->currentFormName . ':previewMode'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
      * Returns trial period field definition.
      *
      * @return array
