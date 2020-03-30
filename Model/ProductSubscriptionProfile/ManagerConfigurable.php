@@ -282,7 +282,7 @@ class ManagerConfigurable
             $billingFrequency = $request['item_' . $request['subscription_profile_id']]['billing_frequency'];
             $profile->setBillingFrequencyId($billingFrequency);
         }
-        if (isset($request['item_' . $request['subscription_profile_id']]['qty']) || $profile->hasDataChanges()) {
+        if (isset($request['item_' . $request['subscription_profile_id']]['qty'])) {
             $products = $profile->getProducts();
             $request = $this->objectFactory->create($request);
             foreach ($products as $product) {

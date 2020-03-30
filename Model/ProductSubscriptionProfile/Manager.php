@@ -16,6 +16,9 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Simple as SimpleTypeManager;
+
+
 /**
  * Class Manager
  */
@@ -66,21 +69,32 @@ class Manager
     ];
 
     /**
+     * @var SimpleTypeManager
+     */
+    private $simpleTypeManager;
+
+    /**
+     * Manager constructor.
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
-     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param SimpleTypeManager $simpleTypeManager
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
-        MessageHistoryLogger $historyLogger
+        MessageHistoryLogger $historyLogger,
+        SimpleTypeManager $simpleTypeManager
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
+        $this->simpleTypeManager = $simpleTypeManager;
     }
 
+    /**
+     * @return $this
+     */
     public function reset()
     {
         $this->profileProduct = null;
@@ -339,10 +353,9 @@ class Manager
                                 $billingFrequency = $data['item_' . $product->getId()]['billing_frequency'];
                                 $profileModel->setBillingFrequencyId($billingFrequency);
                             }
-                            if (isset($data['item_' . $product->getId()]['qty']) || $profileModel->hasDataChanges()) {
-                                $product->setPrice(number_format(
-                                    ($product->getPrice() / $oldQty) * $data['item_' . $product->getId()]['qty']
-                                ));
+                            if (isset($data['item_' . $product->getId()]['qty'])) {
+                                $price = $this->simpleTypeManager->getSubscriptionPrice($product->getMagentoProduct(), $data['item_' . $product->getId()]);
+                                $product->setPrice(number_format($price * $product->getQty(), 4));
                             }
                             if (isset($data['item_' . $product->getId()]['start_on'])) {
                                 $startOn = $data['item_' . $product->getId()]['start_on'];
