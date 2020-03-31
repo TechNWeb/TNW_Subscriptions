@@ -157,7 +157,7 @@ class SummaryProductsForm extends ModifyForm
                 $presetQty = (int)$product->getTnwSubscrUnlockPresetQty();
                 $itemPrice = $item->getPrice();
                 $taxAmount = (float) $item->getTaxAmount($subQuote) ?: 0;
-                $priceInclTax = $taxAmount ? ($taxAmount + $itemPrice) . ' (' .  __('Incl. Tax') . ')' : $itemPrice;
+                $priceInclTax = $taxAmount ? ($taxAmount + $itemPrice) : null;
                 $term = !empty($subQuote->getTerm()) ? 1 : 0;
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
@@ -568,8 +568,7 @@ class SummaryProductsForm extends ModifyForm
                 'term' => $this->getTermDefinition(),
                 'period' => $this->getPeriodDefenition(),
                 'start_on' => $this->getStartOnDefinition(),
-                'price' => $this->getPriceDefinition(),
-                'price_incl_tax' => $this->getPriceInclTaxDefinition(),
+                'price' => $this->getPriceDefinition()
             ]
         ];
     }
