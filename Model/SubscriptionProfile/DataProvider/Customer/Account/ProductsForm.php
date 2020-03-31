@@ -9,6 +9,8 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Acco
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
@@ -396,6 +398,29 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function isEditButtonVisible()
     {
-        return null !== $this->currentProduct;
+        return $this->canEditProfile();
+    }
+
+    /**
+     * Check if subscription profile can be editable by customer
+     *
+     * @return bool
+     */
+    private function canEditProfile()
+    {
+        $canEdit = false;
+        /** @var SubscriptionProfile $currentProfile */
+        $currentProfile = $this->getCurrentProfile();
+        $status = (int)$currentProfile->getStatus();
+        $nonEditableStatuses = [
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_PAST_DUE
+        ];
+        if ($currentProfile && !in_array($status, $nonEditableStatuses, true)) {
+            $canEdit = true;
+        }
+        return $canEdit;
     }
 }
