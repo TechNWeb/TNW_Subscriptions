@@ -79,7 +79,6 @@ class Configurable extends Base
                             'children' => [
                                 'description_fieldset' => [
                                     'children' => [
-                                        'left_container' => $this->editOptionsButtonMeta(),
                                         'middle_container' => $this->getProductOptionsMeta(),
                                     ],
                                 ],
