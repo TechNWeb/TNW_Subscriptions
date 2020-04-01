@@ -64,9 +64,13 @@ class TokenExtractor
         $tokenData = $quotePayment->getAdditionalInformation('token_data');
         $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
             'type' => $quotePayment->getCcType(),
-            'maskedCC' => $tokenData['cc_last4'],
+            'maskedCC' => isset($tokenData['cc_last4'])
+                ? $tokenData['cc_last4']
+                : $quotePayment->getAdditionalInformation('cardNumber'),
             'incrementId' => $quote->getReserverdOrderId(),
-            'expirationDate' => $tokenData['card_expiry_date'],
+            'expirationDate' => isset($tokenData['card_expiry_date'])
+                ? $tokenData['card_expiry_date']
+                : $quotePayment->getCcExpMonth() . '-' . $quotePayment->getCcExpYear(),
             'title' => "CyberSource Stored Cards"
         ]));
         return $paymentToken;
