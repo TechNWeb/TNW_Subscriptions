@@ -28,6 +28,9 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
                     <item name="direction" xsi:type="string">DESC</item>
                     <item name="update_url" path="tnw_subscriptions/ui/render" xsi:type="url"/>
+                    <item name="filter_url_params" xsi:type="array">
+                        <item name="status" xsi:type="string">0,6</item>
+                    </item>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">entity_id</item>
                     </item>
