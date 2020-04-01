@@ -663,9 +663,10 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getStartOnDefinition()
     {
-        $visibleOnEdit = isset($this->currentProduct)
+        $visible = isset($this->currentProduct)
             ? $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'] : false;
         $nowDate = new \DateTime();
+        $imports = $visible ? ['showPreview' => '${ $.parentFormName }:previewMode'] : [];
 
         return [
             'arguments' => [
@@ -681,11 +682,10 @@ class SummaryProductsForm extends ModifyForm
                         'validation' => ['required-entry' => true],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-date',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'visibleOnEdit' => $visibleOnEdit,
+                        'visible' => $visible,
+                        'visibleOnEdit' => $visible,
                         'parentFormName' => $this->currentFormName,
-                        'imports' => [
-                            'showPreview' => '${ $.parentFormName }:previewMode'
-                        ],
+                        'imports' => $imports,
                         'options' => [
                             'minDate' => $nowDate->add(new \DateInterval('P1D'))->format('m/d/Y'),
                         ]
