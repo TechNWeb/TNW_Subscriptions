@@ -252,6 +252,44 @@ class ProductsForm extends SummaryProductsForm
     }
 
     /**
+     * Returns edit button definition.
+     *
+     * @return array
+     */
+    protected function getEditButton()
+    {
+        $additionalClasses = $this->getRemoveButtonVisibility() ? '': 'right';
+        $additionalClasses .= ' action-editor';
+
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => $this->isEditButtonVisible(),
+                        'formElement' => UiContainer::NAME,
+                        'componentType' => UiContainer::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/edit-button',
+                        'additionalClasses' => $additionalClasses,
+                        'title' => 'Modify',
+                        'actions' => [
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'togglePreviewMode',
+                            ],
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'toggleButtonPreviewMode',
+                            ]
+                        ],
+                        'provider' => null,
+                        'buttonVisibility' => $this->isEditButtonVisible(),
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
      * Returns middle container definition from description fieldset.
      *
      * @return array

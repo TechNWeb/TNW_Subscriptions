@@ -9,7 +9,7 @@ define([
     'uiRegistry',
     'mage/translate',
     'jquery/ui'
-], function (Abstract, formatPrice, $, registry) {
+], function (Abstract, formatPrice, $, registry, $t) {
     'use strict';
 
     return Abstract.extend({
@@ -21,8 +21,12 @@ define([
          * Callback that fires when 'value' property is updated.
          */
         onUpdate: function () {
-            this._super();
+            this.bubble('update', this.hasChanged());
+            this.validate();
             this.changeValue();
+            if (this.getPriceInclTax()) {
+                this.setCompletePreviewLabel(this.getPriceInclTax());
+            }
         },
 
         /**
@@ -105,26 +109,31 @@ define([
          * @returns {boolean, string}
          */
         getPreviewLabel: function () {
-            var priceInclTaxLabel = '0',
-                parent;
-            if (this.modifySubscription && this.getParentForm()) {
-                parent = this.getParentForm();
-                if (parent) {
-                    priceInclTaxLabel = parent.source.data['item_' + parent.additionalData.objectItemId].price_incl_tax;
-                }
-            }
-            return this.previewLabelVisible
-                ? (priceInclTaxLabel ? priceInclTaxLabel : this.completePreviewLabel())
-                : false;
+            return this.previewLabelVisible ? this.completePreviewLabel() : false;
+        },
+
+        /**
+         * Get price including tax.
+         * @returns {string|boolean}
+         */
+        getPriceInclTax: function() {
+            var priceInclTax = this.source.get(this.parentScope + '.price_incl_tax'),
+                priceFormat = this.getPriceFormat();
+            priceFormat.pattern = '%s';
+            if (!priceInclTax) return false;
+            priceInclTax = formatPrice.formatToNumber(priceInclTax, priceFormat);
+            priceInclTax = formatPrice.formatPrice(priceInclTax, priceFormat) + ' (' + $t('Incl. Tax') + ')';
+            return priceInclTax;
         },
 
         /**
          * Sets initial value of the element and subscribes to it's changes.
          */
-        setInitialValue: function () {
+        setInitialValue: function() {
             this._super();
-            this.setCompletePreviewLabel(this.value());
-
+            if (this.getPriceInclTax()) {
+                this.setCompletePreviewLabel(this.getPriceInclTax());
+            }
             return this;
         }
     });
