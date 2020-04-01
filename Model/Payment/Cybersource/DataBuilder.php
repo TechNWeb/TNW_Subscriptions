@@ -8,6 +8,10 @@ namespace TNW\Subscriptions\Model\Payment\Cybersource;
 use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
+/**
+ * Class DataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Cybersource
+ */
 class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
     use \Magento\Payment\Helper\Formatter;
@@ -37,7 +41,12 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
      */
     private $auth;
 
+    /**
+     * @var mixed
+     */
     private $gatewayConfig;
+
+    private $paymentTokenManagement;
 
     public function __construct(
         SubscriptionConfig $subscriptionConfig,
@@ -48,8 +57,10 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         \Magento\GiftMessage\Helper\Message $giftMessageHelper,
         \Magento\Backend\Model\Auth $auth,
         \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
     ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
         $this->orderCollectionFactory = $orderCollectionFactory;
@@ -61,6 +72,14 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         parent::__construct($subscriptionConfig, $manager);
     }
 
+    /**
+     * @param $order
+     * @param $paymentData
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
     public function build($order, $paymentData)
     {
         $request = [];
@@ -139,12 +158,31 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 
         $request['billTo']['customerID'] = $order->getCustomerId();
         $request['billTo']['ipAddress'] = $order->getRemoteIp();
-        $request['recurringSubscriptionInfo']['subscriptionID'] = $order->getPayment()->getAdditionalInformation(\CyberSource\SecureAcceptance\Model\PaymentTokenManagement::KEY_CYBERSOURCE_PAYMENT_TOKEN);
+        $gateWayToken =  $order
+            ->getPayment()
+            ->getAdditionalInformation(
+                \CyberSource\SecureAcceptance\Model\PaymentTokenManagement::KEY_CYBERSOURCE_PAYMENT_TOKEN
+            );
+        if (!$gateWayToken && isset($paymentData['additional_data']['public_hash'])) {
+            $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+                $paymentData['additional_data']['public_hash'],
+                $order->getCustomerId()
+            );
+            if ($paymentToken) {
+                $gateWayToken = $paymentToken->getGatewayToken();
+            }
+        }
+        $request['recurringSubscriptionInfo']['subscriptionID'] = $gateWayToken;
+
         $request['item'] =  $this->getItems($order->getAllItems());
         $request['ccAuthService']['run'] = 'true';
         return $request;
     }
 
+    /**
+     * @param $items
+     * @return array
+     */
     private function getItems($items)
     {
         $result = [];
@@ -182,6 +220,10 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         return $result;
     }
 
+    /**
+     * @param $address
+     * @return array
+     */
     private function buildAddress($address)
     {
         return [
@@ -199,11 +241,21 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         ];
     }
 
+    /**
+     * @return \Magento\Quote\Model\Quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     private function getQuote()
     {
         return $this->checkoutSession->getQuote();
     }
 
+    /**
+     * @return \Magento\Sales\Model\ResourceModel\Order\Collection
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     private function getOrders()
     {
         $field = 'customer_email';
@@ -217,16 +269,27 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
             ->setOrder('created_at', 'desc');
     }
 
+    /**
+     * @return string|null
+     */
     private function getAccountCreationDate()
     {
         return $this->customerSession->getCustomerData()->getCreatedAt();
     }
 
+    /**
+     * @return float
+     */
     private function getAccountAge()
     {
         return round((time() - strtotime($this->customerSession->getCustomerData()->getCreatedAt())) / (3600 * 24));
     }
 
+    /**
+     * @return mixed|string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     private function getGiftMessage()
     {
         $message = $this->giftMessageHelper->getGiftMessage($this->getQuote()->getGiftMessageId());
