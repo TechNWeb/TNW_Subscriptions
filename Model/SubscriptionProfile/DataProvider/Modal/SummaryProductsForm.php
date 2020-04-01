@@ -579,7 +579,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getTermDefinition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [
@@ -604,7 +604,7 @@ class SummaryProductsForm extends ModifyForm
                         'previewLabel' => __('Until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
-                        'links' => [
+                        'imports' => [
                             'showPreview' => '${ $.parentFormName }:previewMode'
                         ],
                         'parentFormName' => $this->currentFormName,
@@ -619,7 +619,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getPeriodDefenition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [

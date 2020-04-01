@@ -347,7 +347,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getPeriodDefenition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [
