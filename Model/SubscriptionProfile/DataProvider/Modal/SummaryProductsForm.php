@@ -149,6 +149,7 @@ class SummaryProductsForm extends ModifyForm
         foreach ($this->getObjects() as $subQuote) {
             $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
             $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
+            $data[$subQuote->getId()]['subscription_shipping'] = (float)$subQuote->getData('shipping');
 
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
@@ -162,7 +163,7 @@ class SummaryProductsForm extends ModifyForm
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
-                    'price' => (string)$itemPrice,
+                    'price' => $itemPrice,
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),
                     'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
@@ -172,7 +173,7 @@ class SummaryProductsForm extends ModifyForm
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
                     'description' => $isProductDeleted ? __('Product deleted')
                         : $product->getData('short_description'),
-                    'qty' => $item->getQty(),
+                    'qty' => (int)$item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
                     'price_incl_tax' => $priceInclTax,
                 ];
