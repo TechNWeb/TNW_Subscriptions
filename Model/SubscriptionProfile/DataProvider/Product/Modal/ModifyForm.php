@@ -727,7 +727,7 @@ class ModifyForm extends Form
      */
     protected function getTermDefinition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
 
