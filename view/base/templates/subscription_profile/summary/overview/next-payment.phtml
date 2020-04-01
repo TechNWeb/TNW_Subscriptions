@@ -1,6 +1,6 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment $block */ ?>
 <div class="bordered block-next-payment">
-    <div class="title"><?php echo __('Next Payment') ?></div>
+    <div class="title"><?php echo __('Estimated Payment') ?></div>
     <?php $date = $block->getNextPaymentDateParts(); ?>
     <div class="date day"><?php echo $date ? $date['day'] : '--' ?></div>
     <div class="date month"><?php echo $date ? $date['month'] : '--' ?></div>
