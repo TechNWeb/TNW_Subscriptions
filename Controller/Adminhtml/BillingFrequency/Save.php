@@ -35,6 +35,8 @@ class Save extends \Magento\Backend\App\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
+        $data['links']['linked'] = json_decode($data['links']['linked'], true);
+        $data['linked_product_listing'] = json_decode($data['linked_product_listing'], true);
         if ($data) {
             $id = $this->getRequest()->getParam('id');
 
