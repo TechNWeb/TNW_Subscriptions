@@ -276,7 +276,7 @@ class ProductSubscriptionProfile
                 ->setTaxClassKey($taxClassKey)
                 ->setIsTaxIncluded(false)
                 ->setType('product')
-                ->setUnitPrice($this->getUnitPrice());
+                ->setUnitPrice($this->getProfileUnitPrice(true));
 
             $quoteDetails->setShippingAddress($subscriptionProfile->getShippingAddress()->exportCustomerAddress())
                 ->setBillingAddress($subscriptionProfile->getBillingAddress()->exportCustomerAddress())
@@ -296,6 +296,17 @@ class ProductSubscriptionProfile
      */
     public function getUnitPrice()
     {
+        return $this->getProfileUnitPrice();
+    }
+
+    /**
+     * Gets price.
+     *
+     * @param bool $divideByQty
+     * @return string|null
+     */
+    public function getProfileUnitPrice($divideByQty = false)
+    {
         $result = null;
         if (is_array($this->getData(self::PRICE))){
             $result = $this->getData(self::PRICE)[0];
@@ -303,7 +314,7 @@ class ProductSubscriptionProfile
             $result = $this->getData(self::PRICE);
         }
 
-        if ($this->getTnwSubscrUnlockPresetQty()) {
+        if ($this->getTnwSubscrUnlockPresetQty() || $divideByQty) {
             $result = $this->getQty() ? round($result / $this->getQty()) : 0;
         }
 
