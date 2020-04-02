@@ -138,7 +138,7 @@ class NextPayment extends Template
         $grandTotal = 0;
 
         foreach ($profileProducts as $value) {
-            $grandTotal += $value->getPrice();
+            $grandTotal += $value->getPrice() + $value->getTaxAmount($this->getSubscriptionProfile());
         }
         $grandTotal += $this->getSubscriptionProfile()->getData('shipping');
 
