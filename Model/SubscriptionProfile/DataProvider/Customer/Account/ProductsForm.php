@@ -234,6 +234,12 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getForm($objectId, $itemId)
     {
+        //TODO: Get from config. If no confirm modal, set null to $confirmBeforeSave
+        $confirmBeforeSave = [
+            'title' => 'Warning!',
+            'message' => ' Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.'
+        ];
+
         return [
             'arguments' => [
                 'data' => [
@@ -244,7 +250,8 @@ class ProductsForm extends SummaryProductsForm
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
                         'requestFields' => $this->getRequestFields(),
-                        'editButtons' => $this->getFormEditButtons()
+                        'editButtons' => $this->getFormEditButtons(),
+                        'confirmBeforeSave' => $confirmBeforeSave
                     ]
                 ]
             ],
