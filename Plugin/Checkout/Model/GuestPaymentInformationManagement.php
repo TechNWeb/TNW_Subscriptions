@@ -66,10 +66,7 @@ class GuestPaymentInformationManagement
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
 
-        if (
-            $quote->getBaseGrandTotal() < 0.0001
-            && $paymentMethod->getMethod() != 'chcybersource'
-        ) {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),
                 $quote,
