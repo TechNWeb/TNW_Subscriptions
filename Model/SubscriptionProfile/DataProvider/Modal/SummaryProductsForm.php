@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
@@ -22,7 +23,6 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
@@ -101,6 +101,7 @@ class SummaryProductsForm extends ModifyForm
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param StockRegistryInterface $stockRegistry
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -117,6 +118,7 @@ class SummaryProductsForm extends ModifyForm
         Registry $registry,
         UrlInterface $urlBuilder,
         ProductTypeManagerResolver $productTypeResolver,
+        StockRegistryInterface $stockRegistry,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -133,6 +135,7 @@ class SummaryProductsForm extends ModifyForm
             $pool,
             $registry,
             $productTypeResolver,
+            $stockRegistry,
             $scope,
             $meta,
             $data
@@ -173,7 +176,7 @@ class SummaryProductsForm extends ModifyForm
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
                     'description' => $isProductDeleted ? __('Product deleted')
                         : $product->getData('short_description'),
-                    'qty' => (int)$item->getQty(),
+                    'qty' => (float)$item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
                     'price_incl_tax' => $priceInclTax,
                 ];

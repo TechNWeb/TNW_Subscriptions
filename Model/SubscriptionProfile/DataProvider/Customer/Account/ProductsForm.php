@@ -120,6 +120,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getQtyDefinition()
     {
+        $canUseDecimals = $this->canUseQtyDecimals();
         return [
             'arguments' => [
                 'data' => [
@@ -130,8 +131,9 @@ class ProductsForm extends SummaryProductsForm
                         'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'qty',
                         'validation' => [
-                            'validate-zero-or-greater' => true,
-                            'required-entry' => true
+                            'validate-greater-than-zero' => true,
+                            'required-entry' => true,
+                            'validate-digits' => !$canUseDecimals
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
