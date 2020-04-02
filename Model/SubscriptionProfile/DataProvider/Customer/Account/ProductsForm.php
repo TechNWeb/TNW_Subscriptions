@@ -12,6 +12,16 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
+use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -22,6 +32,65 @@ class ProductsForm extends SummaryProductsForm
      * Form data scope
      */
     const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_products_and_services_form';
+
+    /**
+     * @var Config
+     */
+    protected $subscriptionConfig;
+
+    /**
+     * ProductsForm constructor.
+     * @param Config $subscriptionConfig
+     * @param $name
+     * @param $primaryFieldName
+     * @param $requestFieldName
+     * @param PriceCalculator $priceCalculator
+     * @param Context $context
+     * @param FormContext $formContext
+     * @param PoolInterface $pool
+     * @param Manager $profileManager
+     * @param Registry $registry
+     * @param UrlInterface $urlBuilder
+     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param string $scope
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        Config $subscriptionConfig,
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
+        PriceCalculator $priceCalculator,
+        Context $context,
+        FormContext $formContext,
+        PoolInterface $pool,
+        Manager $profileManager,
+        Registry $registry,
+        UrlInterface $urlBuilder,
+        ProductTypeManagerResolver $productTypeResolver,
+        $scope = '',
+        array $meta = [],
+        array $data = []
+    ) {
+        $this->subscriptionConfig = $subscriptionConfig;
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $priceCalculator,
+            $context,
+            $formContext,
+            $pool,
+            $profileManager,
+            $registry,
+            $urlBuilder,
+            $productTypeResolver,
+            $scope,
+            $meta,
+            $data
+        );
+    }
 
     /**
      * @var array
@@ -234,12 +303,13 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getForm($objectId, $itemId)
     {
-        //TODO: Get from config. If no confirm modal, set null to $confirmBeforeSave
-        $confirmBeforeSave = [
-            'title' => 'Warning!',
-            'message' => ' Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.'
-        ];
-
+        $confirmBeforeSave = null;
+        if ($this->subscriptionConfig->getPricingStrategy() == PriceStrategy::DYNAMIC_PRICE) {
+            $confirmBeforeSave = [
+                'title' => 'Warning!',
+                'message' => ' Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.'
+            ];
+        }
         return [
             'arguments' => [
                 'data' => [

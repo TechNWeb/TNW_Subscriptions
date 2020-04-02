@@ -37,6 +37,12 @@ class Config
     /**#@-*/
 
     /**#@+
+     * Config xml path for general profile options section
+     */
+    private $xmlPricingStartegy = 'tnw_subscriptions_profile_options/general/product_price_strategy';
+    /**#@-*/
+
+    /**#@+
      * Config xml path for past due profile options section
      */
     private $xmlAttemptCount = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_count';
@@ -150,6 +156,15 @@ class Config
         }
 
         return $result;
+    }
+
+    /**
+     * Gets the configured Subscription profile pricing strategy
+     * @return mixed
+     */
+    public function getPricingStrategy()
+    {
+        return $this->scopeConfig->getValue($this->xmlPricingStartegy);
     }
 
     /**

@@ -786,7 +786,7 @@ class Manager
             try {
                 $quoteItem = $quote->addProduct(
                     $magentoProduct,
-                    $this->getProductAddRequest($profileProduct)
+                    $this->getProductAddRequest($profileProduct, $isReBill)
                 );
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $quoteItemCreated = false;
@@ -869,10 +869,10 @@ class Manager
      * Returns request for adding product to subscription quote.
      *
      * @param ProductSubscriptionProfileInterface $profileProduct
-     *
+     * @param bool $isRebill
      * @return DataObject
      */
-    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct)
+    protected function  getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
     {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
@@ -893,6 +893,9 @@ class Manager
             $data = array_replace_recursive($customOptions['info_buyRequest'], $data);
         }
 
+        if ($isRebill) {
+            $data['rebill_processing'] = $isRebill;
+        }
         return $this->dataObjectFactory->create($data);
     }
 

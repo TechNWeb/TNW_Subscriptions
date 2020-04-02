@@ -90,6 +90,12 @@ class Product extends Create
     private $searchCriteriaBuilder;
 
     /**
+     * @var
+     */
+    private $config;
+
+    /**
+     * Product constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param ProductRepositoryInterface $productRepository
@@ -109,6 +115,7 @@ class Product extends Create
         ProductBillingFrequencyRepository $productBillingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
+        $this->config = $config;
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
@@ -244,8 +251,14 @@ class Product extends Create
                 }
             }
 
+            $currentProductCustomPrice = $this->getCustomPrice($product, $productData);;
+            $customProductPrice = $this->getRebillProcessing()
+                ? (float) $this->getPresetCustomPrice()
+                : (float) $currentProductCustomPrice;
+            $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
+
             $data = [
-                'custom_price' => sprintf('%F', $this->getCustomPrice($product, $productData)),
+                'custom_price' => sprintf('%F', $customProductPrice),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                     static::UNIQUE => [
                         'billing_frequency' => $productData['billing_frequency'],
@@ -270,6 +283,22 @@ class Product extends Create
         }
 
         return $this->buyRequest;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRebillProcessing()
+    {
+        return isset($this->data['rebill_processing']) ? (bool) $this->data['rebill_processing'] : false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPresetCustomPrice()
+    {
+        return $this->data['custom_price'];
     }
 
     /**
