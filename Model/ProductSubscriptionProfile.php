@@ -315,7 +315,7 @@ class ProductSubscriptionProfile
         }
 
         if ($this->getTnwSubscrUnlockPresetQty() || $divideByQty) {
-            $result = $this->getQty() ? round($result / $this->getQty()) : 0;
+            $result = $this->getQty() ? round($result / $this->getQty(), 2) : 0;
         }
 
         return $result;
