@@ -859,7 +859,6 @@ class Manager
                 }
 
                 $quote->setTotalsCollectedFlag(false);
-                $quote->getShippingAddressesItems();
                 $quote->collectTotals();
             }
         }
