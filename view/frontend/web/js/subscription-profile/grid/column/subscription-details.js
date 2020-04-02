@@ -28,7 +28,7 @@ define([
 
         getProductQty: function (row) {
             if (!row.subscription_product) return false;
-            return parseInt(row.subscription_product.qty);
+            return parseFloat(row.subscription_product.qty);
         },
 
         getProudctThumbnailSrc: function(row) {

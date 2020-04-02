@@ -6,7 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
-use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use Magento\Quote\Model\Quote\Item;
@@ -70,6 +70,7 @@ class Products extends ModifyForm
      * @param DescriptionCreator $descriptionCreator
      * @param Registry $registry
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param StockRegistryInterface $stockRegistry
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -85,11 +86,13 @@ class Products extends ModifyForm
         DescriptionCreator $descriptionCreator,
         Registry $registry,
         ProductTypeManagerResolver $productTypeResolver,
+        StockRegistryInterface $stockRegistry,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->descriptionCreator = $descriptionCreator;
+        $this->stockRegistry = $stockRegistry;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -100,6 +103,7 @@ class Products extends ModifyForm
             $pool,
             $registry,
             $productTypeResolver,
+            $stockRegistry,
             $scope,
             $meta,
             $data
