@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use Magento\Quote\Api\Data\CartItemInterface;
@@ -98,6 +99,11 @@ class ModifyForm extends Form
     ];
 
     /**
+     * @var StockRegistryInterface
+     */
+    protected $stockRegistry;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -107,6 +113,7 @@ class ModifyForm extends Form
      * @param PoolInterface $pool
      * @param Registry $registry
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param StockRegistryInterface $stockRegistry
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -121,11 +128,13 @@ class ModifyForm extends Form
         PoolInterface $pool,
         Registry $registry,
         ProductTypeManagerResolver $productTypeResolver,
+        StockRegistryInterface $stockRegistry,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->registry = $registry;
+        $this->stockRegistry = $stockRegistry;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -610,7 +619,7 @@ class ModifyForm extends Form
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
                         'additionalClasses' => $additionalClasses,
-                        'title' => 'Modify',
+                        'title' => '',
                         'actions' => [
                             [
                                 'targetName' => $this->currentFormName,
@@ -727,7 +736,7 @@ class ModifyForm extends Form
      */
     protected function getTermDefinition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
 
@@ -879,37 +888,6 @@ class ModifyForm extends Form
     }
 
     /**
-     * Returns price incl. tax field definition.
-     *
-     * @return array
-     */
-    protected function getPriceInclTaxDefinition()
-    {
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'label' => __('Price Incl.Tax') . ':',
-                        'dataType' => 'text',
-                        'formElement' => UiForm\Element\Input::NAME,
-                        'componentType' => UiForm\Element\Input::NAME,
-                        'dataScope' => 'price_incl_tax',
-                        'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
-                        'additionalClasses' => 'field-wide',
-                        'visible' => false,
-                        'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode'
-                        ]
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
      * Returns trial period field definition.
      *
      * @return array
@@ -980,6 +958,7 @@ class ModifyForm extends Form
      */
     protected function getQtyDefinition()
     {
+        $canUseDecimals = $this->canUseQtyDecimals();
         return [
             'arguments' => [
                 'data' => [
@@ -992,7 +971,8 @@ class ModifyForm extends Form
                         'dataScope' => 'qty',
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'validate-digits' => !$canUseDecimals
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -1002,6 +982,17 @@ class ModifyForm extends Form
                 ]
             ]
         ];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function canUseQtyDecimals()
+    {
+        return $this->stockRegistry->getStockItem(
+            $this->currentProduct->getId(),
+            $this->currentProduct->getStore()->getWebsiteId())
+            ->getIsQtyDecimal();
     }
 
     /**

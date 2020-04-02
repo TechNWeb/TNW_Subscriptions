@@ -45,6 +45,33 @@ class Grid extends SubscriptionsGrid
     public function prepareUpdateUrl()
     {
         $this->data['config']['filter_url_params']['customer_id'] = $this->customerSession->getCustomer()->getId();
-        parent::prepareUpdateUrl();
+        if (!isset($this->data['config']['filter_url_params'])) {
+            return;
+        }
+        foreach ($this->data['config']['filter_url_params'] as $paramName => $paramValue) {
+            if ('*' == $paramValue) {
+                $paramValue = $this->request->getParam($paramName);
+            }
+            if ($paramValue) {
+                $this->data['config']['update_url'] = sprintf(
+                    '%s%s/%s/',
+                    $this->data['config']['update_url'],
+                    $paramName,
+                    $paramValue
+                );
+                if ($paramName == 'status') {
+                    $paramValue = explode(',', $paramValue);
+                    $this->addFilter(
+                        $this->filterBuilder->setField($paramName)->setValue($paramValue)
+                            ->setConditionType('nin')->create()
+                    );
+                } else {
+                    $this->addFilter(
+                        $this->filterBuilder->setField($paramName)->setValue($paramValue)
+                            ->setConditionType('eq')->create()
+                    );
+                }
+            }
+        }
     }
 }

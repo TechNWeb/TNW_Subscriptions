@@ -660,7 +660,11 @@
         .right-container {
             padding-top: 0.5rem;
             .control-preview {
-                font-size: 3rem;
+                font-size: @font-size__xl;
+
+                span {
+                    white-space: nowrap;
+                }
             }
         }
 
@@ -708,6 +712,7 @@
                     vertical-align: top;
                     width: 1.6rem;
                     position: absolute;
+                    top: 0;
                     left: 0;
                 }
 
@@ -883,6 +888,10 @@
 
 .tnw_subscriptions-subscription-history {
 
+    .action-primary.action-accept {
+        .lib-button-primary();
+        box-shadow: none;
+    }
     .admin__data-grid-wrap {
         padding-top: 0;
         border-top: 2px solid @color-gray-middle3;
@@ -918,6 +927,20 @@
                 width: 100%;
                 margin-bottom: 1.5rem;
             }
+            .sub-status-label {
+                font-size: @font-size__base;
+                .sub-status {
+                    &_0 {
+                        color: @color-red11;
+                    }
+                    &_1 {
+                        color: @color-dark-green1;
+                    }
+                    &_4 {
+                        color: @color-gray-middle3;
+                    }
+                }
+            }
         }
         .details-wrapper {
             .lib-vendor-prefix-flex-basis(85%);
@@ -936,11 +959,30 @@
                 .sub-actions {
                     text-align: right;
                     font-size: @font-size__l;
+                    a {
+                        padding: 0 0.75rem 0 0.25rem;
+                        border-right: 1px solid @color-gray-middle3;
+                        &:last-child {
+                            border-right: none;
+                        }
+                        &.cancel {
+                            color: @color-red11;
+                        }
+                        &.hold {
+                            color: @color-gray-middle3;
+                        }
+                        &.reactivate {
+                            color: @color-dark-green1;
+                        }
+                    }
                 }
                 .price {
                     text-align: right;
                     font-weight: @font-weight__bold;
                     font-size: 2rem;
+                }
+                .sub-configurable-options {
+                    margin-bottom: 1rem;
                 }
                 .sub-next-order-on {
                     margin-top: 2rem;
@@ -1008,6 +1050,7 @@
                             font-weight: @font-weight__regular;
                             .lib-vendor-prefix-flex-grow(1);
                             .lib-vendor-prefix-flex-basis(35%);
+                            box-sizing: border-box;
                         }
                         dd {
                             padding-left: 1rem;
