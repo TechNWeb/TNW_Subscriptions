@@ -22,6 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -39,11 +40,9 @@ class ProductsForm extends SummaryProductsForm
     protected $subscriptionConfig;
 
     /**
-     * ProductsForm constructor.
-     * @param Config $subscriptionConfig
-     * @param $name
-     * @param $primaryFieldName
-     * @param $requestFieldName
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
      * @param PriceCalculator $priceCalculator
      * @param Context $context
      * @param FormContext $formContext
@@ -52,12 +51,13 @@ class ProductsForm extends SummaryProductsForm
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param StockRegistryInterface $stockRegistry
+     * @param Config $subscriptionConfig
      * @param string $scope
      * @param array $meta
      * @param array $data
      */
     public function __construct(
-        Config $subscriptionConfig,
         $name,
         $primaryFieldName,
         $requestFieldName,
@@ -69,6 +69,8 @@ class ProductsForm extends SummaryProductsForm
         Registry $registry,
         UrlInterface $urlBuilder,
         ProductTypeManagerResolver $productTypeResolver,
+        StockRegistryInterface $stockRegistry,
+        Config $subscriptionConfig,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -86,6 +88,7 @@ class ProductsForm extends SummaryProductsForm
             $registry,
             $urlBuilder,
             $productTypeResolver,
+            $stockRegistry,
             $scope,
             $meta,
             $data

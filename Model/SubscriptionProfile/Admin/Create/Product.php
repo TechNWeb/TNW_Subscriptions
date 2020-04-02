@@ -90,11 +90,6 @@ class Product extends Create
     private $searchCriteriaBuilder;
 
     /**
-     * @var
-     */
-    private $config;
-
-    /**
      * Product constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -115,7 +110,6 @@ class Product extends Create
         ProductBillingFrequencyRepository $productBillingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
-        $this->config = $config;
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
