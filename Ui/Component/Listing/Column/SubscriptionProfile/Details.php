@@ -4,20 +4,21 @@ namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image;
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Customer\Model\Address\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Ui\Component\Form\Element\Input;
-use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Block\Subscription\History;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
 class Details extends Column
 {
@@ -57,12 +58,28 @@ class Details extends Column
     private $paymentConfig;
 
     /**
+     * @var ManagerConfigurable
+     */
+    private $managerConfigurable;
+    /**
+     * @var StatusManager
+     */
+    private $statusManager;
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
      * Details constructor.
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param ProductRepositoryInterface $productRepository
      * @param ScopeConfigInterface $scopeConfig
+     * @param ManagerConfigurable $managerConfigurable
+     * @param StatusManager $statusManager
      * @param ProfileStatus $profileStatus
      * @param PaymentConfig $paymentConfig
+     * @param UrlInterface $urlBuilder
      * @param Config $addressConfig
      * @param Image $imageHelper
      * @param ContextInterface $context
@@ -74,8 +91,11 @@ class Details extends Column
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         ProductRepositoryInterface $productRepository,
         ScopeConfigInterface $scopeConfig,
+        ManagerConfigurable $managerConfigurable,
+        StatusManager $statusManager,
         ProfileStatus $profileStatus,
         PaymentConfig $paymentConfig,
+        UrlInterface $urlBuilder,
         Config $addressConfig,
         Image $imageHelper,
         ContextInterface $context,
@@ -85,12 +105,15 @@ class Details extends Column
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
-        $this->imageHelper = $imageHelper;
         $this->productRepository = $productRepository;
-        $this->profileStatus = $profileStatus;
-        $this->addressConfig = $addressConfig;
         $this->scopeConfig = $scopeConfig;
+        $this->managerConfigurable = $managerConfigurable;
+        $this->profileStatus = $profileStatus;
         $this->paymentConfig = $paymentConfig;
+        $this->addressConfig = $addressConfig;
+        $this->imageHelper = $imageHelper;
+        $this->statusManager = $statusManager;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -107,6 +130,7 @@ class Details extends Column
                 $itemId = $item[SubscriptionProfileInterface::ID];
                 if (isset($itemId)) {
                     $profileProduct = $this->getSubscriptionProfileProduct($itemId);
+                    if (!$profileProduct) continue;
                     $product = $this->getProduct($profileProduct->getMagentoProductId());
                     $imageHelper = $this->imageHelper->init($product, 'mini_cart_product_thumbnail');
                     $item['subscription_product'] = [
@@ -114,7 +138,9 @@ class Details extends Column
                         'qty' => $profileProduct->getQty(),
                         'short_description' => $product->getShortDescription(),
                         'img_src' => $imageHelper->getUrl(),
-                        'img_alt' => $profileProduct->getName()
+                        'img_alt' => $profileProduct->getName(),
+                        'configurable_options' => $this->managerConfigurable
+                            ->getConfigurableOptionsData($profileProduct)
                     ];
                     $item['term_label'] = $this->getTerm($itemId);
                     $item['status_label'] = $this->profileStatus->getLabelByValue($item['status']);
@@ -130,6 +156,7 @@ class Details extends Column
                     //TODO: next date should consider locale & timezones
                     $nextDate = new \DateTime($item['next_billing_cycle_date']);
                     $item['next_date'] = $nextDate->format('M d, Y');
+                    $item['profile_actions'] = $this->getProfileActions($itemId);
                 }
             }
         }
@@ -269,6 +296,76 @@ class Details extends Column
     {
         $path = 'payment/' . $this->getSubscriptionProfile($id)->getPayment()->getEngineCode() . '/title';
         return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $this->getStore());
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getProfileActions($id)
+    {
+        $profile = $this->getSubscriptionProfile($id);
+        if (!$profile) return [];
+        $result = [
+            [
+                'type' => 'edit',
+                'label' => __('Edit'),
+                'href' => $this->urlBuilder->getUrl(
+                    'tnw_subscriptions/subscription/edit/',
+                    [
+                        'entity_id' => $id
+                    ]
+                )
+            ]
+        ];
+        if ($this->statusManager->canHoldSubscription($profile)) {
+            $result[] = [
+                'type' => 'hold',
+                'label' => __('Hold'),
+                'title' => __('Warning!'),
+                'message' => __('Are you sure? While "On Hold" your will not be billed.'),
+                'href' => $this->urlBuilder->getUrl(
+                    'tnw_subscriptions/subscription_actions/updateStatus',
+                    [
+                        'entity_id' => $id,
+                        'status' => ProfileStatus::STATUS_HOLDED,
+                        'redirect' => History::REDIRECT,
+                    ]
+                )
+            ];
+        }
+        if ($this->statusManager->canReActiveSubscription($profile)) {
+            $result[] = [
+                'type' => 'reactivate',
+                'label' => __('Reactivate'),
+                'href' => $this->urlBuilder->getUrl(
+                    'tnw_subscriptions/subscription_actions/updateStatus',
+                    [
+                        'entity_id' => $id,
+                        'status' => ProfileStatus::STATUS_ACTIVE,
+                        'redirect' => History::REDIRECT,
+                    ]
+                )
+            ];
+        }
+        if ($this->statusManager->canCancelSubscription($profile)) {
+            $result[] = [
+                'type' => 'cancel',
+                'label' => __('Cancel'),
+                'title' => __('Warning!'),
+                'message' => __('Are you sure? This action cannot be reversed.'),
+                'href' => $this->urlBuilder->getUrl(
+                    'tnw_subscriptions/subscription_actions/updateStatus',
+                    [
+                        'entity_id' => $id,
+                        'status' => ProfileStatus::STATUS_CANCELED,
+                        'redirect' => History::REDIRECT,
+                    ]
+                )
+            ];
+        }
+        return $result;
     }
 
     /**

@@ -56,7 +56,6 @@ class PaymentInformationManagement
 
         if (
             $this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001
-            && !in_array($paymentMethod->getMethod(), ['chcybersource', 'chcybersource_cc_vault'])
         ) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),

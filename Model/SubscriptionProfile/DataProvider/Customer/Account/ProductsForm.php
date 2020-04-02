@@ -9,6 +9,8 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Acco
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 
 /**
@@ -118,6 +120,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getQtyDefinition()
     {
+        $canUseDecimals = $this->canUseQtyDecimals();
         return [
             'arguments' => [
                 'data' => [
@@ -128,8 +131,9 @@ class ProductsForm extends SummaryProductsForm
                         'componentType' => UiForm\Element\Input::NAME,
                         'dataScope' => 'qty',
                         'validation' => [
-                            'validate-zero-or-greater' => true,
-                            'required-entry' => true
+                            'validate-greater-than-zero' => true,
+                            'required-entry' => true,
+                            'validate-digits' => !$canUseDecimals
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -252,6 +256,44 @@ class ProductsForm extends SummaryProductsForm
     }
 
     /**
+     * Returns edit button definition.
+     *
+     * @return array
+     */
+    protected function getEditButton()
+    {
+        $additionalClasses = $this->getRemoveButtonVisibility() ? '': 'right';
+        $additionalClasses .= ' action-editor';
+
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'visible' => $this->isEditButtonVisible(),
+                        'formElement' => UiContainer::NAME,
+                        'componentType' => UiContainer::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/edit-button',
+                        'additionalClasses' => $additionalClasses,
+                        'title' => 'Modify',
+                        'actions' => [
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'togglePreviewMode',
+                            ],
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'toggleButtonPreviewMode',
+                            ]
+                        ],
+                        'provider' => null,
+                        'buttonVisibility' => $this->isEditButtonVisible(),
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
      * Returns middle container definition from description fieldset.
      *
      * @return array
@@ -347,7 +389,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getPeriodDefenition()
     {
-        $infiniteSubscriptions = $this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [
@@ -396,6 +438,29 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function isEditButtonVisible()
     {
-        return null !== $this->currentProduct;
+        return $this->canEditProfile();
+    }
+
+    /**
+     * Check if subscription profile can be editable by customer
+     *
+     * @return bool
+     */
+    private function canEditProfile()
+    {
+        $canEdit = false;
+        /** @var SubscriptionProfile $currentProfile */
+        $currentProfile = $this->getCurrentProfile();
+        $status = (int)$currentProfile->getStatus();
+        $nonEditableStatuses = [
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_CANCELED,
+            ProfileStatus::STATUS_COMPLETE,
+            ProfileStatus::STATUS_PAST_DUE
+        ];
+        if ($currentProfile && !in_array($status, $nonEditableStatuses, true)) {
+            $canEdit = true;
+        }
+        return $canEdit;
     }
 }

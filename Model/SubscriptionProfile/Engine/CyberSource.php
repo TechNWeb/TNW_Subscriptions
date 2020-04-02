@@ -10,10 +10,17 @@ use CyberSource\Core\Model\Config as ConfigProvider;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 
+/**
+ * Class CyberSource
+ * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
+ */
 class CyberSource extends Base
 {
+    /**
+     * @var mixed
+     */
     private $transferFactory;
 
     /**
@@ -21,7 +28,31 @@ class CyberSource extends Base
      */
     private $transactionCustomer;
 
+    /**
+     * @var mixed
+     */
+    private $requestHelper;
+
+    /**
+     * @var PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * CyberSource constructor.
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\Context $context
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
+     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
+     */
     public function __construct(
+        PaymentTokenManagementInterface $paymentTokenManagement,
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
@@ -40,10 +71,15 @@ class CyberSource extends Base
             $zeroTotalValidator
         );
         $cyberSourceConfig->reBillProcess();
-        if ($moduleManager->isEnabled("CyberSource_Core")) {
+        if (
+            $moduleManager->isEnabled("CyberSource_Core")
+            && $moduleManager->isEnabled("CyberSource_SecureAcceptance")
+        ) {
             $this->transferFactory = $objectManager->get("CyberSource\Core\Gateway\Http\TransferFactory");
+            $this->requestHelper = $objectManager->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
         }
         $this->transactionCustomer = $transactionCustomer;
+        $this->paymentTokenManagement = $paymentTokenManagement;
     }
 
     /**
@@ -51,14 +87,16 @@ class CyberSource extends Base
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
+        $cybersourceToken = $payment->getAdditionalInformation('cybersourse_token');
+        $cyberSourceData = $payment->getAdditionalInformation();
         return [
-            'token_hash' => $payment->getAdditionalInformation('cybersourse_token'),
+            'token_hash' => $cybersourceToken,
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
                 OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear(),
-                'cybersource_data' => $payment->getAdditionalInformation()
+                'cybersource_data' =>$cyberSourceData
             ]
         ];
     }
@@ -82,15 +120,46 @@ class CyberSource extends Base
      */
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
+        $profilePayment = $profile->getPayment();
         $result = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
+        $cyberSourceData = isset($result['cybersource_data']) ? $result['cybersource_data'] : [];
+        if (!isset($result['cybersource_data'])) {
+            $paymentToken = $this->paymentTokenManagement->getByGatewayToken(
+                $profilePayment->getPaymentToken(),
+                'cybersource',
+                $profile->getCustomerId()
+            );
+            $cyberSourceData = [
+                'cybersource_token' => $profilePayment->getPaymentToken(),
+                'cardNumber' => str_replace('-', '', $result['cc_last_4']),
+                'cardType' => $this->requestHelper->getCardType($result['cc_type']),
+                "is_active_payment_token_enabler" => true,
+                'token_data' => [
+                    "payment_token" => $profilePayment->getPaymentToken(),
+                    "card_type" => $this->requestHelper->getCardType($result['cc_type']),
+                    "cc_last4" => $result['cc_last_4'],
+                    "card_expiry_date" => $result['cc_exp_month'] . '-' . $result['cc_exp_year']
+                ]
+            ];
+            if ($paymentToken) {
+                $cyberSourceData['extension_attributes'] = json_decode($paymentToken->getTokenDetails(), true);
+            }
+        }
         return array_merge(
-            $result['cybersource_data'],
+            $cyberSourceData,
             [OrderPaymentInterface::METHOD => ConfigProvider::CODE]
         );
     }
 
+    /**
+     * @param $requestData
+     * @return $this|Base
+     * @throws PaymentException
+     * @throws \Magento\Payment\Gateway\Http\ClientException
+     * @throws \Magento\Payment\Gateway\Http\ConverterException
+     */
     public function processProfileByRequestData($requestData)
     {
         if (empty($requestData['payment'][ConfigProvider::CODE]['method'])) {

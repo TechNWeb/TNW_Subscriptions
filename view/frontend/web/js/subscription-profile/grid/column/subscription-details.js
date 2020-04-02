@@ -1,7 +1,25 @@
 define([
-    'Magento_Ui/js/grid/columns/column'
-], function (Column) {
+    'Magento_Ui/js/grid/columns/column',
+    'underscore',
+    'Magento_Ui/js/modal/confirm'
+], function (Column, _, confirm) {
     return Column.extend({
+
+        applyAction: function(action) {
+            if (action.title && action.message) {
+                confirm({
+                    title: action.title,
+                    content: action.message,
+                    actions: {
+                        confirm: function () {
+                            window.location.href=action.href;
+                        }
+                    }
+                });
+            } else {
+                window.location.href=action.href;
+            }
+        },
 
         getProductName: function (row) {
             if (!row.subscription_product) return false;
@@ -10,7 +28,7 @@ define([
 
         getProductQty: function (row) {
             if (!row.subscription_product) return false;
-            return parseInt(row.subscription_product.qty);
+            return parseFloat(row.subscription_product.qty);
         },
 
         getProudctThumbnailSrc: function(row) {
@@ -28,6 +46,11 @@ define([
             return row.subscription_product.short_description;
         },
 
+        getProductOptions: function (row) {
+            if (!row.subscription_product || _.isEmpty(row.subscription_product.configurable_options)) return false;
+            return row.subscription_product.configurable_options;
+        },
+
         getIsVirtual: function(row) {
             return row.is_virtual;
         },
@@ -40,9 +63,14 @@ define([
             return 'sub-status_' + row.status;
         },
 
+        getProfileActions: function(row) {
+            if (_.isEmpty(row.profile_actions)) return false;
+            return row.profile_actions;
+        },
+
         getSubscriptionEditLink: function (row) {
-            if (!row.label || !row.label.edit) return false;
-            return row.label.edit.href;
+            var actions = _.indexBy(this.getProfileActions(row), 'type');
+            return actions.edit.href;
         },
 
         getSubBillingFrequency: function (row) {

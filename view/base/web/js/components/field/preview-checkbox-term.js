@@ -51,6 +51,9 @@ define([
                     this.reset();
                 }
             } else {
+                if (this.disabled()) {
+                    this.showPreview(true);
+                }
                 this.visible(this.visibleOnEdit);
             }
         }

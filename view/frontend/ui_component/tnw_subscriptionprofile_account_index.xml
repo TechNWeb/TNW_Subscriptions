@@ -28,6 +28,9 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
                     <item name="direction" xsi:type="string">DESC</item>
                     <item name="update_url" path="tnw_subscriptions/ui/render" xsi:type="url"/>
+                    <item name="filter_url_params" xsi:type="array">
+                        <item name="status" xsi:type="string">0,6</item>
+                    </item>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">entity_id</item>
                     </item>
@@ -69,16 +72,6 @@
                 </item>
             </argument>
         </column>
-        <actionsColumn name="label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Label">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="visible" xsi:type="boolean">false</item>
-                    <item name="sortOrder" xsi:type="number">1</item>
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Label</item>
-                </item>
-            </argument>
-        </actionsColumn>
         <column name="frequency_label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Details">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Frequency\Options</item>

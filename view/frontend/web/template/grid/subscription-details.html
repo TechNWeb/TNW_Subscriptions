@@ -29,11 +29,13 @@
                 />
             </div>
             <div class="sub-actions">
-                <a class="name" data-bind="
-                    attr: {
-                        href: $col.getSubscriptionEditLink($row()),
-                    }" translate="'Edit'"
-                />
+                <!-- ko foreach: {data: $col.getProfileActions($row()), as: 'action'} -->
+                <a data-bind="
+                    attr: { href: action.href },
+                    click: $parent.applyAction,
+                    css: action.type,
+                    text: action.label"/>
+                <!-- /ko -->
             </div>
             <div class="sub-product-description">
                 <div html="$col.getProductDescription($row())"/>
@@ -41,6 +43,16 @@
             <div class="price">
                 <span text="$col.getPaymentAmount($row())"/>
             </div>
+            <!-- ko if: $col.getProductOptions($row()) -->
+            <div class="sub-configurable-options">
+                <!-- ko foreach: {data: $col.getProductOptions($row()), as: 'option'}-->
+                <div class="option">
+                    <strong text="option.attributeLabel"/>:&nbsp;
+                    <span text="option.optionLabel"/>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
         </div>
         <div class="term-frequency-date-wrapper">
             <div class="sub-billing-frequency">

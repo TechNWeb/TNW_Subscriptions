@@ -48,8 +48,12 @@ define(
                     }
                     mainForm = registry.get('index = ' + this.productsFormName);
                     if (mainForm) {
-                        mainForm.destroyInserted();
-                        mainForm.render();
+                        if ($('.account.tnw_subscriptions-subscription-edit .block-next-payment .cost').length) {
+                            window.location.reload();
+                        } else {
+                            mainForm.destroyInserted();
+                            mainForm.render();
+                        }
                     }
                     this.setMessageFromResponse();
                 }

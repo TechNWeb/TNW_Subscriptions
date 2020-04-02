@@ -404,6 +404,9 @@ class Form extends AbstractDataProvider
                 $frequency = $this->formContext->getFrequencyRepository()
                     ->getById($productFrequency->getBillingFrequencyId());
                 $label = $frequency->getLabel();
+                if ((bool)$productFrequency->getDefaultBillingFrequency()) {
+                    $label = $label . ' ' . __('(most common)');
+                }
                 $result[] = [
                     'label' => $label,
                     'value' => $productFrequency->getBillingFrequencyId(),
@@ -752,6 +755,7 @@ class Form extends AbstractDataProvider
             'price' => $this->getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject),
             'preset_qty' => $frequency->getPresetQty(),
             'initial_fee' => $this->getInitialFee($billingFrequencyId, $productDataObject->getChildProductId()),
+            'is_default' => (bool)($frequency->getDefaultBillingFrequency())
         ];
 
         $frequencyData = [];
