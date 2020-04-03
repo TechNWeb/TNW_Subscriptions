@@ -12,6 +12,17 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
+use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -22,6 +33,67 @@ class ProductsForm extends SummaryProductsForm
      * Form data scope
      */
     const DATA_SCOPE_MODAL_FORM = 'tnw_subscriptionprofile_products_and_services_form';
+
+    /**
+     * @var Config
+     */
+    protected $subscriptionConfig;
+
+    /**
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param PriceCalculator $priceCalculator
+     * @param Context $context
+     * @param FormContext $formContext
+     * @param PoolInterface $pool
+     * @param Manager $profileManager
+     * @param Registry $registry
+     * @param UrlInterface $urlBuilder
+     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param StockRegistryInterface $stockRegistry
+     * @param Config $subscriptionConfig
+     * @param string $scope
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
+        PriceCalculator $priceCalculator,
+        Context $context,
+        FormContext $formContext,
+        PoolInterface $pool,
+        Manager $profileManager,
+        Registry $registry,
+        UrlInterface $urlBuilder,
+        ProductTypeManagerResolver $productTypeResolver,
+        StockRegistryInterface $stockRegistry,
+        Config $subscriptionConfig,
+        $scope = '',
+        array $meta = [],
+        array $data = []
+    ) {
+        $this->subscriptionConfig = $subscriptionConfig;
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $priceCalculator,
+            $context,
+            $formContext,
+            $pool,
+            $profileManager,
+            $registry,
+            $urlBuilder,
+            $productTypeResolver,
+            $stockRegistry,
+            $scope,
+            $meta,
+            $data
+        );
+    }
 
     /**
      * @var array
@@ -234,6 +306,16 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getForm($objectId, $itemId)
     {
+        $confirmBeforeSave = null;
+        if ($this->subscriptionConfig->getPricingStrategy() == PriceStrategy::DYNAMIC_PRICE) {
+            $confirmBeforeSave = [
+                'type' => 'warning',
+                'title' => __('Warning!'),
+                'message' => __('Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.')
+            ];
+        }
+        $formMessages = $confirmBeforeSave ? [$confirmBeforeSave] : null;
+
         return [
             'arguments' => [
                 'data' => [
@@ -244,12 +326,25 @@ class ProductsForm extends SummaryProductsForm
                         'additionalData' => $this->getAdditionalData($objectId, $itemId),
                         'productsFormName' => $this->getProductFormName(),
                         'requestFields' => $this->getRequestFields(),
-                        'editButtons' => $this->getFormEditButtons()
+                        'editButtons' => $this->getFormEditButtons(),
+                        'confirmBeforeSave' => $confirmBeforeSave
                     ]
                 ]
             ],
             'children' => [
                 'edit_button' => $this->getEditButton(),
+                'form_messages' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => UiContainer::NAME,
+                                'componentType' => UiContainer::NAME,
+                                'template' => 'TNW_Subscriptions/form/element/messages',
+                                'messages' => $formMessages
+                            ]
+                        ]
+                    ]
+                ],
                 'description_fieldset' => $this->getDescriptionFieldset()
             ]
         ];

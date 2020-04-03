@@ -53,4 +53,44 @@ class Collection extends AbstractCollection
 
         return $this->getConnection()->fetchPairs($select);
     }
+
+    /**
+     * Return sum of total price and shipping subscription profile orders for subscriptions
+     *
+     * @param array $ids
+     * @return array
+     */
+    public function getQuoteItemsData(array $ids)
+    {
+        $arrItems = [];
+        array_filter($ids, function($v, $k) use(&$arrItems) {
+            array_push($arrItems, $v['entity_id']);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        $select = $this->getConnection()->select()
+          ->from(
+              ['profile_order' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+              ['entity_id', 'subscription_profile_id']
+          )->join(
+              ['profile_items' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
+              'profile_order.entity_id = profile_items.profile_item_id',
+              'quote_item_id'
+            )->join(
+                'quote_item',
+                'quote_item.item_id = profile_items.quote_item_id',
+                '*'
+            )->join(
+                ['profile_entity' => $this->getTable('tnw_subscriptions_subscription_profile_entity')],
+                'profile_entity.entity_id = profile_order.subscription_profile_id',
+                'shipping'
+            )->where('profile_order.subscription_profile_id in (?)', $arrItems)
+            ->group('subscription_profile_id');
+
+        $result = [];
+        array_filter($this->getConnection()->fetchAll($select), function($v, $k) use(&$result) {
+            $result[$v['subscription_profile_id']] = $v['row_total'] + $v['shipping'];
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return $result;
+    }
 }
