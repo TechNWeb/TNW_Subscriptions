@@ -3,9 +3,10 @@ define(
         'jquery',
         'TNW_Subscriptions/js/components/subscriptions-form',
         'uiRegistry',
-        'underscore'
+        'underscore',
+        'Magento_Ui/js/modal/confirm'
     ],
-    function ($, Component, registry, _) {
+    function ($, Component, registry, _, confirm) {
         'use strict';
 
         return Component.extend({
@@ -131,13 +132,26 @@ define(
              * @param {Object} data
              */
             save: function (redirect, data) {
-                this.validate();
+                function doSave(r, d) {
+                    this.validate();
+                    if (!this.additionalInvalid && !this.source.get('params.invalid')) {
+                        this.filterRequestFields();
+                        this.setAdditionalData(this.additionalData);
+                        this.setAdditionalData(d)
+                            .submit(r);
+                    }
+                }
 
-                if (!this.additionalInvalid && !this.source.get('params.invalid')) {
-                    this.filterRequestFields();
-                    this.setAdditionalData(this.additionalData);
-                    this.setAdditionalData(data)
-                        .submit(redirect);
+                if (this.confirmBeforeSave) {
+                    confirm({
+                        title: this.confirmBeforeSave.title,
+                        content: this.confirmBeforeSave.message,
+                        actions: {
+                            confirm: doSave.bind(this, redirect, data)
+                        }
+                    })
+                } else {
+                    doSave.bind(this)(redirect, data);
                 }
             },
 
