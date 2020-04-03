@@ -15,6 +15,8 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 
 /**
  * Base class for product manager by type.
@@ -42,17 +44,31 @@ abstract class Base implements TypeInterface
     protected $productRepository;
 
     /**
+     * @var null
+     */
+    private $profileProduct = null;
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * Base constructor.
+     * @param Config $config
      * @param PriceCalculator $priceCalculator
      * @param ProductFrequencyRepository $productFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductRepositoryInterface $productRepository
      */
     public function __construct(
+        Config $config,
         PriceCalculator $priceCalculator,
         ProductFrequencyRepository $productFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductRepositoryInterface $productRepository
     ) {
+        $this->config = $config;
         $this->priceCalculator = $priceCalculator;
         $this->productFrequencyRepository = $productFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -172,6 +188,13 @@ abstract class Base implements TypeInterface
             isset($productData['price']) ? $productData['price'] : null,
             $full
         );
+        if ($this->profileProduct) {
+            $originProfileProductData = $this->profileProduct->getOrigData();
+            $originUnitPrice = (float) $originProfileProductData['price'] / (int) $originProfileProductData['qty'];
+            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE) {
+                $price = min($originUnitPrice, $price);
+            }
+        }
         if ($lockProductPriceStatus && $productQty) {
             $tierPrice = $this->productRepository
                 ->getById($product->getData('child_product_id'))
@@ -222,5 +245,15 @@ abstract class Base implements TypeInterface
         ];
 
         return $data;
+    }
+
+    /**
+     * @param $productObject
+     * @return $this
+     */
+    public function setOriginalProfileProduct($productObject)
+    {
+        $this->profileProduct = $productObject;
+        return $this;
     }
 }

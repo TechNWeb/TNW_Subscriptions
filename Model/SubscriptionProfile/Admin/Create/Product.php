@@ -21,6 +21,8 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolve
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 
 /**
  * Class Product
@@ -89,18 +91,10 @@ class Product extends Create
      */
     private $searchCriteriaBuilder;
 
-    /**
-     * Product constructor.
-     * @param Context $context
-     * @param QuoteSessionInterface $session
-     * @param ProductRepositoryInterface $productRepository
-     * @param PriceCalculator $priceCalculator
-     * @param ExtensionManager $extensionManager
-     * @param ProductTypeManagerResolver $productTypeResolver
-     * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     */
+    private $config;
+
     public function __construct(
+        Config $config,
         Context $context,
         QuoteSessionInterface $session,
         ProductRepositoryInterface $productRepository,
@@ -110,6 +104,7 @@ class Product extends Create
         ProductBillingFrequencyRepository $productBillingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
+        $this->config = $config;
         $this->productRepository = $productRepository;
         $this->priceCalculator = $priceCalculator;
         $this->extensionManager = $extensionManager;
@@ -249,6 +244,12 @@ class Product extends Create
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
+            if (
+                $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                && isset($this->data['custom_price'])
+            ) {
+                $customProductPrice = (float) $this->data['custom_price'] / $this->data['qty'];
+            }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
 
             $data = [
@@ -292,7 +293,7 @@ class Product extends Create
      */
     public function getPresetCustomPrice()
     {
-        return $this->data['custom_price'];
+        return (float) $this->data['custom_price'] / (int) $this->data['qty'];
     }
 
     /**

@@ -241,7 +241,7 @@ class ManagerConfigurable
                     return strval($candidates);
                 }
 
-                $price = $this->getSubscriptionItemPrice($request, $profile, $magentoProduct);
+                $price = $this->getSubscriptionItemPrice($request, $profile, $updatedSubProduct);
 
                 /** @var \Magento\Catalog\Model\Product $candidate */
                 foreach ($candidates as $candidate) {
@@ -286,7 +286,7 @@ class ManagerConfigurable
             $products = $profile->getProducts();
             $request = $this->objectFactory->create($request);
             foreach ($products as $product) {
-                $price = $this->getSubscriptionItemPrice($request, $profile, $product->getMagentoProduct());
+                $price = $this->getSubscriptionItemPrice($request, $profile, $product);
                 $product->setPrice($price * $request['item_' . $request['subscription_profile_id']]['qty']);
             }
         }
@@ -309,22 +309,22 @@ class ManagerConfigurable
      *
      * @param DataObject $request
      * @param SubscriptionProfile $profile
-     * @param Product $magentoProduct
+     * @param $profileProduct
      * @return float|string
      */
     private function getSubscriptionItemPrice(
         DataObject $request,
         SubscriptionProfile $profile,
-        Product $magentoProduct
+        $profileProduct
     ) {
+        $magentoProduct = $profileProduct->getMagentoProduct();
         $requestData = $request->getData();
         $requestData['billing_frequency'] = $profile->getBillingFrequencyId();
         if (isset($requestData['price'])) {
             unset($requestData['price']);
         }
-
-        $price = $this->configurableTypeManager->getSubscriptionPrice($magentoProduct, $requestData);
-
-        return $price;
+        return $this->configurableTypeManager
+            ->setOriginalProfileProduct($profileProduct)
+            ->getSubscriptionPrice($magentoProduct, $requestData);
     }
 }
