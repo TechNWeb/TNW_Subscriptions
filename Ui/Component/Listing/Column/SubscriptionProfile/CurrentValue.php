@@ -32,7 +32,6 @@ class CurrentValue extends Column
      * @var PriceCurrencyInterface
      */
     private $priceFormatter;
-
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
@@ -60,18 +59,15 @@ class CurrentValue extends Column
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
-            $profileIds = array_map(
-                function ($itemData){
-                    return $itemData['entity_id'];
-                },
-                $dataSource['data']['items']
-            );
-
-            $profileCurrentValues = $this->profileCollection->getCurrentValues($profileIds);
-
+            $quoteItemsData = $this->profileCollection->getQuoteItemsData($dataSource['data']['items']);
             foreach ($dataSource['data']['items'] as & $item) {
                 $profileId = $item['entity_id'];
-                $currentValue = isset($profileCurrentValues[$profileId]) ? $profileCurrentValues[$profileId] : 0;
+                if (key_exists($profileId, $quoteItemsData)) {
+                    $currentValue = $quoteItemsData[$profileId];
+                } else {
+                    $currentValueArray = $this->profileCollection->getCurrentValues([$profileId]);
+                    $currentValue = count($currentValueArray) ? (float) array_shift($currentValueArray) : 0;
+                }
                 $currencyCode = isset($item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE])
                     ? $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE]
                     : null;
