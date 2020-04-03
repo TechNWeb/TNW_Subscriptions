@@ -8,9 +8,10 @@ namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
-use Magento\Quote\Model\Quote;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
@@ -72,21 +73,37 @@ class Manager
     private $simpleTypeManager;
 
     /**
+     * @var Context
+     */
+    private $subscriptionContext;
+
+    /**
+     * @var Json
+     */
+    private $serializer;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
      * @param SimpleTypeManager $simpleTypeManager
+     * @param Context $subscriptionContext
+     * @param Json $serializer
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
         MessageHistoryLogger $historyLogger,
-        SimpleTypeManager $simpleTypeManager
+        SimpleTypeManager $simpleTypeManager,
+        Context $subscriptionContext,
+        Json $serializer
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
         $this->simpleTypeManager = $simpleTypeManager;
+        $this->subscriptionContext = $subscriptionContext;
+        $this->serializer = $serializer;
     }
 
     public function reset()
@@ -320,11 +337,24 @@ class Manager
                                 }
                             }
                         } else {
+                            $priceFormat = $this->serializer->unserialize(
+                                $this->subscriptionContext->getPriceFormatData(
+                                    $profileModel->getProfileCurrencyCode()
+                                )
+                            );
+
                             if (!empty($requestData['price'])) {
-                                $product->setPrice(number_format($requestData['price'], 4));
+                                $requestPrice = floatval(preg_replace(
+                                    [
+                                        '/[^\d' . $priceFormat['decimalSymbol'] . ']/',
+                                        '/\\' . $priceFormat['decimalSymbol'] . '/'
+                                    ],
+                                    ['', '.'],
+                                    $requestData['price']));
+                                $product->setPrice($requestPrice);
                             }
                             if (!empty($requestData['qty'])) {
-                                $product->setQty(number_format($requestData['qty'], 4));
+                                $product->setQty(number_format($requestData['qty'], 4, '.', ''));
                             }
                             if (!empty($requestData['additional_attribute'])) {
                                 foreach ($requestData['additional_attribute'] as $attributeCode => $attributeValue) {
@@ -348,10 +378,11 @@ class Manager
                             }
                             if (isset($data['item_' . $product->getId()]['qty'])) {
                                 $price = $this->simpleTypeManager
+                                    ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
                                         $product->getMagentoProduct(), $data['item_' . $product->getId()]
                                     );
-                                $product->setPrice(number_format($price * $product->getQty(), 4));
+                                $product->setPrice($price * $product->getQty(), 4);
                             }
                             if (isset($data['item_' . $product->getId()]['start_on'])) {
                                 $startOn = $data['item_' . $product->getId()]['start_on'];

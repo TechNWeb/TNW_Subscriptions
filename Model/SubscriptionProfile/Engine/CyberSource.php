@@ -11,6 +11,7 @@ use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Framework\Exception\PaymentException;
 
 /**
  * Class CyberSource

@@ -786,7 +786,7 @@ class Manager
             try {
                 $quoteItem = $quote->addProduct(
                     $magentoProduct,
-                    $this->getProductAddRequest($profileProduct)
+                    $this->getProductAddRequest($profileProduct, $isReBill)
                 );
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $quoteItemCreated = false;
@@ -815,6 +815,10 @@ class Manager
                     $profile->getCustomerId()
                 );
 
+                //Set payment method
+                $quote->getPayment()
+                    ->importData($this->getEngine()->getPaymentInfo($profile))
+                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
                 if (!$quote->isVirtual()) {
                     $profileShippingAddressData = $profile->getShippingAddress()->getData();
@@ -830,6 +834,7 @@ class Manager
                     //Set shipping method
                     $quote->getShippingAddress()
                         ->setCollectShippingRates(true)
+                        ->setItemQty($quote->getItemsSummaryQty())
                         ->collectShippingRates()
                         ->setShippingMethod($profile->getShippingMethod());
                 }
@@ -837,11 +842,6 @@ class Manager
                 if ($isReBill && method_exists($this->getEngine(), 'setRebillProcessFlag')) {
                     $this->getEngine()->setRebillProcessFlag();
                 }
-
-                // Set payment method
-                $quote->getPayment()
-                    ->importData($this->getEngine()->getPaymentInfo($profile))
-                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
                 if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
                     $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
@@ -869,10 +869,10 @@ class Manager
      * Returns request for adding product to subscription quote.
      *
      * @param ProductSubscriptionProfileInterface $profileProduct
-     *
+     * @param bool $isRebill
      * @return DataObject
      */
-    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct)
+    protected function  getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
     {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
@@ -893,6 +893,9 @@ class Manager
             $data = array_replace_recursive($customOptions['info_buyRequest'], $data);
         }
 
+        if ($isRebill) {
+            $data['rebill_processing'] = $isRebill;
+        }
         return $this->dataObjectFactory->create($data);
     }
 
