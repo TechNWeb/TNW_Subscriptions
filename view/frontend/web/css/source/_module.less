@@ -428,6 +428,17 @@
     .subscription-item-form {
         padding: 2rem 0 0 0;
 
+        >.fieldset-wrapper-content {
+            >.fieldset {
+                .lib-vendor-prefix-flex-wrap(wrap);
+            }
+        }
+
+        .subscription-product-messages {
+            .lib-vendor-prefix-flex-grow(1);
+            .lib-vendor-prefix-flex-basis(100%);
+        }
+
         .fieldset {
             display: -webkit-inline-flex;
             display: -ms-inline-flexbox;

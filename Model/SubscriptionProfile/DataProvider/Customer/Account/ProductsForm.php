@@ -309,10 +309,13 @@ class ProductsForm extends SummaryProductsForm
         $confirmBeforeSave = null;
         if ($this->subscriptionConfig->getPricingStrategy() == PriceStrategy::DYNAMIC_PRICE) {
             $confirmBeforeSave = [
-                'title' => 'Warning!',
-                'message' => ' Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.'
+                'type' => 'warning',
+                'title' => __('Warning!'),
+                'message' => __('Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.')
             ];
         }
+        $formMessages = $confirmBeforeSave ? [$confirmBeforeSave] : null;
+
         return [
             'arguments' => [
                 'data' => [
@@ -330,6 +333,18 @@ class ProductsForm extends SummaryProductsForm
             ],
             'children' => [
                 'edit_button' => $this->getEditButton(),
+                'form_messages' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => UiContainer::NAME,
+                                'componentType' => UiContainer::NAME,
+                                'template' => 'TNW_Subscriptions/form/element/messages',
+                                'messages' => $formMessages
+                            ]
+                        ]
+                    ]
+                ],
                 'description_fieldset' => $this->getDescriptionFieldset()
             ]
         ];
