@@ -128,7 +128,6 @@ class BillingCyclesManager
                     break;
                 case BillingFrequencyUnitType::MONTHS:
                     $months = $dateDiff->y * 12 + $dateDiff->m;
-                    $cyclesCount = floor($months / $profile->getFrequency());
                     $cyclesCount = floor( $profile->getFrequency() / $months);
                     break;
                 default:
