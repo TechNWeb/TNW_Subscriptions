@@ -122,7 +122,7 @@ define([
             priceFormat.pattern = '%s';
             if (!priceInclTax) return false;
             priceInclTax = formatPrice.formatToNumber(priceInclTax, priceFormat);
-            priceInclTax = formatPrice.formatPrice(priceInclTax, priceFormat) + ' (' + $t('Incl. Tax') + ')';
+            priceInclTax = formatPrice.formatPrice(priceInclTax, priceFormat) + ' <span class="tax-label">(' + $t('incl. tax') + ')</span>';
             return priceInclTax;
         },
 

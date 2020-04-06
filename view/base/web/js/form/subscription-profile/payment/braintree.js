@@ -8,20 +8,32 @@ define([
     'TNW_Subscriptions/js/form/subscription-profile/payment/base',
     'uiRegistry',
     'Magento_Braintree/js/validator',
+    'underscore',
     'Magento_Ui/js/lib/spinner'
-], function ($, $t, PaymentBase, registry, validator) {
+], function ($, $t, PaymentBase, registry, validator, _) {
     'use strict';
 
     return PaymentBase.extend({
         defaults: {
             scriptLoaded: false,
-            braintree: null,
-            grandTotal: null,
+            braintree: {
+                client: null,
+                hostedFields: null
+            },
             braintreeClient: null,
+            hostedFieldsInstance: null,
+            grandTotal: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
             sdkUrl: null,
+            hostedFieldsSdkUrl: null,
             clientToken: null,
+            selectorsMapper: {
+                'expirationMonth': 'cc-month',
+                'expirationYear': 'cc-year',
+                'number': 'cc-number',
+                'cvv': 'cc-cvv'
+            },
             useCvv: true,
             links: {
                 selectedCardType: 'dataContainer = braintree-cc-type:value'
@@ -65,8 +77,44 @@ define([
          * @return void
          */
         beforeSubmit: function () {
+            var self = this;
+
+            if (!this.validateHostedFields()) return;
+
             $('body').trigger('processStart');
-            $('#braintree_submit').trigger('click');
+            this.hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+                if (tokenizeErr) {
+                    self.processErrors([tokenizeErr.message]);
+                    $('body').trigger('processStop');
+                    return false;
+                }
+                var form = registry.get('index = '+self.options.formName);
+                form.source.data.payment.braintree.nonce = payload.nonce;
+                $('body').trigger('processStop');
+                form.triggerSave([]);
+            });
+        },
+
+        /**
+         * Validate Braintree hosted fields via SDK state api
+         * @returns {boolean}
+         */
+        validateHostedFields: function() {
+            var self = this,
+                state = this.hostedFieldsInstance.getState(),
+                formValid = Object.keys(state.fields).every(function (key) {
+                    return state.fields[key].isValid;
+                });
+
+            if (formValid) return true;
+
+            _.each(Object.keys(state.fields), function (fieldKey) {
+                if (fieldKey in self.selectorsMapper && state.fields[fieldKey].isValid === false) {
+                    self.addInvalidClass(self.selectorsMapper[fieldKey]);
+                }
+            });
+
+            return false;
         },
 
         /**
@@ -78,9 +126,10 @@ define([
                 state = self.scriptLoaded;
 
             this.showLoader();
-            require([this.sdkUrl], function (braintree) {
+            require([this.sdkUrl, this.hostedFieldsSdkUrl], function (braintreeClient, hostedFields) {
                 state(true);
-                self.braintree = braintree;
+                self.braintree.client = braintreeClient;
+                self.braintree.hostedFields = hostedFields;
                 self.initBraintree();
                 self.hideLoader();
             });
@@ -93,52 +142,24 @@ define([
         initBraintree: function () {
             var self = this;
 
-            try {
-                $('body').trigger('processStart');
+            $('body').trigger('processStart');
 
-                this.braintreeClient = new this.braintree.api.Client({
-                    clientToken: this.clientToken
-                });
-
-                this.braintree.setup(this.clientToken, 'custom', {
-                    id: this.selector,
-                    hostedFields: this.getHostedFields(),
-
-                    /**
-                     * Triggered when sdk was loaded
-                     */
-                    onReady: function () {
-                        $('body').trigger('processStop');
-                    },
-
-                    /**
-                     * Callback for success response
-                     */
-                    onPaymentMethodReceived: function (response) {
-                        $('body').trigger('processStop');
-
-                        if (!self.validateCardType()) {
-                            return;
-                        }
-
-                        var form = registry.get('index = '+self.options.formName);
-                        form.source.data.payment.braintree.nonce = response.nonce;
-                        form.triggerSave([]);
-                    },
-
-                    /**
-                     * Error callback
-                     * @param {Object} response
-                     */
-                    onError: function (response) {
-                        self.processErrors([response.message]);
-                        $('body').trigger('processStop');
-                    }
-                });
-            } catch (e) {
+            this.braintree.client.create({
+                authorization: this.clientToken
+            }).then(function (clientInstance) {
+                var options = {
+                    client: clientInstance,
+                    fields: self.getHostedFields()
+                };
+                return self.braintree.hostedFields.create(options);
+            }).then(function (hostedFieldsInstance) {
+                self.hostedFieldsInstance = hostedFieldsInstance;
+                self.fieldEventHandler(hostedFieldsInstance);
                 $('body').trigger('processStop');
-                this.processErrors([e.message]);
-            }
+            }).catch(function () {
+                $('body').trigger('processStop');
+                self.processErrors([$t('Braintree can\'t be initialized.')]);
+            });
         },
 
         /**
@@ -147,29 +168,21 @@ define([
          */
         getHostedFields: function () {
             var self = this,
+
                 fields = {
-                    number: {
-                        selector: self.getSelector('cc-number'),
-                        placeholder: $t('Credit card number')
-                    },
-                    expirationMonth: {
-                        selector: self.getSelector('cc-month'),
-                        placeholder: $t('MM')
-                    },
-                    expirationYear: {
-                        selector: self.getSelector('cc-year'),
-                        placeholder: $t('YY')
-                    },
-
-                    /**
-                     * Triggered when hosted field is changed
-                     * @param {Object} event
-                     */
-                    onFieldEvent: function (event) {
-                        return self.fieldEventHandler(event);
-                    }
-                };
-
+                number: {
+                    selector: self.getSelector('cc-number'),
+                    placeholder: $t('Credit card number')
+                },
+                expirationMonth: {
+                    selector: self.getSelector('cc-month'),
+                    placeholder: $t('MM')
+                },
+                expirationYear: {
+                    selector: self.getSelector('cc-year'),
+                    placeholder: $t('YY')
+                },
+            };
             if (this.useCvv) {
                 fields.cvv = {
                     selector: self.getSelector('cc-cvv'),
@@ -191,22 +204,40 @@ define([
 
         /**
          * Function to handle hosted fields events
-         * @param {Object} event
          * @returns {Boolean}
+         * @param hostedFieldsInstance
          */
-        fieldEventHandler: function (event) {
-            if (event.type !== 'fieldStateChange') {
-                return false;
-            }
+        fieldEventHandler: function (hostedFieldsInstance) {
+            var self = this;
+            hostedFieldsInstance.on('empty', function (event) {
+                if (event.emittedBy === 'number') {
+                    self.selectedCardType(null);
+                }
+            });
 
-            // Handle a change in validation or card type
-            if (event.target.fieldKey === 'number') {
-                this.selectedCardType(null);
-            }
+            hostedFieldsInstance.on('cardTypeChange', function (event) {
+                if (event.cards.length !== 1) {
+                    return;
+                }
+                self.selectedCardType(
+                    validator.getMageCardType(event.cards[0].type, self.getCcAvailableTypes())
+                );
+            });
 
-            if (event.card) {
-                this.selectedCardType(validator.getMageCardType(event.card.type, this.getCcAvailableTypes()));
-            }
+            hostedFieldsInstance.on('validityChange', function (event) {
+                var field = event.fields[event.emittedBy],
+                    fieldKey = event.emittedBy;
+
+                if (fieldKey in self.selectorsMapper && field.isValid === false) {
+                    self.addInvalidClass(self.selectorsMapper[fieldKey]);
+                }
+            });
+
+            hostedFieldsInstance.on('blur', function (event) {
+                if (event.emittedBy === 'number') {
+                    self.validateCardType();
+                }
+            });
         },
 
         /**
@@ -230,6 +261,28 @@ define([
          */
         validateCardType: function () {
             return this.selectedCardType();
+        },
+
+        /**
+         * Add invalid class to field.
+         *
+         * @param {String} field
+         * @returns void
+         * @private
+         */
+        addInvalidClass: function (field) {
+            $(this.getSelector(field)).addClass('braintree-hosted-fields-invalid');
+        },
+
+        /**
+         * Remove invalid class from field.
+         *
+         * @param {String} field
+         * @returns void
+         * @private
+         */
+        removeInvalidClass: function (field) {
+            $(this.getSelector(field)).removeClass('braintree-hosted-fields-invalid');
         }
     });
 });
