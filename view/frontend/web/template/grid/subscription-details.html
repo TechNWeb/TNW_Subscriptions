@@ -19,29 +19,33 @@
     </div>
     <div class="details-wrapper">
         <div class="name-actions-descr-price-wrapper">
-            <div class="sub-product-name">
-                <span class="qty" text="$col.getProductQty($row())"/>x&nbsp;
-                <a class="name" data-bind="
-                    attr: {
-                        href: $col.getSubscriptionEditLink($row()),
-                    },
-                    text:$col.getProductName($row())"
-                />
+            <div class="row-left">
+                <div class="sub-product-name">
+                    <span class="qty" text="$col.getProductQty($row())"/>x&nbsp;
+                    <a class="name" data-bind="
+                        attr: {
+                            href: $col.getSubscriptionEditLink($row()),
+                        },
+                        text:$col.getProductName($row())"
+                    />
+                </div>
+                <div class="sub-product-description">
+                    <div html="$col.getProductDescription($row())"/>
+                </div>
             </div>
-            <div class="sub-actions">
-                <!-- ko foreach: {data: $col.getProfileActions($row()), as: 'action'} -->
-                <a data-bind="
-                    attr: { href: action.href },
-                    click: $parent.applyAction,
-                    css: action.type,
-                    text: action.label"/>
-                <!-- /ko -->
-            </div>
-            <div class="sub-product-description">
-                <div html="$col.getProductDescription($row())"/>
-            </div>
-            <div class="price">
-                <span text="$col.getPaymentAmount($row())"/>
+            <div class="row-right">
+                <div class="sub-actions">
+                    <!-- ko foreach: {data: $col.getProfileActions($row()), as: 'action'} -->
+                    <a data-bind="
+                        attr: { href: action.href },
+                        click: $parent.applyAction,
+                        css: action.type,
+                        text: action.label"/>
+                    <!-- /ko -->
+                </div>
+                <div class="price">
+                    <span text="$col.getPaymentAmount($row())"/>
+                </div>
             </div>
             <!-- ko if: $col.getProductOptions($row()) -->
             <div class="sub-configurable-options">
