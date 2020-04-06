@@ -40,7 +40,7 @@
         </argument>
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
-                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/billingfrequency-form</item>
             </item>
         </argument>
     </dataSource>

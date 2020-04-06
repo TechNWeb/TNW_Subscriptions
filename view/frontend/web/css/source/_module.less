@@ -670,11 +670,14 @@
 
         .right-container {
             padding-top: 0.5rem;
+            text-align: right;
             .control-preview {
-                font-size: @font-size__xl;
+                font-size: 2.6rem;
+                font-weight: @font-weight__bold;
 
-                span {
-                    white-space: nowrap;
+                .tax-label {
+                    display: block;
+                    font-size: @font-size__xs;
                 }
             }
         }
@@ -2027,6 +2030,12 @@ div.shipping-details-content {
 
     .payment-cvv .control-text {
         width: 6rem;
+    }
+}
+
+#payment-details-edit {
+    .braintree-hosted-fields-invalid:not(.braintree-hosted-fields-focused) {
+        border-color: @color-red10;
     }
 }
 

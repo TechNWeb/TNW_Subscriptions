@@ -232,6 +232,7 @@ class Braintree extends Base
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sdkUrl' => $this->braintreeConfig->getSdkUrl(),
+            'hostedFieldsSdkUrl' => $this->braintreeConfig->getHostedFieldsSdkUrl(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),

@@ -896,6 +896,10 @@ button.action-editor.active:before{
     padding: 0.6rem 1rem 0.6rem;
 }
 
+#co-transparent-form-braintree .braintree-hosted-fields-invalid:not(.braintree-hosted-fields-focused) {
+    border-color: #e02b27;
+}
+
 #co-transparent-form-braintree .payment-cvv .admin__control-text {
     width: 6rem;
 }
