@@ -30,7 +30,7 @@ class Collection
                 []
             );
 
-            $collection->addExpressionFieldToSelect('profiles', 'GROUP_CONCAT(profile_table.{{profileId}})', [
+            $collection->addExpressionFieldToSelect('subscription_profile_id', 'GROUP_CONCAT(profile_table.{{profileId}})', [
                 'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
             ]);
 
