@@ -116,10 +116,15 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
 
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
-
+            if ($this->_request->isAjax()) {
+                return $this->getResponse()->representJson('{"error":"true"}');
+            }
             return $this->getRedirect();
         }
 
+        if ($this->_request->isAjax()) {
+            return $this->getResponse()->representJson('{"error":"false"}');
+        }
         return $this->getRedirect();
     }
 
