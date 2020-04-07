@@ -38,7 +38,7 @@
                     <!-- ko foreach: {data: $col.getProfileActions($row()), as: 'action'} -->
                     <a data-bind="
                         attr: { href: action.href },
-                        click: $parent.applyAction,
+                        click: $parent.applyAction.bind(action, $col),
                         css: action.type,
                         text: action.label"/>
                     <!-- /ko -->
