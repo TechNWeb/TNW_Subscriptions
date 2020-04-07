@@ -81,6 +81,12 @@ class Save extends AbstractSave
     {
         $errors = [];
         $request = $this->getRequest()->getParams();
+        if (isset($request['objectItemId'])
+            && isset($request['item_' . $request['objectItemId']]['term'])
+            && (1 == $request['item_' . $request['objectItemId']]['term'])
+        ) {
+            $request['item_' . $request['objectItemId']]['period'] = 0;
+        }
         $result = $this->initProfile();
         if ($result) {
             try {

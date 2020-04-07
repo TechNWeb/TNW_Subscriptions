@@ -69,8 +69,8 @@ class TokenExtractor
                 : $quotePayment->getAdditionalInformation('cardNumber'),
             'incrementId' => $quote->getReserverdOrderId(),
             'expirationDate' => isset($tokenData['card_expiry_date'])
-                ? $tokenData['card_expiry_date']
-                : $quotePayment->getCcExpMonth() . '-' . $quotePayment->getCcExpYear(),
+                ? str_replace('-', '/', $tokenData['card_expiry_date'])
+                : $quotePayment->getCcExpMonth() . '/' . $quotePayment->getCcExpYear(),
             'title' => "CyberSource Stored Cards"
         ]));
         return $paymentToken;
