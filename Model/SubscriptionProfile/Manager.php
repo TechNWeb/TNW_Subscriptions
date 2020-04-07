@@ -872,7 +872,7 @@ class Manager
      * @param bool $isRebill
      * @return DataObject
      */
-    protected function  getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
+    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
     {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
