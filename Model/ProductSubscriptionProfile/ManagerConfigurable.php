@@ -272,10 +272,18 @@ class ManagerConfigurable
             $profile->setDataChanges($profileChanged);
         }
         if (isset($request['subscription_profile_id'])) {
-            if (isset($request['item_' . $request['subscription_profile_id']]['period'])) {
-                $periodValue = $request['item_' . $request['subscription_profile_id']]['period'];
-                if ($periodValue <= 0 && $request['item_' . $request['subscription_profile_id']]['term'] == 0) {
-                    return strval(__('Bill times must be greater than 0.'));
+            if (isset($request['item_' . $request['subscription_profile_id']]['term'])) {
+                $term = $request['item_' . $request['subscription_profile_id']]['term'];
+                $profile->setTerm($term);
+                if (1 == $term) {
+                    $periodValue = 0;
+                } else {
+                    $periodValue = isset($request['item_' . $request['subscription_profile_id']]['period'])
+                        ? $request['item_' . $request['subscription_profile_id']]['period']
+                        : 0;
+                    if (1 > $periodValue) {
+                        return strval(__('Bill times must be greater than 0.'));
+                    }
                 }
                 $profile->setTotalBillingCycles($periodValue);
             }

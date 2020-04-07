@@ -380,3 +380,4 @@ The number of future quotes to generate at a time for the new subscription profi
 "Subscription %1 created","Subscription %1 created"
 "Re-activate","Re-activate"
 "Re-activate subscription.","Re-activate subscription."
+"Bill times must be greater than 0.","Bill times must be greater than 0."

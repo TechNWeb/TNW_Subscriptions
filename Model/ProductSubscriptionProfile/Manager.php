@@ -314,8 +314,9 @@ class Manager
 
                     // Restore original data
                     $product->setOrigData();
+                    $productId = $product->getId();
 
-                    if ($product->getId() == $objectItemId) {
+                    if ($productId == $objectItemId) {
                         $productDataChanges = $product->hasDataChanges();
                         $product->setDataChanges(false);
                         $remove = isset($data['remove']);
@@ -365,27 +366,35 @@ class Manager
                                     $product->setCustomAttribute($attributeCode, $attributeValue);
                                 }
                             }
-                            if (isset($data['item_' . $product->getId()]['period'])) {
-                                $periodValue = $data['item_' . $product->getId()]['period'];
-                                if ($periodValue <= 0 && $data['item_' . $product->getId()]['term'] == 0) {
-                                    return strval(__('Bill times must be greater than 0.'));
+                            if (isset($data['item_' . $productId]['term'])) {
+                                $term = $data['item_' . $productId]['term'];
+                                $profileModel->setTerm($term);
+                                if (1 == $term) {
+                                    $periodValue = 0;
+                                } else {
+                                    $periodValue = isset($data['item_' . $productId]['period'])
+                                        ? $data['item_' . $productId]['period']
+                                        : 0;
+                                    if (1 > $periodValue) {
+                                        return strval(__('Bill times must be greater than 0.'));
+                                    }
                                 }
                                 $profileModel->setTotalBillingCycles($periodValue);
                             }
-                            if (isset($data['item_' . $product->getId()]['billing_frequency'])) {
-                                $billingFrequency = $data['item_' . $product->getId()]['billing_frequency'];
+                            if (isset($data['item_' . $productId]['billing_frequency'])) {
+                                $billingFrequency = $data['item_' . $productId]['billing_frequency'];
                                 $profileModel->setBillingFrequencyId($billingFrequency);
                             }
-                            if (isset($data['item_' . $product->getId()]['qty'])) {
+                            if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
-                                        $product->getMagentoProduct(), $data['item_' . $product->getId()]
+                                        $product->getMagentoProduct(), $data['item_' . $productId]
                                     );
                                 $product->setPrice($price * $product->getQty(), 4);
                             }
-                            if (isset($data['item_' . $product->getId()]['start_on'])) {
-                                $startOn = $data['item_' . $product->getId()]['start_on'];
+                            if (isset($data['item_' . $productId]['start_on'])) {
+                                $startOn = $data['item_' . $productId]['start_on'];
                                 $date = new \DateTime();
                                 $startDate = new \DateTime($startOn);
                                 $expression = 'PT' . $date->format('H') . 'H'
