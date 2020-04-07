@@ -88,6 +88,18 @@
             <argument name="messageFormatter" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\FrontendMessageHistoryFormatter</argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\Message\MessageConfigurationsPool">
+        <arguments>
+            <argument name="configurationsMap" xsi:type="array">
+                <item name="addHtmlMessage" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">TNW_Subscriptions::messages/addStatusChangeMessage.phtml</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Magento\Checkout\Model\DefaultConfigProvider">
         <plugin name="tnw_subscriptions_checkout_config_provider" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig" />
     </type>

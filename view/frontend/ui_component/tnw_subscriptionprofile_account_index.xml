@@ -103,6 +103,34 @@
                 <item name="sticky" xsi:type="boolean">false</item>
             </item>
         </argument>
-        <paging name="listing_paging"/>
+        <paging name="listing_paging">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="options" xsi:type="array">
+                        <item name="10" xsi:type="array">
+                            <item name="value" xsi:type="string">10</item>
+                            <item name="label" xsi:type="string">10</item>
+                        </item>
+                        <item name="20" xsi:type="array">
+                            <item name="value" xsi:type="string">20</item>
+                            <item name="label" xsi:type="string">20</item>
+                        </item>
+                        <item name="30" xsi:type="array">
+                            <item name="value" xsi:type="string">30</item>
+                            <item name="label" xsi:type="string">30</item>
+                        </item>
+                        <item name="50" xsi:type="array">
+                            <item name="value" xsi:type="string">50</item>
+                            <item name="label" xsi:type="string">50</item>
+                        </item>
+                        <item name="100" xsi:type="array">
+                            <item name="value" xsi:type="string">100</item>
+                            <item name="label" xsi:type="string">100</item>
+                        </item>
+                    </item>
+                    <item name="pageSize" xsi:type="string">10</item>
+                </item>
+            </argument>
+        </paging>
     </listingToolbar>
 </listing>

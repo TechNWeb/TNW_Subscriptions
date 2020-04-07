@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+
+<?= $block->escapeHtml(__(
+    'Subscription profile <a href="%1">%2</a> status successfully changed to "%3"',
+    $block->getData('subs_url'),
+    $block->getData('subs_label'),
+    $block->getData('subs_status')
+), ['a']);

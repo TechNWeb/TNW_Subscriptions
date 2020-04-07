@@ -109,18 +109,36 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
             $this->profileRepository->save($model);
             $this->logChangeStatus($model, $oldStatus);
 
+            if ($this->_request->isAjax()) {
+                $this->messageManager->addComplexSuccessMessage(
+                    'addHtmlMessage',
+                    [
+                        'subs_label' => $model->getLabel(),
+                        'subs_url' => $this->_url->getUrl(
+                            'tnw_subscriptions/subscription/edit',
+                            [
+                                'entity_id' => $profileId
+                            ]
+                        ),
+                        'subs_status' => $this->statusSource->getLabelByValue($newStatus)->getText()
+                    ]
+                );
+                return $this->getResponse()->representJson('{"error":"false"}');
+            }
+
             $this->messageManager->addSuccessMessage(__(
                 'Status successfully changed to "%1"',
                 $this->statusSource->getLabelByValue($newStatus)
             ));
+            return $this->getRedirect();
 
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
-
+            if ($this->_request->isAjax()) {
+                return $this->getResponse()->representJson('{"error":"true"}');
+            }
             return $this->getRedirect();
         }
-
-        return $this->getRedirect();
     }
 
     /**

@@ -351,6 +351,10 @@
     padding-top: 2.5rem;
     vertical-align: top;
 
+    .fieldset:last-child {
+        margin-bottom: 0;
+    }
+
     .fieldset-wrapper-content {
         position: relative;
         height: 100%;
@@ -361,30 +365,6 @@
             }
         }
     }
-
-    /* "action-editor" button */
-    //button.action-editor {
-    //    color: #514943;
-    //    background: none;
-    //    border: none;
-    //    padding: 1rem;
-    //    box-shadow: none;
-    //    margin: 0;
-    //
-    //    :before {
-    //        font-family: 'luma-icons';
-    //        font-size: 2.4rem;
-    //        color: #333333;
-    //        content: '\e601';
-    //        font-weight: normal;
-    //    }
-    //}
-    //
-    //button.action-editor.active {
-    //    :before {
-    //        content: '\e616';
-    //    }
-    //}
 
     /* "action-remove" button */
     button.remove-button-icon {
@@ -453,6 +433,11 @@
             vertical-align: top;
             position: relative;
 
+            >.fieldset-wrapper-content {
+                >.fieldset {
+                    margin-bottom: 0;
+                }
+            }
             .middle-container {
                 padding-top: 0.5rem;
                 padding-right: 1.5rem;
@@ -461,9 +446,20 @@
                 width: 100%;
                 height: 100%;
 
+                .product-options {
+                    margin-bottom: 2rem;
+                }
+                .edit-fieldset .fieldset .field {
+                    margin-top: 2rem;
+                }
+
                 .fieldset {
                     display: block;
                     text-align: left;
+
+                    >.field {
+                        margin-bottom: 0;
+                    }
 
                     .field {
                         text-align: start;
@@ -629,6 +625,7 @@
                 .fieldset {
                     display: block;
                     width: 100%;
+                    margin-bottom: 0;
 
                     .edit-options-button {
                         line-height: 1.36;
@@ -1555,6 +1552,12 @@
 
     .subscription-container {
         padding: 0;
+
+        >.fieldset-wrapper-content {
+            >.fieldset {
+                margin-bottom: 0;
+            }
+        }
 
         .subscription-item-form {
             .edit-fieldset {

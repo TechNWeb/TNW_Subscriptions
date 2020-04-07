@@ -1,21 +1,35 @@
 define([
+    'jquery',
     'Magento_Ui/js/grid/columns/column',
     'underscore',
-    'Magento_Ui/js/modal/confirm'
-], function (Column, _, confirm) {
+    'Magento_Ui/js/modal/confirm',
+    'uiRegistry'
+], function ($, Column, _, confirm, registry) {
     return Column.extend({
 
-        applyAction: function(action) {
+        applyAction: function(component, action) {
+            function doPost(action) {
+                var self = this;
+                $('body').trigger('processStart');
+                $.post(action.href, {isAjax: true})
+                .done(function () {
+                    registry.get(self.provider).set('params.t', Date.now());
+                })
+                .always(function() {
+                    $('body').trigger('processStop');
+                });
+            }
+
             if (action.title && action.message) {
                 confirm({
                     title: action.title,
                     content: action.message,
                     actions: {
-                        confirm: function () {
-                            window.location.href=action.href;
-                        }
+                        confirm: doPost.bind(component, action)
                     }
                 });
+            } else if (action.type !== 'edit') {
+                doPost.bind(component, action)();
             } else {
                 window.location.href=action.href;
             }
