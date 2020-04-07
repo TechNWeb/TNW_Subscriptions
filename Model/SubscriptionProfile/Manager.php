@@ -815,10 +815,18 @@ class Manager
                     $profile->getCustomerId()
                 );
 
+                if ($isReBill && method_exists($this->getEngine(), 'setRebillProcessFlag')) {
+                    $this->getEngine()->setRebillProcessFlag();
+                }
+
                 //Set payment method
                 $quote->getPayment()
                     ->importData($this->getEngine()->getPaymentInfo($profile))
                     ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+
+                if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
+                    $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
+                }
 
                 if (!$quote->isVirtual()) {
                     $profileShippingAddressData = $profile->getShippingAddress()->getData();
@@ -837,14 +845,6 @@ class Manager
                         ->setItemQty($quote->getItemsSummaryQty())
                         ->collectShippingRates()
                         ->setShippingMethod($profile->getShippingMethod());
-                }
-
-                if ($isReBill && method_exists($this->getEngine(), 'setRebillProcessFlag')) {
-                    $this->getEngine()->setRebillProcessFlag();
-                }
-
-                if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
-                    $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
                 }
 
                 $this->quoteRepository->save($quote);
@@ -872,7 +872,7 @@ class Manager
      * @param bool $isRebill
      * @return DataObject
      */
-    protected function  getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
+    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
     {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
