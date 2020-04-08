@@ -310,7 +310,7 @@ class Details extends Column
         $result = [
             [
                 'type' => 'edit',
-                'label' => __('Edit'),
+                'label' => __('edit'),
                 'href' => $this->urlBuilder->getUrl(
                     'tnw_subscriptions/subscription/edit/',
                     [
@@ -322,7 +322,7 @@ class Details extends Column
         if ($this->statusManager->canHoldSubscription($profile)) {
             $result[] = [
                 'type' => 'hold',
-                'label' => __('Hold'),
+                'label' => __('hold'),
                 'title' => __('Warning!'),
                 'message' => __('Are you sure? While "On Hold" your will not be billed.'),
                 'href' => $this->urlBuilder->getUrl(
@@ -338,7 +338,7 @@ class Details extends Column
         if ($this->statusManager->canReActiveSubscription($profile)) {
             $result[] = [
                 'type' => 'reactivate',
-                'label' => __('Reactivate'),
+                'label' => __('resume'),
                 'href' => $this->urlBuilder->getUrl(
                     'tnw_subscriptions/subscription_actions/updateStatus',
                     [
@@ -352,7 +352,7 @@ class Details extends Column
         if ($this->statusManager->canCancelSubscription($profile)) {
             $result[] = [
                 'type' => 'cancel',
-                'label' => __('Cancel'),
+                'label' => __('cancel'),
                 'title' => __('Warning!'),
                 'message' => __('Are you sure? This action cannot be reversed.'),
                 'href' => $this->urlBuilder->getUrl(
@@ -389,11 +389,11 @@ class Details extends Column
         $profile = $this->subscriptionProfileRepository->getById($id);
         if ($profile) {
             if ($profile->getTerm()) {
-                $label = __('Until canceled');
+                $label = __('until canceled');
             } elseif ((int)$profile->getTotalBillingCycles() === 1) {
-                $label = __('Bill once');
+                $label = __('bill once');
             } else {
-                $label = __('Bill %1 times', $profile->getTotalBillingCycles());
+                $label = __('bill %1 times', $profile->getTotalBillingCycles());
             }
         }
         return $label;
