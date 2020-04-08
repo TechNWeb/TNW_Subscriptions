@@ -50,12 +50,12 @@ class ExpireWarningProcessor
             $relation = $this->getNextProfileRelation($block->getSubscriptionProfile());
             if (
                 false !== $relation &&
-                $this->profileCcUtils->isCcExpireBy($block->getSubscriptionProfile(), $relation->getScheduledAt())
+                $this->profileCcUtils->isCcExpireBy($block->getSubscriptionProfile(), $relation->getScheduledAt(), true)
             ) {
                 $block->getMessagePool()->addMessage(
                     \Magento\Framework\Message\MessageInterface::TYPE_WARNING,
                     __(
-                        'Credit Card will expire before next billing cycle.' .
+                        'Credit Card will expire soon.' .
                         ' <a href="%1">Click here</a> to update your billing information.',
                         $this->getBillingTabUrl($block)
                     )
