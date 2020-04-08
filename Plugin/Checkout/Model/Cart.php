@@ -26,7 +26,11 @@ class Cart
         if (isset($requestInfo['subscribe_button'])) {
             $subscribeOptions = json_decode($requestInfo['subscribe_options'], true);
             $billingFrequency['billing_frequency'] = $subscribeOptions['value'];
-            $requestInfo = array_merge($requestInfo, $billingFrequency, $subscribeOptions);
+            if (is_object($requestInfo)) {
+                $requestInfo = array_merge($requestInfo->getData(), $billingFrequency, $subscribeOptions);
+            } else {
+                $requestInfo = array_merge($requestInfo, $billingFrequency, $subscribeOptions);
+            }
         }
         return [$productInfo, $requestInfo];
     }
