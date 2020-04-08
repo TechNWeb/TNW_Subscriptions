@@ -449,7 +449,7 @@
                 .product-options {
                     margin-bottom: 2rem;
                 }
-                .edit-fieldset .fieldset .field {
+                .edit-fieldset .fieldset .field:not(.field-option) {
                     margin-top: 2rem;
                 }
 
@@ -572,6 +572,7 @@
                     }
 
                     .sub-button-right {
+                        margin-top: 2rem;
                         float: left;
                     }
                 }
@@ -941,14 +942,20 @@
             .sub-status-label {
                 font-size: @font-size__base;
                 .sub-status {
-                    &_0 {
+                    &_0,
+                    &_5 {
                         color: @color-red11;
                     }
-                    &_1 {
+                    &_1,
+                    &_2,
+                    &_3 {
                         color: @color-dark-green1;
                     }
                     &_4 {
                         color: @color-gray-middle3;
+                    }
+                    &_7 {
+                        color: #FFBE00;
                     }
                 }
             }
