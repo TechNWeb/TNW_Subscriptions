@@ -7,7 +7,7 @@
 -->
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <columns name="sales_order_columns">
-        <actionsColumn name="profiles" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\ProfileLink">
+        <actionsColumn name="subscription_profile_id" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\ProfileLink">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
