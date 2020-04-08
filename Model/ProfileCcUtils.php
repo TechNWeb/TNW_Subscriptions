@@ -13,7 +13,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
 
-
 /**
  *  Credit card utility methods.
  */
@@ -30,13 +29,14 @@ class ProfileCcUtils
     private $enginePool;
 
     /**
-     * @param JsonHelper $jsonHelper
-     */
-    /**
-     * @var
+     * @var ScopeConfigInterface $scopeConfig
      */
     private $scopeConfig;
 
+    /**
+     * @param JsonHelper $jsonHelper
+     * @param ScopeConfigInterface $scopeConfig
+     */
     public function __construct(JsonHelper $jsonHelper, EnginePool $enginePool, ScopeConfigInterface $scopeConfig)
     {
         $this->jsonHelper = $jsonHelper;
