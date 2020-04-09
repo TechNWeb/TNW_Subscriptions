@@ -4,12 +4,15 @@
 .long_note .admin__field-note span{
     position: absolute;
 }
-.container_tnw_subscr_all .admin__fieldset {
-    padding-top: 0;
-}
 .tnw-subscriptions-tab .admin__field .admin__field-label {
     text-transform: capitalize;
 }
 .tnw-subscriptions-tab .admin__field .admin__field-label span {
     white-space: nowrap;
+}
+.tnw_recurring_summary .data-grid td {
+    vertical-align: middle;
+}
+.tnw_recurring_summary .data-grid td:last-child {
+    text-align: center;
 }
