@@ -98,13 +98,15 @@ class Authorizenet extends Base
 
     public function setPaymentExtensionAttributes(Payment $payment, SubscriptionProfileInterface $profile)
     {
-        $publicHash = $this->paymentTokenManagement->getByGatewayToken(
+        $token = $this->paymentTokenManagement->getByGatewayToken(
             $profile->getPayment()->getPaymentToken(),
             $this->getPaymentMethodCode(),
             $profile->getCustomerId()
-        )->getPublicHash();
+        );
+        if ($token) {
+            $payment->setData('public_hash', $totken->getPublicHash());
+        }
         $payment->setData('method', $this->getPaymentMethodCode() . '_vault');
-        $payment->setData('public_hash', $publicHash);
         return $this;
     }
 
