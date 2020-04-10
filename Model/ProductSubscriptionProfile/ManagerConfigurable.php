@@ -295,7 +295,7 @@ class ManagerConfigurable
                 $products = $profile->getProducts();
                 $request = $this->objectFactory->create($request);
                 foreach ($products as $product) {
-                    $price = $this->getSubscriptionItemPrice($request, $profile, $product->getMagentoProduct());
+                    $price = $this->getSubscriptionItemPrice($request, $profile, $product);
                     $product->setPrice($price * $request['item_' . $request['subscription_profile_id']]['qty']);
                 }
             }

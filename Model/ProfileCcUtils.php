@@ -10,6 +10,8 @@ use Magento\Framework\Json\Helper\Data as JsonHelper;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
 
 /**
  *  Credit card utility methods.
@@ -27,12 +29,19 @@ class ProfileCcUtils
     private $enginePool;
 
     /**
-     * @param JsonHelper $jsonHelper
+     * @var ScopeConfigInterface $scopeConfig
      */
-    public function __construct(JsonHelper $jsonHelper, EnginePool $enginePool)
+    private $scopeConfig;
+
+    /**
+     * @param JsonHelper $jsonHelper
+     * @param ScopeConfigInterface $scopeConfig
+     */
+    public function __construct(JsonHelper $jsonHelper, EnginePool $enginePool, ScopeConfigInterface $scopeConfig)
     {
         $this->jsonHelper = $jsonHelper;
         $this->enginePool = $enginePool;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -60,11 +69,13 @@ class ProfileCcUtils
             isset($paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]) &&
             isset($paymentInfo[OrderPaymentInterface::CC_EXP_YEAR])
         ) {
+            $lastDayOfMonth = (int)date("t");
             $expiredAt = new \DateTime(
                 sprintf(
-                    "%s-%s-01",
+                    "%s-%s-%s",
                     $paymentInfo[OrderPaymentInterface::CC_EXP_YEAR],
-                    $paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]
+                    $paymentInfo[OrderPaymentInterface::CC_EXP_MONTH],
+                    $lastDayOfMonth
                 )
             );
         }
@@ -77,15 +88,24 @@ class ProfileCcUtils
      *
      * @param SubscriptionProfileInterface|\Magento\Framework\DataObject $object
      * @param \DateTime|string $paymentDate
+     * @param $notificationPeriod
      * @return bool
      */
-    public function isCcExpireBy($object, $paymentDate)
+    public function isCcExpireBy($object, $paymentDate, bool $notificationPeriod = false)
     {
         if ($object->getPayment() && $this->isCcPayment($object->getPayment())) {
             $paymentInfo = $object->getPayment()->getPaymentAdditionalInfo();
             if (!empty($paymentInfo) && is_string($paymentInfo)) {
                 $paymentInfo = $this->jsonHelper->jsonDecode($paymentInfo);
                 $expiredAt = $this->getCcExpireDate($paymentInfo);
+                if ($notificationPeriod != false) {
+                    $dayModifier = '+'
+                        . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD)
+                        . ' day';
+                    $currentDate = new \DateTime('now');
+                    $currentDate->modify($dayModifier);
+                    return $expiredAt < $currentDate;
+                }
                 if (null !== $expiredAt && !empty($paymentDate)) {
                     $paymentDate = ($paymentDate instanceof \DateTime)
                         ? $paymentDate

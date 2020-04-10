@@ -78,6 +78,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->removePaymentSubscriptionColumn($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.34', '<')) {
+            $this->updateItemIdColumnToOrderItemExtAtrTable($setup);
+        }
         $setup->endSetup();
     }
 
@@ -641,5 +644,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     ]
                 );
         }
+    }
+
+    private function updateItemIdColumnToOrderItemExtAtrTable(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->changeColumn(
+            $setup->getTable('tnw_subscriptions_order_item_extension_entity'),
+            'item_id',
+            'magento_item_id',
+            [
+                'type' => Table::TYPE_INTEGER,
+                'identity' => true,
+                'unsigned' => true,
+                'nullable' => false,
+                'primary' => true,
+                'comment' => 'Magento order item ID'
+            ]
+        );
     }
 }
