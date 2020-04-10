@@ -53,10 +53,16 @@ class SubscriptionProfile implements ObserverInterface
         $quote = $this->quoteGenerator->generateProfileQuote($profile);
 
         $totals = $quote->getTotals();
+
+        $quoteItems = array_values($quote->getItemsCollection()->getItems());
+        $quoteItem = array_shift($quoteItems);
+        $price = $quoteItem->getPrice() * $quoteItem->getQty();
+
+        $profileProducts = array_values($profile->getProfileProducts());
+        $profileProduct = array_shift($profileProducts);
+        $profileProduct->setPrice($price);
+
         if ($profile->getStatus() == ProfileStatus::STATUS_TRIAL) {
-            $profileProducts = array_values($profile->getProfileProducts());
-            $profileProduct = array_shift($profileProducts);
-            $price = $profileProduct->getPrice();
             $totals['grand_total']->setValue(
                 $totals['grand_total']->getValue() - $totals['subtotal']->getValue() + $price
             );
