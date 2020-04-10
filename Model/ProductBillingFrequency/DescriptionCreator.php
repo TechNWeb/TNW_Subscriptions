@@ -109,7 +109,7 @@ class DescriptionCreator
         }
 
         $description[] = __('%1 / every %2. ',
-            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']), $frequencyUnit);
+            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice']), $frequencyUnit);
 
         if (!$subscriptionData[CreateProfile::UNIQUE]['term']) {
             $description[] = __('Total of %1 %2. ',
