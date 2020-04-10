@@ -104,7 +104,7 @@ class Authorizenet extends Base
             $profile->getCustomerId()
         );
         if ($token) {
-            $payment->setData('public_hash', $totken->getPublicHash());
+            $payment->setData('public_hash', $token->getPublicHash());
         }
         $payment->setData('method', $this->getPaymentMethodCode() . '_vault');
         return $this;
