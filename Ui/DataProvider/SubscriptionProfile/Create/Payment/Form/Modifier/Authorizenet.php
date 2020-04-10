@@ -225,7 +225,7 @@ class Authorizenet extends Base
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/braintree',
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/authorizenet',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
@@ -262,7 +262,7 @@ class Authorizenet extends Base
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
-                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree',
+                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/authorizenet',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',
