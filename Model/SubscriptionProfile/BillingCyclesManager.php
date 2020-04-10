@@ -128,7 +128,7 @@ class BillingCyclesManager
                     break;
                 case BillingFrequencyUnitType::MONTHS:
                     $months = $dateDiff->y * 12 + $dateDiff->m;
-                    $cyclesCount = floor( $profile->getFrequency() / $months);
+                    $cyclesCount = floor($months / $profile->getFrequency());
                     break;
                 default:
                     throw new \Exception('Undefined length unit type.');
