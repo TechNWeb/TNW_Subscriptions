@@ -114,6 +114,9 @@ class Manager
      */
     private $billingCyclesManagerFactory;
 
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
     private $orderSender;
 
     /**
@@ -613,6 +616,11 @@ class Manager
         }
     }
 
+    /**
+     * @param $queue
+     * @param $profile
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     private function createNewRelation($queue, $profile)
     {
         /** @var BillingCyclesManager $billingCyclesManager */
