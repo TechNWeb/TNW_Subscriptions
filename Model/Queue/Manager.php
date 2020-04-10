@@ -115,6 +115,11 @@ class Manager
     private $billingCyclesManagerFactory;
 
     /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    private $orderSender;
+
+    /**
      * Manager constructor.
      * @param CollectionFactory $collectionFactory
      * @param Config $config
@@ -131,6 +136,7 @@ class Manager
      * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -147,8 +153,10 @@ class Manager
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
         EmailNotifierFactory $emailNotifierFactory,
-        BillingCyclesManagerFactory $billingCyclesManagerFactory
+        BillingCyclesManagerFactory $billingCyclesManagerFactory,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
     ) {
+        $this->orderSender = $orderSender;
         $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->collectionFactory = $collectionFactory;
@@ -493,6 +501,7 @@ class Manager
                     ->getEngine()
                     ->getCartManagement()
                     ->submit($quote);
+                $this->orderSender->send($order);
 
                 $insertData = [];
                 foreach ($quote->getAllVisibleItems() as $item) {
@@ -607,6 +616,11 @@ class Manager
         }
     }
 
+    /**
+     * @param $queue
+     * @param $profile
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     private function createNewRelation($queue, $profile)
     {
         /** @var BillingCyclesManager $billingCyclesManager */

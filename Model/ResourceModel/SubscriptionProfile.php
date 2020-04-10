@@ -80,7 +80,7 @@ class SubscriptionProfile extends AbstractEntity
             )
             ->joinLeft(
                 ['orderItemExtension' => $this->getTable('tnw_subscriptions_order_item_extension_entity')],
-                'invoiceItem.order_item_id = orderItemExtension.item_id',
+                'invoiceItem.order_item_id = orderItemExtension.magento_item_id',
                 []
             )
             ->where('profileItem.subscription_profile_id = ?', $object->getId());

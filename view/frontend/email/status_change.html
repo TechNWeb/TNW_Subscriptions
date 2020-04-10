@@ -26,12 +26,12 @@
         </td>
     </tr>
 </table>
-{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
 <p>
     {{if date}}
         {{trans 'The next payment will occur on %date.' date=$date}}
     {{/if}}
 </p>
+{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
 <p>
     {{trans 'To make changes to your recurring order <a href="%account_url">log into your account</a>' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
 </p>
