@@ -43,7 +43,7 @@ class Form extends AbstractDataProvider
     /**
      * Period field default value.
      */
-    const DEFAULT_PERIOD_VALUE = 1;
+    const DEFAULT_PERIOD_VALUE = 2;
 
     /**
      * Data scope component name.
