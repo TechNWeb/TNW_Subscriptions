@@ -92,7 +92,11 @@ class Authorizenet extends Base
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
-        $result[OrderPaymentInterface::METHOD] = $this->getPaymentMethodCode();
+        if (isset($result['authorizenet_data']['public_hash'])) {
+            $result[OrderPaymentInterface::METHOD] =  $this->getPaymentMethodCode() . '_vault';
+        } else {
+            $result[OrderPaymentInterface::METHOD] = $this->getPaymentMethodCode();
+        }
         return $result;
     }
 
@@ -132,6 +136,9 @@ class Authorizenet extends Base
         }
         $publicHash = $gateWayToken ? $gateWayToken->getPublicHash() : '';
         $result = isset($addtionalInfo['authorizenet_data']) ? $addtionalInfo['authorizenet_data'] : $addtionalInfo;
+        if (!$publicHash && isset($result['public_hash'])) {
+            $publicHash = $result['public_hash'];
+        }
         if ($this->isRebill) {
             $result = [
                 'is_active_payment_token_enabler' => true,

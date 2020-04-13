@@ -27,7 +27,6 @@ class Save extends AbstractSave
                 __('Profile(s) was successfully created.')
             );
         }
-
         return $resultRedirect->setPath('*/*/');
     }
 
