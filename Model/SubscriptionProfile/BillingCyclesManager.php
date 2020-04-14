@@ -163,7 +163,10 @@ class BillingCyclesManager
         $resultDates = array_filter(
             $neededDates,
             function ($neededDate) use ($formattedNowDate) {
-                return (strtotime($neededDate) > strtotime($formattedNowDate));
+                $neededDateDayString = new \DateTime($neededDate);
+                $formattedNowDateString = new \DateTime($formattedNowDate);
+                return (strtotime($neededDateDayString->format('Y-m-d'))
+                    > strtotime($formattedNowDateString->format('Y-m-d')));
             }
         );
         if ($count > 0) {
