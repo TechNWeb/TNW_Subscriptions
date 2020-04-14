@@ -13,6 +13,7 @@ use TNW\Subscriptions\Model\EmailNotifier;
 use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\App\State;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 
 /**
  * Class NotificationProcessor
@@ -61,6 +62,11 @@ class NotificationProcessor
     private $appState;
 
     /**
+     * @var Payment
+     */
+    private $paymentFactory;
+
+    /**
      * NotificationProcessor constructor.
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param ScopeConfigInterface $scopeConfig
@@ -69,6 +75,7 @@ class NotificationProcessor
      * @param ProfileCcUtilsFactory $ccUtilsFactory
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param State $appState
+     * @param Payment $paymentFactory
      */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
@@ -77,7 +84,8 @@ class NotificationProcessor
         TimezoneInterface $timezone,
         ProfileCcUtilsFactory $ccUtilsFactory,
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
-        State $appState
+        State $appState,
+        Payment $paymentFactory
     ) {
         $this->appState = $appState;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
@@ -86,6 +94,7 @@ class NotificationProcessor
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->scopeConfig = $scopeConfig;
+        $this->paymentFactory = $paymentFactory;
     }
 
     /**
@@ -124,18 +133,17 @@ class NotificationProcessor
      */
     public function sendExpiredCardsNotifications()
     {
-        $dayModifier = '+'
-            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD)
-            . ' day';
-        $orderCollection = $this->getFutureOrderCollection($dayModifier);
-        foreach ($orderCollection->getItems() as $item) {
-            try {
-                $profile = $this->subscriptionProfileRepository->getById($item->getSubscriptionProfileId());
-            } catch (\Exception $e) {
-                $profile = null;
-            }
-            if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt())) {
-                $this->emailNotifierFactory->create()->cardExpire($profile, $item->getScheduledAt());
+        $orderCollection = $this->getOrderWithCcPayment();
+        if ($orderCollection != false) {
+            foreach ($orderCollection->getItems() as $item) {
+                try {
+                    $profile = $this->subscriptionProfileRepository->getById($item->getSubscriptionProfileId());
+                } catch (\Exception $e) {
+                    $profile = null;
+                }
+                if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt(), true)) {
+                    $this->emailNotifierFactory->create()->cardExpire($profile, $item->getScheduledAt());
+                }
             }
         }
     }
@@ -163,5 +171,22 @@ class NotificationProcessor
             ;
         }
         return $this->loadedCollections[$dayModifier];
+    }
+
+    /**
+     * Get order with Cc payment method
+     *
+     * @return \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
+     */
+    private function getOrderWithCcPayment()
+    {
+        try {
+            return $this->loadedCollections[] = $this->paymentFactory->create()
+                ->addFieldToFilter('engine_code', array('neq' => 'checkmo'))
+                ->addFieldToFilter('payment_additional_info', ['notnull' => true])
+                ->addFieldToSelect('subscription_profile_id');
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
