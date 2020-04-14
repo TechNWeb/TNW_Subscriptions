@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Controller\Subscription\Customer\Account;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
@@ -47,6 +48,11 @@ class Save extends AbstractSave
     private $dataPersistor;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $messageManager;
+
+    /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param RequestProcessor $saveProcessor
@@ -54,6 +60,7 @@ class Save extends AbstractSave
      * @param Registry $coreRegistry
      * @param ResponseProcessor $responseProcessor
      * @param DataPersistorInterface $dataPersistor
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Context $context,
@@ -62,12 +69,14 @@ class Save extends AbstractSave
         ProfileManager $profileManager,
         Registry $coreRegistry,
         ResponseProcessor $responseProcessor,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        ManagerInterface $messageManager
     ) {
         $this->profileManager = $profileManager;
         $this->coreRegistry = $coreRegistry;
         $this->responseProcessor = $responseProcessor;
         $this->dataPersistor = $dataPersistor;
+        $this->messageManager = $messageManager;
         parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
@@ -92,6 +101,14 @@ class Save extends AbstractSave
             try {
                 /** @var SubscriptionProfile $profile */
                 $profile = $this->profileManager->getProfile();
+                $frequencyChanged = (
+                    isset($request['item_' . $request['objectItemId']]['billing_frequency'])
+                    && ($profile->getBillingFrequencyId()
+                        != $request['item_' . $request['objectItemId']]['billing_frequency']
+                    )
+                )
+                    ? true
+                    : false;
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
 
@@ -102,6 +119,11 @@ class Save extends AbstractSave
                 }
                 $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
+                if ($frequencyChanged) {
+                    $this->messageManager->addSuccessMessage(__(
+                        'New Billing Frequency will take effect after the next order.'
+                    ));
+                }
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();
             }
