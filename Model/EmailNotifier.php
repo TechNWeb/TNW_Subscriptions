@@ -160,7 +160,7 @@ class EmailNotifier
      */
     public function cardExpire($subscriptionProfile, $date)
     {
-        if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
+        if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE) && $subscriptionProfile->getStatus() == 1) {
             $customer = $subscriptionProfile->getCustomer();
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
