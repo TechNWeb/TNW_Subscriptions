@@ -1,0 +1,60 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="fieldset-wrapper"
+     css="$data.additionalClasses"
+     attr="'data-level': $data.level, 'data-index': index"
+     data-bind="visible: $data.visible === undefined ? true: $data.visible">
+    <div class="fieldset-wrapper-title"
+         attr="tabindex: !collapsible ? -1 : 0,
+               'data-state-collapsible': collapsible ? opened() ? 'open' : 'closed' : null"
+         click="toggleOpened"
+         keyboard="13: toggleOpened"
+         if="label">
+
+        <strong css="'admin__collapsible-title': collapsible,
+                      title: !collapsible,
+                      '_changed': changed,
+                      '_loading': loading,
+                      '_error': error">
+            <span translate="label"/>
+        </strong>
+    </div>
+
+    <div class="admin__fieldset-wrapper-content"
+         css="'admin__collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
+        <fieldset if="opened() || _wasOpened || initializeFieldsetDataByDefault" class="admin__fieldset">
+            <p>
+                <span if="getTrialDescription()" text="getTrialDescription()"/>
+                <span if="getDiscountDescription()" text="getDiscountDescription()"/>
+                <span if="getBillingDescription()" text="getBillingDescription()"/>
+            </p>
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th class="data-grid-th" translate="'Billing Frequency'"/>
+                        <th class="data-grid-th" translate="'Recurring Price'"/>
+                        <th class="data-grid-th" translate="'Original Price'"/>
+                        <th class="data-grid-th" translate="'Is Default'"/>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: {data: frequencyRecords, as: 'record'} -->
+                        <tr data-bind="css: {'_odd-row': $index() % 2}">
+                            <td text="$parent.getFrequencyLabel(record)"/>
+                            <td>
+                                <span text="$parent.getRecurringPrice(record)"/><br>
+                                <span text="$parent.getInitialFee(record)"/><br>
+                            </td>
+                            <td text="$parent.getOriginalPrice()"/>
+                            <td><strong text="$parent.getIsDefault(record)"/></td>
+                        </tr>
+                    <!-- /ko -->
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+</div>

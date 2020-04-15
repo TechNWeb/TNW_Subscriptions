@@ -10,6 +10,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObject\Factory as DataObjectFactory;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Configurable as ConfigurableTypeManager;
@@ -62,6 +63,11 @@ class ManagerConfigurable
     private $filterManager;
 
     /**
+     * @var FrequencyRepository
+     */
+    private $frequencyRepository;
+
+    /**
      * @param ProfileManager $profileManager
      * @param ProductSubscriptionProfileRepository $subproductRepository
      * @param DataObjectFactory $objectFactory
@@ -69,6 +75,7 @@ class ManagerConfigurable
      * @param Product\OptionFactory $productOptionFactory
      * @param \Magento\Framework\Stdlib\StringUtils $stringUtils
      * @param \Magento\Framework\Filter\FilterManager $filterManager
+     * @param FrequencyRepository $frequencyRepository
      */
     public function __construct(
         ProfileManager $profileManager,
@@ -77,7 +84,8 @@ class ManagerConfigurable
         ConfigurableTypeManager $configurableTypeManager,
         \Magento\Catalog\Model\Product\OptionFactory $productOptionFactory,
         \Magento\Framework\Stdlib\StringUtils $stringUtils,
-        \Magento\Framework\Filter\FilterManager $filterManager
+        \Magento\Framework\Filter\FilterManager $filterManager,
+        FrequencyRepository $frequencyRepository
     ) {
         $this->profileManager = $profileManager;
         $this->subproductRepository = $subproductRepository;
@@ -86,6 +94,7 @@ class ManagerConfigurable
         $this->productOptionFactory = $productOptionFactory;
         $this->stringUtils = $stringUtils;
         $this->filterManager = $filterManager;
+        $this->frequencyRepository = $frequencyRepository;
     }
 
     /**
@@ -288,8 +297,11 @@ class ManagerConfigurable
                 $profile->setTotalBillingCycles($periodValue);
             }
             if (isset($request['item_' . $request['subscription_profile_id']]['billing_frequency'])) {
-                $billingFrequency = $request['item_' . $request['subscription_profile_id']]['billing_frequency'];
-                $profile->setBillingFrequencyId($billingFrequency);
+                $frequencyId = $request['item_' . $request['subscription_profile_id']]['billing_frequency'];
+                $frequency = $this->frequencyRepository->getById($frequencyId);
+                $profile->setBillingFrequencyId($frequencyId)
+                    ->setFrequency($frequency->getFrequency())
+                    ->setUnit($frequency->getUnit());
             }
             if (isset($request['item_' . $request['subscription_profile_id']]['qty'])) {
                 $products = $profile->getProducts();

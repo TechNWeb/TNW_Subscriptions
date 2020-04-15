@@ -6,11 +6,12 @@
 define([
     'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
     'underscore',
+    'mageUtils',
     'uiRegistry',
     'jquery',
     'Magento_Ui/js/lib/validation/validator',
     'mage/translate'
-], function (DynamicRows, _, registry, $, validator) {
+], function (DynamicRows, _, utils, registry, $, validator) {
     'use strict';
 
     var maxId = 0,
@@ -49,6 +50,7 @@ define([
             modules: {
                 buttonAdd: '${ $.parentName }.container_header.button_add'
             },
+            default: null,
             billingFrequenciesCount: ''
         },
 
@@ -75,7 +77,7 @@ define([
                 },
                 $.mage.__('The same billing frequency is selected.')
             );
-
+            this.default = utils.copy(this.recordData());
             return this;
         },
 
@@ -180,9 +182,13 @@ define([
          * @return {void}
          */
         checkAddingBillingFrequency: function (rowIndex) {
-            var button = this.buttonAdd();
+            var button = this.buttonAdd(),
+                activeRecords = _.filter(this.recordData(), function (elem) {
+                    return elem && elem['is_delete'] !== '1';
+                }, this),
+                recordsCount = rowIndex === undefined ? activeRecords.length + 1 : activeRecords.length;
             button.set('disabled', false);
-            if (rowIndex === undefined && this._elems.length == this.billingFrequenciesCount) {
+            if (recordsCount >= this.billingFrequenciesCount) {
                  button.set('disabled', true);
             }
         },
