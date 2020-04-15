@@ -101,14 +101,10 @@ class Save extends AbstractSave
             try {
                 /** @var SubscriptionProfile $profile */
                 $profile = $this->profileManager->getProfile();
-                $frequencyChanged = (
-                    isset($request['item_' . $request['objectItemId']]['billing_frequency'])
+                $frequencyChanged = isset($request['item_' . $request['objectItemId']]['billing_frequency'])
                     && ($profile->getBillingFrequencyId()
                         != $request['item_' . $request['objectItemId']]['billing_frequency']
-                    )
-                )
-                    ? true
-                    : false;
+                    );
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
 
