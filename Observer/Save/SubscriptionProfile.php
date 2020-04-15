@@ -54,11 +54,9 @@ class SubscriptionProfile implements ObserverInterface
 
         $totals = $quote->getTotals();
 
-        $quoteItems = array_values($quote->getItemsCollection()->getItems());
-        $quoteItem = array_shift($quoteItems);
+        $quoteItem = $quote->getItemsCollection()->getFirstItem();
         $price = $quoteItem->getPrice() * $quoteItem->getQty();
-
-        $profileProducts = array_values($profile->getProfileProducts());
+        $profileProducts = $profile->getProfileProducts();
         $profileProduct = array_shift($profileProducts);
         $profileProduct->setPrice($price);
 
