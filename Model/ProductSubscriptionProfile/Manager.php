@@ -10,6 +10,7 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -83,12 +84,18 @@ class Manager
     private $serializer;
 
     /**
+     * @var FrequencyRepository
+     */
+    private $frequencyRepository;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
      * @param SimpleTypeManager $simpleTypeManager
      * @param Context $subscriptionContext
      * @param Json $serializer
+     * @param FrequencyRepository $frequencyRepository
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
@@ -96,7 +103,8 @@ class Manager
         MessageHistoryLogger $historyLogger,
         SimpleTypeManager $simpleTypeManager,
         Context $subscriptionContext,
-        Json $serializer
+        Json $serializer,
+        FrequencyRepository $frequencyRepository
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
@@ -104,6 +112,7 @@ class Manager
         $this->simpleTypeManager = $simpleTypeManager;
         $this->subscriptionContext = $subscriptionContext;
         $this->serializer = $serializer;
+        $this->frequencyRepository = $frequencyRepository;
     }
 
     public function reset()
@@ -382,8 +391,11 @@ class Manager
                                 $profileModel->setTotalBillingCycles($periodValue);
                             }
                             if (isset($data['item_' . $productId]['billing_frequency'])) {
-                                $billingFrequency = $data['item_' . $productId]['billing_frequency'];
-                                $profileModel->setBillingFrequencyId($billingFrequency);
+                                $frequencyId = $data['item_' . $productId]['billing_frequency'];
+                                $frequency = $this->frequencyRepository->getById($frequencyId);
+                                $profileModel->setBillingFrequencyId($frequencyId)
+                                    ->setFrequency($frequency->getFrequency())
+                                    ->setUnit($frequency->getUnit());
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
