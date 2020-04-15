@@ -26,10 +26,28 @@ class Authorizenet extends Base
      */
     private $transactionCustomer;
 
+    /**
+     * @var bool
+     */
     private $isRebill = false;
 
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenManagement
+     */
     private $paymentTokenManagement;
 
+    /**
+     * Authorizenet constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\Context $context
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
+     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -100,6 +118,11 @@ class Authorizenet extends Base
         return $result;
     }
 
+    /**
+     * @param Payment $payment
+     * @param SubscriptionProfileInterface $profile
+     * @return $this
+     */
     public function setPaymentExtensionAttributes(Payment $payment, SubscriptionProfileInterface $profile)
     {
         $token = $this->paymentTokenManagement->getByGatewayToken(
@@ -149,13 +172,19 @@ class Authorizenet extends Base
         return $result;
     }
 
+    /**
+     * @return string
+     */
     public function getPaymentMethodCode()
     {
         //TODO: resolve if vault method
         return 'tnw_authorize_cim';
     }
 
-     public function setRebillProcessFlag()
+    /**
+     *
+     */
+    public function setRebillProcessFlag()
      {
          $this->isRebill = true;
      }
@@ -212,5 +241,22 @@ class Authorizenet extends Base
             ]);
 
         return $this;
+    }
+
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(\Magento\Quote\Model\Quote $quote)
+    {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            /** @var Payment $payment */
+            $payment = $quote->getPayment();
+            $payment->importData(['method' => \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        } else {
+            parent::validatePayment($quote);
+        }
     }
 }
