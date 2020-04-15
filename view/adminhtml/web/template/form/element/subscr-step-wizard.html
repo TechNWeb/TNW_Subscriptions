@@ -1,0 +1,53 @@
+<!--
+/**
+* Copyright © 2018 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
+<div data-role="steps-wizard-main" class="steps-wizard subscription-options-wizard" data-bind="afterRender: open">
+    <div data-role="messages" class="messages"></div>
+
+    <div data-role="steps-wizard-controls" class="steps-wizard-navigation">
+        <ul class="nav-bar">
+            <each args="data: elems, as: 'element'">
+                <li data-role="collapsible"
+                    data-bind="css: { 'active': $parent.isSelectedStep(element.name) }">
+                    <a data-bind="text:element.caption, click: $parent.showSpecificStep.bind($parent), attr: {href: '#'+element.name}"/>
+                </li>
+            </each>
+        </ul>
+        <div class="nav-bar-outer-actions">
+            <div class="action-wrap" data-role="closeBtn">
+                <button type="button"
+                        class="action-cancel action-tertiary" data-bind="click: cancel">
+                    <span translate="'Cancel'"/>
+                </button>
+            </div>
+            <div class="action-wrap action-wrap-prev" data-role="step-wizard-prev">
+                <button type="button"
+                        class="action-default action-back-step"
+                        data-bind="click: back, css: { 'disabled': disabled}">
+                    <span translate="'Back'"/>
+                </button>
+            </div>
+            <div class="action-wrap action-wrap-next" data-role="step-wizard-next">
+                <button type="button"
+                        class="action-default action-primary action-next-step" data-bind="click: next">
+                    <span translate="'Next'"/>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div data-role="steps-wizard-tab">
+            <each args="data: elems, as: 'element'">
+                <div data-bind="
+                    visible: $parent.isSelectedStep(element.name),
+                    css: {'no-display':false},
+                    attr:{id: element.name}"
+                     class="content no-display"
+                     data-role="content">
+                        <render if="hasTemplate()"/>
+                </div>
+            </each>
+    </div>
+</div>

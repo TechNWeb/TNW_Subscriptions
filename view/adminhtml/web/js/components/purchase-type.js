@@ -13,6 +13,12 @@ define([
     'use strict';
 
     return Collection.extend({
+        defaults: {
+            notificationMessage: {
+                text: null,
+                error: null
+            }
+        },
 
         changingVisibility: function () {
             var purchaseType = registry.get('index=tnw_subscr_purchase_type'),
@@ -52,6 +58,16 @@ define([
 
         changedLockPrice: function () {
             this.changingVisibility();
+        },
+
+        render: function (wizard) {
+            this.wizard = wizard;
+        },
+
+        force: function (wizard) {
+        },
+
+        back: function () {
         }
     });
 });
