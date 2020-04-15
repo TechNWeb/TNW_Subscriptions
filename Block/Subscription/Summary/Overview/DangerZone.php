@@ -150,14 +150,4 @@ class DangerZone extends Template
     {
         return $this->registry->registry('tnw_subscription_profile');
     }
-
-    /**
-     * Check whether a block is displayed.
-     *
-     * @return bool
-     */
-    public function isDangerZoneActive()
-    {
-        return $this->statusManager->canShowDangerZone($this->getCurrentSubscriptionProfile());
-    }
 }

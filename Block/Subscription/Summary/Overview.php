@@ -416,14 +416,26 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * and current subscription profile hasn't status "Canceled".
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function canShowDangerZone()
     {
         $websiteId = $this->_storeManager->getWebsite()->getId();
 
-        return ($this->subscriptionConfig->getCanHoldProfile($websiteId)
-            || $this->subscriptionConfig->getCanCancelProfile($websiteId))
-            && (int) $this->getSubscriptionProfile()->getStatus() !== ProfileStatus::STATUS_CANCELED;
+        if ($this->subscriptionConfig->getCanHoldProfile($websiteId)
+            || $this->subscriptionConfig->getCanCancelProfile($websiteId)
+        ) {
+            $result = true;
+            switch ($this->getSubscriptionProfile()->getStatus()) {
+                case ProfileStatus::STATUS_PENDING:
+                case ProfileStatus::STATUS_COMPLETE:
+                case ProfileStatus::STATUS_PAST_DUE:
+                case ProfileStatus::STATUS_CANCELED:
+                    $result = false;
+                    break;
+            }
+            return $result;
+        }
     }
 
     /**

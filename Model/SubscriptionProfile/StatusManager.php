@@ -162,23 +162,4 @@ class StatusManager
 
         return $this->websiteId;
     }
-
-    /**
-     * Check do we need to show Danger Zone by status
-     *
-     * @param \Magento\Framework\DataObject $subscription
-     * @return bool
-     */
-    public function canShowDangerZone(\Magento\Framework\DataObject $subscription)
-    {
-        $result = true;
-        switch ($subscription->getStatus()) {
-            case ProfileStatus::STATUS_PENDING:
-            case ProfileStatus::STATUS_COMPLETE:
-            case ProfileStatus::STATUS_PAST_DUE:
-                $result = false;
-                break;
-        }
-        return $result;
-    }
 }
