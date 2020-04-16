@@ -1,73 +1,40 @@
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
-
-/**
- * Class to handle enabling/disabling subscription attributes fields to made them not required
- */
 define([
-    'Magento_Ui/js/form/components/fieldset',
-    'uiRegistry'
-], function (Collection, registry) {
-    'use strict';
+    'Magento_Ui/js/form/element/select',
+    'mage/translate'
+], function (Select, $t) {
+    return Select.extend({
 
-    return Collection.extend({
         defaults: {
-            notificationMessage: {
-                text: null,
-                error: null
+            frequencyRecords: null,
+            tracks: {
+                frequencyRecords: true
             }
         },
 
-        changingVisibility: function () {
-            var purchaseType = registry.get('index=tnw_subscr_purchase_type'),
-                trialStatusValue = registry.get('index=tnw_subscr_trial_status')
-                    ? registry.get('index=tnw_subscr_trial_status').checked()
-                    : false,
-                lockPriceValue = registry.get('index=tnw_subscr_lock_product_price')
-                    ? registry.get('index=tnw_subscr_lock_product_price').checked()
-                    : false,
-                offerDiscountValue = registry.get('index=tnw_subscr_offer_flat_discount')
-                    ? registry.get('index=tnw_subscr_offer_flat_discount').checked()
-                    : false,
-                discountAmount = registry.get('index=tnw_subscr_discount_amount'),
-                trialLength = registry.get('index=tnw_subscr_trial_length'),
-                isOneTime = purchaseType.value() == 1;
-
-            this.visible(!isOneTime);
-            if (trialLength) {
-                trialLength.disabled(isOneTime || !trialStatusValue);
-            }
-            if (discountAmount) {
-                discountAmount.disabled(isOneTime || !lockPriceValue || !offerDiscountValue);
+        validate: function () {
+            if (this.value() !== '1' && !this.frequencyRecords.length) {
+                var message = $t('Please add billing frequencies by clicking \'manage\' button!');
+                this.error(message);
+                this.error.valueHasMutated();
+                this.bubble('error', message);
+                if (this.source) {
+                    this.source.set('params.invalid', true);
+                }
+                return {
+                    valid: false,
+                    target: this
+                };
+            } else {
+                return this._super();
             }
         },
 
-        changedPurchaseType: function () {
-            this.changingVisibility();
-        },
-
-        changedTrialStatus: function () {
-            this.changingVisibility();
-        },
-
-        changedOfferDiscount: function () {
-            this.changingVisibility();
-        },
-
-        changedLockPrice: function () {
-            this.changingVisibility();
-        },
-
-        render: function (wizard) {
-            this.wizard = wizard;
-        },
-
-        force: function (wizard) {
-        },
-
-        back: function () {
+        onUpdate: function () {
+            if (this.value() === '1') {
+                this.error('');
+                this.bubble('error', '');
+            }
+            this.bubble('update', this.hasChanged());
         }
     });
 });
