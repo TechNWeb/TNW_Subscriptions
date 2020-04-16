@@ -57,7 +57,7 @@ class StatusComplete extends Base
         )->group(
             ['orders.subscription_profile_id']
         )->having(
-            'COUNT(orders.subscription_profile_id) = profile.total_billing_cycles + trial_cycle_count'
+            'profile.total_billing_cycles = 0'
         );
 
         return $this->resource->getConnection()->fetchCol($select);

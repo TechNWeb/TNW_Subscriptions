@@ -575,6 +575,8 @@ class Manager
 
                     $this->relationManager->saveRelation($relation);
                     $this->createNewRelation($queue, $profile);
+                    $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
+                    $this->profileRepository->save($profile);
                 }
             } catch (\Exception $e) {
                 foreach ($groupQueue as $queue) {
