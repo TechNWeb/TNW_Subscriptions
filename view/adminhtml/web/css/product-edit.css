@@ -10,6 +10,9 @@
 .tnw-subscriptions-tab .admin__field .admin__field-label span {
     white-space: nowrap;
 }
+.tnw-subscriptions-tab .admin__field-complex {
+    padding-left: 0;
+}
 .tnw_recurring_summary .data-grid td {
     vertical-align: middle;
 }
