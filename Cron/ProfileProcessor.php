@@ -45,6 +45,8 @@ class ProfileProcessor
      */
     private $profileRepository;
 
+    private $tokenHashGroupMap = [];
+
     /**
      * @var SerializerInterface
      */
@@ -209,6 +211,15 @@ class ProfileProcessor
     {
         $part[] = $profile->getCustomerId();
         $part[] = $profile->getPayment()->getEngineCode();
+
+        $gatewayToken = $profile->getPayment()->getPaymentToken();
+        $hashTempId = array_search($gatewayToken, $this->tokenHashGroupMap);
+        if ($hashTempId !== false) {
+            $part[] = $hashTempId;
+        } else {
+            $this->tokenHashGroupMap[] = $gatewayToken;
+            $part[] = count($this->tokenHashGroupMap) - 1;
+        }
 
         if (!$profile->getIsVirtual()) {
             /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $address */
