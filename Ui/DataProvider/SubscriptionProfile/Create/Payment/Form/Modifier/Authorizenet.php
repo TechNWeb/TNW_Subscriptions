@@ -176,7 +176,10 @@ class Authorizenet extends Base
                                     'validation' => [
                                         'required-entry' => true,
                                         'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
-                                    ]
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],
@@ -198,7 +201,10 @@ class Authorizenet extends Base
                                     'validation' => [
                                         'required-entry' => true,
                                         'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
-                                    ]
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],

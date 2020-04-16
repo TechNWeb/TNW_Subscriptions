@@ -6,423 +6,204 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Payment\Model\Config;
-use Magento\Ui\Component\Container;
-use Magento\Ui\Component\Form;
+use Magento\Framework\Module\Manager;
+use Magento\Payment\Model\CcConfig;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Ui\Component\Form\Element\Checkbox;
+use Magento\Ui\Component\Form\Field;
+use Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider;
+use Magento\Vault\Model\Ui\VaultConfigProvider;
+use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
-/**
- * Class Authorizenet
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
- */
 class Vault extends Base
 {
     /**
-     *
+     * @var string
      */
-    const SORT_ORDER = 46;
+    private $tokensConfig = [];
 
     /**
-     * @var Config
+     * @var TokensConfigProvider
      */
-    private $paymentConfig;
-
-    /**
-     * @var mixed
-     */
-    private $authorizenetConfig;
+    private $tokensConfigProvider;
 
     /**
      * @var string
      */
-    private $clientToken = '';
+    private  $currentVaultMethod;
 
     /**
-     * Authorizenet constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
+     * @var array
+     */
+    private $vaultMethods = [];
+
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+     * @var CcConfig
+     */
+    private $ccConfig;
+
+    /**
+     * @var VaultConfigProvider
+     */
+    private $vaultConfigProvider;
+
+    /**
+     * Vault constructor.
+     * @param TokensConfigProvider $tokensConfigProvider
+     * @param Manager $moduleManager
+     * @param CcConfig $ccConfig
+     * @param VaultConfigProvider $vaultConfigProvider
+     * @param Config $config
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param Config $paymentConfig
+     * @param CartRepositoryInterface $cartRepository
      */
     public function __construct(
-        \TNW\Subscriptions\Model\Config $config,
+        TokensConfigProvider $tokensConfigProvider,
+        Manager $moduleManager,
+        CcConfig $ccConfig,
+        VaultConfigProvider $vaultConfigProvider,
+        Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        Config $paymentConfig
+        CartRepositoryInterface $cartRepository
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-        if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
-            $this->authorizenetConfig = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
+        /**
+         * TODO: tokensConfigProvider has different classes for admin & frontend:
+         * \Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider
+         * \Magento\Vault\Model\Ui\TokensConfigProvider
+         */
+        $this->tokensConfigProvider = $tokensConfigProvider;
+        $this->moduleManager = $moduleManager;
+        $this->config = $config;
+        $this->session = $session;
+        $this->ccConfig = $ccConfig;
+        $this->vaultConfigProvider = $vaultConfigProvider;
+    }
+
+    /**
+     * @param array $meta
+     * @return array
+     */
+    public function modifyMeta(array $meta)
+    {
+        foreach ($this->vaultConfigProvider->getConfig()['vault'] as $vaultCode => $isEnabled) {
+            if ($isEnabled) {
+                $this->vaultMethods[] = $vaultCode;
+            }
         }
-        $this->paymentConfig = $paymentConfig;
+        if (empty($this->vaultMethods)) {
+            return $meta;
+        }
+        foreach ($this->vaultMethods as $method) {
+            $this->tokensConfig[$method] = $this->tokensConfigProvider->getTokensComponents($method);
+            if (empty($this->tokensConfig[$method])) continue;
+            $this->currentVaultMethod = $method;
+
+            $meta = array_replace_recursive(
+                $meta,
+                $this->getPaymentFields()
+            );
+        }
+        return $meta;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentCode()
-    {
-        return 'tnw_authorize_cim';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getPaymentTitle()
-    {
-        return $this->getMethodConfigData('title');
-    }
-
-    /**
-     * {@inheritdoc}
+     * @return array
      */
     protected function getAdditionalFields()
     {
-        $result = [
-            'credit_card_type' => [
+        $cards = [];
+        $checked = true;
+        foreach ($this->tokensConfig[$this->currentVaultMethod] as $ccToken) {
+            $ccTypeLabel = $this->getCcTypeLabel($ccToken->getConfig()['details']['type']);
+            $ccTitle = $ccTypeLabel . ' ending ' . $ccToken->getConfig()['details']['maskedCC'] . ' (expires: ' .
+                $ccToken->getConfig()['details']['expirationDate'] . ')';
+            $pubHash = $ccToken->getConfig()['publicHash'];
+            $cards[$pubHash] = [
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'label' => __('Credit Card Type'),
-                            'componentType' => Form\Field::NAME,
-                            'formElement' => Form\Element\Select::NAME,
-                            'dataScope' => 'cc_type',
-                            'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
-                            'dataContainer' => $this->getPaymentCode() . '-cc-type',
-                            'additionalClasses' => 'credit-card-type',
-                            'sortOrder' => 10,
-                            'options' => $this->getPaymentCcTypes(),
-                            'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
+                            'formElement' => Checkbox::NAME,
+                            'componentType' => Field::NAME,
+                            'prefer' => 'radio',
+                            'description' => $ccTitle,
+                            'value' => $pubHash,
+                            'checked' => $checked,
+                            'dataScope' => 'publicHash',
+                            'elementTmpl' => 'TNW_Subscriptions/form/element/radio',
                             'validation' => [
-                                'required-entry' => true,
-                            ]
-                        ],
-                    ],
-                ],
-            ],
-            'credit_card_number' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'label' => __('Credit Card Number'),
-                            'placeholder' => __('Credit card number'),
-                            'componentType' => Form\Field::NAME,
-                            'formElement' => Form\Element\Input::NAME,
-                            'dataScope' => 'cc_number',
-                            'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
-                            'additionalClasses' => 'credit-card-number',
-                            'dataContainer' => $this->getPaymentCode() . '-cc-number',
-                            'sortOrder' => 20,
+                                'required-entry' => true
+                            ],
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                            'validation' => [
-                                'required-entry' => true,
-                                'required-number' => true,
-                                'validate-cc-number' => $this->getPaymentCode() . '_cc_type',
-                                'validate-cc-type' => $this->getPaymentCode() . '_cc_type',
-                            ]
-                        ],
-                    ],
-                ],
-            ],
-            'exp_date_container' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'label' => __('Expiration Date'),
-                            'component' => 'TNW_Subscriptions/js/components/group',
-                            'componentType' => Container::NAME,
-                            'title' => __('Expiration Date'),
-                            'additionalClasses' => 'field_without_legend',
-                            'dataScope' => '',
-                            'sortOrder' => 30,
-                            'required' => true,
-                            'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                        ],
-                    ],
-                ],
-                'children' => [
-                    'exp_date_month' => [
-                        'arguments' => [
-                            'data' => [
-                                'config' => [
-                                    'label' => false,
-                                    'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Select::NAME,
-                                    'options' => $this->getCcMonths(),
-                                    'dataScope' => 'cc_exp_month',
-                                    'dataType' => Form\Element\DataType\Text::NAME,
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
-                                    'dataContainer' => $this->getPaymentCode() . '-cc-month',
-                                    'additionalClasses' => 'control-label-up select month',
-                                    'sortOrder' => 10,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
-                                    ]
-                                ],
-                            ],
-                        ],
-                    ],
-                    'exp_date_year' => [
-                        'arguments' => [
-                            'data' => [
-                                'config' => [
-                                    'label' => false,
-                                    'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Select::NAME,
-                                    'options' => $this->getCcYears(),
-                                    'dataScope' => 'cc_exp_year',
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
-                                    'dataContainer' => $this->getPaymentCode() . '-cc-year',
-                                    'additionalClasses' => 'control-label-up select year',
-                                    'dataType' => Form\Element\DataType\Text::NAME,
-                                    'sortOrder' => 20,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
-                                    ]
-                                ],
                             ],
                         ],
                     ],
                 ]
-            ]
-        ];
-
-        if ($this->hasVerification()) {
-            $result['credit_card_cvv'] = [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'label' => __('Card Verification Number'),
-                            'placeholder' => __('Credit verification number'),
-                            'name' => '',
-                            'componentType' => Form\Field::NAME,
-                            'formElement' => Form\Element\Input::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
-                            'dataContainer' => $this->getPaymentCode() . '-cc-cvv',
-                            'dataScope' => 'cc_cid',
-                            'dataType' => Form\Element\DataType\Text::NAME,
-                            'additionalClasses' => 'payment-cvv',
-                            'sortOrder' => 40,
-                            'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                            'validation' => [
-                                'required-number' => true,
-                                'required-entry' => true,
-                                'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
-                            ]
-                        ],
-                    ],
-                ],
             ];
+            $checked = false;
         }
-
-        return $result;
+        return $cards;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/authorizenet',
-            'listens' => $this->getListens(),
-            'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
-            'code' => $this->getPaymentCode(),
-            'acceptConfig' => [
-                'sdkUrl' => $this->authorizenetConfig->getSdkUrl(),
-                'apiLoginID' => $this->authorizenetConfig->getApiLoginId(),
-                'clientKey' => $this->authorizenetConfig->getClientKey(),
-            ],
-            'clientToken' => $this->getClientToken(),
-            'useCvv' => $this->hasVerification(),
-            'availableCardTypes' => $this->authorizenetConfig->getAvailableCardTypes(),
-            'ccTypesMapper' => $this->authorizenetConfig->getCcTypesMapper(),
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/base',
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
-            'imports' => [
-                'changeVisibility' => "{$this->getFieldsetName()}.method:checked",
-            ],
         ];
     }
 
     /**
-     * Returns array of child elements.
-     *
-     * @return array
-     */
-    protected function getChildren()
-    {
-        $result = [
-            'method' => $this->getField(),
-        ];
-        $fieldsetName = $this->getFieldsetName();
-        $checkBoxName = $fieldsetName . '.method';
-        $result['additional_fields'] = [
-            'children' => $this->getAdditionalFields(),
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
-                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/authorizenet',
-                        'label' => false,
-                        'visible' => false,
-                        'dataScope' => 'additional',
-                        'additionalClasses' => 'payment-additional-fieldset',
-                        'collapsible' => false,
-                        'opened' => true,
-                        'imports' => [
-                            'changeVisibility' => $checkBoxName . ':checked',
-                        ],
-                        'exports' => [
-                            'visible' => $fieldsetName . ':checked',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        return $result;
-    }
-
-    /**
-     * Generate a new client token if necessary
-     * @return string
-     */
-    public function getClientToken()
-    {
-        return $this->clientToken;
-    }
-
-    /**
-     * Returns list of available credit card types.
-     *
-     * @return array
-     */
-    private function getPaymentCcTypes()
-    {
-        $result[] = [
-            'label' =>  __('Type'),
-            'value' => ''
-        ];
-
-        $types = $this->paymentConfig->getCcTypes();
-        $availableTypes = $this->authorizenetConfig->getAvailableCardTypes();
-
-        if ($availableTypes) {
-            foreach ($types as $code => $name) {
-                if (!in_array($code, $availableTypes)) {
-                    unset($types[$code]);
-                } else {
-                    $result[] = [
-                        'value' => $code,
-                        'label' => $name,
-                    ];
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves credit card expire months.
-     *
-     * @return array
-     */
-    private function getCcMonths()
-    {
-        $result[] = [
-            'label' =>  __('Month'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getMonths() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => $label
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves credit card expire years
-     *
-     * @return array
-     */
-    private function getCcYears()
-    {
-        $result[] = [
-            'label' =>  __('Year'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getYears() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => (string)$label
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function modifyConfigData(array $configData)
-    {
-        $date = $this->getValidationDate();
-        return array_merge(
-            $configData,
-            [
-                $this->getPaymentCode() . '_start_on_month' => $date->format('m'),
-                $this->getPaymentCode() . '_start_on_year' => $date->format('Y'),
-            ]
-        );
-    }
-
-    /**
-     * Retrieves has verification configuration.
-     *
-     * @return bool
-     */
-    private function hasVerification()
-    {
-        return $this->authorizenetConfig->isCcvEnabled();
-    }
-
-    /**
-     * Retrieves config data value by field name.
-     *
-     * @param string $fieldName
+     * @param $ccCode
      * @return mixed
      */
-    private function getMethodConfigData($fieldName)
+    protected function getCcTypeLabel($ccCode)
     {
-        return $this->authorizenetConfig->getValue($fieldName);
+        return $this->ccConfig->getCcAvailableTypes()[$ccCode];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPaymentCode()
+    {
+        return $this->currentVaultMethod;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPaymentTitle()
+    {
+        //TODO: get actual vault title
+        return 'Stored Cards '. $this->getPaymentCode();
     }
 }
