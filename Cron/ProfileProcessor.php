@@ -15,6 +15,10 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class ProfileProcessor
+ * @package TNW\Subscriptions\Cron
+ */
 class ProfileProcessor
 {
     /**
@@ -45,6 +49,9 @@ class ProfileProcessor
      */
     private $profileRepository;
 
+    /**
+     * @var array
+     */
     private $tokenHashGroupMap = [];
 
     /**
