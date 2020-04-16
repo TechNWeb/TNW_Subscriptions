@@ -283,7 +283,7 @@ class RecurringOptions extends BaseModifier
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'title' => __('Add Recurring Option'),
+                                'title' => __('Add New'),
                                 'formElement' => Container::NAME,
                                 'componentType' => Container::NAME,
                                 'component' => 'Magento_Ui/js/form/components/button',

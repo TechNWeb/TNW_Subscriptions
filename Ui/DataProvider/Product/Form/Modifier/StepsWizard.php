@@ -266,6 +266,7 @@ class StepsWizard extends BaseModifier
                 'data' => [
                     'config' => [
                         'label' => __('Summary'),
+                        'wizardSummaryLabel' => __('Step 3: Summary'),
                         'formElement' => Fieldset::NAME,
                         'componentType' => Fieldset::NAME,
                         'caption' => __('Summary'),
