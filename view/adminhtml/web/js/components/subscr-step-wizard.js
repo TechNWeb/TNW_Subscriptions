@@ -20,6 +20,7 @@ define([
         },
 
         close: function () {
+            uiRegistry.get('index = recurring_options').setDefaultRecords();
             this.modalComponent.closeModal();
         },
 
