@@ -205,12 +205,11 @@ class Manager
     {
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
-        $currentDate = $this->timezone->date();
 
         $pendingCondition = implode(' AND ', [
             $connection->prepareSqlCondition('relation.scheduled_at', [
-                'from' => $currentDate->format('Y-m-d 00:00:00'),
-                'to' => $currentDate->format('Y-m-d 23:59:59')
+                'from' => date('Y-m-d 00:00:00'),
+                'to' => date('Y-m-d 23:59:59')
             ]),
             $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
         ]);
