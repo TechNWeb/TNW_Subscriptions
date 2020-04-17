@@ -53,7 +53,11 @@ class Authorizenet extends Base
         /** @var \Magento\Quote\Model\Quote[] $subQuotes */
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
         $quote = reset($subQuotes);
-        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote);
+        $guestEmail = null;
+        if (!$quote->getCustomerId()) {
+            $guestEmail = $this->getSession()->getCustomerEmail();
+        }
+        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote, $guestEmail);
         $paymentToken = $result['payment_token'];
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
         $paymentToken->setCustomerId($quote->getCustomerId());
