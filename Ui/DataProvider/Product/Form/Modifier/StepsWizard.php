@@ -13,6 +13,8 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
+use Magento\Ui\Component\Form\Element\Select;
+use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
@@ -112,6 +114,16 @@ class StepsWizard extends BaseModifier
             null,
             'children'
         );
+        $meta = $this->arrayManager->merge(
+            $purchaseTypePath . '/arguments/data/config', $meta, [
+                'component' => 'TNW_Subscriptions/js/components/purchase-type',
+                'componentType' => Field::NAME,
+                'formElement' => Select::NAME,
+                'imports' => [
+                    'frequencyRecords' => 'index = ' . $this->summaryContainerName . ':frequencyRecords'
+                ]
+            ]
+        );
         $rootPath = $this->arrayManager->slicePath($purchaseTypePath, 0, 2);
         $rootArray = $this->arrayManager->get($rootPath, $meta);
         // Move all fields to container
@@ -142,7 +154,8 @@ class StepsWizard extends BaseModifier
                                 'componentType' => Modal::NAME,
                                 'component' => 'Magento_Ui/js/modal/modal-component',
                                 'options' => [
-                                    'title' => __('Recurring Options Management')
+                                    'title' => __('Recurring Options Management'),
+                                    'clickableOverlay' => false
                                 ]
                             ]
                         ]
@@ -218,7 +231,7 @@ class StepsWizard extends BaseModifier
                     'caption' => __('Settings'),
                     'sortOrder' => 30,
                     'breakLine' => false,
-                    'component' => 'TNW_Subscriptions/js/components/purchase-type',
+                    'component' => 'TNW_Subscriptions/js/components/settings-fieldset',
                     'additionalClasses' => $this->settingsContainerName,
                     'imports' => [
                         'changedPurchaseType' => 'index = ' . Attribute::SUBSCRIPTION_PURCHASE_TYPE . ':value',
