@@ -135,7 +135,8 @@ class Authorizenet extends Base
                                 'required-number' => true,
                                 'validate-cc-number' => $this->getPaymentCode() . '_cc_type',
                                 'validate-cc-type' => $this->getPaymentCode() . '_cc_type',
-                            ]
+                            ],
+                            'valueUpdate' => 'keyup'
                         ],
                     ],
                 ],
