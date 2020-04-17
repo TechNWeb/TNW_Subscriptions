@@ -166,12 +166,23 @@ class Vault extends Base
         $cards = [];
         $checked = true;
         foreach ($this->tokensConfig[$this->currentVaultMethod] as $ccToken) {
-            $ccTypeLabel = $this->getCcTypeLabel($ccToken->getConfig()['details']['type']);
+            $ccType = isset($ccToken->getConfig()['details']['type'])
+                ? $ccToken->getConfig()['details']['type']
+                : $ccToken->getConfig()['details']['cc_type'];
+            $ccTypeLabel = $this->getCcTypeLabel($ccType);
+            $maskedCC = isset($ccToken->getConfig()['details']['maskedCC'])
+                ? $ccToken->getConfig()['details']['maskedCC']
+                : $ccToken->getConfig()['details']['cc_last_4'];
+            $expDate = isset($ccToken->getConfig()['details']['expirationDate'])
+                ? $ccToken->getConfig()['details']['expirationDate']
+                : $ccToken->getConfig()['details']['cc_exp_month']
+                    . '/'
+                    . $ccToken->getConfig()['details']['cc_exp_year'];
             $ccTitle = $ccTypeLabel
                 . ' ending '
-                . $ccToken->getConfig()['details']['maskedCC']
+                . $maskedCC
                 . ' (expires: '
-                . $ccToken->getConfig()['details']['expirationDate']
+                . $expDate
                 . ')';
             $pubHash = $ccToken->getConfig()['publicHash'];
             $cards[$pubHash] = [
