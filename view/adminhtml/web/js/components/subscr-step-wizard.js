@@ -15,8 +15,11 @@ define([
         },
 
         initialize: function () {
+            var self = this;
             this._super();
-            this.modalComponent = uiRegistry.get(this.parentName);
+            uiRegistry.async(this.parentName)(function (modal) {
+                self.modalComponent = modal;
+            });
         },
 
         close: function () {
