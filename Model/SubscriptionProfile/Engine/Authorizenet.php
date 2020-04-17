@@ -61,9 +61,17 @@ class Authorizenet extends Base
     public function getProfilePaymentInfo(Payment $payment)
     {
         $additionalInfo = $payment->getAdditionalInformation();
+        $cardDetails = [];
+        $expirationDate = [];
         if (array_key_exists('extension_attributes', $additionalInfo)) {
             $cardDetails = json_decode($additionalInfo['extension_attributes'], true);
-            $expirateionDate = explode('/' , $cardDetails['expirationDate']);
+            $expirationDate = explode('/' , $cardDetails['expirationDate']);
+        }
+        if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
+            $cardDetails = [
+                'type' => $payment->getCcType()
+            ];
+            $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
         }
         $result = [
             'encoded_payment_additional_info' => [
@@ -73,10 +81,10 @@ class Authorizenet extends Base
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
-                    : $expirateionDate[0],
+                    : $expirationDate[0],
                 OrderPaymentInterface::CC_EXP_YEAR => isset($additionalInfo[OrderPaymentInterface::CC_EXP_YEAR])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR]
-                    : $expirateionDate[1],
+                    : $expirationDate[1],
                 'authorizenet_data' => $additionalInfo
             ]
         ];
