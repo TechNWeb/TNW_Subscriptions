@@ -324,7 +324,7 @@ class Details extends Column
                 'type' => 'hold',
                 'label' => __('hold'),
                 'title' => __('Warning!'),
-                'message' => __('Are you sure? While "On Hold" your will not be billed.'),
+                'message' => __('Are you sure? While "On Hold" you will not be billed.'),
                 'href' => $this->urlBuilder->getUrl(
                     'tnw_subscriptions/subscription_actions/updateStatus',
                     [
