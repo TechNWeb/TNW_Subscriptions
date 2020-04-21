@@ -117,19 +117,8 @@ class CreateProfile extends BaseCreate
      */
     private $relationResource;
 
-    /**
-     * @param Context $context
-     * @param QuoteSessionInterface $session
-     * @param Address $addressCreator
-     * @param QuoteCreateInterface $quoteCreator
-     * @param Product $productModifier
-     * @param Customer $customerCreator
-     * @param Manager $profileManager
-     * @param ManagerInterface $eventManager
-     * @param MessageHistoryLogger $messageHistoryLogger
-     * @param QueueManager $queueManager
-     * @param QuoteGenerator $quoteGenerator
-     */
+    private $addressRepository;
+
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
@@ -143,8 +132,10 @@ class CreateProfile extends BaseCreate
         QueueManager $queueManager,
         QuoteGenerator $quoteGenerator,
         ProfileStatus $profileStatus,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
     ) {
+        $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
         $this->productModifier = $productModifier;
@@ -318,35 +309,6 @@ class CreateProfile extends BaseCreate
     private function getSubQuote()
     {
         return $this->createSubCart();
-    }
-
-    /**
-     * Checks whether it is possible to add a product in to quote.
-     *
-     * @param ModelQuote $subQuote
-     * @return bool
-     */
-    private function canAddProduct(ModelQuote $subQuote)
-    {
-        $result = false;
-
-        $quoteItems = $subQuote->getAllVisibleItems();
-        /** @var Item $item */
-        $item = $quoteItems ? reset($quoteItems) : null;
-
-        if ($item) {
-            $request = $item->getBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
-
-            $newRequest = $this->productModifier->getPreparedBuyRequest()
-                ->getDataByPath(static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME . DIRECTORY_SEPARATOR . self::UNIQUE);
-
-            if ($request == $newRequest) {
-                $result = true;
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -705,6 +667,7 @@ class CreateProfile extends BaseCreate
         $sessionCustomerId = $session->getCustomerId();
         $customer = null;
         if ($sessionCustomerId) {
+            /** @var \Magento\Customer\Api\Data\CustomerInterface $customer */
             $customer = $this->customerCreator->getCustomer($sessionCustomerId);
         }
         /** @var array $subQuotes */
@@ -713,42 +676,33 @@ class CreateProfile extends BaseCreate
         foreach ($subQuotes as $subQuote) {
             $subQuoteCustomerId = $subQuote->getCustomerId();
             if ($sessionCustomerId != $subQuoteCustomerId) {
+                $subQuoteAddresses = $subQuote->getAllAddresses();
+                if ($subQuoteAddresses) {
+                    foreach ($subQuoteAddresses as $subQuoteAddress) {
+                        $subQuote->removeAddress($subQuoteAddress->getId());
+                    }
+                }
                 $defaultShippingId = null;
                 $defaultBillingId = null;
                 $customerEmail = null;
+                $customerDataObject = $this->customerCreator->getCustomer();
+                $subQuote->setCustomer($customerDataObject);
                 //If there is a customer we find customer's default addresses
                 if ($customer) {
-                    $defaultShippingId = $customer->getDefaultShipping();
-                    $defaultBillingId = $customer->getDefaultBilling();
-                    $customerEmail = $customer->getEmail();
+                    $subQuote->assignCustomer($customer);
+                    if ($defaultShippingId = $customer->getDefaultShipping()) {
+                        $subQuote->getShippingAddress()->importCustomerAddressData(
+                            $this->addressRepository->getById($customer->getDefaultShipping())
+                        );
+                        $subQuote->getShippingAddress()->setCustomerAddressId($defaultShippingId);
+                    };
+                    if ($defaultBillingId = $customer->getDefaultBilling()) {
+                        $subQuote->getBillingAddress()->importCustomerAddressData(
+                            $this->addressRepository->getById($customer->getDefaultBilling())
+                        );
+                        $subQuote->getBillingAddress()->setCustomerAddressId($defaultBillingId);
+                    }
                 }
-                //If there is default shipping address we load it. Otherwise we get empty address.
-                if ($defaultShippingId) {
-                    /** @var QuoteAddress $shippingAddress */
-                    $shippingAddress = $customer->getAddressById($defaultShippingId);
-                } else {
-                    /** @var QuoteAddress $shippingAddress */
-                    $shippingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
-                }
-                //If there is default billing address we load it. Otherwise we get empty address.
-                if ($defaultBillingId) {
-                    /** @var QuoteAddress $billingAddress */
-                    $billingAddress = $customer->getAddressById($defaultBillingId);
-                } else {
-                    /** @var QuoteAddress $billingAddress */
-                    $billingAddress = $this->addressCreator->getEmptyAddressObject($customerEmail);
-                }
-                //If there is existing customer we assign his to the quote.
-                //Otherwise we assign empty customer and empty addresses.
-                if ($customer) {
-                    $subQuote->assignCustomerWithAddressChange($customer, $billingAddress, $shippingAddress);
-                } else {
-                    $customerDataObject = $this->customerCreator->getCustomer();
-                    $subQuote->setBillingAddress($billingAddress);
-                    $subQuote->setShippingAddress($shippingAddress);
-                    $subQuote->setCustomer($customerDataObject);
-                }
-
                 $subQuote->getShippingAddress()->setCollectShippingRates(true);
                 $this->setNeedCollect(true);
             } else {

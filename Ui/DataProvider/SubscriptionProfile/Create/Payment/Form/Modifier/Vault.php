@@ -142,7 +142,10 @@ class Vault extends Base
             return $meta;
         }
         $customerId = $this->session->getCustomerId();
-        if (!$this->sessionManager->getCustomerId() && $customerId) {
+        if (
+            (!$this->sessionManager->getCustomerId() && $customerId)
+            || $this->sessionManager->getCustomerId() != $customerId
+        ) {
             $this->sessionManager->setCustomerId($customerId);
         }
         foreach ($this->vaultMethods as $method) {
