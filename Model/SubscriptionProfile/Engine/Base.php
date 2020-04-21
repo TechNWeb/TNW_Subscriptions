@@ -195,6 +195,26 @@ class Base implements EngineInterface
     }
 
     /**
+     * Validates zero total and sets free payment method to quote if validation failed.
+     *
+     * @param Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(Quote $quote)
+    {
+        /** @var Payment $payment */
+        $payment = $quote->getPayment();
+        $payment->importData($this->getPaymentInfo($this->getProfile()));
+        $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
+
+        // check quote total
+        if (!$this->zeroTotalValidator->isApplicable($payment->getMethodInstance(), $quote)) {
+            $payment->importData(['method' => Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        }
+    }
+
+    /**
      * Updates profile status after order processing
      */
     private function updateProfileStatus()
@@ -210,25 +230,5 @@ class Base implements EngineInterface
             }
         }
         $this->getProfile()->setStatus($status);
-    }
-
-    /**
-     * Validates zero total and sets free payment method to quote if validation failed.
-     *
-     * @param Quote $quote
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function validatePayment(Quote $quote)
-    {
-        /** @var Payment $payment */
-        $payment = $quote->getPayment();
-        $payment->importData($this->getPaymentInfo($this->getProfile()));
-        $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
-
-        // check quote total
-        if (!$this->zeroTotalValidator->isApplicable($payment->getMethodInstance(), $quote)) {
-            $payment->importData(['method' => Free::PAYMENT_METHOD_FREE_CODE]);
-            $payment->setAdditionalInformation([]);
-        }
     }
 }

@@ -18,6 +18,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote as AdminQuote;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 
 /**
  * Create Quote for subscription profile on storefront.
@@ -42,6 +44,8 @@ class Quote extends AdminQuote
      * @param CustomerRepositoryInterface $customerRepository
      * @param FormFactory $customerFormFactory
      * @param Mapper $customerMapper
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
      */
     public function __construct(
@@ -54,11 +58,23 @@ class Quote extends AdminQuote
         CustomerRepositoryInterface $customerRepository,
         FormFactory $customerFormFactory,
         Mapper $customerMapper,
+        PaymentTokenManagementInterface $paymentTokenManagement,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
         CustomerQuoteRepositoryInterface $customerQuoteRepository
     ) {
         $this->customerQuoteRepository = $customerQuoteRepository;
-        parent::__construct($context, $session, $quoteFactory, $groupManagement, $addressCreator,
-            $cartRepository, $customerRepository, $customerFormFactory, $customerMapper
+        parent::__construct(
+            $context,
+            $session,
+            $quoteFactory,
+            $groupManagement,
+            $addressCreator,
+            $cartRepository,
+            $customerRepository,
+            $customerFormFactory,
+            $paymentTokenManagement,
+            $paymentTokenRepository,
+            $customerMapper
         );
     }
 

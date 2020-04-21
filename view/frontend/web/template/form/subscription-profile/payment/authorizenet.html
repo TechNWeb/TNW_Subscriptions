@@ -1,0 +1,19 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="fieldset-wrapper"
+     css="$data.additionalClasses"
+     attr="'data-level': $data.level, 'data-index': index"
+     data-bind="visible: $data.visible === undefined ? true: $data.visible">
+
+    <div class="fieldset-wrapper-content"
+         css="'collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
+        <form id="co-transparent-form-authorize_cim">
+            <div class="fieldset" if="opened() || _wasOpened" each="data: elems, as: 'element'" render=""/>
+            <input id="authorize_cim_submit" style="display:none" type="submit">
+        </form>
+    </div>
+</div>

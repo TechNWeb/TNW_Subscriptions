@@ -238,7 +238,7 @@ class Base implements PaymentModifierInterface
      *
      * @return array
      */
-    private function getPaymentFields()
+    protected function getPaymentFields()
     {
         $additionalConfig = $this->getAdditionalConfig();
 

@@ -26,10 +26,28 @@ class Authorizenet extends Base
      */
     private $transactionCustomer;
 
+    /**
+     * @var bool
+     */
     private $isRebill = false;
 
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenManagement
+     */
     private $paymentTokenManagement;
 
+    /**
+     * Authorizenet constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\Context $context
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
+     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -61,9 +79,17 @@ class Authorizenet extends Base
     public function getProfilePaymentInfo(Payment $payment)
     {
         $additionalInfo = $payment->getAdditionalInformation();
+        $cardDetails = [];
+        $expirationDate = [];
         if (array_key_exists('extension_attributes', $additionalInfo)) {
             $cardDetails = json_decode($additionalInfo['extension_attributes'], true);
-            $expirateionDate = explode('/' , $cardDetails['expirationDate']);
+            $expirationDate = explode('/' , $cardDetails['expirationDate']);
+        }
+        if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
+            $cardDetails = [
+                'type' => $payment->getCcType()
+            ];
+            $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
         }
         $result = [
             'encoded_payment_additional_info' => [
@@ -73,10 +99,10 @@ class Authorizenet extends Base
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
                 OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
-                    : $expirateionDate[0],
+                    : $expirationDate[0],
                 OrderPaymentInterface::CC_EXP_YEAR => isset($additionalInfo[OrderPaymentInterface::CC_EXP_YEAR])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR]
-                    : $expirateionDate[1],
+                    : $expirationDate[1],
                 'authorizenet_data' => $additionalInfo
             ]
         ];
@@ -92,10 +118,19 @@ class Authorizenet extends Base
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
-        $result[OrderPaymentInterface::METHOD] = $this->getPaymentMethodCode();
+        if (isset($result['authorizenet_data']['public_hash'])) {
+            $result[OrderPaymentInterface::METHOD] =  $this->getPaymentMethodCode() . '_vault';
+        } else {
+            $result[OrderPaymentInterface::METHOD] = $this->getPaymentMethodCode();
+        }
         return $result;
     }
 
+    /**
+     * @param Payment $payment
+     * @param SubscriptionProfileInterface $profile
+     * @return $this
+     */
     public function setPaymentExtensionAttributes(Payment $payment, SubscriptionProfileInterface $profile)
     {
         $token = $this->paymentTokenManagement->getByGatewayToken(
@@ -104,7 +139,7 @@ class Authorizenet extends Base
             $profile->getCustomerId()
         );
         if ($token) {
-            $payment->setData('public_hash', $totken->getPublicHash());
+            $payment->setData('public_hash', $token->getPublicHash());
         }
         $payment->setData('method', $this->getPaymentMethodCode() . '_vault');
         return $this;
@@ -132,6 +167,9 @@ class Authorizenet extends Base
         }
         $publicHash = $gateWayToken ? $gateWayToken->getPublicHash() : '';
         $result = isset($addtionalInfo['authorizenet_data']) ? $addtionalInfo['authorizenet_data'] : $addtionalInfo;
+        if (!$publicHash && isset($result['public_hash'])) {
+            $publicHash = $result['public_hash'];
+        }
         if ($this->isRebill) {
             $result = [
                 'is_active_payment_token_enabler' => true,
@@ -142,13 +180,19 @@ class Authorizenet extends Base
         return $result;
     }
 
+    /**
+     * @return string
+     */
     public function getPaymentMethodCode()
     {
         //TODO: resolve if vault method
         return 'tnw_authorize_cim';
     }
 
-     public function setRebillProcessFlag()
+    /**
+     *
+     */
+    public function setRebillProcessFlag()
      {
          $this->isRebill = true;
      }
@@ -205,5 +249,22 @@ class Authorizenet extends Base
             ]);
 
         return $this;
+    }
+
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(\Magento\Quote\Model\Quote $quote)
+    {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            /** @var Payment $payment */
+            $payment = $quote->getPayment();
+            $payment->importData(['method' => \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        } else {
+            parent::validatePayment($quote);
+        }
     }
 }
