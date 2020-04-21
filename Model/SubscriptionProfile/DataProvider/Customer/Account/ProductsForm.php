@@ -18,6 +18,7 @@ use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Config;
@@ -502,7 +503,8 @@ class ProductsForm extends SummaryProductsForm
                         'last_phrase' => __('times'),
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName()

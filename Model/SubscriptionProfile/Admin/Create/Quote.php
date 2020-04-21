@@ -22,6 +22,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 
 /**
  * Create quotes for subscription in admin area.
@@ -78,6 +80,16 @@ class Quote extends Create implements QuoteCreateInterface
     protected $customerMapper;
 
     /**
+     * @var PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
+    private $paymentTokenRepository;
+
+    /**
      * Quote constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -87,6 +99,8 @@ class Quote extends Create implements QuoteCreateInterface
      * @param CartRepositoryInterface $cartRepository
      * @param CustomerRepositoryInterface $customerRepository
      * @param FormFactory $customerFormFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param Mapper $customerMapper
      */
     public function __construct(
@@ -98,8 +112,12 @@ class Quote extends Create implements QuoteCreateInterface
         CartRepositoryInterface $cartRepository,
         CustomerRepositoryInterface $customerRepository,
         FormFactory $customerFormFactory,
+        PaymentTokenManagementInterface $paymentTokenManagement,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
         Mapper $customerMapper
     ) {
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->quoteFactory = $quoteFactory;
         $this->groupManagement = $groupManagement;
         $this->addressCreator = $addressCreator;
@@ -191,14 +209,28 @@ class Quote extends Create implements QuoteCreateInterface
     }
 
     /**
-     * Sets into quote customer data.
-     *
      * @param CustomerInterface $customer
      * @param ModelQuote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function fillCustomerData(CustomerInterface $customer, ModelQuote $quote)
     {
         $quoteData = [];
+        if (
+            !$quote->getCustomerId()
+            && !$quote->getPayment()->getAdditionalInformation('customer_id')
+            && $quote->getPayment()->getAdditionalInformation('public_hash')
+            && $customer->getId()
+        ) {
+            $quote->getPayment()->setAdditionalInformation('customer_id', $customer->getId());
+            $token = $this
+                ->paymentTokenManagement
+                ->getByPublicHash($quote->getPayment()->getAdditionalInformation('public_hash'), null);
+            if ($token) {
+                $token->setCustomerId($customer->getId());
+                $this->paymentTokenRepository->save($token);
+            }
+        }
         $origAddresses = $customer->getAddresses(); // save original addresses
         $customer->setAddresses([]);
         $data = $this->customerMapper->toFlatArray($customer);

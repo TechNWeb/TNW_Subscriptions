@@ -711,6 +711,12 @@
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Save\Processor\Pool</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AuthorizenetVault"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Vault">
+        <arguments>
+            <argument name="vaultMethodCode" xsi:type="string">tnw_authorize_cim_vault</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Save\Processor\Pool"
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>
@@ -722,6 +728,14 @@
                 <item name="braintree_payment" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Braintree</item>
                     <item name="sortOrder" xsi:type="number">15</item>
+                </item>
+                <item name="authorizenet_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Authorizenet</item>
+                    <item name="sortOrder" xsi:type="number">16</item>
+                </item>
+                <item name="authorizenet_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AuthorizenetVault</item>
+                    <item name="sortOrder" xsi:type="number">17</item>
                 </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
@@ -758,6 +772,10 @@
                 <item name="tnw_authorize_cim" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
                     <item name="sortOrder" xsi:type="number">45</item>
+                </item>
+                <item name="vault" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault</item>
+                    <item name="sortOrder" xsi:type="number">46</item>
                 </item>
             </argument>
         </arguments>
