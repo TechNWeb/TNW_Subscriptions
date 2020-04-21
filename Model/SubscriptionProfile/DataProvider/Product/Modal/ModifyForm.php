@@ -23,6 +23,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolve
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 
 /**
  * Class ModifyForm
@@ -789,7 +790,8 @@ class ModifyForm extends Form
                         'last_phrase' => __('times'),
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
                         ],
                         'imports' => [
                             'visible' => '!' . $this->currentFormName . '.edit_fieldset.term' . ':checked',

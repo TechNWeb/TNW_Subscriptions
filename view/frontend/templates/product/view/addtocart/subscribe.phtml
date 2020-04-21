@@ -87,7 +87,10 @@
                                    name="period"
                                    id="period"
                                    class="input-text qty"
-                                   data-validate='{"required-number":true}'
+                                   data-validate='{
+                                   "required-number":true,
+                                   "min": <?php echo $block->getDefaultPeriod() ?>
+                                   }'
                                    value="<?php echo $block->getDefaultPeriod() ?>"
                             >
                             <span><?php echo __('payment(s)') ?></span>

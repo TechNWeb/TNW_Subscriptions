@@ -27,6 +27,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Base;
@@ -640,7 +641,8 @@ class SummaryProductsForm extends ModifyForm
                         'last_phrase' => __('times'),
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true
+                            'required-entry' => true,
+                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':value',

@@ -123,12 +123,18 @@ class Authorizenet extends Base
                             'formElement' => Form\Element\Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                             'additionalClasses' => 'credit-card-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ],
+                            'validation' => [
+                                'required-entry' => true,
+                                'required-number' => true,
+                                'validate-cc-number' => $this->getPaymentCode() . '_cc_type',
+                                'validate-cc-type' => $this->getPaymentCode() . '_cc_type',
                             ]
                         ],
                     ],
@@ -159,13 +165,21 @@ class Authorizenet extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Input::NAME,
+                                    'formElement' => Form\Element\Select::NAME,
+                                    'options' => $this->getCcMonths(),
                                     'dataScope' => 'cc_exp_month',
                                     'dataType' => Form\Element\DataType\Text::NAME,
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],
@@ -176,13 +190,21 @@ class Authorizenet extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Input::NAME,
+                                    'formElement' => Form\Element\Select::NAME,
+                                    'options' => $this->getCcYears(),
                                     'dataScope' => 'cc_exp_year',
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Form\Element\DataType\Text::NAME,
                                     'sortOrder' => 20,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],
@@ -201,7 +223,7 @@ class Authorizenet extends Base
                             'name' => '',
                             'componentType' => Form\Field::NAME,
                             'formElement' => Form\Element\Input::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                             'dataContainer' => $this->getPaymentCode() . '-cc-cvv',
                             'dataScope' => 'cc_cid',
                             'dataType' => Form\Element\DataType\Text::NAME,
@@ -209,6 +231,11 @@ class Authorizenet extends Base
                             'sortOrder' => 40,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ],
+                            'validation' => [
+                                'required-number' => true,
+                                'required-entry' => true,
+                                'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
                     ],
@@ -225,11 +252,15 @@ class Authorizenet extends Base
     protected function getAdditionalConfig()
     {
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/braintree',
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/authorizenet',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
-            'sdkUrl' => $this->authorizenetConfig->getSdkUrl(),
+            'acceptConfig' => [
+                'sdkUrl' => $this->authorizenetConfig->getSdkUrl(),
+                'apiLoginID' => $this->authorizenetConfig->getApiLoginId(),
+                'clientKey' => $this->authorizenetConfig->getClientKey(),
+            ],
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->authorizenetConfig->getAvailableCardTypes(),
@@ -262,7 +293,7 @@ class Authorizenet extends Base
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
-                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree',
+                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/authorizenet',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',
@@ -318,6 +349,48 @@ class Authorizenet extends Base
                     ];
                 }
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves credit card expire months.
+     *
+     * @return array
+     */
+    private function getCcMonths()
+    {
+        $result[] = [
+            'label' =>  __('Month'),
+            'value' => ''
+        ];
+        foreach ($this->paymentConfig->getMonths() as $value => $label) {
+            $result[] = [
+                'value' => $value,
+                'label' => $label
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves credit card expire years
+     *
+     * @return array
+     */
+    private function getCcYears()
+    {
+        $result[] = [
+            'label' =>  __('Year'),
+            'value' => ''
+        ];
+        foreach ($this->paymentConfig->getYears() as $value => $label) {
+            $result[] = [
+                'value' => $value,
+                'label' => (string)$label
+            ];
         }
 
         return $result;

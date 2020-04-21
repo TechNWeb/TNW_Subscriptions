@@ -71,7 +71,11 @@
             </argument>
         </arguments>
     </type>
-
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault">
+        <arguments>
+            <argument name="sessionManager" xsi:type="object">Magento\Backend\Model\Session\Quote</argument>
+        </arguments>
+    </type>
     <!-- Validate and convert currency fields in configuration -->
     <type name="Magento\Config\Model\Config">
         <plugin name="subscriptions_config_validate_currency_fields"
@@ -192,6 +196,14 @@
                 <item name="subscription_and_account_information" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation</item>
                     <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="tnw_authorize_cim" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
+                    <item name="sortOrder" xsi:type="number">45</item>
+                </item>
+                <item name="vault" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault</item>
+                    <item name="sortOrder" xsi:type="number">46</item>
                 </item>
             </argument>
         </arguments>

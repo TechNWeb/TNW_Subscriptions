@@ -18,6 +18,7 @@ define([
                 text: null,
                 error: null
             },
+            wizardSummaryLabel: null,
             frequencyRecords: null,
             indexedFrequencies: null,
             originalPrice: null,
@@ -52,7 +53,7 @@ define([
 
         render: function (wizard) {
             this.wizard = wizard;
-            this.label = $t('Step 3: ') + this.label;
+            this.label = this.wizardSummaryLabel;
         },
 
         force: function (wizard) {

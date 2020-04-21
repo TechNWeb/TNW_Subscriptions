@@ -69,6 +69,7 @@ class VaultPaymentAuthorization
 
     public function processPreAuthForTrial($paymentData, $quote, $email = null)
     {
+        $result = $paymentData;
         if (isset($this->paymentProcessors[$paymentData['method']])) {
             if (!$this->checkRequiredObjects($paymentData['method'])) {
                 $this->logger->critical(__('Trial payment could not be processed.'));
@@ -125,9 +126,11 @@ class VaultPaymentAuthorization
             ];
 
             $this->createProfileObserver->setTrialPaymentData($trialPaymentData);
+            $result = $trialPaymentData;
         } elseif ($paymentData['method'] == 'checkmo') {
             $this->createProfileObserver->setTrialPaymentData($paymentData);
         }
+        return $result;
     }
 
     /**
