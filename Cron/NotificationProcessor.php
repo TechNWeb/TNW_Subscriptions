@@ -185,7 +185,7 @@ class NotificationProcessor
                 ->join(
                     'tnw_subscriptions_subscription_profile_order',
                     'main_table.subscription_profile_id = 
-                    tnw_subscriptions_subscription_profile_order.subscription_profile_id and magento_order_id is null',
+                    tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )
                 ->addFieldToFilter('engine_code', array('neq' => 'checkmo'))
