@@ -22,6 +22,7 @@
         <tnw_subscriptions_profile_options>
             <general>
                 <product_price_strategy>0</product_price_strategy>
+                <shipping_fallback>1</shipping_fallback>
             </general>
             <past_due_profile_options>
                 <attempt_count>10</attempt_count>

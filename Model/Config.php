@@ -40,6 +40,8 @@ class Config
      * Config xml path for general profile options section
      */
     private $xmlPricingStartegy = 'tnw_subscriptions_profile_options/general/product_price_strategy';
+    private $xmlDefaultShipping = 'tnw_subscriptions_profile_options/general/default_shipping';
+    private $xmlShippingFallback = 'tnw_subscriptions_profile_options/general/shipping_fallback';
     /**#@-*/
 
     /**#@+
@@ -126,6 +128,26 @@ class Config
         $this->storeManager = $storeManager;
         $this->request = $request;
         $this->paypalConfig = $paypalConfig;
+    }
+
+    /**
+     * Get the default shipping method if current is not available
+     *
+     * @return mixed
+     */
+    public function getDefaultShippingMethod()
+    {
+        return $this->scopeConfig->getValue($this->xmlDefaultShipping);
+    }
+
+    /**
+     * Gets the shipping method fallback strategy if current shipping method is not available
+     *
+     * @return mixed
+     */
+    public function getShippingFallbackStrategy()
+    {
+        return $this->scopeConfig->getValue($this->xmlShippingFallback);
     }
 
     /**

@@ -182,6 +182,12 @@ class NotificationProcessor
     {
         try {
             return $this->loadedCollections[] = $this->paymentFactory->create()
+                ->join(
+                    'tnw_subscriptions_subscription_profile_order',
+                    'main_table.subscription_profile_id = 
+                    tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
+                    'scheduled_at'
+                )
                 ->addFieldToFilter('engine_code', array('neq' => 'checkmo'))
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToSelect('subscription_profile_id');

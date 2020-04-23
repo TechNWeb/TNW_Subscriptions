@@ -77,8 +77,12 @@ define([
                 },
                 $.mage.__('The same billing frequency is selected.')
             );
-            this.default = utils.copy(this.recordData());
+            this.setDefaultRecords();
             return this;
+        },
+
+        setDefaultRecords: function () {
+            this.default = utils.copy(this.recordData());
         },
 
         /** @inheritdoc */
@@ -102,9 +106,7 @@ define([
         processingAddChild: function (ctx, index, prop) {
             this.checkAddingBillingFrequency(index);
 
-            if (ctx && !_.isNumber(ctx['id'])) {
-                ctx['id'] = ++maxId;
-            } else if (!ctx) {
+            if (!ctx) {
                 this.showSpinner(true);
                 this.addChild(ctx, index, prop);
 

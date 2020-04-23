@@ -48,7 +48,6 @@ define([
                 offerDiscountComponent = registry.get('index=tnw_subscr_offer_flat_discount'),
                 discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
                 discountTypeComponent = registry.get('index=tnw_subscr_discount_type');
-                priceFormat.pattern = '%s';
             if (typeof recurringPrice === 'string') {
                 recurringPrice = formatPrice.formatToNumber(recurringPrice, priceFormat);
             }
@@ -92,6 +91,8 @@ define([
                 } else {  // Offer flat discount is disabled
                   // no notice
                 }
+                this.value(formatPrice.formatPrice(recurringPrice, priceFormat));
+
             } else {  //Product price is unlocked
                 if ((recurringPrice != 0) && (productPrice != 0)) {
                     discountAmount = productPrice - recurringPrice;
@@ -103,7 +104,6 @@ define([
                 }
             }
 
-            this.value(formatPrice.formatPrice(recurringPrice, priceFormat));
 
             if (notice != '') {     //if calculated notice isn't empty we form whole necessary message to show
                 notice += ' ' + $.mage.__('savings to the customer');
@@ -126,8 +126,8 @@ define([
             var priceFormat = null;
             if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
                 priceFormat = $.parseJSON(this.priceFormat);
+                priceFormat.pattern = '%s'
             }
-
             return priceFormat;
         },
 
@@ -153,13 +153,9 @@ define([
          * Fires to change comment after 'Lock product price' is checked.
          */
         changeCommentLockPrice: function (checked) {
-            var lockPriceComponent = registry.get('index=tnw_subscr_lock_product_price');
-            if (lockPriceComponent.valueChangedByUser && !checked) {
-                var priceFormat = this.getPriceFormat();
-                var productPrice = this.getProductPriceComponentValue();
-                this.value(formatPrice.formatPrice(productPrice, priceFormat));
+            if (checked) {
+                this.changeCommentAndValue();
             }
-            this.changeCommentAndValue();
         },
 
         /**
