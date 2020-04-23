@@ -6,10 +6,11 @@ define([
     'jquery',
     'mage/translate',
     'TNW_Subscriptions/js/form/subscription-profile/payment/base',
+    'Magento_Payment/js/model/credit-card-validation/credit-card-number-validator',
     'uiRegistry',
     'underscore',
     'Magento_Ui/js/lib/spinner'
-], function ($, $t, PaymentBase, registry, _) {
+], function ($, $t, PaymentBase, cardNumberValidator, registry, _) {
     'use strict';
 
     return PaymentBase.extend({
@@ -17,7 +18,12 @@ define([
             code: 'tnw_authorize_cim',
             acceptConfig: null,
             accept: null,
-            payment_errors: null
+            payment_errors: null,
+            ccNumber: null,
+            availableCardTypes: null,
+            imports: {
+                setCardType: '${ $.provider }:${ $.dataScope }.additional.cc_number'
+            }
         },
 
         /**
@@ -109,5 +115,35 @@ define([
         getSelector: function (field) {
             return '[data-container="'+this.code + '-' + field+'"]';
         },
+
+        /**
+         * Set credit card type based on cc number. Set message if type not supported.
+         * @param value
+         * @returns {boolean}
+         */
+        setCardType: function (value) {
+            if (value === '' || value === null) {
+                return false;
+            }
+            var result = cardNumberValidator(value);
+
+            if (!result.isPotentiallyValid && !result.isValid) {
+                return false;
+            }
+
+            if (result.card !== null) {
+                if (_.contains(this.availableCardTypes, result.card.type)) {
+                    this.source.set(this.dataScope+'.additional.cc_type', result.card.type);
+                    this.set('payment_errors', false);
+                } else {
+                    this.set(
+                        'payment_errors',
+                        [$t('Provided credit card type (%1) is not available with this payment method.')
+                            .replace('%1', result.card.title)]
+                    );
+                }
+
+            }
+        }
     });
 });

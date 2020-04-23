@@ -90,6 +90,24 @@
                         <![CDATA[<strong>Grandfathered Price</strong> - product price is grandfathered and will not change for existing profiles when orders are created even if the product price changes in the catalog for new customers.<br><strong>Dynamic</strong> (for any quantity changes) - product price will be automatically re-calculated when the customer makes changes to the quantity of the existing subscription.]]>
                     </comment>
                 </field>
+                <field id="shipping_fallback" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Shipping Fallback</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\ShippingFallback</source_model>
+                    <comment>
+                        <![CDATA[#Force from Subscription Profile - mPower will ignore any price rule or configuration restrictions and allow the customer to use the shipping method linked to their subscription.
+<br>#Pick the cheapest available - a shipping method linked to the profile will be used by default if allowed. Otherwise, mPower will pick the cheapest available shipping method for the order automatically.
+<br>#Use the Default - a shipping method linked to the profile will be used by default if allowed. Otherwise, mPower will force the order to use the Default Shipping method specified in this section.]]>
+                    </comment>
+                </field>
+                <field id="default_shipping" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Default Shipping Method</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\ShippingMethods</source_model>
+                    <comment>
+                        <![CDATA[This is a default available shipping method mPower will use if an order cannot be created using the shipping method from the subscription profile and an alternate shipping method is needed. If you don't see a payment method you want to use in this list, make sure it's enabled under [#Shipping Methods] configuration in Magento.]]>
+                    </comment>
+                </field>
             </group>
             <group id="past_due_profile_options" translate="label" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Past Due</label>

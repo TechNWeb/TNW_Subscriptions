@@ -4,8 +4,9 @@
  */
 
 define([
-    'Magento_Catalog/js/price-utils'
-], function (priceUtils) {
+    'Magento_Catalog/js/price-utils',
+    'jquery'
+], function (priceUtils, $) {
     'use strict';
 
     var priceFormat = {
@@ -31,13 +32,17 @@ define([
     function formatPrice(amount, format) {
         if (typeof format == 'undefined') {
             format = priceFormat;
+        } else if (typeof format == 'string') {
+            format = $.parseJSON(format);
         }
         if (typeof amount === 'string') {
-            var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol;
-            amount = amount.replace(decimalSymbol, '.');
+            var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol,
+                groupSymbol = format.groupSymbol === undefined ? ',' : format.groupSymbol,
+                groupRegEx = new RegExp(groupSymbol, 'g');
+            amount = parseFloat(amount.replace(decimalSymbol, '.').replace(groupRegEx, ''));
         }
         return priceUtils.formatPrice(amount, format);
-    };
+    }
 
     /**
      * Return Price formatted to number.

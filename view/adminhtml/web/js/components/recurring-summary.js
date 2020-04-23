@@ -70,13 +70,13 @@ define([
         },
 
         getRecurringPrice: function (record) {
-            return this.priceSymbol + formatPrice.formatPrice(record.price, this.priceFormat);
+            return formatPrice.formatPrice(record.price, this.priceFormat);
         },
 
         getInitialFee: function (record) {
             var fee = parseInt(record.initial_fee) === 0
                 ? 'None'
-                : this.priceSymbol + formatPrice.formatPrice(record.initial_fee, this.priceFormat);
+                : formatPrice.formatPrice(record.initial_fee, this.priceFormat);
             return $t('Initial Fee: %').replace('%', fee);
         },
 
@@ -85,7 +85,7 @@ define([
         },
 
         getOriginalPrice: function () {
-            return this.priceSymbol + formatPrice.formatPrice(this.originalPrice, this.priceFormat);
+            return formatPrice.formatPrice(this.originalPrice, this.priceFormat);
         },
 
         getIsDefault: function (record) {
@@ -97,7 +97,10 @@ define([
         },
 
         getTrialPrice: function () {
-            return this.priceSymbol + formatPrice.formatPrice(this.trialPrice, this.priceFormat);
+            if (parseFloat(this.trialPrice) > 0) {
+                return formatPrice.formatPrice(this.trialPrice, this.priceFormat);
+            }
+            return $t('FREE');
         },
 
         getTrialStartLabel: function () {
@@ -134,7 +137,7 @@ define([
         },
 
         getDiscountAmount: function () {
-            return this.priceSymbol + formatPrice.formatPrice(this.flatDiscountAmount, this.priceFormat);
+            return formatPrice.formatPrice(this.flatDiscountAmount, this.priceFormat);
         },
 
         onChangedPurchaseType: function (typeValue) {

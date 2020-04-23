@@ -27,7 +27,6 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
-use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
@@ -39,6 +38,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\UpcomingOrders;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use Magento\Framework\DataObject;
+use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
 
 /**
  * Class Manager
@@ -171,6 +171,17 @@ class Manager
     private $dataObjectFactory;
 
     /**
+     * @var \TNW\Subscriptions\Model\Config
+     */
+    private $mpowerConfig;
+
+    /**
+     * @var \TNW\Subscriptions\Model\Shipping\Free
+     */
+    private $freeShipping;
+
+    /**
+     * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
      * @param PaymentRepository $paymentRepository
@@ -189,6 +200,9 @@ class Manager
      * @param PaymentConfig $paymentConfig
      * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
      * @param ProfileStatus $profileStatus
+     * @param DataObject\Factory $dataObjectFactory
+     * @param \TNW\Subscriptions\Model\Config $mpowerConfig
+     * @param \TNW\Subscriptions\Model\Shipping\Manager $shippingManager
      */
     public function __construct(
         EnginePool $enginePool,
@@ -209,8 +223,12 @@ class Manager
         PaymentConfig $paymentConfig,
         \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
         ProfileStatus $profileStatus,
-        \Magento\Framework\DataObject\Factory $dataObjectFactory
+        \Magento\Framework\DataObject\Factory $dataObjectFactory,
+        \TNW\Subscriptions\Model\Config $mpowerConfig,
+        \TNW\Subscriptions\Model\Shipping\Free $freeShipping
     ) {
+        $this->freeShipping = $freeShipping;
+        $this->mpowerConfig = $mpowerConfig;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
         $this->enginePool = $enginePool;
@@ -843,8 +861,8 @@ class Manager
                     $quote->getShippingAddress()
                         ->setCollectShippingRates(true)
                         ->setItemQty($quote->getItemsSummaryQty())
-                        ->collectShippingRates()
-                        ->setShippingMethod($profile->getShippingMethod());
+                        ->collectShippingRates();
+                    $this->processShippingMethodRate($quote, $profile);
                 }
 
                 $this->quoteRepository->save($quote);
@@ -863,6 +881,57 @@ class Manager
             }
         }
         return $outOfStockProducts;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param $profile
+     * @return $this
+     */
+    protected function processShippingMethodRate($quote, $profile)
+    {
+        $shippingMethodAvailable = false;
+        $shippingRates = $quote->getShippingAddress()->getAllShippingRates();
+        $ratesApplicable = [];
+        $cheapestRate = '';
+        if ($shippingRates) {
+            $cheapestPrice = null;
+            foreach ($shippingRates as $rate) {
+                if ($rate->getCode() == $profile->getShippingMethod()) {
+                    $shippingMethodAvailable = true;
+                }
+                $ratesApplicable[$rate->getCode()] = $rate->getPrice();
+                if ($cheapestPrice === null || $cheapestPrice > $rate->getPrice()) {
+                    $cheapestRate = $rate->getCode();
+                    $cheapestPrice = $rate->getPrice();
+                }
+            }
+        }
+        if ($shippingMethodAvailable) {
+            $quote->getShippingAddress()->setShippingMethod($profile->getShippingMethod());
+        } else {
+            switch ($this->mpowerConfig->getShippingFallbackStrategy()) {
+                case ShippingFallback::FORCE_PROFILE:
+                    if ($profile->getShippingMethod() == 'freeshipping_freeshipping') {
+                        $quote->getShippingAddress()->addShippingRate($this->freeShipping->getCarrierRate($quote));
+                    }
+                    $quote->getShippingAddress()->setShippingMethod($profile->getShippingMethod());
+                    break;
+                case ShippingFallback::DEFAULT_VALUE:
+                    $defaultShippingMethod = $this->mpowerConfig->getDefaultShippingMethod();
+                    if ($defaultShippingMethod) {
+                        if (isset($defaultShippingMethod, $ratesApplicable)) {
+                            $quote->getShippingAddress()->setShippingMethod($defaultShippingMethod);
+                        }
+                    }
+                    break;
+                case ShippingFallback::CHEAPEST:
+                    $quote->getShippingAddress()->setShippingMethod($cheapestRate);
+                    break;
+                default: break;
+            }
+        }
+        return $this;
     }
 
     /**
