@@ -1,0 +1,59 @@
+<?php
+/**
+ *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ *  See TNW_LICENSE.txt for license details.
+ */
+namespace TNW\Subscriptions\Model\Config\Source;
+
+/**
+ * Class ShippingFallback
+ * @package TNW\Subscriptions\Model\Config\Source
+ */
+class ShippingFallback implements \Magento\Framework\Option\ArrayInterface
+{
+    /**
+     * Values for Force from subscription profile setting
+     */
+    const FORCE_PROFILE = 1;
+
+    /**
+     * Value for cheapest shipping method
+     */
+    const CHEAPEST = 2;
+
+    /**
+     * Value for default shipping method
+     */
+    const DEFAULT_VALUE = 3;
+
+    /**
+     * Options getter
+     *
+     * @return array
+     */
+    public function toOptionArray()
+    {
+        $result = [];
+        foreach ($this->toArray() as $value => $label) {
+            $result[] =  [
+                'value' => $value,
+                'label' => $label
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Get options in "key-value" format
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            self::FORCE_PROFILE => __('Force from Subscription Profile'),
+            self::CHEAPEST => __('Pick the cheapest available'),
+            self::DEFAULT_VALUE =>  __('Use the Default')
+        ];
+    }
+}
