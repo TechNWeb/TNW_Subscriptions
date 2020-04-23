@@ -1,0 +1,106 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="fieldset" data-bind="visible: !currentProduct">
+    <span translate="'Please select options'"/>
+</div>
+<div class="fieldset" data-bind="visible: (currentProduct && !currentProduct.frequency_data)">
+    <span translate="'There is no subscription available for this option'"/>
+</div>
+<div class="fieldset" data-bind="visible: (currentProduct && currentProduct.frequency_data)">
+    <div class="field required">
+        <label class="label"><span translate="'Billing Frequency'"/>:</label>
+        <div class="control">
+            <div class="options-list nested">
+                <select name="billing_frequency"
+                        id="billing_frequency"
+                        class="required"
+                        data-bind="
+                            options: getFrequencyOptions(),
+                            optionsText: getFrequencyLabel,
+                            optionsValue: 'value',
+                            value: selectedFrequency,
+                            event: { change: frequencyChanged }">
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="fieldset">
+        <div class="field term required">
+            <label class="label"><span translate="'Term'"/>:</label>
+            <div class="control">
+
+                <span translate="'Until canceled'" data-bind="visible: isInfinite()"/>
+
+                <div data-bind="visible: !isInfinite()">
+                    <input type="radio" id="term1" name="term" value="1" ko-checked="getDefaultUntilCancelled()"/>
+                    <label class="label" for="term1">
+                        <span translate="'Until canceled'"/>
+                    </label>
+                </div>
+                <div data-bind="visible: !isInfinite()">
+                    <input type="radio" id="term0" name="term" value="0"/>
+                    <label class="label" for="term0">
+                        <span translate="'Stop after'"/>
+                        <input type="number"
+                               name="period"
+                               id="period"
+                               class="input-text qty"
+                               data-validate='{"required-number":true}'
+                               ko-value="defaultPeriod"
+                        >
+                        <span translate="'payment(s)'"/>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fieldset" data-bind="visible: getIsVisibleStartOn(), afterRender: setupCalendar()">
+        <div class="field date required">
+            <label class="label"><span translate="'Delivery Schedule'"/>:</label>
+            <div class="control delivery-schedule">
+                <span translate="'First delivery on'"/>
+                <span class="delivery-schedule-date"/>
+                <input type="hidden" name="start_on_alt" id="start_on_alt"/>
+                <a href="#" class="action change-delivery-date"
+                   translate="'change'"
+                   data-bind="visible: !scheduleDateInputVisible, click: manageStartOn"/>
+                <span class="start-on-wrapper" data-bind="visible: scheduleDateInputVisible">
+                    <input type="text"
+                           name="start_on"
+                           id="start_at"
+                           class="required"
+                           data-bind="value: defaultStartOn"
+                    />
+                    <a href="#" class="action update-delivery-date"
+                       translate="'Update'"
+                       data-bind="click: manageStartOn"/>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="fieldset" data-bind="visible: getAllowDisplaySubscribeQty()">
+        <div class="field required">
+            <label class="label" for="subscribe_qty"><span translate="'Qty'"/>:</label>
+            <div class="control">
+                <input type="number"
+                       name="subscribe_qty"
+                       id="subscribe_qty"
+                       maxlength="12"
+                       class="input-text qty"
+                       data-bind="
+                        attr: {
+                            readonly: getIsQtyPreset()
+                        },
+                        value: getDefaultSubscribeQty()"
+                />
+            </div>
+        </div>
+    </div>
+    <button type="submit" id="product-subscribe-button" class="action primary tocart">
+        <span data-role="button-text" translate="'Subscribe'"/>
+    </button>
+</div>
