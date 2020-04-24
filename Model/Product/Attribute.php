@@ -28,7 +28,6 @@ class Attribute
     const SUBSCRIPTION_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
     const SUBSCRIPTION_HIDE_QTY = 'tnw_subscr_hide_qty';
     const SUBSCRIPTION_SAVINGS_CALCULATION = 'tnw_subscr_savings_calculation';
-    const SUBSCRIPTION_SENDING_EMAIL = 'tnw_subscr_sending_email';
     const SUBSCRIPTION_INFINITE_SUBSCRIPTIONS = 'tnw_subscr_inf_subscriptions';
     const SUBSCRIPTION_SCHEDULE = 'tnw_subscr_schedule';
 
@@ -52,7 +51,6 @@ class Attribute
             self::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             self::SUBSCRIPTION_HIDE_QTY,
             self::SUBSCRIPTION_SAVINGS_CALCULATION,
-            self::SUBSCRIPTION_SENDING_EMAIL,
             self::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
             self::SUBSCRIPTION_SCHEDULE
         ];

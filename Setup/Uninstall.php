@@ -119,7 +119,6 @@ class Uninstall implements UninstallInterface
             'tnw_subscr_unlock_preset_qty',
             'tnw_subscr_hide_qty',
             'tnw_subscr_savings_calculation',
-            'tnw_subscr_sending_email',
             'tnw_subscr_inf_subscriptions',
         ];
 

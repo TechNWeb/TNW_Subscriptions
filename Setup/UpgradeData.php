@@ -110,11 +110,6 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '2.2.13', '<')) {
             $this->addHideQtyProductAttributes($eavSetup);
         }
-
-        if (version_compare($context->getVersion(), '2.2.14', '<')) {
-            $this->addCheckSendingEmailAttributes($eavSetup);
-        }
-
         $setup->endSetup();
     }
 
@@ -486,34 +481,5 @@ class UpgradeData implements UpgradeDataInterface
                 ]
             );
         }
-    }
-
-    /**
-     * Add attributes for check sending email
-     *
-     * @param EavSetup $eavSetup
-     */
-    private function addCheckSendingEmailAttributes(EavSetup $eavSetup)
-    {
-        $eavSetup->addAttribute(
-            Product::ENTITY,
-            Attribute::SUBSCRIPTION_SENDING_EMAIL,
-            [
-                'type' => 'int',
-                'label' => 'Check email sending',
-                'input' => 'boolean',
-                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
-                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
-                'visible' => false,
-                'required' => false,
-                'user_defined' => true,
-                'visible_on_front' => false,
-                'used_in_product_listing' => false,
-                'unique' => false,
-                'apply_to' => 'simple,virtual,downloadable,configurable',
-                'group' => 'Subscription Options',
-                'sort_order' => '160',
-            ]
-        );
     }
 }
