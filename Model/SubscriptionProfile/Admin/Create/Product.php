@@ -240,7 +240,7 @@ class Product extends Create
                 }
             }
 
-            $currentProductCustomPrice = $this->getCustomPrice($product, $productData);;
+            $currentProductCustomPrice = $this->getCustomPrice($product, $productData);
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
@@ -248,7 +248,7 @@ class Product extends Create
                 $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
                 && isset($this->data['custom_price'])
             ) {
-                $customProductPrice = (float) $this->data['custom_price'] / $this->data['qty'];
+                $customProductPrice = (float) $this->data['custom_price'];
             }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
 
@@ -293,7 +293,7 @@ class Product extends Create
      */
     public function getPresetCustomPrice()
     {
-        return (float) $this->data['custom_price'] / (int) $this->data['qty'];
+        return (float) $this->data['custom_price'];
     }
 
     /**
