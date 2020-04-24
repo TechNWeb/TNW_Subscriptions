@@ -61,6 +61,6 @@ class Grid extends DataProvider
      */
     public function addOrder($field, $direction)
     {
-        parent::addOrder($field, \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
+        parent::addOrder($field, $direction);
     }
 }
