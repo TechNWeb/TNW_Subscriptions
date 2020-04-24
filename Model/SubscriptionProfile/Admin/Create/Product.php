@@ -91,8 +91,23 @@ class Product extends Create
      */
     private $searchCriteriaBuilder;
 
+    /**
+     * @var Config
+     */
     private $config;
 
+    /**
+     * Product constructor.
+     * @param Config $config
+     * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param ProductRepositoryInterface $productRepository
+     * @param PriceCalculator $priceCalculator
+     * @param ExtensionManager $extensionManager
+     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
     public function __construct(
         Config $config,
         Context $context,

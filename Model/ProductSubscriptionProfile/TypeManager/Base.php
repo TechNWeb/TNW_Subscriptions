@@ -190,7 +190,7 @@ abstract class Base implements TypeInterface
         );
         if ($this->profileProduct) {
             $originProfileProductData = $this->profileProduct->getOrigData();
-            $originUnitPrice = (float) $originProfileProductData['price'] / (int) $originProfileProductData['qty'];
+            $originUnitPrice = (float) $originProfileProductData['price'];
             if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE) {
                 $price = min($originUnitPrice, $price);
             }
@@ -204,9 +204,7 @@ abstract class Base implements TypeInterface
             }
         }
         if (!$rowPrice && $usePresetQty) {
-            $price = $productQty ? round($price / $productQty, 4) : 0;
-        } elseif ($rowPrice && !$usePresetQty) {
-            $price *= $productData['qty'];
+            $price = $productQty ? round($price, 4) : 0;
         }
 
         return $price;
