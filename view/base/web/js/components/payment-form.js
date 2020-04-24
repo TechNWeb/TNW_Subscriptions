@@ -69,6 +69,10 @@ define(
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
                         fieldset = registry.get('index = ' + code);
+                        if (fieldset === undefined) {
+                            fields.method = '';
+                            return;
+                        }
                         fieldset.beforeSubmit();
                         validForm = _.isArray(fieldset.payment_errors()) && fieldset.payment_errors().length === 0;
                         needShowRequiredError = false;
@@ -102,6 +106,9 @@ define(
                     if (fields.method === "1") {
                         if (errors && errors.length > 0) {
                             var fieldset = registry.get('index = ' + code);
+                            if (fieldset === undefined) {
+                                return;
+                            }
                             fieldset.processErrors(errors);
                             current.updateButtons(false);
                             current.hideLoader();
