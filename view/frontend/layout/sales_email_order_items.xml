@@ -15,7 +15,7 @@
             </block>
         </referenceBlock>
         <referenceBlock name="additional.product.info">
-
+            <block class="TNW\Subscriptions\Block\Order\Email\SubscriptionItems" name="subscription_items" template="TNW_Subscriptions::order/email/items.phtml"/>
         </referenceBlock>
     </body>
 </page>
