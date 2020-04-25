@@ -81,6 +81,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.34', '<')) {
             $this->updateItemIdColumnToOrderItemExtAtrTable($setup);
         }
+
+        if (version_compare($context->getVersion(), '2.2.44', '<')) {
+            $this->addOriginalStartDateColumnToSubscriptionProfile($setup);
+        }
         $setup->endSetup();
     }
 
@@ -679,5 +683,37 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'comment' => 'Magento order item ID'
             ]
         );
+    }
+
+    /**
+     * Add Original Start Date column to Subscription Profile Entity.
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup) {
+        $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $connection = $setup->getConnection();
+        $connection->addColumn(
+            $table,
+            SubscriptionProfile::ORIGINAL_START_DATE,
+            [
+                'type' => Table::TYPE_DATETIME,
+                'comment' => 'Original Start Date'
+            ]
+        );
+        $select = $connection->select()
+            ->from($table)
+            ->columns([
+                'entity_id',
+                SubscriptionProfile::START_DATE
+            ]);
+        $rows = $connection->fetchAssoc($select);
+        foreach ($rows as $row) {
+            $connection->update(
+                $table,
+                [SubscriptionProfile::ORIGINAL_START_DATE => $row[SubscriptionProfile::START_DATE]],
+                ['entity_id = ?' => $row['entity_id']]
+            );
+        }
     }
 }

@@ -165,7 +165,7 @@ class SummaryProductsForm extends ModifyForm
                 $priceInclTax = $taxAmount ? ($taxAmount + $itemPrice) : null;
                 $term = !empty($subQuote->getTerm()) ? 1 : 0;
                 $trialStartDate = $subQuote->getTrialStartDate();
-                $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
+                $startOn =  isset($trialStartDate) ? $trialStartDate : $subQuote->getOriginalStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => (float) $itemPrice * (int) $item->getQty(),
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),

@@ -12,6 +12,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
@@ -309,6 +310,8 @@ class Manager
      * Process products data from request.
      *
      * @param $data
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Exception
      */
     public function processProfileProducts($data)
     {
@@ -391,12 +394,45 @@ class Manager
                                 }
                                 $profileModel->setTotalBillingCycles($periodValue);
                             }
+                            $originalStartDate = date('Y-m-d', strtotime($profileModel->getOriginalStartDate()));
+                            if (isset($data['item_' . $productId]['start_on'])
+                                && (date('Y-m-d', strtotime($data['item_' . $productId]['start_on']))
+                                    !== $originalStartDate)
+                            ) {
+                                $startOn = (new \DateTime($data['item_' . $productId]['start_on']))
+                                    ->add(new \DateInterval($this->getCurrentTimeExpression()))
+                                    ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                if ($trialLength = $profileModel->getTrialLength()) {
+                                    $profileModel->setTrialStartDate($startOn);
+                                    $intervalUnit = $profileModel->getTrialLengthUnit()
+                                        == \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::MONTHS
+                                        ? 'M'
+                                        : 'D';
+                                    $expression = 'P' . $trialLength . $intervalUnit;
+                                    $startOn =  (new \DateTime($startOn))
+                                        ->add(new \DateInterval($expression))
+                                        ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                }
+                                $profileModel->setStartDate($startOn)
+                                    ->setOriginalStartDate($startOn);
+                            }
                             if (isset($data['item_' . $productId]['billing_frequency'])) {
                                 $frequencyId = $data['item_' . $productId]['billing_frequency'];
-                                $frequency = $this->frequencyRepository->getById($frequencyId);
-                                $profileModel->setBillingFrequencyId($frequencyId)
-                                    ->setFrequency($frequency->getFrequency())
-                                    ->setUnit($frequency->getUnit());
+                                if ($profileModel->getBillingFrequencyId() != $frequencyId) {
+                                    if (!isset($startOn)) {
+                                        $startOn = $this->getNewStartDate($product);
+                                        if (strtotime($startOn) > strtotime($originalStartDate)){
+                                            $startOn = (new \DateTime($startOn))
+                                                ->add(new \DateInterval($this->getCurrentTimeExpression()))
+                                                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                            $profileModel->setStartDate($startOn);
+                                        }
+                                    }
+                                    $frequency = $this->frequencyRepository->getById($frequencyId);
+                                    $profileModel->setBillingFrequencyId($frequencyId)
+                                        ->setFrequency($frequency->getFrequency())
+                                        ->setUnit($frequency->getUnit());
+                                }
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
@@ -405,18 +441,7 @@ class Manager
                                     ->getSubscriptionPrice(
                                         $product->getMagentoProduct(), $data['item_' . $productId]
                                     );
-                                $product->setPrice($price, 4);
-                            }
-                            if (isset($data['item_' . $productId]['start_on'])) {
-                                $startOn = $data['item_' . $productId]['start_on'];
-                                $date = new \DateTime();
-                                $startDate = new \DateTime($startOn);
-                                $expression = 'PT' . $date->format('H') . 'H'
-                                    . $date->format('i') . 'M'
-                                    . $date->format('s') . 'S';
-                                $startDate->add(new \DateInterval($expression));
-                                $startOn = $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                $profileModel->setStartDate($startOn);
+                                $product->setPrice($price);
                             }
                         }
                         if ($product->hasDataChanges()) {
@@ -551,5 +576,53 @@ class Manager
             : $productPrice;
 
         return !$zeroPrices ? $price : 0;
+    }
+
+    /**
+     * Calculates new start date for subscription.
+     *
+     * @param ProductSubscriptionProfile $product
+     * @return string
+     */
+    protected function getNewStartDate($product)
+    {
+        $startDateType = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
+        $nowDate = date_create()->format('Y-m-d');
+        switch ($startDateType) {
+            case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
+                $result = date_create()->format('Y-m-t');
+                break;
+            case StartDateType::FIRST_DAY_OF_THE_MONTH:
+                $result = date_create()->format('Y-m-01');
+                if (strtotime($result) < strtotime($nowDate)) {
+                    $result = new \DateTime();
+                    $result = $result->format('Y-') . ($result->format('m') + 1) . '-' . '01';
+                }
+                break;
+            case StartDateType::ON_15TH_OF_THE_MONTH:
+                $result = date_create()->format('Y-m-15');
+                if (strtotime($result) < strtotime($nowDate)) {
+                    $result = new \DateTime();
+                    $result = $result->format('Y-') . ($result->format('m') + 1) . '-' . '15';
+                }
+                break;
+            default:
+                $result = $nowDate;
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get current time expression.
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function getCurrentTimeExpression() {
+        $date = new \DateTime();
+        return
+            'PT' . $date->format('H') . 'H' . $date->format('i') . 'M' . $date->format('s') . 'S';
     }
 }
