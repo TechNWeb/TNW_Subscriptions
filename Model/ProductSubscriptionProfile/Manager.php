@@ -403,7 +403,7 @@ class Manager
                                     ->getSubscriptionPrice(
                                         $product->getMagentoProduct(), $data['item_' . $productId]
                                     );
-                                $product->setPrice($price * $product->getQty(), 4);
+                                $product->setPrice($price, 4);
                             }
                             if (isset($data['item_' . $productId]['start_on'])) {
                                 $startOn = $data['item_' . $productId]['start_on'];

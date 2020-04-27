@@ -76,7 +76,7 @@ abstract class Base implements ProcessInterface
     /**
      * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
      */
-    private $profileManager;
+    protected $profileManager;
 
     /**
      * @param SubscriptionProfileRepository $profileRepository
@@ -172,7 +172,7 @@ abstract class Base implements ProcessInterface
      */
     protected function processQuote(SubscriptionProfileInterface $profile, Quote $quote)
     {
-        $this->profileManager->populateQuoteData($quote, $profile);
+        $this->profileManager->populateQuoteData($quote, $profile, true, true);
         $this->cartRepository->save($quote);
 
         return $quote;

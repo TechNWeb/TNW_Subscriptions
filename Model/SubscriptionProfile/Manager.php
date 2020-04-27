@@ -39,6 +39,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Upcoming
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
+use Magento\Quote\Model\QuoteFactory;
 
 /**
  * Class Manager
@@ -181,6 +182,16 @@ class Manager
     private $freeShipping;
 
     /**
+     * @var QuoteFactory
+     */
+    private $quoteFactory;
+
+    /**
+     * @var bool
+     */
+    private $tempQuote = false;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -202,7 +213,8 @@ class Manager
      * @param ProfileStatus $profileStatus
      * @param DataObject\Factory $dataObjectFactory
      * @param \TNW\Subscriptions\Model\Config $mpowerConfig
-     * @param \TNW\Subscriptions\Model\Shipping\Manager $shippingManager
+     * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
+     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         EnginePool $enginePool,
@@ -225,8 +237,10 @@ class Manager
         ProfileStatus $profileStatus,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \TNW\Subscriptions\Model\Config $mpowerConfig,
-        \TNW\Subscriptions\Model\Shipping\Free $freeShipping
+        \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
+        QuoteFactory $quoteFactory
     ) {
+        $this->quoteFactory = $quoteFactory;
         $this->freeShipping = $freeShipping;
         $this->mpowerConfig = $mpowerConfig;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
@@ -248,6 +262,27 @@ class Manager
         $this->resourceQueue = $resourceQueue;
         $this->profileStatus = $profileStatus;
         $this->dataObjectFactory = $dataObjectFactory;
+    }
+
+    /**
+     * @param $profile
+     * @param $quote
+     */
+    public function populateTotals($profile, $quote)
+    {
+        $totals = $quote->getTotals();
+        if ($profile->getStatus() == ProfileStatus::STATUS_TRIAL) {
+            $quoteItem = $quote->getItemsCollection()->getFirstItem();
+            $price = $quoteItem->getPrice() * $quoteItem->getQty();
+            $totals['grand_total']->setValue(
+                $totals['grand_total']->getValue() - $totals['subtotal']->getValue() + $price
+            );
+            $totals['subtotal']->setValue($price);
+        }
+
+        foreach ($totals as $total) {
+            $profile->setData($total->getCode(), $total->getValue());
+        }
     }
 
     /**
@@ -357,6 +392,13 @@ class Manager
     public function saveProfile()
     {
         $profile = $this->getProfile();
+        $this->tempQuote = true;
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]])
+            ->assignCustomer($profile->getCustomer());
+        $this->populateQuoteData($quote, $profile, true, true);
+        $this->populateTotals($profile, $quote);
+        $this->tempQuote = false;
+
         $this->subscriptionProfileRepository->save($profile);
 
         $payment = $profile->getPayment()
@@ -767,7 +809,7 @@ class Manager
         $collectQuoteTotals = true,
         $isReBill = false
     ) {
-        if (!$quote->getId()) {
+        if (!$quote->getId() && !$this->tempQuote) {
             throw new LocalizedException(__('Quote not saved'));
         }
 
@@ -837,15 +879,16 @@ class Manager
                     $this->getEngine()->setRebillProcessFlag();
                 }
 
-                //Set payment method
-                $quote->getPayment()
-                    ->importData($this->getEngine()->getPaymentInfo($profile))
-                    ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+                if (!$this->tempQuote) {
+                    //Set payment method
+                    $quote->getPayment()
+                        ->importData($this->getEngine()->getPaymentInfo($profile))
+                        ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
 
-                if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
-                    $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
+                    if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
+                        $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
+                    }
                 }
-
                 if (!$quote->isVirtual()) {
                     $profileShippingAddressData = $profile->getShippingAddress()->getData();
                     unset($profileShippingAddressData['id']);
@@ -865,7 +908,9 @@ class Manager
                     $this->processShippingMethodRate($quote, $profile);
                 }
 
-                $this->quoteRepository->save($quote);
+                if (!$this->tempQuote) {
+                    $this->quoteRepository->save($quote);
+                }
 
                 foreach ($quote->getAllAddresses() as $address) {
                     $address->unsetData('cached_items_all');
