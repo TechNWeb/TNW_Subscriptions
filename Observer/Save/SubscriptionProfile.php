@@ -50,6 +50,12 @@ class SubscriptionProfile implements ObserverInterface
         /** @var \Magento\Quote\Model\Quote $quote */
         $profile = $observer->getData('data_object');
 
+        $profilePayment = $profile->getPayment();
+
+        if ($profilePayment->dataHasChangedFor('payment_additional_info') && $profilePayment->getSentMail() != 0) {
+            $profilePayment->setSentMail(0)->save();
+        }
+
         $quote = $this->quoteGenerator->generateProfileQuote($profile);
 
         $totals = $quote->getTotals();

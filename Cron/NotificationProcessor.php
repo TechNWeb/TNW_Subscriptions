@@ -14,6 +14,7 @@ use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\App\State;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class NotificationProcessor
@@ -141,8 +142,16 @@ class NotificationProcessor
                 } catch (\Exception $e) {
                     $profile = null;
                 }
-                if ($profile && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt(), true)) {
+                if (
+                    $profile
+                    && (
+                        $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                        || $profile->getStatus() == ProfileStatus::STATUS_TRIAL
+                    )
+                    && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt(), true)
+                ) {
                     $this->emailNotifierFactory->create()->cardExpire($profile, $item->getScheduledAt());
+                    $profile->getPayment()->setSentMail(1)->save();
                 }
             }
         }
@@ -190,6 +199,7 @@ class NotificationProcessor
                 )
                 ->addFieldToFilter('engine_code', array('neq' => 'checkmo'))
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
+                ->addFieldToFilter('sent_mail', 0)
                 ->addFieldToSelect('subscription_profile_id');
         } catch (\Exception $e) {
             return false;
