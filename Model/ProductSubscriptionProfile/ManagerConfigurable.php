@@ -346,6 +346,7 @@ class ManagerConfigurable
             unset($requestData['price']);
         }
         return $this->configurableTypeManager
+            ->setProfile($profile)
             ->setOriginalProfileProduct($profileProduct)
             ->getSubscriptionPrice($magentoProduct, $requestData);
     }

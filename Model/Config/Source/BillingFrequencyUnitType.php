@@ -94,7 +94,7 @@ class BillingFrequencyUnitType implements ArrayInterface
      * @param int $frequency
      * @return string
      */
-    public function getPeriodLabel($unit, $frequency)
+    public function  getPeriodLabel($unit, $frequency)
     {
         $label = $this->getLabelByValueAndFrequency($unit, $frequency);
 
