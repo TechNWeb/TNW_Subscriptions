@@ -717,6 +717,12 @@
             <argument name="vaultMethodCode" xsi:type="string">tnw_authorize_cim_vault</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\StripeVault"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Vault">
+        <arguments>
+            <argument name="vaultMethodCode" xsi:type="string">tnw_stripe_vault</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Save\Processor\Pool"
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>
@@ -736,6 +742,14 @@
                 <item name="authorizenet_vault_payment" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AuthorizenetVault</item>
                     <item name="sortOrder" xsi:type="number">17</item>
+                </item>
+                <item name="stripe_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">18</item>
+                </item>
+                <item name="stripe_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">19</item>
                 </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
@@ -772,6 +786,10 @@
                 <item name="tnw_authorize_cim" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
                     <item name="sortOrder" xsi:type="number">45</item>
+                </item>
+                <item name="tnw_stripe" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">55</item>
                 </item>
                 <item name="vault" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault</item>
@@ -924,11 +942,6 @@
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\AuthorizenetFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
-                <item name="free" xsi:type="array">
-                    <item name="code" xsi:type="const">Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE</item>
-                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\FreeFactory</item>
-                    <item name="cc" xsi:type="boolean">false</item>
-                </item>
                 <item name="tnw_stripe" xsi:type="array">
                     <item name="code" xsi:type="string">tnw_stripe</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\StripeFactory</item>
@@ -938,6 +951,11 @@
                     <item name="code" xsi:type="string">tnw_stripe_vault</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\StripeFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
+                </item>
+                <item name="free" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\FreeFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </arguments>
@@ -1231,6 +1249,28 @@
                     <item name="validator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\TransactionResponseValidator</item>
                     <item name="voidValidator" xsi:type="string">TNW\AuthorizeCim\Gateway\Validator\GeneralResponseValidator</item>
                     <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Authorizenet\VoidDataBuilder</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                </item>
+                <item name="tnw_stripe" xsi:type="array">
+                    <item name="factory" xsi:type="string">TNW\Stripe\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Stripe\StripePaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="string">TNW\Stripe\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="string">TNW\Stripe\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Stripe\TokenExtractor</item>
+                    <item name="validator" xsi:type="string">TNW\Stripe\Gateway\Validator\ResponseValidator\Authorize</item>
+                    <item name="voidValidator" xsi:type="string">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
+                    <item name="extendedVoid" xsi:type="boolean">true</item>
+                </item>
+                <item name="tnw_stripe_vault" xsi:type="array">
+                    <item name="factory" xsi:type="string">TNW\Stripe\Gateway\Http\TransferFactory</item>
+                    <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Stripe\StripePaymentDataBuilder</item>
+                    <item name="authClient" xsi:type="string">TNW\Stripe\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="string">TNW\Stripe\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Stripe\TokenExtractor</item>
+                    <item name="validator" xsi:type="string">TNW\Stripe\Gateway\Validator\ResponseValidator\Authorize</item>
+                    <item name="voidValidator" xsi:type="string">TNW\Stripe\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                     <item name="extendedVoid" xsi:type="boolean">true</item>
                 </item>
                 <item name="chcybersource" xsi:type="array">
