@@ -244,27 +244,16 @@ class Manager
     {
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
-        $currentDate = $this->timezone->date()->modfiy('+' . $daysBefore . ' day');
-
+        $searchableDate = strtotime(date('Y-m-d') . " +" . $daysBefore . " day");
         $pendingCondition = implode(' AND ', [
             $connection->prepareSqlCondition('relation.scheduled_at', [
-                'from' => $currentDate->format('Y-m-d 00:00:00'),
-                'to' => $currentDate->format('Y-m-d 23:59:59')
+                'from' => date('Y-m-d 00:00:00', $searchableDate),
+                'to' => date('Y-m-d 23:59:59', $searchableDate)
             ]),
             $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
         ]);
-
-        $otherCondition = implode(' AND ', [
-            $connection->quoteInto('main_table.updated_at <= ?', $this->getAttemptDate()),
-            $connection->quoteInto('main_table.status IN (?)', [
-                QueueStatus::QUEUE_STATUS_ERROR,
-                QueueStatus::QUEUE_STATUS_SKIPPED
-            ]),
-            $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
-        ]);
-
         $collection->getSelect()
-            ->where("($pendingCondition) OR ($otherCondition)")
+            ->where("$pendingCondition")
             ->order('relation.scheduled_at ASC')
             ->group(['main_table.profile_order_id']);
 
