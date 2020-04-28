@@ -399,6 +399,7 @@ class Manager
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
+                                    ->setProfile($profileModel)
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
                                         $product->getMagentoProduct(), $data['item_' . $productId]

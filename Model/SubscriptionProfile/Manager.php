@@ -384,14 +384,18 @@ class Manager
     }
 
     /**
-     * Saves subscription profile.
-     *
      * @return SubscriptionProfileInterface
+     * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
     public function saveProfile()
     {
         $profile = $this->getProfile();
+        $profilePayment = $profile->getPayment();
+        if ($profilePayment->dataHasChangedFor('payment_additional_info') && $profilePayment->getSentMail() != 0) {
+            $profilePayment->setSentMail(0);
+        }
+
         $this->tempQuote = true;
         $quote = $this->quoteFactory->create(['data' => ['is_active' => false]])
             ->assignCustomer($profile->getCustomer());
@@ -979,15 +983,10 @@ class Manager
         return $this;
     }
 
-    /**
-     * Returns request for adding product to subscription quote.
-     *
-     * @param ProductSubscriptionProfileInterface $profileProduct
-     * @param bool $isRebill
-     * @return DataObject
-     */
-    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
-    {
+    protected function getProductAddRequest(
+        ProductSubscriptionProfileInterface $profileProduct,
+        $isRebill = false
+    ) {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
             'qty' => $profileProduct->getQty(),
@@ -1006,8 +1005,16 @@ class Manager
         if (isset($customOptions['info_buyRequest'])) {
             $data = array_replace_recursive($customOptions['info_buyRequest'], $data);
         }
+        if ($this->profile) {
+            $data['billing_frequency'] = $this->profile->getBillingFrequencyId();
+            $data['term'] = $this->profile->getTerm();
+            $data['period'] = $this->profile->getTotalBillingCycles();
+        }
 
-        if ($isRebill) {
+        if (
+            $isRebill
+            && $this->profile->getOrigData('billing_frequency_id') == $this->profile->getData('billing_frequency_id')
+        ) {
             $data['rebill_processing'] = $isRebill;
         }
         return $this->dataObjectFactory->create($data);

@@ -54,6 +54,11 @@ abstract class Base implements TypeInterface
     private $config;
 
     /**
+     * @var null
+     */
+    protected $profile = null;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param PriceCalculator $priceCalculator
@@ -178,7 +183,7 @@ abstract class Base implements TypeInterface
         $rowPrice = false
     ) {
         $productQty  = !empty($productData['qty']) ? $productData['qty'] : 0;
-            $usePresetQty = !empty($productData['use_preset_qty']) && $productQty;
+        $usePresetQty = !empty($productData['use_preset_qty']) && $productQty;
         //Calculate product Price
         $lockProductPriceStatus =
             (bool) $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE);
@@ -191,7 +196,13 @@ abstract class Base implements TypeInterface
         if ($this->profileProduct) {
             $originProfileProductData = $this->profileProduct->getOrigData();
             $originUnitPrice = (float) $originProfileProductData['price'];
-            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE) {
+            $currentProfile = $this->getProfile();
+            if (
+                $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                && $currentProfile
+                && $currentProfile->getOrigData('billing_frequency_id')
+                    == $currentProfile->getData('billing_frequency_id')
+            ) {
                 $price = min($originUnitPrice, $price);
             }
         }
@@ -208,6 +219,24 @@ abstract class Base implements TypeInterface
         }
 
         return $price;
+    }
+
+    /**
+     * @return |null
+     */
+    public function getProfile()
+    {
+        return $this->profile;
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @return $this
+     */
+    public function setProfile($subscriptionProfile)
+    {
+        $this->profile = $subscriptionProfile;
+        return $this;
     }
 
     /**
