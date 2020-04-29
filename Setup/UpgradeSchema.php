@@ -81,10 +81,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.34', '<')) {
             $this->updateItemIdColumnToOrderItemExtAtrTable($setup);
         }
-
-        if (version_compare($context->getVersion(), '2.2.38', '<')) {
-            $this->addCheckSendMailColumn($setup);
-        }
         $setup->endSetup();
     }
 
@@ -615,24 +611,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => $nextPaymentAttribute
                 ]);
         }
-    }
-
-    /**
-     * Add column for check sent mail
-     *
-     * @param SchemaSetupInterface $setup
-     */
-    private function addCheckSendMailColumn(SchemaSetupInterface $setup)
-    {
-        $setup->getConnection()
-            ->addColumn($setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
-                'sent_mail', [
-                'type' => Table::TYPE_BOOLEAN,
-                'nullable' => false,
-                'default' => 0,
-                'comment' => 'sent_mail'
-
-            ]);
     }
 
     /**

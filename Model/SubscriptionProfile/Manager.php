@@ -40,6 +40,7 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
 use Magento\Quote\Model\QuoteFactory;
+use TNW\Subscriptions\Model\Config\Source\FreeShipping;
 
 /**
  * Class Manager
@@ -939,6 +940,7 @@ class Manager
      */
     protected function processShippingMethodRate($quote, $profile)
     {
+        $shippingMethodToSet = $profile->getShippingMethod();
         $shippingMethodAvailable = false;
         $shippingRates = $quote->getShippingAddress()->getAllShippingRates();
         $ratesApplicable = [];
@@ -946,7 +948,7 @@ class Manager
         if ($shippingRates) {
             $cheapestPrice = null;
             foreach ($shippingRates as $rate) {
-                if ($rate->getCode() == $profile->getShippingMethod()) {
+                if ($rate->getCode() == $shippingMethodToSet) {
                     $shippingMethodAvailable = true;
                 }
                 $ratesApplicable[$rate->getCode()] = $rate->getPrice();
@@ -956,37 +958,29 @@ class Manager
                 }
             }
         }
-        if ($shippingMethodAvailable) {
-            $quote->getShippingAddress()->setShippingMethod($profile->getShippingMethod());
-        } else {
-            switch ($this->mpowerConfig->getShippingFallbackStrategy()) {
-                case ShippingFallback::FORCE_PROFILE:
-                    if ($profile->getShippingMethod() == 'freeshipping_freeshipping') {
-                        $quote->getShippingAddress()->addShippingRate($this->freeShipping->getCarrierRate($quote));
+        if (
+            !$shippingMethodAvailable
+            && $this->mpowerConfig->getFreeShippingStrategy() == FreeShipping::HONOR_MAGENTO_VALUE
+            && $shippingMethodToSet == 'freeshipping_freeshipping'
+        ) {
+            $quote->getShippingAddress()->addShippingRate($this->freeShipping->getCarrierRate($quote));
+        } elseif (!$shippingMethodAvailable) {
+            $shippingMethodToSet = $cheapestRate;
+            if ($this->mpowerConfig->getShippingFallbackStrategy() == ShippingFallback::DEFAULT_VALUE) {
+                $defaultShippingMethod = $this->mpowerConfig->getDefaultShippingMethod();
+                if ($defaultShippingMethod) {
+                    if (isset($defaultShippingMethod, $ratesApplicable)) {
+                        $shippingMethodToSet = $defaultShippingMethod;
                     }
-                    $quote->getShippingAddress()->setShippingMethod($profile->getShippingMethod());
-                    break;
-                case ShippingFallback::DEFAULT_VALUE:
-                    $defaultShippingMethod = $this->mpowerConfig->getDefaultShippingMethod();
-                    if ($defaultShippingMethod) {
-                        if (isset($defaultShippingMethod, $ratesApplicable)) {
-                            $quote->getShippingAddress()->setShippingMethod($defaultShippingMethod);
-                        }
-                    }
-                    break;
-                case ShippingFallback::CHEAPEST:
-                    $quote->getShippingAddress()->setShippingMethod($cheapestRate);
-                    break;
-                default: break;
+                }
             }
         }
+        $quote->getShippingAddress()->setShippingMethod($shippingMethodToSet);
         return $this;
     }
 
-    protected function getProductAddRequest(
-        ProductSubscriptionProfileInterface $profileProduct,
-        $isRebill = false
-    ) {
+    protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
+    {
         $data = [
             'custom_price' => $profileProduct->getUnitPrice(),
             'qty' => $profileProduct->getQty(),

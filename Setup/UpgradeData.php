@@ -110,6 +110,11 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '2.2.13', '<')) {
             $this->addHideQtyProductAttributes($eavSetup);
         }
+
+        if (version_compare($context->getVersion(), '2.2.38', '<')) {
+            $this->removeConfigValue($setup, 'tnw_subscriptions_profile_options/general/shipping_fallback');
+        }
+
         $setup->endSetup();
     }
 
@@ -481,5 +486,21 @@ class UpgradeData implements UpgradeDataInterface
                 ]
             );
         }
+    }
+
+    /**
+     * Removes Config Value By Path for each store
+     *
+     * @param ModuleDataSetupInterface $setup
+     * @param $path
+     */
+    protected function removeConfigValue(ModuleDataSetupInterface $setup, $path)
+    {
+        $configTable = $setup->getTable('core_config_data');
+        $connection = $setup->getConnection();
+        $connection->delete(
+            $configTable,
+            $setup->getConnection()->prepareSqlCondition('path', $path)
+        );
     }
 }
