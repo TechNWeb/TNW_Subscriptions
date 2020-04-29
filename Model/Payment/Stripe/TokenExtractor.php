@@ -45,6 +45,13 @@ class TokenExtractor
      */
     private $tokenManagement;
 
+    /**
+     * TokenExtractor constructor.
+     * @param PaymentTokenManagementInterface $tokenManagement
+     * @param CreditCardTokenFactory $creditCardTokenFactory
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
@@ -59,7 +66,6 @@ class TokenExtractor
             );
             $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
             $this->subjectReader = $objectManager->get("TNW\Stripe\Gateway\Helper\SubjectReader");
-            $this->config = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
         }
     }
 
