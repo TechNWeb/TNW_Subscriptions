@@ -4,7 +4,9 @@
     <tbody>
     <tr>
         <td>
-            <?php echo $block->getShippingInfoHtml() ?>
+            <?php if ($block->canShowShippingDetailsBlock()): ?>
+                <?php echo $block->getShippingInfoHtml() ?>
+            <?php endif; ?>
         </td>
         <td>
             <?php if ($block->canShowShippingDetailsBlock()): ?>

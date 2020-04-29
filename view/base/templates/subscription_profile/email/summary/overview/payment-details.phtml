@@ -1,4 +1,8 @@
-<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails $block */ ?>
+<?php
+/* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails $block */
+$profiles = $this->getSubscriptionProfiles();
+$block->setSubscriptionProfile(reset($profiles));
+?>
 <h3><?php echo __("Payment Details") ?></h3>
 <p>
     <strong><?php echo __('Payment Type') ?>:</strong>

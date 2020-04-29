@@ -270,7 +270,7 @@ class EmailNotifier
             }
 
             if ($subscriptionProfiles) {
-                $subscriptionProfile =  array_shift($subscriptionProfiles);
+                $subscriptionProfile =  reset($subscriptionProfiles);
                 $customer = $subscriptionProfile->getCustomer();
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(

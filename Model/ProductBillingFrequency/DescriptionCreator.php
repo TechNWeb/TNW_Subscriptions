@@ -91,25 +91,27 @@ class DescriptionCreator
     public function getDescription(array $subscriptionData)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+        $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
             ? $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
             : __('Free');
-        $frequencyUnit = $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']);
-        $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
+        $formattedPrice = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
+        $frequencyUnit = isset($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) ?
+            $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']): false;
+        $startDate = isset($subscriptionData[CreateProfile::UNIQUE]['start_on']) ?
+            $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']) : false;
 
-        $startDate = $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']);
+        $subscriptionPeriod = $subscriptionData[CreateProfile::UNIQUE]['period'];
 
         if ($isTrial) {
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
                 $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
-            $description[] = __('%1 for %2 and then ', $formattedPrice, $frequencyTrialPeriod);
+            $description[] = __('%1 for %2 and then ', $formattedTotalPrice, $frequencyTrialPeriod);
         } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
-            $description[] = __('%1 initial payment and then ', $formattedPrice);
+            $description[] = __('%1 initial payment and then ', $formattedTotalPrice);
         }
 
-        $description[] = __('%1 / every %2. ',
-            $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice']), $frequencyUnit);
+        $description[] = __('%1 / every %2. ', $formattedPrice, $frequencyUnit);
 
         if (!$subscriptionData[CreateProfile::UNIQUE]['term']) {
             $description[] = __('Total of %1 %2. ',
@@ -122,7 +124,9 @@ class DescriptionCreator
             ? __('can be used')
             : __('will be shipped');
 
-        $description[] = __('Products %1 every %2 starting %3.', $shipOrUse, $frequencyUnit, $startDate);
+        if ($frequencyUnit && $startDate) {
+            $description[] = __('Products %1 every %2 starting %3.', $shipOrUse, $frequencyUnit, $startDate);
+        }
 
         return implode(' ', $description);
     }

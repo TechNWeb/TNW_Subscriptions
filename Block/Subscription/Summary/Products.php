@@ -211,6 +211,9 @@ class Products extends BaseSummary
 
     /**
      * @return string
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getFrequencyDescription()
     {
@@ -243,6 +246,33 @@ class Products extends BaseSummary
                     : 0,
                 'initialFee' => $initialFee > 0,
                 'price' => $price,
+                'isVirtual' => $profile->getIsVirtual(),
+            ]
+        ]);
+    }
+
+    /**
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getProfileFrequencyDescription()
+    {
+        $profile = $this->getSubscriptionProfile();
+        if (!$profile) {
+            return '';
+        }
+
+        return $this->descriptionCreator->getDescription([
+            CreateProfile::UNIQUE => [
+                'is_trial' => false,
+                'billing_frequency' => $profile->getBillingFrequencyId(),
+                'period' => $profile->getTotalBillingCycles(),
+                'term' => $profile->getTerm(),
+            ],
+            CreateProfile::NON_UNIQUE => [
+                'totalPrice' =>  $profile->getGrandTotal(),
+                'initialFee' => false,
+                'price' => $profile->getGrandTotal(),
                 'isVirtual' => $profile->getIsVirtual(),
             ]
         ]);

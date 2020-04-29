@@ -1,5 +1,9 @@
-<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details $block */ ?>
+<?php
+/* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details $block */
+$profiles = $this->getSubscriptionProfiles();
+$block->setSubscriptionProfile(reset($profiles));
+?>
 <h3><?php echo __("Shipping Details") ?></h3>
 <strong><?php echo __("Shipping Method") ?></strong>
 <br>
-<?php echo $block->getShippingDescription() ?>: <?php echo $block->getShippingAmount() ?>
+<?php echo $block->getShippingDescription() ?>
