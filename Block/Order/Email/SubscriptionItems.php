@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Block\Order\Email;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Helper\Image;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
