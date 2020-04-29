@@ -308,7 +308,7 @@ class ManagerConfigurable
                 $request = $this->objectFactory->create($request);
                 foreach ($products as $product) {
                     $price = $this->getSubscriptionItemPrice($request, $profile, $product);
-                    $product->setPrice($price * $request['item_' . $request['subscription_profile_id']]['qty']);
+                    $product->setPrice($price);
                 }
             }
             if (isset($request['item_' . $request['subscription_profile_id']]['start_on'])) {
@@ -346,6 +346,7 @@ class ManagerConfigurable
             unset($requestData['price']);
         }
         return $this->configurableTypeManager
+            ->setProfile($profile)
             ->setOriginalProfileProduct($profileProduct)
             ->getSubscriptionPrice($magentoProduct, $requestData);
     }

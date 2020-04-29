@@ -1,4 +1,8 @@
-<?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */ ?>
+<?php
+/* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */
+$profiles = $this->getSubscriptionProfiles();
+$block->setSubscriptionProfile(reset($profiles));
+?>
 
 <h3><?php echo $block->getAddressTitle() ?></h3>
 <p><?php echo $block->getAddressHtml() ?></p>

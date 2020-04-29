@@ -5,7 +5,7 @@
 "var store_email":"Store Email",
 "var date":"Upcoming Subscription Renewal Date",
 "var customer":"Customer",
-"var subscription":"Subscription Profile",
+"var subscriptions":"Subscription Profiles",
 "layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
 } @-->
 {{template config_path="design/email/header_template"}}
@@ -17,7 +17,7 @@
                 {{trans 'You have an upcoming recurring order on'}} <strong>{{var date}}</strong>
             </p>
             <p>
-                {{trans '<a href="%account_url">Log into your account</a> to make any changes to your recurring profile. You can find it under the My Subscriptions tab after you authenticate.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
+                {{trans '<a href="%account_url">Login to your account</a> to make any changes to your recurring purchase. You can find it under the My Subscriptions tab on your account page.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
             </p>
             <p>
                 {{trans 'If you have questions about your subscription profile, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}
@@ -28,7 +28,7 @@
 <p>
     {{trans 'The next payment will occur on %date.' date=$date}}
 </p>
-{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
+{{layout handle="subscriptions_email_profile_items" subscriptionProfiles=$subscriptions area="frontend"}}
 <p>
     {{trans 'To make changes to your recurring order <a href="%account_url">log into your account</a>' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
 </p>

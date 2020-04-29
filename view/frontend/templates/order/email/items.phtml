@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var $block \TNW\Subscriptions\Block\Order\Email\SubscriptionItems */
+/** @var $tmpBlock \Magento\Framework\View\Element\Template */
+?>
+<?php
+    $_order = $block->getOrder() ;
+    $magentoProduct = $tmpBlock->getItem()->getProduct();
+    $itemOptions = $tmpBlock->getItem()->getProductOptions();
+    $productImages = $magentoProduct->getMediaAttributeValues('thumbnail');
+?>
+<?php if (key_exists('subscription_data', $itemOptions['info_buyRequest'])) : ?>
+    <table>
+        <tr>
+            <td><img class="product-image" src="<?= $block->getImageThumbnail($magentoProduct) ?>"></td>
+            <td class="item-subscription-info">
+                <dt><?php echo __('Billing Frequency') ?></dt>
+                <dd><?php echo $block->getBillingFrequencyLabel($itemOptions['info_buyRequest']['billing_frequency']) ?></dd>
+                <dt><?php echo __('Term') ?></dt>
+                <dd><?php echo $block->getTerm($itemOptions['info_buyRequest']) ?></dd>
+                <dt><?php echo __('Start on') ?></dt>
+                <dd><?php echo date("d M, Y", strtotime($itemOptions['info_buyRequest']['subscription_data']['unique']['start_on'])) ?></dd>
+                <dt><?php echo __('Next payment') ?></dt>
+                <dd><?php echo date("d M, Y", strtotime($block->getNextPayment($itemOptions['info_buyRequest']))) ?></dd>
+            </td>
+        </tr>
+    </table>
+
+<?php else: ?>
+    <table>
+        <tr>
+            <td><img class="product-image" src="<?= $block->getImageThumbnail($magentoProduct) ?>"></td>
+        </tr>
+    </table>
+<?php endif; ?>

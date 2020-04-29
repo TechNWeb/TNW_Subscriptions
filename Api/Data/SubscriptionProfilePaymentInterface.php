@@ -24,6 +24,7 @@ interface SubscriptionProfilePaymentInterface
     const PAYMENT_ADDITIONAL_INFO = 'payment_additional_info';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const SENT_MAIL = 'sent_mail';
 
     /**
      * Gets id.
@@ -144,4 +145,18 @@ interface SubscriptionProfilePaymentInterface
      * @return SubscriptionProfileInterface
      */
     public function getSubscriptionProfile();
+
+    /**
+     * Set sent mail flag
+     *
+     * @return $this
+     */
+    public function setSentMail(bool $flag);
+
+    /**
+     * Get sent mail flag
+     *
+     * @return $this
+     */
+    public function getSentMail();
 }
