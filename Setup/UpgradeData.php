@@ -110,7 +110,6 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '2.2.13', '<')) {
             $this->addHideQtyProductAttributes($eavSetup);
         }
-
         $setup->endSetup();
     }
 

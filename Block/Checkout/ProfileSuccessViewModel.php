@@ -5,52 +5,95 @@
  */
 namespace TNW\Subscriptions\Block\Checkout;
 
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\View\Element\Context;
+use Magento\Framework\Message\ManagerInterface;
+use TNW\Subscriptions\Model\Backend\UrlBuilder;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
+use TNW\Subscriptions\Model\SubscriptionProfileOrderRepository;
+
 class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
     /**
-     * @var \TNW\Subscriptions\Model\Backend\UrlBuilder
+     * @var UrlBuilder
      */
     private $urlBuilder;
 
     /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfileOrderRepository
+     * @var SubscriptionProfileOrderRepository
      */
     private $profileOrderRepo;
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var Session
      */
     private $checkoutSession;
 
     /**
-     * @var \Magento\Framework\Api\FilterBuilder
+     * @var FilterBuilder
      */
     private $filterBuilder;
 
     /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
 
     /**
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \TNW\Subscriptions\Model\Backend\UrlBuilder $urlBuilder
-     * @param \TNW\Subscriptions\Model\SubscriptionProfileOrderRepository $profileOrderRepo
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
+     */
+    private $_localeDate;
+
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+
+    /**
+     * @var Manager
+     */
+    private $profileOrderManager;
+
+    /**
+     * @param Context $context
+     * @param Session $checkoutSession
+     * @param FilterBuilder $filterBuilder
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param UrlBuilder $urlBuilder
+     * @param SubscriptionProfileOrderRepository $profileOrderRepo
+     * @param Manager $profileOrderManager
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\Api\FilterBuilder $filterBuilder,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \TNW\Subscriptions\Model\Backend\UrlBuilder $urlBuilder,
-        \TNW\Subscriptions\Model\SubscriptionProfileOrderRepository $profileOrderRepo
+        Context $context,
+        Session $checkoutSession,
+        FilterBuilder $filterBuilder,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        UrlBuilder $urlBuilder,
+        SubscriptionProfileOrderRepository $profileOrderRepo,
+        Manager $profileOrderManager,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        ManagerInterface $messageManager
     ) {
+        $this->_localeDate = $context->getLocaleDate();
+        $this->messageManager = $messageManager;
         $this->checkoutSession = $checkoutSession;
         $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->urlBuilder = $urlBuilder;
         $this->profileOrderRepo = $profileOrderRepo;
+        $this->profileRepository = $profileRepository;
+        $this->profileOrderManager = $profileOrderManager;
     }
 
     /**
@@ -87,5 +130,21 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
             ->create();
         $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filter])->create();
         return $this->profileOrderRepo->getList($searchCriteria)->getItems();
+    }
+
+    /**
+     * @param $profileId
+     * @return string
+     */
+    public function getNextPaymentDate($profileId)
+    {
+        try{
+            $date = $this->profileOrderManager
+                ->getNextProfileRelation($this->profileRepository->getById($profileId))
+                ->getScheduledAt();
+            return $this->_localeDate->formatDate($date, \IntlDateFormatter::LONG);
+        } catch (NoSuchEntityException $e){
+            $this->messageManager->addExceptionMessage($e);
+        }
     }
 }

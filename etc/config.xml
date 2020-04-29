@@ -37,6 +37,7 @@
                 <payment_failed>tnw_subscriptions_profile_options_emails_payment_failed</payment_failed>
                 <renewal>tnw_subscriptions_profile_options_emails_renewal</renewal>
                 <out_of_stock>tnw_subscriptions_profile_options_emails_out_of_stock</out_of_stock>
+                <confirmation_order>tnw_subscriptions_profile_options_emails_confirmation_order</confirmation_order>
             </emails>
             <notifications>
                 <renewals>1</renewals>

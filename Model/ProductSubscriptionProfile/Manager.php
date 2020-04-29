@@ -399,11 +399,12 @@ class Manager
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
+                                    ->setProfile($profileModel)
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
                                         $product->getMagentoProduct(), $data['item_' . $productId]
                                     );
-                                $product->setPrice($price * $product->getQty(), 4);
+                                $product->setPrice($price, 4);
                             }
                             if (isset($data['item_' . $productId]['start_on'])) {
                                 $startOn = $data['item_' . $productId]['start_on'];
@@ -521,10 +522,11 @@ class Manager
      */
     protected function getProductPrice(Item $item, $zeroPrices, array $buyRequest)
     {
-        $price = isset($buyRequest[Create::UNIQUE]['use_preset_qty'])
-            ? $item->getRowTotal()
-            : $item->getPrice();
-
+        if (isset($buyRequest[Create::UNIQUE]['use_preset_qty']) && $buyRequest[Create::UNIQUE]['use_preset_qty']) {
+            $price = $item->getRowTotal();
+        } else {
+            $price = $item->getPrice();
+        }
         return !$zeroPrices ? $price : 0;
     }
 

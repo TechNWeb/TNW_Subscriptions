@@ -22,7 +22,7 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
     protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
     {
         $block->addData([
-            'subscription_profile' => $this->getSubscriptionProfile()
+            'subscription_profiles' => $this->getSubscriptionProfiles()
         ]);
 
         return $block;
@@ -64,7 +64,13 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function canShowShippingDetailsBlock()
     {
-        return $this->getSubscriptionProfile() ? !(bool)$this->getSubscriptionProfile()->getIsVirtual() : false;
+        $canShow = false;
+        foreach ($this->getSubscriptionProfiles() as $profile) {
+            if (!(bool)$profile->getIsVirtual()) {
+                $canShow = true;
+            }
+        }
+        return $canShow;
     }
 
     /**

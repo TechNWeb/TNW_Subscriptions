@@ -136,6 +136,9 @@
                 type="Magento\Framework\Api\SearchResults"/>
     <preference for="Magento\Catalog\Pricing\Render"
                 type="TNW\Subscriptions\Pricing\Render\FinalPrice" />
+    <preference for="Magento\Sales\Model\Order\Email\Container\OrderIdentity"
+                type="TNW\Subscriptions\Model\Order\Email\Container\OrderIdentity" />
+
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
