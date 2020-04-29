@@ -196,11 +196,16 @@ class Stripe extends Base
     {
         $this->isRebill = true;
     }
-
+    /*public function processProfileByRequestData($requestData)
+    {
+        $this->getProfile()->getPayment()->setPaymentAdditionalInfo('');
+        $this->getProfile()->getPayment()->setTokenHash('');
+        return $this;
+    }*/
     /**
      * @inheritdoc
      * @param $requestData
-     * @return Braintree
+     * @return Stripe
      * @throws PaymentException
      * @throws \Magento\Payment\Gateway\Http\ClientException
      * @throws \Magento\Payment\Gateway\Http\ConverterException
@@ -218,16 +223,15 @@ class Stripe extends Base
 
         /** @var string[] $additionalData */
         $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-
+        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
         $transfer = $this->transferFactory->create([
             'firstName' => $customer->getFirstname(),
             'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $requestData['payment'][$this->getPaymentMethodCode()]['nonce']
+            'email' => $customer->getEmail()
         ]);
 
         $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
+        if ($response['object'] instanceof \Stripe\Error\Card) {
             $errors = [];
             foreach($response->errors->deepAll() AS $error) {
                 $errors[] = "{$error->code}: {$error->message}";
@@ -236,16 +240,16 @@ class Stripe extends Base
             throw new PaymentException(__('Stripe message: %1', implode(', ', $errors)));
         }
 
-        /** @var \Braintree\CreditCard $paymentMethod */
-        $paymentMethod = $response['object']->customer->paymentMethods[0];
-
+        /** @var \Stripe\Card $paymentMethod */
+        //$paymentMethod = $response['object']->customer->paymentMethods[0];
+        //TODO Set actual Stripe Token
         $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentMethod->token)
+            ->setPaymentToken('')
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
-                OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
+                OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],
+                OrderPaymentInterface::CC_EXP_MONTH => $additionalData['cc_exp_month'],
+                OrderPaymentInterface::CC_EXP_YEAR => $additionalData['cc_exp_year'],
             ]);
 
         return $this;

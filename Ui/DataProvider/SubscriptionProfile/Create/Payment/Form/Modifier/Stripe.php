@@ -6,23 +6,21 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Stripe\Model\Ui\ConfigProvider as StripeConfigProvider;
 
 /**
- * Class Authorizenet
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
+ * Stripe payment methods form modifier.
  */
 class Stripe extends Base
 {
-    /**
-     *
-     */
-    const SORT_ORDER = 45;
+    const SORT_ORDER = 25;
 
     /**
      * @var Config
@@ -30,9 +28,14 @@ class Stripe extends Base
     private $paymentConfig;
 
     /**
-     * @var mixed
+     * @var \Magento\Braintree\Gateway\Config\Config
      */
     private $stripeConfig;
+
+    /**
+     * @var StripeAdapterFactory
+     */
+    private $stripeAdapterFactory;
 
     /**
      * @var string
@@ -40,15 +43,14 @@ class Stripe extends Base
     private $clientToken = '';
 
     /**
-     * Authorizenet constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \Magento\Braintree\Gateway\Config\Config $stripeConfig
      * @param Config $paymentConfig
+     * @param StripeAdapterFactory $stripeAdapterFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -56,14 +58,14 @@ class Stripe extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        Config $paymentConfig
+        \TNW\Stripe\Gateway\Config\Config $stripeConfig,
+        Config $paymentConfig,
+        StripeAdapterFactory $stripeAdapterFactory
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-        if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->stripeConfig = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
-        }
+
+        $this->stripeConfig = $stripeConfig;
+        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
     }
 
@@ -72,7 +74,7 @@ class Stripe extends Base
      */
     protected function getPaymentCode()
     {
-        return 'tnw_stripe';
+        return StripeConfigProvider::CODE;
     }
 
     /**
@@ -129,14 +131,7 @@ class Stripe extends Base
                             'sortOrder' => 20,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                            'validation' => [
-                                'required-entry' => true,
-                                'required-number' => true,
-                                'validate-cc-number' => $this->getPaymentCode() . '_cc_type',
-                                'validate-cc-type' => $this->getPaymentCode() . '_cc_type',
-                            ],
-                            'valueUpdate' => 'keyup'
+                            ]
                         ],
                     ],
                 ],
@@ -166,21 +161,13 @@ class Stripe extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Select::NAME,
-                                    'options' => $this->getCcMonths(),
+                                    'formElement' => Form\Element\Input::NAME,
                                     'dataScope' => 'cc_exp_month',
                                     'dataType' => Form\Element\DataType\Text::NAME,
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
-                                    ],
-                                    'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                                    ],
                                 ],
                             ],
                         ],
@@ -191,21 +178,13 @@ class Stripe extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Select::NAME,
-                                    'options' => $this->getCcYears(),
+                                    'formElement' => Form\Element\Input::NAME,
                                     'dataScope' => 'cc_exp_year',
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Form\Element\DataType\Text::NAME,
                                     'sortOrder' => 20,
-                                    'validation' => [
-                                        'required-entry' => true,
-                                        'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
-                                    ],
-                                    'imports' => [
-                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                                    ],
                                 ],
                             ],
                         ],
@@ -232,11 +211,6 @@ class Stripe extends Base
                             'sortOrder' => 40,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                            'validation' => [
-                                'required-number' => true,
-                                'required-entry' => true,
-                                'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
                     ],
@@ -257,11 +231,8 @@ class Stripe extends Base
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
-            'acceptConfig' => [
-                'sdkUrl' => $this->stripeConfig->getSdkUrl(),
-                'apiLoginID' => $this->stripeConfig->getApiLoginId(),
-                'clientKey' => $this->stripeConfig->getClientKey(),
-            ],
+            'sdkUrl' => $this->stripeConfig->getSdkUrl(),
+            'publishableKey' => $this->stripeConfig->getPublishableKey(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->stripeConfig->getAvailableCardTypes(),
@@ -294,7 +265,7 @@ class Stripe extends Base
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
-                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/authorizenet',
+                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',
@@ -321,7 +292,7 @@ class Stripe extends Base
      */
     public function getClientToken()
     {
-        return $this->clientToken;
+        return $this->stripeConfig->getPublishableKey();
     }
 
     /**
@@ -356,48 +327,6 @@ class Stripe extends Base
     }
 
     /**
-     * Retrieves credit card expire months.
-     *
-     * @return array
-     */
-    private function getCcMonths()
-    {
-        $result[] = [
-            'label' =>  __('Month'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getMonths() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => $label
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Retrieves credit card expire years
-     *
-     * @return array
-     */
-    private function getCcYears()
-    {
-        $result[] = [
-            'label' =>  __('Year'),
-            'value' => ''
-        ];
-        foreach ($this->paymentConfig->getYears() as $value => $label) {
-            $result[] = [
-                'value' => $value,
-                'label' => (string)$label
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
      * @inheritdoc
      */
     public function modifyConfigData(array $configData)
@@ -419,7 +348,7 @@ class Stripe extends Base
      */
     private function hasVerification()
     {
-        return $this->stripeConfig->isCcvEnabled();
+        return $this->stripeConfig->isCvvEnabled();
     }
 
     /**
