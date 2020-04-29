@@ -515,7 +515,7 @@ class Subscribe extends View
                 'product_price' => $this->getProduct()->getFinalPrice(),
                 'frequency_data' => $this->getChildProductBillingFrequencies($productData),
                 'trial_data' => $this->getTrialDataByProduct($productData),
-                'recurring_settings' => $this->getRecurringSettingsByProduct($productData),
+                'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
                 'preconfigured' => $preconfiguredValues
             ]
         ];
@@ -544,7 +544,7 @@ class Subscribe extends View
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
-                        $productDataObject
+                        $childProduct
                     );
                 }
 
@@ -559,10 +559,10 @@ class Subscribe extends View
 
     /**
      * Returns array of recurring settings used on product page for child products
-     * @param DataObject $productDataObject
+     * @param $product
      * @return array
      */
-    protected function getRecurringSettingsByProduct(DataObject $productDataObject)
+    protected function getRecurringSettingsByProduct($product)
     {
         $attributesMap = [
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
@@ -573,8 +573,13 @@ class Subscribe extends View
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         ];
         $result = [];
-        foreach ($productDataObject->getData() as $key => $attribute) {
+        foreach ($product->getData() as $key => $attribute) {
             if (in_array($key, $attributesMap)) {
+                if ($key == Attribute::SUBSCRIPTION_SAVINGS_CALCULATION) {
+                    $result[substr($key, 11)] = $this->savingsCalculation
+                        ->getSavingsCalculationType($product);
+                    continue;
+                }
                 $result[substr($key, 11)] = $attribute;
             }
         }

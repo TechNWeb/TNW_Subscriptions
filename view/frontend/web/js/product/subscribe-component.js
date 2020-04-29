@@ -3,13 +3,15 @@ define([
     'underscore',
     'mage/translate',
     'jquery',
-    'mage/calendar'
-], function (Element, _, $t, $, calendar) {
+    'mage/calendar',
+    'Magento_Catalog/js/price-utils'
+], function (Element, _, $t, $, calendar, utils) {
     return Element.extend({
         defaults: {
             currentProduct: undefined,
             selectedFrequency: null,
             scheduleDateInputVisible: false,
+            recurringQty: null,
             superAttributeSelectClass: '.super-attribute-select',
             selectedProductInput: '[name=selected_configurable_option]',
             swatchSelector: '#product-options-wrapper .swatch-attribute',
@@ -18,9 +20,12 @@ define([
             infoPriceContainer: '.product-info-price',
             subsPriceBox: '.price-box.price-subscription_price',
             priceBox: '.price-box.price-final_price',
+            altPriceBox: '.onetime-final-price',
+            onetimeFields: '#product-addtocart-button, #qty',
             tracks: {
                 currentProduct: true,
                 selectedFrequency: true,
+                recurringQty: true,
                 scheduleDateInputVisible: true
             },
             template: 'TNW_Subscriptions/product/subscribe-component'
@@ -38,7 +43,8 @@ define([
                 this.setDefaultFrequency();
             }
             this.bindEvents();
-            this.updatePriceBox();
+            this.togglePriceBoxes();
+            this.getFrequencyLabel = this.getFrequencyLabel.bind(this);
         },
 
         bindEvents: function () {
@@ -46,20 +52,37 @@ define([
             $(this.superAttributeSelectClass).on('change', function () {
                 var productId = self.getSelectedProductId();
                 self.setCurrentProduct(productId);
-                self.updatePriceBox();
                 self.setupCalendar();
+                self.togglePriceBoxes();
             });
-            $(this.purchaseTypeRadio).on('change', function (event) {
-                var subsActive = $(event.target).val();
-                $(self.activeInputSelector).val(subsActive);
-                if (subsActive === '1') {
-                    $(self.subsPriceBox).show();
-                    $(self.priceBox).hide();
-                } else {
-                    $(self.subsPriceBox).hide();
-                    $(self.priceBox).show();
-                }
-            });
+
+            $(this.purchaseTypeRadio).on('change', this.togglePriceBoxes.bind(this));
+        },
+
+        togglePriceBoxes: function () {
+            var selectedPurchaseType = $(this.purchaseTypeRadio + ':checked').val(),
+                priceWidget = $('.product-info-price').data('mageTnwSubscribePrice');
+
+            if (priceWidget) {
+                priceWidget._insertPriseBox(this.selectedFrequency, this.getSelectedProductId());
+            }
+            $(this.activeInputSelector).val(selectedPurchaseType);
+            if (selectedPurchaseType === '1') {
+                $(this.subsPriceBox).show();
+                $(this.priceBox).hide();
+            } else {
+                $(this.subsPriceBox).hide();
+                $(this.priceBox).show();
+            }
+
+            if (this.oneTimePurchaseAllowed()) {
+                $(this.altPriceBox).html($(this.priceBox).html());
+                $(this.onetimeFields).removeAttr('disabled');
+            } else {
+                $(this.priceBox).hide();
+                $(this.altPriceBox).html($t('There is no one time purchase available for this option'));
+                $(this.onetimeFields).attr('disabled', 'disabled');
+            }
         },
 
         getSelectedProductId: function () {
@@ -104,6 +127,7 @@ define([
                 this.selectedFrequency = null;
                 return false;
             }
+
             this.currentProduct = this.products.children[productId];
             this.setDefaultFrequency();
         },
@@ -112,6 +136,8 @@ define([
             var defaultOption = _.findWhere(this.currentProduct.frequency_data, {'is_default': '1'});
             if (defaultOption) {
                 this.selectedFrequency = defaultOption.value;
+            } else {
+                this.selectedFrequency = this.currentProduct.frequency_data[0].value;
             }
         },
 
@@ -127,28 +153,69 @@ define([
             return options;
         },
 
+        getSavingsCalculation: function (option) {
+            var type = this.get('currentProduct.recurring_settings.savings_calculation'),
+                price = this.get('currentProduct.product_price'),
+                recurringPrice = parseFloat(option.price),
+                unitType = option.frequency_unit_type,
+                frequencyUnit = parseInt(option.frequency_unit),
+                qty = option.preset_qty ? option.preset_qty : this.recurringQty,
+                saveString = $t(' %p (SAVE ~%s%)'),
+                saving,
+                priceWithSaving;
+
+            if (type === 2) {
+                //formula for service
+                if (unitType === '5') {
+                    frequencyUnit *= 30;
+                }
+                saving = ((price * frequencyUnit - recurringPrice) * qty * 100)
+                    / (price * frequencyUnit);
+            } else if (type === 1) {
+                //formula for any retail / physical product with preset qty
+                saving = ((price * qty - recurringPrice) * 100)
+                    / (price * qty);
+            } else {
+                //formula for any retail / physical product
+                saving = ((price - recurringPrice) * qty * 100) / price;
+            }
+            saving = parseInt(saving);
+            if (saving > 0) {
+                priceWithSaving = saveString
+                .replace('%p', utils.formatPrice(recurringPrice, {}, false))
+                .replace('%s', saving);
+            } else {
+                priceWithSaving = ' ' + utils.formatPrice(recurringPrice, {}, false);
+            }
+            return priceWithSaving;
+        },
+
         getFrequencyLabel: function (option) {
             var label = '';
             if (option && option.label) {
                 label = option.is_default === '1' ? option.label + $t(' (most common)') : option.label;
             }
-            return label;
-        },
-
-        updatePriceBox: function () {
-            var priceWidget = $('.product-info-price').data('mageTnwSubscribePrice');
-            if (priceWidget) {
-                priceWidget._insertPriseBox(this.selectedFrequency, this.getSelectedProductId());
+            if (this.getSavingsCalculation(option)) {
+                label += this.getSavingsCalculation(option);
             }
+            return label;
         },
 
         frequencyChanged: function (self, event) {
             this.selectedFrequency = $(event.target).val();
-            this.updatePriceBox();
+            this.togglePriceBoxes();
+        },
+
+        qtyChanged: function (self, event) {
+            this.recurringQty = $(event.target).val();
         },
 
         isInfinite: function () {
             return  !!parseInt(this.get('currentProduct.recurring_settings.inf_subscriptions'));
+        },
+
+        oneTimePurchaseAllowed: function () {
+            return this.get('currentProduct.recurring_settings.purchase_type') !== '2';
         },
 
         getDefaultUntilCancelled: function () {

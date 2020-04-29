@@ -25,7 +25,6 @@ define([
          */
         _insertPriseBox: function (optionIndex, selectedProduct) {
             var priceHtml,
-                altHtml = '',
                 productId;
 
             // If simple
@@ -34,20 +33,20 @@ define([
                     return;
                 }
                 priceHtml = this.options.subscriptionPricesData[optionIndex];
-                // If configurable
+            // If configurable
             } else {
                 if (selectedProduct && !!optionIndex) {
-                    altHtml = priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
+                    priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
                 } else if (selectedProduct && !optionIndex) {
                     priceHtml = $t('There is no subscription available for this option');
                 } else {
                     productId = _.toArray(this.options.subscriptionPricesData['default']).slice(0, 1);
-                    altHtml = priceHtml = _.toArray(this.options.subscriptionPricesData[productId]).slice(0, 1);
+                    priceHtml = _.toArray(this.options.subscriptionPricesData[productId]).slice(0, 1);
                 }
             }
 
             $(this.options.subscriptionPriceContainerSelector).html(priceHtml);
-            $(this.options.alternativeContainerSelector).html(altHtml);
+            $(this.options.alternativeContainerSelector).html(priceHtml);
         }
     });
     return $.mage.tnwSubscribePrice;

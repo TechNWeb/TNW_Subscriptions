@@ -7,9 +7,6 @@
 <div class="fieldset" data-bind="visible: !currentProduct">
     <span translate="'Please select options'"/>
 </div>
-<div class="fieldset" data-bind="visible: (currentProduct && !currentProduct.frequency_data)">
-    <span translate="'There is no subscription available for this option'"/>
-</div>
 <div class="fieldset" data-bind="visible: (currentProduct && currentProduct.frequency_data)">
     <div class="field required">
         <label class="label"><span translate="'Billing Frequency'"/>:</label>
@@ -95,7 +92,8 @@
                         attr: {
                             readonly: getIsQtyPreset()
                         },
-                        value: getDefaultSubscribeQty()"
+                        value: getDefaultSubscribeQty(),
+                        event: { change: qtyChanged }"
                 />
             </div>
         </div>
