@@ -15,6 +15,8 @@ use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\App\State;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
  * Class NotificationProcessor
@@ -67,17 +69,10 @@ class NotificationProcessor
      */
     private $paymentFactory;
 
-    /**
-     * NotificationProcessor constructor.
-     * @param EmailNotifierFactory $emailNotifierFactory
-     * @param ScopeConfigInterface $scopeConfig
-     * @param CollectionFactory $subscriptionProfileFactory
-     * @param TimezoneInterface $timezone
-     * @param ProfileCcUtilsFactory $ccUtilsFactory
-     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
-     * @param State $appState
-     * @param Payment $paymentFactory
-     */
+    private $queueManager;
+
+    private $processor;
+
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
@@ -86,8 +81,12 @@ class NotificationProcessor
         ProfileCcUtilsFactory $ccUtilsFactory,
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         State $appState,
-        Payment $paymentFactory
+        Payment $paymentFactory,
+        Manager $queueManager,
+        ProfileProcessor $processor
     ) {
+        $this->processor = $processor;
+        $this->queueManager = $queueManager;
         $this->appState = $appState;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->ccUtilsFactory = $ccUtilsFactory;
@@ -117,14 +116,19 @@ class NotificationProcessor
      */
     public function sendRenewalNotifications()
     {
-        $dayModifier = '+'
-            . $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
-            . ' day';
-        $orderCollection = $this->getFutureOrderCollection($dayModifier);
-        foreach ($orderCollection->getItems() as $item) {
+        $collectionToday = $this->queueManager->getCollectionForDate(
+            $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
+        );
+        foreach ($this->processor->groupedQueue($collectionToday->getItems()) as $groupQueue) {
+            $profileIds = [];
+            $scheduledAt = '';
+            foreach ($groupQueue as $queue) {
+                $profileIds[] = $queue->getData('subscription_profile_id');
+                $scheduledAt =  $queue->getData('scheduled_at');
+            }
             $this->emailNotifierFactory->create()->renewal(
-                $item->getSubscriptionProfileId(),
-                $item->getScheduledAt()
+                $profileIds,
+                $scheduledAt
             );
         }
     }
