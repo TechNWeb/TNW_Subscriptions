@@ -19,7 +19,7 @@
                     "recurringAddToCart": {
                         "component": "TNW_Subscriptions/js/product/subscribe-component",
                         "config": {
-                            "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
+                            "buttonLabel" : "<?php echo $block->escapeHtml(__('Subscribe')) ?>",
                             "qtyValidators": "<?php echo $block->escapeHtml(json_encode($block->getQtyValidators())) ?>",
                             "dateFormat": "<?php echo $block->getDateFormat() ?>",
                             "minStartOn" : "<?php echo $block->getMinStartOn() ?>",

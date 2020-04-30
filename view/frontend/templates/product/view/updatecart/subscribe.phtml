@@ -8,174 +8,32 @@
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
-    <div class="fieldset">
-        <div class="field required">
-            <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
-            <div class="control">
-                <div class="options-list nested">
-                    <select name="billing_frequency"
-                            id="billing_frequency"
-                            class="required">
-                        <?php foreach ($block->getFrequencyOptions() as $option): ?>
-                            <option id="billing_frequency_<?php echo $option['value'] ?>"
-                                    value="<?php echo $option['value'] ?>"
-                                <?php if ($option['is_default']): ?>
-                                    selected
-                                <?php endif ?>
-                                <?php if (isset($option['preset_qty'])): ?>
-                                    data-preset-qty="<?php echo $option['preset_qty'] * 1 ?>"
-                                <?php endif ?>
-                                <?php if (isset($option['frequency_unit'])): ?>
-                                    data-frequency-unit="<?php echo $option['frequency_unit'] * 1 ?>"
-                                <?php endif ?>
-                                <?php if (isset($option['frequency_unit_type'])): ?>
-                                    data-frequency-unit-type="<?php echo $option['frequency_unit_type'] * 1 ?>"
-                                <?php endif ?>
-                                    data-default-label="<?php echo $option['label'] ?>"
-                            >
-                                <?php echo $option['label'] ?>
-                            </option>
-                        <?php endforeach ?>
-                    </select>
-                </div>
-            </div>
-        </div>
+    <div id="subscribe-container" data-bind="scope: 'recurringAddToCart'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
     </div>
-    <div class="fieldset">
-        <div class="field term required">
-            <label class="label"><span><?php echo __('Term') ?>:</span></label>
-            <div class="control">
-                <?php if ($block->getIsInfiniteSubscriptions()): ?>
-                    <span><?php echo __('Until canceled') ?></span>
-                    <input type="hidden"
-                           name="term"
-                           class="input-text qty"
-                           data-validate='{"required-number":true}'
-                           value="1"
-                           checked="checked"
-                    >
-                    <input type="hidden"
-                           name="period"
-                           id="period"
-                           class="input-text qty"
-                           data-validate='{"required-number":true}'
-                           value="<?php echo $block->getDefaultPeriod() ?>"
-                    >
-                <?php else: ?>
-                    <div>
-                        <input type="radio" id="term1" name="term" value="1"
-                            <?php if ($block->getDefaultUntilCancelled()): ?>
-                                checked="checked"
-                            <?php endif ?>
-                        />
-                        <label class="label" for="term1">
-                            <span><?php echo __('Until canceled') ?></span>
-                        </label>
-                    </div>
-                    <div>
-                        <input type="radio" id="term0" name="term" value="0"
-                            <?php if (!$block->getDefaultUntilCancelled()): ?>
-                                checked="checked"
-                            <?php endif ?>
-                        />
-                        <label class="label" for="term0">
-                            <span><?php echo __('Stop after') ?></span>
-                            <input type="number"
-                                   name="period"
-                                   id="period"
-                                   class="input-text qty"
-                                   data-validate='{
-                                   "required-number":true,
-                                   "min": <?php echo $block->getDefaultPeriod() ?>
-                                   }'
-                                   value="<?php echo $block->getDefaultPeriod() ?>"
-                            >
-                            <span><?php echo __('payment(s)') ?></span>
-                        </label>
-                    </div>
-                <?php endif;?>
-            </div>
-        </div>
-    </div>
-    <?php if ($block->getIsVisibleStartOn()): ?>
-        <div class="fieldset">
-            <div class="field date required">
-                <label class="label"><span><?php echo __('Delivery Schedule') ?>:</span></label>
-                <div class="control delivery-schedule">
-                    <span><?php echo __('First delivery on'); ?></span>
-                    <span class="delivery-schedule-date"></span>
-                    <input type="hidden" name="start_on_alt" id="start_on_alt"/>
-                    <a href="#" class="action change-delivery-date"><?php echo __('change') ?></a>
-                    <span class="start-on-wrapper hidden">
-                    <input type="text"
-                           name="start_on"
-                           id="start_at"
-                           class="required"
-                           value="<?php echo $block->getDefaultStartOn() ?>"
-                    />
-                    <a href="#" class="action update-delivery-date"><?php echo __('Update') ?></a>
-                </span>
-                </div>
-            </div>
-        </div>
-    <?php endif ?>
-    <div class="fieldset <?php if (!$block->getAllowDisplaySubscribeQty()): ?>
-         hidden
-    <?php endif; ?>">
-        <div class="field required">
-            <label class="label" for="subscribe_qty"><span><?php echo __('Qty') ?>:</span></label>
-            <div class="control">
-                <input type="number"
-                       name="subscribe_qty"
-                       id="subscribe_qty"
-                       maxlength="12"
-                       value="<?php /* @escapeNotVerified */ echo $block->getDefaultSubscribeQty() * 1 ?>"
-                       title="<?php /* @escapeNotVerified */ echo __('Qty') ?>"
-                       class="input-text qty"
-                       data-validate='<?php echo $block->escapeHtml(\json_encode($block->getQtyValidators())) ?>'
-                    <?php if (!$block->getAllowEditSubscribeQty()): ?>
-                        readonly="readonly"
-                    <?php endif ?>
-                />
-            </div>
-        </div>
-    </div>
-    <button type="submit"
-            id="product-subscribe-button"
-            title="<?php /* @escapeNotVerified */ echo __('Modify Cart') ?>"
-            class="action primary tocart">
-        <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Modify Cart') ?></span>
-    </button>
-</div>
-<script type="text/x-magento-init">
+    <script type="text/x-magento-init">
     {
-        "#product_addtocart_form": {
-            "tnwSubscribeContainer": {
-                "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
-                "canShowSubscribePriceBlock" : true,
-                "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
-                "product" : <?php echo $block->getProductDataArray() ?>
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "recurringAddToCart": {
+                        "component": "TNW_Subscriptions/js/product/subscribe-component",
+                        "config": {
+                            "defaultFrequency" : "<?php echo $block->getDefaultFrequency() ?>",
+                            "buttonLabel" : "<?php echo $block->escapeHtml(__('Update cart')) ?>",
+                            "qtyValidators": "<?php echo $block->escapeHtml(json_encode($block->getQtyValidators())) ?>",
+                            "dateFormat": "<?php echo $block->getDateFormat() ?>",
+                            "minStartOn" : "<?php echo $block->getMinStartOn() ?>",
+                            "defaultPeriod" : "<?php echo $block->getDefaultPeriod() ?>",
+                            "defaultUntilCancelled" : "<?php echo $block->getDefaultUntilCancelled() ?>",
+                            "defaultSubscribeQty" : "<?php echo $block->getDefaultSubscribeQty() ?>",
+                            "defaultStartOn" : "<?php echo $block->getDefaultStartOn() ?>",
+                            "products" : <?php echo $block->getProductDataArray() ?>
+                        }
+                    }
+                }
             }
         }
     }
-</script>
-<?php if ($block->getIsVisibleStartOn()): ?>
-    <script type="text/javascript">
-        require([
-            "jquery",
-            "mage/calendar"
-        ], function($) {
-            $("#start_at").calendar({
-                showsTime: false,
-                dateFormat: "<?php echo $block->getDateFormat() ?>",
-                buttonImage: "<?php echo $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
-                buttonText: "<?php echo __('Select Date') ?>",
-                showOn: 'both',
-                minDate: "<?php echo $block->getMinStartOn() ?>",
-                altField: "#start_on_alt",
-                altFormat: "MM dd"
-            }).datepicker('setDate', '<?php echo $block->getDefaultStartOn() ?>');
-            $('.delivery-schedule-date').html($('#start_on_alt').val());
-        });
     </script>
-<?php endif ?>
+</div>

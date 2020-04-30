@@ -39,7 +39,7 @@
                     </label>
                 </div>
                 <div data-bind="visible: !isInfinite()">
-                    <input type="radio" id="term0" name="term" value="0"/>
+                    <input type="radio" id="term0" name="term" value="0" ko-checked="getDefaultUntilCancelled()"/>
                     <label class="label" for="term0">
                         <span translate="'Stop after'"/>
                         <input type="number"
@@ -99,6 +99,6 @@
         </div>
     </div>
     <button type="submit" id="product-subscribe-button" class="action primary tocart">
-        <span data-role="button-text" translate="'Subscribe'"/>
+        <span data-role="button-text" text="buttonLabel"/>
     </button>
 </div>

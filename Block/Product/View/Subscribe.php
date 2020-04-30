@@ -346,6 +346,11 @@ class Subscribe extends View
         return $this->savingsCalculation->getSavingsCalculationType($this->getProduct());
     }
 
+    public function getDefaultFrequency()
+    {
+        return $this->preconfiguredValue('subscription_data/unique/billing_frequency');
+    }
+
     /**
      * Get default value for Subscribe Qty
      *

@@ -9,11 +9,16 @@ define([
     return Element.extend({
         defaults: {
             currentProduct: undefined,
+            defaultFrequency: false,
+            defaultSubscribeQty: 1,
             selectedFrequency: null,
             scheduleDateInputVisible: false,
             recurringQty: null,
             superAttributeSelectClass: '.super-attribute-select',
             selectedProductInput: '[name=selected_configurable_option]',
+            swatchWidgetSelector : '.swatch-opt',
+            swatchWidgetName : 'mageSwatchRenderer',
+            swatchWidgetInitEvent : 'swatch.initialized',
             swatchSelector: '#product-options-wrapper .swatch-attribute',
             purchaseTypeRadio: '[name=addtocart_type]',
             activeInputSelector: 'input[name=subscribe_active]',
@@ -33,7 +38,18 @@ define([
 
 
         initialize: function () {
+            var self = this;
             this._super();
+            this.getFrequencyLabel = this.getFrequencyLabel.bind(this);
+
+            function initializePreselected() {
+                if (self.getSelectedProductId()) {
+                    self.setCurrentProduct(self.getSelectedProductId());
+                }
+                self.bindEvents();
+                self.togglePriceBoxes();
+            }
+
             if (
                 this.products.type === 'simple' ||
                 this.products.type === 'virtual' ||
@@ -41,10 +57,14 @@ define([
             ) {
                 this.currentProduct = this.products.product;
                 this.setDefaultFrequency();
+                initializePreselected();
+            } else if (this.products.type === 'configurable'){
+                if ($(this.swatchWidgetSelector).data(this.swatchWidgetName)) {
+                    initializePreselected();
+                } else {
+                    $(this.swatchWidgetSelector).on(this.swatchWidgetInitEvent, initializePreselected.bind(self));
+                }
             }
-            this.bindEvents();
-            this.togglePriceBoxes();
-            this.getFrequencyLabel = this.getFrequencyLabel.bind(this);
         },
 
         bindEvents: function () {
@@ -134,6 +154,10 @@ define([
 
         setDefaultFrequency: function () {
             var defaultOption = _.findWhere(this.currentProduct.frequency_data, {'is_default': '1'});
+            if (this.defaultFrequency) {
+                this.selectedFrequency = this.defaultFrequency;
+                return;
+            }
             if (defaultOption) {
                 this.selectedFrequency = defaultOption.value;
             } else {
@@ -269,7 +293,7 @@ define([
                 }
                 return _.indexBy(this.getFrequencyOptions(), 'is_default')['1']['preset_qty'] * 1;
             }
-            return 1;
+            return this.defaultSubscribeQty;
         },
 
         manageStartOn: function () {
