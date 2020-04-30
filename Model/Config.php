@@ -39,9 +39,10 @@ class Config
     /**#@+
      * Config xml path for general profile options section
      */
-    private $xmlPricingStartegy = 'tnw_subscriptions_profile_options/general/product_price_strategy';
+    private $xmlPricingStrategy = 'tnw_subscriptions_profile_options/general/product_price_strategy';
     private $xmlDefaultShipping = 'tnw_subscriptions_profile_options/general/default_shipping';
     private $xmlShippingFallback = 'tnw_subscriptions_profile_options/general/shipping_fallback';
+    private $xmlFreeShipping = 'tnw_subscriptions_profile_options/general/free_shipping';
     /**#@-*/
 
     /**#@+
@@ -131,6 +132,16 @@ class Config
     }
 
     /**
+     * Get the free shipping method strategy config
+     *
+     * @return mixed
+     */
+    public function getFreeShippingStrategy()
+    {
+        return $this->scopeConfig->getValue($this->xmlFreeShipping);
+    }
+
+    /**
      * Get the default shipping method if current is not available
      *
      * @return mixed
@@ -186,7 +197,7 @@ class Config
      */
     public function getPricingStrategy()
     {
-        return $this->scopeConfig->getValue($this->xmlPricingStartegy);
+        return $this->scopeConfig->getValue($this->xmlPricingStrategy);
     }
 
     /**

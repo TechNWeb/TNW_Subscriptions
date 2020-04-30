@@ -81,10 +81,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.34', '<')) {
             $this->updateItemIdColumnToOrderItemExtAtrTable($setup);
         }
-
-        if (version_compare($context->getVersion(), '2.2.38', '<')) {
-            $this->addCheckSendMailColumn($setup);
-        }
         $setup->endSetup();
     }
 
