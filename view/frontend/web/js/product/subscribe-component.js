@@ -137,7 +137,9 @@ define([
             if (defaultOption) {
                 this.selectedFrequency = defaultOption.value;
             } else {
-                this.selectedFrequency = this.currentProduct.frequency_data[0].value;
+                this.selectedFrequency = this.get('currentProduct.frequency_data') ?
+                    this.get('currentProduct.frequency_data.0.value') :
+                    false;
             }
         },
 
@@ -151,6 +153,22 @@ define([
                 }
             }, this);
             return options;
+        },
+
+        getTrialLabel: function (option) {
+            var trialData = this.get('currentProduct.trial_data'),
+                trialLabelString = $t(', try for %p %u%p'),
+                trialPrice = $t(' FREE');
+            if (trialData) {
+                trialPrice = trialData.trial_price
+                    ? $t(', starting at ') + utils.formatPrice(trialData.trial_price, {}, false)
+                    : trialPrice;
+                return trialLabelString
+                .replace('%p', trialData.trial_length)
+                .replace('%u', trialData.trial_label)
+                .replace('%p', trialPrice)
+            }
+            return false;
         },
 
         getSavingsCalculation: function (option) {
@@ -191,12 +209,16 @@ define([
         },
 
         getFrequencyLabel: function (option) {
-            var label = '';
+            var label = '',
+                trialLabel = this.getTrialLabel(option),
+                savingsLabel = this.getSavingsCalculation(option);
             if (option && option.label) {
                 label = option.is_default === '1' ? option.label + $t(' (most common)') : option.label;
             }
-            if (this.getSavingsCalculation(option)) {
-                label += this.getSavingsCalculation(option);
+            if (trialLabel) {
+                label += trialLabel;
+            } else if (savingsLabel) {
+                label += savingsLabel;
             }
             return label;
         },
