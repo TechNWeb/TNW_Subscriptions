@@ -192,8 +192,37 @@ class Manager
      */
     private $tempQuote = false;
 
+    /**
+     * @var Quote\TotalsCollector
+     */
     private $totalsCollector;
 
+    /**
+     * Manager constructor.
+     * @param EnginePool $enginePool
+     * @param SubscriptionProfileRepository $subscriptionProfileRepository
+     * @param PaymentRepository $paymentRepository
+     * @param SubscriptionProfileFactory $subscriptionProfileFactory
+     * @param BillingFrequencyRepositoryInterface $frequencyRepository
+     * @param DataObjectHelper $dataObjectHelper
+     * @param AddressFactory $profileAddressFactory
+     * @param ProductManager $productManager
+     * @param OrderRelationManager $orderRelationManager
+     * @param RequestInterface $request
+     * @param CartRepositoryInterface $quoteRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ShippingMethods $shippingMethods
+     * @param MessageHistoryLogger $historyLogger
+     * @param ScopeConfigInterface $scopeConfig
+     * @param PaymentConfig $paymentConfig
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param ProfileStatus $profileStatus
+     * @param DataObject\Factory $dataObjectFactory
+     * @param \TNW\Subscriptions\Model\Config $mpowerConfig
+     * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
+     * @param QuoteFactory $quoteFactory
+     * @param Quote\TotalsCollector $totalsCollector
+     */
     public function __construct(
         EnginePool $enginePool,
         SubscriptionProfileRepository $subscriptionProfileRepository,
@@ -958,6 +987,11 @@ class Manager
         return $this;
     }
 
+    /**
+     * @param ProductSubscriptionProfileInterface $profileProduct
+     * @param bool $isRebill
+     * @return DataObject
+     */
     protected function getProductAddRequest(ProductSubscriptionProfileInterface $profileProduct, $isRebill = false)
     {
         $data = [
