@@ -21,7 +21,6 @@ define([
                 publishableKey: null
             },
             stripeClient: null,
-            hostedFieldsInstance: null,
             grandTotal: null,
             selectedCardType: null,
             selector: 'co-transparent-form-stripe',
@@ -35,7 +34,7 @@ define([
             },
             useCvv: true,
             links: {
-                selectedCardType: 'dataContainer = stripe-cc-type:value'
+                selectedCardType: 'dataContainer = tnw_stripe-cc-type:value'
             }
         },
 
@@ -61,16 +60,16 @@ define([
          * @return void
          */
         changeVisibility: function(checkBoxChecked) {
+            var self = this;
             if (checkBoxChecked && !this.clientToken) {
                 this.processErrors([$t('This payment is not available')]);
                 return;
             }
 
             if (checkBoxChecked && !this.scriptLoaded()) {
-                this.loadScript();
+                //this.loadScript();
             }
         },
-
         /**
          * Before submit action for payment method.
          * @return void
@@ -78,7 +77,8 @@ define([
         beforeSubmit: function () {
             var self = this;
             $('body').trigger('processStart');
-            var form = registry.get('index = '+self.options.formName);
+
+            /*var form = registry.get('index = '+self.options.formName);
             console.log(self.options.formName);
             self.source.set(
                 self.dataScope+'.cc_last_4',
@@ -87,24 +87,24 @@ define([
             self.source.set(self.dataScope+'.additional.cc_number', 'XXXX');
             self.source.set(self.dataScope+'.additional.cc_cid', 'XXX');
             $('body').trigger('processStop');
-            form.triggerSave([]);
+            form.triggerSave([]);*/
             //TODO Actually run validation through Stripe Api
-            /*this.validate()
-                .done(function (opaqueData) {
+            this.validate()
+                .done(function (result) {
                     var form = registry.get('index = '+self.options.formName);
-                    self.source.set(
+                    /*self.source.set(
                         self.dataScope+'.cc_last_4',
                         self.source.get(self.dataScope+'.additional.cc_number').substr(-4)
                     );
                     self.source.set(self.dataScope+'.additional.cc_number', 'XXXX');
-                    self.source.set(self.dataScope+'.additional.cc_cid', 'XXX');
+                    self.source.set(self.dataScope+'.additional.cc_cid', 'XXX');*/
                     $('body').trigger('processStop');
                     form.triggerSave([]);
                 })
                 .fail(function (errors) {
                     $('body').trigger('processStop');
                     self.set('payment_errors', [errors]);
-                });*/
+                });
         },
 
         /**
@@ -112,20 +112,23 @@ define([
          * @return void
          */
         loadScript: function () {
+            console.log('script loaded');
             var self = this,
                 state = self.scriptLoaded;
 
             self.showLoader();
-            $('body').trigger('processStart');
+            //$('body').trigger('processStart');
             require([this.sdkUrl], function (stripeClient) {
                 state(true);
-                self.stripe.client = stripeClient;
-                self.stripe.publishableKey = window.Stripe(self.publishableKey);
-                $('body').trigger('processStop');
+                self.stripe.client = window.Stripe(self.publishableKey);
+                self.stripe.publishableKey = self.publishableKey;
+
+                self.initStripeFields();
+
+                //$('body').trigger('processStop');
                 self.hideLoader();
             });
         },
-
         /**
          * Get hosted fields configuration
          * @returns {Object}
@@ -163,76 +166,54 @@ define([
          * @returns {String}
          */
         getSelector: function (field) {
-            return '[data-container="'+this.code + '-' + field+'"]';
+            return '#' + this.code + '-' + field;
         },
 
-        /**
-         * Function to handle hosted fields events
-         * @returns {Boolean}
-         * @param hostedFieldsInstance
-         */
-        fieldEventHandler: function (hostedFieldsInstance) {
-            var self = this;
-            hostedFieldsInstance.on('empty', function (event) {
-                if (event.emittedBy === 'number') {
-                    self.selectedCardType(null);
-                }
-            });
 
-            hostedFieldsInstance.on('cardTypeChange', function (event) {
-                if (event.cards.length !== 1) {
-                    return;
-                }
-                self.selectedCardType(
-                    validator.getMageCardType(event.cards[0].type, self.getCcAvailableTypes())
-                );
-            });
-
-            hostedFieldsInstance.on('validityChange', function (event) {
-                var field = event.fields[event.emittedBy],
-                    fieldKey = event.emittedBy;
-
-                if (fieldKey in self.selectorsMapper && field.isValid === false) {
-                    self.addInvalidClass(self.selectorsMapper[fieldKey]);
-                }
-            });
-
-            hostedFieldsInstance.on('blur', function (event) {
-                if (event.emittedBy === 'number') {
-                    self.validateCardType();
-                }
-            });
-        },
         /**
          * Validate paymentData via api
          * @returns {jQuery.Deferred}
          */
         validate: function () {
-            var state = $.Deferred(),
-                paymentData = {
-                    cardData: {
-                        cardNumber: $(this.getSelector('cc-number')).val().replace(/\D/g, ''),
-                        month: $(this.getSelector('cc-month')).val(),
-                        year: $(this.getSelector('cc-year')).val(),
-                        cardCode: $(this.getSelector('cc-cvv')).val()
-                    },
-                    authData: {
-                        clientKey: this.clientToken
-                    }
-                };
+            var self = this;
+            var state = $.Deferred();
 
-            /*this.accept.dispatchData(paymentData, function (response) {
-                if (response.messages.resultCode === "Error") {
-                    var messages = $.map(response.messages.message, function(message) {
-                        return message.code + ": " + message.text;
-                    });
-                    state.reject(messages.join(' '));
-                } else {
-                    state.resolve(response.opaqueData);
-                }
-            });*/
+            var $input = $(this.getSelector('cc_number'));
+            $input.removeClass('stripe-shosted-fields-invalid');
+
+            if (!this.validateCardType()) {
+               // state.reject('Card is not valid.');
+            }
+            //var token = self.stripe.client.createSource(self.stripeCardNumber);
+            $.when($.fn.createToken()).done(function () {
+
+            }).fail(function (result) {
+                state.reject('Could not validate card.');
+            });
+
+            //failed  $(this.getSelector('cc_type')).val(this.selectedCardType());
+
+
             state.resolve([]);
             return state.promise();
+        },
+        /**
+         * Convert card information to stripe token
+         */
+        createToken2: function () {
+            var self = this;
+            var defer = $.Deferred();
+
+            self.stripe.client.createSource(self.stripeCardNumber).then(function (response) {
+                if (response.error) {
+                    defer.reject(response.error.message);
+                } else {
+                    var token = response.source.id;
+                    defer.resolve();
+                }
+            });
+
+            return defer.promise();
         },
         /**
          * Get list of currently available card types
@@ -254,7 +235,8 @@ define([
          * @returns {Boolean}
          */
         validateCardType: function () {
-            return this.selectedCardType();
+            var self = this;
+            return validator.getMageCardType(event.brand, self.getCcAvailableTypes());
         }
     });
 });

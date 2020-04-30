@@ -1,0 +1,84 @@
+<?php
+/**
+ * TNW_Stripe extension
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the OSL 3.0 License
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ *
+ * @category  TNW
+ * @package   TNW_Stripe
+ * @copyright Copyright (c) 2017-2018
+ * @license   Open Software License (OSL 3.0)
+ */
+
+/** @var TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe $block */
+
+$code = 'tnw_stripe';
+?>
+<div id="stripe_container"></div>
+<script>
+    require([
+        'jquery',
+        'https://js.stripe.com/v3/'
+    ], function ($, stripe) {
+       // $(function () { // to ensure that code evaluates on page load
+            var self = this,
+                stripeCardElement;
+            var stripe = window.Stripe("<?php echo $block->getPublishableKey(); ?>");
+
+            //try {
+            stripeCardElement = stripe.elements();
+
+            var style = {
+                base: {
+                    fontSize: '17px'
+                }
+            };
+
+            var stripeCardNumber = stripeCardElement.create('card', {style: style});
+            stripeCardNumber.mount('#stripe_container');
+            /* self.stripeCardNumber.on('change', function (event) {
+             if (event.empty === false) {
+                 self.validateCardType();
+             }
+
+             self.selectedCardType(
+                 validator.getMageCardType(event.brand, self.getCcAvailableTypes())
+             );
+         });
+
+         self.stripeCardElement
+             .create('cardExpiry', {style: style})
+             .mount(self.getSelector('cc-month'));
+
+         self.stripeCardElement
+             .create('cardCvc', {style: style})
+             .mount(self.getSelector('cc-cvv'));*/
+            /*} catch (e) {
+                self.error(e.message);
+            }*/
+
+
+        //});
+        $.fn.createToken = function(){
+            var self = this;
+            //var container = $('#' + this.container);
+
+            var defer = $.Deferred();
+
+            stripe.createSource(stripeCardNumber).then(function (response) {
+                if (response.error) {
+                    defer.reject(response.error.message);
+                } else {
+                    //container.find('#' + self.code + '_cc_token').val(response.source.id);
+                    defer.resolve();
+                }
+            });
+
+            return defer.promise();
+        }
+    });
+</script>
