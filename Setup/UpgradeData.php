@@ -111,7 +111,7 @@ class UpgradeData implements UpgradeDataInterface
             $this->addHideQtyProductAttributes($eavSetup);
         }
 
-        if (version_compare($context->getVersion(), '2.2.38', '<')) {
+        if (version_compare($context->getVersion(), '2.2.39', '<')) {
             $this->removeConfigValue($setup, 'tnw_subscriptions_profile_options/general/shipping_fallback');
         }
 
