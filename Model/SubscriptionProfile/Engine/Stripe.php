@@ -233,18 +233,15 @@ class Stripe extends Base
         $response = $this->transactionCustomer->placeRequest($transfer);
         if ($response['object'] instanceof \Stripe\Error\Card) {
             $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
+            foreach ($response->errors->deepAll() as $error) {
                 $errors[] = "{$error->code}: {$error->message}";
             }
 
             throw new PaymentException(__('Stripe message: %1', implode(', ', $errors)));
         }
-
         /** @var \Stripe\Card $paymentMethod */
-        //$paymentMethod = $response['object']->customer->paymentMethods[0];
-        //TODO Set actual Stripe Token
         $this->getProfile()->getPayment()
-            ->setPaymentToken('')
+            ->setPaymentToken($paymentData['client_secret'])
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
                 OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],

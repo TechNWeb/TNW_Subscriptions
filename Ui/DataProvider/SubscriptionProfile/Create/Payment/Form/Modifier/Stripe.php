@@ -97,48 +97,9 @@ class Stripe extends Base
     protected function getAdditionalFields()
     {
         $result = [
-            'credit_card_type' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'name' => $this->getPaymentCode() . '-cc-type',
-                            'label' => __('Credit Card Type'),
-                            'componentType' => Form\Field::NAME,
-                            'formElement' => Form\Element\Select::NAME,
-                            'dataScope' => 'cc_type',
-                            'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-select',
-                            'dataContainer' => $this->getPaymentCode() . '-cc-type',
-                            'additionalClasses' => 'credit-card-type',
-                            'sortOrder' => 10,
-                            'options' => $this->getPaymentCcTypes(),
-                            'imports' => [
-                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ],
-                            'validation' => [
-                                'required-entry' => true,
-                            ]
-                        ],
-                    ],
-                ],
-            ],
             'stripe_container' => [
                 'arguments' => [
                     'data' => [
-                        /* 'config' => [
-                             'name' => 'stripe_container',
-                             'label' => __('Credit Card Information'),
-                             'template' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-container',
-                             'componentType' => Container::NAME,
-                             'title' => __('Credit Card Information'),
-                             'additionalClasses' => 'field_without_legend',
-                             'dataScope' => 'additional',
-                             'sortOrder' => 20,
-                             'required' => true,
-                             'imports' => [
-                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                             ],
-                       ],*/
                          "config" => [
                              "formElement" => "container",
                              "componentType" => "container",
@@ -147,119 +108,13 @@ class Stripe extends Base
                              "required" => 0,
                              "sortOrder" => 1,
                              "content" => $this->layoutFactory->create()->createBlock(
-                                 'TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe'
+                                 \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe::class
                              )->toHtml(),
                          ]
                     ],
                 ]
             ]
         ];
-        /*'credit_card_number' => [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'name' => $this->getPaymentCode() . '-cc-number2',
-                        'label' => __('Credit Card Number'),
-                        'placeholder' => __('Credit card number'),
-                        'componentType' => Form\Field::NAME,
-                        'formElement' => Form\Element\Input::NAME,
-                        'dataScope' => 'cc_number',
-                        'dataType' => Form\Element\DataType\Text::NAME,
-                        'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
-                        'additionalClasses' => 'credit-card-number',
-                        'dataContainer' => $this->getPaymentCode() . '-cc-number2',
-                        'sortOrder' => 20,
-                        'imports' => [
-                            'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                        ]
-                    ],
-                ],
-            ],
-        ],
-        'exp_date_container' => [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'name' => $this->getPaymentCode() . '-cc-exp',
-                        'label' => __('Expiration Date'),
-                        'component' => 'TNW_Subscriptions/js/components/group',
-                        'componentType' => Container::NAME,
-                        'title' => __('Expiration Date'),
-                        'additionalClasses' => 'field_without_legend',
-                        'dataScope' => '',
-                        'sortOrder' => 30,
-                        'required' => true,
-                        'imports' => [
-                            'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                        ],
-                    ],
-                ],
-            ],
-            'children' => [
-                'exp_date_month' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'name' => $this->getPaymentCode() . '-cc-month',
-                                'label' => false,
-                                'componentType' => Form\Field::NAME,
-                                'formElement' => Form\Element\Input::NAME,
-                                'dataScope' => 'cc_exp_month',
-                                'dataType' => Form\Element\DataType\Text::NAME,
-                                'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
-                                'dataContainer' => $this->getPaymentCode() . '-cc-month',
-                                'additionalClasses' => 'control-label-up select month',
-                                'sortOrder' => 10,
-                            ],
-                        ],
-                    ],
-                ],
-                'exp_date_year' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'name' => $this->getPaymentCode() . '-cc-year',
-                                'label' => false,
-                                'componentType' => Form\Field::NAME,
-                                'formElement' => Form\Element\Input::NAME,
-                                'dataScope' => 'cc_exp_year',
-                                'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
-                                'dataContainer' => $this->getPaymentCode() . '-cc-year',
-                                'additionalClasses' => 'control-label-up select year',
-                                'dataType' => Form\Element\DataType\Text::NAME,
-                                'sortOrder' => 20,
-                            ],
-                        ],
-                    ],
-                ],
-            ]
-        ]
-        ];
-
-        if ($this->hasVerification()) {
-        $result['credit_card_cvv'] = [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'name' => $this->getPaymentCode() . '-cc-cvv',
-                        'label' => __('Card Verification Number'),
-                        'placeholder' => __('Credit verification number'),
-                        'componentType' => Form\Field::NAME,
-                        'formElement' => Form\Element\Input::NAME,
-                        'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
-                        'dataContainer' => $this->getPaymentCode() . '-cc-cvv',
-                        'dataScope' => 'cc_cid',
-                        'dataType' => Form\Element\DataType\Text::NAME,
-                        'additionalClasses' => 'payment-cvv',
-                        'sortOrder' => 40,
-                        'imports' => [
-                            'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                        ]
-                    ],
-                ],
-            ],
-        ];
-        }*/
 
         return $result;
     }
