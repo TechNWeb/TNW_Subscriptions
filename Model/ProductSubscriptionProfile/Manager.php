@@ -397,6 +397,16 @@ class Manager
                                     ->setFrequency($frequency->getFrequency())
                                     ->setUnit($frequency->getUnit());
                             }
+                            if ((bool) $product->getTnwSubscrUnlockPresetQty()) {
+                                $billingFrequency = $data['item_' . $productId]['billing_frequency'];
+                                $recurringOptions = $product->getMagentoProduct()->getRecurringOptions();
+                                array_filter($recurringOptions, function($v) use ($billingFrequency, &$product) {
+                                    if($v->getBillingFrequencyId() == $billingFrequency){
+                                        $product->setQty($v->getPresetQty());
+                                        $product->setPrice($v->getPrice());
+                                    }
+                                });
+                            }
                             if (isset($data['item_' . $productId]['qty'])) {
                                 $price = $this->simpleTypeManager
                                     ->setProfile($profileModel)
