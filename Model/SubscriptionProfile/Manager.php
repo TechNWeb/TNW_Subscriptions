@@ -192,31 +192,8 @@ class Manager
      */
     private $tempQuote = false;
 
-    /**
-     * Manager constructor.
-     * @param EnginePool $enginePool
-     * @param SubscriptionProfileRepository $subscriptionProfileRepository
-     * @param PaymentRepository $paymentRepository
-     * @param SubscriptionProfileFactory $subscriptionProfileFactory
-     * @param BillingFrequencyRepositoryInterface $frequencyRepository
-     * @param DataObjectHelper $dataObjectHelper
-     * @param AddressFactory $profileAddressFactory
-     * @param ProductManager $productManager
-     * @param OrderRelationManager $orderRelationManager
-     * @param RequestInterface $request
-     * @param CartRepositoryInterface $quoteRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ShippingMethods $shippingMethods
-     * @param MessageHistoryLogger $historyLogger
-     * @param ScopeConfigInterface $scopeConfig
-     * @param PaymentConfig $paymentConfig
-     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
-     * @param ProfileStatus $profileStatus
-     * @param DataObject\Factory $dataObjectFactory
-     * @param \TNW\Subscriptions\Model\Config $mpowerConfig
-     * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
-     * @param QuoteFactory $quoteFactory
-     */
+    private $totalsCollector;
+
     public function __construct(
         EnginePool $enginePool,
         SubscriptionProfileRepository $subscriptionProfileRepository,
@@ -239,8 +216,10 @@ class Manager
         \Magento\Framework\DataObject\Factory $dataObjectFactory,
         \TNW\Subscriptions\Model\Config $mpowerConfig,
         \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
-        QuoteFactory $quoteFactory
+        QuoteFactory $quoteFactory,
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector
     ) {
+        $this->totalsCollector = $totalsCollector;
         $this->quoteFactory = $quoteFactory;
         $this->freeShipping = $freeShipping;
         $this->mpowerConfig = $mpowerConfig;
@@ -908,8 +887,7 @@ class Manager
                     //Set shipping method
                     $quote->getShippingAddress()
                         ->setCollectShippingRates(true)
-                        ->setItemQty($quote->getItemsSummaryQty())
-                        ->collectShippingRates();
+                        ->setItemQty($quote->getItemsSummaryQty());
                     $this->processShippingMethodRate($quote, $profile);
                 }
 
@@ -941,6 +919,9 @@ class Manager
     protected function processShippingMethodRate($quote, $profile)
     {
         $shippingMethodToSet = $profile->getShippingMethod();
+        $quote->getShippingAddress()->setShippingMethod($shippingMethodToSet);
+        $this->totalsCollector->collectAddressTotals($quote, $quote->getShippingAddress());
+        $quote->getShippingAddress()->collectShippingRates();
         $shippingMethodAvailable = false;
         $shippingRates = $quote->getShippingAddress()->getAllShippingRates();
         $ratesApplicable = [];
@@ -968,10 +949,8 @@ class Manager
             $shippingMethodToSet = $cheapestRate;
             if ($this->mpowerConfig->getShippingFallbackStrategy() == ShippingFallback::DEFAULT_VALUE) {
                 $defaultShippingMethod = $this->mpowerConfig->getDefaultShippingMethod();
-                if ($defaultShippingMethod) {
-                    if (isset($defaultShippingMethod, $ratesApplicable)) {
-                        $shippingMethodToSet = $defaultShippingMethod;
-                    }
+                if ($defaultShippingMethod && array_key_exists($defaultShippingMethod, $ratesApplicable)) {
+                    $shippingMethodToSet = $defaultShippingMethod;
                 }
             }
         }

@@ -526,7 +526,9 @@ class Manager
                     }
                     $profile->setShippingMethod($order->getShippingMethod());
                     $profile->setShippingDescription($order->getShippingDescription());
-                    $this->profileRepository->save($profile);
+
+                    $this->profileManager->setProfile($profile);
+                    $this->profileManager->saveProfile();
 
                     if ($oldStatus != $profile->getStatus()) {
                         //Add comment profile place.

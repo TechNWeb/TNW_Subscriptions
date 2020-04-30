@@ -614,6 +614,24 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
 
     /**
+     * Add column for check sent mail
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addCheckSendMailColumn(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()
+            ->addColumn($setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
+                'sent_mail', [
+                'type' => Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'default' => 0,
+                'comment' => 'sent_mail'
+
+            ]);
+    }
+
+    /**
      * Updates attributes for the next payment calculation.
      *
      * @param EavSetup $eavSetup
