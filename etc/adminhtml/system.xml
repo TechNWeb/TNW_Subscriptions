@@ -74,8 +74,8 @@
             </group>
         </section>
 
-        <section id="tnw_subscriptions_profile_options" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
-                 showInStore="0">
+        <section id="tnw_subscriptions_profile_options" translate="label" sortOrder="20" showInDefault="1"
+                 showInWebsite="1" showInStore="0">
             <class>separator-top</class>
             <label>Subscription Profiles</label>
             <tab>tnw_subscriptions</tab>
@@ -87,25 +87,48 @@
                     <label>Profile Product Price</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\PriceStrategy</source_model>
                     <comment>
-                        <![CDATA[<strong>Grandfathered Price</strong> - product price is grandfathered and will not change for existing profiles when orders are created even if the product price changes in the catalog for new customers.<br><strong>Dynamic</strong> (for any quantity changes) - product price will be automatically re-calculated when the customer makes changes to the quantity of the existing subscription.]]>
+                        <![CDATA[
+                        <strong>Grandfathered Price</strong> - product price is grandfathered and will not change for
+                        existing profiles when orders are created even if the product price changes in the catalog for
+                        new customers.<br><strong>Dynamic</strong> (for any quantity changes) - product price will be
+                        automatically re-calculated when the customer makes changes to the quantity of the existing
+                        subscription.
+                        ]]>
                     </comment>
                 </field>
-                <field id="shipping_fallback" translate="label" type="select" sortOrder="10" showInDefault="1"
+                <field id="shipping_fallback" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Shipping Fallback</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\ShippingFallback</source_model>
                     <comment>
-                        <![CDATA[#Force from Subscription Profile - mPower will ignore any price rule or configuration restrictions and allow the customer to use the shipping method linked to their subscription.
-<br>#Pick the cheapest available - a shipping method linked to the profile will be used by default if allowed. Otherwise, mPower will pick the cheapest available shipping method for the order automatically.
-<br>#Use the Default - a shipping method linked to the profile will be used by default if allowed. Otherwise, mPower will force the order to use the Default Shipping method specified in this section.]]>
+                        <![CDATA[
+                        <strong>Pick the cheapest available</strong> - a shipping method linked to the profile will be
+                        used by default if allowed. Otherwise, mPower will pick the cheapest available shipping method
+                        for the order automatically.<br>
+                        <strong>Use the Default</strong> - a shipping method linked to the profile will be used by
+                        default if allowed. Otherwise, mPower will force the order to use the Default Shipping method
+                        specified in this section.
+                        ]]>
                     </comment>
                 </field>
-                <field id="default_shipping" translate="label" type="select" sortOrder="10" showInDefault="1"
+                <field id="default_shipping" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="0">
                     <label>Default Shipping Method</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\ShippingMethods</source_model>
+                    <comment model ="TNW\Subscriptions\Block\Adminhtml\System\Config\ShippingMethodsComment" />
+                </field>
+                <field id="free_shipping" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Free Shipping</label>
+                    <source_model>TNW\Subscriptions\Model\Config\Source\FreeShipping</source_model>
                     <comment>
-                        <![CDATA[This is a default available shipping method mPower will use if an order cannot be created using the shipping method from the subscription profile and an alternate shipping method is needed. If you don't see a payment method you want to use in this list, make sure it's enabled under [#Shipping Methods] configuration in Magento.]]>
+                        <![CDATA[
+                        <strong>Honor Magento free shipping</strong> - Magento order minimum setting will be ignored
+                        and the Free Shipping method in Magento will be honored.<br>
+                        <strong>Substitute with an alternate</strong> - Magento will use the logic specified in
+                        Shipping Fallback setting in this section to dictate how to pick the alternate shipping method
+                        for the customer.
+                        ]]>
                     </comment>
                 </field>
             </group>
