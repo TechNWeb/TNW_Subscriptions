@@ -6,20 +6,14 @@
 namespace TNW\Subscriptions\Model\Config\Source;
 
 /**
- * Class ShippingFallback
+ * Class FreeShipping
  * @package TNW\Subscriptions\Model\Config\Source
  */
-class ShippingFallback implements \Magento\Framework\Option\ArrayInterface
+class FreeShipping implements \Magento\Framework\Option\ArrayInterface
 {
-    /**
-     * Value for cheapest shipping method
-     */
-    const CHEAPEST = 2;
+    const HONOR_MAGENTO_VALUE = 1;
 
-    /**
-     * Value for default shipping method
-     */
-    const DEFAULT_VALUE = 3;
+    const ALTERNATE_VALUE = 2;
 
     /**
      * Options getter
@@ -46,8 +40,8 @@ class ShippingFallback implements \Magento\Framework\Option\ArrayInterface
     public function toArray()
     {
         return [
-            self::CHEAPEST => __('Pick the cheapest available'),
-            self::DEFAULT_VALUE =>  __('Use the Default')
+            self::HONOR_MAGENTO_VALUE => __('Honor Magento free shipping'),
+            self::ALTERNATE_VALUE =>  __('Substitute with an alternate')
         ];
     }
 }
