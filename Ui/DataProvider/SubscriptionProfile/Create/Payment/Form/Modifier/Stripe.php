@@ -9,8 +9,6 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\F
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
-use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
-use TNW\Stripe\Model\Ui\ConfigProvider as StripeConfigProvider;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -62,15 +60,18 @@ class Stripe extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \TNW\Stripe\Gateway\Config\Config $stripeConfig,
         Config $paymentConfig,
-        StripeAdapterFactory $stripeAdapterFactory,
-        LayoutFactory $layoutFactory
+        LayoutFactory $layoutFactory,
+        \Magento\Framework\Module\Manager $moduleManager
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->stripeAdapterFactory
+                = $moduleManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
+            $this->stripeConfig
+                = $moduleManager->get(\TNW\Stripe\Gateway\Config\Config::class);
+        }
 
-        $this->stripeConfig = $stripeConfig;
-        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
         $this->layoutFactory = $layoutFactory;
     }
