@@ -211,4 +211,20 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
         return $this->subscriptionProfile;
     }
 
+    /**
+     * @inheritdoc
+     * @param bool $flag
+     */
+    public function setSentMail(bool $flag)
+    {
+        return $this->setData(self::SENT_MAIL, $flag);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSentMail()
+    {
+        return $this->getData(self::SENT_MAIL);
+    }
 }

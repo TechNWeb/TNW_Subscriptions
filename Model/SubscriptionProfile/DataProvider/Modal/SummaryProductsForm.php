@@ -167,7 +167,7 @@ class SummaryProductsForm extends ModifyForm
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
-                    'price' => $itemPrice,
+                    'price' => (float) $itemPrice * (int) $item->getQty(),
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),
                     'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
@@ -179,7 +179,7 @@ class SummaryProductsForm extends ModifyForm
                         : $product->getData('short_description'),
                     'qty' => (float)$item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
-                    'price_incl_tax' => $priceInclTax,
+                    'price_incl_tax' => (float) $priceInclTax * (int) $item->getQty(),
                 ];
 
                 /** @var Base $modifier */

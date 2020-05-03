@@ -162,14 +162,13 @@ class Creator extends Base
             }
 
             foreach ($cycles as $cycleDate) {
-
                 $quote = $this->generateProfileQuote($profile);
-
                 $relations[] = $this->assignQuoteToProfile(
                     $profile,
                     $quote,
                     $cycleDate
                 );
+                $this->profileManager->populateTotals($profile, $quote);
             }
 
             $this->updateGenerateQuotesState(

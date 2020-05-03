@@ -246,12 +246,6 @@
   float: none;
 
 }
-#anchor-content .control-label-up{
-  position: relative;
-}
-[data-index = "account_info"] legend {
-  display: none;
-}
 .field_without_legend > div.admin__field{
   display: inline-block;
   margin-top: 0px;

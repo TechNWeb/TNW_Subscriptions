@@ -91,8 +91,23 @@ class Product extends Create
      */
     private $searchCriteriaBuilder;
 
+    /**
+     * @var Config
+     */
     private $config;
 
+    /**
+     * Product constructor.
+     * @param Config $config
+     * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param ProductRepositoryInterface $productRepository
+     * @param PriceCalculator $priceCalculator
+     * @param ExtensionManager $extensionManager
+     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
     public function __construct(
         Config $config,
         Context $context,
@@ -240,7 +255,7 @@ class Product extends Create
                 }
             }
 
-            $currentProductCustomPrice = $this->getCustomPrice($product, $productData);;
+            $currentProductCustomPrice = $this->getCustomPrice($product, $productData);
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
@@ -248,7 +263,7 @@ class Product extends Create
                 $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
                 && isset($this->data['custom_price'])
             ) {
-                $customProductPrice = (float) $this->data['custom_price'] / $this->data['qty'];
+                $customProductPrice = (float) $this->data['custom_price'];
             }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
 
@@ -293,7 +308,7 @@ class Product extends Create
      */
     public function getPresetCustomPrice()
     {
-        return (float) $this->data['custom_price'] / (int) $this->data['qty'];
+        return (float) $this->data['custom_price'];
     }
 
     /**

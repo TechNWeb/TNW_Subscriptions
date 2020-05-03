@@ -160,7 +160,7 @@ class EmailNotifier
      */
     public function cardExpire($subscriptionProfile, $date)
     {
-        if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE) && $subscriptionProfile->getStatus() == 1) {
+        if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
             $customer = $subscriptionProfile->getCustomer();
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
@@ -251,14 +251,26 @@ class EmailNotifier
     public function renewal($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
+            $subscriptionProfiles = [];
             if (is_numeric($subscriptionProfile)) {
                 try {
-                    $subscriptionProfile = $this->subscriptionProfileRepository->getById($subscriptionProfile);
+                    $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
                 } catch (\Exception $e) {
-                    $subscriptionProfile = null;
+                    $subscriptionProfiles = [];
                 }
+            } elseif (is_array($subscriptionProfile)) {
+                foreach ($subscriptionProfile as $profileId) {
+                    try {
+                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                    } catch (\Exception $e) {
+                    }
+                }
+            } else {
+                $subscriptionProfiles[] = $subscriptionProfile;
             }
-            if ($subscriptionProfile) {
+
+            if ($subscriptionProfiles) {
+                $subscriptionProfile =  reset($subscriptionProfiles);
                 $customer = $subscriptionProfile->getCustomer();
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
@@ -267,7 +279,7 @@ class EmailNotifier
                     ),
                     $customer->getStoreId(),
                     [
-                        'subscription' => $subscriptionProfile,
+                        'subscriptions' => $subscriptionProfiles,
                         'customer' => $customer,
                         'date' => date('F jS, Y', strtotime($date))
                     ],
