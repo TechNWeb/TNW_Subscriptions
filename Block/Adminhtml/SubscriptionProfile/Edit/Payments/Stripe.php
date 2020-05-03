@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments;
 
 use Magento\Backend\Block\Template;
-use TNW\Stripe\Model\Ui\ConfigProvider as StripeConfigProvider;
 
 class Stripe extends Template
 {
@@ -19,16 +18,15 @@ class Stripe extends Template
      */
     public function __construct(
         Template\Context $context,
-        StripeConfigProvider $configProvider,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         array $data = []
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/payments/stripe.phtml');
         parent::__construct($context, $data);
-        $this->_configProvider = $configProvider;
-    }
-    public function useCcv()
-    {
-        return $this->gatewayConfig->isCcvEnabled();
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->_configProvider = $objectManager->get(\TNW\Stripe\Model\Ui\ConfigProvider::class);
+        }
     }
 
     private function getConfig()

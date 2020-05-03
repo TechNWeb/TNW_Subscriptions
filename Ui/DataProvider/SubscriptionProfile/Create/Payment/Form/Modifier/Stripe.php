@@ -62,14 +62,15 @@ class Stripe extends Base
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         Config $paymentConfig,
         LayoutFactory $layoutFactory,
-        \Magento\Framework\Module\Manager $moduleManager
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->stripeAdapterFactory
-                = $moduleManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
+                = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
             $this->stripeConfig
-                = $moduleManager->get(\TNW\Stripe\Gateway\Config\Config::class);
+                = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
         }
 
         $this->paymentConfig = $paymentConfig;
@@ -81,7 +82,7 @@ class Stripe extends Base
      */
     protected function getPaymentCode()
     {
-        return StripeConfigProvider::CODE;
+        return 'tnw_stripe';
     }
 
     /**
