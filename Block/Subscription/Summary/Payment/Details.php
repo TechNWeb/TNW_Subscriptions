@@ -114,10 +114,15 @@ class Details extends BaseSummary
         $creditCardTypeLabel = __('Unknown Cart Type');
         if (isset($additionalInfo['cc_type'])) {
             $ccTypes = $this->paymentConfig->getCcTypes();
+            $match = false;
             foreach ($ccTypes as $key => $label) {
                 if ($key == $additionalInfo['cc_type']) {
                     $creditCardTypeLabel = $label;
+                    $match = true;
                 }
+            }
+            if (!$match) {
+                $creditCardTypeLabel = __($additionalInfo['cc_type']);
             }
         }
 
