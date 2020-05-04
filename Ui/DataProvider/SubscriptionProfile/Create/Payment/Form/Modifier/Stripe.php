@@ -67,10 +67,10 @@ class Stripe extends Base
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->stripeAdapterFactory
-                = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
+            /*$this->stripeAdapterFactory
+                = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");*/
             $this->stripeConfig
-                = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
+                = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
         }
 
         $this->paymentConfig = $paymentConfig;
@@ -110,7 +110,7 @@ class Stripe extends Base
                              "required" => 0,
                              "sortOrder" => 1,
                              "content" => $this->layoutFactory->create()->createBlock(
-                                 \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe::class
+                                 "TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe"
                              )->toHtml(),
                          ]
                     ],
