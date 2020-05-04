@@ -296,6 +296,13 @@ define([
             return this.defaultSubscribeQty;
         },
 
+        getQtyValidators: function () {
+            if (this.currentProduct) {
+                return JSON.stringify(this.get('currentProduct.qtyValidators'));
+            }
+            return '';
+        },
+
         manageStartOn: function () {
             this.scheduleDateInputVisible = !this.scheduleDateInputVisible;
             $('.delivery-schedule-date').html($('#start_on_alt').val());

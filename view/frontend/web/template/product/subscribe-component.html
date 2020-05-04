@@ -90,7 +90,8 @@
                        class="input-text qty"
                        data-bind="
                         attr: {
-                            readonly: getIsQtyPreset()
+                            readonly: getIsQtyPreset(),
+                            'data-validate': getQtyValidators()
                         },
                         value: getDefaultSubscribeQty(),
                         event: { change: qtyChanged }"

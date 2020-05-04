@@ -478,17 +478,19 @@ class Subscribe extends View
     /**
      * Returns validators for qty field. Depends on product settings
      *
+     * @param ProductInterface $product
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQtyValidators()
+    public function getQtyValidators(ProductInterface $product)
     {
         $params = [];
         $validators = [];
         $validators['required-number'] = true;
         /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem(
-            $this->getProduct()->getId(),
-            $this->getProduct()->getStore()->getWebsiteId()
+            $product->getId(),
+            $product->getStore()->getWebsiteId()
         );
 
         $params['minAllowed'] = max((float)$stockItem->getQtyMinAllowed(), 1);
@@ -521,6 +523,7 @@ class Subscribe extends View
                 'frequency_data' => $this->getChildProductBillingFrequencies($productData),
                 'trial_data' => $this->getTrialDataByProduct($productData),
                 'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
+                'qtyValidators' => $this->getQtyValidators($this->getProduct()),
                 'preconfigured' => $preconfiguredValues
             ]
         ];
@@ -551,6 +554,7 @@ class Subscribe extends View
                     $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
                         $childProduct
                     );
+                    $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
                 }
 
                 $result['children'] = $childArray;
