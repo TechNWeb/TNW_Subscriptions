@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item;
 
+use \Zend\Serializer\Serializer;
+
 /**
  * Value decoder.
  */
@@ -28,7 +30,7 @@ class OptionValueResolver
         if (self::isJson($value)) {
             $result = \Zend_Json::decode($value);
         } else {
-            $result = unserialize($value);
+            $result = Serializer::unserialize($value);
         }
 
         return $result;
@@ -57,7 +59,7 @@ class OptionValueResolver
         if ($format === self::JSON_FORMAT) {
             $result = \Zend_Json::encode($value);
         } else {
-            $result = serialize($value);
+            $result = Serializer::serialize($value);
         }
 
         return $result;

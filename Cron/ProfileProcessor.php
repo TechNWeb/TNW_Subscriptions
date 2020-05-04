@@ -13,6 +13,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ProfileProcessor
 {
@@ -45,21 +46,29 @@ class ProfileProcessor
     private $profileRepository;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @param Context $context
      * @param Manager $queueManager
      * @param PoolInterface $statusProcessorsPool
      * @param SubscriptionProfileRepository $profileRepository
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
         PoolInterface $statusProcessorsPool,
-        SubscriptionProfileRepository $profileRepository
+        SubscriptionProfileRepository $profileRepository,
+        SerializerInterface $serializer
     ) {
         $this->context = $context;
         $this->queueManager = $queueManager;
         $this->statusProcessorsPool = $statusProcessorsPool;
         $this->profileRepository = $profileRepository;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -206,7 +215,7 @@ class ProfileProcessor
             $address = $profile->getShippingAddress();
 
             $part[] = $profile->getShippingMethod();
-            $part[] = \serialize([
+            $part[] = $this->serializer->serialize([
                 $address->getFirstname(),
                 $address->getMiddlename(),
                 $address->getLastname(),
