@@ -707,6 +707,12 @@
             <argument name="vaultMethodCode" xsi:type="string">tnw_stripe_vault</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\CybersourceVault"
+                 type="TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Vault">
+        <arguments>
+            <argument name="vaultMethodCode" xsi:type="string">chcybersource_cc_vault</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Save\Processor\Pool"
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>
@@ -734,6 +740,10 @@
                 <item name="stripe_vault_payment" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
                     <item name="sortOrder" xsi:type="number">19</item>
+                </item>
+                <item name="cybersoruce_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\CybersourceVault</item>
+                    <item name="sortOrder" xsi:type="number">18</item>
                 </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
