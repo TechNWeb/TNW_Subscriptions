@@ -52,7 +52,7 @@ define([
                 recurringPrice = formatPrice.formatToNumber(recurringPrice, priceFormat);
             }
             //if price field is disabled - don't display discount fields
-            if (!productPriceComponent || productPriceComponent.disabled()) {
+            if (!productPriceComponent) {
                 offerDiscountComponent.checked(false);
                 offerDiscountComponent.visible(false);
             }

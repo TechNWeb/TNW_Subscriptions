@@ -70,6 +70,7 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'changeComment' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT . ':value',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled',
                 ],
                 'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
@@ -83,8 +84,17 @@ class Trial extends BaseModifier
                 'breakLine' => false,
                 'component' => 'Magento_Ui/js/form/components/group',
                 'imports' => [
-                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'visible' => 'ns = ${ $.ns }, dataScope = ${ $.parentScope }.product.' .
+                        Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                ],
+            ]
+        );
+        $meta = $this->arrayManager->merge(
+            $trialLengthUnitPath . self::META_CONFIG_PATH,
+            $meta,
+            [
+                'imports' => [
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
                 ],
             ]
         );
@@ -108,7 +118,7 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':checked',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
                     'changeComment' => 'index = price:value',
                 ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
@@ -129,7 +139,7 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',

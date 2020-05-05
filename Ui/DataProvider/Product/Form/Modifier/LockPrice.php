@@ -68,7 +68,6 @@ class LockPrice extends AbstractModifier
             [
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
-                    'disabled' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                 ],
                 'notice' =>  __('Apply a flat discount on top of the product price.'),
             ]
