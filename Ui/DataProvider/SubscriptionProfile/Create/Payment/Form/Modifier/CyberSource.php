@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Backend\Model\UrlInterface;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
@@ -32,6 +33,10 @@ class CyberSource extends Base
      * @var string
      */
     private $clientToken = '';
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
 
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -41,13 +46,15 @@ class CyberSource extends Base
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        Config $paymentConfig
+        Config $paymentConfig,
+        UrlInterface $urlBuilder
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
             $this->cybersourceConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
         }
         $this->paymentConfig = $paymentConfig;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -106,13 +113,20 @@ class CyberSource extends Base
                             'formElement' => Form\Element\Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                             'additionalClasses' => 'credit-card-number',
                             'dataContainer' => $this->getPaymentCode() . '-cc-number',
                             'sortOrder' => 20,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
-                            ]
+                            ],
+                            'validation' => [
+                                'required-entry' => true,
+                                'required-number' => true,
+                                'validate-cc-number' => $this->getPaymentCode() . '_cc_type',
+                                'validate-cc-type' => $this->getPaymentCode() . '_cc_type',
+                            ],
+                            'valueUpdate' => 'keyup'
                         ],
                     ],
                 ],
@@ -142,13 +156,21 @@ class CyberSource extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Input::NAME,
+                                    'formElement' => Form\Element\Select::NAME,
+                                    'options' => $this->getCcMonths(),
                                     'dataScope' => 'cc_exp_month',
                                     'dataType' => Form\Element\DataType\Text::NAME,
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-month' => $this->getPaymentCode(),
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],
@@ -159,13 +181,21 @@ class CyberSource extends Base
                                 'config' => [
                                     'label' => false,
                                     'componentType' => Form\Field::NAME,
-                                    'formElement' => Form\Element\Input::NAME,
+                                    'formElement' => Form\Element\Select::NAME,
+                                    'options' => $this->getCcYears(),
                                     'dataScope' => 'cc_exp_year',
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Form\Element\DataType\Text::NAME,
                                     'sortOrder' => 20,
+                                    'validation' => [
+                                        'required-entry' => true,
+                                        'subscription-validate-cc-exp-year' => $this->getPaymentCode(),
+                                    ],
+                                    'imports' => [
+                                        'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                                    ],
                                 ],
                             ],
                         ],
@@ -184,7 +214,7 @@ class CyberSource extends Base
                             'name' => '',
                             'componentType' => Form\Field::NAME,
                             'formElement' => Form\Element\Input::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/input',
                             'dataContainer' => $this->getPaymentCode() . '-cc-cvv',
                             'dataScope' => 'cc_cid',
                             'dataType' => Form\Element\DataType\Text::NAME,
@@ -192,6 +222,11 @@ class CyberSource extends Base
                             'sortOrder' => 40,
                             'imports' => [
                                 'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ],
+                            'validation' => [
+                                'required-number' => true,
+                                'required-entry' => true,
+                                'validate-cc-cvn' => $this->getPaymentCode() . '_cc_type'
                             ]
                         ],
                     ],
@@ -207,22 +242,21 @@ class CyberSource extends Base
      */
     protected function getAdditionalConfig()
     {
+        if ($this->cybersourceConfig->isTestMode()) {
+            $configServiceUrl = $this->cybersourceConfig->getSopServiceUrlTest();
+        } else {
+            $configServiceUrl = $this->cybersourceConfig->getSopServiceUrl();
+        }
+        $tokenCreateUrl = $configServiceUrl . '/silent/token/create';
         return [
-            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/braintree',
+            'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
-            'sdkUrl' => $this->cybersourceConfig->getSopServiceUrl(),
-            'clientToken' => $this->getClientToken(),
+            'sopServiceUrl' => $tokenCreateUrl,
+            'loadSilentDataUrl' => $this->urlBuilder->getUrl('chcybersource/transparent/requestSilentData'),
             'useCvv' => $this->hasVerification(),
-            'availableCardTypes' => $this->cybersourceConfig->getCcTypes(),
-            'ccTypesMapper' => array_flip([
-                'VI' => 'visa',
-                'MC' => 'masterCard',
-                'AE' => 'amex',
-                'DI' => 'discover',
-                'JCB' => 'jcb'
-            ]),
+            'availableCardTypes' => explode(',', $this->cybersourceConfig->getCcTypes()),
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
@@ -313,6 +347,48 @@ class CyberSource extends Base
     }
 
     /**
+     * Retrieves credit card expire months.
+     *
+     * @return array
+     */
+    private function getCcMonths()
+    {
+        $result[] = [
+            'label' =>  __('Month'),
+            'value' => ''
+        ];
+        foreach ($this->paymentConfig->getMonths() as $value => $label) {
+            $result[] = [
+                'value' => $value,
+                'label' => $label
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves credit card expire years
+     *
+     * @return array
+     */
+    private function getCcYears()
+    {
+        $result[] = [
+            'label' =>  __('Year'),
+            'value' => ''
+        ];
+        foreach ($this->paymentConfig->getYears() as $value => $label) {
+            $result[] = [
+                'value' => $value,
+                'label' => (string)$label
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * @inheritdoc
      */
     public function modifyConfigData(array $configData)
@@ -334,7 +410,7 @@ class CyberSource extends Base
      */
     private function hasVerification()
     {
-        return $this->cybersourceConfig->isCvvEnabled();
+        return !$this->cybersourceConfig->getIgnoreCvn();
     }
 
     /**
