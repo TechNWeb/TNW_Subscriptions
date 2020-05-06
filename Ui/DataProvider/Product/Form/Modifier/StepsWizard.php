@@ -11,6 +11,7 @@ use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
@@ -89,6 +90,10 @@ class StepsWizard extends BaseModifier
      * @var string
      */
     private $scopeLabel;
+    /**
+     * @var Json
+     */
+    private $serializer;
 
     /**
      * @param LocatorInterface $locator
@@ -97,6 +102,7 @@ class StepsWizard extends BaseModifier
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param StoreManagerInterface $storeManager
+     * @param Json $serializer
      * @param Context $context
      */
     public function __construct(
@@ -106,6 +112,7 @@ class StepsWizard extends BaseModifier
         BillingFrequencyRepository $billingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         StoreManagerInterface $storeManager,
+        Json $serializer,
         Context $context
     ) {
         $this->locator = $locator;
@@ -113,6 +120,7 @@ class StepsWizard extends BaseModifier
         $this->urlBuilder = $urlBuilder;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->serializer = $serializer;
         parent::__construct($storeManager, $context);
     }
 
@@ -219,6 +227,13 @@ class StepsWizard extends BaseModifier
      */
     public function modifyData(array $data)
     {
+        $inheritAttr =& $data[$this->locator->getProduct()->getId()]['product']['tnw_subscr_inheritance'];
+
+        if ($inheritAttr) {
+            $inheritAttr = $this->serializer->unserialize($inheritAttr);
+        } else {
+            $inheritAttr = '';
+        }
         return $data;
     }
 
@@ -329,7 +344,14 @@ class StepsWizard extends BaseModifier
                                 'formElement' => Container::NAME,
                                 'component' => 'Magento_Ui/js/form/components/html',
                                 'label' => null,
-                                'content' => __('<p>Recurring options for a configurable product can be setup to support two different use cases.</p><p><b>Option 1</b> is where the configurable product itself has specific recurring option which apply to all child products.</p><p><b>Option 2</b> is where child products have their own specific recurring options.</p><p>This page will help you specify where the recurring option are inherited from: the parent or the child. By default all listed option will be inherited from the child records instead of parent.</p><br>')
+                                'content' => __('<p>Recurring options for a configurable product can be setup to ' .
+                                    'support two different use cases.</p><p><b>Option 1</b> is where the ' .
+                                    'configurable product itself has specific recurring option which apply to all ' .
+                                    'child products.</p><p><b>Option 2</b> is where child products have their own ' .
+                                    'specific recurring options.</p><p>This page will help you specify where the ' .
+                                    'recurring option are inherited from: the parent or the child. By default all ' .
+                                    'listed option will be inherited from the child records instead of parent.</p>' .
+                                    '<br><h2>Inherit following attributes from child products</h2>')
                             ]
                         ]
                     ]
@@ -347,13 +369,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the trial is offered for the product'),
-                                    '1' => __('Parent controls if the trial is offered for the product')
+                                    '1' => __('Child controls if the trial is offered for the product'),
+                                    '0' => __('Parent controls if the trial is offered for the product')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_TRIAL_STATUS,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_TRIAL_STATUS,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -373,13 +395,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls when the billing starts for the product'),
-                                    '1' => __('Parent controls when the billing starts for the product')
+                                    '1' => __('Child controls when the billing starts for the product'),
+                                    '0' => __('Parent controls when the billing starts for the product')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_START_DATE . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_START_DATE,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_START_DATE,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -399,15 +421,15 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the product price is the same regardless of ' .
+                                    '1' => __('Child controls if the product price is the same regardless of ' .
                                         'the billing frequency or custom'),
-                                    '1' => __('Parent controls if the product price is the same regardless of ' .
+                                    '0' => __('Parent controls if the product price is the same regardless of ' .
                                         'the billing frequency or custom')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -427,13 +449,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the product price is discounted for recurring orders'),
-                                    '1' => __('Parent controls if the product price is discounted for recurring orders')
+                                    '1' => __('Child controls if the product price is discounted for recurring orders'),
+                                    '0' => __('Parent controls if the product price is discounted for recurring orders')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -453,13 +475,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the product quantity is editable'),
-                                    '1' => __('Parent controls if the product quantity is editable')
+                                    '1' => __('Child controls if the product quantity is editable'),
+                                    '0' => __('Parent controls if the product quantity is editable')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -479,13 +501,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the product quantity is visible on storefront'),
-                                    '1' => __('Parent controls if the product quantity is visible on storefront')
+                                    '1' => __('Child controls if the product quantity is visible on storefront'),
+                                    '0' => __('Parent controls if the product quantity is visible on storefront')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_HIDE_QTY . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_HIDE_QTY,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_HIDE_QTY,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -505,13 +527,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls the savings calculation type'),
-                                    '1' => __('Parent controls the savings calculation type')
+                                    '1' => __('Child controls the savings calculation type'),
+                                    '0' => __('Parent controls the savings calculation type')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -531,13 +553,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '0' => __('Child controls if the customer can choose when to stop recurring orders'),
-                                    '1' => __('Parent controls if the customer can choose when to stop recurring orders')
+                                    '1' => __('Child controls if the customer can choose when to stop recurring orders'),
+                                    '0' => __('Parent controls if the customer can choose when to stop recurring orders')
                                 ],
                                 'exports' => [
                                     'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_inheritance.' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -574,6 +596,7 @@ class StepsWizard extends BaseModifier
                         'priceFormat' => $this->getPriceFormatData(),
                         'priceSymbol' => $this->getCurrencySymbol(),
                         'additionalClasses' => $this->summaryContainerName,
+                        'productType' => $this->locator->getProduct()->getTypeId(),
                         'imports' => [
                             'onChangedPurchaseType' => 'index = ' . Attribute::SUBSCRIPTION_PURCHASE_TYPE . ':value',
                             'setFrequencyRecords' => '${ $.provider }:data.product.recurring_options',

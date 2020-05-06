@@ -129,6 +129,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->removeConfigValue($setup, 'tnw_subscriptions_general/advanced/generated_quotes_count');
         }
 
+        if (version_compare($context->getVersion(), '2.2.48', '<')) {
+            $this->addInheritProductAttribute($eavSetup);
+        }
+
         $setup->endSetup();
     }
 
@@ -196,6 +200,42 @@ class UpgradeData implements UpgradeDataInterface
                 'apply_to' => 'simple,virtual,downloadable,configurable',
                 'group' => 'Subscription Options',
                 'sort_order' => 125,
+            ]
+        );
+    }
+
+    /**
+     * Adds 'inheritance' product attribute.
+     *
+     * @param EavSetup $eavSetup
+     * @return void
+     */
+    private function addInheritProductAttribute(EavSetup $eavSetup)
+    {
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_INHERITANCE,
+            [
+                'type' => 'text',
+                'label' => 'Configurable product inheritance',
+                'input' => 'textarea',
+                'source' => '',
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => false,
+                'user_defined' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => false,
+                'unique' => false,
+                'apply_to' => 'configurable',
+                'group' => 'Subscription Options',
+                'backend' => '',
+                'frontend' => '',
+                'class' => '',
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
             ]
         );
     }
