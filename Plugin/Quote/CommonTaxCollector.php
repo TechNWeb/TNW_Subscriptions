@@ -11,12 +11,28 @@ use Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory;
 use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector as MagentoCollector;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use Magento\Framework\Serialize\SerializerInterface;
+
 
 /**
  * Plugin for tax collector model.
  */
 class CommonTaxCollector
 {
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * @param SerializerInterface $serializer
+     */
+    public function __construct(
+        SerializerInterface $serializer
+    ) {
+        $this->serializer = $serializer;
+    }
+
     /**
      * Adds subscription data into quote item tax details object.
      *
@@ -86,7 +102,7 @@ class CommonTaxCollector
     {
         $result = json_decode($string, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $result = unserialize($string);
+            $result = $this->serializer->unserialize($string);
         }
 
         return $result;

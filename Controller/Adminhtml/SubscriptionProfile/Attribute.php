@@ -119,7 +119,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
         );
         $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
         if (!$validatorAttrCode->isValid($code)) {
-            $code = 'attr_' . ($code ?: substr(md5(time()), 0, 8));
+            $code = 'attr_' . ($code ?: substr(hash('sha512',time()), 0, 8));
         }
 
         return $code;
