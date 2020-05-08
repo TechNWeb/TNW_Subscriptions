@@ -84,7 +84,7 @@ class QuoteRepository implements \Magento\Quote\Api\CartRepositoryInterface
         \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor,
         \Magento\Quote\Model\ResourceModel\Quote\CollectionFactory $quoteCollectionFactory,
         \Magento\Quote\Model\QuoteRepository\LoadHandler $loadHandler,
-        \Magento\Quote\Model\QuoteRepository\SaveHandler\Proxy $saveHandler
+        \Magento\Quote\Model\QuoteRepository\SaveHandler $saveHandler
     ) {
         $this->quoteFactory = $quoteFactory;
         $this->storeManager = $storeManager;
