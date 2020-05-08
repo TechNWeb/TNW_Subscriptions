@@ -54,6 +54,9 @@ class Initialization
         if ($options) {
             $recurringOptions = [];
             foreach ($options as $recurringOptionData) {
+                if ($recurringOptionData instanceof \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface) {
+                    $recurringOptionData = $recurringOptionData->getData();
+                }
                 $recurringOptionData = $this->processPresetQty($product, $recurringOptionData);
                 if (empty($recurringOptionData['is_delete'])) {
                     /** @var ProductBillingFrequencyInterface $recurringOption */
