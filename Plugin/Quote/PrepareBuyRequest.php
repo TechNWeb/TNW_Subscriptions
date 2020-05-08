@@ -10,7 +10,8 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
+use TNW\Subscriptions\Service\Serializer;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Plugin for modifying product buy request, when the product is added to the subscription.
@@ -18,45 +19,53 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 class PrepareBuyRequest
 {
     /**
-     * Subscriptions product manager.
-     *
      * @var ProductTypeManagerResolver
      */
     private $productTypeResolver;
 
     /**
-     * @param ProductTypeManagerResolver $productTypeResolver
+     * @var Serializer
      */
-    public function __construct(ProductTypeManagerResolver $productTypeResolver)
-    {
+    private $serializer;
+
+    /**
+     * PrepareBuyRequest constructor.
+     * @param ProductTypeManagerResolver $productTypeResolver
+     * @param Serializer $serializer
+     */
+    public function __construct(
+        ProductTypeManagerResolver $productTypeResolver,
+        Serializer $serializer
+    ) {
         $this->productTypeResolver = $productTypeResolver;
+        $this->serializer = $serializer;
     }
 
     /**
-     * After preparing product modifies product buy request.
-     *
      * @param AbstractType $subject
-     * @param array $result
-     * @return array|string
+     * @param array|mixed $result
+     * @return array
+     * @throws LocalizedException
      */
     public function afterPrepareForCartAdvanced(AbstractType $subject, $result)
     {
-        if (is_array($result)) {
-            /** @var ProductInterface $firstItem */
-            $firstItem = reset($result);
-            if ($firstItem) {
-                $buyRequest = $firstItem->getCustomOption('info_buyRequest');
-                if ($buyRequest) {
-                    $buyRequestValue = OptionValueResolver::getDecodedValue($buyRequest->getValue());
-                    $subscriptionPart = !empty($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])
-                        ? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME] : [];
-                    //check if we need to update request.
-                    // True - if in buy request exists subscription part and we need to create full request
-                    if (!empty($subscriptionPart[Create::FULL_REQUEST_PARAM_NAME])) {
-                        $type = $firstItem->getTypeId();
-                        $this->productTypeResolver->resolve($type)
-                            ->modifyBuyRequests($result);
-                    }
+        if (!is_array($result)) {
+            return $result;
+        }
+
+        /** @var ProductInterface $firstItem */
+        $firstItem = reset($result);
+        if ($firstItem) {
+            $buyRequest = $firstItem->getCustomOption('info_buyRequest');
+            if ($buyRequest) {
+                $buyRequestValue = $this->serializer->unserialize($buyRequest->getValue());
+                $subscriptionPart = !empty($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME])
+                    ? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME] : [];
+                //check if we need to update request.
+                // True - if in buy request exists subscription part and we need to create full request
+                if (!empty($subscriptionPart[Create::FULL_REQUEST_PARAM_NAME])) {
+                    $this->productTypeResolver->resolve($firstItem->getTypeId())
+                        ->modifyBuyRequests($result);
                 }
             }
         }

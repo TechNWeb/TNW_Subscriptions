@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
-use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -79,7 +79,7 @@ class Manager
     private $subscriptionContext;
 
     /**
-     * @var Json
+     * @var SerializerInterface
      */
     private $serializer;
 
@@ -94,7 +94,7 @@ class Manager
      * @param MessageHistoryLogger $historyLogger
      * @param SimpleTypeManager $simpleTypeManager
      * @param Context $subscriptionContext
-     * @param Json $serializer
+     * @param SerializerInterface $serializer
      * @param FrequencyRepository $frequencyRepository
      */
     public function __construct(
@@ -103,7 +103,7 @@ class Manager
         MessageHistoryLogger $historyLogger,
         SimpleTypeManager $simpleTypeManager,
         Context $subscriptionContext,
-        Json $serializer,
+        SerializerInterface $serializer,
         FrequencyRepository $frequencyRepository
     ) {
         $this->profileProductFactory = $profileFactory;
@@ -360,7 +360,8 @@ class Manager
                                         '/\\' . $priceFormat['decimalSymbol'] . '/'
                                     ],
                                     ['', '.'],
-                                    $requestData['price']));
+                                    $requestData['price']
+                                ));
                                 $product->setPrice($requestPrice);
                             }
                             if (!empty($requestData['qty'])) {

@@ -12,7 +12,6 @@ use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -30,8 +29,7 @@ class Configurable extends Base
             /** @var ProductInterface $mainProduct */
             $request = $mainProduct->getCustomOption('info_buyRequest');
             if ($request) {
-                $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
-                $requestValue = OptionValueResolver::getDecodedValue($request->getValue());
+                $requestValue = $this->serializer->unserialize($request->getValue());
                 $subscriptionPart = $requestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $requestValue['qty'];
                 if (!empty($requestValue['super_attribute'])) {
@@ -55,7 +53,7 @@ class Configurable extends Base
                         ],
                     ]
                 );
-                $request->setValue(OptionValueResolver::getEncodedValue($requestValue, $valueFormat));
+                $request->setValue($this->serializer->serialize($requestValue));
             }
         }
     }
@@ -89,7 +87,7 @@ class Configurable extends Base
                     $discountFields = $this->getDiscountFields($product);
 
                     if (!$discountFields[Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT]) {
-                        $discountFields = $this->getDiscountFields($childProduct);;
+                        $discountFields = $this->getDiscountFields($childProduct);
                     }
                 }
             }
@@ -133,8 +131,8 @@ class Configurable extends Base
      */
     public function getAdditionalData(CartItemInterface $item)
     {
-       return [
-           'super_attribute' => $item->getBuyRequest()->getSuperAttribute(),
-       ];
+        return [
+            'super_attribute' => $item->getBuyRequest()->getSuperAttribute(),
+        ];
     }
 }

@@ -196,7 +196,7 @@ class Configurable extends Base
     {
         $currentFormName = $this->registry->registry('form_full_name');
         $leftContainerName = $currentFormName . '.description_fieldset.left_container';
-        $encodedAttributes = \Zend_Json::encode($this->getItem()->getBuyRequest()->getSuperAttribute());
+        $encodedAttributes = $this->serializer->serialize($this->getItem()->getBuyRequest()->getSuperAttribute());
 
         return [
             'children' => [
