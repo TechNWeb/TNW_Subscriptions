@@ -137,7 +137,14 @@ class BillingCyclesManager
             // Profile has a finite count of cycles
             $cyclesCount = (int)$profile->getTotalBillingCycles() - 1;
         }
-
+        //get already generated dates
+        $existDates = array_map(
+            function (SubscriptionProfileOrderInterface $relation) {
+                return $relation->getScheduledAt();
+            },
+            $this->relationManager->getAllProfileRelations($profile->getId())
+        );
+        $cyclesCount = $cyclesCount + count($existDates);
         $products = $profile->getProducts();
         $product = array_shift($products);
         //Calculate the list of dates for profile
@@ -151,13 +158,6 @@ class BillingCyclesManager
             );
             $neededDates[] = $this->format($date);
         }
-        //get already generated dates
-        $existDates = array_map(
-            function (SubscriptionProfileOrderInterface $relation) {
-                return $relation->getScheduledAt();
-            },
-            $this->relationManager->getAllProfileRelations($profile->getId())
-        );
         $neededDates = array_diff($neededDates, $existDates);
         //generate only future dates
         $resultDates = array_filter(
