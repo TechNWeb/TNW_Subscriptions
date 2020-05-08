@@ -1,0 +1,44 @@
+name: PHP Composer
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  Code_standart_check:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.2'
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+    - name: Set ssh key
+      uses: webfactory/ssh-agent@v0.2.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY_GIT }}
+    - name: Install code standard (new version)
+      run: cd ${GITHUB_WORKSPACE}/.. && mkdir -p magento-coding-standard && mkdir -p error_logs
+        && cd magento-coding-standard
+        && git clone git@github.com:magento/magento-coding-standard.git .
+        && composer install
+    - name: Run new code standard check
+      run: ${GITHUB_WORKSPACE}/../magento-coding-standard/vendor/bin/phpcs --standard=Magento2 ${GITHUB_WORKSPACE} --severity=10 > ${GITHUB_WORKSPACE}/../error_logs/new_standard.txt
+    - name: Install code standard (old version)
+      run: cd ${GITHUB_WORKSPACE}/.. && mkdir -p magento-coding-standard-old && mkdir -p error_logs
+        && cd magento-coding-standard-old
+        && git clone git@github.com:magento/marketplace-eqp.git . && git checkout 2.0.1 && git branch && php --ini
+        && composer install
+    - name: Run old code standard check
+      run: ${GITHUB_WORKSPACE}/../magento-coding-standard-old/vendor/bin/phpcs --standard=MEQP2 ${GITHUB_WORKSPACE} --severity=10 > ${GITHUB_WORKSPACE}/../error_logs/old_standard.txt
+    - name: Upload math result for new standard
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: errors_logs
+        path: ${GITHUB_WORKSPACE}/../../error_logs
