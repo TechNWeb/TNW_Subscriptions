@@ -29,6 +29,9 @@ var config = {
             },
             'Magento_Checkout/js/view/summary/cart-items' : {
                 'TNW_Subscriptions/js/checkout/view/summary/cart-items-mixin' : true
+            },
+            'Magento_Swatches/js/swatch-renderer' : {
+                'TNW_Subscriptions/js/swatch-renderer-mixin' : true
             }
         }
     }

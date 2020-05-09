@@ -1,3 +1,6 @@
 #menu-tnw-subscriptions-top-level>a:before {
     content: '\e634';
 }
+.data-grid td .action-menu._active {
+    right: auto;
+}

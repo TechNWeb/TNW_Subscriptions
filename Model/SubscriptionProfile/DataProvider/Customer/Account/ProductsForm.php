@@ -519,6 +519,7 @@ class ProductsForm extends SummaryProductsForm
                         'previewLabelVisible' => false,
                         'previewLabel' => __('Bill %s times'),
                         'previewLabelOnce' => __('Bill once'),
+                        'previewLabelComplete' => __('Complete'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'parentFormName' => $this->currentFormName,

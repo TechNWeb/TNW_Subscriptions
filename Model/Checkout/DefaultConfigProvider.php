@@ -125,8 +125,8 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
-        \Magento\Customer\Model\Session\Proxy $customerSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         \Magento\Customer\Model\Address\Config $addressConfig,
         \Magento\Framework\App\Http\Context $httpContext,
