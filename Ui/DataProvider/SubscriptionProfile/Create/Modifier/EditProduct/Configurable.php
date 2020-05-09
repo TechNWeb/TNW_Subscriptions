@@ -6,10 +6,10 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct;
 
-use JMS\Serializer\SerializerInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
