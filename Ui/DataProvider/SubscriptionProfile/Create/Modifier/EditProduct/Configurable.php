@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct;
 
+use JMS\Serializer\SerializerInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
@@ -44,19 +45,22 @@ class Configurable extends Base
     private $urlBuilder;
 
     /**
+     * Configurable constructor.
      * @param FormContext $formContext
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         FormContext $formContext,
         Registry $registry,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        SerializerInterface $serializer
     ) {
         $this->registry = $registry;
         $this->urlBuilder = $urlBuilder;
 
-        parent::__construct($formContext);
+        parent::__construct($formContext, $serializer);
     }
 
     /**
