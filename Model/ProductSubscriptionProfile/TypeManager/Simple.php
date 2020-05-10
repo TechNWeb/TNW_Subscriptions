@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Pricing\SaleableInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
-use TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item\OptionValueResolver;
 
 /**
  * Simple product manager.
@@ -25,8 +24,7 @@ class Simple extends Base
         foreach ($products as $product) {
             $request = $product->getCustomOption('info_buyRequest');
             if ($request) {
-                $valueFormat = OptionValueResolver::getValueFormat($request->getValue());
-                $buyRequestValue = OptionValueResolver::getDecodedValue($request->getValue());
+                $buyRequestValue = $this->serializer->unserialize($request->getValue());
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
 
@@ -36,13 +34,15 @@ class Simple extends Base
                     'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
                 ];
 
-                $originalNonUnique = isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE])? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]: [];
+                $originalNonUnique = isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]) ?
+                    $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] :
+                    [];
 
                 $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] = array_merge(
                     $originalNonUnique,
                     $updateNonUnique
                 );
-                $request->setValue(OptionValueResolver::getEncodedValue($buyRequestValue, $valueFormat));
+                $request->setValue($this->serializer->serialize($buyRequestValue));
             }
         }
     }

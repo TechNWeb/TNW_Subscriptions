@@ -12,6 +12,7 @@ use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
@@ -47,21 +48,30 @@ class UpgradeData implements UpgradeDataInterface
     private $subscriptionSetupFactory;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * UpgradeData constructor.
      * @param EavSetupFactory $eavSetupFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductAttributeRepositoryInterface $attributeRepository
      * @param SubscriptionSetupFactory $subscriptionSetupFactory
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         EavSetupFactory $eavSetupFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductAttributeRepositoryInterface $attributeRepository,
-        SubscriptionSetupFactory $subscriptionSetupFactory
+        SubscriptionSetupFactory $subscriptionSetupFactory,
+        SerializerInterface $serializer
     ) {
         $this->eavSetupFactory = $eavSetupFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->attributeRepository = $attributeRepository;
         $this->subscriptionSetupFactory = $subscriptionSetupFactory;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -433,7 +443,7 @@ class UpgradeData implements UpgradeDataInterface
 
         foreach ($connection->fetchPairs($select) as $entityId => $options) {
             try {
-                $options = \Zend_Json::decode($options);
+                $options = $this->serializer->unserialize($options);
             } catch (\Exception $e) {
                 continue;
             }
@@ -444,7 +454,7 @@ class UpgradeData implements UpgradeDataInterface
 
             $connection->update(
                 $productSubscriptionTable,
-                ['custom_options' => \Zend_Json::encode(['info_buyRequest' => ['super_attribute' => $options]])],
+                ['custom_options' => $this->serializer->serialize(['info_buyRequest' => ['super_attribute' => $options]])],
                 $connection->prepareSqlCondition('entity_id', $entityId)
             );
         }

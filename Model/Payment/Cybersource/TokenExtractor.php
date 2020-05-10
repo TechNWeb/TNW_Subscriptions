@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Cybersource;
 
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
 use \Magento\Vault\Api\PaymentTokenManagementInterface;
@@ -21,12 +22,25 @@ class TokenExtractor
      */
     private $tokenManagement;
 
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * TokenExtractor constructor.
+     * @param PaymentTokenManagementInterface $tokenManagement
+     * @param CreditCardTokenFactory $creditCardTokenFactory
+     * @param SerializerInterface $serializer
+     */
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
-        CreditCardTokenFactory $creditCardTokenFactory
+        CreditCardTokenFactory $creditCardTokenFactory,
+        SerializerInterface $serializer
     ) {
         $this->paymentTokenFactory = $creditCardTokenFactory;
         $this->tokenManagement = $tokenManagement;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -95,7 +109,7 @@ class TokenExtractor
      */
     private function _convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
 }
