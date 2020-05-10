@@ -6,6 +6,9 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
+use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
 use TNW\Subscriptions\Model\MessagePool;
 
@@ -23,6 +26,30 @@ class Items extends ContentAbstract implements ExpireWarningSupportInterface
      * @var string
      */
     protected $_template = 'subscription/items.phtml';
+
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * Items constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param MessagePool $messagePool
+     * @param SerializerInterface $serializer
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        MessagePool $messagePool,
+        SerializerInterface $serializer,
+        array $data = []
+    ) {
+        $this->serializer = $serializer;
+        parent::__construct($context, $registry, $messagePool, $data);
+    }
 
     /**
      * @return MessagePool
@@ -52,7 +79,7 @@ class Items extends ContentAbstract implements ExpireWarningSupportInterface
             $this->getConfig()
         );
 
-        return \Zend_Json::encode($this->jsLayout);
+        return $this->serializer->serialize($this->jsLayout);
     }
 
     /**

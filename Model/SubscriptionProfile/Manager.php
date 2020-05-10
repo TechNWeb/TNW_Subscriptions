@@ -12,6 +12,7 @@ use Magento\Framework\Api\SimpleDataObjectConverter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -198,6 +199,11 @@ class Manager
     private $totalsCollector;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -246,7 +252,8 @@ class Manager
         \TNW\Subscriptions\Model\Config $mpowerConfig,
         \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
         QuoteFactory $quoteFactory,
-        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector
+        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        SerializerInterface $serializer
     ) {
         $this->totalsCollector = $totalsCollector;
         $this->quoteFactory = $quoteFactory;
@@ -271,6 +278,7 @@ class Manager
         $this->resourceQueue = $resourceQueue;
         $this->profileStatus = $profileStatus;
         $this->dataObjectFactory = $dataObjectFactory;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -670,16 +678,12 @@ class Manager
     }
 
     /**
-     * Set data to profile from quote.
-     *
      * @param Quote $quote
-     * @param \Magento\Quote\Model\Quote\Item[] $quoteItems
-     * @param null|\DateTime $date
-     *
+     * @param $quoteItems
+     * @param null $date
      * @return $this
+     * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Zend_Json_Exception
      */
     public function populateProfileData(Quote $quote, $quoteItems, $date = null)
     {
@@ -1162,12 +1166,8 @@ class Manager
     }
 
     /**
-     * Returns unique subscription data from  buy request.
-     *
-     * @param Quote\Item[] $quoteItems
-     *
-     * @return array|null
-     * @throws \Zend_Json_Exception
+     * @param array $quoteItems
+     * @return array|bool|float|int|string|null
      */
     private function getUniqueBuyRequest(array $quoteItems)
     {
@@ -1177,7 +1177,9 @@ class Manager
             return null;
         }
 
-        return \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+        $result = $this->serializer->unserialize($item->getOptionByCode('subscription')->getValue());
+
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -1273,7 +1275,6 @@ class Manager
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
      */
     public function createByOrder(OrderInterface $order, Quote $quote, $quoteItems, $trialData = null)
     {

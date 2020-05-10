@@ -9,6 +9,7 @@ use Magento\Customer\Model\ResourceModel\GroupRepository;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
+use Magento\Framework\Serialize\SerializerInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -109,6 +110,11 @@ class ProductSubscriptionProfile
     ];
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * ProductSubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -137,6 +143,7 @@ class ProductSubscriptionProfile
         \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory,
         \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory,
         GroupRepository $groupRepository,
+        SerializerInterface $serializer,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -158,6 +165,7 @@ class ProductSubscriptionProfile
         $this->productRepository = $productRepository;
         $this->metadataService = $metadataService;
         $this->groupRepository = $groupRepository;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -606,11 +614,9 @@ class ProductSubscriptionProfile
             return [];
         }
 
-        try {
-            return \Zend_Json::decode($options);
-        } catch (\Zend_Json_Exception $e) {
-            return [];
-        }
+        $result = $this->serializer->unserialize($options);
+
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -618,7 +624,7 @@ class ProductSubscriptionProfile
      */
     public function setCustomOptions($customOptions)
     {
-        $this->setData(self::CUSTOM_OPTIONS, \Zend_Json::encode($customOptions));
+        $this->setData(self::CUSTOM_OPTIONS, $this->serializer->serialize($customOptions));
         return $this;
     }
 

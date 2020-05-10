@@ -5,14 +5,11 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Stripe;
 
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
 use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
-/**
- * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Stripe
- */
 class TokenExtractor
 {
     /**
@@ -46,6 +43,11 @@ class TokenExtractor
     private $tokenManagement;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * TokenExtractor constructor.
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param CreditCardTokenFactory $creditCardTokenFactory
@@ -56,7 +58,8 @@ class TokenExtractor
         PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
         \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        SerializerInterface $serializer
     ) {
         $this->paymentTokenFactory = $creditCardTokenFactory;
         $this->tokenManagement = $tokenManagement;
@@ -67,6 +70,7 @@ class TokenExtractor
             $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
             $this->subjectReader = $objectManager->get("TNW\Stripe\Gateway\Helper\SubjectReader");
         }
+        $this->serializer = $serializer;
     }
 
     /**
@@ -147,7 +151,7 @@ class TokenExtractor
      */
     private function _convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
 }

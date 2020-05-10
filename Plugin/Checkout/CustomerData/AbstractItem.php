@@ -5,17 +5,32 @@
  */
 namespace TNW\Subscriptions\Plugin\Checkout\CustomerData;
 
+use Magento\Framework\Serialize\SerializerInterface;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+
 class AbstractItem
 {
     /**
-     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     * @var DescriptionCreator
      */
     private $descriptionCreator;
 
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * AbstractItem constructor.
+     * @param DescriptionCreator $descriptionCreator
+     * @param SerializerInterface $serializer
+     */
     public function __construct(
-        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+        DescriptionCreator $descriptionCreator,
+        SerializerInterface $serializer
     ) {
         $this->descriptionCreator = $descriptionCreator;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -23,7 +38,6 @@ class AbstractItem
      * @param callable $callback
      * @param \Magento\Quote\Model\Quote\Item $quoteItem
      * @return array
-     * @throws \Zend_Json_Exception
      */
     public function aroundGetItemData(
         \Magento\Checkout\CustomerData\AbstractItem $subject,
@@ -33,7 +47,7 @@ class AbstractItem
         $subscription = $quoteItem->getOptionByCode('subscription');
         $subscriptionItemPrice = '';
         if (null !== $subscription) {
-            $subscription = \Zend_Json::decode($subscription->getValue());
+            $subscription = $this->serializer->unserialize($subscription->getValue());
             $subscriptionItemPrice = $this->getSubscriptionItemPrice($quoteItem);
         }
 
@@ -45,9 +59,8 @@ class AbstractItem
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote\Item $item
+     * @param $item
      * @return string
-     * @throws \Zend_Json_Exception
      */
     private function getSubscriptionItemPrice($item)
     {

@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
@@ -34,11 +35,21 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     private $formContext;
 
     /**
-     * @param FormContext $formContext
+     * @var SerializerInterface
      */
-    public function __construct(FormContext $formContext)
-    {
+    protected $serializer;
+
+    /**
+     * Base constructor.
+     * @param FormContext $formContext
+     * @param SerializerInterface $serializer
+     */
+    public function __construct(
+        FormContext $formContext,
+        SerializerInterface $serializer
+    ) {
         $this->formContext = $formContext;
+        $this->serializer = $serializer;
     }
 
     /**
