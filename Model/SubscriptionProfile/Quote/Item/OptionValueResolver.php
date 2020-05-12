@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Quote\Item;
 use \Zend\Serializer\Serializer;
 
 /**
- * Value decoder.
+ * @deprecated since 2.2.42
  */
 class OptionValueResolver
 {

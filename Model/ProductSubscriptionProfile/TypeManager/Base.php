@@ -17,6 +17,8 @@ use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use TNW\Subscriptions\Service\Serializer;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Base class for product manager by type.
@@ -59,25 +61,33 @@ abstract class Base implements TypeInterface
     protected $profile = null;
 
     /**
+     * @var Serializer
+     */
+    protected $serializer;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param PriceCalculator $priceCalculator
      * @param ProductFrequencyRepository $productFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductRepositoryInterface $productRepository
+     * @param Serializer $serializer
      */
     public function __construct(
         Config $config,
         PriceCalculator $priceCalculator,
         ProductFrequencyRepository $productFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        Serializer $serializer
     ) {
         $this->config = $config;
         $this->priceCalculator = $priceCalculator;
         $this->productFrequencyRepository = $productFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->productRepository = $productRepository;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -169,12 +179,12 @@ abstract class Base implements TypeInterface
     }
 
     /**
-     * Returns calculated product price.
-     *
      * @param DataObject $product
      * @param array $productData
      * @param bool $full
-     * @return float|string
+     * @param bool $rowPrice
+     * @return float|int|mixed|string
+     * @throws NoSuchEntityException
      */
     protected function getCalculatedPrice(
         DataObject $product,

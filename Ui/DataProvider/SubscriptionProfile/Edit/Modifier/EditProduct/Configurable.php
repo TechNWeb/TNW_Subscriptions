@@ -6,9 +6,9 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct;
 
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlFactory;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
@@ -48,20 +48,29 @@ class Configurable extends Base
     private $contextModel;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * Configurable constructor.
      * @param Registry $registry
      * @param UrlFactory $urlFactory
      * @param ManagerConfigurable $managerConfigurable
      * @param Context $contextModel
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         Registry $registry,
         UrlFactory $urlFactory,
         ManagerConfigurable $managerConfigurable,
-        Context $contextModel
+        Context $contextModel,
+        SerializerInterface $serializer
     ) {
         $this->registry = $registry;
         $this->managerConfigurable = $managerConfigurable;
         $this->contextModel = $contextModel;
+        $this->serializer = $serializer;
         parent::__construct($urlFactory);
     }
 
@@ -190,7 +199,7 @@ class Configurable extends Base
                                             $this->getItem()->getId(),  //subscription item id
                                             $this->getItem()->getSubscriptionProfileId(),  // subscription id
                                             isset($customOptions['info_buyRequest']['super_attribute'])
-                                                ? \Zend_Json::encode($customOptions['info_buyRequest']['super_attribute'])
+                                                ? $this->serializer->serialize($customOptions['info_buyRequest']['super_attribute'])
                                                 : '', //super attributes data
                                         ],
                                     ],

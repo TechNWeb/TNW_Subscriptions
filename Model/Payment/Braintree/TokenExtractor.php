@@ -6,17 +6,13 @@
 namespace TNW\Subscriptions\Model\Payment\Braintree;
 
 use Braintree\Transaction;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Braintree\Gateway\Config\Config;
 use Magento\Braintree\Gateway\SubjectReader;
 
-/**
- * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Braintree
- */
 class TokenExtractor
 {
     /**
@@ -44,18 +40,19 @@ class TokenExtractor
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
      * @param Config $config
      * @param SubjectReader $subjectReader
-     * @param Json|null $serializer
+     * @param SerializerInterface|null $serializer
      */
     public function __construct(
         PaymentTokenFactoryInterface $paymentTokenFactory,
         Config $config,
         SubjectReader $subjectReader,
-        Json $serializer = null
+        SerializerInterface $serializer = null
     ) {
         $this->config = $config;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->subjectReader = $subjectReader;
-        $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
+        $this->serializer = $serializer ?: ObjectManager::getInstance()
+            ->get(SerializerInterface::class);
     }
 
     /**

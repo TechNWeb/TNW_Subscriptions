@@ -5,14 +5,11 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
 use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
-/**
- * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Authorizenet
- */
 class TokenExtractor
 {
     /**
@@ -45,11 +42,17 @@ class TokenExtractor
      */
     private $tokenManagement;
 
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
         \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        SerializerInterface $serializer
     ) {
         $this->paymentTokenFactory = $creditCardTokenFactory;
         $this->tokenManagement = $tokenManagement;
@@ -61,6 +64,8 @@ class TokenExtractor
             $this->subjectReader = $objectManager->get("TNW\AuthorizeCim\Gateway\Helper\SubjectReader");
             $this->config = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
         }
+
+        $this->serializer = $serializer;
     }
 
     /**
@@ -141,7 +146,7 @@ class TokenExtractor
      */
     private function _convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
 }

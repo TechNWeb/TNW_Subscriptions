@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
@@ -38,23 +39,30 @@ class DescriptionCreator
     private $trialLengthUnitType;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * DescriptionCreator constructor.
-     *
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
      * @param BillingFrequencyUnitType $frequencyUnitType
      * @param TrialLengthUnitType $trialLengthUnitType
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         Context $context,
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
-        TrialLengthUnitType $trialLengthUnitType
+        TrialLengthUnitType $trialLengthUnitType,
+        SerializerInterface $serializer
     ) {
         $this->context = $context;
         $this->frequencyRepository = $frequencyRepository;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -172,12 +180,12 @@ class DescriptionCreator
         foreach ($groupItems as $item) {
             if (!$fullSubscriptionData) {
                 $fullSubscriptionData[CreateProfile::UNIQUE] =
-                    \Zend_Json::decode($item->getOptionByCode('subscription')->getValue());
+                    $this->serializer->unserialize($item->getOptionByCode('subscription')->getValue());
                 $isTrial = $fullSubscriptionData[CreateProfile::UNIQUE]['is_trial'];
             }
 
             if ($isTrial) {
-                $infoBuyRequestData = \Zend_Json::decode($item->getOptionByCode('info_buyRequest')->getValue());
+                $infoBuyRequestData = $this->serializer->unserialize($item->getOptionByCode('info_buyRequest')->getValue());
                 $infoBuyRequestData = $infoBuyRequestData[CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME];
                 $price = $infoBuyRequestData[CreateProfile::NON_UNIQUE]['price'];
                 if (is_array($price)) {
@@ -295,10 +303,8 @@ class DescriptionCreator
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote\Item $quoteItem
-     *
+     * @param $quoteItem
      * @return string
-     * @throws \Zend_Json_Exception
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {

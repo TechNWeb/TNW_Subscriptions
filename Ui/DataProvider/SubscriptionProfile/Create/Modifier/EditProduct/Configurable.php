@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
@@ -44,19 +45,22 @@ class Configurable extends Base
     private $urlBuilder;
 
     /**
+     * Configurable constructor.
      * @param FormContext $formContext
      * @param Registry $registry
      * @param UrlInterface $urlBuilder
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         FormContext $formContext,
         Registry $registry,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        SerializerInterface $serializer
     ) {
         $this->registry = $registry;
         $this->urlBuilder = $urlBuilder;
 
-        parent::__construct($formContext);
+        parent::__construct($formContext, $serializer);
     }
 
     /**
@@ -196,7 +200,7 @@ class Configurable extends Base
     {
         $currentFormName = $this->registry->registry('form_full_name');
         $leftContainerName = $currentFormName . '.description_fieldset.left_container';
-        $encodedAttributes = \Zend_Json::encode($this->getItem()->getBuyRequest()->getSuperAttribute());
+        $encodedAttributes = $this->serializer->serialize($this->getItem()->getBuyRequest()->getSuperAttribute());
 
         return [
             'children' => [
