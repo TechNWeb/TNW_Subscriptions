@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Simple as SimpleTypeManager;
 /**
  * Class Manager
@@ -90,6 +91,11 @@ class Manager
     private $frequencyRepository;
 
     /**
+     * @var OrderRelationManager
+     */
+    private $orderRelationManager;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
@@ -97,6 +103,7 @@ class Manager
      * @param Context $subscriptionContext
      * @param SerializerInterface $serializer
      * @param FrequencyRepository $frequencyRepository
+     * @param OrderRelationManager $orderRelationManager
      */
     public function __construct(
         ProductSubscriptionProfileFactory $profileFactory,
@@ -105,7 +112,8 @@ class Manager
         SimpleTypeManager $simpleTypeManager,
         Context $subscriptionContext,
         SerializerInterface $serializer,
-        FrequencyRepository $frequencyRepository
+        FrequencyRepository $frequencyRepository,
+        OrderRelationManager $orderRelationManager
     ) {
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
@@ -114,6 +122,7 @@ class Manager
         $this->subscriptionContext = $subscriptionContext;
         $this->serializer = $serializer;
         $this->frequencyRepository = $frequencyRepository;
+        $this->orderRelationManager = $orderRelationManager;
     }
 
     public function reset()
@@ -420,7 +429,9 @@ class Manager
                                 $frequencyId = $data['item_' . $productId]['billing_frequency'];
                                 if ($profileModel->getBillingFrequencyId() != $frequencyId) {
                                     if (!isset($startOn)) {
-                                        $startOn = $this->getNewStartDate($product);
+                                        $nextPaymentDate = $this->orderRelationManager
+                                            ->getNextProfileRelation($profileModel)->getScheduledAt();
+                                        $startOn = $this->getNewStartDate($product, $nextPaymentDate);
                                         if (strtotime($startOn) > strtotime($originalStartDate)){
                                             $startOn = (new \DateTime($startOn))
                                                 ->add(new \DateInterval($this->getCurrentTimeExpression()))
@@ -582,32 +593,33 @@ class Manager
      * Calculates new start date for subscription.
      *
      * @param ProductSubscriptionProfile $product
+     * @param string $nextDate
      * @return string
      */
-    protected function getNewStartDate($product)
+    protected function getNewStartDate($product, $nextDate = null)
     {
         $startDateType = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
-        $nowDate = date_create()->format('Y-m-d');
+        $nextDate = date_create($nextDate)->format('Y-m-d');
         switch ($startDateType) {
             case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
                 $result = date_create()->format('Y-m-t');
                 break;
             case StartDateType::FIRST_DAY_OF_THE_MONTH:
                 $result = date_create()->format('Y-m-01');
-                if (strtotime($result) < strtotime($nowDate)) {
+                if (strtotime($result) < strtotime($nextDate)) {
                     $result = new \DateTime();
                     $result = $result->format('Y-') . ($result->format('m') + 1) . '-' . '01';
                 }
                 break;
             case StartDateType::ON_15TH_OF_THE_MONTH:
                 $result = date_create()->format('Y-m-15');
-                if (strtotime($result) < strtotime($nowDate)) {
+                if (strtotime($result) < strtotime($nextDate)) {
                     $result = new \DateTime();
                     $result = $result->format('Y-') . ($result->format('m') + 1) . '-' . '15';
                 }
                 break;
             default:
-                $result = $nowDate;
+                $result = $nextDate;
                 break;
         }
 
