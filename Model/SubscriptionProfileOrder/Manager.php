@@ -274,6 +274,18 @@ class Manager
     }
 
     /**
+     * Update scheduled_at date for profile order
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param string $date
+     */
+    public function updateNextPaymentDate(SubscriptionProfileInterface $profile, string $date)
+    {
+        $next = $this->getNextProfileRelation($profile);
+        $next->setScheduledAt($date)->save();
+    }
+
+    /**
      * Retrieve the number of days from the last successful payment.
      *
      * @param string $scheduledAt
