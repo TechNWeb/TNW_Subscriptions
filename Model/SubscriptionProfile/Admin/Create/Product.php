@@ -255,20 +255,26 @@ class Product extends Create
                 (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
             $productData['hide_qty'] =
                 (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
-            $isTrial = $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
-            $trialPeriod = $isTrial ?
-                $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
-            $trialUnitId = $isTrial ?
-                (int)$this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
-            //Note: If product "is trial" then "start on" is start date of trial period,
-            // otherwise "start on" is start date of subscription
             $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_START_DATE);
+            $isTrial = $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
+            $trialPeriod = $trialUnitId = null;
+            if ($isTrial) {
+                $childTrial = $this->getInheritanceConfig(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+                $trialPeriod = $childTrial
+                    ? $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
+                    : $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH);
+                $trialUnitId = $childTrial
+                    ? (int)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
+                    : (int)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
+                //Note: If product "is trial" then "start on" is start date of trial period,
+                // otherwise "start on" is start date of subscription
+                $startOn = $childTrial
+                    ? $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                    : $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
+            }
             if (isset($productData['start_on'])) {
                 $startOn = $productData['start_on'];
-            } elseif ($isTrial) {
-                $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
             }
-
             if ($productData['use_preset_qty']) {
                 if ($this->getInheritanceConfig(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
                     $this->searchCriteriaBuilder

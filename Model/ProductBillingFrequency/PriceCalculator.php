@@ -223,7 +223,7 @@ class PriceCalculator
     private function getDiscountAmount(DataObject $product, $processPrice = null)
     {
         if ($processPrice === null) {
-            $processPrice = $product->getData('price');
+            $processPrice = $product->getData('price') ?? $product->getData('child_product_price');
         }
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {

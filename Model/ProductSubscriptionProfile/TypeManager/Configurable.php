@@ -114,6 +114,9 @@ class Configurable extends Base
             if ($superAttributes) {
                 $existFrequency = false;
                 $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
+                if ($childProduct) {
+                    $productData = $this->processInheritance($childProduct, $product, $productData);
+                }
                 if ($childProduct && !empty($arguments['billing_frequency'])) {
                     $existFrequency = $this->checkFrequencyExistanse(
                         $arguments['billing_frequency'],
@@ -175,6 +178,13 @@ class Configurable extends Base
         ];
     }
 
+    /**
+     * Set attributes to product data object according to inheritance
+     * @param $childProduct
+     * @param $product
+     * @param $productData
+     * @return mixed
+     */
     public function processInheritance($childProduct, $product, $productData)
     {
         $inheritance = $product->getData(Attribute::SUBSCRIPTION_INHERITANCE);
