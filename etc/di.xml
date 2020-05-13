@@ -21,6 +21,10 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection</argument>
         </arguments>
     </virtualType>
+    <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
+        <plugin name="add_proposed_shipping_date"
+                type="TNW\Subscriptions\Plugin\Sales\Model\Order\ItemRepository" />
+    </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
