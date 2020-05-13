@@ -121,7 +121,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
                 $arguments['child_product'] = $product;
                 $mappedResult[$product->getId()] = parent::renderSubscriptionAmounts(
                     $simpleProductAmount->getAmount(),
-                    $product,
+                    $currentProduct,
                     $arguments
                 );
             }

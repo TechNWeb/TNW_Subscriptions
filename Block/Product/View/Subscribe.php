@@ -269,10 +269,12 @@ class Subscribe extends View
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function getChildProductBillingFrequencies(DataObject $productDataObject)
+    private function getProductBillingFrequenciesData(DataObject $productDataObject)
     {
         $result = [];
-        $productId = $productDataObject->getId();
+        $productId = !empty($productDataObject['child_product_id'])
+            ? $productDataObject['child_product_id']
+            : $productDataObject->getId();
         $productBillingFrequencies = $this->frequencyOptionRepository
             ->getListByProductId($productId)
             ->getItems();
@@ -520,7 +522,7 @@ class Subscribe extends View
             'type' => $type,
             'product' => [
                 'product_price' => $this->getProduct()->getFinalPrice(),
-                'frequency_data' => $this->getChildProductBillingFrequencies($productData),
+                'frequency_data' => $this->getProductBillingFrequenciesData($productData),
                 'trial_data' => $this->getTrialDataByProduct($productData),
                 'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
                 'qtyValidators' => $this->getQtyValidators($this->getProduct()),
@@ -533,7 +535,7 @@ class Subscribe extends View
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
                 break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+            case Configurable::TYPE_CODE:
                 $result['super_attributes'] = $this->getOptions();
                 $childProducts = $this->getProduct()
                     ->getTypeInstance()
@@ -542,17 +544,19 @@ class Subscribe extends View
 
                 foreach ($childProducts as $childProduct) {
                     $childType = $childProduct->getTypeId();
-                    $childSubsProductType = $this->subscriptionTypeResolver->resolve($childType);
                     $childArray[$childProduct->getId()]['product_price'] = $childProduct->getFinalPrice();
-                    $productDataObject = $childSubsProductType->getProductDataObject($childProduct);
-                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getChildProductBillingFrequencies(
+                    $productDataObject = $subsProductType->getProductDataObject(
+                        $this->getProduct(),
+                        ['child_product' => $childProduct]
+                    );
+                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getProductBillingFrequenciesData(
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['trial_data'] = $this->getTrialDataByProduct(
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
-                        $childProduct
+                        $productDataObject
                     );
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
                 }
@@ -568,10 +572,10 @@ class Subscribe extends View
 
     /**
      * Returns array of recurring settings used on product page for child products
-     * @param $product
+     * @param $productData
      * @return array
      */
-    protected function getRecurringSettingsByProduct($product)
+    protected function getRecurringSettingsByProduct($productData)
     {
         $attributesMap = [
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
@@ -582,11 +586,11 @@ class Subscribe extends View
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         ];
         $result = [];
-        foreach ($product->getData() as $key => $attribute) {
+        foreach ($productData->getData() as $key => $attribute) {
             if (in_array($key, $attributesMap)) {
                 if ($key == Attribute::SUBSCRIPTION_SAVINGS_CALCULATION) {
                     $result[substr($key, 11)] = $this->savingsCalculation
-                        ->getSavingsCalculationType($product);
+                        ->getSavingsCalculationType($productData);
                     continue;
                 }
                 $result[substr($key, 11)] = $attribute;
