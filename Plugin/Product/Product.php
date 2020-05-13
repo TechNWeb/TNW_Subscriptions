@@ -8,8 +8,8 @@
 namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Framework\Serialize\Serializer\Json;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Plugin for processing recurring options.
@@ -18,12 +18,12 @@ class Product
 {
 
     /**
-     * @var Json
+     * @var Serializer
      */
     private $serializer;
 
     public function __construct(
-        Json $serializer
+        Serializer $serializer
     ) {
         $this->serializer = $serializer;
     }
@@ -32,7 +32,7 @@ class Product
      *
      * @param ProductInterface $product
      *
-     * @return ProductInterface
+     * @return array
      */
     public function beforeSave(ProductInterface $product)
     {

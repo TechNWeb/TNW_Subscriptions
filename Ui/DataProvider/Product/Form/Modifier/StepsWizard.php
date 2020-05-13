@@ -11,7 +11,6 @@ use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
@@ -24,6 +23,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
 * Customize tnw attributes to use steps wizard component.
@@ -91,7 +91,7 @@ class StepsWizard extends BaseModifier
      */
     private $scopeLabel;
     /**
-     * @var Json
+     * @var Serializer
      */
     private $serializer;
 
@@ -102,7 +102,7 @@ class StepsWizard extends BaseModifier
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param StoreManagerInterface $storeManager
-     * @param Json $serializer
+     * @param Serializer $serializer
      * @param Context $context
      */
     public function __construct(
@@ -112,7 +112,7 @@ class StepsWizard extends BaseModifier
         BillingFrequencyRepository $billingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         StoreManagerInterface $storeManager,
-        Json $serializer,
+        Serializer $serializer,
         Context $context
     ) {
         $this->locator = $locator;

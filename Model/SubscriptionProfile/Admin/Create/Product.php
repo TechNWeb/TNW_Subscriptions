@@ -11,7 +11,6 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
@@ -25,6 +24,7 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Class Product
@@ -111,7 +111,7 @@ class Product extends Create
     private $config;
 
     /**
-     * @var Json
+     * @var Serializer
      */
     private $serializer;
 
@@ -126,7 +126,7 @@ class Product extends Create
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param Json $serializer
+     * @param Serializer $serializer
      */
     public function __construct(
         Config $config,
@@ -138,7 +138,7 @@ class Product extends Create
         ProductTypeManagerResolver $productTypeResolver,
         ProductBillingFrequencyRepository $productBillingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        Json $serializer
+        Serializer $serializer
     ) {
         $this->config = $config;
         $this->productRepository = $productRepository;

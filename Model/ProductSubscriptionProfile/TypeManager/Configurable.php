@@ -11,7 +11,6 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Pricing\SaleableInterface;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
@@ -19,6 +18,7 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Configurable product manager.
@@ -26,18 +26,13 @@ use TNW\Subscriptions\Model\Product\Attribute;
 class Configurable extends Base
 {
     /**
-     * @var Json
-     */
-    private $serializer;
-
-    /**
      * Configurable constructor.
      * @param Config $config
      * @param PriceCalculator $priceCalculator
      * @param ProductFrequencyRepository $productFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductRepositoryInterface $productRepository
-     * @param Json $serializer
+     * @param Serializer $serializer
      */
     public function __construct(
         Config $config,
@@ -45,16 +40,16 @@ class Configurable extends Base
         ProductFrequencyRepository $productFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductRepositoryInterface $productRepository,
-        Json $serializer
+        Serializer $serializer
     ) {
         parent::__construct(
             $config,
             $priceCalculator,
             $productFrequencyRepository,
             $searchCriteriaBuilder,
-            $productRepository
+            $productRepository,
+            $serializer
         );
-        $this->serializer = $serializer;
     }
 
     /**
