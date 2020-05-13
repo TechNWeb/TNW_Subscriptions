@@ -280,49 +280,7 @@ class ManagerConfigurable
             }
             $profile->setDataChanges($profileChanged);
         }
-        if (isset($request['subscription_profile_id'])) {
-            if (isset($request['item_' . $request['subscription_profile_id']]['term'])) {
-                $term = $request['item_' . $request['subscription_profile_id']]['term'];
-                $profile->setTerm($term);
-                if (1 == $term) {
-                    $periodValue = 0;
-                } else {
-                    $periodValue = isset($request['item_' . $request['subscription_profile_id']]['period'])
-                        ? $request['item_' . $request['subscription_profile_id']]['period']
-                        : 0;
-                    if (1 > $periodValue) {
-                        return strval(__('Bill times must be greater than 0.'));
-                    }
-                }
-                $profile->setTotalBillingCycles($periodValue);
-            }
-            if (isset($request['item_' . $request['subscription_profile_id']]['billing_frequency'])) {
-                $frequencyId = $request['item_' . $request['subscription_profile_id']]['billing_frequency'];
-                $frequency = $this->frequencyRepository->getById($frequencyId);
-                $profile->setBillingFrequencyId($frequencyId)
-                    ->setFrequency($frequency->getFrequency())
-                    ->setUnit($frequency->getUnit());
-            }
-            if (isset($request['item_' . $request['subscription_profile_id']]['qty'])) {
-                $products = $profile->getProducts();
-                $request = $this->objectFactory->create($request);
-                foreach ($products as $product) {
-                    $price = $this->getSubscriptionItemPrice($request, $profile, $product);
-                    $product->setPrice($price);
-                }
-            }
-            if (isset($request['item_' . $request['subscription_profile_id']]['start_on'])) {
-                $startOn = $request['item_' . $request['subscription_profile_id']]['start_on'];
-                $date = new \DateTime();
-                $startDate = new \DateTime($startOn);
-                $expression = 'PT' . $date->format('H') . 'H'
-                    . $date->format('i') . 'M'
-                    . $date->format('s') . 'S';
-                $startDate->add(new \DateInterval($expression));
-                $startOn = $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                $profile->setStartDate($startOn);
-            }
-        }
+
         return $profile;
     }
 

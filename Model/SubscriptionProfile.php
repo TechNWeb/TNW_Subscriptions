@@ -773,4 +773,25 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
         return $this;
     }
+
+    /**
+     * Gets original start date.
+     *
+     * @return string|null
+     */
+    public function getOriginalStartDate()
+    {
+        return $this->getData(self::ORIGINAL_START_DATE);
+    }
+
+    /**
+     * Sets original start date.
+     *
+     * @param string $originalStartDate
+     * @return $this
+     */
+    public function setOriginalStartDate($originalStartDate)
+    {
+        return $this->setData(self::ORIGINAL_START_DATE, $originalStartDate);
+    }
 }

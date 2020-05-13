@@ -705,6 +705,7 @@ class Manager
             ->setTerm($request['term'])
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] - 1 : 0)
             ->setStartDate($startDate)
+            ->setOriginalStartDate($startDate)
             ->setBillingFrequencyId($frequency->getId())
             ->setFrequency($frequency->getFrequency())
             ->setUnit($frequency->getUnit())
@@ -720,8 +721,11 @@ class Manager
         //set trial start date to profile
         if ($request['is_trial']) {
             $this->getProfile()
-                ->setTrialStartDate($startDate)
-                ->setStartDate($this->calculateStartDate());
+                ->setTrialStartDate($startDate);
+            $calculatedStatDate = $this->calculateStartDate();
+            $this->getProfile()
+                ->setStartDate($calculatedStatDate)
+                ->setOriginalStartDate($calculatedStatDate);
 
             //set status "trial" if trial period starts immediately
             if (strtotime($startDate) <= time()) {
