@@ -272,10 +272,13 @@ class StepsWizard extends BaseModifier
      */
     private function getSettingsContainerConfig()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 2: Recurring Settings')
+            : __('Step 1: Recurring Settings');
         return [
             'data' => [
                 'config' => [
-                    'label' => __('Recurring Settings'),
+                    'label' => $label,
                     'formElement' => Fieldset::NAME,
                     'componentType' => Fieldset::NAME,
                     'caption' => __('Settings'),
@@ -300,10 +303,13 @@ class StepsWizard extends BaseModifier
      */
     private function getRecurringContainerConfig()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 3: Billing Frequencies')
+            : __('Step 2: Billing Frequencies');
         return [
             'data' => [
                 'config' => [
-                    'label' => __('Billing Frequencies'),
+                    'label' => $label,
                     'formElement' => Fieldset::NAME,
                     'componentType' => Fieldset::NAME,
                     'caption' => __('Billing Frequencies'),
@@ -322,7 +328,7 @@ class StepsWizard extends BaseModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => __('Select attributes'),
+                        'label' => __('Step 1: Select attributes'),
                         'formElement' => Fieldset::NAME,
                         'componentType' => Fieldset::NAME,
                         'caption' => __('Select attributes'),
@@ -578,12 +584,15 @@ class StepsWizard extends BaseModifier
      */
     private function getSummaryContainer()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 4: Summary')
+            : __('Step 3: Summary');
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
                         'label' => __('Summary'),
-                        'wizardSummaryLabel' => __('Step 3: Summary'),
+                        'wizardSummaryLabel' => $label,
                         'formElement' => Fieldset::NAME,
                         'componentType' => Fieldset::NAME,
                         'caption' => __('Summary'),

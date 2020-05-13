@@ -157,7 +157,6 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'visible' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
-                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',

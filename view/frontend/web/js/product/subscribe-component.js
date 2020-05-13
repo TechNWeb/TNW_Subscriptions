@@ -59,6 +59,10 @@ define([
                 this.setDefaultFrequency();
                 initializePreselected();
             } else if (this.products.type === 'configurable'){
+                if (!$(this.swatchWidgetSelector).length) {
+                    initializePreselected();
+                    return;
+                }
                 if ($(this.swatchWidgetSelector).data(this.swatchWidgetName)) {
                     initializePreselected();
                 } else {
@@ -85,6 +89,11 @@ define([
 
             if (priceWidget) {
                 priceWidget._insertPriseBox(this.selectedFrequency, this.getSelectedProductId());
+            }
+            if (selectedPurchaseType === undefined) {
+                $(this.subsPriceBox).show();
+                $(this.priceBox).hide();
+                return;
             }
             $(this.activeInputSelector).val(selectedPurchaseType);
             if (selectedPurchaseType === '1') {
@@ -170,13 +179,13 @@ define([
         getFrequencyOptions: function () {
             var options = [];
 
-            if (!this.currentProduct || !this.currentProduct.frequency_data) return;
+            if (!this.currentProduct || !this.currentProduct.frequency_data) return false;
             _.each(this.currentProduct.frequency_data, function (option) {
                 if (_.indexBy(this.products.product.frequency_data, 'value')[option.value]) {
                     options.push(option);
                 }
             }, this);
-            return options;
+            return options.length ? options : false;
         },
 
         getTrialLabel: function (option) {

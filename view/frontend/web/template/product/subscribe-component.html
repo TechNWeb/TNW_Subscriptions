@@ -7,7 +7,7 @@
 <div class="fieldset" data-bind="visible: !currentProduct">
     <span translate="'Please select options'"/>
 </div>
-<div class="fieldset" data-bind="visible: (currentProduct && currentProduct.frequency_data)">
+<div class="fieldset" data-bind="visible: (currentProduct && getFrequencyOptions())">
     <div class="field required">
         <label class="label"><span translate="'Billing Frequency'"/>:</label>
         <div class="control">

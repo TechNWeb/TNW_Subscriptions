@@ -64,7 +64,7 @@ class Product
                 }
             }
         }
-        if ($product->hasData('tnw_subscr_inheritance')) {
+        if (is_array($product->getData('tnw_subscr_inheritance'))) {
             $product->setData(
                 'tnw_subscr_inheritance',
                 $this->serializer->serialize($product->getData('tnw_subscr_inheritance'))

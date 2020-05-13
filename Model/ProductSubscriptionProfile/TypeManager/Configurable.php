@@ -215,6 +215,10 @@ class Configurable extends Base
                 }
             }
         }
+        $productData->setData(
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
+            $childProduct->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE)
+        );
         return $productData;
     }
 }
