@@ -61,7 +61,6 @@ class Uninstall implements UninstallInterface
     {
         $tnwTables = [
             'tnw_subscriptions_product_billing_frequency',
-            'tnw_subscriptions_subscription_profile_order',
             'tnw_subscriptions_billing_frequency',
             'tnw_subscriptions_customer_quote',
             'tnw_subscriptions_quote_item_extension_entity',
@@ -72,6 +71,21 @@ class Uninstall implements UninstallInterface
             'tnw_subscriptions_subscription_profile_queue',
             'tnw_subscriptions_subscription_profile_status_history',
             'tnw_subscriptions_message',
+            'tnw_subscriptions_creditmemo_extension_entity',
+            'tnw_subscriptions_invoice_item_extension_entity',
+            'tnw_subscriptions_subscription_profile_order',
+            'tnw_subscriptions_subscription_profile_payment',
+            'tnw_subscriptions_profile_item_sales_item',
+            'tnw_subscriptions_order_extension_entity',
+
+            // Product Profile EAV
+            'tnw_subscriptions_product_subscription_profile_eav_attribute',
+            'tnw_subscriptions_product_subscription_profile_entity_varchar',
+            'tnw_subscriptions_product_subscription_profile_entity_text',
+            'tnw_subscriptions_product_subscription_profile_entity_int',
+            'tnw_subscriptions_product_subscription_profile_entity_decimal',
+            'tnw_subscriptions_product_subscription_profile_entity_datetime',
+            'tnw_subscriptions_product_subscription_profile_entity',
 
             // Profile EAV
             'tnw_subscriptions_subscription_profile_entity_varchar',
@@ -81,13 +95,6 @@ class Uninstall implements UninstallInterface
             'tnw_subscriptions_subscription_profile_entity_datetime',
             'tnw_subscriptions_subscription_profile_entity',
 
-            // Product Profile EAV
-            'tnw_subscriptions_product_subscription_profile_entity_varchar',
-            'tnw_subscriptions_product_subscription_profile_entity_text',
-            'tnw_subscriptions_product_subscription_profile_entity_int',
-            'tnw_subscriptions_product_subscription_profile_entity_decimal',
-            'tnw_subscriptions_product_subscription_profile_entity_datetime',
-            'tnw_subscriptions_product_subscription_profile_entity',
         ];
 
         foreach ($tnwTables as $tnwTable) {
