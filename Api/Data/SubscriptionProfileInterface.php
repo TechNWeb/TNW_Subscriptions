@@ -45,6 +45,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const UPDATED_AT = 'updated_at';
     const NEED_RECOLLECT = 'need_recollect';
     const CANCEL_BEFORE_NEXT_CYCLE = 'cancel_before_next_cycle';
+    const ORIGINAL_START_DATE = 'original_start_date';
     /**#@-*/
 
     /**#@+

@@ -36,6 +36,7 @@
                 <field>base_subs_initial_fee</field>
             </join>
         </attribute>
+        <attribute code="proposed_shipping_date" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceItemInterface">
         <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\InvoiceItem">
