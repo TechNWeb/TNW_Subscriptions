@@ -13,7 +13,6 @@ var config = {
             tnwSubscribeShipmentDetails: 'TNW_Subscriptions/js/subscription-profile/shipment-details',
             tnwSubscribeBilling: 'TNW_Subscriptions/js/subscription-profile/billing',
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
-            configurable: 'TNW_Subscriptions/js/configurable'
         }
     },
     config: {
@@ -32,7 +31,11 @@ var config = {
             },
             'Magento_Swatches/js/swatch-renderer' : {
                 'TNW_Subscriptions/js/swatch-renderer-mixin' : true
-            }
+            },
+            'Magento_ConfigurableProduct/js/configurable' : {
+                'TNW_Subscriptions/js/configurable-mixin' : true
+            },
+
         }
     }
 };
