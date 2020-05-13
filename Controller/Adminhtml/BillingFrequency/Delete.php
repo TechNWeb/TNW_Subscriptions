@@ -6,25 +6,60 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency;
+use TNW\Subscriptions\Model\BillingFrequency;
+
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {
 
     /**
+     * @var ProductBillingFrequency
+     */
+    private $productBillingFrequency;
+
+    /**
+     * @var BillingFrequency
+     */
+    private $billingFrequency;
+
+    /**
+     * Delete constructor.
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param ProductBillingFrequency $productBillingFrequency
+     * @param BillingFrequency $billingFrequency
+     */
+    public function __construct(
+        Context $context,
+        Registry $coreRegistry,
+        ProductBillingFrequency $productBillingFrequency,
+        BillingFrequency $billingFrequency
+    ) {
+        $this->productBillingFrequency = $productBillingFrequency;
+        $this->billingFrequency = $billingFrequency;
+        parent::__construct($context, $coreRegistry);
+    }
+
+    /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        // check if we know what should be deleted
         $id = $this->getRequest()->getParam('id');
-        if ($id) {
+        $billingFrequency = $this->productBillingFrequency->isBillingFrequencyAllowedToProduct($id);
+        // check if we know what should be deleted and it not have any associated products
+        if ($id && empty($billingFrequency)) {
             try {
                 // init model and delete
-                $model = $this->_objectManager->create('TNW\Subscriptions\Model\BillingFrequency');
-                $model->load($id);
+                $model = $this->billingFrequency->load($id);
                 $model->delete();
                 // display success message
                 $this->messageManager->addSuccessMessage(__('You deleted the Billing Frequency.'));
@@ -38,7 +73,9 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
             }
         }
         // display error message
-        $this->messageManager->addErrorMessage(__('We can\'t find a Billing Frequency to delete.'));
+        $this->messageManager->addErrorMessage(__(
+            'Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again.'
+        ));
         // go to grid
         return $resultRedirect->setPath('*/*/');
     }
