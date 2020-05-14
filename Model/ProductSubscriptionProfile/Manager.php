@@ -431,16 +431,14 @@ class Manager
                             if (isset($data['item_' . $productId]['billing_frequency'])) {
                                 $frequencyId = $data['item_' . $productId]['billing_frequency'];
                                 if ($profileModel->getBillingFrequencyId() != $frequencyId) {
-                                    if (!isset($startOn)) {
+                                    if (!isset($startOn) && (strtotime('now')) >= strtotime($originalStartDate)) {
                                         $nextPaymentDate = $this->orderRelationManager
                                             ->getNextProfileRelation($profileModel)->getScheduledAt();
                                         $startOn = $this->getNewStartDate($product, $nextPaymentDate);
-                                        if (strtotime($startOn) > strtotime($originalStartDate)){
-                                            $startOn = (new \DateTime($startOn))
-                                                ->add(new \DateInterval($this->getCurrentTimeExpression()))
-                                                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                            $profileModel->setStartDate($startOn);
-                                        }
+                                        $startOn = (new \DateTime($startOn))
+                                            ->add(new \DateInterval($this->getCurrentTimeExpression()))
+                                            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                                        $profileModel->setStartDate($startOn);
                                     }
                                     $frequency = $this->frequencyRepository->getById($frequencyId);
                                     $profileModel->setBillingFrequencyId($frequencyId)

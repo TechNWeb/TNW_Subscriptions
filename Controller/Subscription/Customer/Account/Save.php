@@ -18,7 +18,6 @@ use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
-use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory as BillingFrequencyCollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
@@ -135,12 +134,16 @@ class Save extends AbstractSave
                 }
                 $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
-                $currentDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
                 $originalStartDate = $profile->getTrialStartDate() ?: $profile->getOriginalStartDate();
-                if ($currentDate < $originalStartDate) {
-                    $this->updateNextPaymentDate();
+                if (strtotime('now') < strtotime($originalStartDate)) {
+                    if ($profile->getTrialStartDate()) {
+                        $nextDate = $profile->getStartDate();
+                    } else {
+                        $billingCycles = $this->billingCyclesManager->getBillingCycles($profile, 2);
+                        $nextDate = array_pop($billingCycles[0]);
+                    }
+                    $this->profileOrderManager->updateNextPaymentDate($profile, $nextDate);
                 }
-
                 if ($frequencyChanged) {
                     $this->messageManager->addSuccessMessage(__(
                         'New Billing Frequency will take effect after the next order.'
@@ -202,58 +205,5 @@ class Save extends AbstractSave
         $response['data'] = $this->responseProcessor->processResponse($request);
 
         return $response;
-    }
-
-   /**
-     * Update ScheduledAt date if was changed date or billing frequency for profile
-     *
-     * @throws \Exception
-     */
-    private function updateNextPaymentDate()
-    {
-        $nowDate = new \DateTime();
-        $nowDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-
-        $profileSubscription = $this->profileManager->loadProfileFromRequest('subscription_profile_id');
-        $this->profileOrderManager->updateNextPaymentDate(
-            $profileSubscription,
-            $this->calculateStartDate($profileSubscription)
-        );
-    }
-
-    /**
-     * Calculates start date of subscription
-     *
-     * @param $profileSubscription
-     * @return mixed|string|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function calculateStartDate($profileSubscription)
-    {
-        $result = null;
-
-        if ($profileSubscription->getTrialStartDate()) {
-            $startDate = new \DateTime($profileSubscription->getTrialStartDate());
-
-            switch ($profileSubscription->getTrialLengthUnit()) {
-                case \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::DAYS:
-                    $intervalUnit = 'D';
-                    break;
-                case \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::MONTHS:
-                    $intervalUnit = 'M';
-                    break;
-                default:
-                    throw new \Magento\Framework\Exception\LocalizedException(__('Undefined trial length unit type.'));
-            }
-
-            $expression = 'P' . $profileSubscription->getTrialLength() . $intervalUnit;
-            $result = $startDate->add(new \DateInterval($expression))
-                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-        } else {
-            $billingCycles = $this->billingCyclesManager->getBillingCycles($profileSubscription, 2);
-            $result = array_pop($billingCycles[0]);
-        }
-
-        return $result;
     }
 }
