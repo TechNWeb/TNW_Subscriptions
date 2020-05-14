@@ -61,11 +61,6 @@ class Save extends AbstractSave
     private $billingCyclesManager;
 
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection
-     */
-    private $billingFrequencyCollection;
-
-    /**
      * @var ManagerInterface
      */
     protected $messageManager;
@@ -81,7 +76,6 @@ class Save extends AbstractSave
      * @param ManagerInterface $messageManager
      * @param ProfileOrderManager $profileOrderManager
      * @param BillingCyclesManager $billingCyclesManager
-     * @param BillingFrequencyCollectionFactory $billingFrequencyCollectionFactory
      */
     public function __construct(
         Context $context,
@@ -93,8 +87,7 @@ class Save extends AbstractSave
         DataPersistorInterface $dataPersistor,
         ManagerInterface $messageManager,
         ProfileOrderManager $profileOrderManager,
-        BillingCyclesManager $billingCyclesManager,
-        BillingFrequencyCollectionFactory $billingFrequencyCollectionFactory
+        BillingCyclesManager $billingCyclesManager
     ) {
         $this->profileManager = $profileManager;
         $this->coreRegistry = $coreRegistry;
@@ -103,7 +96,6 @@ class Save extends AbstractSave
         $this->messageManager = $messageManager;
         $this->profileOrderManager = $profileOrderManager;
         $this->billingCyclesManager = $billingCyclesManager;
-        $this->billingFrequencyCollection = $billingFrequencyCollectionFactory->create();
         parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
@@ -139,13 +131,13 @@ class Save extends AbstractSave
                 $errors = $this->processRequestData($request);
 
                 if ($profile->hasDataChanges()) {
-                    $this->updateBillingFrequencyUnit($request['item_' . $request['objectItemId']]['billing_frequency']);
                     $profile->setNeedRecollect('1');
                 }
                 $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
                 $currentDate = (new \DateTime())->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                if ($currentDate < $profile->getStartDate()) {
+                $originalStartDate = $profile->getTrialStartDate() ?: $profile->getOriginalStartDate();
+                if ($currentDate < $originalStartDate) {
                     $this->updateNextPaymentDate();
                 }
 
@@ -212,23 +204,7 @@ class Save extends AbstractSave
         return $response;
     }
 
-    /**
-     * Update unit if it was changed
-     *
-     * @param $billingFrequencyId
-     */
-    private function updateBillingFrequencyUnit($billingFrequencyId)
-    {
-        if ($this->getRequest()->getParam('billing_frequency_id') != $billingFrequencyId) {
-            $billingFrequency = $this->billingFrequencyCollection
-                ->addFieldToFilter('id', ['eq' => $billingFrequencyId])
-                ->fetchItem();
-            $profile = $this->profileManager->getProfile();
-            $profile->setUnit($billingFrequency->getUnit());
-        }
-    }
-
-    /**
+   /**
      * Update ScheduledAt date if was changed date or billing frequency for profile
      *
      * @throws \Exception
@@ -274,10 +250,7 @@ class Save extends AbstractSave
             $result = $startDate->add(new \DateInterval($expression))
                 ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
         } else {
-            $billingCycles = $this->billingCyclesManager->getBillingCycles(
-                $profileSubscription,
-                2
-            );
+            $billingCycles = $this->billingCyclesManager->getBillingCycles($profileSubscription, 2);
             $result = array_pop($billingCycles[0]);
         }
 

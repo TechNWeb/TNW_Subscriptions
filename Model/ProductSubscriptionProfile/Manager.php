@@ -403,7 +403,10 @@ class Manager
                                 }
                                 $profileModel->setTotalBillingCycles($periodValue);
                             }
-                            $originalStartDate = date('Y-m-d', strtotime($profileModel->getOriginalStartDate()));
+                            $trialLength = $profileModel->getTrialLength();
+                            $originalStartDate = $trialLength
+                                ? date('Y-m-d', strtotime($profileModel->getTrialStartDate()))
+                                : date('Y-m-d', strtotime($profileModel->getOriginalStartDate()));
                             if (isset($data['item_' . $productId]['start_on'])
                                 && (date('Y-m-d', strtotime($data['item_' . $productId]['start_on']))
                                     !== $originalStartDate)
@@ -411,7 +414,7 @@ class Manager
                                 $startOn = (new \DateTime($data['item_' . $productId]['start_on']))
                                     ->add(new \DateInterval($this->getCurrentTimeExpression()))
                                     ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                if ($trialLength = $profileModel->getTrialLength()) {
+                                if ($trialLength) {
                                     $profileModel->setTrialStartDate($startOn);
                                     $intervalUnit = $profileModel->getTrialLengthUnit()
                                         == \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::MONTHS
