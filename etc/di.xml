@@ -1322,4 +1322,7 @@
     <type name="CyberSource\SecureAcceptance\Gateway\Config\Config">
         <plugin name="get_config_cybersource" type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config"/>
     </type>
+    <type name="Magento\Multishipping\Controller\Checkout\Addresses">
+        <plugin name="tnw_multishipping_redirect" type="TNW\Subscriptions\Plugin\Multishipping\Controller\Checkout\Addresses"/>
+    </type>
 </config>
