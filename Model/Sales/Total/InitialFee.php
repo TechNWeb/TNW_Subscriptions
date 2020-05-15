@@ -99,7 +99,7 @@ class InitialFee extends AbstractTotal
     /**
      * Returns quote item subscription initial fees extension attribute.
      *
-     * @param CartItemInterface | ItemInterface $item
+     * @param CartItemInterface $item
      * @return QuoteItem
      */
     private function getItemInitialFees($item)

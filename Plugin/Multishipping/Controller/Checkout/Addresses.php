@@ -9,7 +9,6 @@ use Magento\Framework\UrlInterface;
 
 class Addresses
 {
-
     /**
      * @var ResultFactory
      */
@@ -30,6 +29,13 @@ class Addresses
      */
     private $context;
 
+    /**
+     * Addresses constructor.
+     * @param ResultFactory $resultFactory
+     * @param ManagerInterface $managerInterface
+     * @param UrlInterface $urlBuilder
+     * @param Context $context
+     */
     public function __construct(
         ResultFactory $resultFactory,
         ManagerInterface $managerInterface,
@@ -42,14 +48,15 @@ class Addresses
         $this->context = $context;
     }
 
+    /**
+     * @param \Magento\Multishipping\Controller\Checkout\Addresses $subject
+     * @return mixed
+     */
     public function afterExecute(\Magento\Multishipping\Controller\Checkout\Addresses $subject)
     {
-        $resultRedirect = $this->resultFactory->create(
-            ResultFactory::TYPE_REDIRECT
-        );
+        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
 
         $this->managerInterface->addWarningMessage( __('Checkout with multiple addresses is not supported.') );
         return $resultRedirect->setUrl($this->urlBuilder->getUrl('checkout/cart', ['_secure' => true]));
-
     }
 }
