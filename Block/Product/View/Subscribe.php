@@ -543,7 +543,6 @@ class Subscribe extends View
                 $childArray = [];
 
                 foreach ($childProducts as $childProduct) {
-                    $childType = $childProduct->getTypeId();
                     $childArray[$childProduct->getId()]['product_price'] = $childProduct->getFinalPrice();
                     $productDataObject = $subsProductType->getProductDataObject(
                         $this->getProduct(),

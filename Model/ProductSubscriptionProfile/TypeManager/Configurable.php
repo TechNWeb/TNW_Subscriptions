@@ -219,6 +219,10 @@ class Configurable extends Base
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             $childProduct->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE)
         );
+        $productData->setData(
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            $childProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+        );
         return $productData;
     }
 }

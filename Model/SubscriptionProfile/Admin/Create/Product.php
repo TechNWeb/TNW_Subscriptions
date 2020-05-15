@@ -251,8 +251,9 @@ class Product extends Create
                 }
             }
             // add preset qty param to product request array
-            $productData['use_preset_qty'] =
-                (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+            $productData['use_preset_qty'] = $this->getChildProduct()
+                ? (bool)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+                : (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
             $productData['hide_qty'] =
                 (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
             $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_START_DATE);
@@ -276,7 +277,7 @@ class Product extends Create
                 $startOn = $productData['start_on'];
             }
             if ($productData['use_preset_qty']) {
-                if ($this->getInheritanceConfig(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
+                if ($this->getChildProduct()) {
                     $this->searchCriteriaBuilder
                         ->addFilter(
                             ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
@@ -547,6 +548,11 @@ class Product extends Create
             ->getSubscriptionCurrentPresetQtyPrice($product, $productData);
     }
 
+    /**
+     * Get attribute value according to inheritance config
+     * @param $code
+     * @return mixed|null
+     */
     private function getSubsAttribute($code)
     {
         if (

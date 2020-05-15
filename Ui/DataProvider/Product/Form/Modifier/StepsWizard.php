@@ -468,32 +468,6 @@ class StepsWizard extends BaseModifier
                         ]
                     ]
                 ],
-                'inherit_' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'formElement' => Checkbox::NAME,
-                                'componentType' => Field::NAME,
-                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
-                                'label' => __('Unlock Preset Qty'),
-                                'valueMap' => [
-                                    'false' => '0',
-                                    'true' => '1'
-                                ],
-                                'notices' => [
-                                    '1' => __('Child controls if the product quantity is editable'),
-                                    '0' => __('Parent controls if the product quantity is editable')
-                                ],
-                                'exports' => [
-                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY . ':disabled'
-                                ],
-                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
-                                'prefer' => 'toggle',
-                                'scopeLabel' => $this->scopeLabel
-                            ]
-                        ]
-                    ]
-                ],
                 'inherit_' . Attribute::SUBSCRIPTION_HIDE_QTY => [
                     'arguments' => [
                         'data' => [
