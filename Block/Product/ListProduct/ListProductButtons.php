@@ -235,7 +235,7 @@ class ListProductButtons extends Template
     public function getDefaultSubscribeQty()
     {
         if (!$this->getAllowEditSubscribeQty()) {
-            if ($this->getFrequencyOption()['is_default'] && isset($option['preset_qty'])) {
+            if (array_key_exists('is_default', $this->getFrequencyOption()) && isset($option['preset_qty'])) {
                 return $this->getFrequencyOption()['preset_qty'] * 1;
             }
         }
