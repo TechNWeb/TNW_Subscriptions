@@ -130,7 +130,8 @@ class PriceCalculator
             } elseif ($lockProductPrice) {
                 $discountAmount = $this->getDiscountAmount($product, $productPrice);
                 $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
-                $price = isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
+                $discountedPrice = ($origPrice - $discountAmount) >= 0 ? $origPrice - $discountAmount : 0;
+                $price = isset($productPrice) ? $productPrice : $discountedPrice;
             } else {
                 $billingFrequencyPrice = $this->getBillingFrequencyPrice(
                     $billingFrequencyId,
