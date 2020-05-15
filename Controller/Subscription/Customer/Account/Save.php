@@ -124,6 +124,21 @@ class Save extends AbstractSave
                     && ($profile->getBillingFrequencyId()
                         != $request['item_' . $request['objectItemId']]['billing_frequency']
                     );
+                $trialLength = $profile->getTrialLength();
+                $originalStartDate = $trialLength
+                    ? date('Y-m-d', strtotime($profile->getTrialStartDate()))
+                    : date('Y-m-d', strtotime($profile->getOriginalStartDate()));
+                $startOnChanged = isset($request['objectItemId'])
+                    && isset($request['item_' . $request['objectItemId']]['start_on'])
+                    && (date('Y-m-d', strtotime($request['item_' . $request['objectItemId']]['start_on']))
+                        !== $originalStartDate
+                    );
+                if ($startOnChanged) {
+                    $originalStartDate = date(
+                        'Y-m-d',
+                        strtotime($request['item_' . $request['objectItemId']]['start_on'])
+                    );
+                }
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
 
@@ -134,14 +149,12 @@ class Save extends AbstractSave
                 }
                 $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
-                $originalStartDate = $profile->getTrialStartDate() ?: $profile->getOriginalStartDate();
-                if (strtotime('now') < strtotime($originalStartDate)) {
-                    if ($profile->getTrialStartDate()) {
-                        $nextDate = $profile->getStartDate();
-                    } else {
-                        $billingCycles = $this->billingCyclesManager->getBillingCycles($profile, 2);
-                        $nextDate = array_pop($billingCycles[0]);
-                    }
+                if ((strtotime(date('Y-m-d')) < strtotime($originalStartDate))
+                    && ($frequencyChanged || $startOnChanged)
+                ) {
+                    $nextDate = $trialLength
+                        ? $profile->getStartDate()
+                        : $this->billingCyclesManager->calculateBillingCycleDate($profile);
                     $this->profileOrderManager->updateNextPaymentDate($profile, $nextDate);
                 }
                 if ($frequencyChanged) {

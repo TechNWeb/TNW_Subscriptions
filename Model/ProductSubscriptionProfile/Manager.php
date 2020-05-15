@@ -431,7 +431,9 @@ class Manager
                             if (isset($data['item_' . $productId]['billing_frequency'])) {
                                 $frequencyId = $data['item_' . $productId]['billing_frequency'];
                                 if ($profileModel->getBillingFrequencyId() != $frequencyId) {
-                                    if (!isset($startOn) && (strtotime('now')) >= strtotime($originalStartDate)) {
+                                    if (!isset($startOn)
+                                        && (strtotime(date('Y-m-d')) >= strtotime($originalStartDate))
+                                    ) {
                                         $nextPaymentDate = $this->orderRelationManager
                                             ->getNextProfileRelation($profileModel)->getScheduledAt();
                                         $startOn = $this->getNewStartDate($product, $nextPaymentDate);

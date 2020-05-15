@@ -183,6 +183,30 @@ class BillingCyclesManager
     }
 
     /**
+     * Calculates subscription date for billing cycle by its number.
+     *
+     * @param SubscriptionProfileInterface $profile
+     * @param int $cycleNumber
+     * @return string
+     * @throws \Exception
+     */
+    public function calculateBillingCycleDate(SubscriptionProfileInterface $profile, $cycleNumber = 1)
+    {
+        $startDate = new \DateTime($profile->getStartDate());
+        $products = $profile->getProducts();
+        $product = array_shift($products);
+        $date = $this->calculateScheduledDate(
+            $startDate,
+            $profile->getUnit(),
+            $profile->getFrequency() * $cycleNumber,
+            $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
+            $startDate->format('j')
+        );
+
+        return $this->format($date);
+    }
+
+    /**
      * Calculates subscription date for billing cycle.
      *
      * @param \DateTime $date
