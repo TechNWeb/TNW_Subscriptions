@@ -308,7 +308,6 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="tnw_subscriptions_generate_quotes_command" xsi:type="object">TNW\Subscriptions\Console\Command\GenerateCommand</item>
                 <item name="tnw_subscriptions_process_command" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessCommand</item>
                 <item name="tnw_subscriptions_renewal_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessRenewalCommand</item>
                 <item name="tnw_subscriptions_expire_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessExpiredCardCommand</item>
@@ -355,28 +354,6 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
-
-    <!--Subscription profile quote processors-->
-    <type name="TNW\Subscriptions\Console\Command\GenerateCommand">
-        <arguments>
-            <argument name="quoteProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Quote\Processor\Pool</argument>
-        </arguments>
-    </type>
-    <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Quote\Processor\Pool"
-                 type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
-        <arguments>
-            <argument name="processors" xsi:type="array">
-                <item name="recalculate" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Cron\Quote\Updater</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
-                <item name="create" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Cron\Quote\Creator</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
-                </item>
-            </argument>
-        </arguments>
-    </virtualType>
 
     <!--Subscription profile status modifiers after profile queue processing-->
     <type name="TNW\Subscriptions\Cron\ProfileProcessor">

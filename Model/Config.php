@@ -54,12 +54,6 @@ class Config
     /**#@-*/
 
     /**#@+
-     * Config xml path for past advanced section
-     */
-    private $xmlGeneratedQuotesCount = 'tnw_subscriptions_general/advanced/generated_quotes_count';
-    /**#@-*/
-
-    /**#@+
      * Config xml path for Trial section
      */
     private $xmlTrialStatus = 'tnw_subscriptions_product/trial/trial_status';
@@ -255,17 +249,6 @@ class Config
     public function getGracePeriod($websiteId = null)
     {
         return  $this->getStoreConfig($this->xmlGracePeriod, $websiteId);
-    }
-
-    /**
-     * Get "Generated quotes count" config value.
-     *
-     * @param null|bool|int|string|WebsiteInterface $websiteId
-     * @return null|string
-     */
-    public function getGeneratedQuotesCount($websiteId = null)
-    {
-        return  $this->getStoreConfig($this->xmlGeneratedQuotesCount, $websiteId);
     }
 
     /**
