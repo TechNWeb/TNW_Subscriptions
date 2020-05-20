@@ -38,8 +38,7 @@ class Configurable extends Base
                     throw new LocalizedException(__('Super attributes must be set'));
                 }
 
-                $requestValue = array_merge_recursive(
-                    $requestValue,
+                $requestValue = array_replace_recursive(
                     [
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [
                             Create::NON_UNIQUE => [
@@ -51,7 +50,8 @@ class Configurable extends Base
                                 'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($mainProduct, $subscriptionPart),
                             ],
                         ],
-                    ]
+                    ],
+                    $requestValue
                 );
                 $request->setValue($this->serializer->serialize($requestValue));
             }

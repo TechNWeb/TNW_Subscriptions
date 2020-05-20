@@ -381,4 +381,6 @@ The number of future quotes to generate at a time for the new subscription profi
 "Re-activate","Re-activate"
 "Re-activate subscription.","Re-activate subscription."
 "Bill times must be greater than 0.","Bill times must be greater than 0."
+"Checkout with multiple addresses is not supported.","Checkout with multiple addresses is not supported."
 "New Billing Frequency will take effect after the next order.","New Billing Frequency will take effect after the next order."
+

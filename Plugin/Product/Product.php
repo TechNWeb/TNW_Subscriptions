@@ -31,6 +31,16 @@ class Product
         if ($product->getCanSaveRecurringOptions()) {
             $options = $product->getData('recurring_options');
             if (is_array($options)) {
+                $defaultBillingFrequencyChecked = 0;
+                array_filter($options, function($option) use (&$defaultBillingFrequencyChecked) {
+                    if ($option->getDefaultBillingFrequency()) {
+                        $defaultBillingFrequencyChecked = 1;
+                        return;
+                    }
+                }, ARRAY_FILTER_USE_BOTH);
+                if(!$defaultBillingFrequencyChecked){
+                    $options[0]->setDefaultBillingFrequency(1);
+                }
                 $product->setIsRecurringOptionChanged(true);
                 foreach ($options as $option) {
                     if ($option instanceof ProductBillingFrequencyInterface) {
