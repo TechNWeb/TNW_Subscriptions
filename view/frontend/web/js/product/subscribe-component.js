@@ -274,7 +274,7 @@ define([
         },
 
         getDefaultUntilCancelled: function () {
-            return this.isInfinite() ? this.isInfinite() : this.defaultUntilCancelled;
+            return this.isInfinite() ? '1' : this.defaultUntilCancelled;
         },
 
         getIsVisibleStartOn: function () {
