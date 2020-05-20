@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\Sales\Total;
 
+use Magento\Catalog\Model\Product\Configuration\Item\ItemInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Quote\Api\Data\CartItemExtensionInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
@@ -101,7 +102,7 @@ class InitialFee extends AbstractTotal
      * @param CartItemInterface $item
      * @return QuoteItem
      */
-    private function getItemInitialFees(CartItemInterface $item)
+    private function getItemInitialFees($item)
     {
         $extensionAttributes = $item->getExtensionAttributes();
         if (!$extensionAttributes instanceof CartItemExtensionInterface) {
