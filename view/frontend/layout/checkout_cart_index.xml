@@ -56,5 +56,6 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
     </body>
 </page>

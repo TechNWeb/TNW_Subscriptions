@@ -85,6 +85,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.44', '<')) {
             $this->addOriginalStartDateColumnToSubscriptionProfile($setup);
         }
+
+        if (version_compare($context->getVersion(), '2.2.45', '<')) {
+            $this->addCheckSendMailColumn($setup);
+        }
         $setup->endSetup();
     }
 
