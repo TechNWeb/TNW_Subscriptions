@@ -5,17 +5,41 @@
  */
 namespace TNW\Subscriptions\Model\Quote;
 
+use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Service\Serializer;
+
 class ItemGroup
 {
     /**
-     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     * @var DescriptionCreator
      */
     private $descriptionCreator;
 
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
+     * @var BillingFrequencyRepositoryInterface
+     */
+    private $billingFrequencyRepository;
+
+    /**
+     * ItemGroup constructor.
+     * @param DescriptionCreator $descriptionCreator
+     * @param BillingFrequencyRepositoryInterface $billingFrequencyRepository
+     * @param Serializer $serializer
+     */
     public function __construct(
-        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+        DescriptionCreator $descriptionCreator,
+        BillingFrequencyRepositoryInterface $billingFrequencyRepository,
+        Serializer $serializer
     ) {
         $this->descriptionCreator = $descriptionCreator;
+        $this->serializer = $serializer;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
     }
 
     /**
@@ -31,8 +55,8 @@ class ItemGroup
             if (null === $option) {
                 $group['no_option'][] = $item;
             } else {
-                $optionValuesWithId[] = json_decode($option->getValue())->product_id = $option->getProductId();
-                $group[json_encode($optionValuesWithId)][] = $item;
+                $billingFrequency = $this->serializer->unserialize($option->getValue())['billing_frequency'];
+                $group[$billingFrequency][] = $item;
             }
         }
 
@@ -50,22 +74,17 @@ class ItemGroup
     /**
      * @param \Magento\Quote\Model\Quote\Item[] $group
      *
-     * @return \Magento\Framework\Phrase
+     * @return \Magento\Framework\Phrase|string
      */
-    public function caption($group)
+    public function caption($group, $frequency_id = null)
     {
-        static $quoteIndex = [];
-
         if (!$this->isSubscriptionGroup($group)) {
             return __('One-Time Purchase');
         }
-
-        $key = spl_object_hash(reset($group));
-        if (!isset($quoteIndex[$key])) {
-            $quoteIndex[$key] = \count($quoteIndex) + 1;
+        if (null !== $frequency_id) {
+            return __('%1 Purchase', $this->billingFrequencyRepository->getById($frequency_id)->getLabel());
         }
-
-        return __('Subscription Profile #%1', $quoteIndex[$key]);
+        return '';
     }
 
     /**
