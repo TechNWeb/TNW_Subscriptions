@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\BillingFrequency;
 
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {
-
     /**
      * @var ProductBillingFrequency
      */
@@ -28,6 +27,7 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 
     /**
      * Delete constructor.
+     *
      * @param Context $context
      * @param Registry $coreRegistry
      * @param ProductBillingFrequency $productBillingFrequency

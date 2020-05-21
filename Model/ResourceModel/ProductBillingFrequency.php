@@ -29,15 +29,19 @@ class ProductBillingFrequency extends AbstractDb
      * Checks if there is a record with current billing frequency id
      *
      * @param $id
-     * @return array
+     * @return bool
      */
     public function isBillingFrequencyAllowedToProduct($id)
     {
         $connection = $this->getConnection();
         $sql = $connection->select()
             ->from(
-                ['main' => $this->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)]
-        )->where('main.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=?', $id);
-        return $this->getConnection()->fetchCol($sql);
+                ['main' => $this->getTable(
+                    ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)
+                ],
+                [ProductBillingFrequencyInterface::ID]
+            )->where('main.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=?', $id);
+
+        return count($this->getConnection()->fetchCol($sql)) > 0;
     }
 }
