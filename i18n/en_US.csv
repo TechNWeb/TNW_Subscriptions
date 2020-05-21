@@ -386,3 +386,5 @@ The number of future quotes to generate at a time for the new subscription profi
 "Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again.","Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again."
 "+ %1 (estimated shipment)","+ %1 (estimated shipment)"
 "free","free"
+"Bill %1 times","Bill %1 times"
+"Start on","Start on"
