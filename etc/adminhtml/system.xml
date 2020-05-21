@@ -37,11 +37,6 @@
 
             <group id="advanced" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Advanced</label>
-                <field id="generated_quotes_count" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0">
-                    <label>Number of Quotes</label>
-                    <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
-                    <comment>The number of future quotes to generate at a time for the new subscription profile.</comment>
-                </field>
                 <group id="log" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Log Messages</label>
                     <field id="status" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0">
