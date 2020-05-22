@@ -149,8 +149,8 @@ for,for
 "Could not delete the SubscriptionProfile: %1","Could not delete the SubscriptionProfile: %1"
 Edit,Edit
 Delete,Delete
-"Delete ""${ $.$data.title }""","Delete ""${ $.$data.title }"""
-"Are you sure you wan't to delete a ""${ $.$data.title }"" record?","Are you sure you wan't to delete a ""${ $.$data.title }"" record?"
+"Delete ""${ $.$data.label }""","Delete ""${ $.$data.label }"""
+"Are you sure you wan't to delete a ""${ $.$data.label }"" record?","Are you sure you wan't to delete a ""${ $.$data.label }"" record?"
 [Add],[Add]
 Select,Select
 Process,Process
