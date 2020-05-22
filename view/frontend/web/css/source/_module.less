@@ -157,371 +157,503 @@
             }
         }
     }
-}
 
-.checkout-cart-index {
-    .addtocart-subscribe,
-    .addtocart-onetime {
-        .addtocart-wrapper {
-            padding: 1rem 0 1rem 2.2rem;
-            .fieldset {
-                margin-bottom: 1rem;
-            }
-            .period {
-                width: 54px;
-            }
-            .subscribe-container {
-                padding: 1rem;
-                background: #eee;
-                border-radius: 0.5rem;
-            }
-            .start-on {
-                width: 100px;
+    .checkout-cart-index {
+        .cart.items.data.table {
+            .col.subtotal.subscription {
+                width: 66%;
+                white-space: normal;
             }
         }
-
-        >input:not([type=hidden]):not(:checked) ~ .addtocart-wrapper {
-            display: none;
-        }
-
-        >input:checked ~ label {
-            font-weight: bold;
-        }
-
-        >input[type=hidden] {
-            ~ label {
-                display: none;
-            }
-            ~ .addtocart-wrapper {
-                padding-left: 0;
-            }
-        }
-    }
-}
-
-.catalog-product-view {
-    .tnw-addtocart-container {
-        input[name="addtocart_type"] {
-            &:not(:checked) {
-                & ~ .addtocart-wrapper {
-                    display: none;
-                }
-            }
-            &+label {
-                font-weight: bold;
-            }
-        }
-        .addtocart-onetime,
-        .addtocart-subscribe {
-            padding-bottom: 1.5rem;
-            padding-top: 1.5rem;
-            border-bottom: 1px solid #777;
-            .subscription-price-with-savings,
-            .onetime-final-price {
-                padding-left: 2.2rem;
-                padding-top: 0.5rem;
-                padding-bottom: 1.5rem;
-                font-weight: bold;
-                color: #b30000;
-            }
+        .addtocart-subscribe,
+        .addtocart-onetime {
             .addtocart-wrapper {
-                padding-left: 2.2rem;
-            }
-        }
-        #start_at {
-            width: 100px;
-
-        }
-        .action.update-delivery-date {
-            .lib-link-as-button();
-            .lib-button-primary();
-        }
-    }
-
-    .addtocart-tabs {
-        padding-top: 20px;
-
-        .title-container {
-            display: inline-block;
-            width: 100%;
-
-            .tab-title {
-                display: inline-block;
-                float: left;
-                background: #f6f6f6;
-                border: 1px solid #cccccc;
-                border-bottom: none;
-                margin-right: -1px;
-
-                > a {
-                    padding: 8px 15px;
-                    line-height: 2.5em;
-                    color: #7d7d7d;
-                    text-decoration: none;
-                }
-            }
-            .tab-title.active {
-                > a {
-                    padding-bottom: 10px;
-                    color: #333333;
-                    background: #ffffff;
-                    cursor: default;
-                }
-            }
-        }
-        .content-container {
-            margin-top: -5px;
-            margin-bottom: 10px;
-            padding: 0 30px;
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #cccccc;
-
-            .tab-content.subscribe-tab {
-                padding: 30px 0;
+                padding: 1rem 0 1rem 2.2rem;
 
                 .fieldset {
-                    margin: 0 0 20px;
+                    margin-bottom: 1rem;
                 }
 
-                .fieldset > .field > .label {
-                    margin: 0 0 10px;
-                }
-
-                .fieldset > .field.required > .label:after,
-                .fieldset > .fields > .field.required > .label:after {
-                    content: '';
-                }
-
-                .input-text.qty {
-                    text-align: center;
+                .period {
                     width: 54px;
                 }
 
-                .field.term {
-                    margin-bottom: 10px;
+                .subscribe-container {
+                    padding: 1rem;
+                    background: #eee;
+                    border-radius: 0.5rem;
                 }
 
-                .field.period .control {
-                    position: relative;
+                .start-on {
+                    width: 100px;
+                }
+            }
 
-                    > label {
-                        margin-right: 3px;
+            > input:not([type=hidden]):not(:checked) ~ .addtocart-wrapper {
+                display: none;
+            }
+
+            > input:checked ~ label {
+                font-weight: bold;
+            }
+
+            > input[type=hidden] {
+                ~ label {
+                    display: none;
+                }
+
+                ~ .addtocart-wrapper {
+                    padding-left: 0;
+                }
+            }
+        }
+    }
+
+    .catalog-product-view {
+        .tnw-addtocart-container {
+            input[name="addtocart_type"] {
+                &:not(:checked) {
+                    & ~ .addtocart-wrapper {
+                        display: none;
                     }
-
-                    > label.after-input {
-                        position: absolute;
-                        top: 6px;
-                        left: 101px;
-                    }
                 }
 
-                .field.date {
-                    .control {
-                        position: relative;
-                        width: 57%;
-
-                        .ui-datepicker-trigger {
-                            position: absolute;
-                            top: 7px;
-                            right: 4rem;
-                            z-index: 3;
-                        }
-
-                        #start_at {
-                            z-index: 2;
-                            position: relative;
-                            background: inherit;
-                        }
-                    }
-                }
-
-                .action.primary {
-                    padding: 14px 17px;
-                    width: 49%;
-                    line-height: 2.2rem;
-                    font-size: 1.8rem;
+                & + label {
+                    font-weight: bold;
                 }
             }
-        }
-    }
-}
 
-.subscription-container {
-    padding-top: 2.5rem;
-    vertical-align: top;
+            .addtocart-onetime,
+            .addtocart-subscribe {
+                padding-bottom: 1.5rem;
+                padding-top: 1.5rem;
+                border-bottom: 1px solid #777;
 
-    .fieldset:last-child {
-        margin-bottom: 0;
-    }
+                .subscription-price-with-savings,
+                .onetime-final-price {
+                    padding-left: 2.2rem;
+                    padding-top: 0.5rem;
+                    padding-bottom: 1.5rem;
+                    font-weight: bold;
+                    color: #b30000;
+                }
 
-    .fieldset-wrapper-content {
-        position: relative;
-        height: 100%;
-
-        .middle-container {
-            .fieldset-wrapper-content {
-                position: static;
+                .addtocart-wrapper {
+                    padding-left: 2.2rem;
+                }
             }
-        }
-    }
 
-    /* "action-remove" button */
-    button.remove-button-icon {
-        color: #514943;
-        background: none;
-        border: none;
-        box-shadow: none;
-        padding: 1rem;
-        margin: 0;
+            #start_at {
+                width: 100px;
 
-        :before {
-            font-size: 2.2rem;
-            font-family: 'luma-icons';
-            content: '\e604';
-        }
-    }
+            }
 
-    .fieldset-wrapper-title {
-        padding-bottom: 1.5rem;
-
-        span {
-            font-weight: 300;
-            line-height: 1.1;
-            font-size: 2.6rem;
-        }
-    }
-
-    .mage-error input {
-        border-color: #ed8380;
-    }
-
-    > .fieldset-wrapper-content {
-        border-top: 2px solid #ccc;
-        margin-top: 50px;
-    }
-
-    .subscription-item-form:not(:last-child) {
-        border-bottom: 1px solid #ccc;
-    }
-
-    .subscription-item-form {
-        padding: 2rem 0 0 0;
-
-        >.fieldset-wrapper-content {
-            >.fieldset {
-                .lib-vendor-prefix-flex-wrap(wrap);
+            .action.update-delivery-date {
+                .lib-link-as-button();
+                .lib-button-primary();
             }
         }
 
-        .subscription-product-messages {
-            .lib-vendor-prefix-flex-grow(1);
-            .lib-vendor-prefix-flex-basis(100%);
-        }
+        .addtocart-tabs {
+            padding-top: 20px;
 
-        .fieldset {
-            display: -webkit-inline-flex;
-            display: -ms-inline-flexbox;
-            display: inline-flex;
-            width: -moz-available;
-            width: -webkit-fill-available;
-            height: 100%;
-        }
-        .description-fieldset {
-            display: inline-block;
-            width: 100%;
-            vertical-align: top;
-            position: relative;
-
-            >.fieldset-wrapper-content {
-                >.fieldset {
-                    margin-bottom: 0;
-                }
-            }
-            .middle-container {
-                padding-top: 0.5rem;
-                padding-right: 1.5rem;
+            .title-container {
                 display: inline-block;
-                vertical-align: top;
                 width: 100%;
+
+                .tab-title {
+                    display: inline-block;
+                    float: left;
+                    background: #f6f6f6;
+                    border: 1px solid #cccccc;
+                    border-bottom: none;
+                    margin-right: -1px;
+
+                    > a {
+                        padding: 8px 15px;
+                        line-height: 2.5em;
+                        color: #7d7d7d;
+                        text-decoration: none;
+                    }
+                }
+
+                .tab-title.active {
+                    > a {
+                        padding-bottom: 10px;
+                        color: #333333;
+                        background: #ffffff;
+                        cursor: default;
+                    }
+                }
+            }
+
+            .content-container {
+                margin-top: -5px;
+                margin-bottom: 10px;
+                padding: 0 30px;
+                width: 100%;
+                box-sizing: border-box;
+                border: 1px solid #cccccc;
+
+                .tab-content.subscribe-tab {
+                    padding: 30px 0;
+
+                    .fieldset {
+                        margin: 0 0 20px;
+                    }
+
+                    .fieldset > .field > .label {
+                        margin: 0 0 10px;
+                    }
+
+                    .fieldset > .field.required > .label:after,
+                    .fieldset > .fields > .field.required > .label:after {
+                        content: '';
+                    }
+
+                    .input-text.qty {
+                        text-align: center;
+                        width: 54px;
+                    }
+
+                    .field.term {
+                        margin-bottom: 10px;
+                    }
+
+                    .field.period .control {
+                        position: relative;
+
+                        > label {
+                            margin-right: 3px;
+                        }
+
+                        > label.after-input {
+                            position: absolute;
+                            top: 6px;
+                            left: 101px;
+                        }
+                    }
+
+                    .field.date {
+                        .control {
+                            position: relative;
+                            width: 57%;
+
+                            .ui-datepicker-trigger {
+                                position: absolute;
+                                top: 7px;
+                                right: 4rem;
+                                z-index: 3;
+                            }
+
+                            #start_at {
+                                z-index: 2;
+                                position: relative;
+                                background: inherit;
+                            }
+                        }
+                    }
+
+                    .action.primary {
+                        padding: 14px 17px;
+                        width: 49%;
+                        line-height: 2.2rem;
+                        font-size: 1.8rem;
+                    }
+                }
+            }
+        }
+    }
+
+    .subscription-container {
+        padding-top: 2.5rem;
+        vertical-align: top;
+
+        .fieldset:last-child {
+            margin-bottom: 0;
+        }
+
+        .fieldset-wrapper-content {
+            position: relative;
+            height: 100%;
+
+            .middle-container {
+                .fieldset-wrapper-content {
+                    position: static;
+                }
+            }
+        }
+
+        /* "action-remove" button */
+
+        button.remove-button-icon {
+            color: #514943;
+            background: none;
+            border: none;
+            box-shadow: none;
+            padding: 1rem;
+            margin: 0;
+
+            :before {
+                font-size: 2.2rem;
+                font-family: 'luma-icons';
+                content: '\e604';
+            }
+        }
+
+        .fieldset-wrapper-title {
+            padding-bottom: 1.5rem;
+
+            span {
+                font-weight: 300;
+                line-height: 1.1;
+                font-size: 2.6rem;
+            }
+        }
+
+        .mage-error input {
+            border-color: #ed8380;
+        }
+
+        > .fieldset-wrapper-content {
+            border-top: 2px solid #ccc;
+            margin-top: 50px;
+        }
+
+        .subscription-item-form:not(:last-child) {
+            border-bottom: 1px solid #ccc;
+        }
+
+        .subscription-item-form {
+            padding: 2rem 0 0 0;
+
+            > .fieldset-wrapper-content {
+                > .fieldset {
+                    .lib-vendor-prefix-flex-wrap(wrap);
+                }
+            }
+
+            .subscription-product-messages {
+                .lib-vendor-prefix-flex-grow(1);
+                .lib-vendor-prefix-flex-basis(100%);
+            }
+
+            .fieldset {
+                display: -webkit-inline-flex;
+                display: -ms-inline-flexbox;
+                display: inline-flex;
+                width: -moz-available;
+                width: -webkit-fill-available;
                 height: 100%;
+            }
 
-                .product-options {
-                    margin-bottom: 2rem;
-                }
-                .edit-fieldset .fieldset .field:not(.field-option) {
-                    margin-top: 2rem;
-                }
+            .description-fieldset {
+                display: inline-block;
+                width: 100%;
+                vertical-align: top;
+                position: relative;
 
-                .fieldset {
-                    display: block;
-                    text-align: left;
-
-                    >.field {
+                > .fieldset-wrapper-content {
+                    > .fieldset {
                         margin-bottom: 0;
                     }
+                }
 
-                    .field {
-                        text-align: start;
+                .middle-container {
+                    padding-top: 0.5rem;
+                    padding-right: 1.5rem;
+                    display: inline-block;
+                    vertical-align: top;
+                    width: 100%;
+                    height: 100%;
+
+                    .product-options {
+                        margin-bottom: 2rem;
                     }
 
-                    .label {
-                        margin: 0;
+                    .edit-fieldset .fieldset .field:not(.field-option) {
+                        margin-top: 2rem;
+                    }
+
+                    .fieldset {
                         display: block;
-                    }
+                        text-align: left;
 
-                    .field-name {
-                        font-size: 2.6rem;
-                        margin-bottom: 0;
-                        float: left;
-                        width: calc(100% - 45px);
-                    }
+                        > .field {
+                            margin-bottom: 0;
+                        }
 
-                    .field-description {
-                        margin-top: 0.5rem;
-                    }
+                        .field {
+                            text-align: start;
+                        }
 
-                    .qty-container {
-                        display: inline-block;
-                        width: 50%;
-                        margin: 0;
-                        margin-top: 1.5rem;
+                        .label {
+                            margin: 0;
+                            display: block;
+                        }
 
-                        .field-qty {
+                        .field-name {
+                            font-size: 2.6rem;
+                            margin-bottom: 0;
                             float: left;
-                            width: 16rem;
+                            width: calc(100% - 45px);
+                        }
 
-                            &._required {
-                                & > .label:after {
-                                    content: '*';
-                                    color: #e02b27;
-                                    font-size: 1.2rem;
-                                    margin: 0 0 0 5px;
+                        .field-description {
+                            margin-top: 0.5rem;
+                        }
+
+                        .qty-container {
+                            display: inline-block;
+                            width: 50%;
+                            margin: 0;
+                            margin-top: 1.5rem;
+
+                            .field-qty {
+                                float: left;
+                                width: 16rem;
+
+                                &._required {
+                                    & > .label:after {
+                                        content: '*';
+                                        color: #e02b27;
+                                        font-size: 1.2rem;
+                                        margin: 0 0 0 5px;
+                                    }
+                                }
+
+                                label {
+                                    float: left;
+                                    font-weight: 600;
+                                    padding: 0.5rem 0.5rem 0 0;
+                                }
+
+                                .field-control {
+                                    float: left;
+
+                                    input {
+                                        width: 8rem;
+                                        margin: 0 0.5rem;
+                                    }
+
+                                    .control-preview {
+                                        margin: 0.5rem 0.5rem;
+                                    }
                                 }
                             }
+
+                            .qty-edit-button {
+                                float: left;
+                                line-height: 1.36;
+                                padding: 0.3rem 0 0 0;
+                                color: #007bdb;
+                                text-decoration: none;
+                                background: none;
+                                border: 0;
+                                display: inline;
+                                font-weight: 400;
+                                border-radius: 0;
+                                box-shadow: none;
+                            }
+                        }
+
+                        .field-price {
+                            display: inline-block;
+                            vertical-align: top;
+                            text-align: end;
+                            width: 50%;
+                        }
+
+                        .remove-button-icon {
+                            float: right;
+                            margin-top: -10px;
+                        }
+
+                        .action-editor {
+                            float: right;
+                            position: inherit;
+                            padding: 1rem;
+                            margin-top: -10px;
+                        }
+
+                        .field-description {
+                            clear: both;
+                        }
+
+                        .edit-attributes-button {
+                            line-height: 1.36;
+                            padding: 0.3rem 0 0 0;
+                            color: #007bdb;
+                            text-decoration: none;
+                            background: none;
+                            border: 0;
+                            display: inline;
+                            font-weight: 400;
+                            border-radius: 0;
+                            box-shadow: none;
+                        }
+
+                        .sub-button-right {
+                            margin-top: 2rem;
+                            float: left;
+                        }
+                    }
+
+                    .fieldset-wrapper.product-options {
+                        .edit-product {
+                            margin: 0;
 
                             label {
-                                float: left;
-                                font-weight: 600;
-                                padding: 0.5rem 0.5rem 0 0;
+                                display: inline-block;
+                                margin: 0 10px 5px 0;
                             }
 
-                            .field-control {
-                                float: left;
+                            div.control, div.field-control {
+                                display: inline-block;
+                            }
+                        }
+                    }
 
-                                input {
-                                    width: 8rem;
-                                    margin: 0 0.5rem;
-                                }
+                    .fieldset-wrapper.product-attributes {
+                        clear: both;
 
-                                .control-preview {
-                                    margin: 0.5rem 0.5rem;
-                                }
+                        .edit-product {
+                            margin: 0;
+                            padding: 5px;
+
+                            label {
+                                display: inline-block;
+                                margin: 0;
+                                width: calc((100%) * .50 - 5px) !important;
+                            }
+
+                            label:after {
+                                content: ':';
+                            }
+
+                            div.control, div.field-control {
+                                display: inline-block;
                             }
                         }
 
-                        .qty-edit-button {
-                            float: left;
+                        .edit-product:nth-child(2n) {
+                            background-color: #f5f5f5;
+                        }
+                    }
+                }
+
+                .left-container {
+                    display: inline-block;
+                    min-width: 27%;
+                    text-align: center;
+                    margin-right: 2rem;
+
+                    .fieldset {
+                        display: block;
+                        width: 100%;
+                        margin-bottom: 0;
+
+                        .edit-options-button {
                             line-height: 1.36;
                             padding: 0.3rem 0 0 0;
                             color: #007bdb;
@@ -535,300 +667,216 @@
                         }
                     }
 
-                    .field-price {
-                        display: inline-block;
-                        vertical-align: top;
-                        text-align: end;
-                        width: 50%;
-                    }
+                    .sub-product-image {
+                        margin-bottom: 0;
+                        margin-left: 0;
+                        position: relative;
 
-                    .remove-button-icon {
-                        float: right;
-                        margin-top: -10px;
-                    }
+                        .control {
+                            width: 100%;
+                            margin-left: 0;
+                            padding-left: 30px;
+                            padding-bottom: 100%;
 
-                    .action-editor {
-                        float: right;
-                        position: inherit;
-                        padding: 1rem;
-                        margin-top: -10px;
-                    }
-
-                    .field-description {
-                        clear: both;
-                    }
-
-                    .edit-attributes-button {
-                        line-height: 1.36;
-                        padding: 0.3rem 0 0 0;
-                        color: #007bdb;
-                        text-decoration: none;
-                        background: none;
-                        border: 0;
-                        display: inline;
-                        font-weight: 400;
-                        border-radius: 0;
-                        box-shadow: none;
-                    }
-
-                    .sub-button-right {
-                        margin-top: 2rem;
-                        float: left;
-                    }
-                }
-
-                .fieldset-wrapper.product-options {
-                    .edit-product {
-                        margin: 0;
-
-                        label {
-                            display: inline-block;
-                            margin: 0 10px 5px 0;
+                            img {
+                                bottom: 0;
+                                left: 0;
+                                margin: auto;
+                                position: absolute;
+                                right: 0;
+                                top: 0;
+                            }
                         }
-                        div.control, div.field-control {
-                            display: inline-block;
-                        }
-                    }
-                }
-
-                .fieldset-wrapper.product-attributes {
-                    clear: both;
-
-                    .edit-product {
-                        margin: 0;
-                        padding: 5px;
-
-                        label {
-                            display: inline-block;
-                            margin: 0;
-                            width: calc( (100%) * .50 - 5px ) !important;
-                        }
-                        label:after {
-                            content: ':';
-                        }
-                        div.control, div.field-control {
-                            display: inline-block;
-                        }
-                    }
-
-                    .edit-product:nth-child(2n) {
-                        background-color: #f5f5f5;
                     }
                 }
             }
 
-            .left-container {
+            .right-container {
+                padding-top: 0.5rem;
+                text-align: right;
+
+                .control-preview {
+                    font-size: 2.6rem;
+                    font-weight: @font-weight__bold;
+
+                    .tax-label {
+                        display: block;
+                        font-size: @font-size__xs;
+                    }
+                }
+            }
+
+            .edit-fieldset {
                 display: inline-block;
-                min-width: 27%;
-                text-align: center;
-                margin-right: 2rem;
+                width: 100%;
+                position: relative;
 
                 .fieldset {
                     display: block;
                     width: 100%;
-                    margin-bottom: 0;
-
-                    .edit-options-button {
-                        line-height: 1.36;
-                        padding: 0.3rem 0 0 0;
-                        color: #007bdb;
-                        text-decoration: none;
-                        background: none;
-                        border: 0;
-                        display: inline;
-                        font-weight: 400;
-                        border-radius: 0;
-                        box-shadow: none;
-                    }
                 }
 
-                .sub-product-image {
-                    margin-bottom: 0;
-                    margin-left: 0;
-                    position: relative;
+                .field-option {
+                    padding-top: .8rem;
 
-                    .control {
-                        width: 100%;
-                        margin-left: 0;
-                        padding-left: 30px;
-                        padding-bottom: 100%;
-
-                        img {
-                            bottom: 0;
-                            left: 0;
-                            margin: auto;
-                            position: absolute;
-                            right: 0;
-                            top: 0;
-                        }
-                    }
-                }
-            }
-        }
-
-        .right-container {
-            padding-top: 0.5rem;
-            text-align: right;
-            .control-preview {
-                font-size: 2.6rem;
-                font-weight: @font-weight__bold;
-
-                .tax-label {
-                    display: block;
-                    font-size: @font-size__xs;
-                }
-            }
-        }
-
-        .edit-fieldset {
-            display: inline-block;
-            width: 100%;
-            position: relative;
-
-            .fieldset {
-                display: block;
-                width: 100%;
-            }
-
-            .field-option {
-                padding-top: .8rem;
-
-                .control-radio {
-                    cursor: pointer;
-                    opacity: .01;
-                    overflow: hidden;
-                    position: absolute;
-                    vertical-align: top;
-                    &:disabled {
-                        +label {
-                            opacity: 0.5;
-                        }
-                    }
-                }
-
-                label {
-                    padding-left: 2.6rem;
-                    position: relative;
-                }
-
-                label:before {
-                    box-sizing: border-box;
-                    border-radius: 1.6rem;
-                    content: '';
-                    transition: border-color .1s linear, color .1s ease-in;
-                    background-color: #fff;
-                    border: 1px solid #adadad;
-                    color: transparent;
-                    height: 1.6rem;
-                    text-align: center;
-                    vertical-align: top;
-                    width: 1.6rem;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                }
-
-                :checked + label:after {
-                    background-color: #514943;
-                    border-radius: 50%;
-                    content: '';
-                    height: 10px;
-                    left: 3px;
-                    top: 3px;
-                    min-width: 10px;
-                    position: absolute;
-                }
-            }
-
-            .field.field-option ~ .field-option {
-                margin-top: .9rem;
-            }
-
-            .sub-period-input {
-                input {
-                    width: 4rem !important;
-                    margin: 0 0.5rem;
-                }
-            }
-
-            .field-date {
-                .field-control {
-                    position: relative;
-
-                    .field-container:after {
-                        font-family: 'luma-icons';
-                        font-size: 20px;
-                        content: '\e612';
+                    .control-radio {
+                        cursor: pointer;
+                        opacity: .01;
+                        overflow: hidden;
                         position: absolute;
-                        bottom: 0.3rem;
-                        right: 1rem;
-                        z-index: 1;
+                        vertical-align: top;
+
+                        &:disabled {
+                            + label {
+                                opacity: 0.5;
+                            }
+                        }
                     }
+
+                    label {
+                        padding-left: 2.6rem;
+                        position: relative;
+                    }
+
+                    label:before {
+                        box-sizing: border-box;
+                        border-radius: 1.6rem;
+                        content: '';
+                        transition: border-color .1s linear, color .1s ease-in;
+                        background-color: #fff;
+                        border: 1px solid #adadad;
+                        color: transparent;
+                        height: 1.6rem;
+                        text-align: center;
+                        vertical-align: top;
+                        width: 1.6rem;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+
+                    :checked + label:after {
+                        background-color: #514943;
+                        border-radius: 50%;
+                        content: '';
+                        height: 10px;
+                        left: 3px;
+                        top: 3px;
+                        min-width: 10px;
+                        position: absolute;
+                    }
+                }
+
+                .field.field-option ~ .field-option {
+                    margin-top: .9rem;
+                }
+
+                .sub-period-input {
+                    input {
+                        width: 4rem !important;
+                        margin: 0 0.5rem;
+                    }
+                }
+
+                .field-date {
+                    .field-control {
+                        position: relative;
+
+                        .field-container:after {
+                            font-family: 'luma-icons';
+                            font-size: 20px;
+                            content: '\e612';
+                            position: absolute;
+                            bottom: 0.3rem;
+                            right: 1rem;
+                            z-index: 1;
+                        }
+                    }
+                }
+
+                .field-price, .button-container {
+                    display: none;
+                }
+
+                .field-option {
+                    padding-top: .8rem;
                 }
             }
 
-            .field-price, .button-container {
-                display: none;
+            .button-container {
+                display: block;
+                height: 4rem;
+
+                .sub-button-right {
+                    padding-top: .6875em;
+                    padding-bottom: .6875em;
+                    font-size: 16px;
+                    position: absolute;
+                    bottom: 0;
+                    right: 1.5rem;
+                }
             }
 
-            .field-option {
-                padding-top: .8rem;
-            }
-        }
-
-        .button-container {
-            display: block;
-            height: 4rem;
-
-            .sub-button-right {
-                padding-top: .6875em;
-                padding-bottom: .6875em;
-                font-size: 16px;
+            .action-editor {
                 position: absolute;
-                bottom: 0;
-                right: 1.5rem;
-            }
-        }
-
-        .action-editor {
-            position: absolute;
-            right: 0;
-            top: -65px;
-            padding: 2rem;
-            z-index: 1;
-            .lib-button(
-                @_button-icon-font-size: 1.4rem,
-                @_button-icon-use: true,
-                @_button-font-content: @icon-settings,
-                @_button-icon-font-position: before
-            );
-            &.active {
+                right: 0;
+                top: -65px;
+                padding: 2rem;
+                z-index: 1;
                 .lib-button(
-                    @_button-icon-use: true,
                     @_button-icon-font-size: 1.4rem,
-                    @_button-font-content: @icon-remove,
+                    @_button-icon-use: true,
+                    @_button-font-content: @icon-settings,
                     @_button-icon-font-position: before
                 );
+
+                &.active {
+                    .lib-button(
+                        @_button-icon-use: true,
+                        @_button-icon-font-size: 1.4rem,
+                        @_button-font-content: @icon-remove,
+                        @_button-icon-font-position: before
+                    );
+                }
             }
-        }
 
-        .field-price {
-            .control {
-                span {
-                    font-size: 16px;
-                    font-weight: 600;
-                    display: inline-block;
+            .field-price {
+                .control {
+                    span {
+                        font-size: 16px;
+                        font-weight: 600;
+                        display: inline-block;
 
-                    .price {
-                        font-size: 35px;
-                    }
-
-                    .base-price.has-trial {
                         .price {
-                            font-size: 22px;
+                            font-size: 35px;
+                        }
+
+                        .base-price.has-trial {
+                            .price {
+                                font-size: 22px;
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .checkout-cart-index {
+        .cart.items.data.table {
+            .col.subtotal.subscription {
+                width: 30%;
+            }
+        }
+        .addtocart-subscribe,
+        .addtocart-onetime {
+            .addtocart-wrapper {
+                max-width: unset;
             }
         }
     }
