@@ -37,7 +37,24 @@ class CyberSource extends Base
      * @var UrlInterface
      */
     private $urlBuilder;
+    /**
+     * @var \CyberSource\Core\Block\Fingerprint
+     */
+    private $fingerprintBlock;
 
+    /**
+     * CyberSource constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param QuoteSessionInterface $session
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param Config $paymentConfig
+     * @param UrlInterface $urlBuilder
+     * @param \CyberSource\Core\Block\Fingerprint $fingerprintBlock
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
@@ -47,7 +64,8 @@ class CyberSource extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         Config $paymentConfig,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        \CyberSource\Core\Block\Fingerprint $fingerprintBlock
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
@@ -55,6 +73,7 @@ class CyberSource extends Base
         }
         $this->paymentConfig = $paymentConfig;
         $this->urlBuilder = $urlBuilder;
+        $this->fingerprintBlock = $fingerprintBlock;
     }
 
     /**
@@ -78,7 +97,20 @@ class CyberSource extends Base
      */
     protected function getAdditionalFields()
     {
+        $fingerprint = $this->fingerprintBlock
+            ->setTemplate('CyberSource_Core::fingerprint.phtml')->toHtml();
         $result = [
+            'fingerprint' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'componentType' => Container::NAME,
+                            'component' => 'Magento_Ui/js/form/components/html',
+                            'content' => $fingerprint,
+                        ]
+                    ]
+                ]
+            ],
             'credit_card_type' => [
                 'arguments' => [
                     'data' => [
@@ -247,7 +279,7 @@ class CyberSource extends Base
         } else {
             $configServiceUrl = $this->cybersourceConfig->getSopServiceUrl();
         }
-        $tokenCreateUrl = $configServiceUrl . '/silent/token/create';
+        $tokenCreateUrl = $configServiceUrl . '/silent/embedded/token/create';
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
             'listens' => $this->getListens(),
