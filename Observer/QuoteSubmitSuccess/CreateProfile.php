@@ -138,12 +138,18 @@ class CreateProfile implements ObserverInterface
             return;
         }
 
-        $groups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function($key) {
+        $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function($key) {
             return strcasecmp($key, 'no_option') !== 0;
         }, ARRAY_FILTER_USE_KEY);
 
-        if (empty($groups)) {
+        if (empty($indexedGroups)) {
             return;
+        }
+        $groups = [];
+        foreach ($indexedGroups as $indexedGroup) {
+            foreach ($indexedGroup as $quoteItem) {
+                $groups[][] = $quoteItem;
+            }
         }
 
         // Create customer
