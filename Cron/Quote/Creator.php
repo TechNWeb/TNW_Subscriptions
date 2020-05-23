@@ -146,14 +146,13 @@ class Creator extends Base
      * Generates future quotes for profile.
      *
      * @param SubscriptionProfileInterface $profile
-     * @param null $quotesCount
+     * @param int $count
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function generateProfileQuotes(SubscriptionProfileInterface $profile, $quotesCount = null)
+    public function generateProfileQuotes(SubscriptionProfileInterface $profile, $count = 1)
     {
         $relations = [];
         try {
-            $count = $quotesCount ?: $this->config->getGeneratedQuotesCount();
             list($cycles, $needMore) = $this->billingCyclesManagerFactory->create()->getBillingCycles($profile, $count);
 
             if (!empty($cycles)) {

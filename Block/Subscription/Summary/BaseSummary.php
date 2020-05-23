@@ -48,7 +48,8 @@ class BaseSummary extends Template
      */
     public function getSubscriptionProfile()
     {
-        return $this->getData('subscription_profile');
+        $profiles = $this->getData('subscription_profiles');
+        return $this->getData('subscription_profile') ?? reset($profiles);
     }
 
     /**

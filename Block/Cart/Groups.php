@@ -49,9 +49,9 @@ class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
      *
      * @return string
      */
-    public function getCaption($groupItems)
+    public function getCaption($frequency_id, $groupItems)
     {
-        return $this->quoteItemGroup->caption($groupItems);
+        return $this->quoteItemGroup->caption($frequency_id, $groupItems);
     }
 
     /**

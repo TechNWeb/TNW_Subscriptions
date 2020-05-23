@@ -8,6 +8,10 @@ define(['jquery'], function ($) {
         $.widget('mage.SwatchRenderer', originalSwatch, {
             options: {
                 selectorProductPrice: '[data-role=priceBox]:not(.subscription-price-container)'
+            },
+            _create: function () {
+                this._super();
+                this.productForm = this.element.parents(this.options.selectorProductTile).find('form[data-role*="tocart"]');
             }
         });
 

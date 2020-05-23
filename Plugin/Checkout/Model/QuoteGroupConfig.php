@@ -102,10 +102,9 @@ class QuoteGroupConfig
             return [];
         }
         $quoteGroupData = [];
-        foreach ($this->quoteItemGroup->groups($quoteItems) as $group) {
+        foreach ($this->quoteItemGroup->groups($quoteItems) as $frequency_id => $group) {
             $quoteGroupData[] = [
-                'caption' => $this->quoteItemGroup->caption($group),
-                'description' => $this->quoteItemGroup->frequencyDescription($group),
+                'caption' => $this->quoteItemGroup->caption($group, $frequency_id),
                 'itemIds' => array_map(function ($item) {
                     return $item->getId();
                 }, $group)
