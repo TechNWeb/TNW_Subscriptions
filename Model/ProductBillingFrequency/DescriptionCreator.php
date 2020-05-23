@@ -305,16 +305,13 @@ class DescriptionCreator
     /**
      * @param $quoteItem
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {
         $subscriptionData = $this->fullSubscriptionData([$quoteItem]);
 
-        return $this->getDescribedItemPriceHtml(
-            $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
-            $subscriptionData,
-            $subscriptionData[CreateProfile::NON_UNIQUE]['initialPrice']
-        );
+        return $this->getDescription($subscriptionData);
     }
 
     /**

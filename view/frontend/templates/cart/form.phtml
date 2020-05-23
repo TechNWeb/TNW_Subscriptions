@@ -20,15 +20,14 @@ $groupsViewModel = $block->getGroupsViewModel();
           }'
       class="form form-cart">
     <?= $block->getBlockHtml('formkey') ?>
-    <?php foreach ($groupsViewModel->getGroupQuoteItems() as $groupItems) : ?>
+    <?php foreach ($groupsViewModel->getGroupQuoteItems() as $frequency_id => $groupItems) : ?>
     <div class="cart table-wrapper<?= $mergedCells == 2 ? ' detailed' : '' ?>">
         <?php if ($block->getPagerHtml()) :?>
             <div class="cart-products-toolbar cart-products-toolbar-top toolbar"
                  data-attribute="cart-products-toolbar-top"><?= $block->getPagerHtml() ?>
             </div>
         <?php endif ?>
-        <h2><?= $block->escapeHtml($groupsViewModel->getCaption($groupItems)) ?></h2>
-        <p><?= /* @escapeNotVerified */ $groupsViewModel->frequencyDescription($groupItems) ?></p>
+        <h2><?= $block->escapeHtml($groupsViewModel->getCaption($groupItems, $frequency_id)) ?></h2>
         <table class="cart items data table"
                data-mage-init='{"shoppingCart":{"emptyCartButton": ".action.clear",
                    "updateCartActionContainer": "#update_cart_action_container"}}'>

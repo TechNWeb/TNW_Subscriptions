@@ -125,6 +125,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->removeConfigValue($setup, 'tnw_subscriptions_profile_options/general/shipping_fallback');
         }
 
+        if (version_compare($context->getVersion(), '2.2.46', '<')) {
+            $this->removeConfigValue($setup, 'tnw_subscriptions_general/advanced/generated_quotes_count');
+        }
+
         $setup->endSetup();
     }
 

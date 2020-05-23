@@ -120,11 +120,12 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
             </div>
         </td>
 
+        <?php if ($groupsViewModel->isSubscriptionItem($_item)): ?>
+        <td class="col subtotal subscription" data-th="<?= $block->escapeHtmlAttr(__('Subtotal')) ?>">
+            <span><?= $groupsViewModel->getSubscriptionItemPrice($_item)?></span>
+        <?php else : ?>
         <td class="col subtotal" data-th="<?= $block->escapeHtmlAttr(__('Subtotal')) ?>">
-            <?php if ($groupsViewModel->isSubscriptionItem($_item)): ?>
-                <?= $groupsViewModel->getSubscriptionItemPrice($_item)?>
-            <?php else : ?>
-                <?php if ($canApplyMsrp) :?>
+        <?php if ($canApplyMsrp) :?>
                     <span class="cart msrp subtotal">--</span>
                 <?php else :?>
                     <?= $block->getRowTotalHtml($_item) ?>
