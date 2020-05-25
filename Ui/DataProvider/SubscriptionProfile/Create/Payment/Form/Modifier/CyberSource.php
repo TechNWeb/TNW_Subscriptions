@@ -13,7 +13,6 @@ use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
 
 class CyberSource extends Base
 {
@@ -286,7 +285,7 @@ class CyberSource extends Base
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sopServiceUrl' => $tokenCreateUrl,
-            'loadSilentDataUrl' => $this->urlBuilder->getUrl('chcybersource/transparent/requestSilentData'),
+            'loadSilentDataUrl' => $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest'),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => explode(',', $this->cybersourceConfig->getCcTypes()),
             'options' => [
