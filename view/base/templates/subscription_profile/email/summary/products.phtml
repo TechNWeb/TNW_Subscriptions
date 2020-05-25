@@ -16,55 +16,57 @@
         </tr>
     </thead>
     <tbody>
-    <?php foreach ($block->getSubscriptionProfiles() as $subscriptionProfile) : ?>
-        <?php $block->setSubscriptionProfile($subscriptionProfile) ?>
-        <?php foreach ($block->getItems() as $item): ?>
-            <tr>
-                <td class="item-info">
-                    <p class="product-name"><?php echo $block->getName($item) ?></p>
-                    <img class="product-image" src="<?php echo $block->getImageUrl($item) ?>" alt="<?php echo $block->getName($item) ?>"/>
-                </td>
-                <td class="item-additional">
-                    <dl class="item-options custom-attributes">
-                        <dt class="qty"><?php echo __('Qty') ?></dt>
-                        <dd><?php echo (int)$item->getQty() ?></dd>
-                        <?php foreach ($block->getItemOptions($item) as $option): ?>
-                            <dt><?= $block->escapeHtml($option['label']) ?></dt>
-                            <?php $formatedOptionValue = $block->getFormatedOptionValue($option) ?>
-                            <dd>
-                                <?php if (isset($formatedOptionValue['full_view'])): ?>
-                                    <?= /* @escapeNotVerified */ $formatedOptionValue['full_view'] ?>
-                                <?php else: ?>
-                                    <?= /* @escapeNotVerified */ $formatedOptionValue['value'] ?>
-                                <?php endif; ?>
-                            </dd>
-                        <?php endforeach; ?>
-                        <?php foreach ($block->customAttributes($item) as $attribute): ?>
-                            <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
-                            <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
-                        <?php endforeach; ?>
-                    </dl>
-                </td>
-                <td class="item-subscription-info">
-                    <dt><?php echo __('Billing Frequency') ?></dt>
-                    <dd><?php echo $block->getBillingFrequencyLabel() ?></dd>
-                    <dt><?php echo __('Term') ?></dt>
-                    <dd><?php echo $block->getTerm() ?></dd>
-                    <dt><?php echo __('Start on') ?></dt>
-                    <dd><?php echo $block->getStartOnFormatted() ?></dd>
-                    <dt><?php echo __('Price') ?></dt>
-                    <?php $taxAmount = (float) $item->getTaxAmount($subscriptionProfile) ?>
-                    <dd>
-                        <?php echo $block->formatPrice($item->getPrice() + $taxAmount) ?>
-                        <?php if ($taxAmount): ?>
-                            <?php echo '(' .  __('Incl. Tax') . ')' ?>
-                        <?php endif; ?>
-                    </dd>
-                    <dt><?php echo __('Subtotal') ?></dt>
-                    <dd><?php echo $block->getProfileFrequencyDescription() ?></dd>
-                </td>
-            </tr>
+    <?php if ($block->getSubscriptionProfiles()) : ?>
+        <?php foreach ($block->getSubscriptionProfiles() as $subscriptionProfile) : ?>
+            <?php $block->setSubscriptionProfile($subscriptionProfile) ?>
+            <?php foreach ($block->getItems() as $item): ?>
+                <tr>
+                    <td class="item-info">
+                        <p class="product-name"><?php echo $block->getName($item) ?></p>
+                        <img class="product-image" src="<?php echo $block->getImageUrl($item) ?>" alt="<?php echo $block->getName($item) ?>"/>
+                    </td>
+                    <td class="item-additional">
+                        <dl class="item-options custom-attributes">
+                            <dt class="qty"><?php echo __('Qty') ?></dt>
+                            <dd><?php echo (int)$item->getQty() ?></dd>
+                            <?php foreach ($block->getItemOptions($item) as $option): ?>
+                                <dt><?= $block->escapeHtml($option['label']) ?></dt>
+                                <?php $formatedOptionValue = $block->getFormatedOptionValue($option) ?>
+                                <dd>
+                                    <?php if (isset($formatedOptionValue['full_view'])): ?>
+                                        <?= /* @escapeNotVerified */ $formatedOptionValue['full_view'] ?>
+                                    <?php else: ?>
+                                        <?= /* @escapeNotVerified */ $formatedOptionValue['value'] ?>
+                                    <?php endif; ?>
+                                </dd>
+                            <?php endforeach; ?>
+                            <?php foreach ($block->customAttributes($item) as $attribute): ?>
+                                <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
+                                <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
+                            <?php endforeach; ?>
+                        </dl>
+                    </td>
+                    <td class="item-subscription-info">
+                        <dt><?php echo __('Billing Frequency') ?></dt>
+                        <dd><?php echo $block->getBillingFrequencyLabel() ?></dd>
+                        <dt><?php echo __('Term') ?></dt>
+                        <dd><?php echo $block->getTerm() ?></dd>
+                        <dt><?php echo __('Start on') ?></dt>
+                        <dd><?php echo $block->getStartOnFormatted() ?></dd>
+                        <dt><?php echo __('Price') ?></dt>
+                        <?php $taxAmount = (float) $item->getTaxAmount($subscriptionProfile) ?>
+                        <dd>
+                            <?php echo $block->formatPrice($item->getPrice() + $taxAmount) ?>
+                            <?php if ($taxAmount): ?>
+                                <?php echo '(' .  __('Incl. Tax') . ')' ?>
+                            <?php endif; ?>
+                        </dd>
+                        <dt><?php echo __('Subtotal') ?></dt>
+                        <dd><?php echo $block->getProfileFrequencyDescription() ?></dd>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         <?php endforeach; ?>
-    <?php endforeach; ?>
+    <?php endif; ?>
     </tbody>
 </table>
