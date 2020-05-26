@@ -28,6 +28,13 @@ class Braintree extends Base
     private $transactionCustomer;
 
     /**
+     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * Braintree constructor.
+     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -37,6 +44,7 @@ class Braintree extends Base
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      */
     public function __construct(
+        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
@@ -52,7 +60,7 @@ class Braintree extends Base
             $persistor,
             $zeroTotalValidator
         );
-
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -62,8 +70,7 @@ class Braintree extends Base
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        return [
-            'token_hash' => $payment->getAdditionalInformation('token_hash'),
+        $result = [
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
@@ -71,6 +78,21 @@ class Braintree extends Base
                 OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear(),
             ]
         ];
+        $token = $payment->getAdditionalInformation('token_hash');
+        if (!$token && $payment->getAdditionalInformation('public_hash')) {
+            $vaultToken = $this->paymentTokenManagement
+                ->getByPublicHash(
+                    $payment->getAdditionalInformation('public_hash'),
+                    $payment->getAdditionalInformation('customer_id')
+                );
+            if ($vaultToken) {
+                $token = $vaultToken->getGatewayToken();
+                $result['payment_token'] = $token;
+            }
+        } else {
+            $result['token_hash'] = $token;
+        }
+        return $result;
     }
 
     /**
@@ -149,5 +171,23 @@ class Braintree extends Base
             ]);
 
         return $this;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(\Magento\Quote\Model\Quote $quote)
+    {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            /** @var Payment $payment */
+            $payment = $quote->getPayment();
+            $payment->unsetData('method_instance');
+            $quote->setSubscriptionPaymentDataSet(true);
+            $payment->importData(['method' => \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        } else {
+            parent::validatePayment($quote);
+        }
     }
 }
