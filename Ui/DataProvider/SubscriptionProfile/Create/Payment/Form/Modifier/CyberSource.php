@@ -6,7 +6,7 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Backend\Model\UrlInterface;
+use \Magento\Framework\UrlInterface;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
@@ -279,13 +279,16 @@ class CyberSource extends Base
             $configServiceUrl = $this->cybersourceConfig->getSopServiceUrl();
         }
         $tokenCreateUrl = $configServiceUrl . '/silent/embedded/token/create';
+        $loadSilentDataUrl = ($this->urlBuilder instanceof \Magento\Backend\Model\UrlInterface)
+            ? $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest')
+            : $this->urlBuilder->getUrl('cybersource/index/loadSilentData');
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sopServiceUrl' => $tokenCreateUrl,
-            'loadSilentDataUrl' => $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest'),
+            'loadSilentDataUrl' => $loadSilentDataUrl,
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => explode(',', $this->cybersourceConfig->getCcTypes()),
             'options' => [

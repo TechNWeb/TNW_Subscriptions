@@ -46,7 +46,7 @@ class ReceiveToken extends \Magento\Backend\App\Action
                 'chcybersource_payment_token',
                 $this->getRequest()->getParam('payment_token')
             );
-            $result->setData(['success' => true]);
+            $result->setData(['success' => true, 'payment_token' => $this->getRequest()->getParam('payment_token')]);
         }
 
         return $result;

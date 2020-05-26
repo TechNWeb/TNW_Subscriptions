@@ -54,7 +54,6 @@ define([
 
             this. loadSilentData()
                 .done(function (response) {
-                    $('body').trigger('processStop');
                     self.postPaymentToGateway(response);
                 })
                 .fail(function (errors) {
@@ -64,7 +63,8 @@ define([
         },
 
         postPaymentToGateway: function (response) {
-            var $iframe = $('#' + this.getCode() + '-transparent-iframe'),
+            var self = this,
+                $iframe = $('#' + this.getCode() + '-transparent-iframe'),
                 data = this.preparePaymentData(response),
                 tmpl = this.hiddenFormTmpl({
                     data: {
@@ -77,14 +77,25 @@ define([
             $iframe.on('submit', function (event) {
                 event.stopPropagation();
             });
+            $('[name=iframeTransparent]').on('load', function (event) {
+                var result = JSON.parse(event.target.contentWindow.document.body.innerText);
+                if (result.success && result.payment_token) {
+                    var form = registry.get('index = '+self.options.formName);
+                    form.source.data.payment.chcybersource.payment_token = result.payment_token;
+                    $('body').trigger('processStop');
+                    form.triggerSave([]);
+                }
+            })
             $(tmpl).appendTo($iframe).submit();
-            $iframe.html('');
         },
 
         preparePaymentData: function (response) {
-            var data = response[this.getCode()].fields;
+            var data = response[this.getCode()].fields,
+                month;
             data['card_cvn'] = this.source.get(this.dataScope + '.additional.cc_cid');
-            data['card_expiry_date'] = this.source.get(this.dataScope + '.additional.cc_exp_month') + '-' +
+            month = this.source.get(this.dataScope + '.additional.cc_exp_month');
+            month = parseInt(month) < 10 ? '0' + month.toString() : month;
+            data['card_expiry_date'] = month + '-' +
                 this.source.get(this.dataScope + '.additional.cc_exp_year');
             data['card_number'] = this.source.get(this.dataScope + '.additional.cc_number');
             data['transaction_type'] = 'create_payment_token';
@@ -93,8 +104,10 @@ define([
 
         loadSilentData: function () {
             var silentData = $.Deferred(),
-                postData = {
-                'form_key': FORM_KEY,
+                formKey = typeof FORM_KEY !== 'undefined' ? FORM_KEY : $('input[name=form_key]').val(),
+                postData;
+            postData = {
+                'form_key': formKey,
                 'cc_type': this.source.get(this.dataScope + '.additional.cc_type')
             };
             $.ajax({
