@@ -10,8 +10,9 @@ define([
     'uiRegistry',
     'jquery',
     'Magento_Ui/js/lib/validation/validator',
-    'mage/translate'
-], function (DynamicRows, _, utils, registry, $, validator) {
+    'mage/translate',
+    'Magento_Ui/js/modal/alert'
+], function (DynamicRows, _, utils, registry, $, validator, $t, alert) {
     'use strict';
 
     var maxId = 0,
@@ -211,16 +212,25 @@ define([
                 recordInstance = _.find(this.elems(), function (elem) {
                     return elem.index === index;
                 });
-                recordInstance.destroy();
-                this.elems([]);
-                this._updateCollection();
-                this.removeMaxPosition();
-                this.recordData()[recordInstance.index][this.deleteProperty] = this.deleteValue;
-                this.recordData.valueHasMutated();
-                childs = this.getChildItems();
 
-                if (childs.length > this.elems().length) {
-                    this.addChild(false, childs[childs.length - 1][this.identificationProperty], false);
+                if (recordInstance.data().subscriptions !== undefined) {
+                    alert({
+                        content: $t('Cannot delete Billing frequency. The following subscription profiles use it: %1')
+                            .replace('%1',recordInstance.data().subscriptions)
+                    });
+                    return false;
+                } else {
+                    recordInstance.destroy();
+                    this.elems([]);
+                    this._updateCollection();
+                    this.removeMaxPosition();
+                    this.recordData()[recordInstance.index][this.deleteProperty] = this.deleteValue;
+                    this.recordData.valueHasMutated();
+                    childs = this.getChildItems();
+
+                    if (childs.length > this.elems().length) {
+                        this.addChild(false, childs[childs.length - 1][this.identificationProperty], false);
+                    }
                 }
             } else {
                 this.update = true;

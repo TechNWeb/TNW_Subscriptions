@@ -384,5 +384,6 @@ The number of future quotes to generate at a time for the new subscription profi
 "Checkout with multiple addresses is not supported.","Checkout with multiple addresses is not supported."
 "New Billing Frequency will take effect after the next order.","New Billing Frequency will take effect after the next order."
 "Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again.","Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again."
+"Cannot delete Billing frequency. The following subscription profiles use it: %1","Cannot delete Billing frequency. The following subscription profiles use it: %1"
 "+ %1 (estimated shipment)","+ %1 (estimated shipment)"
 "free","free"

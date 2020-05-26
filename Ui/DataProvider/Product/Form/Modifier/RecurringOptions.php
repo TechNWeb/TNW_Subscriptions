@@ -24,9 +24,13 @@ use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Backend\UrlBuilder;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 
 /**
  * Data provider for "Recurring Options" panel
@@ -122,6 +126,21 @@ class RecurringOptions extends BaseModifier
     private $supportTypes;
 
     /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
+
+    /**
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
+     * @var ProductSubscriptionProfileRepository
+     */
+    private $productSubscriptionProfileRepository;
+
+    /**
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
      * @param ArrayManager $arrayManager
@@ -130,6 +149,9 @@ class RecurringOptions extends BaseModifier
      * @param Context $context
      * @param Config $config
      * @param array $supportTypes
+     * @param UrlBuilder $urlBuilder
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
      */
     public function __construct(
         LocatorInterface $locator,
@@ -139,7 +161,10 @@ class RecurringOptions extends BaseModifier
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Context $context,
         Config $config,
-        array $supportTypes
+        array $supportTypes,
+        UrlBuilder $urlBuilder,
+        SubscriptionProfileRepository $profileRepository,
+        ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
@@ -147,6 +172,9 @@ class RecurringOptions extends BaseModifier
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->config = $config;
         $this->supportTypes = $supportTypes;
+        $this->urlBuilder = $urlBuilder;
+        $this->profileRepository = $profileRepository;
+        $this->productSubscriptionProfileRepository = $productSubscriptionProfileRepository;
         parent::__construct($storeManager, $context);
     }
 
@@ -166,7 +194,36 @@ class RecurringOptions extends BaseModifier
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-                $options[] = $optionArray;
+                $searchStatuses = [ProfileStatus::STATUS_ACTIVE, ProfileStatus::STATUS_TRIAL];
+                $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                    'billing_frequency_id',
+                    $optionArray['billing_frequency_id'],
+                    'eq'
+                )->addFilter(
+                    'status',
+                    $searchStatuses,
+                    'in'
+                )->create();
+
+                $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
+                if (!empty($subscriptionProfiles->getItems())) {
+                    $subscriptionArray = [];
+                    foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
+                        $productSubscription = $this->productSubscriptionProfileRepository
+                            ->getById($subscriptionProfile['entity_id']);
+                        if (
+                            $productSubscription->getData()['magento_product_id']
+                            == $this->locator->getProduct()->getId()
+                        ) {
+                            $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
+                                $subscriptionProfile['entity_id'], true
+                            );
+                        }
+                    }
+                    $options[] = array_merge($optionArray, $subscriptionArray);
+                } else {
+                    $options[] = $optionArray;
+                }
             }
 
             $data =  array_replace_recursive(
