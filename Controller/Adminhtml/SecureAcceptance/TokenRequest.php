@@ -31,22 +31,18 @@ class TokenRequest extends \Magento\Backend\App\Action
      */
     private $tokenRequestDataBuilder;
 
-    /**
-     * TokenRequest constructor.
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Payment\Gateway\Command\Result\ArrayResultFactory $resultFactory
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
-     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
-     * @param \TNW\Subscriptions\Model\Payment\Cybersource\TokenRequestDataBuilder $tokenRequestDataBuilder
-     */
+    private $quoteSession;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Payment\Gateway\Command\Result\ArrayResultFactory $resultFactory,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
-        \TNW\Subscriptions\Model\Payment\Cybersource\TokenRequestDataBuilder $tokenRequestDataBuilder
+        \TNW\Subscriptions\Model\Payment\Cybersource\TokenRequestDataBuilder $tokenRequestDataBuilder,
+        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
     ) {
         parent::__construct($context);
+        $this->quoteSession = $quoteSession;
         $this->resultFactory = $resultFactory;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->formKeyValidator = $formKeyValidator;
@@ -58,25 +54,30 @@ class TokenRequest extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-
         $result = $this->resultJsonFactory->create();
-
+        $billingAddress = [];
+        $firstQuote = null;
+        foreach ($this->quoteSession->getSubQuotes() as $quote) {
+            $billingAddress = $quote->getBillingAddress();
+            $firstQuote = $quote;
+            break;
+        }
         try {
             $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
                 [
-                    'order_id' => '24',
-                    'session_id' => $this->_session->getSessionId(),
+                    'order_id' => $firstQuote->getId(),
+                    'session_id' => $this->_session->getId(),
                     'card_type' =>  $this->getRequest()->getParam('cc_type'),
-                    'currency' => 'USD',
+                    'currency' => $firstQuote->getQuoteCurrencyCode(),
                     'billing_address' => [
-                        'firstname' => 'aloha',
-                        'lastname' => 'aloha2',
-                        'email' => 'aloha@gmail.com',
-                        'country_id' => 'US',
-                        'city' => 'test',
-                        'region_code' => 'CA',
-                        'street_line_1' => 'gwegw',
-                        'postcode' => '90230',
+                        'firstname' => $billingAddress->getFirstname(),
+                        'lastname' => $billingAddress->getLastname(),
+                        'email' => $billingAddress->getEmail(),
+                        'country_id' => $billingAddress->getCountryId(),
+                        'city' => $billingAddress->getCity(),
+                        'region_code' => $billingAddress->getRegionCode(),
+                        'street_line_1' => implode("\n", $billingAddress->getStreet()),
+                        'postcode' => $billingAddress->getPostcode(),
                     ]
                 ]
             )]);
