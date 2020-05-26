@@ -19,13 +19,17 @@ class Cybersource extends Base
 
     private $paymentTokenRepository;
 
+    private $paymentTokenFactory;
+
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
     ) {
+        $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
@@ -42,32 +46,31 @@ class Cybersource extends Base
         if (empty($data['payment']['chcybersource']['method'])) {
             return;
         }
-        $paymentData = $data['payment']['tnw_authorize_cim'];
-        $paymentData['method'] = 'tnw_authorize_cim';
+        $paymentData = $data['payment']['chcybersource'];
+        $paymentData['method'] = 'chcybersource';
         $paymentData['additional_data'] = array_merge($paymentData, $paymentData['additional']);
 
         /** @var \Magento\Quote\Model\Quote[] $subQuotes */
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
         $quote = reset($subQuotes);
-        $guestEmail = null;
-        if (!$quote->getCustomerId()) {
-            $guestEmail = $this->getSession()->getCustomerEmail();
-        }
-        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote, $guestEmail);
-        $paymentToken = $result['payment_token'];
-        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+        $paymentToken = $this->paymentTokenFactory->create('card');
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentData), $quote->getCustomerId());
+        $paymentToken->setGatewayToken($paymentData['payment_token']);
         $paymentToken->setCustomerId($quote->getCustomerId());
-        $paymentToken->setPaymentMethodCode('tnw_authorize_cim');
+        $paymentToken->setPaymentMethodCode('chcybersource');
+        $paymentToken->setTokenDetails($this->getTokenDetails($paymentData));
+        $paymentToken->setIsActive(true);
+        $paymentToken->setIsVisible(true);
         $this->paymentTokenRepository->save($paymentToken);
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subQuote->getPayment()
                 ->setAdditionalInformation('cc_number', $paymentData['cc_last_4'])
                 ->setAdditionalInformation('customer_id', $subQuote->getCustomerId())
-                ->setMethod('tnw_authorize_cim_vault')
+                ->setMethod('chcybersource_cc_vault')
                 ->setAdditionalInformation('public_hash', $paymentToken->getPublicHash())
                 ->setCcType($paymentData['additional']['cc_type'])
-                ->setCcLast4($paymentData['cc_last_4'])
+                ->setCcLast4(substr($paymentData['cc_number'], -4))
                 ->setCcExpMonth($paymentData['additional']['cc_exp_month'])
                 ->setCcExpYear($paymentData['additional']['cc_exp_year']);
         }
@@ -79,17 +82,32 @@ class Cybersource extends Base
      * @param $paymentToken
      * @return string
      */
-    protected function generatePublicHash($paymentToken)
+    protected function generatePublicHash($paymentData, $customerId)
     {
-        $hashKey = $paymentToken->getGatewayToken();
-        if ($paymentToken->getCustomerId()) {
-            $hashKey = $paymentToken->getCustomerId();
-        }
-
-        $hashKey .= $paymentToken->getPaymentMethodCode()
-            . $paymentToken->getType()
-            . $paymentToken->getTokenDetails();
+        $hashKey = $paymentData['payment_token'];
+        $hashKey .= $customerId;
+        $hashKey .= 'chcybersource'
+            . 'card'
+            . $this->getTokenDetails($paymentData);
 
         return $this->encryptor->getHash($hashKey);
+    }
+
+    /**
+     * @param $paymentData
+     * @return false|string
+     */
+    private function getTokenDetails($paymentData)
+    {
+        //TODO:: get valid pyament method title
+        return json_encode(
+            [
+                "type" => $paymentData['cc_type'],
+                "maskedCC" => "****-****-****-" . substr($paymentData['cc_number'], -4),
+                "incrementId" => null,
+                "expirationDate" => $paymentData['cc_exp_month'] . "\/" . $paymentData['cc_exp_year'],
+                "title"=>"CyberSource Stored Cards"
+            ]
+        );
     }
 }

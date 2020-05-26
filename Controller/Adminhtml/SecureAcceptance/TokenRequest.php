@@ -66,8 +66,8 @@ class TokenRequest extends \Magento\Backend\App\Action
             $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
                 [
                     'order_id' => $firstQuote->getId(),
-                    'session_id' => $this->_session->getId(),
-                    'card_type' =>  $this->getRequest()->getParam('cc_type'),
+                    'session_id' => $this->_session->getSessionId(),
+                    'card_type' => $this->getRequest()->getParam('cc_type'),
                     'currency' => $firstQuote->getQuoteCurrencyCode(),
                     'billing_address' => [
                         'firstname' => $billingAddress->getFirstname(),
@@ -76,7 +76,8 @@ class TokenRequest extends \Magento\Backend\App\Action
                         'country_id' => $billingAddress->getCountryId(),
                         'city' => $billingAddress->getCity(),
                         'region_code' => $billingAddress->getRegionCode(),
-                        'street_line_1' => implode("\n", $billingAddress->getStreet()),
+                        'street_line_1' => $billingAddress->getStreetLine(1),
+                        'street_line_2' => $billingAddress->getStreetLine(2),
                         'postcode' => $billingAddress->getPostcode(),
                     ]
                 ]
