@@ -19,6 +19,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
@@ -138,6 +139,7 @@ class Subscribe extends View
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
 
+
     /**
      * Retrieve current product model.
      *
@@ -166,22 +168,50 @@ class Subscribe extends View
     }
 
     /**
+     * Get product data object. Respect inheritance config for configurable.
+     * @return DataObject
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getProductDataObject()
+    {
+        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+            $children = $this->getItem()->getChildren();
+            $child = is_array($children) ? reset($children) : null;
+            $arguments = !empty($child) ? ['child_product' => $child->getProduct()] : [];
+            return $this->subscriptionTypeResolver->resolve($this->getItem()->getProduct()->getTypeId())
+                ->getProductDataObject($this->getItem()->getProduct(), $arguments);
+        }
+        $typeId = $this->getProduct()->getTypeId();
+        return $this->subscriptionTypeResolver->resolve($typeId)->getProductDataObject($this->getProduct());
+    }
+
+    /**
      * Get "Enable Subscriptions" config value for current website.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function isSubscribeAvailable()
     {
-        return $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
+        return ( $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
+                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE )
+            && $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
     }
 
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function IsOnlySubscribePurchase()
     {
+        if (
+            $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
+            && $this->getPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
+        ) {
+            return true;
+        }
         return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($this->getProduct());
     }
 
@@ -189,10 +219,22 @@ class Subscribe extends View
      * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function IsOneTimeAndSubscribePurchase()
     {
-        return $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
+        return $this->getPurchaseType() ===  PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
+            && $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
+    }
+
+    /**
+     * Get purchase type from product data object. Respect configurable inheritance.
+     * @return int
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getPurchaseType()
+    {
+        return (int)$this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
     }
 
     /**
@@ -305,26 +347,36 @@ class Subscribe extends View
      */
     private function getProductBillingFrequencies()
     {
-        if (!$this->getProduct()->hasData('product_billing_frequencies')) {
-            $productId = $this->getProduct()->getId();
-            $productBillingFrequencies = $this->frequencyOptionRepository
-                ->getListByProductId($productId)
+        $frequencies = [];
+        $productData = $this->getProductDataObject();
+        $parentFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productData->getId())
+            ->getItems();
+        if ($productData->getChildProductId() && $productData->getId() !== $productData->getChildProductId()) {
+            $childFrequencies = $this->frequencyOptionRepository
+                ->getListByProductId($productData->getChildProductId())
                 ->getItems();
-            $this->getProduct()->setData('product_billing_frequencies', $productBillingFrequencies);
+            foreach ($parentFrequencies as $parentFrequency) {
+                foreach ($childFrequencies as $childFrequency) {
+                    if ($childFrequency->getBillingFrequencyId() === $parentFrequency->getBillingFrequencyId()) {
+                        $frequencies[] = $childFrequency;
+                    }
+                }
+            }
+            return $frequencies;
         }
-
-        return $this->getProduct()->getData('product_billing_frequencies');
+        return $parentFrequencies;
     }
 
     /**
      * Can allow edit Subscribe Qty
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getAllowEditSubscribeQty()
     {
-        $product = $this->getProduct();
-        return !(bool)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        return !(bool)$this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
     }
 
     /**
@@ -389,7 +441,7 @@ class Subscribe extends View
      */
     public function getIsInfiniteSubscriptions()
     {
-        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+        return $this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
     }
 
     /**
@@ -413,7 +465,7 @@ class Subscribe extends View
      */
     public function getIsVisibleStartOn()
     {
-        $product = $this->getProduct();
+        $product = $this->getProductDataObject();
         // Note: If product "is trial" then "start on" is start date of trial period,
         // otherwise "start on" is start date of subscription
         if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
