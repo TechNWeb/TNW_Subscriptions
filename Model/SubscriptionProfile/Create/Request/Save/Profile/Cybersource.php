@@ -54,23 +54,23 @@ class Cybersource extends Base
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
         $quote = reset($subQuotes);
         $paymentToken = $this->paymentTokenFactory->create('card');
-        $paymentToken->setPublicHash($this->generatePublicHash($paymentData), $quote->getCustomerId());
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentData, $quote->getCustomerId()));
         $paymentToken->setGatewayToken($paymentData['payment_token']);
         $paymentToken->setCustomerId($quote->getCustomerId());
         $paymentToken->setPaymentMethodCode('chcybersource');
-        $paymentToken->setTokenDetails($this->getTokenDetails($paymentData));
+        $paymentToken->setTokenDetails($this->getTokenDetails($paymentData['additional']));
         $paymentToken->setIsActive(true);
         $paymentToken->setIsVisible(true);
         $this->paymentTokenRepository->save($paymentToken);
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subQuote->getPayment()
-                ->setAdditionalInformation('cc_number', $paymentData['cc_last_4'])
+                ->setAdditionalInformation('cc_number', $paymentData['additional']['cc_number'])
                 ->setAdditionalInformation('customer_id', $subQuote->getCustomerId())
                 ->setMethod('chcybersource_cc_vault')
                 ->setAdditionalInformation('public_hash', $paymentToken->getPublicHash())
                 ->setCcType($paymentData['additional']['cc_type'])
-                ->setCcLast4(substr($paymentData['cc_number'], -4))
+                ->setCcLast4(substr($paymentData['additional']['cc_number'], -4))
                 ->setCcExpMonth($paymentData['additional']['cc_exp_month'])
                 ->setCcExpYear($paymentData['additional']['cc_exp_year']);
         }
@@ -88,7 +88,7 @@ class Cybersource extends Base
         $hashKey .= $customerId;
         $hashKey .= 'chcybersource'
             . 'card'
-            . $this->getTokenDetails($paymentData);
+            . $this->getTokenDetails($paymentData['additional']);
 
         return $this->encryptor->getHash($hashKey);
     }
