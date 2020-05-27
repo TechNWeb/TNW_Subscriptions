@@ -337,9 +337,11 @@ class Form extends AbstractDataProvider
         if ($productId) {
             $arguments = [];
             $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
             if ($childProduct) {
                 $arguments['child_product'] = $childProduct;
             }
+
             $productData = $this->getProductObjectData($productId, $arguments);
 
             //Note: If product "is trial" then "start on" is start date of trial period,
@@ -412,6 +414,7 @@ class Form extends AbstractDataProvider
         if (!$productId) return $result;
 
         $childProduct = $this->getChildProductFromRequest();
+        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
         if ($childProduct) {
             foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
                 $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
@@ -462,6 +465,7 @@ class Form extends AbstractDataProvider
             try {
                 $arguments = [];
                 $childProduct = $this->getChildProductFromRequest();
+                $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
                 if ($childProduct) {
                     $arguments['child_product'] = $childProduct;
                 }
@@ -670,6 +674,7 @@ class Form extends AbstractDataProvider
         if ($productId) {
             $arguments = [];
             $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
             if ($childProduct) {
                 $arguments['child_product'] = $childProduct;
             }
@@ -774,6 +779,24 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Get child product from current subscription profile
+     * @return ProductInterface|null
+     * @throws NoSuchEntityException
+     */
+    protected function getChildProductFromCurrentItem()
+    {
+        if (!empty($this->currentItem)) {
+            $children = $this->currentItem->getChildren();
+            $child = is_array($children) ? reset($children) : null;
+            $childProductId = !empty($child) ? $child->getMagentoProductId() : null;
+            return !empty($childProductId)
+                ? $this->formContext->getProductRepository()->getById($childProductId)
+                : null;
+        }
+        return null;
+    }
+
+    /**
      * Returns billing frequency label.
      *
      * @param int|string $frequencyId
@@ -841,6 +864,7 @@ class Form extends AbstractDataProvider
         if ($productId) {
             $arguments = [];
             $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
             if ($childProduct) {
                 $arguments['child_product'] = $childProduct;
             }
@@ -874,6 +898,7 @@ class Form extends AbstractDataProvider
         if ($productId) {
             $arguments = [];
             $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
             if ($childProduct) {
                 $arguments['child_product'] = $childProduct;
             }
