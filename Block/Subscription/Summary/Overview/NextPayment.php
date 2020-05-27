@@ -135,10 +135,41 @@ class NextPayment extends Template
     public function getCostFormatting()
     {
         $grandTotal = $this->getCost();
-        if ($grandTotal === false) {
+        if ($grandTotal === false || $grandTotal < 0) {
             return '--';
         } else {
+            $grandTotal -= $this->getShippingCost();
             return $this->priceHelper->currency($grandTotal, true, false);
         }
+    }
+
+    /**
+     * Retrieve Cost from Quote for shipping
+     *
+     * @return float|false
+     */
+    public function getShippingCost()
+    {
+        return $this->getSubscriptionProfile()->getShipping();
+    }
+
+    /**
+     * Retrieve Cost for shipping price formatting
+     *
+     * @return string
+     */
+    public function getShippingCostFormatting()
+    {
+        $cost = '';
+        if (!$this->getSubscriptionProfile()->getIsVirtual()) {
+            $shippingCost = $this->getShippingCost();
+            $cost = __('free');
+            if ($shippingCost > 0) {
+                $cost = $this->priceHelper->currency($shippingCost, true, false);
+            }
+            $cost = __('+ %1 (estimated shipment)', $cost);
+        }
+
+        return $cost;
     }
 }

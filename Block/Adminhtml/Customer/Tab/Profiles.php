@@ -132,7 +132,7 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $this->addColumn(
             'current_value',
-            ['header' => __('Current Value'), 'index' => 'current_value', 'type' => 'currency']
+            ['header' => __('Current Value'), 'index' => 'current_value', 'type' => 'currency', 'sortable' => false]
         );
 
         $this->addColumn(

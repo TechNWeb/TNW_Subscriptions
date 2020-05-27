@@ -5,5 +5,8 @@
     <div class="date day"><?php echo $date ? $date['day'] : '--' ?></div>
     <div class="date month"><?php echo $date ? $date['month'] : '--' ?></div>
     <div class="date year"><?php echo $date ? $date['year'] : '--' ?></div>
-    <div class="cost"><?php echo $block->getCostFormatting() ?></div>
+    <div class="cost">
+        <?php echo $block->getCostFormatting() ?>
+        <div class="delivery-cost"><?php echo $block->getShippingCostFormatting() ?></div>
+    </div>
 </div>
