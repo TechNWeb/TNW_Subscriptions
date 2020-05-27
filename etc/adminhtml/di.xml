@@ -24,6 +24,17 @@
             </argument>
         </arguments>
     </virtualType>
+    <virtualType name="Magento\CatalogStaging\Ui\DataProvider\Product\Form\Modifier\Pool"
+                 type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="product_subscriptions_options" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\SubscriptionOptions</item>
+                    <item name="sortOrder" xsi:type="number">202</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SubscriptionProfileEditPreviewBillingAddress"
                  type="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address">
         <arguments>
