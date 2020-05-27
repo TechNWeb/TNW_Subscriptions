@@ -98,7 +98,10 @@ class Products extends BaseSummary
      */
     public function getSubscriptionProfiles()
     {
-        return $this->getData('subscription_profiles') ?? [$this->getData('subscription_profile')];
+        $profiles = $this->getData('subscription_profile')
+            ? [$this->getData('subscription_profile')]
+            : null;
+        return $this->getData('subscription_profiles') ?? $profiles;
     }
 
     /**
