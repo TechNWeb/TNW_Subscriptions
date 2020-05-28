@@ -6,10 +6,13 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Authorizenet Engine
@@ -37,6 +40,26 @@ class Authorizenet extends Base
     private $paymentTokenManagement;
 
     /**
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     */
+    private $vaultPaymentAuthorization;
+
+    /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
+    private $paymentTokenRepository;
+
+    /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     */
+    private $manager;
+
+    /**
      * Authorizenet constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
@@ -47,6 +70,10 @@ class Authorizenet extends Base
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -57,7 +84,11 @@ class Authorizenet extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
     ) {
         parent::__construct(
             $config,
@@ -66,6 +97,10 @@ class Authorizenet extends Base
             $persistor,
             $zeroTotalValidator
         );
+        $this->manager = $manager;
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->encryptor = $encryptor;
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
@@ -219,33 +254,29 @@ class Authorizenet extends Base
         /** @var string[] $additionalData */
         $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
 
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $requestData['payment'][$this->getPaymentMethodCode()]['nonce']
-        ]);
+        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
+        $paymentData['method'] = $this->getPaymentMethodCode();
+        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
 
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
-            $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
-                $errors[] = "{$error->code}: {$error->message}";
-            }
+        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial(
+            $paymentData,
+            $this->manager->getTempQuote($this->getProfile())
+        );
+        $paymentToken = $result['payment_token'];
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+        $paymentToken->setCustomerId($customer->getId());
+        $paymentToken->setPaymentMethodCode('tnw_authorize_cim');
+        $this->paymentTokenRepository->save($paymentToken);
 
-            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
-        }
-
-        /** @var \Braintree\CreditCard $paymentMethod */
-        $paymentMethod = $response['object']->customer->paymentMethods[0];
 
         $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentMethod->token)
+            ->setEngineCode($this->getPaymentMethodCode())
+            ->setPaymentToken($paymentToken->getGatewayToken())
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
-                OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
+                OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],
+                OrderPaymentInterface::CC_EXP_MONTH => $additionalData['cc_exp_month'],
+                OrderPaymentInterface::CC_EXP_YEAR => $additionalData['cc_exp_year'],
             ]);
 
         return $this;
@@ -266,5 +297,23 @@ class Authorizenet extends Base
         } else {
             parent::validatePayment($quote);
         }
+    }
+
+    /**
+     * @param $paymentToken
+     * @return string
+     */
+    protected function generatePublicHash($paymentToken)
+    {
+        $hashKey = $paymentToken->getGatewayToken();
+        if ($paymentToken->getCustomerId()) {
+            $hashKey = $paymentToken->getCustomerId();
+        }
+
+        $hashKey .= $paymentToken->getPaymentMethodCode()
+            . $paymentToken->getType()
+            . $paymentToken->getTokenDetails();
+
+        return $this->encryptor->getHash($hashKey);
     }
 }
