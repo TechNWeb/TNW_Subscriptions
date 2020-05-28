@@ -33,15 +33,23 @@ class TokenRequest extends \Magento\Backend\App\Action
 
     private $quoteSession;
 
+    private $manager;
+
+    private $profileRepository;
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Payment\Gateway\Command\Result\ArrayResultFactory $resultFactory,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator,
         \TNW\Subscriptions\Model\Payment\Cybersource\TokenRequestDataBuilder $tokenRequestDataBuilder,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
+        \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
     ) {
         parent::__construct($context);
+        $this->profileRepository = $profileRepository;
+        $this->manager = $manager;
         $this->quoteSession = $quoteSession;
         $this->resultFactory = $resultFactory;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -49,26 +57,29 @@ class TokenRequest extends \Magento\Backend\App\Action
         $this->tokenRequestDataBuilder = $tokenRequestDataBuilder;
     }
 
-    /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
-     */
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
         $billingAddress = [];
-        $firstQuote = null;
-        foreach ($this->quoteSession->getSubQuotes() as $quote) {
+        $quote = null;
+        if (true || $profileId = $this->getRequest()->getParam('profile_id')) {
+            $profileId = 205; //TODO: add new param to admin form
+            $quote = $this->manager->getTempQuote($this->profileRepository->getById($profileId));
             $billingAddress = $quote->getBillingAddress();
-            $firstQuote = $quote;
-            break;
+        } else {
+            foreach ($this->quoteSession->getSubQuotes() as $subQuotequote) {
+                $billingAddress = $subQuotequote->getBillingAddress();
+                $quote = $subQuotequote;
+                break;
+            }
         }
         try {
             $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
                 [
-                    'order_id' => $firstQuote->getId(),
+                    'order_id' => $quote->getId(),
                     'session_id' => $this->_session->getSessionId(),
                     'card_type' => $this->getRequest()->getParam('cc_type'),
-                    'currency' => $firstQuote->getQuoteCurrencyCode(),
+                    'currency' => $quote->getQuoteCurrencyCode(),
                     'billing_address' => [
                         'firstname' => $billingAddress->getFirstname(),
                         'lastname' => $billingAddress->getLastname(),

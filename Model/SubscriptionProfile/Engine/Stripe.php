@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
 
 /**
  * Stripe Engine
@@ -38,7 +37,6 @@ class Stripe extends Base
 
     /**
      * Stripe constructor.
-     *
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -48,6 +46,10 @@ class Stripe extends Base
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -58,14 +60,22 @@ class Stripe extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization
         );
         $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
@@ -196,62 +206,6 @@ class Stripe extends Base
     {
         $this->isRebill = true;
     }
-    /*public function processProfileByRequestData($requestData)
-    {
-        $this->getProfile()->getPayment()->setPaymentAdditionalInfo('');
-        $this->getProfile()->getPayment()->setTokenHash('');
-        return $this;
-    }*/
-    /**
-     * @inheritdoc
-     * @param $requestData
-     * @return Stripe
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
-     */
-    public function processProfileByRequestData($requestData)
-    {
-        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
-            return $this;
-        }
-
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
-        }
-
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail()
-        ]);
-
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Stripe\Error\Card) {
-            $errors = [];
-            foreach ($response->errors->deepAll() as $error) {
-                $errors[] = "{$error->code}: {$error->message}";
-            }
-
-            throw new PaymentException(__('Stripe message: %1', implode(', ', $errors)));
-        }
-        /** @var \Stripe\Card $paymentMethod */
-        $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentData['client_secret'])
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],
-                OrderPaymentInterface::CC_EXP_MONTH => $additionalData['cc_exp_month'],
-                OrderPaymentInterface::CC_EXP_YEAR => $additionalData['cc_exp_year'],
-            ]);
-
-        return $this;
-    }
-
 
     /**
      * @param \Magento\Quote\Model\Quote $quote

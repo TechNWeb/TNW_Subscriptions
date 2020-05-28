@@ -11,7 +11,6 @@ use Magento\Paypal\Model\Payflowpro as PaypalPayflow;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 
 /**
  * Class Payflowpro
@@ -31,6 +30,10 @@ class Payflowpro extends Base
      * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
      * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
      * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -38,14 +41,22 @@ class Payflowpro extends Base
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization
         );
         $this->paymentTokenManagement = $paymentTokenManagement;
     }
@@ -101,32 +112,6 @@ class Payflowpro extends Base
     }
 
     /**
-     * @inheritdoc
-     */
-    public function processProfileByRequestData($requestData)
-    {
-        $additionalData = [];
-        $tokenHash = '';
-        $paymentData = $this->getPersistor()->get(self::PAYMENT_DATA_KEY);
-        if (isset($paymentData[SubscriptionProfileInterface::ID],
-            $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH])) {
-            if ((int)$paymentData[SubscriptionProfileInterface::ID] === (int)$this->getProfile()->getId()) {
-                $tokenHash = $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH];
-            }
-        }
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
-        foreach ($paymentPostData as $code => $methodData) {
-            if ($methodData['method']) {
-                $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
-                break;
-            }
-        }
-        $this->getProfile()->getPayment()->setTokenHash($tokenHash);
-        $this->getProfile()->getPayment()->setEncodedPaymentAdditionalInfo($additionalData);
-        return $this;
-    }
-
-    /**
      * @param \Magento\Quote\Model\Quote $quote
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -142,5 +127,13 @@ class Payflowpro extends Base
         } else {
             parent::validatePayment($quote);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return Config::METHOD_PAYFLOWPRO;
     }
 }

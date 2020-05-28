@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use Magento\Payment\Model\Method\Free;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
  * Class Base
@@ -63,20 +64,52 @@ class Base implements EngineInterface
     private $zeroTotalValidator;
 
     /**
+     * @var \Magento\Framework\Encryption\EncryptorInterface
+     */
+    protected $encryptor;
+
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
+    protected $paymentTokenRepository;
+
+    /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     */
+    protected $manager;
+
+    /**
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     */
+    protected $vaultPaymentAuthorization;
+
+    /**
      * Base constructor.
      * @param Config $config
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param DataPersistorInterface $persistor
      * @param ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      */
     public function __construct(
         Config $config,
         Context $context,
         CartManagementInterface $cartManagement,
         DataPersistorInterface $persistor,
-        ZeroTotal $zeroTotalValidator
+        ZeroTotal $zeroTotalValidator,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
+        $this->manager = $manager;
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->encryptor = $encryptor;
         $this->config = $config;
         $this->context = $context;
         $this->cartManagement = $cartManagement;
@@ -187,10 +220,67 @@ class Base implements EngineInterface
     }
 
     /**
-     * @inheritdoc
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return '';
+    }
+
+    /**
+     * @param $requestData
+     * @return $this|EngineInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function processProfileByRequestData($requestData)
     {
+        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
+            return $this;
+        }
+
+        $customer = $this->getProfile()->getCustomer();
+        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+            return $this;
+        }
+
+        /** @var string[] $additionalData */
+        $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
+
+        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
+        $paymentData['method'] = $this->getPaymentMethodCode();
+        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
+
+        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial(
+            $paymentData,
+            $this->manager->getTempQuote($this->getProfile())
+        );
+        $paymentToken = $result['payment_token'];
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+        $paymentToken->setCustomerId($customer->getId());
+        $paymentToken->setPaymentMethodCode($this->getPaymentMethodCode());
+        $this->paymentTokenRepository->save($paymentToken);
+        $this->populateProfilePayment($paymentToken);
+        return $this;
+    }
+
+    /**
+     * @param $paymentToken
+     * @return $this
+     */
+    protected function populateProfilePayment($paymentToken)
+    {
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $expiration = explode('/', $tokenDetails['expirationDate']);
+        $this->getProfile()->getPayment()
+            ->setEngineCode($this->getPaymentMethodCode())
+            ->setPaymentToken($paymentToken->getGatewayToken())
+            ->setEncodedPaymentAdditionalInfo([
+                OrderPaymentInterface::CC_TYPE => $tokenDetails['type'],
+                OrderPaymentInterface::CC_LAST_4 => $tokenDetails['maskedCC'],
+                OrderPaymentInterface::CC_EXP_MONTH => $expiration[0],
+                OrderPaymentInterface::CC_EXP_YEAR => $expiration[1],
+            ]);
         return $this;
     }
 
@@ -230,5 +320,23 @@ class Base implements EngineInterface
             }
         }
         $this->getProfile()->setStatus($status);
+    }
+
+    /**
+     * @param $paymentToken
+     * @return string
+     */
+    protected function generatePublicHash($paymentToken)
+    {
+        $hashKey = $paymentToken->getGatewayToken();
+        if ($paymentToken->getCustomerId()) {
+            $hashKey = $paymentToken->getCustomerId();
+        }
+
+        $hashKey .= $paymentToken->getPaymentMethodCode()
+            . $paymentToken->getType()
+            . $paymentToken->getTokenDetails();
+
+        return $this->encryptor->getHash($hashKey);
     }
 }

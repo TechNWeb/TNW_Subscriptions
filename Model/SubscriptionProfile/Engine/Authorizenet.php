@@ -6,13 +6,9 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Authorizenet Engine
@@ -38,26 +34,6 @@ class Authorizenet extends Base
      * @var \Magento\Vault\Model\PaymentTokenManagement
      */
     private $paymentTokenManagement;
-
-    /**
-     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
-     */
-    private $vaultPaymentAuthorization;
-
-    /**
-     * @var \Magento\Framework\Encryption\EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
-     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
-     */
-    private $manager;
 
     /**
      * Authorizenet constructor.
@@ -95,12 +71,12 @@ class Authorizenet extends Base
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization
         );
-        $this->manager = $manager;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->encryptor = $encryptor;
-        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
@@ -233,57 +209,6 @@ class Authorizenet extends Base
      }
 
     /**
-     * @inheritdoc
-     * @param $requestData
-     * @return Braintree
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
-     */
-    public function processProfileByRequestData($requestData)
-    {
-        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
-            return $this;
-        }
-
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
-        }
-
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-
-        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
-        $paymentData['method'] = $this->getPaymentMethodCode();
-        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
-
-        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial(
-            $paymentData,
-            $this->manager->getTempQuote($this->getProfile())
-        );
-        $paymentToken = $result['payment_token'];
-        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
-        $paymentToken->setCustomerId($customer->getId());
-        $paymentToken->setPaymentMethodCode('tnw_authorize_cim');
-        $this->paymentTokenRepository->save($paymentToken);
-
-
-        $this->getProfile()->getPayment()
-            ->setEngineCode($this->getPaymentMethodCode())
-            ->setPaymentToken($paymentToken->getGatewayToken())
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],
-                OrderPaymentInterface::CC_EXP_MONTH => $additionalData['cc_exp_month'],
-                OrderPaymentInterface::CC_EXP_YEAR => $additionalData['cc_exp_year'],
-            ]);
-
-        return $this;
-    }
-
-
-    /**
      * @param \Magento\Quote\Model\Quote $quote
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -297,23 +222,5 @@ class Authorizenet extends Base
         } else {
             parent::validatePayment($quote);
         }
-    }
-
-    /**
-     * @param $paymentToken
-     * @return string
-     */
-    protected function generatePublicHash($paymentToken)
-    {
-        $hashKey = $paymentToken->getGatewayToken();
-        if ($paymentToken->getCustomerId()) {
-            $hashKey = $paymentToken->getCustomerId();
-        }
-
-        $hashKey .= $paymentToken->getPaymentMethodCode()
-            . $paymentToken->getType()
-            . $paymentToken->getTokenDetails();
-
-        return $this->encryptor->getHash($hashKey);
     }
 }
