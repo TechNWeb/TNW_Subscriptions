@@ -62,8 +62,7 @@ class TokenRequest extends \Magento\Backend\App\Action
         $result = $this->resultJsonFactory->create();
         $billingAddress = [];
         $quote = null;
-        if (true || $profileId = $this->getRequest()->getParam('profile_id')) {
-            $profileId = 205; //TODO: add new param to admin form
+        if ($profileId = $this->getRequest()->getParam('profile_id')) {
             $quote = $this->manager->getTempQuote($this->profileRepository->getById($profileId));
             $billingAddress = $quote->getBillingAddress();
         } else {
