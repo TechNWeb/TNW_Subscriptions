@@ -19,12 +19,54 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 class Payflowpro extends Base
 {
     /**
+     * @var \Magento\Vault\Model\PaymentTokenManagement
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * Payflowpro constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\Context $context
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
+     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     */
+    public function __construct(
+        \TNW\Subscriptions\Model\Config $config,
+        \TNW\Subscriptions\Model\Context $context,
+        \Magento\Quote\Api\CartManagementInterface $cartManagement,
+        \Magento\Framework\App\Request\DataPersistorInterface $persistor,
+        \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+    ) {
+        parent::__construct(
+            $config,
+            $context,
+            $cartManagement,
+            $persistor,
+            $zeroTotalValidator
+        );
+        $this->paymentTokenManagement = $paymentTokenManagement;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
+        $paymentToken = $payment->getAdditionalInformation(PaypalPayflow::PNREF);
+        if (!$paymentToken && $payment->getAdditionalInformation('public_hash')) {
+            $token = $this->paymentTokenManagement->getByPublicHash(
+                $payment->getAdditionalInformation('public_hash'),
+                $payment->getQuote()->getCustomerId()
+            );
+            if ($token) {
+                $paymentToken = $token->getGatewayToken();
+            }
+        }
         return [
-            'payment_token' => $payment->getAdditionalInformation(PaypalPayflow::PNREF),
+            'payment_token' => $paymentToken,
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
                 OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
@@ -82,5 +124,23 @@ class Payflowpro extends Base
         $this->getProfile()->getPayment()->setTokenHash($tokenHash);
         $this->getProfile()->getPayment()->setEncodedPaymentAdditionalInfo($additionalData);
         return $this;
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(\Magento\Quote\Model\Quote $quote)
+    {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            /** @var Payment $payment */
+            $payment = $quote->getPayment();
+            $payment->unsetData('method_instance');
+            $quote->setSubscriptionPaymentDataSet(true);
+            $payment->importData(['method' => \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        } else {
+            parent::validatePayment($quote);
+        }
     }
 }
