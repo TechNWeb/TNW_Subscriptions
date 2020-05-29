@@ -19,7 +19,7 @@ class PaymentMethod extends Base
         if (isset($data['payment'])) {
             $result = [];
             foreach ($data['payment'] as $code => $methodData) {
-                if ($methodData['method']) {
+                if ($code !== 'undefined' && $methodData['method']) {
                     $result = $this->getSubCreateModel()->setPaymentMethod($code);
                     break;
                 }

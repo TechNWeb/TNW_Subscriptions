@@ -388,10 +388,10 @@ class CreateProfile extends BaseCreate
     /**
      * Sets into subscription quotes shipping methods.
      *
-     * @param array $methods
+     * @param $method
      * @return array
      */
-    public function setShippingMethods(array $methods)
+    public function setShippingMethods($method)
     {
         $result = [];
         foreach ($this->getSubQuotes() as $subQuote) {
@@ -399,7 +399,6 @@ class CreateProfile extends BaseCreate
                 continue;
             }
             /** @var string|null $method */
-            $method = !empty($methods[$subQuote->getId()]) ? $methods[$subQuote->getId()] : null;
             if ($method) {
                 try {
                     $subQuote->getShippingAddress()->setShippingMethod($method);

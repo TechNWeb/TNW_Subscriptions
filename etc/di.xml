@@ -494,6 +494,50 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PaymentMethod</item>
                     <item name="sortOrder" xsi:type="number">70</item>
                 </item>
+                <item name="additional_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AdditionalPayment</item>
+                    <item name="sortOrder" xsi:type="number">80</item>
+                </item>
+                <item name="braintree_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Braintree</item>
+                    <item name="sortOrder" xsi:type="number">90</item>
+                </item>
+                <item name="braintree_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\BraintreeVault</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+                <item name="payflow_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PyaflowVault</item>
+                    <item name="sortOrder" xsi:type="number">110</item>
+                </item>
+                <item name="authorizenet_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Authorizenet</item>
+                    <item name="sortOrder" xsi:type="number">120</item>
+                </item>
+                <item name="authorizenet_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AuthorizenetVault</item>
+                    <item name="sortOrder" xsi:type="number">130</item>
+                </item>
+                <item name="stripe_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">140</item>
+                </item>
+                <item name="stripe_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">150</item>
+                </item>
+                <item name="cybersoruce_vault_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\CybersourceVault</item>
+                    <item name="sortOrder" xsi:type="number">160</item>
+                </item>
+                <item name="cybersource_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Cybersource</item>
+                    <item name="sortOrder" xsi:type="number">170</item>
+                </item>
+                <item name="payflow_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PayflowPro</item>
+                    <item name="sortOrder" xsi:type="number">180</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -559,6 +603,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\BillingAddressModifier</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="shipping_methods" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ShippingModifier</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -579,6 +627,29 @@
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment">
         <arguments>
             <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SummaryPool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="subscription_and_account_information" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SubscriptionAndAccountInformation</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="shipping" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Summary\Shipping</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Summary\Payment</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Summary">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\SummaryPool</argument>
         </arguments>
     </type>
 
@@ -730,50 +801,6 @@
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>
             <argument name="processors" xsi:type="array">
-                <item name="additional_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AdditionalPayment</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
-                <item name="braintree_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Braintree</item>
-                    <item name="sortOrder" xsi:type="number">15</item>
-                </item>
-                <item name="braintree_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\BraintreeVault</item>
-                    <item name="sortOrder" xsi:type="number">15</item>
-                </item>
-                <item name="payflow_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PyaflowVault</item>
-                    <item name="sortOrder" xsi:type="number">15</item>
-                </item>
-                <item name="authorizenet_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Authorizenet</item>
-                    <item name="sortOrder" xsi:type="number">16</item>
-                </item>
-                <item name="authorizenet_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\AuthorizenetVault</item>
-                    <item name="sortOrder" xsi:type="number">17</item>
-                </item>
-                <item name="stripe_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
-                    <item name="sortOrder" xsi:type="number">18</item>
-                </item>
-                <item name="stripe_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
-                    <item name="sortOrder" xsi:type="number">19</item>
-                </item>
-                <item name="cybersoruce_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\CybersourceVault</item>
-                    <item name="sortOrder" xsi:type="number">18</item>
-                </item>
-                <item name="cybersource_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Cybersource</item>
-                    <item name="sortOrder" xsi:type="number">21</item>
-                </item>
-                <item name="payflow_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PayflowPro</item>
-                    <item name="sortOrder" xsi:type="number">30</item>
-                </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
                     <item name="sortOrder" xsi:type="number">100</item>

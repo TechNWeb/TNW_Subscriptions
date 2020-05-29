@@ -18,7 +18,7 @@ class AdditionalPayment extends Base
     {
         $additionalData = [];
         $paymentData = !empty($data['payment']) ? $data['payment'] : [];
-        if ($paymentData) {
+        if ($paymentData && empty($paymentData['undefined'])) {
             foreach ($paymentData as $code => $methodData) {
                 if ($methodData['method']) {
                     $additionalData = !empty($methodData['additional']) ? $methodData['additional'] : [];

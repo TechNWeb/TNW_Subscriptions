@@ -522,7 +522,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         return $this->isShippingFieldSet()
             ? __('Shipping Information')
-            : __('Billing Information');
+            : '';
+//            : __('Billing Information');
     }
 
     /**

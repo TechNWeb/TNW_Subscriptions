@@ -273,7 +273,8 @@
 .control-label-up.input {
   width: 74%;
 }
-.admin__address-information-preview {
+.admin__address-information-preview,
+.admin__panel-information-preview {
   width: 47%;
   margin: 1%;
   float: left;
@@ -508,6 +509,24 @@
 }
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container .admin__fieldset-simple-container-wrapper .admin__field-control {
   text-align: right;
+}
+
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field {
+    margin: 0;
+    padding: 1% 1% 1% 2%;
+    line-height: 3.2rem;
+}
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field .admin__field-label{
+    margin: 0;
+    width: 50%;
+    text-align: left;
+    vertical-align: middle;
+}
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field .admin__field-value{
+    padding:0;
 }
 
 /* "action-editor" button */

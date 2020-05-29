@@ -94,10 +94,10 @@ class Payment extends AbstractDataProvider
         }
 
         $configData['submit_url'] = $this->urlBuilder->getUrl(
-            '*/subscriptionprofile/save'
+            'tnw_subscriptions/subscriptionprofile_create/process'
         );
         $configData['process_url'] = $this->urlBuilder->getUrl(
-            '*/subscriptionprofile_create/process'
+            'tnw_subscriptions/subscriptionprofile_create/process'
         );
 
         return $configData;
