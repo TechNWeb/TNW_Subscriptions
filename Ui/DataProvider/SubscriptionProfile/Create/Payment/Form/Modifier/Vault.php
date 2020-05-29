@@ -148,6 +148,9 @@ class Vault extends Base
         ) {
             $this->sessionManager->setCustomerId($customerId);
         }
+        if (!$this->sessionManager->getCustomerId() && $this->getProfile()) {
+            $this->sessionManager->setCustomerId($this->getProfile()->getCustomerId());
+        }
         foreach ($this->vaultMethods as $method) {
             $this->tokensConfig[$method] = $this->tokensConfigProvider->getTokensComponents($method);
             if (empty($this->tokensConfig[$method])) continue;

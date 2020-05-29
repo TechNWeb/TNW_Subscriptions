@@ -18,50 +18,6 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 class Payflowpro extends Base
 {
     /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
-    /**
-     * Payflowpro constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
-     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
-     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
-     */
-    public function __construct(
-        \TNW\Subscriptions\Model\Config $config,
-        \TNW\Subscriptions\Model\Context $context,
-        \Magento\Quote\Api\CartManagementInterface $cartManagement,
-        \Magento\Framework\App\Request\DataPersistorInterface $persistor,
-        \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
-        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
-    ) {
-        parent::__construct(
-            $config,
-            $context,
-            $cartManagement,
-            $persistor,
-            $zeroTotalValidator,
-            $encryptor,
-            $paymentTokenRepository,
-            $manager,
-            $vaultPaymentAuthorization
-        );
-        $this->paymentTokenManagement = $paymentTokenManagement;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getProfilePaymentInfo(Payment $payment)
@@ -85,6 +41,11 @@ class Payflowpro extends Base
                 OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear()
             ]
         ];
+    }
+
+    public function getVaultPaymentCode()
+    {
+        return 'payflowpro_cc_vault';
     }
 
     /**

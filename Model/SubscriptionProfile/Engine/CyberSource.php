@@ -10,7 +10,6 @@ use CyberSource\Core\Model\Config as ConfigProvider;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
  * Class CyberSource
@@ -34,18 +33,13 @@ class CyberSource extends Base
     private $requestHelper;
 
     /**
-     * @var PaymentTokenManagementInterface
-     */
-    private $paymentTokenManagement;
-
-    /**
      * @var \Magento\Vault\Model\PaymentTokenFactory
      */
     private $paymentTokenFactory;
 
     /**
      * CyberSource constructor.
-     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -62,7 +56,7 @@ class CyberSource extends Base
      * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
      */
     public function __construct(
-        PaymentTokenManagementInterface $paymentTokenManagement,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
@@ -87,7 +81,8 @@ class CyberSource extends Base
             $encryptor,
             $paymentTokenRepository,
             $manager,
-            $vaultPaymentAuthorization
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
         $this->paymentTokenFactory = $paymentTokenFactory;
         $cyberSourceConfig->reBillProcess();
@@ -99,7 +94,6 @@ class CyberSource extends Base
             $this->requestHelper = $objectManager->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
         }
         $this->transactionCustomer = $transactionCustomer;
-        $this->paymentTokenManagement = $paymentTokenManagement;
     }
 
     /**

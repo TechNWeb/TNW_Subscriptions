@@ -83,18 +83,8 @@ class Base implements EngineInterface
      */
     protected $vaultPaymentAuthorization;
 
-    /**
-     * Base constructor.
-     * @param Config $config
-     * @param Context $context
-     * @param CartManagementInterface $cartManagement
-     * @param DataPersistorInterface $persistor
-     * @param ZeroTotal $zeroTotalValidator
-     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
-     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
-     */
+    protected $paymentTokenManagement;
+
     public function __construct(
         Config $config,
         Context $context,
@@ -104,8 +94,10 @@ class Base implements EngineInterface
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
     ) {
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->manager = $manager;
         $this->paymentTokenRepository = $paymentTokenRepository;
@@ -235,6 +227,9 @@ class Base implements EngineInterface
      */
     public function processProfileByRequestData($requestData)
     {
+        if (!empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            return $this->processProfileByRequestDataVault($requestData);
+        }
         if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
             return $this;
         }
@@ -246,7 +241,6 @@ class Base implements EngineInterface
 
         /** @var string[] $additionalData */
         $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-
         $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
         $paymentData['method'] = $this->getPaymentMethodCode();
         $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
@@ -262,6 +256,40 @@ class Base implements EngineInterface
         $this->paymentTokenRepository->save($paymentToken);
         $this->populateProfilePayment($paymentToken);
         return $this;
+    }
+
+    public function processProfileByRequestDataVault($requestData)
+    {
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            return $this;
+        }
+        $customer = $this->getProfile()->getCustomer();
+        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+            return $this;
+        }
+
+        $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+            $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
+            $customer->getId()
+        );
+        /** @var string[] $additionalData */
+        $additionalData = $requestData['payment'][$this->getVaultPaymentCode()]['additional'];
+        $additionalData['public_hash'] = $additionalData['publicHash'];
+        $paymentData = $requestData['payment'][$this->getVaultPaymentCode()];
+        $paymentData['method'] = $this->getVaultPaymentCode();
+        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
+
+        $this->vaultPaymentAuthorization->processPreAuthForTrial(
+            $paymentData,
+            $this->manager->getTempQuote($this->getProfile())
+        );
+        $this->populateProfilePayment($paymentToken);
+        return $this;
+    }
+
+    public function getVaultPaymentCode()
+    {
+        return '';
     }
 
     /**

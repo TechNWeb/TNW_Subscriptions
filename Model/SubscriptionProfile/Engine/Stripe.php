@@ -31,11 +31,6 @@ class Stripe extends Base
      */
     private $isRebill = false;
 
-    /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -60,9 +55,9 @@ class Stripe extends Base
             $encryptor,
             $paymentTokenRepository,
             $manager,
-            $vaultPaymentAuthorization
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
-        $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
         }

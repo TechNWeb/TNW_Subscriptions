@@ -31,11 +31,6 @@ class Authorizenet extends Base
     private $isRebill = false;
 
     /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
-    /**
      * Authorizenet constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
@@ -75,9 +70,9 @@ class Authorizenet extends Base
             $encryptor,
             $paymentTokenRepository,
             $manager,
-            $vaultPaymentAuthorization
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
-        $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
         }
