@@ -279,9 +279,8 @@ class CyberSource extends Base
             $configServiceUrl = $this->cybersourceConfig->getSopServiceUrl();
         }
         $tokenCreateUrl = $configServiceUrl . '/silent/embedded/token/create';
-        $loadSilentDataUrl = ($this->urlBuilder instanceof \Magento\Backend\Model\UrlInterface)
-            ? $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest')
-            : $this->urlBuilder->getUrl('cybersource/index/loadSilentData');
+        $loadSilentDataUrl = $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest');
+
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
             'listens' => $this->getListens(),
