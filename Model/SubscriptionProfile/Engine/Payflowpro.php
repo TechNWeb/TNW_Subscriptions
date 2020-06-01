@@ -43,9 +43,49 @@ class Payflowpro extends Base
         ];
     }
 
+    /**
+     * @return string
+     */
     public function getVaultPaymentCode()
     {
         return 'payflowpro_cc_vault';
+    }
+
+    /**
+     * @param $requestData
+     * @return $this|Base
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
+    public function processProfileByRequestDataVault($requestData)
+    {
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            return $this;
+        }
+        $customer = $this->getProfile()->getCustomer();
+        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+            return $this;
+        }
+
+        $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+            $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
+            $customer->getId()
+        );
+        /** @var string[] $additionalData */
+        $additionalData = $requestData['payment'][$this->getVaultPaymentCode()]['additional'];
+        $additionalData['public_hash'] = $additionalData['publicHash'];
+        $paymentData = $requestData['payment'][$this->getVaultPaymentCode()];
+        $paymentData['method'] = $this->getVaultPaymentCode();
+        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
+        $tempQuote = $this->manager->getTempQuote($this->getProfile());
+        $tempQuote->getPayment()->setMethod($this->getPaymentMethodCode());
+        $tempQuote->getPayment()->setQuote($tempQuote);
+        $this->vaultPaymentAuthorization->processPreAuthForTrial(
+            $paymentData,
+            $tempQuote
+        );
+        $this->populateProfilePayment($paymentToken);
+        return $this;
     }
 
     /**

@@ -189,6 +189,14 @@ class Authorizenet extends Base
     /**
      * @return string
      */
+    public function getVaultPaymentCode()
+    {
+        return 'tnw_authorize_cim_vault';
+    }
+
+    /**
+     * @return string
+     */
     public function getPaymentMethodCode()
     {
         //TODO: resolve if vault method

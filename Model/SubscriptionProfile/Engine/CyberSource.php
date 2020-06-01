@@ -183,25 +183,37 @@ class CyberSource extends Base
      */
     public function processProfileByRequestData($requestData)
     {
-        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])) {
+        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])
+            && empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
             return $this;
         }
-        $paymentToken = $this->paymentTokenFactory->create('card');
-        $paymentToken->setPublicHash($this->generateNewTokenPublicHash(
-            $requestData['payment'][ConfigProvider::CODE],
-            $this->getProfile()->getCustomerId()
-        ));
-        $paymentToken->setGatewayToken($requestData['payment'][ConfigProvider::CODE]['payment_token']);
-        $paymentToken->setCustomerId($this->getProfile()->getCustomerId());
-        $paymentToken->setPaymentMethodCode('chcybersource');
-        $paymentToken->setTokenDetails(
-            $this->getNewTokenDetails($requestData['payment'][ConfigProvider::CODE]['additional'])
-        );
-        $paymentToken->setIsActive(true);
-        $paymentToken->setIsVisible(true);
-        $this->paymentTokenRepository->save($paymentToken);
-        $requestData['payment'][ConfigProvider::CODE]['additional']['public_hash'] = $paymentToken->getPublicHash();
+
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            $paymentToken = $this->paymentTokenFactory->create('card');
+            $paymentToken->setPublicHash($this->generateNewTokenPublicHash(
+                $requestData['payment'][ConfigProvider::CODE],
+                $this->getProfile()->getCustomerId()
+            ));
+            $paymentToken->setGatewayToken($requestData['payment'][ConfigProvider::CODE]['payment_token']);
+            $paymentToken->setCustomerId($this->getProfile()->getCustomerId());
+            $paymentToken->setPaymentMethodCode('chcybersource');
+            $paymentToken->setTokenDetails(
+                $this->getNewTokenDetails($requestData['payment'][ConfigProvider::CODE]['additional'])
+            );
+            $paymentToken->setIsActive(true);
+            $paymentToken->setIsVisible(true);
+            $this->paymentTokenRepository->save($paymentToken);
+            $requestData['payment'][ConfigProvider::CODE]['additional']['public_hash'] = $paymentToken->getPublicHash();
+        }
         return parent::processProfileByRequestData($requestData);
+    }
+
+    /**
+     * @return string
+     */
+    public function getVaultPaymentCode()
+    {
+        return 'chcybersource_cc_vault';
     }
 
     /**
