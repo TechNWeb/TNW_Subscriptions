@@ -85,6 +85,7 @@
     <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault">
         <arguments>
             <argument name="sessionManager" xsi:type="object">Magento\Backend\Model\Session\Quote</argument>
+            <argument name="tokensConfigClass" xsi:type="string">Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider</argument>
         </arguments>
     </type>
     <!-- Validate and convert currency fields in configuration -->

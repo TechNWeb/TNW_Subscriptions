@@ -6,12 +6,11 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Framework\Module\Manager;
+use Magento\Framework\DataObject;
 use Magento\Payment\Model\CcConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
-use Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -30,7 +29,7 @@ class Vault extends Base
     private $tokensConfig = [];
 
     /**
-     * @var TokensConfigProvider
+     * @var null
      */
     private $tokensConfigProvider;
 
@@ -43,11 +42,6 @@ class Vault extends Base
      * @var array
      */
     private $vaultMethods = [];
-
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
 
     /**
      * @var Config
@@ -81,8 +75,7 @@ class Vault extends Base
 
     /**
      * Vault constructor.
-     * @param TokensConfigProvider $tokensConfigProvider
-     * @param Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig
      * @param VaultConfigProvider $vaultConfigProvider
      * @param Config $config
@@ -92,10 +85,10 @@ class Vault extends Base
      * @param CartRepositoryInterface $cartRepository
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Session\SessionManagerInterface $sessionManager
+     * @param string $tokensConfigClass
      */
     public function __construct(
-        TokensConfigProvider $tokensConfigProvider,
-        Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         CcConfig $ccConfig,
         VaultConfigProvider $vaultConfigProvider,
         Config $config,
@@ -104,16 +97,15 @@ class Vault extends Base
         OrderRelationManager $relationManager,
         CartRepositoryInterface $cartRepository,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Session\SessionManagerInterface $sessionManager
+        \Magento\Framework\Session\SessionManagerInterface $sessionManager,
+        $tokensConfigClass = ''
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-        /**
-         * TODO: tokensConfigProvider has different classes for admin & frontend:
-         * \Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider
-         * \Magento\Vault\Model\Ui\TokensConfigProvider
-         */
-        $this->tokensConfigProvider = $tokensConfigProvider;
-        $this->moduleManager = $moduleManager;
+        if ($tokensConfigClass) {
+            $this->tokensConfigProvider = $objectManager->get($tokensConfigClass);
+        } else {
+            $this->tokensConfigProvider = null;
+        }
         $this->config = $config;
         $this->session = $session;
         $this->ccConfig = $ccConfig;
@@ -151,17 +143,48 @@ class Vault extends Base
         if (!$this->sessionManager->getCustomerId() && $this->getProfile()) {
             $this->sessionManager->setCustomerId($this->getProfile()->getCustomerId());
         }
-        foreach ($this->vaultMethods as $method) {
-            $this->tokensConfig[$method] = $this->tokensConfigProvider->getTokensComponents($method);
-            if (empty($this->tokensConfig[$method])) continue;
-            $this->currentVaultMethod = $method;
+        if ($this->tokensConfigProvider) {
+            switch (get_class($this->tokensConfigProvider)) {
+                case 'Magento\Vault\Model\Ui\TokensConfigProvider':
+                    $this->processTokensConfigData($this->tokensConfigProvider->getConfig());
+                    foreach ($this->vaultMethods as $method) {
+                        if (empty($this->tokensConfig[$method])) continue;
+                        $this->currentVaultMethod = $method;
+                        $meta = array_replace_recursive(
+                            $meta,
+                            $this->getPaymentFields()
+                        );
+                    }
+                    break;
+                case 'Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider':
+                    foreach ($this->vaultMethods as $method) {
+                        $this->tokensConfig[$method] = $this->tokensConfigProvider->getTokensComponents($method);
+                        if (empty($this->tokensConfig[$method])) continue;
+                        $this->currentVaultMethod = $method;
 
-            $meta = array_replace_recursive(
-                $meta,
-                $this->getPaymentFields()
-            );
+                        $meta = array_replace_recursive(
+                            $meta,
+                            $this->getPaymentFields()
+                        );
+                    }
+                    break;
+                default: break;
+            }
         }
         return $meta;
+    }
+
+    protected function processTokensConfigData($configData)
+    {
+        if (isset($configData['payment']['vault']) && is_array($configData['payment']['vault'])) {
+            foreach ($this->vaultMethods as $method) {
+                foreach ($configData['payment']['vault'] as $code => $data) {
+                    if (strpos($code, $method) !== false) {
+                        $this->tokensConfig[$method][] = new DataObject($data);
+                    }
+                }
+            }
+        }
     }
 
     /**

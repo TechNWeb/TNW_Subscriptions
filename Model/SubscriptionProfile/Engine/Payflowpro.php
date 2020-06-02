@@ -88,6 +88,21 @@ class Payflowpro extends Base
         return $this;
     }
 
+    protected function populateProfilePayment($paymentToken)
+    {
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $this->getProfile()->getPayment()
+            ->setEngineCode($this->getPaymentMethodCode())
+            ->setPaymentToken($paymentToken->getGatewayToken())
+            ->setEncodedPaymentAdditionalInfo([
+                OrderPaymentInterface::CC_TYPE => $tokenDetails['cc_type'],
+                OrderPaymentInterface::CC_LAST_4 => $tokenDetails['cc_last_4'],
+                OrderPaymentInterface::CC_EXP_MONTH => $tokenDetails['cc_exp_month'],
+                OrderPaymentInterface::CC_EXP_YEAR => $tokenDetails['cc_exp_year'],
+            ]);
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      */
