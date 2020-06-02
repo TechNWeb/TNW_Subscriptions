@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
@@ -194,7 +195,12 @@ class RecurringOptions extends BaseModifier
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-                $searchStatuses = [ProfileStatus::STATUS_ACTIVE, ProfileStatus::STATUS_TRIAL];
+                $searchStatuses = [
+                    ProfileStatus::STATUS_ACTIVE,
+                    ProfileStatus::STATUS_TRIAL,
+                    ProfileStatus::STATUS_HOLDED,
+                    ProfileStatus::STATUS_PAST_DUE
+                ];
                 $searchCriteria = $this->searchCriteriaBuilder->addFilter(
                     'billing_frequency_id',
                     $optionArray['billing_frequency_id'],
@@ -207,20 +213,24 @@ class RecurringOptions extends BaseModifier
 
                 $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
                 if (!empty($subscriptionProfiles->getItems())) {
-                    $subscriptionArray = [];
-                    foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
-                        $productSubscription = $this->productSubscriptionProfileRepository
-                            ->getById($subscriptionProfile['entity_id']);
-                        if (
-                            $productSubscription->getData()['magento_product_id']
-                            == $this->locator->getProduct()->getId()
-                        ) {
-                            $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
-                                $subscriptionProfile['entity_id'], true
-                            );
+                    try {
+                        $subscriptionArray = [];
+                        foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
+                            $productSubscription = $this->productSubscriptionProfileRepository
+                                ->getById($subscriptionProfile['entity_id']);
+                            if (
+                                $productSubscription->getData()['magento_product_id']
+                                == $this->locator->getProduct()->getId()
+                            ) {
+                                $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
+                                    $subscriptionProfile['entity_id'], true
+                                );
+                            }
                         }
+                        $options[] = array_merge($optionArray, $subscriptionArray);
+                    } catch (NoSuchEntityException $e) {
+                        $options[] = $optionArray;
                     }
-                    $options[] = array_merge($optionArray, $subscriptionArray);
                 } else {
                     $options[] = $optionArray;
                 }
