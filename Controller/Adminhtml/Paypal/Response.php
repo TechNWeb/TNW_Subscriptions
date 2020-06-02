@@ -6,7 +6,11 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Registry;
@@ -30,7 +34,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 /**
  * Controller to processing response from PayPal gateway.
  */
-class Response extends \Magento\Framework\App\Action\Action
+class Response extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface, HttpPostActionInterface
 {
     /**
      * Core registry
@@ -171,5 +175,22 @@ class Response extends \Magento\Framework\App\Action\Action
             : Payment::DATA_SCOPE_PAYMENT_FORM;
 
         return $index;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createCsrfValidationException(
+        RequestInterface $request
+    ): ?InvalidRequestException {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        return true;
     }
 }
