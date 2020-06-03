@@ -88,6 +88,20 @@ class Payflowpro extends Base
         return $this;
     }
 
+    public function processProfileByRequestData($requestData)
+    {
+        if (!empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
+            $editData = $this->persistor->get(
+                \TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface::PAYMENT_DATA_KEY
+            );
+            $requestData['payment'][$this->getPaymentMethodCode()]['additional_information'][PaypalPayflow::PNREF]
+                = isset($editData['pnref'])
+                ? $editData['pnref']
+                : '';
+        }
+        return parent::processProfileByRequestData($requestData);
+    }
+
     protected function populateProfilePayment($paymentToken)
     {
         $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);

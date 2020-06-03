@@ -73,12 +73,17 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         }
         $config = $this->configFactory->create();
         $config->setStoreId($storeId);
+        if (!$quote->getPayment()->getQuote()) {
+            $quote->getPayment()->setQuote($quote);
+        }
         $config->setMethodInstance($quote->getPayment()->getMethodInstance());
         $config->setMethod($this->methodCode);
         $orderIncrementId = $quote->getReservedOrderId();
         $billing = $quote->getBillingAddress();
         $totals = $quote->getTotals();
-        $token = $paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF];
+        $token = isset($paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF])
+        ? $paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF]
+        : $paymentInfo['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF];
         $requestData = [
             'user' => $this->getConfigData('user'),
             'vendor' => $this->getConfigData('vendor'),

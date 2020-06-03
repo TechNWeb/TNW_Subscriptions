@@ -54,7 +54,7 @@ class Base implements EngineInterface
      *
      * @var DataPersistorInterface
      */
-    private $persistor;
+    protected $persistor;
 
     /**
      * Zero total quote validator.
@@ -252,6 +252,7 @@ class Base implements EngineInterface
         $paymentToken = $result['payment_token'];
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
         $paymentToken->setCustomerId($customer->getId());
+        $paymentToken->setType('card');
         $paymentToken->setPaymentMethodCode($this->getPaymentMethodCode());
         $this->paymentTokenRepository->save($paymentToken);
         $this->populateProfilePayment($paymentToken);
