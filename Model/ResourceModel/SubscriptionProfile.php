@@ -27,6 +27,11 @@ class SubscriptionProfile extends AbstractEntity
     private $timezone;
 
     /**
+     * @var $invoiceItems
+     */
+    private $invoiceItems;
+
+    /**
      * SubscriptionProfile constructor.
      * @param \Magento\Eav\Model\Entity\Context $context
      * @param \Magento\Framework\EntityManager\EntityManager $entityManager
@@ -63,29 +68,13 @@ class SubscriptionProfile extends AbstractEntity
      */
     public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $select = $this->getConnection()->select()
-            ->from(
-                ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
-                ['total' => new \Zend_Db_Expr('SUM(profileItem.qty)*((SUM(invoiceItem.base_row_total_incl_tax)/SUM(invoiceItem.qty))+IFNULL(SUM(orderItemExtension.base_subs_initial_fee), 0))')]
-            )
-            ->joinInner(
-                ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
-                'profileItem.entity_id = salesRelative.profile_item_id',
-                []
-            )
-            ->joinInner(
-                ['invoiceItem' => $this->getTable('sales_invoice_item')],
-                'salesRelative.order_item_id = invoiceItem.order_item_id',
-                []
-            )
-            ->joinLeft(
-                ['orderItemExtension' => $this->getTable('tnw_subscriptions_order_item_extension_entity')],
-                'invoiceItem.order_item_id = orderItemExtension.magento_item_id',
-                []
-            )
-            ->where('profileItem.subscription_profile_id = ?', $object->getId());
+        $invoiceItems = $this->getInvoiceItems($object);
+        $profit = 0;
+        foreach ($invoiceItems as $item) {
+            $profit += $item['base_row_total_incl_tax'];
+        }
 
-        return (float)$this->getConnection()->fetchOne($select);
+        return (float) $profit;
     }
 
     /**
@@ -96,19 +85,19 @@ class SubscriptionProfile extends AbstractEntity
      */
     public function getTotalValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        $connection = $this->getConnection();
-        $sql = $connection->select()
-            ->from($this->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-            ->where('subscription_profile_id = ?', $object->getId())
-            ->where($connection->prepareSqlCondition('scheduled_at', [
-                'to' => $this->timezone->date()->modify('+1 year'),
-                'datetime' => true
-            ]))
-            ->where('magento_order_id IS NULL');
-
-        $futureOrderCount = (float)$connection->fetchOne($sql);
-
-        return $futureOrderCount * $object->getGrandTotal();
+        $invoiceItems = $this->getInvoiceItems($object);
+        $lastInvoiceItem = array_pop($invoiceItems);
+        $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax'];
+        if ($object->getTerm() == 1) {
+            if ($object->getUnit() == 3) {
+                $profit = $profitOfLastItem * 365;
+            } else {
+                $profit = $profitOfLastItem * 12;
+            }
+        } else {
+            $profit = $profitOfLastItem * $object->getTotalBillingCycles();
+        }
+        return $profit;
     }
 
     /**
@@ -198,5 +187,34 @@ class SubscriptionProfile extends AbstractEntity
     {
         $this->entityManager->save($object);
         return $this;
+    }
+
+    /**
+     * Get last invoice items
+     *
+     * @param \Magento\Framework\Model\AbstractModel $object
+     * @return array
+     */
+    private function getInvoiceItems(\Magento\Framework\Model\AbstractModel $object)
+    {
+        if ($this->invoiceItems == null) {
+            $select = $this->getConnection()->select()
+                ->from(
+                    ['invoiceItem' => $this->getTable('sales_invoice_item')]
+                )
+                ->joinInner(
+                    ['salesRelative' => $this->getTable('tnw_subscriptions_profile_item_sales_item')],
+                    'invoiceItem.order_item_id = salesRelative.order_item_id',
+                    []
+                )
+                ->joinInner(
+                    ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                    'salesRelative.profile_item_id = profileItem.entity_id',
+                    []
+                )
+                ->where('profileItem.subscription_profile_id = ?', $object->getId());
+            $this->invoiceItems = $this->getConnection()->fetchAll($select);
+        }
+        return $this->invoiceItems;
     }
 }
