@@ -11,45 +11,12 @@ use Magento\Paypal\Model\Payflowpro as PaypalPayflow;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 
 /**
  * Class Payflowpro
  */
 class Payflowpro extends Base
 {
-    /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
-    /**
-     * Payflowpro constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
-     */
-    public function __construct(
-        \TNW\Subscriptions\Model\Config $config,
-        \TNW\Subscriptions\Model\Context $context,
-        \Magento\Quote\Api\CartManagementInterface $cartManagement,
-        \Magento\Framework\App\Request\DataPersistorInterface $persistor,
-        \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
-    ) {
-        parent::__construct(
-            $config,
-            $context,
-            $cartManagement,
-            $persistor,
-            $zeroTotalValidator
-        );
-        $this->paymentTokenManagement = $paymentTokenManagement;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -77,6 +44,80 @@ class Payflowpro extends Base
     }
 
     /**
+     * @return string
+     */
+    public function getVaultPaymentCode()
+    {
+        return 'payflowpro_cc_vault';
+    }
+
+    /**
+     * @param $requestData
+     * @return $this|Base
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
+    public function processProfileByRequestDataVault($requestData)
+    {
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            return $this;
+        }
+        $customer = $this->getProfile()->getCustomer();
+        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
+            return $this;
+        }
+
+        $paymentToken = $this->paymentTokenManagement->getByPublicHash(
+            $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
+            $customer->getId()
+        );
+        /** @var string[] $additionalData */
+        $additionalData = $requestData['payment'][$this->getVaultPaymentCode()]['additional'];
+        $additionalData['public_hash'] = $additionalData['publicHash'];
+        $paymentData = $requestData['payment'][$this->getVaultPaymentCode()];
+        $paymentData['method'] = $this->getVaultPaymentCode();
+        $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
+        $tempQuote = $this->manager->getTempQuote($this->getProfile());
+        $tempQuote->getPayment()->setMethod($this->getPaymentMethodCode());
+        $tempQuote->getPayment()->setQuote($tempQuote);
+        $this->vaultPaymentAuthorization->processPreAuthForTrial(
+            $paymentData,
+            $tempQuote
+        );
+        $this->populateProfilePayment($paymentToken);
+        return $this;
+    }
+
+    public function processProfileByRequestData($requestData)
+    {
+        if (!empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
+            $editData = $this->persistor->get(
+                \TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface::PAYMENT_DATA_KEY
+            );
+            $requestData['payment'][$this->getPaymentMethodCode()]['additional_information'][PaypalPayflow::PNREF]
+                = isset($editData['pnref'])
+                ? $editData['pnref']
+                : '';
+        }
+        return parent::processProfileByRequestData($requestData);
+    }
+
+    protected function populateProfilePayment($paymentToken)
+    {
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $this->getProfile()->getPayment()
+            ->setEngineCode($this->getPaymentMethodCode())
+            ->setPaymentToken($paymentToken->getGatewayToken())
+            ->setEncodedPaymentAdditionalInfo([
+                OrderPaymentInterface::CC_TYPE => $tokenDetails['cc_type'],
+                OrderPaymentInterface::CC_LAST_4 => $tokenDetails['cc_last_4'],
+                OrderPaymentInterface::CC_EXP_MONTH => $tokenDetails['cc_exp_month'],
+                OrderPaymentInterface::CC_EXP_YEAR => $tokenDetails['cc_exp_year'],
+            ]);
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
@@ -101,32 +142,6 @@ class Payflowpro extends Base
     }
 
     /**
-     * @inheritdoc
-     */
-    public function processProfileByRequestData($requestData)
-    {
-        $additionalData = [];
-        $tokenHash = '';
-        $paymentData = $this->getPersistor()->get(self::PAYMENT_DATA_KEY);
-        if (isset($paymentData[SubscriptionProfileInterface::ID],
-            $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH])) {
-            if ((int)$paymentData[SubscriptionProfileInterface::ID] === (int)$this->getProfile()->getId()) {
-                $tokenHash = $paymentData[SubscriptionProfilePaymentInterface::TOKEN_HASH];
-            }
-        }
-        $paymentPostData = isset($requestData['payment']) ? $requestData['payment'] :[];
-        foreach ($paymentPostData as $code => $methodData) {
-            if ($methodData['method']) {
-                $additionalData = isset($methodData['additional']) ? $methodData['additional'] : [];
-                break;
-            }
-        }
-        $this->getProfile()->getPayment()->setTokenHash($tokenHash);
-        $this->getProfile()->getPayment()->setEncodedPaymentAdditionalInfo($additionalData);
-        return $this;
-    }
-
-    /**
      * @param \Magento\Quote\Model\Quote $quote
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -142,5 +157,13 @@ class Payflowpro extends Base
         } else {
             parent::validatePayment($quote);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return Config::METHOD_PAYFLOWPRO;
     }
 }

@@ -52,7 +52,6 @@ class CyberSource extends Base
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param Config $paymentConfig
      * @param UrlInterface $urlBuilder
-     * @param \CyberSource\Core\Block\Fingerprint $fingerprintBlock
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -63,16 +62,15 @@ class CyberSource extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         Config $paymentConfig,
-        UrlInterface $urlBuilder,
-        \CyberSource\Core\Block\Fingerprint $fingerprintBlock
+        UrlInterface $urlBuilder
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
             $this->cybersourceConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+            $this->fingerprintBlock = $objectManager->get("CyberSource\Core\Block\Fingerprint");
         }
         $this->paymentConfig = $paymentConfig;
         $this->urlBuilder = $urlBuilder;
-        $this->fingerprintBlock = $fingerprintBlock;
     }
 
     /**
@@ -279,9 +277,8 @@ class CyberSource extends Base
             $configServiceUrl = $this->cybersourceConfig->getSopServiceUrl();
         }
         $tokenCreateUrl = $configServiceUrl . '/silent/embedded/token/create';
-        $loadSilentDataUrl = ($this->urlBuilder instanceof \Magento\Backend\Model\UrlInterface)
-            ? $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest')
-            : $this->urlBuilder->getUrl('cybersource/index/loadSilentData');
+        $loadSilentDataUrl = $this->urlBuilder->getUrl('tnw_subscriptions/secureAcceptance/TokenRequest');
+
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
             'listens' => $this->getListens(),

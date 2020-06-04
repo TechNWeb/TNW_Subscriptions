@@ -770,6 +770,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Cybersource</item>
                     <item name="sortOrder" xsi:type="number">21</item>
                 </item>
+                <item name="payflow_payment" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PayflowPro</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
                 <item name="submit" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Submit</item>
                     <item name="sortOrder" xsi:type="number">100</item>

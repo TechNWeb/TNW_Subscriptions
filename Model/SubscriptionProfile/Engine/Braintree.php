@@ -10,7 +10,6 @@ use Magento\Braintree\Model\Ui\ConfigProvider;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
 
 /**
  * Braintree Engine
@@ -27,40 +26,36 @@ class Braintree extends Base
      */
     private $transactionCustomer;
 
-    /**
-     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
-     */
-    private $paymentTokenManagement;
+    private $command;
 
-    /**
-     * Braintree constructor.
-     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
-     */
     public function __construct(
-        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Framework\App\Request\DataPersistorInterface $persistor,
         \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
-        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+        \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Braintree\Gateway\Command\GetPaymentNonceCommand $command
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
-        $this->paymentTokenManagement = $paymentTokenManagement;
+        $this->command = $command;
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -120,57 +115,51 @@ class Braintree extends Base
     }
 
     /**
-     * @inheritdoc
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return ConfigProvider::CODE;
+    }
+
+    /**
      * @param $requestData
-     * @return Braintree
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
+     * @return $this|Base|EngineInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function processProfileByRequestData($requestData)
     {
-        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])) {
+        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])
+            && empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
             return $this;
         }
 
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
-        }
-
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][ConfigProvider::CODE]['additional'];
-
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $requestData['payment'][ConfigProvider::CODE]['nonce']
-        ]);
-
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
-            $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
-                $errors[] = "{$error->code}: {$error->message}";
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            $paymentMethodNonce = $requestData['payment'][ConfigProvider::CODE]['nonce'];
+            $paymentCode = ConfigProvider::CODE;
+        } else {
+            $subject = [
+                'public_hash' => $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
+                'customer_id' => $this->getProfile()->getCustomerId(),
+                'store_id' => $this->getProfile()->getCustomer()->getStoreId(),
+            ];
+            try {
+                $result = $this->command->execute($subject)->get();
+                $paymentMethodNonce = $result['paymentMethodNonce'];
+                $paymentCode = $this->getVaultPaymentCode();
+            } catch (\Exception $e) {
+                throw new \Exception(__('Sorry, but something went wrong'));
             }
-
-            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
         }
+        $requestData['payment'][$paymentCode]['additional']
+        [\Magento\Braintree\Observer\DataAssignObserver::PAYMENT_METHOD_NONCE] = $paymentMethodNonce;
+        return parent::processProfileByRequestData($requestData);
+    }
 
-        /** @var \Braintree\CreditCard $paymentMethod */
-        $paymentMethod = $response['object']->customer->paymentMethods[0];
-
-        $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentMethod->token)
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
-                OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
-            ]);
-
-        return $this;
+    public function getVaultPaymentCode()
+    {
+        return 'braintree_cc_vault';
     }
 
     /**

@@ -10,8 +10,6 @@ use CyberSource\Core\Model\Config as ConfigProvider;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Vault\Api\PaymentTokenManagementInterface;
-use Magento\Framework\Exception\PaymentException;
 
 /**
  * Class CyberSource
@@ -35,13 +33,13 @@ class CyberSource extends Base
     private $requestHelper;
 
     /**
-     * @var PaymentTokenManagementInterface
+     * @var \Magento\Vault\Model\PaymentTokenFactory
      */
-    private $paymentTokenManagement;
+    private $paymentTokenFactory;
 
     /**
      * CyberSource constructor.
-     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
      * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
@@ -51,9 +49,14 @@ class CyberSource extends Base
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      * @param \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
      */
     public function __construct(
-        PaymentTokenManagementInterface $paymentTokenManagement,
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
@@ -62,15 +65,26 @@ class CyberSource extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig
+        \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config\Config $cyberSourceConfig,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
+        $this->paymentTokenFactory = $paymentTokenFactory;
         $cyberSourceConfig->reBillProcess();
         if (
             $moduleManager->isEnabled("CyberSource_Core")
@@ -80,7 +94,6 @@ class CyberSource extends Base
             $this->requestHelper = $objectManager->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
         }
         $this->transactionCustomer = $transactionCustomer;
-        $this->paymentTokenManagement = $paymentTokenManagement;
     }
 
     /**
@@ -100,6 +113,14 @@ class CyberSource extends Base
                 'cybersource_data' =>$cyberSourceData
             ]
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethodCode()
+    {
+        return ConfigProvider::CODE;
     }
 
     /**
@@ -156,54 +177,97 @@ class CyberSource extends Base
 
     /**
      * @param $requestData
-     * @return $this|Base
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
+     * @return $this|Base|EngineInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function processProfileByRequestData($requestData)
     {
-        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])) {
+        if (empty($requestData['payment'][ConfigProvider::CODE]['method'])
+            && empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
             return $this;
         }
 
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
+        if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            $paymentToken = $this->paymentTokenFactory->create('card');
+            $paymentToken->setPublicHash($this->generateNewTokenPublicHash(
+                $requestData['payment'][ConfigProvider::CODE],
+                $this->getProfile()->getCustomerId()
+            ));
+            $paymentToken->setGatewayToken($requestData['payment'][ConfigProvider::CODE]['payment_token']);
+            $paymentToken->setCustomerId($this->getProfile()->getCustomerId());
+            $paymentToken->setPaymentMethodCode('chcybersource');
+            $paymentToken->setTokenDetails(
+                $this->getNewTokenDetails($requestData['payment'][ConfigProvider::CODE]['additional'])
+            );
+            $paymentToken->setIsActive(true);
+            $paymentToken->setIsVisible(true);
+            $this->paymentTokenRepository->save($paymentToken);
+            $requestData['payment'][ConfigProvider::CODE]['additional']['public_hash'] = $paymentToken->getPublicHash();
         }
+        return parent::processProfileByRequestData($requestData);
+    }
 
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][ConfigProvider::CODE]['additional'];
+    /**
+     * @return string
+     */
+    public function getVaultPaymentCode()
+    {
+        return 'chcybersource_cc_vault';
+    }
 
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $requestData['payment'][ConfigProvider::CODE]['nonce']
-        ]);
-
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
-            $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
-                $errors[] = "{$error->code}: {$error->message}";
+    /**
+     * @param $paymentToken
+     * @return string
+     */
+    protected function generatePublicHash($paymentToken)
+    {
+        $result = $paymentToken->getPublicHash();
+        if ($result) {
+            $hashKey = $paymentToken->getGatewayToken();
+            if ($paymentToken->getCustomerId()) {
+                $hashKey = $paymentToken->getCustomerId();
             }
 
-            throw new PaymentException(__('CyberSource message: %1', implode(', ', $errors)));
+            $hashKey .= $paymentToken->getPaymentMethodCode()
+                . $paymentToken->getType()
+                . $paymentToken->getTokenDetails();
+
+            $result = $this->encryptor->getHash($hashKey);
         }
+        return $result;
+    }
 
-        /** @var \Braintree\CreditCard $paymentMethod */
-        $paymentMethod = $response['object']->customer->paymentMethods[0];
+    /**
+     * @param $paymentToken
+     * @return string
+     */
+    protected function generateNewTokenPublicHash($paymentData, $customerId)
+    {
+        $hashKey = $paymentData['payment_token'];
+        $hashKey .= $customerId;
+        $hashKey .= 'chcybersource'
+            . 'card'
+            . $this->getNewTokenDetails($paymentData['additional']);
 
-        $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentMethod->token)
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
-                OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
-            ]);
+        return $this->encryptor->getHash($hashKey);
+    }
 
-        return $this;
+    /**
+     * @param $paymentData
+     * @return false|string
+     */
+    private function getNewTokenDetails($paymentData)
+    {
+        //TODO:: get valid pyament method title
+        return json_encode(
+            [
+                "type" => $paymentData['cc_type'],
+                "maskedCC" => "****-****-****-" . substr($paymentData['cc_number'], -4),
+                "incrementId" => null,
+                "expirationDate" => $paymentData['cc_exp_month'] . "/" . $paymentData['cc_exp_year'],
+                "title"=>"CyberSource Stored Cards"
+            ]
+        );
     }
 }

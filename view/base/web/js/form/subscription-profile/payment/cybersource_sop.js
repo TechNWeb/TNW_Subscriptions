@@ -105,11 +105,18 @@ define([
         loadSilentData: function () {
             var silentData = $.Deferred(),
                 formKey = typeof FORM_KEY !== 'undefined' ? FORM_KEY : $('input[name=form_key]').val(),
-                postData;
+                postData,
+                profile_id = this.source.get('data.subscription_profile_id'),
+                entity_id = this.source.get('data.entity_id');
             postData = {
                 'form_key': formKey,
                 'cc_type': this.source.get(this.dataScope + '.additional.cc_type')
             };
+            if (profile_id) {
+                postData.profile_id = profile_id;
+            } else if (entity_id) {
+                postData.profile_id = entity_id;
+            }
             $.ajax({
                 url: this.loadSilentDataUrl,
                 type: 'post',
