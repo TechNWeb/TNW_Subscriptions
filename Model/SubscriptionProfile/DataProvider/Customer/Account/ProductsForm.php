@@ -415,7 +415,8 @@ class ProductsForm extends SummaryProductsForm
             ]
         ];
 
-        if (!(bool) $this->currentProduct->getData('tnw_subscr_hide_qty')) {
+        $hideQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
+        if (!$hideQty) {
             $result['children']['qty_container'] = $this->getQtyContainerDefinition();
         }
         $result['children']['edit_fieldset'] = $this->getEditFieldsetDefinition();
@@ -485,7 +486,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getPeriodDefenition()
     {
-        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [

@@ -744,7 +744,7 @@ class Form extends AbstractDataProvider
      * @param array|null $additionalData
      * @return DataObject
      */
-    private function getProductObjectData($productId, $additionalData = null)
+    protected function getProductObjectData($productId, $additionalData = null)
     {
         $product = $this->formContext->getProductRepository()->getById($productId);
 
@@ -788,7 +788,9 @@ class Form extends AbstractDataProvider
         if (!empty($this->currentItem)) {
             $children = $this->currentItem->getChildren();
             $child = is_array($children) ? reset($children) : null;
-            $childProductId = !empty($child) ? $child->getMagentoProductId() : null;
+            if (!empty($child)) {
+                $childProductId =  $child->getMagentoProductId() ?? $child->getProductId();
+            }
             return !empty($childProductId)
                 ? $this->formContext->getProductRepository()->getById($childProductId)
                 : null;

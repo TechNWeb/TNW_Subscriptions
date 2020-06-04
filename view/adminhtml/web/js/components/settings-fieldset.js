@@ -21,27 +21,17 @@ define([
         },
 
         changingVisibility: function () {
-            var purchaseType = registry.get('index=tnw_subscr_purchase_type'),
-                trialStatusValue = registry.get('index=tnw_subscr_trial_status')
-                    ? registry.get('index=tnw_subscr_trial_status').checked()
-                    : false,
-                lockPriceValue = registry.get('index=tnw_subscr_lock_product_price')
+            var lockPriceValue = registry.get('index=tnw_subscr_lock_product_price')
                     ? registry.get('index=tnw_subscr_lock_product_price').checked()
                     : false,
                 offerDiscountValue = registry.get('index=tnw_subscr_offer_flat_discount')
                     ? ( registry.get('index=tnw_subscr_offer_flat_discount').checked() &&
                         !registry.get('index=tnw_subscr_offer_flat_discount').disabled())
                     : false,
-                discountAmount = registry.get('index=tnw_subscr_discount_amount'),
-                trialLength = registry.get('index=tnw_subscr_trial_length'),
-                isOneTime = purchaseType.value() == 1;
+                discountAmount = registry.get('index=tnw_subscr_discount_amount');
 
-            this.visible(!isOneTime);
-            if (trialLength) {
-                trialLength.disabled(isOneTime || !trialStatusValue);
-            }
             if (discountAmount) {
-                discountAmount.disabled(isOneTime || !lockPriceValue || !offerDiscountValue);
+                discountAmount.disabled(!lockPriceValue || !offerDiscountValue);
             }
         },
 
