@@ -64,10 +64,17 @@ class Cybersource extends Base
         $this->paymentTokenRepository->save($paymentToken);
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
+            if ($subQuote->getGrandTotal() < 0.001) {
+                $vaultPaymentData = [];
+                $vaultPaymentData['method'] = $this->getVaultMethodCode();
+                $vaultPaymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
+                $vaultPaymentData['additional_data']['public_hash'] = $paymentToken->getPublicHash();
+                $this->vaultPaymentAuthorization->processPreAuthForTrial($vaultPaymentData, $subQuote);
+            }
             $subQuote->getPayment()
                 ->setAdditionalInformation('cc_number', $paymentData['additional']['cc_number'])
                 ->setAdditionalInformation('customer_id', $subQuote->getCustomerId())
-                ->setMethod('chcybersource_cc_vault')
+                ->setMethod($this->getVaultMethodCode())
                 ->setAdditionalInformation('public_hash', $paymentToken->getPublicHash())
                 ->setCcType($paymentData['additional']['cc_type'])
                 ->setCcLast4(substr($paymentData['additional']['cc_number'], -4))
@@ -76,6 +83,11 @@ class Cybersource extends Base
         }
 
         $this->getSubCreateModel()->setNeedCollect(true);
+    }
+
+    public function getVaultMethodCode()
+    {
+        return 'chcybersource_cc_vault';
     }
 
     /**
