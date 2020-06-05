@@ -43,18 +43,18 @@ class InitialFee extends AbstractTotal
         $baseTotalInitialFee = 0;
 
         foreach ($shippingAssignment->getItems() as $item) {
+            if (Configurable::TYPE_CODE === $item->getProductType()) {
+                continue;
+            }
             $itemInitialFees = $this->getItemInitialFees($item);
             if (null === $itemInitialFees) {
                 continue;
             }
 
-            if (Configurable::TYPE_CODE === $item->getProductType()) {
-                $totalInitialFee -= $itemInitialFees->getSubsInitialFee();
-                $baseTotalInitialFee -= $itemInitialFees->getBaseSubsInitialFee();
-            }
+            $qty = $item->getBuyRequest()->getUsePresetQty() ? 1 : $item->getQty();
 
-            $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $item->getQty();
-            $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $item->getQty();
+            $totalInitialFee += $itemInitialFees->getSubsInitialFee() * $qty;
+            $baseTotalInitialFee += $itemInitialFees->getBaseSubsInitialFee() * $qty;
         }
         $total->setTotalAmount($this->getCode(), $totalInitialFee);
         $total->setBaseTotalAmount($this->getCode(), $baseTotalInitialFee);
@@ -76,7 +76,8 @@ class InitialFee extends AbstractTotal
                 if (null === $itemInitialFees) {
                     continue;
                 }
-                $amount += $itemInitialFees->getSubsInitialFee() * $item->getQty();
+                $qty = $item->getBuyRequest()->getUsePresetQty() ? 1 : $item->getQty();
+                $amount += $itemInitialFees->getSubsInitialFee() * $qty;
             }
         }
         return [

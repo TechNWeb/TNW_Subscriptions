@@ -11,6 +11,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
@@ -18,6 +19,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
@@ -137,6 +139,7 @@ class Subscribe extends View
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
 
+
     /**
      * Retrieve current product model.
      *
@@ -165,22 +168,50 @@ class Subscribe extends View
     }
 
     /**
+     * Get product data object. Respect inheritance config for configurable.
+     * @return DataObject
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getProductDataObject()
+    {
+        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+            $children = $this->getItem()->getChildren();
+            $child = is_array($children) ? reset($children) : null;
+            $arguments = !empty($child) ? ['child_product' => $child->getProduct()] : [];
+            return $this->subscriptionTypeResolver->resolve($this->getItem()->getProduct()->getTypeId())
+                ->getProductDataObject($this->getItem()->getProduct(), $arguments);
+        }
+        $typeId = $this->getProduct()->getTypeId();
+        return $this->subscriptionTypeResolver->resolve($typeId)->getProductDataObject($this->getProduct());
+    }
+
+    /**
      * Get "Enable Subscriptions" config value for current website.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function isSubscribeAvailable()
     {
-        return $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
+        return ( $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
+                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE )
+            && $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
     }
 
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function IsOnlySubscribePurchase()
     {
+        if (
+            $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
+            && $this->getPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
+        ) {
+            return true;
+        }
         return $this->subscriptionProductViewConfig->isOnlySubscribePurchase($this->getProduct());
     }
 
@@ -188,10 +219,55 @@ class Subscribe extends View
      * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function IsOneTimeAndSubscribePurchase()
     {
-        return $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
+        return $this->getPurchaseType() ===  PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
+            && $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
+    }
+
+    /**
+     * Get purchase type from product data object. Respect configurable inheritance.
+     * @return int
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getPurchaseType()
+    {
+        return (int)$this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getOptions()
+    {
+        $options = [];
+        $currentProduct = $this->getProduct();
+        if ($currentProduct->getTypeId() === Configurable::TYPE_CODE) {
+            $allowedProducts = $currentProduct->getTypeInstance()->getSalableUsedProducts($this->getProduct(), null);
+            $configurableAttributes = $currentProduct->getTypeInstance()->getConfigurableAttributes($currentProduct);
+
+            foreach ($allowedProducts as $product) {
+                $productId = $product->getId();
+                foreach ($configurableAttributes as $attribute) {
+                    $productAttribute = $attribute->getProductAttribute();
+                    $productAttributeId = $productAttribute->getId();
+                    $attributeValue = $product->getData($productAttribute->getAttributeCode());
+
+                    $options[$productId][$productAttributeId] = $attributeValue;
+                }
+            }
+        }
+
+        $defaultValues = $this->getRequest()->getParam('attributes');
+
+        if (!empty($defaultValues) && is_array($defaultValues)) {
+            $options['defaultValues'] = $defaultValues;
+        }
+
+        return $options;
     }
 
     /**
@@ -230,32 +306,77 @@ class Subscribe extends View
     }
 
     /**
+     * @param DataObject $productDataObject
+     * @return array|null
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getProductBillingFrequenciesData(DataObject $productDataObject)
+    {
+        $result = [];
+        $productId = !empty($productDataObject['child_product_id'])
+            ? $productDataObject['child_product_id']
+            : $productDataObject->getId();
+        $productBillingFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productId)
+            ->getItems();
+        foreach ($productBillingFrequencies as $productBillingFrequency) {
+            $frequency = $this->frequencyRepository->getById($productBillingFrequency->getBillingFrequencyId());
+            $frequencyPrice = $this->priceCalculator->getUnitPrice(
+                $productDataObject,
+                $productBillingFrequency->getBillingFrequencyId()
+            );
+            $data = [
+                'label' => $frequency->getLabel(),
+                'value' => $productBillingFrequency->getBillingFrequencyId(),
+                'frequency_unit' => $frequency->getFrequency(),
+                'frequency_unit_type' => $frequency->getUnit(),
+                'is_default' => $productBillingFrequency->getDefaultBillingFrequency(),
+                'price' => $frequencyPrice,
+                'preset_qty' => $productBillingFrequency->getPresetQty()
+            ];
+            $result[] = $data;
+        }
+        return !empty($result) ? $result : null;
+    }
+
+    /**
      * Returns list of product billing frequencies.
      *
      * @return array
      */
     private function getProductBillingFrequencies()
     {
-        if (!$this->getProduct()->hasData('product_billing_frequencies')) {
-            $productId = $this->getProduct()->getId();
-            $productBillingFrequencies = $this->frequencyOptionRepository
-                ->getListByProductId($productId)
+        $frequencies = [];
+        $productData = $this->getProductDataObject();
+        $parentFrequencies = $this->frequencyOptionRepository
+            ->getListByProductId($productData->getId())
+            ->getItems();
+        if ($productData->getChildProductId() && $productData->getId() !== $productData->getChildProductId()) {
+            $childFrequencies = $this->frequencyOptionRepository
+                ->getListByProductId($productData->getChildProductId())
                 ->getItems();
-            $this->getProduct()->setData('product_billing_frequencies', $productBillingFrequencies);
+            foreach ($parentFrequencies as $parentFrequency) {
+                foreach ($childFrequencies as $childFrequency) {
+                    if ($childFrequency->getBillingFrequencyId() === $parentFrequency->getBillingFrequencyId()) {
+                        $frequencies[] = $childFrequency;
+                    }
+                }
+            }
+            return $frequencies;
         }
-
-        return $this->getProduct()->getData('product_billing_frequencies');
+        return $parentFrequencies;
     }
 
     /**
      * Can allow edit Subscribe Qty
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getAllowEditSubscribeQty()
     {
-        $product = $this->getProduct();
-        return !(bool)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        return !(bool)$this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
     }
 
     /**
@@ -277,6 +398,11 @@ class Subscribe extends View
     public function getSavingCalculationType()
     {
         return $this->savingsCalculation->getSavingsCalculationType($this->getProduct());
+    }
+
+    public function getDefaultFrequency()
+    {
+        return $this->preconfiguredValue('subscription_data/unique/billing_frequency');
     }
 
     /**
@@ -315,7 +441,7 @@ class Subscribe extends View
      */
     public function getIsInfiniteSubscriptions()
     {
-        return $this->getProduct()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+        return $this->getProductDataObject()->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
     }
 
     /**
@@ -339,7 +465,7 @@ class Subscribe extends View
      */
     public function getIsVisibleStartOn()
     {
-        $product = $this->getProduct();
+        $product = $this->getProductDataObject();
         // Note: If product "is trial" then "start on" is start date of trial period,
         // otherwise "start on" is start date of subscription
         if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
@@ -406,17 +532,19 @@ class Subscribe extends View
     /**
      * Returns validators for qty field. Depends on product settings
      *
+     * @param ProductInterface $product
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getQtyValidators()
+    public function getQtyValidators(ProductInterface $product)
     {
         $params = [];
         $validators = [];
         $validators['required-number'] = true;
         /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem(
-            $this->getProduct()->getId(),
-            $this->getProduct()->getStore()->getWebsiteId()
+            $product->getId(),
+            $product->getStore()->getWebsiteId()
         );
 
         $params['minAllowed'] = max((float)$stockItem->getQtyMinAllowed(), 1);
@@ -440,13 +568,18 @@ class Subscribe extends View
     {
         $type = $this->getProduct()->getTypeId();
         $subsProductType = $this->subscriptionTypeResolver->resolve($type);
+        $preconfiguredValues = $this->getProduct()->getPreconfiguredValues() ?? null;
         $productData = $subsProductType->getProductDataObject($this->getProduct());
-
         $result = [
             'type' => $type,
-            'product_price' => $this->getProduct()->getFinalPrice(),
-            'frequency_data' => $this->getFrequencyPricesByProduct($productData),
-            'trial_data' => $this->getTrialDataByProduct($productData),
+            'product' => [
+                'product_price' => $this->getProduct()->getFinalPrice(),
+                'frequency_data' => $this->getProductBillingFrequenciesData($productData),
+                'trial_data' => $this->getTrialDataByProduct($productData),
+                'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
+                'qtyValidators' => $this->getQtyValidators($this->getProduct()),
+                'preconfigured' => $preconfiguredValues
+            ]
         ];
 
         switch ($type) {
@@ -454,7 +587,8 @@ class Subscribe extends View
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
                 break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+            case Configurable::TYPE_CODE:
+                $result['super_attributes'] = $this->getOptions();
                 $childProducts = $this->getProduct()
                     ->getTypeInstance()
                     ->getSalableUsedProducts($this->getProduct(), null);
@@ -466,12 +600,16 @@ class Subscribe extends View
                         $this->getProduct(),
                         ['child_product' => $childProduct]
                     );
-                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getFrequencyPricesByProduct(
+                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getProductBillingFrequenciesData(
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['trial_data'] = $this->getTrialDataByProduct(
                         $productDataObject
                     );
+                    $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
                 }
 
                 $result['children'] = $childArray;
@@ -484,10 +622,41 @@ class Subscribe extends View
     }
 
     /**
-     * Returns array of product dilling frequency prices.
+     * Returns array of recurring settings used on product page for child products
+     * @param $productData
+     * @return array
+     */
+    protected function getRecurringSettingsByProduct($productData)
+    {
+        $attributesMap = [
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
+            Attribute::SUBSCRIPTION_START_DATE,
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            Attribute::SUBSCRIPTION_HIDE_QTY,
+            Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        ];
+        $result = [];
+        foreach ($productData->getData() as $key => $attribute) {
+            if (in_array($key, $attributesMap)) {
+                if ($key == Attribute::SUBSCRIPTION_SAVINGS_CALCULATION) {
+                    $result[substr($key, 11)] = $this->savingsCalculation
+                        ->getSavingsCalculationType($productData);
+                    continue;
+                }
+                $result[substr($key, 11)] = $attribute;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Returns array of product billing frequency prices.
      *
      * @param DataObject $productDataObject
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getFrequencyPricesByProduct(DataObject $productDataObject)
     {
@@ -503,7 +672,7 @@ class Subscribe extends View
             $result[$productFrequency->getBillingFrequencyId()] = $frequencyPrice;
         }
 
-        return $result;
+        return !empty($result) ? $result : null;
     }
 
     /**
@@ -518,6 +687,7 @@ class Subscribe extends View
                 'trial_price' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
                 'trial_length' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
                 'trial_length_unit' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                'trial_start_date' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
                 'trial_label' => strtolower($this->trialLengthUnitType->getLabelByValueAndLength(
                     (int)$productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
                     $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH))

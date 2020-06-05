@@ -18,6 +18,7 @@ define([
                 text: null,
                 error: null
             },
+            productType: null,
             wizardSummaryLabel: null,
             frequencyRecords: null,
             indexedFrequencies: null,
@@ -108,7 +109,12 @@ define([
         },
 
         getTrialDescription: function () {
-            var trial = $t('A %1 %2 trial for %3 will be offered and it will start at %4.');
+            var trial = $t('A %1 %2 trial for %3 will be offered and it will start at %4.'),
+                inheritTrial = uiRegistry.get('index=inherit_tnw_subscr_trial_status');
+
+            if (inheritTrial && inheritTrial.checked()) {
+                return $t('A trial for this product might be offered and this configuration is dictated by child products.');
+            }
             if (parseInt(this.trialStatus)) {
                 return trial.replace('%1', this.trialLength)
                     .replace('%2', this.getTrialUnit())
@@ -119,7 +125,12 @@ define([
         },
 
         getDiscountDescription: function () {
-            var discount = $t('For recurring purchases a %1 discount is offered%2.');
+            var discount = $t('For recurring purchases a %1 discount is offered%2.'),
+                inheritDiscount = uiRegistry.get('index=inherit_tnw_subscr_offer_flat_discount');
+
+            if (inheritDiscount && inheritDiscount.checked()) {
+                return $t('For recurring purchases discount may be offered and it is defined by the child products.');
+            }
             if (this.lockPrice === '1' && this.offerFlatDiscount === '1') {
                 var discountAmount = this.flatDiscountType === '1' ? this.getDiscountAmount() : this.flatDiscountAmount + '%',
                     trial = parseInt(this.trialStatus) ? $t(' after the trial') : '';
@@ -130,6 +141,10 @@ define([
         },
 
         getBillingDescription: function () {
+            var inheritInfSubs = uiRegistry.get('index=inherit_tnw_subscr_inf_subscriptions');
+            if (inheritInfSubs && inheritInfSubs.checked()) {
+                return $t('The length of the subscription is defined by the child products and may vary.');
+            }
             if (this.infiniteSubscription === '1') {
                 return $t('The customer will be billed indefinitely until they choose to cancel.');
             }
@@ -138,6 +153,10 @@ define([
 
         getDiscountAmount: function () {
             return formatPrice.formatPrice(this.flatDiscountAmount, this.priceFormat);
+        },
+
+        getIsConfigurableProduct: function () {
+            return this.productType === 'configurable';
         },
 
         onChangedPurchaseType: function (typeValue) {

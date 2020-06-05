@@ -583,7 +583,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getTermDefinition()
     {
-        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [
@@ -623,7 +623,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getPeriodDefenition()
     {
-        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
         return [

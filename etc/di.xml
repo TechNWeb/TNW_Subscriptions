@@ -853,13 +853,6 @@
     <type name="Magento\Quote\Model\Quote\Item\Processor">
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\Processor" />
     </type>
-
-    <type name="Magento\Quote\Model\Quote\Config">
-        <plugin name="append_subscription_attributes_to_quote"
-                type="TNW\Subscriptions\Plugin\Quote\Item\QuoteConfigProductAttributes"
-                sortOrder="100"
-                disabled="false"/>
-    </type>
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\EditProduct\Modal\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">

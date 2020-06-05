@@ -21,7 +21,6 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Simple as SimpleTypeManager;
 /**
  * Class Manager
  */
@@ -72,11 +71,6 @@ class Manager
     ];
 
     /**
-     * @var SimpleTypeManager
-     */
-    private $simpleTypeManager;
-
-    /**
      * @var Context
      */
     private $subscriptionContext;
@@ -97,10 +91,15 @@ class Manager
     private $orderRelationManager;
 
     /**
+     * @var ProductTypeManagerResolver
+     */
+    private $productTypeResolver;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
-     * @param SimpleTypeManager $simpleTypeManager
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param Context $subscriptionContext
      * @param SerializerInterface $serializer
      * @param FrequencyRepository $frequencyRepository
@@ -110,7 +109,7 @@ class Manager
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
         MessageHistoryLogger $historyLogger,
-        SimpleTypeManager $simpleTypeManager,
+        ProductTypeManagerResolver $productTypeResolver,
         Context $subscriptionContext,
         SerializerInterface $serializer,
         FrequencyRepository $frequencyRepository,
@@ -119,11 +118,11 @@ class Manager
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
-        $this->simpleTypeManager = $simpleTypeManager;
         $this->subscriptionContext = $subscriptionContext;
         $this->serializer = $serializer;
         $this->frequencyRepository = $frequencyRepository;
         $this->orderRelationManager = $orderRelationManager;
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     public function reset()
@@ -521,11 +520,19 @@ class Manager
                                 });
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
-                                $price = $this->simpleTypeManager
+                                $children = $product->getChildren();
+                                $child = !empty($children) && is_array($children) ? reset($children) : null;
+                                $productData = $child
+                                    ? array_merge(
+                                        $data['item_' . $productId],
+                                        ['child_product' => $child->getMagentoProduct()]
+                                    )
+                                    : $data['item_' . $productId];
+                                $price = $this->productTypeResolver->resolve($product->getMagentoProduct()->getTypeId())
                                     ->setProfile($profileModel)
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
-                                        $product->getMagentoProduct(), $data['item_' . $productId]
+                                        $product->getMagentoProduct(), $productData
                                     );
                                 $product->setPrice($price);
                             }
