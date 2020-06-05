@@ -72,7 +72,7 @@ class SubscriptionPriceBox extends BasePriceBox
     /**
      * @var ProductTypeManagerResolver
      */
-    private $productTypeResolver;
+    protected $productTypeResolver;
 
     /**
      * @var \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView

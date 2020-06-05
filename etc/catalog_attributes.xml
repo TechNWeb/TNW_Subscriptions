@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Catalog:etc/catalog_attributes.xsd">
+    <group name="quote_item">
+        <attribute name="tnw_subscr_purchase_type"/>
+        <attribute name="tnw_subscr_trial_status"/>
+        <attribute name="tnw_subscr_trial_length"/>
+        <attribute name="tnw_subscr_trial_length_unit"/>
+        <attribute name="tnw_subscr_lock_product_price"/>
+        <attribute name="tnw_subscr_offer_flat_discount"/>
+        <attribute name="tnw_subscr_discount_amount"/>
+        <attribute name="tnw_subscr_discount_type"/>
+        <attribute name="tnw_subscr_trial_price"/>
+        <attribute name="tnw_subscr_trial_start_date"/>
+        <attribute name="tnw_subscr_start_date"/>
+        <attribute name="tnw_subscr_unlock_preset_qty"/>
+        <attribute name="tnw_subscr_hide_qty"/>
+        <attribute name="tnw_subscr_savings_calculation"/>
+        <attribute name="tnw_subscr_inf_subscriptions"/>
+        <attribute name="tnw_subscr_inheritance"/>
+        <attribute name="short_description"/>
+    </group>
+</config>

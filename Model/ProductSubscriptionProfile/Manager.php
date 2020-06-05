@@ -12,6 +12,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -20,7 +21,6 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\Simple as SimpleTypeManager;
 /**
  * Class Manager
  */
@@ -71,11 +71,6 @@ class Manager
     ];
 
     /**
-     * @var SimpleTypeManager
-     */
-    private $simpleTypeManager;
-
-    /**
      * @var Context
      */
     private $subscriptionContext;
@@ -96,10 +91,15 @@ class Manager
     private $orderRelationManager;
 
     /**
+     * @var ProductTypeManagerResolver
+     */
+    private $productTypeResolver;
+
+    /**
      * @param ProductSubscriptionProfileFactory $profileFactory
      * @param Registry $coreRegistry
      * @param MessageHistoryLogger $historyLogger
-     * @param SimpleTypeManager $simpleTypeManager
+     * @param ProductTypeManagerResolver $productTypeResolver
      * @param Context $subscriptionContext
      * @param SerializerInterface $serializer
      * @param FrequencyRepository $frequencyRepository
@@ -109,7 +109,7 @@ class Manager
         ProductSubscriptionProfileFactory $profileFactory,
         Registry $coreRegistry,
         MessageHistoryLogger $historyLogger,
-        SimpleTypeManager $simpleTypeManager,
+        ProductTypeManagerResolver $productTypeResolver,
         Context $subscriptionContext,
         SerializerInterface $serializer,
         FrequencyRepository $frequencyRepository,
@@ -118,11 +118,11 @@ class Manager
         $this->profileProductFactory = $profileFactory;
         $this->coreRegistry = $coreRegistry;
         $this->historyLogger = $historyLogger;
-        $this->simpleTypeManager = $simpleTypeManager;
         $this->subscriptionContext = $subscriptionContext;
         $this->serializer = $serializer;
         $this->frequencyRepository = $frequencyRepository;
         $this->orderRelationManager = $orderRelationManager;
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     public function reset()
@@ -402,6 +402,31 @@ class Manager
                                     }
                                 }
                                 $profileModel->setTotalBillingCycles($periodValue);
+
+                                $origBillingCycle = $profileModel->getOrigData(
+                                    SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
+                                );
+                                $billingCycle = $profileModel->getData(
+                                    SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
+                                );
+                                if ($profileModel->hasDataChanges(SubscriptionProfileInterface::TERM)
+                                    && $origBillingCycle != $billingCycle
+                                ) {
+                                    $message =  __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                                     %3 changed from <b>%4</b> to <b>%5</b>.',
+                                        $product->getMagentoProduct()->getId(),
+                                        $product->getMagentoProduct()->getName(),
+                                        'Term',
+                                        $origBillingCycle == 0 ? __('Until canceled') : __(
+                                            'Bill %1 times', $origBillingCycle
+                                        ),
+                                        $billingCycle == 0 ? __('Until canceled') : __(
+                                            'Bill %1 times', $billingCycle
+                                        )
+                                    );
+
+                                    $this->historyLogger->log($message, $profileModel->getId());
+                                }
                             }
                             $trialLength = $profileModel->getTrialLength();
                             $originalStartDate = $trialLength
@@ -427,6 +452,19 @@ class Manager
                                 }
                                 $profileModel->setStartDate($startOn)
                                     ->setOriginalStartDate($startOn);
+
+                                if ($profileModel->hasDataChanges(SubscriptionProfileInterface::START_DATE)) {
+                                    $message =  __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                                     %3 changed from <b>%4</b> to <b>%5</b>.',
+                                        $product->getMagentoProduct()->getId(),
+                                        $product->getMagentoProduct()->getName(),
+                                        'Start on',
+                                        $profileModel->getOrigData(SubscriptionProfileInterface::START_DATE),
+                                        $profileModel->getData(SubscriptionProfileInterface::START_DATE)
+                                    );
+
+                                    $this->historyLogger->log($message, $profileModel->getId());
+                                }
                             }
                             if (isset($data['item_' . $productId]['billing_frequency'])) {
                                 $frequencyId = $data['item_' . $productId]['billing_frequency'];
@@ -446,6 +484,29 @@ class Manager
                                     $profileModel->setBillingFrequencyId($frequencyId)
                                         ->setFrequency($frequency->getFrequency())
                                         ->setUnit($frequency->getUnit());
+
+                                    if ($profileModel->hasDataChanges(
+                                        SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+                                    )) {
+                                        $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                                        %3 changed from <b>%4</b> to <b>%5</b>.',
+                                            $product->getMagentoProduct()->getId(),
+                                            $product->getMagentoProduct()->getName(),
+                                            'Billing Frequency',
+                                            $this->frequencyRepository->getById(
+                                                $profileModel->getOrigData(
+                                                    SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+                                                )
+                                            )->getLabel(),
+                                            $this->frequencyRepository->getById(
+                                                $profileModel->getData(
+                                                    SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+                                                )
+                                            )->getLabel()
+                                        );
+
+                                        $this->historyLogger->log($message, $profileModel->getId());
+                                    }
                                 }
                             }
                             if ((bool) $product->getTnwSubscrUnlockPresetQty()) {
@@ -459,11 +520,19 @@ class Manager
                                 });
                             }
                             if (isset($data['item_' . $productId]['qty'])) {
-                                $price = $this->simpleTypeManager
+                                $children = $product->getChildren();
+                                $child = !empty($children) && is_array($children) ? reset($children) : null;
+                                $productData = $child
+                                    ? array_merge(
+                                        $data['item_' . $productId],
+                                        ['child_product' => $child->getMagentoProduct()]
+                                    )
+                                    : $data['item_' . $productId];
+                                $price = $this->productTypeResolver->resolve($product->getMagentoProduct()->getTypeId())
                                     ->setProfile($profileModel)
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
-                                        $product->getMagentoProduct(), $data['item_' . $productId]
+                                        $product->getMagentoProduct(), $productData
                                     );
                                 $product->setPrice($price);
                             }

@@ -231,8 +231,9 @@ class DescriptionCreator
         if (!$subsInitialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem) {
             return 0;
         }
+        $qty = $item->getBuyRequest()->getUsePresetQty() ? 1 : $item->getQty();
 
-        return $subsInitialFees->getSubsInitialFee() * $item->getQty();
+        return $subsInitialFees->getSubsInitialFee() * $qty;
     }
 
     /**

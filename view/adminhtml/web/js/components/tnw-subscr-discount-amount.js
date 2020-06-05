@@ -28,7 +28,12 @@ define([
             validator.addRule(
                 "discount-less-then-price",
                 function (validated) {
-                    var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount');
+                    var discountAmountComponent = registry.get('index=tnw_subscr_discount_amount'),
+                        productPriceComponent = registry.get('index=price, dataScope=data.product.price');
+                    if (productPriceComponent.disabled()) {
+                        //In case of configurable product
+                        return true;
+                    }
                     return discountAmountComponent.validateDiscountLessPrice(validated);
                 },
                 $.mage.__('The discount cannot exceed the total product cost.')

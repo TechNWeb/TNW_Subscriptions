@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Quote\Item;
@@ -23,6 +24,7 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Class Product
@@ -75,6 +77,18 @@ class Product extends Create
     private $product;
 
     /**
+     * Current used child product.
+     * @var MagentoProduct
+     */
+    private $childProduct;
+
+    /**
+     * Attributes Inheritance config
+     * @var array
+     */
+    private $inheritanceConfig;
+
+    /**
      * Current used product DataObject.
      *
      * @var DataObject
@@ -97,6 +111,11 @@ class Product extends Create
     private $config;
 
     /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
      * Product constructor.
      * @param Config $config
      * @param Context $context
@@ -107,6 +126,7 @@ class Product extends Create
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param ProductBillingFrequencyRepository $productBillingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Serializer $serializer
      */
     public function __construct(
         Config $config,
@@ -117,7 +137,8 @@ class Product extends Create
         ExtensionManager $extensionManager,
         ProductTypeManagerResolver $productTypeResolver,
         ProductBillingFrequencyRepository $productBillingFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        Serializer $serializer
     ) {
         $this->config = $config;
         $this->productRepository = $productRepository;
@@ -126,6 +147,7 @@ class Product extends Create
         $this->productTypeResolver = $productTypeResolver;
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->serializer = $serializer;
 
         parent::__construct($context, $session);
     }
@@ -217,30 +239,58 @@ class Product extends Create
     {
         if (!$this->buyRequest) {
             $productData = $this->getData();
-            // add preset qty param to product request array
-            $productData['use_preset_qty'] = (bool) $this->getProduct()
-                ->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-            $productData['hide_qty'] = (bool) $this->getProduct()
-                ->getData(Attribute::SUBSCRIPTION_HIDE_QTY);
             $product = $this->getProduct();
-            $isTrial = $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
-            $trialPeriod = $isTrial ? $product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH) : null;
-            $trialUnitId = $isTrial ? (int)$product->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT) : null;
-            //Note: If product "is trial" then "start on" is start date of trial period,
-            // otherwise "start on" is start date of subscription
-            $startOn = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
+            if (
+                $this->getProduct()->getTypeId() === Configurable::TYPE_CODE
+                && isset($productData['super_attribute'])
+            ) {
+                $childProduct = $this->getProduct()->getTypeInstance()
+                    ->getProductByAttributes($productData['super_attribute'], $product);
+                if ($childProduct instanceof MagentoProduct) {
+                    $this->setChildProduct($childProduct);
+                }
+            }
+            // add preset qty param to product request array
+            $productData['use_preset_qty'] = $this->getChildProduct()
+                ? (bool)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+                : (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+            $productData['hide_qty'] =
+                (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
+            $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_START_DATE);
+            $isTrial = $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
+            $trialPeriod = $trialUnitId = null;
+            if ($isTrial) {
+                $childTrial = $this->getInheritanceConfig(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+                $trialPeriod = $childTrial
+                    ? $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
+                    : $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH);
+                $trialUnitId = $childTrial
+                    ? (int)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
+                    : (int)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
+                //Note: If product "is trial" then "start on" is start date of trial period,
+                // otherwise "start on" is start date of subscription
+                $startOn = $childTrial
+                    ? $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                    : $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
+            }
             if (isset($productData['start_on'])) {
                 $startOn = $productData['start_on'];
-            } elseif ($isTrial) {
-                $startOn = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
             }
-
             if ($productData['use_preset_qty']) {
+                if ($this->getChildProduct()) {
+                    $this->searchCriteriaBuilder
+                        ->addFilter(
+                            ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                            $this->getChildProduct()->getId()
+                        );
+                } else {
+                    $this->searchCriteriaBuilder
+                        ->addFilter(
+                            ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                            $this->getProduct()->getId()
+                        );
+                }
                 $this->searchCriteriaBuilder
-                    ->addFilter(
-                        ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                        $this->getProduct()->getId()
-                    )
                     ->addFilter(
                         ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
                         $productData['billing_frequency']
@@ -496,5 +546,57 @@ class Product extends Create
     {
         return $this->productTypeResolver->resolve($product->getTypeId())
             ->getSubscriptionCurrentPresetQtyPrice($product, $productData);
+    }
+
+    /**
+     * Get attribute value according to inheritance config
+     * @param $code
+     * @return mixed|null
+     */
+    private function getSubsAttribute($code)
+    {
+        if (
+            $this->getChildProduct()
+            && $this->getInheritanceConfig()
+            && isset($this->getInheritanceConfig()[$code])
+            && (bool)$this->getInheritanceConfig()[$code]
+        ) {
+            return $this->getChildProduct()->getData($code);
+        }
+        return $this->getProduct()->getData($code);
+    }
+
+    /**
+     * @return MagentoProduct
+     */
+    private function getChildProduct()
+    {
+        return $this->childProduct;
+    }
+
+    /**
+     * @param MagentoProduct $childProduct
+     */
+    private function setChildProduct(MagentoProduct $childProduct)
+    {
+        $this->childProduct = $childProduct;
+    }
+
+    /**
+     * @param null $code
+     * @return array|bool
+     */
+    private function getInheritanceConfig($code = null)
+    {
+        if (null === $this->inheritanceConfig) {
+            $inheritance = $this->getProduct()->getData(Attribute::SUBSCRIPTION_INHERITANCE);
+            if ($this->getProduct()->getTypeId() === Configurable::TYPE_CODE && !empty($inheritance)) {
+                $this->inheritanceConfig = $this->serializer->unserialize($inheritance);
+            }
+        }
+        if (null !== $code && isset($this->inheritanceConfig[$code])) {
+            return (bool)$this->inheritanceConfig[$code];
+        }
+        return $this->inheritanceConfig ?? false;
     }
 }

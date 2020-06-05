@@ -115,7 +115,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
             'currency' => $quote->getBaseCurrencyCode(),
             'itemamt' => $this->formatPrice($amount),
             'taxamt' => $this->formatPrice($totals['tax']->getValue()),
-            'freightamt' => $this->formatPrice($totals['shipping']->getValue()),
+            'freightamt' => isset($totals['shipping']) ? $this->formatPrice($totals['shipping']->getValue()) : 0,
             'discount' => $this->formatPrice(0)
         ];
         $shipping = $quote->getShippingAddress();

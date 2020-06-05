@@ -85,6 +85,7 @@
     <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault">
         <arguments>
             <argument name="sessionManager" xsi:type="object">Magento\Backend\Model\Session\Quote</argument>
+            <argument name="tokensConfigClass" xsi:type="string">Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider</argument>
         </arguments>
     </type>
     <!-- Validate and convert currency fields in configuration -->
@@ -210,11 +211,15 @@
                 </item>
                 <item name="tnw_authorize_cim" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
-                    <item name="sortOrder" xsi:type="number">45</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+                <item name="chcybersource" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\CyberSource</item>
+                    <item name="sortOrder" xsi:type="number">41</item>
                 </item>
                 <item name="tnw_stripe" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Stripe</item>
-                    <item name="sortOrder" xsi:type="number">45</item>
+                    <item name="sortOrder" xsi:type="number">42</item>
                 </item>
                 <item name="vault" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault</item>

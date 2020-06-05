@@ -4,69 +4,50 @@
  */
 
 define([
-    'jquery'
-], function ($j) {
+    'jquery',
+    'mage/translate'
+], function ($, $t) {
     'use strict';
 
-    $j.widget('mage.tnwSubscribePrice', {
+    $.widget('mage.tnwSubscribePrice', {
         options: {
-            subscriptionPricesData: {},
+            childrenSelector: '.super-attribute-select',
             subscriptionPriceContainerSelector: '.price-subscription_price',
-            billingFrequencyOptionsSelector: "select[name='billing_frequency']",
-            subBillingFrequencyId: {
-                value : 0
-            }
+            alternativeContainerSelector: '.subscription-price-with-savings',
+            productAttributesData: {}
         },
 
         /**
-         * Initialize widget.
-         */
-        _create: function () {
-            this._initialize();
-            this._bind();
-        },
-
-        /**
-         * First initialization.
-         */
-        _initialize: function () {
-            var currentFrequency = this.options.subBillingFrequencyId;
-
-            if (typeof currentFrequency == 'undefined' || currentFrequency.value == 0) {
-                currentFrequency = $j(this.options.billingFrequencyOptionsSelector + ' option:selected').get(0);
-            }
-
-            if (currentFrequency !== undefined) {
-                this._insertPriseBox(currentFrequency.value);
-            }
-        },
-
-        /**
-         * Event binding.
-         */
-        _bind: function () {
-            var widget = this;
-
-            $j(this.options.billingFrequencyOptionsSelector).on('change', function () {
-                widget._insertPriseBox(this.value);
-            });
-
-        },
-
-        /**
-         * Insert html price block.
          *
          * @param optionIndex
+         * @param selectedProduct
+         * @private
          */
-        _insertPriseBox: function (optionIndex) {
-            if (!optionIndex) {
-                return;
+        _insertPriseBox: function (optionIndex, selectedProduct) {
+            var priceHtml,
+                productId;
+
+            // If simple
+            if (!this.options.subscriptionPricesData['default']) {
+                if (!optionIndex) {
+                    return;
+                }
+                priceHtml = this.options.subscriptionPricesData[optionIndex];
+            // If configurable
+            } else {
+                if (selectedProduct && !!optionIndex) {
+                    priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
+                } else if (selectedProduct && !optionIndex) {
+                    priceHtml = $t('There is no subscription available for this option');
+                } else {
+                    productId = _.toArray(this.options.subscriptionPricesData['default']).slice(0, 1);
+                    priceHtml = _.toArray(this.options.subscriptionPricesData[productId]).slice(0, 1);
+                }
             }
 
-            var subscriptionPriceContainer = $j(this.options.subscriptionPriceContainerSelector);
-            $j(subscriptionPriceContainer).html(this.options.subscriptionPricesData[optionIndex]);
+            $(this.options.subscriptionPriceContainerSelector).html(priceHtml);
+            $(this.options.alternativeContainerSelector).html(priceHtml);
         }
     });
-
-    return $j.mage.tnwSubscribePrice;
+    return $.mage.tnwSubscribePrice;
 });

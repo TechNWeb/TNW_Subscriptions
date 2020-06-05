@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model\Backend\Product\Attribute;
 
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -24,7 +26,11 @@ class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Pr
     public function beforeSave($object)
     {
         $attrCode = $this->getAttribute()->getAttributeCode();
-        if ($object->hasData($attrCode) && $object->getData($attrCode)) {
+        if (
+            $object->hasData($attrCode) && $object->getData($attrCode)
+            && $object instanceof ProductInterface
+            && $object->getTypeId() !== Configurable::TYPE_CODE
+        ) {
             $validated = $this->checkDiscountLessProductPrice($object, $attrCode);
             if (!$validated) {
                 throw new \Magento\Framework\Exception\LocalizedException(

@@ -7,8 +7,10 @@
 namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
@@ -24,9 +26,13 @@ use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\Backend\UrlBuilder;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 
 /**
  * Data provider for "Recurring Options" panel
@@ -122,6 +128,21 @@ class RecurringOptions extends BaseModifier
     private $supportTypes;
 
     /**
+     * @var UrlBuilder
+     */
+    private $urlBuilder;
+
+    /**
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
+     * @var ProductSubscriptionProfileRepository
+     */
+    private $productSubscriptionProfileRepository;
+
+    /**
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
      * @param ArrayManager $arrayManager
@@ -130,6 +151,9 @@ class RecurringOptions extends BaseModifier
      * @param Context $context
      * @param Config $config
      * @param array $supportTypes
+     * @param UrlBuilder $urlBuilder
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
      */
     public function __construct(
         LocatorInterface $locator,
@@ -139,7 +163,10 @@ class RecurringOptions extends BaseModifier
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Context $context,
         Config $config,
-        array $supportTypes
+        array $supportTypes,
+        UrlBuilder $urlBuilder,
+        SubscriptionProfileRepository $profileRepository,
+        ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
@@ -147,6 +174,9 @@ class RecurringOptions extends BaseModifier
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->config = $config;
         $this->supportTypes = $supportTypes;
+        $this->urlBuilder = $urlBuilder;
+        $this->profileRepository = $profileRepository;
+        $this->productSubscriptionProfileRepository = $productSubscriptionProfileRepository;
         parent::__construct($storeManager, $context);
     }
 
@@ -166,7 +196,45 @@ class RecurringOptions extends BaseModifier
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-                $options[] = $optionArray;
+                $searchStatuses = [
+                    ProfileStatus::STATUS_ACTIVE,
+                    ProfileStatus::STATUS_TRIAL,
+                    ProfileStatus::STATUS_HOLDED,
+                    ProfileStatus::STATUS_PAST_DUE
+                ];
+                $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                    'billing_frequency_id',
+                    $optionArray['billing_frequency_id'],
+                    'eq'
+                )->addFilter(
+                    'status',
+                    $searchStatuses,
+                    'in'
+                )->create();
+
+                $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
+                if (!empty($subscriptionProfiles->getItems())) {
+                    try {
+                        $subscriptionArray = [];
+                        foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
+                            $productSubscription = $this->productSubscriptionProfileRepository
+                                ->getById($subscriptionProfile['entity_id']);
+                            if (
+                                $productSubscription->getData()['magento_product_id']
+                                == $this->locator->getProduct()->getId()
+                            ) {
+                                $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
+                                    $subscriptionProfile['entity_id'], true
+                                );
+                            }
+                        }
+                        $options[] = array_merge($optionArray, $subscriptionArray);
+                    } catch (NoSuchEntityException $e) {
+                        $options[] = $optionArray;
+                    }
+                } else {
+                    $options[] = $optionArray;
+                }
             }
 
             $data =  array_replace_recursive(
@@ -427,6 +495,10 @@ class RecurringOptions extends BaseModifier
                 static::FIELD_PRESET_QTY => $this->getPresetQtyFieldConfig(50),
             ]
         ];
+        if ($this->getIsConfigurableProduct()) {
+            $commonContainer['children'][static::FIELD_PRICE_NAME . '_description'] =
+                $this->getPriceFieldDescriptionConfig(30);
+        }
 
         return $commonContainer;
     }
@@ -597,6 +669,7 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
+                        'visible' => !$this->getIsConfigurableProduct(),
                         'imports' => [
                             'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                             'changeCommentAndValue' => 'index = price:value',
@@ -609,6 +682,30 @@ class RecurringOptions extends BaseModifier
                     ],
                 ],
             ],
+        ];
+    }
+
+    private function getPriceFieldDescriptionConfig($sortOrder)
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'componentType' => Container::NAME,
+                        'formElement' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/field-html',
+                        'elementTmpl' => 'ui/content/content',
+                        'sortOrder' => $sortOrder,
+                        'label' => __('Price'),
+                        'labelVisible' => true,
+                        'error' => false,
+                        'uid' => false,
+                        'content' => __('<p>Price and other attributes are defined on the child product.<br>' .
+                            'Make sure all available billing frequencies configured on the child products are ' .
+                            'reflected in this view.</p>')
+                    ]
+                ]
+            ]
         ];
     }
 
@@ -636,7 +733,9 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
-                        'notice' => __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.')
+                        'visible' => !$this->getIsConfigurableProduct(),
+                        'notice' => __('Fee chanrged once upon creation of the subscription. ' .
+                            'Leave blank if subscription has no initial fee.')
                     ],
                 ],
             ],
@@ -725,6 +824,7 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-greater-than-zero' => true
                         ],
+                        'visible' => !$this->getIsConfigurableProduct(),
                     ],
                 ],
             ],
@@ -746,5 +846,14 @@ class RecurringOptions extends BaseModifier
         }
 
         return in_array($productType, $this->supportTypes);
+    }
+
+    /**
+     * Check if current product is configurable
+     * @return bool
+     */
+    private function getIsConfigurableProduct()
+    {
+        return $this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE;
     }
 }
