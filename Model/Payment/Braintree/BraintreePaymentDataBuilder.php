@@ -18,6 +18,7 @@ use \Magento\Braintree\Observer\DataAssignObserver;
 use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use \Magento\Framework\App\ObjectManager;
+use \Magento\Vault\Api\Data\PaymentTokenInterface;
 
 /**
  * Class BraintreePaymentDataBuilder
@@ -70,12 +71,18 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
     protected $braintreeConfig;
 
     /**
+     * @var \Magento\Braintree\Gateway\Command\GetPaymentNonceCommand
+     */
+    protected $paymentNonceCommand;
+
+    /**
      * BraintreePaymentDataBuilder constructor.
      * @param SubjectReader $subjectReader
      * @param ProductMetadataInterface $productMetadata
      * @param BraintreeConfig $braintreeConfig
      * @param SubscriptionConfig $subscriptionConfig
      * @param Manager $manager
+     * @param \Magento\Braintree\Gateway\Command\GetPaymentNonceCommand $paymentNonceCommand
      * @param Config|null $config
      */
     public function __construct(
@@ -84,8 +91,10 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
        BraintreeConfig $braintreeConfig,
        SubscriptionConfig $subscriptionConfig,
        Manager $manager,
+       \Magento\Braintree\Gateway\Command\GetPaymentNonceCommand $paymentNonceCommand,
        Config $config = null
     ) {
+        $this->paymentNonceCommand = $paymentNonceCommand;
         $this->braintreeConfig = $braintreeConfig;
         $this->subjectReader = $subjectReader;
         $this->productMetadata = $productMetadata;
@@ -104,6 +113,18 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $billingAddress = $order->getBillingAddress();
         $channel = $this->config->getValue('channel');
 
+        $paymentAdditionalData = $paymentData['additional_data'];
+        if (
+            !array_key_exists(DataAssignObserver::PAYMENT_METHOD_NONCE, $paymentAdditionalData)
+            && array_key_exists(PaymentTokenInterface::CUSTOMER_ID, $paymentAdditionalData)
+            && array_key_exists(PaymentTokenInterface::PUBLIC_HASH, $paymentAdditionalData)
+        ) {
+            $paymentData['additional_data'][DataAssignObserver::PAYMENT_METHOD_NONCE] = $this->paymentNonceCommand
+                ->execute([
+                    PaymentTokenInterface::CUSTOMER_ID => $paymentAdditionalData[PaymentTokenInterface::CUSTOMER_ID],
+                    PaymentTokenInterface::PUBLIC_HASH => $paymentAdditionalData[PaymentTokenInterface::PUBLIC_HASH],
+                ])->get()['paymentMethodNonce'];
+        }
         $result = [
             CustomerDataBuilder::CUSTOMER => [
                 CustomerDataBuilder::FIRST_NAME => $billingAddress->getFirstname(),

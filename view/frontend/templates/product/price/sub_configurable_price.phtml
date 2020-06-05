@@ -34,8 +34,8 @@ $optionsData = $block->getEncodedData($block->getOptions());
 ?>
 <script type="text/x-magento-init">
 {
-    "*": {
-        "tnwSubConfigurablePrice": {
+    ".product-info-price": {
+        "tnwSubscribePrice": {
             "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
             "productAttributesData" : <?php /* @noEscape */ echo $optionsData?>,
             "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>

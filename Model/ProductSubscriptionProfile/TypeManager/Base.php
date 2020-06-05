@@ -157,6 +157,8 @@ abstract class Base implements TypeInterface
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH),
             SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+            SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_START_DATE =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_START_DATE),
             SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE),
             SubscriptionProductAttributes::SUBSCRIPTION_OFFER_FLAT_DISCOUNT =>
@@ -171,6 +173,12 @@ abstract class Base implements TypeInterface
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_SAVINGS_CALCULATION),
             SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS),
+            SubscriptionProductAttributes::SUBSCRIPTION_START_DATE =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_START_DATE),
+            SubscriptionProductAttributes::SUBSCRIPTION_PURCHASE_TYPE =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_PURCHASE_TYPE),
+            SubscriptionProductAttributes::SUBSCRIPTION_HIDE_QTY =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_HIDE_QTY),
         ];
         $productData = new DataObject();
         $productData->addData($data);

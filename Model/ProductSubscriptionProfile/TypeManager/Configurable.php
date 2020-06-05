@@ -7,18 +7,51 @@
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Configurable product manager.
  */
 class Configurable extends Base
 {
+    /**
+     * Configurable constructor.
+     * @param Config $config
+     * @param PriceCalculator $priceCalculator
+     * @param ProductFrequencyRepository $productFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductRepositoryInterface $productRepository
+     * @param Serializer $serializer
+     */
+    public function __construct(
+        Config $config,
+        PriceCalculator $priceCalculator,
+        ProductFrequencyRepository $productFrequencyRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductRepositoryInterface $productRepository,
+        Serializer $serializer
+    ) {
+        parent::__construct(
+            $config,
+            $priceCalculator,
+            $productFrequencyRepository,
+            $searchCriteriaBuilder,
+            $productRepository,
+            $serializer
+        );
+    }
+
     /**
      * @inheritdoc
      */
@@ -69,12 +102,16 @@ class Configurable extends Base
 
         if (!empty($arguments['child_product'])) {
             $childProduct = $arguments['child_product'];
+            $productData = $this->processInheritance($arguments['child_product'], $product, $productData);
         } elseif (!empty($arguments['super_attribute'])) {
             $superAttributes = $arguments['super_attribute'];
 
             if ($superAttributes) {
                 $existFrequency = false;
                 $childProduct = $product->getTypeInstance()->getProductByAttributes($superAttributes, $product);
+                if ($childProduct) {
+                    $productData = $this->processInheritance($childProduct, $product, $productData);
+                }
                 if ($childProduct && !empty($arguments['billing_frequency'])) {
                     $existFrequency = $this->checkFrequencyExistanse(
                         $arguments['billing_frequency'],
@@ -134,5 +171,58 @@ class Configurable extends Base
         return [
             'super_attribute' => $item->getBuyRequest()->getSuperAttribute(),
         ];
+    }
+
+    /**
+     * Set attributes to product data object according to inheritance
+     * @param $childProduct
+     * @param $product
+     * @param $productData
+     * @return mixed
+     */
+    public function processInheritance($childProduct, $product, $productData)
+    {
+        $inheritance = $product->getData(Attribute::SUBSCRIPTION_INHERITANCE);
+        if (!empty($inheritance)) {
+            $inheritance = $this->serializer->unserialize($inheritance);
+            foreach ($inheritance as $key => $attribute) {
+                if ((int)$attribute === 1) {
+                    $productData->setData($key, $childProduct->getData($key));
+                    if ($key === Attribute::SUBSCRIPTION_TRIAL_STATUS) {
+                        $trialData = [
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                            Attribute::SUBSCRIPTION_TRIAL_PRICE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
+                            Attribute::SUBSCRIPTION_TRIAL_START_DATE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                        ];
+
+                        $productData->addData($trialData);
+                    }
+                    if ($key === Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT) {
+                        $discountData = [
+                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
+                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
+                        ];
+
+                        $productData->addData($discountData);
+                    }
+                }
+            }
+        }
+        $productData->setData(
+            Attribute::SUBSCRIPTION_PURCHASE_TYPE,
+            $childProduct->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE)
+        );
+        $productData->setData(
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+            $childProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+        );
+        return $productData;
     }
 }

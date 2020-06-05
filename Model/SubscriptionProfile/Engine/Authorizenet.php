@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
 
 /**
  * Authorizenet Engine
@@ -32,11 +31,6 @@ class Authorizenet extends Base
     private $isRebill = false;
 
     /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
-    /**
      * Authorizenet constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
@@ -47,6 +41,10 @@ class Authorizenet extends Base
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -57,16 +55,24 @@ class Authorizenet extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
-        $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
         }
@@ -183,6 +189,14 @@ class Authorizenet extends Base
     /**
      * @return string
      */
+    public function getVaultPaymentCode()
+    {
+        return 'tnw_authorize_cim_vault';
+    }
+
+    /**
+     * @return string
+     */
     public function getPaymentMethodCode()
     {
         //TODO: resolve if vault method
@@ -196,61 +210,6 @@ class Authorizenet extends Base
      {
          $this->isRebill = true;
      }
-
-    /**
-     * @inheritdoc
-     * @param $requestData
-     * @return Braintree
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
-     */
-    public function processProfileByRequestData($requestData)
-    {
-        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
-            return $this;
-        }
-
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
-        }
-
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $requestData['payment'][$this->getPaymentMethodCode()]['nonce']
-        ]);
-
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
-            $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
-                $errors[] = "{$error->code}: {$error->message}";
-            }
-
-            throw new PaymentException(__('Braintree message: %1', implode(', ', $errors)));
-        }
-
-        /** @var \Braintree\CreditCard $paymentMethod */
-        $paymentMethod = $response['object']->customer->paymentMethods[0];
-
-        $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentMethod->token)
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentMethod->last4,
-                OrderPaymentInterface::CC_EXP_MONTH => $paymentMethod->expirationMonth,
-                OrderPaymentInterface::CC_EXP_YEAR => $paymentMethod->expirationYear,
-            ]);
-
-        return $this;
-    }
-
 
     /**
      * @param \Magento\Quote\Model\Quote $quote

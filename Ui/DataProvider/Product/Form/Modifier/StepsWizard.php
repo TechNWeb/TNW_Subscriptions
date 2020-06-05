@@ -8,11 +8,13 @@ namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Backend\Model\UrlInterface;
 use Magento\Catalog\Model\Locator\LocatorInterface;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
+use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
@@ -21,6 +23,7 @@ use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequenc
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
 * Customize tnw attributes to use steps wizard component.
@@ -53,6 +56,12 @@ class StepsWizard extends BaseModifier
     protected $summaryContainerName = 'tnw_recurring_summary';
 
     /**
+     * Recurring inheritance container name
+     * @var string
+     */
+    protected $inheritanceContainerName = 'tnw_recurring_inheritance';
+
+    /**
      * @var ArrayManager
      */
     protected $arrayManager;
@@ -78,12 +87,22 @@ class StepsWizard extends BaseModifier
     private $searchCriteriaBuilder;
 
     /**
+     * @var string
+     */
+    private $scopeLabel;
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param UrlInterface $urlBuilder
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param StoreManagerInterface $storeManager
+     * @param Serializer $serializer
      * @param Context $context
      */
     public function __construct(
@@ -93,6 +112,7 @@ class StepsWizard extends BaseModifier
         BillingFrequencyRepository $billingFrequencyRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         StoreManagerInterface $storeManager,
+        Serializer $serializer,
         Context $context
     ) {
         $this->locator = $locator;
@@ -100,6 +120,7 @@ class StepsWizard extends BaseModifier
         $this->urlBuilder = $urlBuilder;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->serializer = $serializer;
         parent::__construct($storeManager, $context);
     }
 
@@ -126,6 +147,15 @@ class StepsWizard extends BaseModifier
         );
         $rootPath = $this->arrayManager->slicePath($purchaseTypePath, 0, 2);
         $rootArray = $this->arrayManager->get($rootPath, $meta);
+        $inheritancePath = $this->arrayManager->findPath(
+            Attribute::SUBSCRIPTION_INHERITANCE,
+            $meta,
+            null,
+            null
+        );
+        $this->setScopeLabel($this->arrayManager->get(
+            $inheritancePath . '/arguments/data/config/scopeLabel', $meta
+        ));
         // Move all fields to container
         if (!empty($rootArray)) {
             $settingsChildren = [];
@@ -137,6 +167,8 @@ class StepsWizard extends BaseModifier
                     );
                 } elseif ($key == 'container_recurring_options') {
                     $recurringChildren[$key] = $value;
+                    $meta = $this->arrayManager->remove($rootPath . '/' . $key, $meta);
+                } elseif ($key == 'container_' . Attribute::SUBSCRIPTION_INHERITANCE) {
                     $meta = $this->arrayManager->remove($rootPath . '/' . $key, $meta);
                 } else {
                     $settingsChildren[$key] = $value;
@@ -179,6 +211,11 @@ class StepsWizard extends BaseModifier
                 ]
             ];
 
+            if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+                $updatedMeta['management_modal']['children']['step-wizard']['children']
+                [$this->inheritanceContainerName] = $this->getInheritanceContainer();
+            }
+
             $meta = $this->arrayManager->merge($rootPath, $meta, $updatedMeta);
         }
 
@@ -190,6 +227,13 @@ class StepsWizard extends BaseModifier
      */
     public function modifyData(array $data)
     {
+        $inheritAttr =& $data[$this->locator->getProduct()->getId()]['product']['tnw_subscr_inheritance'];
+
+        if ($inheritAttr) {
+            $inheritAttr = $this->serializer->unserialize($inheritAttr);
+        } else {
+            $inheritAttr = '';
+        }
         return $data;
     }
 
@@ -199,7 +243,7 @@ class StepsWizard extends BaseModifier
      */
     private function getStepWizardConfig()
     {
-        return [
+        $result = [
             'data' => [
                 'config' => [
                     'componentType' => Container::NAME,
@@ -214,6 +258,12 @@ class StepsWizard extends BaseModifier
                 ]
             ]
         ];
+        if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
+            array_unshift($result['data']['config']['stepsNames'],
+                $this->stepWizardName . '.' . $this->inheritanceContainerName);
+        }
+
+        return $result;
     }
 
     /**
@@ -222,10 +272,13 @@ class StepsWizard extends BaseModifier
      */
     private function getSettingsContainerConfig()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 2: Recurring Settings')
+            : __('Step 1: Recurring Settings');
         return [
             'data' => [
                 'config' => [
-                    'label' => __('Step 1: Recurring Settings'),
+                    'label' => $label,
                     'formElement' => Fieldset::NAME,
                     'componentType' => Fieldset::NAME,
                     'caption' => __('Settings'),
@@ -250,10 +303,13 @@ class StepsWizard extends BaseModifier
      */
     private function getRecurringContainerConfig()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 3: Billing Frequencies')
+            : __('Step 2: Billing Frequencies');
         return [
             'data' => [
                 'config' => [
-                    'label' => __('Step 2: Billing Frequencies'),
+                    'label' => $label,
                     'formElement' => Fieldset::NAME,
                     'componentType' => Fieldset::NAME,
                     'caption' => __('Billing Frequencies'),
@@ -266,6 +322,234 @@ class StepsWizard extends BaseModifier
         ];
     }
 
+    private function getInheritanceContainer()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'label' => __('Step 1: Select attributes'),
+                        'formElement' => Fieldset::NAME,
+                        'componentType' => Fieldset::NAME,
+                        'caption' => __('Select attributes'),
+                        'nextLabelText' => __('Next'),
+                        'sortOrder' => 10,
+                        'breakLine' => false,
+                        'component' => 'TNW_Subscriptions/js/components/inheritance-fieldset',
+                        'additionalClasses' => $this->inheritanceContainerName,
+                        'imports' => []
+                    ]
+                ]
+            ],
+            'children' => [
+                'inheritance_description' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'componentType' => Container::NAME,
+                                'formElement' => Container::NAME,
+                                'component' => 'Magento_Ui/js/form/components/html',
+                                'label' => null,
+                                'content' => __('<p>Recurring options for a configurable product can be setup to ' .
+                                    'support two different use cases.</p><p><b>Option 1</b> is where the ' .
+                                    'configurable product itself has specific recurring option which apply to all ' .
+                                    'child products.</p><p><b>Option 2</b> is where child products have their own ' .
+                                    'specific recurring options.</p><p>This page will help you specify where the ' .
+                                    'recurring option are inherited from: the parent or the child. By default all ' .
+                                    'listed option will be inherited from the child records instead of parent.</p>' .
+                                    '<br><h2>Inherit following attributes from child products</h2>')
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_TRIAL_STATUS => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Is Trial Offered'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls if the trial is offered for the product'),
+                                    '0' => __('Parent controls if the trial is offered for the product')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_TRIAL_STATUS,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_START_DATE => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Subscription Start Date'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls when the billing starts for the product'),
+                                    '0' => __('Parent controls when the billing starts for the product')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_START_DATE . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_START_DATE,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Lock Product Price'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls if the product price is the same regardless of ' .
+                                        'the billing frequency or custom'),
+                                    '0' => __('Parent controls if the product price is the same regardless of ' .
+                                        'the billing frequency or custom')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Offer Flat Discount'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls if the product price is discounted for recurring orders'),
+                                    '0' => __('Parent controls if the product price is discounted for recurring orders')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_HIDE_QTY => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Hide Qty'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls if the product quantity is visible on storefront'),
+                                    '0' => __('Parent controls if the product quantity is visible on storefront')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_HIDE_QTY . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_HIDE_QTY,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Savings Calculation'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls the savings calculation type'),
+                                    '0' => __('Parent controls the savings calculation type')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+                'inherit_' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => Checkbox::NAME,
+                                'componentType' => Field::NAME,
+                                'component' => 'Magento_Ui/js/form/element/single-checkbox-toggle-notice',
+                                'label' => __('Infinite Subscriptions'),
+                                'valueMap' => [
+                                    'false' => '0',
+                                    'true' => '1'
+                                ],
+                                'notices' => [
+                                    '1' => __('Child controls if the customer can choose when to stop recurring orders'),
+                                    '0' => __('Parent controls if the customer can choose when to stop recurring orders')
+                                ],
+                                'exports' => [
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS . ':disabled'
+                                ],
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+                                'prefer' => 'toggle',
+                                'scopeLabel' => $this->scopeLabel
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ];
+    }
+
     /**
      * Get summary fieldset component
      * @return array
@@ -274,12 +558,15 @@ class StepsWizard extends BaseModifier
      */
     private function getSummaryContainer()
     {
+        $label = ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE)
+            ? __('Step 4: Summary')
+            : __('Step 3: Summary');
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
                         'label' => __('Summary'),
-                        'wizardSummaryLabel' => __('Step 3: Summary'),
+                        'wizardSummaryLabel' => $label,
                         'formElement' => Fieldset::NAME,
                         'componentType' => Fieldset::NAME,
                         'caption' => __('Summary'),
@@ -292,6 +579,7 @@ class StepsWizard extends BaseModifier
                         'priceFormat' => $this->getPriceFormatData(),
                         'priceSymbol' => $this->getCurrencySymbol(),
                         'additionalClasses' => $this->summaryContainerName,
+                        'productType' => $this->locator->getProduct()->getTypeId(),
                         'imports' => [
                             'onChangedPurchaseType' => 'index = ' . Attribute::SUBSCRIPTION_PURCHASE_TYPE . ':value',
                             'setFrequencyRecords' => '${ $.provider }:data.product.recurring_options',
@@ -399,4 +687,13 @@ class StepsWizard extends BaseModifier
     {
         return $this->storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
     }
+
+    /**
+     * @param string $scopeLabel
+     */
+    private function setScopeLabel($scopeLabel)
+    {
+        $this->scopeLabel = $scopeLabel;
+    }
+
 }

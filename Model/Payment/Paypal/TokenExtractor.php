@@ -62,14 +62,22 @@ class TokenExtractor
 
             $paymentToken->setGatewayToken($token);
             $payment = $quote->getPayment();
-            $paymentToken->setTokenDetails(
-                json_encode($payment
-                    ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
-                )
-            );
-            $paymentToken->setExpiresAt(
-                $this->getExpirationDate($payment)
-            );
+            if (
+                !$payment->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
+                && isset($paymentData['additional'])
+            ) {
+                $paymentToken->setTokenDetails(json_encode($paymentData['additional']));
+                $paymentToken->setExpiresAt($this->getExpirationDate($paymentData['additional']));
+            } else {
+                $paymentToken->setTokenDetails(
+                    json_encode($payment
+                        ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
+                    )
+                );
+                $paymentToken->setExpiresAt(
+                    $this->getExpirationDate($payment->getData())
+                );
+            }
         }
 
         return [
@@ -83,12 +91,12 @@ class TokenExtractor
      * @return string
      * @throws \Exception
      */
-    private function getExpirationDate($payment)
+    private function getExpirationDate($paymentData)
     {
         $expDate = new \DateTime(
-            $payment->getCcExpYear()
+            $paymentData['cc_exp_year']
             . '-'
-            . $payment->getCcExpMonth()
+            . $paymentData['cc_exp_month']
             . '-'
             . '01'
             . ' '

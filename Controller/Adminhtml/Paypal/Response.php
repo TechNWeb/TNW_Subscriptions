@@ -6,7 +6,11 @@
 
 namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Registry;
@@ -26,11 +30,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Controller to processing response from PayPal gateway.
  */
-class Response extends \Magento\Framework\App\Action\Action
+class Response extends \Magento\Framework\App\Action\Action implements CsrfAwareActionInterface, HttpPostActionInterface
 {
     /**
      * Core registry
@@ -80,6 +85,8 @@ class Response extends \Magento\Framework\App\Action\Action
      */
     private $encryptor;
 
+    private $quoteSession;
+
     /**
      * Constructor
      *
@@ -102,9 +109,11 @@ class Response extends \Magento\Framework\App\Action\Action
         Transparent $transparent,
         ProfileManager $profileManager,
         DataPersistorInterface $dataPersistor,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        QuoteSessionInterface $quoteSession
     ) {
         parent::__construct($context);
+        $this->quoteSession = $quoteSession;
         $this->coreRegistry = $coreRegistry;
         $this->transaction = $transaction;
         $this->responseValidator = $responseValidator;
@@ -130,15 +139,17 @@ class Response extends \Magento\Framework\App\Action\Action
             /** @var DataObject $response */
             $response = $this->transaction->getResponseObject($this->getRequest()->getPostValue());
             $this->responseValidator->validate($response, $this->transparent);
+            $pnref = $response->getPnref();
             if (isset($profile)) {
                 $this->dataPersistor->set(EngineInterface::PAYMENT_DATA_KEY,
                     [
                         SubscriptionProfileInterface::ID => $profile->getId(),
-                        SubscriptionProfilePaymentInterface::TOKEN_HASH => $this->encryptor->encrypt($response->getPnref()),
+                        SubscriptionProfilePaymentInterface::TOKEN_HASH => $this->encryptor->encrypt($pnref),
+                        'pnref' => $pnref
                     ]
                 );
             } else {
-                $this->transaction->savePaymentInQuote($response);
+                $this->quoteSession->setData('pnref', $pnref);
             }
         } catch (LocalizedException $exception) {
             $parameters['error'] = true;
@@ -171,5 +182,23 @@ class Response extends \Magento\Framework\App\Action\Action
             : Payment::DATA_SCOPE_PAYMENT_FORM;
 
         return $index;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createCsrfValidationException(
+        RequestInterface $request
+    ): ?InvalidRequestException {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        //TODO: implement csrf validation via secure token
+        return true;
     }
 }

@@ -15,6 +15,11 @@
     <type name="Magento\Checkout\Model\Cart">
         <plugin name="add_subscription_params" type="TNW\Subscriptions\Plugin\Checkout\Model\Cart" />
     </type>
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault">
+        <arguments>
+            <argument name="tokensConfigClass" xsi:type="string">Magento\Vault\Model\Ui\TokensConfigProvider</argument>
+        </arguments>
+    </type>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
         <arguments>
             <argument name="modifiers" xsi:type="array">

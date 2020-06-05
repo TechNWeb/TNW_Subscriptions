@@ -130,7 +130,8 @@ class PriceCalculator
             } elseif ($lockProductPrice) {
                 $discountAmount = $this->getDiscountAmount($product, $productPrice);
                 $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
-                $price = isset($productPrice) ? $productPrice : $origPrice - $discountAmount;
+                $discountedPrice = ($origPrice - $discountAmount) >= 0 ? $origPrice - $discountAmount : 0;
+                $price = isset($productPrice) ? $productPrice : $discountedPrice;
             } else {
                 $billingFrequencyPrice = $this->getBillingFrequencyPrice(
                     $billingFrequencyId,
@@ -223,7 +224,7 @@ class PriceCalculator
     private function getDiscountAmount(DataObject $product, $processPrice = null)
     {
         if ($processPrice === null) {
-            $processPrice = $product->getData('price');
+            $processPrice = $product->getData('price') ?? $product->getData('child_product_price');
         }
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {

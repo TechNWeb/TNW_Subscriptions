@@ -5,8 +5,15 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+/**
+ * Class Vault
+ * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
+ */
 class Vault extends Base
 {
+    /**
+     * @var string
+     */
     protected $vaultMethodCode;
 
     /**
@@ -19,16 +26,44 @@ class Vault extends Base
      */
     protected $encryptor;
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     */
     protected $paymentTokenManagement;
 
+    /**
+     * @var \Magento\Payment\Helper\Data
+     */
+    protected $paymentData;
+
+    /**
+     * @var string
+     */
+    protected $paymentInstanceCode;
+
+    /**
+     * Vault constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+     * @param \Magento\Payment\Helper\Data $paymentData
+     * @param string $vaultMethodCode
+     * @param string $paymentInstanceCode
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
-        $vaultMethodCode = 'vault'
+        \Magento\Payment\Helper\Data $paymentData,
+        $vaultMethodCode = 'vault',
+        $paymentInstanceCode = ''
     ) {
+        $this->paymentInstanceCode = $paymentInstanceCode;
+        $this->paymentData = $paymentData;
         $this->vaultMethodCode = $vaultMethodCode;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->encryptor = $encryptor;
@@ -55,6 +90,7 @@ class Vault extends Base
             $quote->getCustomerId()
         );
         $details = json_decode($paymentToken->getTokenDetails(), true);
+        $this->processTokenDetails($details);
         $expirationPeriods = explode('/', $details['expirationDate']);
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
@@ -62,6 +98,10 @@ class Vault extends Base
                 $paymentData['method'] = $this->vaultMethodCode;
                 $paymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
                 $paymentData['additional_data']['public_hash'] = $paymentData['additional']['publicHash'];
+                if ($this->paymentInstanceCode) {
+                    $subQuote->getPayment()
+                        ->setMethodInstance($this->paymentData->getMethodInstance($this->paymentInstanceCode));
+                }
                 $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $subQuote);
             }
             $subQuote->getPayment()
@@ -77,6 +117,24 @@ class Vault extends Base
         }
 
         $this->getSubCreateModel()->setNeedCollect(true);
+    }
+
+    /**
+     * @param $details
+     * @return $this
+     */
+    protected function processTokenDetails(&$details)
+    {
+        if (!array_key_exists('maskedCC', $details)) {
+            $details['maskedCC'] = $details['cc_last_4'];
+        }
+        if (!array_key_exists('type', $details)) {
+            $details['type'] = $details['cc_type'];
+        }
+        if (!array_key_exists('expirationDate', $details)) {
+            $details['expirationDate'] = $details['cc_exp_month'] . '/' . $details['cc_exp_year'];
+        }
+        return $this;
     }
 
     /**
