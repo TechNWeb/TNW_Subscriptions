@@ -29,21 +29,45 @@ class Braintree extends Base
     private $encryptor;
 
     /**
+     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     */
+    private $vaultPaymentAuthorization;
+
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenFactory
+     */
+    private $paymentTokenFactory;
+
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
+    private $paymentTokenRepository;
+
+    /**
+     * Braintree constructor.
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
      * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
     ) {
         parent::__construct($createModel, $session);
-
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->paymentTokenFactory = $paymentTokenFactory;
+        $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
         $this->encryptor = $encryptor;
@@ -86,11 +110,40 @@ class Braintree extends Base
 
         /** @var \Braintree\CreditCard $paymentMethod */
         $paymentMethod = $response['object']->customer->paymentMethods[0];
+        $quote = reset($subQuotes);
+        $paymentData = [
+            'payment_token' => $paymentMethod->token,
+            'additional' => [
+                'type' => $data['payment']['braintree']['additional']['cc_type'],
+                'expirationDate' => $paymentMethod->expirationDate,
+                'maskedCC' => $paymentMethod->last4
+            ]
+        ];
+
+        $paymentToken = $this->paymentTokenFactory->create('card');
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentData, $quote->getCustomerId()));
+        $paymentToken->setGatewayToken($paymentData['payment_token']);
+        $paymentToken->setCustomerId($quote->getCustomerId());
+        $paymentToken->setPaymentMethodCode('braintree');
+        $paymentToken->setTokenDetails($this->getTokenDetails($paymentData));
+        $paymentToken->setIsActive(true);
+        $paymentToken->setIsVisible(true);
+        $this->paymentTokenRepository->save($paymentToken);
 
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
+            if ($subQuote->getGrandTotal() < 0.001) {
+                $vaultPaymentData = [];
+                $vaultPaymentData['method'] = $this->getVaultMethodCode();
+                $vaultPaymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
+                $vaultPaymentData['additional_data']['public_hash'] = $paymentToken->getPublicHash();
+                $this->vaultPaymentAuthorization->processPreAuthForTrial($vaultPaymentData, $subQuote);
+            }
             $subQuote->getPayment()
                 ->setAdditionalInformation('token_hash', $this->encryptor->encrypt($paymentMethod->token))
+                ->setAdditionalInformation('customer_id', $subQuote->getCustomerId())
+                ->setMethod($this->getVaultMethodCode())
+                ->setAdditionalInformation('public_hash', $paymentToken->getPublicHash())
                 ->setCcType($data['payment']['braintree']['additional']['cc_type'])
                 ->setCcLast4($paymentMethod->last4)
                 ->setCcExpMonth($paymentMethod->expirationMonth)
@@ -98,5 +151,37 @@ class Braintree extends Base
         }
 
         $this->getSubCreateModel()->setNeedCollect(true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getVaultMethodCode()
+    {
+        return 'braintree_cc_vault';
+    }
+
+    /**
+     * @param $paymentToken
+     * @return string
+     */
+    protected function generatePublicHash($paymentData, $customerId)
+    {
+        $hashKey = $paymentData['payment_token'];
+        $hashKey .= $customerId;
+        $hashKey .= 'braintree'
+            . 'card'
+            . $this->getTokenDetails($paymentData);
+
+        return $this->encryptor->getHash($hashKey);
+    }
+
+    /**
+     * @param $paymentData
+     * @return false|string
+     */
+    private function getTokenDetails($paymentData)
+    {
+        return json_encode($paymentData['additional']);
     }
 }
