@@ -6,6 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -24,7 +25,6 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolve
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
-
 /**
  * Subscription items form data provider for customer account dashboard page.
  */
@@ -40,6 +40,10 @@ class ProductsForm extends SummaryProductsForm
      */
     protected $subscriptionConfig;
 
+    /**
+     *
+     */
+    protected $getProductSalableQty;
     /**
      * @param string $name
      * @param string $primaryFieldName
@@ -74,9 +78,11 @@ class ProductsForm extends SummaryProductsForm
         Config $subscriptionConfig,
         $scope = '',
         array $meta = [],
-        array $data = []
+        array $data = [],
+        GetProductSalableQtyInterface $getProductSalableQty
     ) {
         $this->subscriptionConfig = $subscriptionConfig;
+        $this->getProductSalableQty = $getProductSalableQty;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -194,6 +200,32 @@ class ProductsForm extends SummaryProductsForm
     protected function getQtyDefinition()
     {
         $canUseDecimals = $this->canUseQtyDecimals();
+        $productId = current($this->profileManager->getProfile()->getProducts())->getMagentoProductId();
+        $websiteId = $this->profileManager->getProfile()->getWebsiteId();
+
+        $params = [];
+        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        $stockItem = $this->stockRegistry->getStockItem(
+            $productId,
+            $websiteId
+        );
+        $getProductSalableQty = $this->getProductSalableQty->execute(
+            current($this->profileManager->getProfile()->getProducts())->getSku(), $websiteId
+        );
+
+        $params['minAllowed'] = $stockItem->getMinQty();
+        if ($getProductSalableQty && $stockItem->getData('backorders') == 0) {
+            $params['maxAllowed'] = $getProductSalableQty < $stockItem->getMaxSaleQty() ? $getProductSalableQty
+                : $stockItem->getMaxSaleQty();
+        }
+        else {
+            $params['maxAllowed'] = $stockItem->getMaxSaleQty();
+        }
+
+        if ($stockItem->getQtyIncrements() > 0) {
+            $params['qtyIncrements'] = (float)$stockItem->getQtyIncrements();
+        }
+
         return [
             'arguments' => [
                 'data' => [
@@ -205,8 +237,8 @@ class ProductsForm extends SummaryProductsForm
                         'dataScope' => 'qty',
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true,
-                            'validate-digits' => !$canUseDecimals
+                            'validate-digits' => !$canUseDecimals,
+                            'validate-item-quantity' => $params
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
