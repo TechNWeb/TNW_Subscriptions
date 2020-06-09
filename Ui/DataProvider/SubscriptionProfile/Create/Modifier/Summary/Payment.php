@@ -2,11 +2,17 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Summary;
 
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Model\Config;
+use Magento\Quote\Api\CartTotalRepositoryInterface;
+use Magento\Quote\Api\Data\TotalsInterfaceFactory;
+use Magento\Quote\Model\Cart\TotalsConverter;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 class Payment implements ModifierInterface
 {
@@ -21,7 +27,7 @@ class Payment implements ModifierInterface
     private $session;
 
     /**
-     * @var Context
+     * @var FormContext
      */
     private $formContext;
 
@@ -36,39 +42,84 @@ class Payment implements ModifierInterface
     private $subQuote;
 
     /**
+     * @var CartTotalRepositoryInterface
+     */
+    private $quoteTotalRepository;
+
+    /**
+     * @var TotalsInterfaceFactory
+     */
+    private $totalsFactory;
+
+    /**
+     * @var DataObjectHelper
+     */
+    private $dataObjectHelper;
+
+    /**
+     * @var TotalsConverter
+     */
+    private $totalsConverter;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
      * Payment constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param Config $paymentConfig
      * @param QuoteSessionInterface $session
-     * @param Context $formContext
+     * @param CartTotalRepositoryInterface $quoteTotalRepository
+     * @param TotalsInterfaceFactory $totalsFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param TotalsConverter $totalsConverter
+     * @param FormContext $formContext
+     * @param Context $context
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Config $paymentConfig,
         QuoteSessionInterface $session,
-        Context $formContext
+        CartTotalRepositoryInterface $quoteTotalRepository,
+        TotalsInterfaceFactory $totalsFactory,
+        DataObjectHelper $dataObjectHelper,
+        TotalsConverter $totalsConverter,
+        FormContext $formContext,
+        Context $context
     ) {
         $this->paymentConfig = $paymentConfig;
         $this->session = $session;
         $this->formContext = $formContext;
         $this->scopeConfig = $scopeConfig;
+        $this->quoteTotalRepository = $quoteTotalRepository;
+        $this->totalsFactory = $totalsFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
+        $this->totalsConverter = $totalsConverter;
+        $this->context = $context;
     }
 
     public function modifyData(array $data)
     {
         $data['new_subscription']['payment_method_content'] = $this->getPaymentMethodTitle();
-        $data['new_subscription']['cc_type'] = $this->getCardTypeLabel();
-        $data['new_subscription']['cc_last_4'] = $this->getCardLastFour();
+        $data['new_subscription'][OrderPaymentInterface::CC_TYPE] = $this->getCardTypeLabel();
+        $data['new_subscription'][OrderPaymentInterface::CC_LAST_4] = $this->getCardLastFour();
+        foreach ($this->getTotalsData() as $key => $total) {
+            $data['new_subscription'][$key] =
+                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'],false);
+        }
         return $data;
     }
 
     public function modifyMeta(array $meta)
     {
+        $meta['payment_method']['children'] = $this->getTotalsConfig();
         if ($ccTypeConfig = $this->getCardTypeConfig()) {
-            $meta['payment_method']['children']['cc_type'] = $ccTypeConfig;
+            $meta['payment_method']['children'][OrderPaymentInterface::CC_TYPE] = $ccTypeConfig;
         }
         if ($ccLast4 = $this->getCardLastFourConfig()) {
-            $meta['payment_method']['children']['cc_last_4'] = $ccLast4;
+            $meta['payment_method']['children'][OrderPaymentInterface::CC_LAST_4] = $ccLast4;
         }
         return $meta;
     }
@@ -86,19 +137,13 @@ class Payment implements ModifierInterface
         );
     }
 
-    private function getPaymentAdditionalInfo()
-    {
-        $payment = $this->getPayment();
-        return $payment->getAdditionalInformation();
-    }
-
     /**
      * @return string|null
      */
     private function getCardLastFour()
     {
-        return $this->getPayment()->getData('cc_last_4')
-            ? 'XXXX-XXXX-XXXX-' . $this->getPayment()->getData('cc_last_4')
+        return $this->getPayment()->getData(OrderPaymentInterface::CC_LAST_4)
+            ? 'XXXX-XXXX-XXXX-' . $this->getPayment()->getData(OrderPaymentInterface::CC_LAST_4)
             : null;
     }
 
@@ -135,7 +180,8 @@ class Payment implements ModifierInterface
                         'formElement' => \Magento\Ui\Component\Form\Element\Input::NAME,
                         'dataType' => \Magento\Ui\Component\Form\Element\DataType\Text::NAME,
                         'elementTmpl' => 'ui/form/element/text',
-                        'label' => __('Credit Card Type')
+                        'label' => __('Credit Card Type'),
+                        'sortOrder' => 20
                     ]
                 ]
             ]
@@ -158,7 +204,8 @@ class Payment implements ModifierInterface
                         'formElement' => \Magento\Ui\Component\Form\Element\Input::NAME,
                         'dataType' => \Magento\Ui\Component\Form\Element\DataType\Text::NAME,
                         'elementTmpl' => 'ui/form/element/text',
-                        'label' => __('Credit Card Number')
+                        'label' => __('Credit Card Number'),
+                        'sortOrder' => 30
                     ]
                 ]
             ]
@@ -185,5 +232,66 @@ class Payment implements ModifierInterface
     private function getPayment()
     {
         return $this->getSubQuote()->getPayment();
+    }
+
+    /**
+     * Get totals data. Merge amounts from all available quotes.
+     * @return array
+     */
+    private function getTotalsData()
+    {
+        $totalsData = [];
+        foreach ($this->formContext->getSession()->getSubQuotes() as $quote) {
+            if ($quote->isVirtual()) {
+                $addressTotals = $quote->getBillingAddress()->getTotals();
+            } else {
+                $addressTotals = $quote->getShippingAddress()->getTotals();
+            }
+            $calculatedTotals = $this->totalsConverter->process($addressTotals);
+            /** @var \Magento\Quote\Model\Cart\TotalSegment $total */
+            foreach ($calculatedTotals as $total) {
+                if (empty($totalsData[$total->getCode()])) {
+                    $totalsData[$total->getCode()] = $total->toArray();
+                } else {
+                    $totalsData[$total->getCode()]['value'] =
+                        (float)$totalsData[$total->getCode()]['value'] + (float)$total->getValue();
+                    $totalsData[$total->getCode()]['title'] = empty($totalsData[$total->getCode()]['title'])
+                        ? $total->getTitle()
+                        : $totalsData[$total->getCode()]['title'];
+                }
+            }
+        }
+        return $totalsData;
+    }
+
+    /**
+     * Get totals elements config
+     * @return array
+     */
+    private function getTotalsConfig()
+    {
+        $config = [];
+        $sortOrder = 50;
+        foreach ($this->getTotalsData() as $key => $segment) {
+            if (($key !== 'shipping' && $key !== 'tax') && empty($segment['value'])) continue;
+            $config[$key] = [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'componentType' => \Magento\Ui\Component\Form\Field::NAME,
+                            'formElement' => \Magento\Ui\Component\Form\Element\Input::NAME,
+                            'dataType' => \Magento\Ui\Component\Form\Element\DataType\Text::NAME,
+                            'elementTmpl' => 'ui/form/element/text',
+                            'label' => $segment['title'],
+                            'sortOrder' => $sortOrder,
+                            'additionalClasses' => 'total_' . $key,
+                            'visible' => !empty($segment['title'])
+                        ]
+                    ]
+                ]
+            ];
+            $sortOrder++;
+        }
+        return $config;
     }
 }

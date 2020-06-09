@@ -519,14 +519,22 @@
 .admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field:nth-child(odd) {
     background-color: #f1f1f1;
 }
-.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field .admin__field-label{
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field .admin__field-label {
     margin: 0;
     width: 50%;
     text-align: left;
     vertical-align: middle;
+    font-weight: normal;
+}
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field.total_subtotal span,
+.admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field.total_grand_total span {
+    font-weight: bold;
 }
 .admin__panel-information-preview  .admin__fieldset-wrapper-content .admin__fieldset .admin__field .admin__field-value{
     padding:0;
+}
+.admin__field-option .admin__field-label+.admin__field-tooltip {
+    margin: 0;
 }
 
 /* "action-editor" button */
