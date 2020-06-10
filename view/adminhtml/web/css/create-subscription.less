@@ -1,0 +1,901 @@
+.admin__fieldset {
+    >.admin__field.field-wide {
+        &:not(.admin__field-option) {
+            >.admin__field-label {
+                display: block;
+                line-height: 1.4rem;
+                margin-bottom: .86rem;
+                margin-top: -0.14rem;
+                text-align: left;
+                width: 100%;
+            }
+        }
+        >.admin__field-control {
+            clear: left;
+            float: none;
+            text-align: left;
+            width: auto;
+        }
+    }
+    >.subscription-store-fieldset {
+        >.admin__field-control {
+            float: none;
+            margin: 0 auto;
+            >.admin__field-option {
+                &:nth-child(1) {
+                    &:nth-last-child(2)+ {
+                        .admin__field-option {
+                            display: block;
+                            margin: 0;
+                            &:before {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.subscription-profile-products-container {
+    .admin__field-complex-elements {
+        max-width: 100%;
+    }
+    .sub-button-left {
+        padding-top: .6875em;
+        padding-bottom: .6875em;
+        font-size: 16px;
+        display: inline-block;
+        float: none !important;
+        margin-bottom: 1.3rem;
+        margin-right: 1.3rem;
+    }
+    .sub-button-right {
+        padding-top: .6875em;
+        padding-bottom: .6875em;
+        font-size: 16px;
+        display: inline-block;
+        float: none !important;
+    }
+    .admin__fieldset {
+        padding-top: 0;
+    }
+}
+.fieldset-wrapper {
+    .admin__fieldset {
+        .sub-button-left {
+            padding-top: .6875em;
+            padding-bottom: .6875em;
+            font-size: 16px;
+            float: left;
+            margin-right: 1.5rem;
+        }
+        .sub-button-right {
+            padding-top: .6875em;
+            padding-bottom: .6875em;
+            font-size: 16px;
+            float: right;
+        }
+    }
+}
+.admin__data-grid-header-row {
+    .header-grid-dext {
+        font-size: 2.1rem;
+        float: left;
+    }
+}
+.subscriptions-add-product-modal-form-container {
+    float: left;
+    width: 17%;
+    margin-left: 2rem;
+    padding-top: 0;
+    .action-secondary {
+        background-color: #eb5202;
+        border-color: #eb5202;
+        color: #fff;
+        text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+        width: 100%;
+    }
+    .admin__fieldset {
+        padding-top: 1.4rem;
+    }
+    .form-inline {
+        .fieldset-wrapper {
+            padding: 0 3rem;
+        }
+    }
+    .sub-legend {
+        legend {
+            opacity: 1;
+        }
+    }
+}
+.subscriptions-modify-modal-form-container {
+    .sub-legend {
+        legend {
+            opacity: 1;
+        }
+    }
+    .admin__fieldset {
+        padding: 0;
+    }
+}
+.sub-period-input {
+    margin: 0 !important;
+    input {
+        width: 4rem !important;
+        margin: 0 0.5rem;
+    }
+    .admin__field-control {
+        margin: 0 !important;
+    }
+}
+.subscriptions-add-product-modal-grid-container {
+    float: left;
+    width: 80%;
+}
+.subscriptions-add-product-modal {
+    .modal-title {
+        font-size: 2.8rem;
+    }
+    .modal-header {
+        border-bottom: 1px solid #ccc;
+        margin-left: 2.6rem;
+        margin-right: 2.6rem;
+        padding-left: 0;
+    }
+}
+.sub-data-grid {
+    color: #666;
+    padding: 0 2rem;
+    background: #f8f8f8;
+    border: 1px solid #e3e3e3;
+    .sub-data-product-container {
+        padding-top: 1.5rem;
+    }
+    .sub-product-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    .sub-data-thumbnail {
+        display: inline-block;
+        width: 20%;
+        img {
+            display: block;
+            width: 5rem;
+        }
+    }
+    .dotted-border {
+        &:after {
+            content: '.................';
+            font-size: 3rem;
+            width: 85%;
+            line-height: 1rem;
+            letter-spacing: 1rem;
+            display: block;
+            margin: 0 auto;
+            padding-bottom: 15px;
+            color: #ccc;
+        }
+    }
+    .border {
+        border-bottom: 2px solid #e3e3e3;
+    }
+    .sub-data-row {
+        padding: 1rem 0 0 0;
+    }
+    .sub-data-product {
+        display: inline-block;
+        width: 75%;
+        vertical-align: top;
+    }
+    .sub-data-product-name {
+        font-size: 16px;
+    }
+    .sub-data-product-qty {
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .sub-data-conf-options {
+        margin-top: 8px;
+    }
+    .sub-product-shipping-method {
+        padding: 0 0 2rem 0;
+    }
+    .subscription-shipping-title {
+        font-weight: bold;
+        padding: 0.5rem 0;
+    }
+    .subscription-shipping-method {
+        font-style: italic;
+    }
+    .subscription-shipping-attention {
+        margin-top: 1rem;
+        &::before {
+            color: #eb5202;
+            content: '\e623';
+            background: none;
+            border: 0;
+            font-family: 'Admin Icons';
+            font-size: 1.9rem;
+            font-style: normal;
+            font-weight: 400;
+            height: auto;
+            left: 1.9rem;
+            line-height: inherit;
+            speak: none;
+            text-shadow: none;
+            width: auto;
+            float: left;
+            margin-right: 5px;
+        }
+    }
+    .hidden {
+        display: none;
+        visibility: hidden;
+    }
+    .sub-product-frequency-description {
+        padding-top: 1rem;
+        .data-grid-cell-content {
+            span {
+                font-weight: bold;
+            }
+        }
+    }
+}
+.data-total-container {
+    .total-title {
+        padding: 1.5rem 0 1.5rem 2rem;
+        font-size: 2.25rem;
+        display: inline-block;
+    }
+    .total-value {
+        padding: 1.5rem 2rem 1.5rem 0;
+        font-size: 2.25rem;
+        display: inline-block;
+        float: right;
+    }
+    background: #e4e4e4;
+    overflow: auto;
+}
+#anchor-content {
+    .control-label-up {
+        label {
+            width: auto;
+            position: relative;
+            margin-left: 0;
+            float: none;
+        }
+    }
+    .field_without_legend {
+        width: calc( (100%) * .7 - 30px);
+    }
+}
+.field_without_legend {
+    >div.admin__field {
+        display: inline-block;
+        margin-top: 0px;
+    }
+}
+.payment-additional-fieldset {
+    legend {
+        opacity: 1 !important;
+    }
+    .payment-cvv {
+        input {
+            width: 6rem;
+        }
+    }
+    ._required-number {
+        >.admin__field-label {
+            >span {
+                &:after {
+                    color: #eb5202;
+                    content: '*';
+                    display: inline-block;
+                    font-size: 1.6rem;
+                    font-weight: 500;
+                    line-height: 1;
+                    margin-left: 10px;
+                    margin-top: .2rem;
+                    position: absolute;
+                    z-index: 1;
+                }
+            }
+        }
+    }
+}
+.payment-additional-fieldset._show {
+    margin-top: 0 !important;
+}
+.control-label-up.select {
+    width: 20%;
+    min-width: 11rem;
+}
+.control-label-up.input {
+    width: 74%;
+}
+.admin__address-information-preview,
+.admin__panel-information-preview {
+    width: 47%;
+    margin: 1%;
+    float: left;
+}
+.admin__panel-information-preview {
+    .admin__fieldset-wrapper-content {
+        .admin__fieldset {
+            .admin__field {
+                margin: 0;
+                padding: 1% 1% 1% 2%;
+                line-height: 3.2rem;
+                &:nth-child(odd) {
+                    background-color: #f1f1f1;
+                }
+                .admin__field-label {
+                    margin: 0;
+                    width: 50%;
+                    text-align: left;
+                    vertical-align: middle;
+                    font-weight: normal;
+                }
+                .admin__field-value {
+                    padding: 0;
+                }
+            }
+            .admin__field.total_subtotal {
+                span {
+                    font-weight: bold;
+                }
+            }
+            .admin__field.total_grand_total {
+                span {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}
+.admin__address-information-buttons {
+    display: block;
+    float: left;
+    margin: 0;
+    padding: 0;
+    fieldset {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+.admin__shipping-information-preview {
+    margin-right: 50%;
+}
+.admin__payment-details-preview {
+    width: 47%;
+    float: right;
+    margin: 1%;
+    .fieldset-wrapper-title {
+        border-bottom: 1px solid #ffffff;
+    }
+    .admin__fieldset {
+        >.admin__field {
+            margin-bottom: 0;
+            margin-top: 0;
+            margin-left: 0;
+            >.admin__field-label {
+                width: calc((100%) * .50 );
+                text-align: left;
+                margin-left: 0;
+                padding: 0.5rem 0 0.5rem 1rem;
+            }
+            >.admin__field-control {
+                text-align: right;
+                line-height: 3.2rem;
+                padding: 0.5rem 0.5rem 0.5rem 1rem;
+            }
+            &:nth-child(odd) {
+                background-color: #f1f1f1;
+            }
+        }
+    }
+    >.admin__fieldset-wrapper-content {
+        >fieldset {
+            padding-top: 1rem;
+        }
+    }
+}
+.admin__field-control {
+    >.admin__field-option {
+        &:nth-child(2) {
+            &:nth-last-child(1)+ {
+                .admin__field-option {
+                    display: block;
+                    margin: 0;
+                    &:before {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    .field-qty {
+        .admin__field-label {
+            span {
+                margin-left: 1rem;
+            }
+        }
+    }
+}
+.sub-fieldset {
+    .admin__fieldset {
+        padding: 0;
+    }
+    .payment-checkbox {
+        margin-bottom: 0;
+    }
+    .payment-additional-fieldset {
+        margin-top: 3rem;
+        margin-left: 2.6rem;
+    }
+}
+.wide-select {
+    select {
+        width: 100%;
+    }
+}
+.subscr-container-title {
+    font-size: 2rem;
+    font-weight: 400;
+}
+#chekbox-label {
+    width: auto;
+    margin-left: 61px;
+}
+.admin_right-label {
+    .admin__field-control {
+        float: left;
+        position: absolute;
+    }
+}
+.subscription-profile-currency {
+    background: #f1f1f1;
+    border: 1px solid #e3e3e3;
+    margin-bottom: 15px;
+    .admin__fieldset {
+        color: #666;
+        padding: 3rem 2rem;
+        >.admin__field {
+            padding: 0 20px;
+        }
+        .admin__field-label {
+            display: block;
+            margin: 0 0 1rem;
+            text-align: left;
+        }
+        .admin__control-select {
+            width: 100%;
+        }
+    }
+}
+.in-stock {
+    span {
+        display: none;
+    }
+}
+.warning-not-in-stock {
+    .admin__grid-tooltip {
+        display: none;
+    }
+    display: inline-block;
+    position: absolute;
+    &:hover {
+        .admin__grid-tooltip {
+            display: block;
+            background: #f1f1f1;
+            border: 1px solid #f1f1f1;
+            border-radius: 1px;
+            box-shadow: 0 3px 9px 0 rgba(0,0,0,0.3);
+            font-size: 1.4rem;
+            font-weight: 400;
+            line-height: 1.36;
+            padding: 1.5rem;
+            position: absolute;
+            text-transform: none;
+            width: 27rem;
+            word-break: normal;
+            z-index: 2;
+            left: -2.2rem;
+            bottom: 1.8rem;
+            &:before {
+                border: 15px solid transparent;
+                height: 0;
+                width: 0;
+                content: '';
+                display: block;
+                left: 2rem;
+                position: absolute;
+                top: 100%;
+                z-index: 3;
+                border-top-color: #bfbfbf;
+                margin-top: 1px;
+            }
+            &:after {
+                border: 15px solid transparent;
+                height: 0;
+                width: 0;
+                content: '';
+                display: block;
+                left: 2rem;
+                position: absolute;
+                top: 100%;
+                border-top-color: #f1f1f1;
+                margin-top: -1px;
+                z-index: 4;
+            }
+        }
+    }
+}
+.admin_grid_col_with_tooltip {
+    display: inline-block;
+}
+.qty-warning {
+    &:after {
+        color: #eb5202;
+        content: '\e623';
+        font-family: 'Admin Icons';
+        font-size: 1.7rem;
+        position: absolute;
+        top: -0.5rem;
+        left: 0.5rem;
+    }
+}
+.radio-options-one-column {
+    .admin__field-control {
+        >.admin__field-option {
+            &:nth-child(1) {
+                &:nth-last-child(2) {
+                    display: block;
+                    + .admin__field-option {
+                        &:before {
+                            display: none;
+                        }
+                        display: block;
+                        margin-left: 0;
+                    }
+                }
+            }
+            &:nth-child(2) {
+                &:nth-last-child(1) {
+                    display: block;
+                    margin-top: .9rem;
+                    + .admin__field-option {
+                            &:before {
+                                display: none;
+                            }
+                            display: block;
+                            margin-left: 0;
+                        }
+                }
+            }
+        }
+    }
+}
+.customer_exists_popup {
+    .admin__fieldset-wrapper-content {
+        .admin__fieldset {
+            padding-bottom: 0;
+        }
+    }
+}
+.admin__subscription-account-information {
+    padding-top: 3rem;
+    .admin__fieldset {
+        .admin__field-simple-container {
+            float: left;
+            width: calc( (100%) * .49 );
+            &:first-child {
+                margin-right: 1%;
+            }
+            .admin__fieldset-simple-container-wrapper {
+                .admin__field {
+                    padding: 1% 1% 1% 2%;
+                    line-height: 3.2rem;
+                    +.admin__field {
+                            margin-top: 0;
+                        }
+                    &:nth-child(odd) {
+                        background-color: #f1f1f1;
+                    }
+                }
+                .admin__field-label {
+                    float: left;
+                    text-align: left;
+                    width: 50%;
+                }
+                .admin__field-control {
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+.admin__field-option {
+    .admin__field-label+.admin__field-tooltip {
+        margin: 0;
+    }
+}
+button.action-editor {
+    &:before {
+        font-size: 2.5rem;
+        font-family: 'Admin Icons';
+        content: '\e631';
+    }
+    background: none;
+    border: none;
+    padding: 1rem;
+    margin: 0;
+}
+.middle-container {
+    button.action-editor {
+        display: inline-block;
+        position: absolute;
+        right: 50px;
+        top: -10px;
+    }
+    button.action-editor.active {
+        right: 0px;
+    }
+}
+button.remove-button-icon {
+    &:before {
+        font-size: 2.5rem;
+        font-family: 'Admin Icons';
+        content: '\e630';
+    }
+    top: -10px;
+    background: none;
+    border: none;
+    padding: 1rem;
+    margin: 0;
+    position: absolute;
+    right: 0px;
+    display: inline-block;
+}
+button.action-editor.active {
+    &:before {
+        content: '\e632';
+    }
+}
+.modify-subscriptions-modal {
+    .modal-inner-wrap {
+        padding-right: 2.6rem;
+        .action-close {
+            padding: 2.6rem 2.6rem 2.1rem 0;
+            right: inherit;
+        }
+        .modal-header {
+            border-bottom: 1px solid #ccc;
+            line-height: 1.2;
+            padding-left: 0;
+            margin-left: 2.6rem;
+            .modal-title {
+                padding-left: 4.8rem;
+                font-size: 2.6rem;
+            }
+        }
+        .modal-content {
+            padding-right: 0;
+        }
+    }
+}
+.subscription-container {
+    padding-top: 1.5rem;
+    .fieldset-wrapper-title {
+        border: none;
+        .title {
+            font-size: 2.5rem;
+            font-weight: 400;
+        }
+    }
+    >.admin__fieldset-wrapper-content {
+        border: 1px solid #ccc;
+        padding: 0 2rem;
+    }
+    .admin__fieldset {
+        padding: 0;
+    }
+    .middle-container {
+        .admin__fieldset {
+            position: relative;
+        }
+    }
+    .subscription-item-form {
+        &:not(:last-child) {
+            border-bottom: 1px solid #ccc;
+        }
+    }
+}
+.subscription-item-form {
+    .description-fieldset {
+        display: inline-block;
+        width: 100%;
+        margin: 2rem 0 !important;
+        .admin__field-label {
+            //width: 3rem !important;
+            span {
+                white-space: nowrap;
+            }
+        }
+        .field-name {
+            font-size: 2.2rem;
+            margin-bottom: 0;
+            .admin__field-label {
+                font-size: 1.8rem;
+                font-weight: normal;
+                line-height: 2.9rem;
+                width: 3rem;
+                text-align: left;
+            }
+            .admin__field-control {
+                width: inherit;
+                margin-left: 0.5rem;
+            }
+        }
+        .field-description {
+            margin-top: 0.5rem;
+            .admin__field-control {
+                width: inherit;
+            }
+        }
+        .qty-container {
+            width: inherit;
+            .field-qty {
+                margin-right: 30px;
+            }
+            .admin__control-preview {
+                padding: 0.625rem;
+            }
+        }
+        .qty-edit-button {
+            padding: 0.625rem;
+        }
+        .middle-container {
+            float: left;
+            width: calc(100% - 280px);
+        }
+        .left-container {
+            float: left;
+            width: 240px;
+            text-align: center;
+            margin-right: 2rem;
+            .sub-product-image {
+                margin-bottom: 0;
+                width: 240px;
+                margin-left: 0px;
+                .admin__field-control {
+                    width: 100%;
+                    margin-left: 0;
+                    padding-left: 30px;
+                    padding-bottom: 100%;
+                }
+                img {
+                    bottom: 0;
+                    left: 0;
+                    margin: auto;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                }
+            }
+        }
+    }
+    .edit-fieldset {
+        float: left;
+        width: calc(100% - 280px);
+        margin: 2rem 0 !important;
+        position: relative;
+        &__left,
+        &__right {
+            float: left;
+            width: 50%;
+        }
+        .field-term {
+            margin-bottom: 0;
+            .admin__control-preview {
+                margin-bottom: 1.5rem;
+            }
+        }
+        .action-editor {
+            position: absolute;
+            right: -40px;
+            top: -20px;
+            padding: 2rem;
+        }
+        .field-wide {
+            .admin__control-select,
+            .admin__control-addon,
+            .admin__control-text {
+                width: 50%;
+            }
+        }
+    }
+    div {
+        vertical-align: top;
+    }
+}
+.table-secondary {
+    tbody {
+        tr {
+            &:nth-child(odd) {
+                th {
+                    background-color: #f1f1f1;
+                }
+                td {
+                    background-color: #f1f1f1;
+                }
+            }
+        }
+    }
+    th {
+        padding: 1rem 1rem;
+        text-align: left;
+    }
+    td {
+        padding: 1rem 1rem;
+        text-align: left;
+    }
+}
+.tnw-subscriptions-subscriptionprofile-create {
+    [data-index="account"] {
+        label {
+            span {
+                &:after {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}
+.product-options {
+    .admin__field {
+        margin-bottom: 0;
+        margin-top: 0;
+        .admin__field-control {
+            line-height: 3.2rem;
+        }
+    }
+    .admin__fieldset {
+        >.admin__field {
+            >.admin__field-label {
+                text-align: left;
+                width: calc( (100%) * .5 - 30px ) !important;
+            }
+        }
+        >.admin__field.edit-product {
+            >.admin__field-label {
+                width: auto !important;
+            }
+        }
+        padding-top: 0;
+        padding-bottom: 1.5rem;
+    }
+    >.fieldset-wrapper-title {
+        border: none;
+        padding-bottom: 0.5rem;
+    }
+    .fieldset-wrapper-title {
+        strong {
+            font-size: 2rem;
+        }
+    }
+}
+#co-transparent-form-braintree {
+    .admin__control-text {
+        height: 33px;
+        border: 1px solid #c2c2c2;
+        padding: 0.6rem 1rem 0.6rem;
+    }
+    .payment-cvv {
+        .admin__control-text {
+            width: 6rem;
+        }
+    }
+}
