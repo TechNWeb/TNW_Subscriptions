@@ -11,12 +11,10 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
-use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -88,6 +86,66 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '2.2.45', '<')) {
             $this->addCheckSendMailColumn($setup);
+        }
+
+        if (version_compare($context->getVersion(), '2.2.49', '<')) {
+            $billingFreqTable = $setup->getTable(
+                ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+            );
+            $productTable = $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE);
+            $this->updateForeignKeys(
+                $setup,
+                [
+                    $billingFreqTable => [
+                        'name' => $setup->getConnection()->getForeignKeyName(
+                            $billingFreqTable,
+                            'magento_product_id',
+                            'catalog_product_entity',
+                            'entity_id'
+                        ),
+                        'column' => 'magento_product_id',
+                        'fk_table' => $setup->getTable('catalog_product_entity'),
+                        'fk_column' => 'entity_id',
+                        'on_delete' => Table::ACTION_NO_ACTION
+                    ],
+                    $productTable => [
+                        'name' => $setup->getConnection()->getForeignKeyName(
+                            $productTable,
+                            'magento_product_id',
+                            'catalog_product_entity',
+                            'entity_id'
+                        ),
+                        'column' => 'magento_product_id',
+                        'fk_table' => $setup->getTable('catalog_product_entity'),
+                        'fk_column' => 'entity_id',
+                        'on_delete' => Table::ACTION_NO_ACTION
+                    ],
+                ]
+            );
+        }
+        $setup->endSetup();
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @param $data
+     */
+    private function updateForeignKeys(SchemaSetupInterface $setup, $data)
+    {
+        $setup->startSetup();
+        foreach ($data as $table => $newData) {
+            $setup->getConnection()->dropForeignKey(
+                $table,
+                $newData['name']
+            );
+            $setup->getConnection()->addForeignKey(
+                $newData['name'],
+                $table,
+                $newData['column'],
+                $newData['fk_table'],
+                $newData['fk_column'],
+                $newData['on_delete']
+            );
         }
         $setup->endSetup();
     }
@@ -672,6 +730,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
     }
 
+    /**
+     * @param SchemaSetupInterface $setup
+     */
     private function updateItemIdColumnToOrderItemExtAtrTable(SchemaSetupInterface $setup)
     {
         $setup->getConnection()->changeColumn(
