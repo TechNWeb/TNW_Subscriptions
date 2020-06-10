@@ -93,33 +93,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
             );
             $productTable = $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE);
-            $this->updateForeignKeys(
+            $this->deleteForeignKeys(
                 $setup,
                 [
-                    $billingFreqTable => [
-                        'name' => $setup->getConnection()->getForeignKeyName(
-                            $billingFreqTable,
-                            'magento_product_id',
-                            'catalog_product_entity',
-                            'entity_id'
-                        ),
-                        'column' => 'magento_product_id',
-                        'fk_table' => $setup->getTable('catalog_product_entity'),
-                        'fk_column' => 'entity_id',
-                        'on_delete' => Table::ACTION_NO_ACTION
-                    ],
-                    $productTable => [
-                        'name' => $setup->getConnection()->getForeignKeyName(
-                            $productTable,
-                            'magento_product_id',
-                            'catalog_product_entity',
-                            'entity_id'
-                        ),
-                        'column' => 'magento_product_id',
-                        'fk_table' => $setup->getTable('catalog_product_entity'),
-                        'fk_column' => 'entity_id',
-                        'on_delete' => Table::ACTION_NO_ACTION
-                    ],
+                    $billingFreqTable => $setup->getConnection()->getForeignKeyName(
+                        $billingFreqTable,
+                        'magento_product_id',
+                        'catalog_product_entity',
+                        'entity_id'
+                    ),
+                    $productTable => $setup->getConnection()->getForeignKeyName(
+                        $productTable,
+                        'magento_product_id',
+                        'catalog_product_entity',
+                        'entity_id'
+                    ),
                 ]
             );
         }
@@ -130,21 +118,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
      * @param SchemaSetupInterface $setup
      * @param $data
      */
-    private function updateForeignKeys(SchemaSetupInterface $setup, $data)
+    private function deleteForeignKeys(SchemaSetupInterface $setup, $data)
     {
         $setup->startSetup();
-        foreach ($data as $table => $newData) {
+        foreach ($data as $table => $fkName) {
             $setup->getConnection()->dropForeignKey(
                 $table,
-                $newData['name']
-            );
-            $setup->getConnection()->addForeignKey(
-                $newData['name'],
-                $table,
-                $newData['column'],
-                $newData['fk_table'],
-                $newData['fk_column'],
-                $newData['on_delete']
+                $fkName
             );
         }
         $setup->endSetup();
