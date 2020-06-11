@@ -11,12 +11,10 @@ use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
-use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -88,6 +86,46 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '2.2.45', '<')) {
             $this->addCheckSendMailColumn($setup);
+        }
+
+        if (version_compare($context->getVersion(), '2.2.49', '<')) {
+            $billingFreqTable = $setup->getTable(
+                ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+            );
+            $productTable = $setup->getTable(ProductSubscriptionProfile::ENTITY_TABLE);
+            $this->deleteForeignKeys(
+                $setup,
+                [
+                    $billingFreqTable => $setup->getConnection()->getForeignKeyName(
+                        $billingFreqTable,
+                        'magento_product_id',
+                        'catalog_product_entity',
+                        'entity_id'
+                    ),
+                    $productTable => $setup->getConnection()->getForeignKeyName(
+                        $productTable,
+                        'magento_product_id',
+                        'catalog_product_entity',
+                        'entity_id'
+                    ),
+                ]
+            );
+        }
+        $setup->endSetup();
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @param $data
+     */
+    private function deleteForeignKeys(SchemaSetupInterface $setup, $data)
+    {
+        $setup->startSetup();
+        foreach ($data as $table => $fkName) {
+            $setup->getConnection()->dropForeignKey(
+                $table,
+                $fkName
+            );
         }
         $setup->endSetup();
     }
@@ -672,6 +710,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
     }
 
+    /**
+     * @param SchemaSetupInterface $setup
+     */
     private function updateItemIdColumnToOrderItemExtAtrTable(SchemaSetupInterface $setup)
     {
         $setup->getConnection()->changeColumn(
