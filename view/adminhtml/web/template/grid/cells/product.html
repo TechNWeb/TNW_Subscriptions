@@ -1,0 +1,13 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="data-grid-cell-content">
+    <span text="$col.getField($row(), 'qty')"/>x&nbsp;
+    <a data-bind="attr: {href: $col.getField($row(), 'href')}" text="$col.getField($row(), 'label')"/>
+    <div class="options-wrapper" each="$col.getField($row(), 'options')">
+        <span text="label"/>:&nbsp;<b text="value"/><br/>
+    </div>
+</div>

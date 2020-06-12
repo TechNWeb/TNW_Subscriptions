@@ -12,6 +12,7 @@ use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 use Psr\Log\LoggerInterface as Logger;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
@@ -67,6 +68,7 @@ class Collection extends SearchResult
                 'trial_start_date',
                 'start_date',
                 'created_at',
+                'customer_id'
             ]
         );
 
@@ -128,7 +130,19 @@ class Collection extends SearchResult
                     'engine_code' => 'payment.engine_code',
                     'payment_additional_info' => 'payment.payment_additional_info',
                 ]
-            );
+            )
+            ->joinLeft(
+                ['profile_product' => $this->getTable(ProductSubscriptionProfileInterface::ENTITY_TABLE)],
+                'main_table.entity_id = profile_product.subscription_profile_id',
+                [
+                    'product_id' => 'profile_product.magento_product_id',
+                    'product_name' => 'profile_product.name',
+                    'product_qty' => 'profile_product.qty',
+                    'parent_id' => 'profile_product.parent_id',
+                    'product_options' => 'profile_product.custom_options'
+                ]
+            )
+            ->where('parent_id IS NULL');
 
         return $this;
     }
