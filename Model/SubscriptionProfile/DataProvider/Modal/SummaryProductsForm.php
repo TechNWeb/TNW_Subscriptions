@@ -218,22 +218,6 @@ class SummaryProductsForm extends ModifyForm
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset-buttons',
                                 'dataScope' => '',
                                 'sortOrder' => $iterator,
-                                'buttons' => [
-                                    [
-                                        'label' => __('Add products'),
-                                        'actions' => [
-                                            [
-                                                'targetName' => '${ $.parentName }.addProductsModal',
-                                                'actionName' => 'openModal',
-                                            ],
-                                            [
-                                                'targetName' => '${ $.parentName }.addProductsModal.grid_container.' .
-                                                    self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
-                                                'actionName' => 'render',
-                                            ]
-                                        ]
-                                    ]
-                                ]
                             ]
                         ]
                     ]

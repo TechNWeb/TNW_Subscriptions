@@ -32,6 +32,11 @@ class SummaryInsertForm extends BaseFormModifier
     const SUMMARY_FIELDSET = 'summary';
 
     /**
+     * Dashboard fieldset name
+     */
+    const DASHBOARD_FIELDSET = 'dashboard';
+
+    /**
      * Form data key
      */
     const FORM_DATA_KEY = 'subscription_profile_id';
@@ -123,7 +128,7 @@ class SummaryInsertForm extends BaseFormModifier
         $result = [];
         if ($this->canShowBlock($this->formType)) {
             $result = [
-                static::SUMMARY_FIELDSET => [
+                $this->getInsertLocation($this->formType) => [
                     'children' => [
                         $this->formType => $this->getInsertFormModifier()
                     ],
@@ -284,5 +289,15 @@ class SummaryInsertForm extends BaseFormModifier
         }
 
         return $result;
+    }
+
+    /**
+     * Get insert location of inserted form
+     * @param $formType
+     * @return string
+     */
+    private function getInsertLocation($formType)
+    {
+        return $formType === self::PRODUCTS_INSERT_FORM ? self::DASHBOARD_FIELDSET : self::SUMMARY_FIELDSET;
     }
 }
