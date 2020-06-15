@@ -6,4 +6,7 @@
                   instance="TNW\Subscriptions\Observer\SalesEventOrderItemToQuoteItemObserver"
                   shared="false" />
     </event>
+    <event name="magento_catalog_api_data_productinterface_delete_after">
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\ClearDbProductInterfaceDeleteAfter" />
+    </event>
 </config>
