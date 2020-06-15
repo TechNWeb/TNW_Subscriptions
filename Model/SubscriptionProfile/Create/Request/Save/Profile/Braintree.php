@@ -44,6 +44,11 @@ class Braintree extends Base
     private $paymentTokenRepository;
 
     /**
+     * @var \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder
+     */
+    private $braintreePaymentDataBuilder;
+
+    /**
      * Braintree constructor.
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
@@ -53,6 +58,7 @@ class Braintree extends Base
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder
      */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
@@ -62,9 +68,11 @@ class Braintree extends Base
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
-        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory,
+        \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder
     ) {
         parent::__construct($createModel, $session);
+        $this->braintreePaymentDataBuilder = $braintreePaymentDataBuilder;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
@@ -129,15 +137,18 @@ class Braintree extends Base
         $paymentToken->setIsActive(true);
         $paymentToken->setIsVisible(true);
         $this->paymentTokenRepository->save($paymentToken);
-
+        $maxAmountPreAuthorized = 0;
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             if ($subQuote->getGrandTotal() < 0.001) {
-                $vaultPaymentData = [];
-                $vaultPaymentData['method'] = $this->getVaultMethodCode();
-                $vaultPaymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
-                $vaultPaymentData['additional_data']['public_hash'] = $paymentToken->getPublicHash();
-                $this->vaultPaymentAuthorization->processPreAuthForTrial($vaultPaymentData, $subQuote);
+                if ($maxAmountPreAuthorized < $this->braintreePaymentDataBuilder->getAmount($subQuote)) {
+                    $vaultPaymentData = [];
+                    $vaultPaymentData['method'] = $this->getVaultMethodCode();
+                    $vaultPaymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
+                    $vaultPaymentData['additional_data']['public_hash'] = $paymentToken->getPublicHash();
+                    $this->vaultPaymentAuthorization->processPreAuthForTrial($vaultPaymentData, $subQuote);
+                    $maxAmountPreAuthorized = $this->braintreePaymentDataBuilder->getAmount($subQuote);
+                }
             }
             $subQuote->getPayment()
                 ->setAdditionalInformation('token_hash', $this->encryptor->encrypt($paymentMethod->token))
