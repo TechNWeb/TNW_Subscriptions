@@ -21,12 +21,16 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
      */
     protected $productSubscriptionProfile;
 
+    /**
+     * @var MagentoProductCollection
+     */
     protected $magentoProductCollection;
 
     /**
      * ClearDbProductInterfaceDeleteAfter constructor.
      * @param ProductBillingFrequency $productBillFrequency
      * @param ProductSubscriptionProfile $productSubscriptionProfile
+     * @param MagentoProductCollection $magentoProductCollection
      */
     public function __construct(
         ProductBillingFrequency $productBillFrequency,
