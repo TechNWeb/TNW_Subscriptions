@@ -6,7 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
-use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
@@ -335,22 +335,34 @@ class Form extends AbstractDataProvider
         $value = null;
         $productId = $productId ?: $this->getRequestProductId();
         if ($productId) {
-            /** @var MagentoProduct $product */
-            $product = $this->formContext->getProductRepository()->getById($productId);
+            $arguments = [];
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                $arguments['child_product'] = $childProduct;
+            }
+
+            $productData = $this->getProductObjectData($productId, $arguments);
 
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
-            if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
-                if ($product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+            if ($productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
+                if (
+                    $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                    == StartDateType::DEFINED_BY_CUSTOMER
+                ) {
                     $visible = true;
                 } else {
-                    $value = $product->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
+                    $value = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
                 }
             } else {
-                if ($product->getData(Attribute::SUBSCRIPTION_START_DATE) == StartDateType::DEFINED_BY_CUSTOMER) {
+                if (
+                    $productData->getData(Attribute::SUBSCRIPTION_START_DATE)
+                    == StartDateType::DEFINED_BY_CUSTOMER
+                ) {
                     $visible = true;
                 } else {
-                    $value = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
+                    $value = $productData->getData(Attribute::SUBSCRIPTION_START_DATE);
                 }
             }
         }
@@ -393,18 +405,38 @@ class Form extends AbstractDataProvider
      *
      * @param null|int|string $productId
      * @return array
+     * @throws NoSuchEntityException
      */
     public function getProductBillingFrequenciesAsOptionArray($productId = null)
     {
         $result = [];
         $productId = $productId ?: $this->getRequestProductId();
+        if (!$productId) return $result;
+
+        $childProduct = $this->getChildProductFromRequest();
+        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+        if ($childProduct) {
+            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
+                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+            }
+        }
         try {
             /** @var ProductBillingFrequencyInterface $productFrequency */
             foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
+                if (
+                    !empty($childProduct)
+                    && empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
+                ) {
+                    //Child product has no such frequency set
+                    continue;
+                }
                 $frequency = $this->formContext->getFrequencyRepository()
                     ->getById($productFrequency->getBillingFrequencyId());
                 $label = $frequency->getLabel();
-                if ((bool)$productFrequency->getDefaultBillingFrequency()) {
+                $isDefault = !empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
+                    ? (bool)$childFrequencies[$productFrequency->getBillingFrequencyId()]->getDefaultBillingFrequency()
+                    : (bool)$productFrequency->getDefaultBillingFrequency();
+                if ($isDefault) {
                     $label = $label . ' ' . __('(most common)');
                 }
                 $result[] = [
@@ -431,29 +463,18 @@ class Form extends AbstractDataProvider
         if ($productId && !isset($this->trialPeriod[$productId])) {
             $this->trialPeriod[$productId] = '';
             try {
-                /** @var MagentoProduct $product */
-                $product = $this->formContext->getProductRepository()->getById($productId);
-                $show = $this->getProductCustomAttribute(
-                    $product,
-                    Attribute::SUBSCRIPTION_TRIAL_STATUS,
-                    false
-                );
+                $arguments = [];
+                $childProduct = $this->getChildProductFromRequest();
+                $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+                if ($childProduct) {
+                    $arguments['child_product'] = $childProduct;
+                }
+                $productData = $this->getProductObjectData($productId, $arguments);
+                $show = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
                 if ($show) {
-                    $trialLength = (int)$this->getProductCustomAttribute(
-                        $product,
-                        Attribute::SUBSCRIPTION_TRIAL_LENGTH,
-                        0
-                    );
-                    $trialUnit = (int)$this->getProductCustomAttribute(
-                        $product,
-                        Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
-                        0
-                    );
-                    $trialPrice = $this->getProductCustomAttribute(
-                        $product,
-                        Attribute::SUBSCRIPTION_TRIAL_PRICE,
-                        0
-                    );
+                    $trialLength = (int)$productData->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH);
+                    $trialUnit = (int)$productData->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
+                    $trialPrice = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE);
                     $formattedPrice = $trialPrice
                         ? $this->formatPrice($this->convertPrice($trialPrice))
                         : __('Free');
@@ -477,12 +498,12 @@ class Form extends AbstractDataProvider
     /**
      * Returns product custom attribute value or "default" value if attribute is not set.
      *
-     * @param MagentoProduct $product
+     * @param ProductInterface $product
      * @param string $attributeCode
      * @param null|bool|int|string $default
      * @return null|bool|int|string
      */
-    protected function getProductCustomAttribute(MagentoProduct $product, $attributeCode, $default = null)
+    protected function getProductCustomAttribute(ProductInterface $product, $attributeCode, $default = null)
     {
         $result = $default;
         if ($product->getCustomAttribute($attributeCode)) {
@@ -651,8 +672,14 @@ class Form extends AbstractDataProvider
         $result = null;
         $productId = $productId ?: $this->getRequestProductId();
         if ($productId) {
-            $product = $this->formContext->getProductRepository()->getById($productId);
-            $result = $this->getSavingsCalculationType($product);
+            $arguments = [];
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                $arguments['child_product'] = $childProduct;
+            }
+            $productData = $this->getProductObjectData($productId, $arguments);
+            $result = $this->getSavingsCalculationType($productData);
         }
 
         return $result;
@@ -676,8 +703,22 @@ class Form extends AbstractDataProvider
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $additionalData['billing_frequency'] = $billingFrequencyId;
             $productDataObject = $this->getProductObjectData($productId, $additionalData);
-            $data['product_frequencies'][$billingFrequencyId] =
-                $this->getBillingFrequencyData($productDataObject, $frequency, $additionalData);
+            if (
+                $productDataObject->getTypeId() === Configurable::TYPE_CODE
+                && $productDataObject->getId() === $productDataObject->getChildProductId()
+            ) {
+                continue;
+            }
+            $productFrequencies = [];
+            foreach ($this->getProductBillingFrequencies($productDataObject->getChildProductId()) as $productFrequency) {
+                $productFrequencies[$productFrequency->getBillingFrequencyId()] = $productFrequency;
+            }
+            if (!empty($productFrequencies[$billingFrequencyId])) {
+                $data['product_frequencies'][$billingFrequencyId] =
+                    $this->getBillingFrequencyData(
+                        $productDataObject, $productFrequencies[$billingFrequencyId]
+                    );
+            }
             if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
                 $data['billing_frequency'] = $billingFrequencyId;
                 $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
@@ -703,7 +744,7 @@ class Form extends AbstractDataProvider
      * @param array|null $additionalData
      * @return DataObject
      */
-    private function getProductObjectData($productId, $additionalData = null)
+    protected function getProductObjectData($productId, $additionalData = null)
     {
         $product = $this->formContext->getProductRepository()->getById($productId);
 
@@ -719,6 +760,42 @@ class Form extends AbstractDataProvider
     protected function getRequestProductId()
     {
         return $this->formContext->getRequest()->getParam('product_id');
+    }
+
+    /**
+     * @return ProductInterface|null
+     * @throws NoSuchEntityException
+     */
+    protected function getChildProductFromRequest()
+    {
+        $productId = $this->getRequestProductId();
+        if (!$productId) return null;
+        $product = $this->formContext->getProductRepository()->getById($productId);
+        $superAttribute = $this->formContext->getRequest()->getParam('super_attribute');
+        if (!empty($product) && $product->getTypeId() === Configurable::TYPE_CODE && !empty($superAttribute)) {
+            return $product->getTypeInstance()->getProductByAttributes($superAttribute, $product);
+        }
+        return null;
+    }
+
+    /**
+     * Get child product from current subscription profile
+     * @return ProductInterface|null
+     * @throws NoSuchEntityException
+     */
+    protected function getChildProductFromCurrentItem()
+    {
+        if (!empty($this->currentItem)) {
+            $children = $this->currentItem->getChildren();
+            $child = is_array($children) ? reset($children) : null;
+            if (!empty($child)) {
+                $childProductId =  $child->getMagentoProductId() ?? $child->getProductId();
+            }
+            return !empty($childProductId)
+                ? $this->formContext->getProductRepository()->getById($childProductId)
+                : null;
+        }
+        return null;
     }
 
     /**
@@ -776,6 +853,7 @@ class Form extends AbstractDataProvider
      *
      * @param int|string|null $productId
      * @return array
+     * @throws NoSuchEntityException
      */
     protected function getFieldTermConfig($productId = null)
     {
@@ -786,8 +864,14 @@ class Form extends AbstractDataProvider
         ];
 
         if ($productId) {
-            $product = $this->formContext->getProductRepository()->getById($productId);
-            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            $arguments = [];
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                $arguments['child_product'] = $childProduct;
+            }
+            $productData = $this->getProductObjectData($productId, $arguments);
+            $isInfiniteSubscriptions = (bool)$productData->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
             if ($isInfiniteSubscriptions) {
                 $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
                 $result['value'] = 1;
@@ -814,8 +898,14 @@ class Form extends AbstractDataProvider
         ];
 
         if ($productId) {
-            $product = $this->formContext->getProductRepository()->getById($productId);
-            $isInfiniteSubscriptions = $product->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
+            $arguments = [];
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                $arguments['child_product'] = $childProduct;
+            }
+            $productData = $this->getProductObjectData($productId, $arguments);
+            $isInfiniteSubscriptions = $productData->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
             if ($isInfiniteSubscriptions) {
                 $result = ['visible' => false];
             }
@@ -827,10 +917,10 @@ class Form extends AbstractDataProvider
     /**
      * Returns product savings calculation type.
      *
-     * @param MagentoProduct $product
+     * @param ProductInterface|DataObject $product
      * @return int
      */
-    protected  function getSavingsCalculationType(MagentoProduct $product)
+    protected  function getSavingsCalculationType($product)
     {
         return $this->formContext->getSavingsCalculation()
             ->getSavingsCalculationType($product);

@@ -107,11 +107,15 @@ define(
                     if (!previewMode) {
                         current.hideEditButtons(current, previewMode);
                         current.buttonPreviewMode(false);
-                        registry.get(item).deactivate();
+                        if (registry.get(item)) {
+                            registry.get(item).deactivate();
+                        }
                     } else {
                         current.hideEditButtons(current, previewMode);
                         current.buttonPreviewMode(true);
-                        registry.get(item).activate();
+                        if (registry.get(item)) {
+                            registry.get(item).activate();
+                        }
                     }
                 });
                 this.previewMode(!previewMode);

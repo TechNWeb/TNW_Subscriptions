@@ -38,7 +38,7 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
 ?>
 <script type="text/x-magento-init">
 {
-    "*": {
+    ".product-info-price": {
         "tnwSubscribePrice": {
             "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
             "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>

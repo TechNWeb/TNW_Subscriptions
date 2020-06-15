@@ -71,6 +71,7 @@ class Discount extends BaseModifier
             [
                 'imports' => [
                     'changeComment' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
+                    'disabled' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':disabled',
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-discount-amount',
                 'componentType' => 'field',
@@ -93,6 +94,15 @@ class Discount extends BaseModifier
                 'imports' => [
                     'changedOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
                     'changedLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
+                ],
+            ]
+        );
+        $meta = $this->arrayManager->merge(
+            $discountTypePath . self::META_CONFIG_PATH,
+            $meta,
+            [
+                'imports' => [
+                    'disabled' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':disabled',
                 ],
             ]
         );

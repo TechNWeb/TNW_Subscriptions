@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
@@ -24,10 +25,10 @@ class SavingsCalculation
     /**
      * Returns product savings calculation type.
      *
-     * @param ProductInterface $product
+     * @param ProductInterface|DataObject $product
      * @return int
      */
-    public function getSavingsCalculationType(ProductInterface $product)
+    public function getSavingsCalculationType($product)
     {
         $result = self::TYPE_DEFAULT;
 

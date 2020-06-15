@@ -9,18 +9,30 @@ namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Plugin for processing recurring options.
  */
 class Product
 {
+
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    public function __construct(
+        Serializer $serializer
+    ) {
+        $this->serializer = $serializer;
+    }
     /**
      * prepare recurring options before product save
      *
      * @param ProductInterface $product
      *
-     * @return ProductInterface
+     * @return array
      */
     public function beforeSave(ProductInterface $product)
     {
@@ -51,6 +63,12 @@ class Product
                     }
                 }
             }
+        }
+        if (is_array($product->getData('tnw_subscr_inheritance'))) {
+            $product->setData(
+                'tnw_subscr_inheritance',
+                $this->serializer->serialize($product->getData('tnw_subscr_inheritance'))
+            );
         }
 
         return [$product];

@@ -160,6 +160,7 @@ class ModifyForm extends Form
         foreach ($this->getObjects() as $subQuote) {
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
+                $this->currentItem = $item;
                 $product = $this->getProductFromItem($item);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
                 $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
@@ -461,7 +462,8 @@ class ModifyForm extends Form
             ]
         ];
 
-        if (!(bool) $this->currentProduct->getData('tnw_subscr_hide_qty')) {
+        $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
+        if (!$hideQty) {
             $result['children']['qty_container'] = $this->getQtyContainerDefinition();
         }
 
@@ -737,10 +739,9 @@ class ModifyForm extends Form
      */
     protected function getTermDefinition()
     {
-        $infiniteSubscriptions = (bool)$this->currentProduct->getData(
+        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
-
         return [
             'arguments' => [
                 'data' => [
@@ -1157,7 +1158,9 @@ class ModifyForm extends Form
         $result = [
             'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
         ];
-        if ($this->currentProduct && !$this->currentProduct->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)) {
+
+        $unlockPresetQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        if (!$unlockPresetQty) {
             $result['qty_button'] = $this->currentFormName
                 . '.description_fieldset.middle_container.qty_container.qty_edit_button';
         }
@@ -1185,5 +1188,22 @@ class ModifyForm extends Form
             'editOptionsForm' => EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
             'insertEditOptionsForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_EDIT_PRODUCT_OPTIONS_FORM,
         ];
+    }
+
+    /**
+     * Get subscription attribute from current item. Respect inheritance.
+     * @param string $subAttribute
+     * @return array|mixed|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getSubAttributeFromItem($subAttribute)
+    {
+        $arguments = [];
+        $childProduct = $this->getChildProductFromCurrentItem() ?? null;
+        if ($childProduct) {
+            $arguments['child_product'] = $childProduct;
+        }
+        $productData = $this->getProductObjectData($this->currentProduct->getId(), $arguments);
+        return $productData->getData($subAttribute);
     }
 }

@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -494,6 +495,10 @@ class RecurringOptions extends BaseModifier
                 static::FIELD_PRESET_QTY => $this->getPresetQtyFieldConfig(50),
             ]
         ];
+        if ($this->getIsConfigurableProduct()) {
+            $commonContainer['children'][static::FIELD_PRICE_NAME . '_description'] =
+                $this->getPriceFieldDescriptionConfig(30);
+        }
 
         return $commonContainer;
     }
@@ -664,6 +669,7 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
+                        'visible' => !$this->getIsConfigurableProduct(),
                         'imports' => [
                             'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                             'changeCommentAndValue' => 'index = price:value',
@@ -676,6 +682,30 @@ class RecurringOptions extends BaseModifier
                     ],
                 ],
             ],
+        ];
+    }
+
+    private function getPriceFieldDescriptionConfig($sortOrder)
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'componentType' => Container::NAME,
+                        'formElement' => Container::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/field-html',
+                        'elementTmpl' => 'ui/content/content',
+                        'sortOrder' => $sortOrder,
+                        'label' => __('Price'),
+                        'labelVisible' => true,
+                        'error' => false,
+                        'uid' => false,
+                        'content' => __('<p>Price and other attributes are defined on the child product.<br>' .
+                            'Make sure all available billing frequencies configured on the child products are ' .
+                            'reflected in this view.</p>')
+                    ]
+                ]
+            ]
         ];
     }
 
@@ -703,7 +733,9 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
-                        'notice' => __('Fee chanrged once upon creation of the subscription. Leave blank if subscription has no initial fee.')
+                        'visible' => !$this->getIsConfigurableProduct(),
+                        'notice' => __('Fee chanrged once upon creation of the subscription. ' .
+                            'Leave blank if subscription has no initial fee.')
                     ],
                 ],
             ],
@@ -792,6 +824,7 @@ class RecurringOptions extends BaseModifier
                         'validation' => [
                             'validate-greater-than-zero' => true
                         ],
+                        'visible' => !$this->getIsConfigurableProduct(),
                     ],
                 ],
             ],
@@ -813,5 +846,14 @@ class RecurringOptions extends BaseModifier
         }
 
         return in_array($productType, $this->supportTypes);
+    }
+
+    /**
+     * Check if current product is configurable
+     * @return bool
+     */
+    private function getIsConfigurableProduct()
+    {
+        return $this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE;
     }
 }
