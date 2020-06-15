@@ -5,6 +5,7 @@ namespace TNW\Subscriptions\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Catalog\Model\ResourceModel\Product\Collection as MagentoProductCollection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection as ProductBillingFrequency;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection as ProductSubscriptionProfile;
 
@@ -20,6 +21,8 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
      */
     protected $productSubscriptionProfile;
 
+    protected $magentoProductCollection;
+
     /**
      * ClearDbProductInterfaceDeleteAfter constructor.
      * @param ProductBillingFrequency $productBillFrequency
@@ -27,11 +30,13 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
      */
     public function __construct(
         ProductBillingFrequency $productBillFrequency,
-        ProductSubscriptionProfile $productSubscriptionProfile
+        ProductSubscriptionProfile $productSubscriptionProfile,
+        MagentoProductCollection $magentoProductCollection
     )
     {
         $this->productBillFrequency = $productBillFrequency;
         $this->productSubscriptionProfile = $productSubscriptionProfile;
+        $this->magentoProductCollection = $magentoProductCollection;
     }
 
     /**
@@ -41,20 +46,24 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $entity = $observer->getEvent()->getEntityId();
+        $entity = $observer->getEvent()->getEntity();
 
-        $productsSubscriptionProfile = $this->productSubscriptionProfile->getItemsByColumnValue(
-            'magento_product_id', $entity->getEntityId()
+        $getMagentoProducts = $this->magentoProductCollection->getItemsByColumnValue(
+            'entity_id', $entity->getEntityId()
         );
-        foreach ($productsSubscriptionProfile as $item) {
-            $item->delete();
-        }
-
-        $productsBillFrequency = $this->productBillFrequency->getItemsByColumnValue(
-            'magento_product_id', $entity->getEntityId()
-        );
-        foreach ($productsBillFrequency as $item) {
-            $item->delete();
+        if(count($getMagentoProducts) > 1) {
+            $productSubscriptions = $this->productSubscriptionProfile->getItemsByColumnValue(
+                'magento_product_id', $entity->getEntityId()
+            );
+            foreach ($productSubscriptions as $item) {
+                $item->delete();
+            }
+            $productsBillFrequency = $this->productBillFrequency->getItemsByColumnValue(
+                'magento_product_id', $entity->getEntityId()
+            );
+            foreach ($productsBillFrequency as $item) {
+                $item->delete();
+            }
         }
     }
 }
