@@ -63,4 +63,25 @@ class Label extends Column
 
         return $dataSource;
     }
+
+    /**
+     * Redefinition method apply sorting
+     *
+     * @return void
+     */
+    protected function applySorting()
+    {
+        $sorting = $this->getContext()->getRequestParam('sorting');
+        $isSortable = $this->getData('config/sortable');
+        if ($isSortable !== false
+            && !empty($sorting['field'])
+            && !empty($sorting['direction'])
+            && $sorting['field'] === $this->getName()
+        ) {
+            $this->getContext()->getDataProvider()->addOrder(
+               'entity_id',
+                strtoupper($sorting['direction'])
+            );
+        }
+    }
 }

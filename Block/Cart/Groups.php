@@ -5,32 +5,51 @@
  */
 namespace TNW\Subscriptions\Block\Cart;
 
+use Magento\Checkout\Model\Session;
+use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\Quote\ItemGroup;
+
 class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var Session
      */
     private $checkoutSession;
 
     /**
-     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     * @var DescriptionCreator
      */
     private $descriptionCreator;
 
     /**
-     * @var \TNW\Subscriptions\Model\Quote\ItemGroup
+     * @var ItemGroup
      */
     private $quoteItemGroup;
+    /**
+     * @var ProductTypeManagerResolver
+     */
+    private $productTypeResolver;
 
+    /**
+     * Groups constructor.
+     * @param Session $checkoutSession
+     * @param DescriptionCreator $descriptionCreator
+     * @param ItemGroup $quoteItemGroup
+     * @param ProductTypeManagerResolver $productTypeResolver
+     */
     public function __construct(
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
-        \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
+        Session $checkoutSession,
+        DescriptionCreator $descriptionCreator,
+        ItemGroup $quoteItemGroup,
+        ProductTypeManagerResolver $productTypeResolver
     ) {
         $this->descriptionCreator = $descriptionCreator;
         $this->quoteItemGroup = $quoteItemGroup;
         $this->checkoutSession = $checkoutSession;
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     /**
@@ -49,9 +68,9 @@ class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
      *
      * @return string
      */
-    public function getCaption($groupItems)
+    public function getCaption($frequency_id, $groupItems)
     {
-        return $this->quoteItemGroup->caption($groupItems);
+        return $this->quoteItemGroup->caption($frequency_id, $groupItems);
     }
 
     /**
@@ -72,8 +91,7 @@ class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
      */
     public function allowDisplaySubscribeQty($item)
     {
-        $product = $item->getProduct();
-        return !(bool) $product->getData('tnw_subscr_hide_qty');
+        return !(bool) $this->getProductDataObject($item)->getData(Attribute::SUBSCRIPTION_HIDE_QTY);
     }
 
     /**
@@ -83,8 +101,20 @@ class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
      */
     public function allowEditSubscribeQty($item)
     {
-        $product = $item->getProduct();
-        return !(bool)$product->getData('tnw_subscr_unlock_preset_qty');
+        return !(bool)$this->getProductDataObject($item)->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
+     * @return \Magento\Framework\DataObject
+     */
+    public function getProductDataObject($item)
+    {
+        $children = $item->getChildren();
+        $child = is_array($children) ? reset($children) : null;
+        $arguments = !empty($child) ? ['child_product' => $child->getProduct()] : [];
+        return $this->productTypeResolver->resolve($item->getProduct()->getTypeId())
+            ->getProductDataObject($item->getProduct(), $arguments);
     }
 
     /**

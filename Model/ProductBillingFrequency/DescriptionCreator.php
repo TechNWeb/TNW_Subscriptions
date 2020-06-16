@@ -231,8 +231,9 @@ class DescriptionCreator
         if (!$subsInitialFees instanceof \TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem) {
             return 0;
         }
+        $qty = $item->getBuyRequest()->getUsePresetQty() ? 1 : $item->getQty();
 
-        return $subsInitialFees->getSubsInitialFee() * $item->getQty();
+        return $subsInitialFees->getSubsInitialFee() * $qty;
     }
 
     /**
@@ -305,16 +306,13 @@ class DescriptionCreator
     /**
      * @param $quoteItem
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getDescribedItemPriceHtmlByQuoteItem($quoteItem)
     {
         $subscriptionData = $this->fullSubscriptionData([$quoteItem]);
 
-        return $this->getDescribedItemPriceHtml(
-            $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
-            $subscriptionData,
-            $subscriptionData[CreateProfile::NON_UNIQUE]['initialPrice']
-        );
+        return $this->getDescription($subscriptionData);
     }
 
     /**

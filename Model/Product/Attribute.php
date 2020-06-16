@@ -30,6 +30,7 @@ class Attribute
     const SUBSCRIPTION_SAVINGS_CALCULATION = 'tnw_subscr_savings_calculation';
     const SUBSCRIPTION_INFINITE_SUBSCRIPTIONS = 'tnw_subscr_inf_subscriptions';
     const SUBSCRIPTION_SCHEDULE = 'tnw_subscr_schedule';
+    const SUBSCRIPTION_INHERITANCE = 'tnw_subscr_inheritance';
 
     /**
      * @return array
@@ -52,7 +53,8 @@ class Attribute
             self::SUBSCRIPTION_HIDE_QTY,
             self::SUBSCRIPTION_SAVINGS_CALCULATION,
             self::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
-            self::SUBSCRIPTION_SCHEDULE
+            self::SUBSCRIPTION_SCHEDULE,
+            self::SUBSCRIPTION_INHERITANCE
         ];
     }
 

@@ -10,6 +10,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
@@ -90,6 +91,17 @@ class Products extends BaseSummary
     public function getItems()
     {
         return $this->getSubscriptionProfile() ? $this->getSubscriptionProfile()->getVisibleProducts() : [];
+    }
+
+    /**
+     * @return SubscriptionProfile[]
+     */
+    public function getSubscriptionProfiles()
+    {
+        $profiles = $this->getData('subscription_profile')
+            ? [$this->getData('subscription_profile')]
+            : null;
+        return $this->getData('subscription_profiles') ?? $profiles;
     }
 
     /**

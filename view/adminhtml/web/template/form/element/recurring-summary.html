@@ -39,8 +39,10 @@
                 <thead>
                     <tr>
                         <th class="data-grid-th" translate="'Billing Frequency'"/>
+                        <!-- ko if: !getIsConfigurableProduct()-->
                         <th class="data-grid-th" translate="'Recurring Price'"/>
                         <th class="data-grid-th" translate="'Original Price'"/>
+                        <!-- /ko -->
                         <th class="data-grid-th" translate="'Is Default'"/>
                     </tr>
                 </thead>
@@ -48,11 +50,13 @@
                     <!-- ko foreach: {data: frequencyRecords, as: 'record'} -->
                         <tr data-bind="css: {'_odd-row': $index() % 2}">
                             <td text="$parent.getFrequencyLabel(record)"/>
+                            <!-- ko if: !$parent.getIsConfigurableProduct()-->
                             <td>
                                 <span text="$parent.getRecurringPrice(record)"/><br>
                                 <span text="$parent.getInitialFee(record)"/><br>
                             </td>
                             <td text="$parent.getOriginalPrice()"/>
+                            <!-- /ko -->
                             <td><strong text="$parent.getIsDefault(record)"/></td>
                         </tr>
                     <!-- /ko -->

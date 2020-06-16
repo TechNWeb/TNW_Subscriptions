@@ -430,6 +430,21 @@ class Manager
     }
 
     /**
+     * @param $profile
+     * @return mixed
+     * @throws LocalizedException
+     */
+    public function getTempQuote($profile)
+    {
+        $this->tempQuote = true;
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]])
+            ->assignCustomer($profile->getCustomer());
+        $this->populateQuoteData($quote, $profile, true, true);
+        $this->tempQuote = false;
+        return $quote;
+    }
+
+    /**
      * Sets to profile status "Holded".
      */
     public function setHoldedStatus()

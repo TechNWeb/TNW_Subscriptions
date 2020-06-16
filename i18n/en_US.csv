@@ -149,8 +149,8 @@ for,for
 "Could not delete the SubscriptionProfile: %1","Could not delete the SubscriptionProfile: %1"
 Edit,Edit
 Delete,Delete
-"Delete ""${ $.$data.title }""","Delete ""${ $.$data.title }"""
-"Are you sure you wan't to delete a ""${ $.$data.title }"" record?","Are you sure you wan't to delete a ""${ $.$data.title }"" record?"
+"Delete ""${ $.$data.label }""","Delete ""${ $.$data.label }"""
+"Are you sure you wan't to delete a ""${ $.$data.label }"" record?","Are you sure you wan't to delete a ""${ $.$data.label }"" record?"
 [Add],[Add]
 Select,Select
 Process,Process
@@ -381,4 +381,11 @@ The number of future quotes to generate at a time for the new subscription profi
 "Re-activate","Re-activate"
 "Re-activate subscription.","Re-activate subscription."
 "Bill times must be greater than 0.","Bill times must be greater than 0."
+"Checkout with multiple addresses is not supported.","Checkout with multiple addresses is not supported."
 "New Billing Frequency will take effect after the next order.","New Billing Frequency will take effect after the next order."
+"Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again.","Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again."
+"Cannot delete Billing frequency. The following subscription profiles use it: %1","Cannot delete Billing frequency. The following subscription profiles use it: %1"
+"+ %1 (estimated shipment)","+ %1 (estimated shipment)"
+"free","free"
+"Bill %1 times","Bill %1 times"
+"Start on","Start on"

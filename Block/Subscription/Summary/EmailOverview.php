@@ -6,6 +6,8 @@
 
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
+use TNW\Subscriptions\Model\SubscriptionProfile;
+
 /**
  * Subscription Email Overview block
  *
@@ -13,32 +15,6 @@ namespace TNW\Subscriptions\Block\Subscription\Summary;
  */
 class EmailOverview extends \Magento\Framework\View\Element\Template
 {
-    /**
-     * Init child block
-     *
-     * @param \Magento\Framework\View\Element\AbstractBlock $block
-     * @return \Magento\Framework\View\Element\AbstractBlock
-     */
-    protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
-    {
-        $block->addData([
-            'subscription_profiles' => $this->getSubscriptionProfiles()
-        ]);
-
-        return $block;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function _prepareLayout()
-    {
-        foreach ($this->getChildNames() as $names) {
-            $this->initChildBlock($this->getLayout()->getBlock($names));
-        }
-        return parent::_prepareLayout();
-    }
-
     /**
      * Returns shipping info block html.
      *
@@ -65,12 +41,24 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
     public function canShowShippingDetailsBlock()
     {
         $canShow = false;
+        if (!$this->getSubscriptionProfiles()) return false;
         foreach ($this->getSubscriptionProfiles() as $profile) {
             if (!(bool)$profile->getIsVirtual()) {
                 $canShow = true;
             }
         }
         return $canShow;
+    }
+
+    /**
+     * @return SubscriptionProfile[]
+     */
+    public function getSubscriptionProfiles()
+    {
+        $profiles = $this->getData('subscription_profile')
+            ? [$this->getData('subscription_profile')]
+            : null;
+        return $this->getData('subscription_profiles') ?? $profiles;
     }
 
     /**

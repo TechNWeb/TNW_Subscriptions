@@ -31,24 +31,6 @@ class Stripe extends Base
      */
     private $isRebill = false;
 
-    /**
-     * @var \Magento\Vault\Model\PaymentTokenManagement
-     */
-    private $paymentTokenManagement;
-
-    /**
-     * Stripe constructor.
-     *
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param \TNW\Subscriptions\Model\Context $context
-     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
-     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
-     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
-     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
-     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -58,16 +40,24 @@ class Stripe extends Base
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
-        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+        \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
         parent::__construct(
             $config,
             $context,
             $cartManagement,
             $persistor,
-            $zeroTotalValidator
+            $zeroTotalValidator,
+            $encryptor,
+            $paymentTokenRepository,
+            $manager,
+            $vaultPaymentAuthorization,
+            $paymentTokenManagement
         );
-        $this->paymentTokenManagement = $paymentTokenManagement;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
         }
@@ -196,12 +186,7 @@ class Stripe extends Base
     {
         $this->isRebill = true;
     }
-    /*public function processProfileByRequestData($requestData)
-    {
-        $this->getProfile()->getPayment()->setPaymentAdditionalInfo('');
-        $this->getProfile()->getPayment()->setTokenHash('');
-        return $this;
-    }*/
+
     /**
      * @inheritdoc
      * @param $requestData
