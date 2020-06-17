@@ -6,6 +6,7 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Collection as MagentoProductCollection;
+use Magento\Framework\Exception\CouldNotDeleteException;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection as ProductBillingFrequency;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection as ProductSubscriptionProfile;
 
@@ -14,12 +15,12 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
     /**
      * @var $productBillFrequency
      */
-    protected $productBillFrequency;
+    protected $productBillFrequencyCollection;
 
     /**
      * @var ProductSubscriptionProfile
      */
-    protected $productSubscriptionProfile;
+    protected $productSubscriptionProfileCollection;
 
     /**
      * @var MagentoProductCollection
@@ -28,18 +29,18 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
 
     /**
      * ClearDbProductInterfaceDeleteAfter constructor.
-     * @param ProductBillingFrequency $productBillFrequency
-     * @param ProductSubscriptionProfile $productSubscriptionProfile
+     * @param ProductBillingFrequency $productsBillFrequency
+     * @param ProductSubscriptionProfile $productsSubscriptionProfile
      * @param MagentoProductCollection $magentoProductCollection
      */
     public function __construct(
-        ProductBillingFrequency $productBillFrequency,
-        ProductSubscriptionProfile $productSubscriptionProfile,
+        ProductBillingFrequency $productsBillFrequency,
+        ProductSubscriptionProfile $productsSubscriptionProfile,
         MagentoProductCollection $magentoProductCollection
     )
     {
-        $this->productBillFrequency = $productBillFrequency;
-        $this->productSubscriptionProfile = $productSubscriptionProfile;
+        $this->productBillFrequencyCollection = $productsBillFrequency;
+        $this->productSubscriptionProfileCollection = $productsSubscriptionProfile;
         $this->magentoProductCollection = $magentoProductCollection;
     }
 
@@ -52,21 +53,22 @@ class ClearDbProductInterfaceDeleteAfter implements ObserverInterface
     {
         $entity = $observer->getEvent()->getEntity();
 
-        $getMagentoProducts = $this->magentoProductCollection->getItemsByColumnValue(
-            'entity_id', $entity->getEntityId()
-        );
-        if(count($getMagentoProducts) > 1) {
-            $productSubscriptions = $this->productSubscriptionProfile->getItemsByColumnValue(
-                'magento_product_id', $entity->getEntityId()
-            );
-            foreach ($productSubscriptions as $item) {
-                $item->delete();
-            }
-            $productsBillFrequency = $this->productBillFrequency->getItemsByColumnValue(
-                'magento_product_id', $entity->getEntityId()
-            );
-            foreach ($productsBillFrequency as $item) {
-                $item->delete();
+        if (!$this->magentoProductCollection->getItemsByColumnValue('entity_id', $entity->getEntityId())) {
+            try {
+                $productSubscriptions = $this->productSubscriptionProfileCollection->getItemsByColumnValue(
+                    'magento_product_id', $entity->getEntityId()
+                );
+                foreach ($productSubscriptions as $item) {
+                    $item->delete();
+                }
+                $productsBillFrequency = $this->productBillFrequencyCollection->getItemsByColumnValue(
+                    'magento_product_id', $entity->getEntityId()
+                );
+                foreach ($productsBillFrequency as $item) {
+                    $item->delete();
+                }
+            } catch (\Exception $exception) {
+                throw new CouldNotDeleteException(__($exception->getMessage()));
             }
         }
     }
