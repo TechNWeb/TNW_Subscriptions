@@ -15,6 +15,7 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
+use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionAttributes;
 use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
@@ -652,6 +653,19 @@ class CreateProfile extends BaseCreate
             $quote->assignCustomer($customer);
             $this->quoteCreator->getCartRepository()->save($quote);
         }
+    }
+
+    /**
+     * Change customer id value in session.
+     *
+     * @param int $customerId
+     * @return void
+     */
+    public function changeCustomerIdInSession($customerId)
+    {
+        /** @var Session $session */
+        $session = $this->getSession();
+        $session->setCustomerId($customerId);
     }
 
     /**

@@ -619,6 +619,9 @@ button.action-editor.active:before {
 .subscription-item-form .description-fieldset .field-description {
   margin-top: 0.5rem;
 }
+.subscription-item-form .description-fieldset .field-description .admin__field-label {
+  display: none;
+}
 .subscription-item-form .description-fieldset .field-description .admin__field-control {
   width: inherit;
 }
