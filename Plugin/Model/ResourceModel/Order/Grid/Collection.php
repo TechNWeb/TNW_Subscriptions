@@ -29,12 +29,15 @@ class Collection
                 'main_table.entity_id = profile_table.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                 []
             );
+            $collection->addExpressionFieldToSelect(
+                'subscription_profile_id',
+                'GROUP_CONCAT(profile_table.{{profileId}})',
+                [
+                    'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
+                ]
+            );
 
-            $collection->addExpressionFieldToSelect('subscription_profile_id', 'GROUP_CONCAT(profile_table.{{profileId}})', [
-                'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
-            ]);
-
-            $collection->getSelect()->group($collection->getIdFieldName());
+            $collection->getSelect()->group('main_table.' . $collection->getIdFieldName());
         }
 
         return null;
