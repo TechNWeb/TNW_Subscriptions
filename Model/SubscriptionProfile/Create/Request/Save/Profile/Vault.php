@@ -42,6 +42,11 @@ class Vault extends Base
     protected $paymentInstanceCode;
 
     /**
+     * @var \TNW\Subscriptions\Model\Payment\DataBuilder
+     */
+    protected $paymentDataBuilder;
+
+    /**
      * Vault constructor.
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
@@ -49,6 +54,7 @@ class Vault extends Base
      * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
      * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      * @param \Magento\Payment\Helper\Data $paymentData
+     * @param \TNW\Subscriptions\Model\Payment\DataBuilder $paymentDataBuilder
      * @param string $vaultMethodCode
      * @param string $paymentInstanceCode
      */
@@ -59,9 +65,11 @@ class Vault extends Base
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
         \Magento\Payment\Helper\Data $paymentData,
+        \TNW\Subscriptions\Model\Payment\DataBuilder $paymentDataBuilder,
         $vaultMethodCode = 'vault',
         $paymentInstanceCode = ''
     ) {
+        $this->paymentDataBuilder = $paymentDataBuilder;
         $this->paymentInstanceCode = $paymentInstanceCode;
         $this->paymentData = $paymentData;
         $this->vaultMethodCode = $vaultMethodCode;
@@ -74,7 +82,9 @@ class Vault extends Base
     /**
      * @param array $data
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws \Zend_Json_Exception
      */
     public function process(array $data)
     {
@@ -92,17 +102,21 @@ class Vault extends Base
         $details = json_decode($paymentToken->getTokenDetails(), true);
         $this->processTokenDetails($details);
         $expirationPeriods = explode('/', $details['expirationDate']);
+        $maxAmountPreAuthorized = 0;
         /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             if ($subQuote->getGrandTotal() < 0.001) {
-                $paymentData['method'] = $this->vaultMethodCode;
-                $paymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
-                $paymentData['additional_data']['public_hash'] = $paymentData['additional']['publicHash'];
-                if ($this->paymentInstanceCode) {
-                    $subQuote->getPayment()
-                        ->setMethodInstance($this->paymentData->getMethodInstance($this->paymentInstanceCode));
+                if ($maxAmountPreAuthorized < $this->paymentDataBuilder->getAmount($subQuote)) {
+                    $paymentData['method'] = $this->vaultMethodCode;
+                    $paymentData['additional_data']['customer_id'] = $subQuote->getCustomerId();
+                    $paymentData['additional_data']['public_hash'] = $paymentData['additional']['publicHash'];
+                    if ($this->paymentInstanceCode) {
+                        $subQuote->getPayment()
+                            ->setMethodInstance($this->paymentData->getMethodInstance($this->paymentInstanceCode));
+                    }
+                    $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $subQuote);
+                    $maxAmountPreAuthorized = $this->paymentDataBuilder->getAmount($subQuote);
                 }
-                $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $subQuote);
             }
             $subQuote->getPayment()
                 ->setAdditionalInformation('cc_number', $details['maskedCC'])

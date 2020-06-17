@@ -63,7 +63,7 @@ class DataBuilder
             $products = $profile->getProfileProducts();
             $amount = 0;
             foreach ($products as $product) {
-                $amount += (float)$product->getPrice();
+                $amount += (float) $product->getPrice();
             }
             $result = $amount;
         }
