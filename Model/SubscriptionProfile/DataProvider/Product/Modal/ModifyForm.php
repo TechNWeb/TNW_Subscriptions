@@ -153,6 +153,7 @@ class ModifyForm extends Form
 
     /**
      * @inheritdoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getData()
     {
@@ -161,9 +162,9 @@ class ModifyForm extends Form
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $this->currentItem = $item;
-                $product = $this->getProductFromItem($item);
+                $this->currentProduct = $this->getProductFromItem($item);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
-                $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                $presetQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $this->getItemPrice(
                     $presetQty,
                     $subBuyRequest[Create::NON_UNIQUE]['price'],
@@ -176,18 +177,18 @@ class ModifyForm extends Form
                     'term' => (string)$subBuyRequest[Create::UNIQUE]['term'],
                     'period' => $subBuyRequest[Create::UNIQUE]['period'],
                     'start_on' => $subBuyRequest[Create::UNIQUE]['start_on'],
-                    'trial_period' => $this->getTrialPeriod($product->getId()),
-                    'name' => $product->getName(),
-                    'description' => $product->getData('short_description'),
+                    'trial_period' => $this->getTrialPeriod($this->currentProduct->getId()),
+                    'name' => $this->currentProduct->getName(),
+                    'description' => $this->currentProduct->getData('short_description'),
                     'qty' => $item->getQty(),
-                    'product_price' => $product->getPrice(),
+                    'product_price' => $this->currentProduct->getPrice(),
                     'unlock_preset_qty' => $presetQty,
-                    'frequency_data' => $this->getFrequenciesData(false, $product->getId(), $this->getAdditionalDataForProduct($item)),
+                    'frequency_data' => $this->getFrequenciesData(false, $this->currentProduct->getId(), $this->getAdditionalDataForProduct($item)),
                     'initial_values' => [
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
                     ],
-                    'savings_calculation' => $this->getSavingsCalculationType($product),
+                    'savings_calculation' => $this->getSavingsCalculationType($this->currentProduct),
                 ];
 
                 /** @var ModifierInterface $modifier */
@@ -941,6 +942,7 @@ class ModifyForm extends Form
      * Returns price field definition.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getPriceDefinition()
     {
@@ -948,6 +950,10 @@ class ModifyForm extends Form
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
         }
+        $unlockQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $notice = $unlockQty
+            ? __('The price is fo all items, excluding tax (if any)')
+            : __('The price is per item, excluding tax (if any)');
         return [
             'arguments' => [
                 'data' => [
@@ -965,6 +971,7 @@ class ModifyForm extends Form
                         ],
                         'addSymbol' => false,
                         'addbefore' => $this->getCurrentCurrencySymbol(),
+                        'notice' => $notice,
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',

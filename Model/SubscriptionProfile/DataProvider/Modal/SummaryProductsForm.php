@@ -145,6 +145,7 @@ class SummaryProductsForm extends ModifyForm
 
     /**
      * @inheritdoc
+     * @throws NoSuchEntityException
      */
     public function getData()
     {
@@ -159,7 +160,7 @@ class SummaryProductsForm extends ModifyForm
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
-                $presetQty = (int)$product->getTnwSubscrUnlockPresetQty();
+                $presetQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $item->getPrice();
                 $taxAmount = (float) $item->getTaxAmount($subQuote) ?: 0;
                 $priceInclTax = $taxAmount ? ($taxAmount + $itemPrice) : null;
@@ -167,7 +168,7 @@ class SummaryProductsForm extends ModifyForm
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getOriginalStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
-                    'price' => (bool) $presetQty ? $itemPrice : (float) $itemPrice * (int) $item->getQty(),
+                    'price' => $itemPrice,
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),
                     'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
@@ -180,7 +181,7 @@ class SummaryProductsForm extends ModifyForm
                         : $product->getData('short_description'),
                     'qty' => (float)$item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
-                    'price_incl_tax' => (float) $priceInclTax * (int) $item->getQty(),
+                    'price_incl_tax' => $priceInclTax,
                 ];
 
                 /** @var Base $modifier */
