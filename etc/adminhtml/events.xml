@@ -7,6 +7,6 @@
                   shared="false" />
     </event>
     <event name="magento_catalog_api_data_productinterface_delete_after">
-        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\ClearDbProductInterfaceDeleteAfter" />
+        <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\ClearDbProductDeleteAfter" />
     </event>
 </config>
