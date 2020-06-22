@@ -90,7 +90,6 @@ define([
                 }
                 var form = registry.get('index = '+self.options.formName);
                 form.source.data.payment.braintree.nonce = payload.nonce;
-                $('body').trigger('processStop');
                 form.triggerSave([]);
             });
         },
@@ -125,13 +124,13 @@ define([
             var self = this,
                 state = self.scriptLoaded;
 
-            this.showLoader();
+            $('body').trigger('processStart');
             require([this.sdkUrl, this.hostedFieldsSdkUrl], function (braintreeClient, hostedFields) {
                 state(true);
                 self.braintree.client = braintreeClient;
                 self.braintree.hostedFields = hostedFields;
                 self.initBraintree();
-                self.hideLoader();
+                $('body').trigger('processStop');
             });
         },
 
