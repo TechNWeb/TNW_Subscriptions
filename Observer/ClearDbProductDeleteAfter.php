@@ -54,9 +54,10 @@ class ClearDbProductDeleteAfter implements ObserverInterface
     }
 
     /**
-     * Clear product subscribe profile and product billing frequency table after delete product
+     * Clear product subscribe profile and product billing frequency table after delete product and add logging
      *
      * @param Observer $observer
+     * @throws CouldNotDeleteException
      */
     public function execute(Observer $observer)
     {
@@ -65,7 +66,8 @@ class ClearDbProductDeleteAfter implements ObserverInterface
         if (!$product) {
             try {
                 $productSubscriptions = $this->productSubscriptionProfileCollection->getItemsByColumnValue(
-                    'magento_product_id', $entity->getEntityId()
+                    'magento_product_id',
+                    $entity->getEntityId()
                 );
                 foreach ($productSubscriptions as $item) {
                     $this->historyLogger->log(
@@ -75,7 +77,8 @@ class ClearDbProductDeleteAfter implements ObserverInterface
                     $item->delete();
                 }
                 $productsBillFrequency = $this->productBillFrequencyCollection->getItemsByColumnValue(
-                    'magento_product_id', $entity->getEntityId()
+                    'magento_product_id',
+                    $entity->getEntityId()
                 );
                 foreach ($productsBillFrequency as $item) {
                     $item->delete();
