@@ -315,6 +315,14 @@ class Product extends Create
             ) {
                 $customProductPrice = (float) $this->data['custom_price'];
             }
+            if (
+                $this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
+                && isset($productData['admin_modification'])
+                && $productData['admin_modification']
+            ) {
+                $currentProductCustomPrice = $customProductPrice;
+                $productData['price'] = $customProductPrice;
+            }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
 
             $data = [
