@@ -68,9 +68,10 @@ class ClearDbProductDeleteAfter implements ObserverInterface
                     'magento_product_id', $entity->getEntityId()
                 );
                 foreach ($productSubscriptions as $item) {
-                    $productName = $item->getName();
-                    $message = __('Product %s has been removed.', $productName);
-                    $this->historyLogger->log($message, $item->getSubscriptionProfileId());
+                    $this->historyLogger->log(
+                        __('Product %1 has been removed.', $item->getName()),
+                        $item->getSubscriptionProfileId()
+                    );
                     $item->delete();
                 }
                 $productsBillFrequency = $this->productBillFrequencyCollection->getItemsByColumnValue(
