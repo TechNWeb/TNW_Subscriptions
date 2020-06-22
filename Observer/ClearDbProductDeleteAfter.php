@@ -1,20 +1,22 @@
 <?php
-
-
+/**
+ * Copyright © 2020 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Catalog\Model\ResourceModel\Product\Collection as MagentoProductCollection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as MagentoProductCollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection as ProductBillingFrequency;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Collection as ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory as ProductBillingFrequencyCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory as ProductSubscriptionProfileCollectionFactory;
 
 class ClearDbProductDeleteAfter implements ObserverInterface
 {
     /**
-     * @var $productBillFrequency
+     * @var $productBillFrequencyCollection
      */
     protected $productBillFrequencyCollection;
 
@@ -34,21 +36,21 @@ class ClearDbProductDeleteAfter implements ObserverInterface
     protected $historyLogger;
 
     /**
-     * ClearDbProductInterfaceDeleteAfter constructor.
-     * @param ProductBillingFrequency $productsBillFrequency
-     * @param ProductSubscriptionProfile $productsSubscriptionProfile
-     * @param MagentoProductCollection $magentoProductCollection
+     * ClearDbProductDeleteAfter constructor.
+     * @param ProductBillingFrequencyCollectionFactory $productsBillFrequencyCollection
+     * @param ProductSubscriptionProfileCollectionFactory $productsSubscriptionProfileCollection
+     * @param MagentoProductCollectionFactory $magentoProductCollection
      * @param MessageHistoryLogger $historyLogger
      */
     public function __construct(
-        ProductBillingFrequency $productsBillFrequency,
-        ProductSubscriptionProfile $productsSubscriptionProfile,
-        MagentoProductCollection $magentoProductCollection,
+        ProductBillingFrequencyCollectionFactory $productsBillFrequencyCollection,
+        ProductSubscriptionProfileCollectionFactory $productsSubscriptionProfileCollection,
+        MagentoProductCollectionFactory $magentoProductCollection,
         MessageHistoryLogger $historyLogger
     )
     {
-        $this->productBillFrequencyCollection = $productsBillFrequency;
-        $this->productSubscriptionProfileCollection = $productsSubscriptionProfile;
+        $this->productBillFrequencyCollection = $productsBillFrequencyCollection;
+        $this->productSubscriptionProfileCollection = $productsSubscriptionProfileCollection;
         $this->magentoProductCollection = $magentoProductCollection;
         $this->historyLogger = $historyLogger;
     }
