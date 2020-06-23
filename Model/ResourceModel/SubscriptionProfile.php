@@ -197,7 +197,7 @@ class SubscriptionProfile extends AbstractEntity
      */
     private function getInvoiceItems(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($this->invoiceItems == null) {
+        if (!$this->invoiceItems) {
             $select = $this->getConnection()->select()
                 ->from(
                     ['invoiceItem' => $this->getTable('sales_invoice_item')]

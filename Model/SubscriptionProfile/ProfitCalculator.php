@@ -168,7 +168,7 @@ class ProfitCalculator
      *
      * @param SubscriptionProfile $profile
      * @param string $profitType
-     * @return float|int
+     * @return float|int|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProfit(SubscriptionProfile $profile, $profitType)
@@ -224,7 +224,6 @@ class ProfitCalculator
                 ->where('profileItem.subscription_profile_id = ?', $profile->getId());
 
             $invoiceItems = $connection->fetchAll($select);
-            $profit = 0;
             foreach ($invoiceItems as $item) {
                 $profit += $item['base_price'] - $item['base_cost'];
             }
@@ -252,8 +251,8 @@ class ProfitCalculator
                     return null;
                     break;
             }
-            return $profit;
         }
+        return $profit;
     }
 
     /**
