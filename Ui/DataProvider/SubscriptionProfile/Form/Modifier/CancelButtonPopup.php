@@ -77,10 +77,9 @@ class CancelButtonPopup extends BaseFormModifier
                                     'class' => 'action-primary',
                                     'actions' => [
                                         [
-                                            'targetName' => 'index = tnw_subscriptionprofile_cancel_button_popup_form_data_source',
+                                            'targetName' => 'index = tnw_subscriptionprofile_cancel_button_popup_form',
                                             'actionName' => 'save'
                                         ],
-                                        'actionDone'
                                     ]
                                 ]
                             ]

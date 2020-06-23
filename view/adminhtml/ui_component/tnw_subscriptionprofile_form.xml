@@ -77,7 +77,6 @@
                                     <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_change_status_popup_form</item>
                                     <item name="actionName" xsi:type="string">save</item>
                                 </item>
-                                <item name="1" xsi:type="string">actionDone</item>
                             </item>
                         </item>
                     </option>

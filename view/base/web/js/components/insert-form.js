@@ -166,6 +166,11 @@ define([
          * @param response
          */
         handleResponse: function (response) {
+            var modal = registry.get(this.parentName);
+
+            if (modal.closeModal && typeof modal.closeModal === 'function') {
+                modal.closeModal();
+            }
             if (response.ajaxRedirect) {
                 window.location = response.ajaxRedirect;
             }
