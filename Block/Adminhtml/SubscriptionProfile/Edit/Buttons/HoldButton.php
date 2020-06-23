@@ -28,9 +28,34 @@ class HoldButton extends ChangeStatusButton implements ButtonProviderInterface
         return [
             'label' => __('Place On Hold'),
             'class' => 'cancel',
-            'on_click' => 'deleteConfirm(\'' . __(
-                    'Are you sure you want to place on hold the profile?'
-                ) . '\', \'' . $this->getUpdateUrl() . '\')',
+            'data_attribute' => [
+                'mage-init' => [
+                    'Magento_Ui/js/form/button-adapter' => [
+                        'actions' => [
+                            [
+                                'targetName' => 'index = change_status',
+                                'actionName' => 'toggleModal',
+                            ],
+                            [
+                                'targetName' => 'index = change_status',
+                                'actionName' => 'setTitle',
+                                'params' => [
+                                    __('Are you sure you want to place on hold the profile?')
+                                ]
+                            ],
+                            [
+                                'targetName' => 'index = tnw_subscriptionprofile_change_status_popup_form_data_source',
+                                'actionName' => 'set',
+                                'params' => [
+                                    'data.status',
+                                    $this->getStatus()
+                                ]
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'on_click' => '',
             'sort_order' => 30,
         ];
     }

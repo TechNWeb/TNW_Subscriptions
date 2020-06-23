@@ -24,13 +24,38 @@ class ActivateButton extends ChangeStatusButton implements ButtonProviderInterfa
         if (!$this->canChangeStatus()) {
             return [];
         }
-        
+
         return [
             'label' => __('Activate'),
             'class' => 'save primary',
-            'on_click' => 'deleteConfirm(\'' . __(
-                    'Are you sure you want to activate the profile?'
-                ) . '\', \'' . $this->getUpdateUrl() . '\')',
+            'data_attribute' => [
+                'mage-init' => [
+                    'Magento_Ui/js/form/button-adapter' => [
+                        'actions' => [
+                            [
+                                'targetName' => 'index = change_status',
+                                'actionName' => 'toggleModal',
+                            ],
+                            [
+                                'targetName' => 'index = change_status',
+                                'actionName' => 'setTitle',
+                                'params' => [
+                                    __('Are you sure you want to activate the profile?')
+                                ]
+                            ],
+                            [
+                                'targetName' => 'index = tnw_subscriptionprofile_change_status_popup_form_data_source',
+                                'actionName' => 'set',
+                                'params' => [
+                                    'data.status',
+                                    $this->getStatus()
+                                ]
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            'on_click' => '',
             'sort_order' => 50,
         ];
     }

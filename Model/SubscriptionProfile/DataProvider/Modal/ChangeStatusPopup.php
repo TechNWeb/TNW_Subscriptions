@@ -14,7 +14,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 /**
  * Data provider for cancel button form in popup.
  */
-class CancelButtonPopup extends AbstractDataProvider
+class ChangeStatusPopup extends AbstractDataProvider
 {
     /**
      * Data persistor.
@@ -22,11 +22,6 @@ class CancelButtonPopup extends AbstractDataProvider
      * @var DataPersistorInterface
      */
     private $dataPersistor;
-
-    /**
-     * Form data scope.
-     */
-    const DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM = 'tnw_subscriptionprofile_cancel_button_popup_form';
 
     /**
      * @param string $name
@@ -54,7 +49,8 @@ class CancelButtonPopup extends AbstractDataProvider
      */
     public function getData()
     {
-        return [];
+        $data['change_status_popup']['entity_id'] = $this->dataPersistor->get('subscription_id');
+        return $data;
     }
 
     /**

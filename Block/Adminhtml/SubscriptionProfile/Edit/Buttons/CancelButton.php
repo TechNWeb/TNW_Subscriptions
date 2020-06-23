@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
@@ -35,6 +36,22 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                             [
                                 'targetName' => 'index = cancelModal',
                                 'actionName' => 'toggleModal',
+                            ],
+                            [
+                                'targetName' => 'index = cancelModal',
+                                'actionName' => 'setTitle',
+                                'params' => [
+                                    __('Are you sure you want to cancel Subscription %1?',
+                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId())
+                                ]
+                            ],
+                            [
+                                'targetName' => 'index = tnw_subscriptionprofile_cancel_button_popup_form_data_source',
+                                'actionName' => 'set',
+                                'params' => [
+                                    'data.status',
+                                    $this->getStatus()
+                                ]
                             ],
                         ]
                     ]

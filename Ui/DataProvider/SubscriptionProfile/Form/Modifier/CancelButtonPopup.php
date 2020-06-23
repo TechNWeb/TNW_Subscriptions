@@ -17,11 +17,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonP
 class CancelButtonPopup extends BaseFormModifier
 {
     /**
-     * Handler for cancel popup.
-     */
-    const CANCEL_BUTTON_HANDLER = 'tnw_subscriptionprofile_cancel_button_popup';
-
-    /**
      * {@inheritdoc}
      */
     public function modifyMeta(array $meta)
@@ -67,7 +62,28 @@ class CancelButtonPopup extends BaseFormModifier
                     'config' => [
                         'componentType' => Modal::NAME,
                         'options' => [
-                            'modalClass' => 'modal-popup tnw_subscriptionprofile_cancel_button_popup',
+                            'title' => __('Are you sure you want to cancel subscription?'),
+                            'type' => 'popup',
+                            'buttons' => [
+                                [
+                                    'text' => __('I changed my mind'),
+                                    'class' => 'action-secondary',
+                                    'actions' => [
+                                        'actionCancel'
+                                    ]
+                                ],
+                                [
+                                    'text' => __('Confirm'),
+                                    'class' => 'action-primary',
+                                    'actions' => [
+                                        [
+                                            'targetName' => 'index = tnw_subscriptionprofile_cancel_button_popup_form_data_source',
+                                            'actionName' => 'save'
+                                        ],
+                                        'actionDone'
+                                    ]
+                                ]
+                            ]
                         ],
                     ],
                 ],
@@ -93,12 +109,7 @@ class CancelButtonPopup extends BaseFormModifier
                         'componentType' => Container::NAME,
                         'component' => 'TNW_Subscriptions/js/components/insert-form',
                         'update_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
-                        'render_url' => $this->getUrlBuilder()->getUrl(
-                            'mui/index/render_handle',
-                            [
-                                'handle' => self::CANCEL_BUTTON_HANDLER
-                            ]
-                        ),
+                        'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                         'autoRender' => true,
                         'ns' => DataProvider::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM,
                         'externalProvider' => DataProvider::DATA_SCOPE_CANCEL_BUTTON_MODAL_FORM . '.'
