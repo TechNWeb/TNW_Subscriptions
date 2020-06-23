@@ -28,7 +28,7 @@ class Simple extends Base
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
 
-                if (isset($buyRequestValue['admin_modification'])) {
+                if (isset($buyRequestValue['admin_modification']) && array_key_exists('price', $buyRequestValue)) {
                     $subscriptionPart['price'] = $buyRequestValue['price'];
                 }
                 $updateNonUnique = [
