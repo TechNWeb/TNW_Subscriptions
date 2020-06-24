@@ -225,7 +225,7 @@ class ProfitCalculator
 
             $invoiceItems = $connection->fetchAll($select);
             foreach ($invoiceItems as $item) {
-                $profit += $item['base_price'] - $item['base_cost'];
+                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
             }
 
             switch ($profitType) {
@@ -236,10 +236,10 @@ class ProfitCalculator
                     $profitOfLastItem = $lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'];
                     if ($profile->getTerm() == 1) {
                         if ($profile->getUnit() == 3) {
-                            $profit = $profitOfLastItem * 365;
+                            $profit = $profitOfLastItem * 365 / $profile->getFrequency();
                             break;
                         } else {
-                            $profit = $profitOfLastItem * 12;
+                            $profit = $profitOfLastItem * 12 / $profile->getFrequency();
                             break;
                         }
                     } else {
