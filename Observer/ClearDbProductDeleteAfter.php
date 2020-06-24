@@ -64,10 +64,10 @@ class ClearDbProductDeleteAfter implements ObserverInterface
     public function execute(Observer $observer)
     {
         $entity = $observer->getEvent()->getEntity();
-        $product = $this->magentoProductCollection->getItemsByColumnValue('entity_id', $entity->getEntityId());
+        $product = $this->magentoProductCollection->create()->getItemsByColumnValue('entity_id', $entity->getEntityId());
         if (!$product) {
             try {
-                $productSubscriptions = $this->productSubscriptionProfileCollection->getItemsByColumnValue(
+                $productSubscriptions = $this->productSubscriptionProfileCollection->create()->getItemsByColumnValue(
                     'magento_product_id',
                     $entity->getEntityId()
                 );
@@ -78,7 +78,7 @@ class ClearDbProductDeleteAfter implements ObserverInterface
                     );
                     $item->delete();
                 }
-                $productsBillFrequency = $this->productBillFrequencyCollection->getItemsByColumnValue(
+                $productsBillFrequency = $this->productBillFrequencyCollection->create()->getItemsByColumnValue(
                     'magento_product_id',
                     $entity->getEntityId()
                 );
