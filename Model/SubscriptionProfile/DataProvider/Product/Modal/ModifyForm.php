@@ -947,8 +947,11 @@ class ModifyForm extends Form
     protected function getPriceDefinition()
     {
         $label = __('Price') . ':';
+        $isTrial = false;
+
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
+            $isTrial = true;
         }
         $unlockQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
         $notice = $unlockQty
@@ -976,7 +979,7 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'showPreview' => $isTrial ? false : $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
                             'priceInclTax' => '${ $.provider }'
                         ],
