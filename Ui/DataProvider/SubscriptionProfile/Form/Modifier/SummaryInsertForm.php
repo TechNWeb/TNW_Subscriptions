@@ -173,7 +173,7 @@ class SummaryInsertForm extends BaseFormModifier
                         'visible' => true,
                         'label' => false,
                         'componentType' => Container::NAME,
-                        'component' => 'TNW_Subscriptions/js/components/insert-form',
+                        'component' => 'TNW_Subscriptions/js/components/dashboard-insert-form',
                         'update_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                         'render_url' => $this->getUrlBuilder()->getUrl(
                             'mui/index/render_handle',
