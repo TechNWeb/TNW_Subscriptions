@@ -77,35 +77,43 @@
                 </item>
             </argument>
         </field>
-        <field name="term">
+        <radioset name="term">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">boolean</item>
-                    <item name="source" xsi:type="string">AddProduct</item>
-                    <item name="formElement" xsi:type="string">checkbox</item>
-                    <item name="valueMap" xsi:type="array">
-                        <item name="true" xsi:type="number">1</item>
-                        <item name="false" xsi:type="number">0</item>
-                    </item>
-                    <item name="default" xsi:type="number">0</item>
-                    <item name="description" xsi:type="string" translate="true">Until canceled</item>
-                    <item name="label" xsi:type="string" translate="true">Term:</item>
-                    <item name="dataScope" xsi:type="string">term</item>
-                    <item name="additionalClasses" xsi:type="string">field-wide</item>
+                    <item name="additionalInfo" xsi:type="string"><![CDATA[&nbsp;]]></item>
                 </item>
             </argument>
-        </field>
-        <field name="period">
+            <settings>
+                <label translate="true">Term:</label>
+                <additionalClasses>
+                    <class name="field-wide">true</class>
+                    <class name="field-term">true</class>
+                </additionalClasses>
+                <dataScope>term</dataScope>
+                <options>
+                    <option name="0" xsi:type="array">
+                        <item name="value" xsi:type="number">1</item>
+                        <item name="label" xsi:type="string" translate="true">until canceled</item>
+                    </option>
+                    <option name="1" xsi:type="array">
+                        <item name="value" xsi:type="number">0</item>
+                        <item name="label" xsi:type="string" translate="true">stop after</item>
+                    </option>
+                </options>
+            </settings>
+        </radioset>
+        <field name="period" component="TNW_Subscriptions/js/components/field/period">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="boolean">false</item>
+                    <item name="labelVisible" xsi:type="boolean">false</item>
                     <item name="additionalClasses" xsi:type="string">field-wide sub-period-input</item>
                     <item name="dataType" xsi:type="string">string</item>
                     <item name="source" xsi:type="string">AddProduct</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/period-input</item>
-                    <item name="first_phrase" xsi:type="string" translate="true">&amp; bill</item>
-                    <item name="last_phrase" xsi:type="string" translate="true">times</item>
+                    <item name="first_phrase" xsi:type="string" translate="true"/>
+                    <item name="last_phrase" xsi:type="string" translate="true">payments</item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-number-range" xsi:type="string">2-9999999999</item>
                         <item name="required-entry" xsi:type="boolean">true</item>

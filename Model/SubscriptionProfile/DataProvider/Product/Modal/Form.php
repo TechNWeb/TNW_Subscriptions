@@ -756,8 +756,8 @@ class Form extends AbstractDataProvider
             $productData = $this->getProductObjectData($productId, $arguments);
             $isInfiniteSubscriptions = (bool)$productData->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
             if ($isInfiniteSubscriptions) {
-                $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
-                $result['value'] = 1;
+                $result['disabled'] = true;
+                $result['value'] = '1';
             }
         }
 
@@ -775,9 +775,9 @@ class Form extends AbstractDataProvider
         $productId = $productId ?: $this->getRequestProductId();
         $result = [
             'imports' => [
-                'visible' => '!ns = ${ $.ns }, index = term:checked',
+                'onTermChange' => 'ns = ${ $.ns }, index = term:value',
                 '__disableTmpl' => [
-                    'visible' => false
+                    'onTermChange' => false
                 ]
             ],
         ];
