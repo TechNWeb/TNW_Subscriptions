@@ -23,14 +23,14 @@ class ProfitCalculator
     const REMAINING = 'remaining';
 
     /**
-     * @var float|int
+     * @var array
      */
-    private $remainingProfit;
+    private $remainingProfit = [];
 
     /**
-     * @var float|int
+     * @var array
      */
-    private $asOfTodayProfit;
+    private $asOfTodayProfit = [];
 
     /**
      * @var ProductBillingFrequencyRepositoryInterface
@@ -108,11 +108,12 @@ class ProfitCalculator
      */
     public function getAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
     {
-        if ($this->asOfTodayProfit === null) {
-            $this->asOfTodayProfit = $this->getProfit($subscriptionProfile, self::AS_OF_TODAY);
+        if (empty($this->asOfTodayProfit[$subscriptionProfile->getId()])) {
+            $this->asOfTodayProfit[$subscriptionProfile->getId()]
+                = $this->getProfit($subscriptionProfile, self::AS_OF_TODAY);
         }
 
-        return $this->asOfTodayProfit;
+        return $this->asOfTodayProfit[$subscriptionProfile->getId()];
     }
 
     /**
@@ -141,11 +142,12 @@ class ProfitCalculator
      */
     public function getRemainingProfit(SubscriptionProfile $subscriptionProfile)
     {
-        if ($this->remainingProfit === null) {
-            $this->remainingProfit =  $this->getProfit($subscriptionProfile, self::REMAINING);
+        if (empty($this->remainingProfit[$subscriptionProfile->getId()])) {
+            $this->remainingProfit[$subscriptionProfile->getId()]
+                =  $this->getProfit($subscriptionProfile, self::REMAINING);
         }
 
-        return $this->remainingProfit;
+        return $this->remainingProfit[$subscriptionProfile->getId()];
     }
 
     /**
