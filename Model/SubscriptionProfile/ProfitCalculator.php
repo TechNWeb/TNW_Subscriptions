@@ -233,7 +233,9 @@ class ProfitCalculator
                     break;
                 case self::REMAINING:
                     $lastInvoiceItem = array_pop($invoiceItems);
-                    $profitOfLastItem = $lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'];
+                    $profitOfLastItem = $lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost']
+                        * $lastInvoiceItem['qty'];
+
                     if ($profile->getTerm() == 1) {
                         if ($profile->getUnit() == 3) {
                             $profit = $profitOfLastItem * 365 / $profile->getFrequency();

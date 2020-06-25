@@ -87,12 +87,12 @@ class SubscriptionProfile extends AbstractEntity
     {
         $invoiceItems = $this->getInvoiceItems($object);
         $lastInvoiceItem = array_pop($invoiceItems);
-        $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax'];
+        $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax'] * $lastInvoiceItem['qty'];
         if ($object->getTerm() == 1) {
             if ($object->getUnit() == 3) {
-                $profit = $profitOfLastItem * 365;
+                $profit = $profitOfLastItem * 365 / $object->getFrequency();
             } else {
-                $profit = $profitOfLastItem * 12;
+                $profit = $profitOfLastItem * 12 / $object->getFrequency();
             }
         } else {
             $profit = $profitOfLastItem * $object->getTotalBillingCycles();
