@@ -168,7 +168,7 @@ class ProfitCalculator
      *
      * @param SubscriptionProfile $profile
      * @param string $profitType
-     * @return float|int
+     * @return float|int|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProfit(SubscriptionProfile $profile, $profitType)
@@ -207,30 +207,53 @@ class ProfitCalculator
             if (empty($recurringOption)) {
                 continue;
             }
-
             $select = $connection->select()
-                ->from($resource->getTable('tnw_subscriptions_subscription_profile_order'), ['COUNT(*)'])
-                ->where('subscription_profile_id = ?', $profile->getId())
-                ->where($connection->prepareSqlCondition('scheduled_at', [
-                    'from' => $profile->getStartDate(),
-                    'date' => true
-                ]));
+                ->from(
+                    ['invoiceItem' => $resource->getTable('sales_invoice_item')]
+                )
+                ->joinInner(
+                    ['salesRelative' => $resource->getTable('tnw_subscriptions_profile_item_sales_item')],
+                    'invoiceItem.order_item_id = salesRelative.order_item_id',
+                    []
+                )
+                ->joinInner(
+                    ['profileItem' => $resource->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                    'salesRelative.profile_item_id = profileItem.entity_id',
+                    []
+                )
+                ->where('profileItem.subscription_profile_id = ?', $profile->getId());
+
+            $invoiceItems = $connection->fetchAll($select);
+            foreach ($invoiceItems as $item) {
+                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
+            }
 
             switch ($profitType) {
                 case self::AS_OF_TODAY:
-                    $select->where('magento_order_id IS NOT NULL');
                     break;
-
                 case self::REMAINING:
+                    $lastInvoiceItem = array_pop($invoiceItems);
+                    $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
+                        * $lastInvoiceItem['qty'];
+
+                    if ($profile->getTerm() == 1) {
+                        if ($profile->getUnit() == 3) {
+                            $profit = $profitOfLastItem * 365 / $profile->getFrequency();
+                            break;
+                        } else {
+                            $profit = $profitOfLastItem * 12 / $profile->getFrequency();
+                            break;
+                        }
+                    } else {
+                        $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
+                        return $profit;
+                        break;
+                    }
                 default:
-                    $select->where('magento_order_id IS NULL');
+                    return null;
                     break;
             }
-
-            $qty = $profileProduct->getQty() * $connection->fetchOne($select);
-            $profit += ($recurringOption->getPrice() - $product->getCost()) * $qty;
         }
-
         return $profit;
     }
 
