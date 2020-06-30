@@ -260,6 +260,32 @@ define([
             this._sort();
             this.hidePager();
             this.checkAddingBillingFrequency(index);
+        },
+
+        /**
+         * If there is deleted record with same billing_requency_id as in new active record,
+         * remove this deleted record & set its id to new record
+         */
+        processNewRecords: function () {
+            var records,
+                activeRecords = _.filter(this.recordData(), function (elem) {
+                    return elem && elem['is_delete'] !== '1';
+                }),
+                recordsToDelete = _.filter(this.recordData(), function (elem) {
+                    return elem && elem['is_delete'] === '1';
+                });
+            if (_.isEmpty(recordsToDelete)) return;
+
+            activeRecords = _.indexBy(activeRecords, 'billing_frequency_id');
+            recordsToDelete = _.indexBy(recordsToDelete, 'billing_frequency_id');
+            _.each(activeRecords, function (value, key, list) {
+                if (!_.isEmpty(recordsToDelete[key]) && !_.isEmpty(recordsToDelete[key]['id'])) {
+                    list[key]['id'] = recordsToDelete[key]['id'];
+                    delete(recordsToDelete[key]);
+                }
+            });
+            records = _.values(_.extend(activeRecords, recordsToDelete));
+            this.recordData(records);
         }
     });
 });
