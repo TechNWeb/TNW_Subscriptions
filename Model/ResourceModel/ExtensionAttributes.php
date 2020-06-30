@@ -51,13 +51,17 @@ class ExtensionAttributes
             return [];
         }
 
+        $cartAttributeConfig = $config[$extensibleInterfaceName];
+        if (array_key_exists('negotiable_quote', $cartAttributeConfig)) {
+            unset($cartAttributeConfig['negotiable_quote']);
+        }
         return array_filter(array_map(function ($attributeConfig) {
             if (empty($attributeConfig[ExtensionAttribute\Config\Converter::JOIN_DIRECTIVE])) {
                 return false;
             }
 
             return $attributeConfig[ExtensionAttribute\Config\Converter::JOIN_DIRECTIVE];
-        }, $config[$extensibleInterfaceName]));
+        }, $cartAttributeConfig));
     }
 
     /**
