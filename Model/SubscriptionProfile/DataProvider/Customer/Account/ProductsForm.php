@@ -208,19 +208,16 @@ class ProductsForm extends SummaryProductsForm
 
         $params = [];
         /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
-        $stockItem = $this->stockRegistry->getStockItem(
-            $productId,
-            $websiteId
-        );
-        $getProductSalableQty = $this->productSalableQty->execute(
+        $stockItem = $this->stockRegistry->getStockItem($productId, $websiteId);
+        $productSalableQty = $this->productSalableQty->execute(
             current($this->profileManager->getProfile()->getProducts())->getSku(),
             $websiteId
         );
 
         $params['minAllowed'] = $stockItem->getMinQty();
-        if ($getProductSalableQty && $stockItem->getData('backorders') == 0) {
-            $params['maxAllowed'] = $getProductSalableQty < $stockItem->getMaxSaleQty()
-                ? $getProductSalableQty
+        if ($productSalableQty && $stockItem->getData('backorders') == 0) {
+            $params['maxAllowed'] = $productSalableQty < $stockItem->getMaxSaleQty()
+                ? $productSalableQty
                 : $stockItem->getMaxSaleQty();
         }
         else {
