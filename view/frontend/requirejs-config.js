@@ -30,6 +30,9 @@ var config = {
             'Magento_Swatches/js/swatch-renderer' : {
                 'TNW_Subscriptions/js/swatch-renderer-mixin' : true
             },
+            'Magento_Catalog/js/catalog-add-to-cart' : {
+                'TNW_Subscriptions/js/catalog-add-to-cart-mixin' : true
+            },
             'Magento_ConfigurableProduct/js/configurable' : {
                 'TNW_Subscriptions/js/configurable-mixin' : true
             },
