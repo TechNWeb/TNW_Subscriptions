@@ -325,6 +325,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 'sortOrder'         => $sortOrder,
                 'dataScope'         => $elemName,
                 'imports'           => $this->getImportsData($attributeCode),
+                'label'             => __($elemLabel),
             ],
         ];
 
