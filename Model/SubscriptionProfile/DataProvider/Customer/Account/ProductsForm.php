@@ -25,6 +25,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolve
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+
 /**
  * Subscription items form data provider for customer account dashboard page.
  */
@@ -41,9 +42,10 @@ class ProductsForm extends SummaryProductsForm
     protected $subscriptionConfig;
 
     /**
-     *
+     * @var $productSalableQty
      */
-    protected $getProductSalableQty;
+    protected $productSalableQty;
+
     /**
      * @param string $name
      * @param string $primaryFieldName
@@ -58,6 +60,7 @@ class ProductsForm extends SummaryProductsForm
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
      * @param Config $subscriptionConfig
+     * @param GetProductSalableQtyInterface $productSalableQty
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -76,13 +79,13 @@ class ProductsForm extends SummaryProductsForm
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
         Config $subscriptionConfig,
+        GetProductSalableQtyInterface $productSalableQty,
         $scope = '',
         array $meta = [],
-        array $data = [],
-        GetProductSalableQtyInterface $getProductSalableQty
+        array $data = []
     ) {
         $this->subscriptionConfig = $subscriptionConfig;
-        $this->getProductSalableQty = $getProductSalableQty;
+        $this->productSalableQty = $productSalableQty;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -209,13 +212,15 @@ class ProductsForm extends SummaryProductsForm
             $productId,
             $websiteId
         );
-        $getProductSalableQty = $this->getProductSalableQty->execute(
-            current($this->profileManager->getProfile()->getProducts())->getSku(), $websiteId
+        $getProductSalableQty = $this->productSalableQty->execute(
+            current($this->profileManager->getProfile()->getProducts())->getSku(),
+            $websiteId
         );
 
         $params['minAllowed'] = $stockItem->getMinQty();
         if ($getProductSalableQty && $stockItem->getData('backorders') == 0) {
-            $params['maxAllowed'] = $getProductSalableQty < $stockItem->getMaxSaleQty() ? $getProductSalableQty
+            $params['maxAllowed'] = $getProductSalableQty < $stockItem->getMaxSaleQty()
+                ? $getProductSalableQty
                 : $stockItem->getMaxSaleQty();
         }
         else {
@@ -223,7 +228,7 @@ class ProductsForm extends SummaryProductsForm
         }
 
         if ($stockItem->getQtyIncrements() > 0) {
-            $params['qtyIncrements'] = (float)$stockItem->getQtyIncrements();
+            $params['qtyIncrements'] = (float) $stockItem->getQtyIncrements();
         }
 
         return [
