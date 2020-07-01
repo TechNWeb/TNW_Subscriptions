@@ -13,6 +13,7 @@
             <item name="deps" xsi:type="string">tnw_subscriptionprofile_create_shipping_and_billing_form.tnw_subscriptionprofile_create_shipping_and_billing_form_data_source</item>
         </item>
         <item name="config" xsi:type="array">
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/shipping-and-billing-form</item>
             <item name="dataScope" xsi:type="string">data</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_create_shipping_and_billing_form</item>
         </item>
@@ -20,7 +21,7 @@
         <item name="buttons" xsi:type="array">
             <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\BackButton</item>
             <item name="cancel" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\CancelButton</item>
-            <item name="save" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\ContinueButton</item>
+            <item name="continue" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\ContinueButton</item>
         </item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_create_shipping_and_billing_form_data_source">
@@ -41,6 +42,81 @@
             </item>
         </argument>
     </dataSource>
+    <fieldset name="shipping_methods">
+        <settings>
+            <label translate="true">Shipping Method</label>
+        </settings>
+        <radioset name="auto_shipping">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="additionalInfo" xsi:type="string"><![CDATA[&nbsp;]]></item>
+                    <item name="template" xsi:type="string">
+                        TNW_Subscriptions/form/element/template/checkbox-set-with-item-tooltips
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <disabled>true</disabled>
+                <label translate="true">Automatically Choose Carrier</label>
+                <dataScope>shipping_method</dataScope>
+                <options>
+                    <option name="0" xsi:type="array">
+                        <item name="value" xsi:type="string">cheapest</item>
+                        <item name="label" xsi:type="string" translate="true">Cheapest available</item>
+                        <item name="tooltip" xsi:type="array">
+                            <item name="description" xsi:type="string" translate="true">
+                                NOTE: Shipping method will automatically be selected based on the cheapest available option.
+                            </item>
+                        </item>
+                    </option>
+                    <option name="1" xsi:type="array">
+                        <item name="value" xsi:type="string">fastest</item>
+                        <item name="label" xsi:type="string" translate="true">Fastest delivery</item>
+                        <item name="tooltip" xsi:type="array">
+                            <item name="description" xsi:type="string" translate="true">
+                                NOTE: Shipping method will automatically be selected based on the available option with fastest delivery.
+                            </item>
+                        </item>
+                    </option>
+                </options>
+            </settings>
+        </radioset>
+        <radioset name="specific_shipping">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="additionalInfo" xsi:type="string">IMPORTANT: Shipping cost will automatically be calculated at the time the order is processed. The recurring order may fluctuate depending on the selected shipping cost.</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Specific Carrier</label>
+                <dataScope>shipping_method</dataScope>
+            </settings>
+        </radioset>
+    </fieldset>
+    <insertForm name="payment_form">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="component" xsi:type="string">TNW_Subscriptions/js/components/insert-payment-form</item>
+            </item>
+        </argument>
+        <settings>
+            <listens>
+                <link name="${ $.parentName }_data_source:data.shipping_method">reRender</link>
+            </listens>
+            <exports>
+                <link name="responseData">${ $.parentName }:onPaymentFormResponse</link>
+            </exports>
+            <formSubmitType>ajax</formSubmitType>
+            <renderUrl path="mui/index/render">
+                <param name="handle">tnw_subscriptionprofile_create_payment_form</param>
+                <param name="buttons">0</param>
+            </renderUrl>
+            <loading>true</loading>
+            <autoRender>false</autoRender>
+            <toolbarContainer>${ $.parentName }</toolbarContainer>
+            <ns>tnw_subscriptionprofile_create_payment_form</ns>
+        </settings>
+    </insertForm>
     <fieldset name="info_fields">
         <field name="same_as_shipping">
             <argument name="data" xsi:type="array">
@@ -182,8 +258,8 @@
                     <item name="displayPrimary" xsi:type="string">true</item>
                     <item name="actions" xsi:type="array">
                         <item name="0" xsi:type="array">
-                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_create_shipping_and_billing_form</item>
-                            <item name="actionName" xsi:type="string">save</item>
+                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_create_payment_form</item>
+                            <item name="actionName" xsi:type="string">beforeSubmit</item>
                         </item>
                     </item>
                 </item>

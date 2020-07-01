@@ -263,6 +263,7 @@ class Form extends AbstractDataProvider
                                     'imports' => [
                                         'changeValue' => 'index = billing_frequency:value',
                                     ],
+                                    'disabled' => (bool) $this->getTrialPeriod(),
                                     'label' => $this->getTrialPeriod() ? __('Post trial price:') : __('Price') . ':',
                                     'priceFormat' => $this->getPriceFormatData(),
                                 ],

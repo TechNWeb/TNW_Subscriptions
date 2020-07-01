@@ -17,10 +17,19 @@ class ContinueButton extends GenericButton implements ButtonProviderInterface
     {
         return [
             'label' => __('Continue >>'),
-            'class' => 'save primary',
+            'class' => 'continue primary',
+            'on_click' => '"return false;"',
             'data_attribute' => [
-                'mage-init' => ['button' => ['event' => 'save']],
-                'form-role' => 'save',
+                'mage-init' => [
+                    'Magento_Ui/js/form/button-adapter' => [
+                        'actions' => [
+                            [
+                                'targetName' => 'index = tnw_subscriptionprofile_create_payment_form',
+                                'actionName' => 'beforeSubmit',
+                            ],
+                        ]
+                    ]
+                ],
             ],
             'sort_order' => 20
         ];

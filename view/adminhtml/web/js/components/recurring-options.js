@@ -24,9 +24,10 @@ define([
         },
 
         force: function (wizard) {
-            var activeRecords = _.filter(uiRegistry.get('index = recurring_options').recordData(), function (elem) {
-                return elem && elem['is_delete'] !== '1';
-            }, this);
+            var recurringComponent = uiRegistry.get('index = recurring_options'),
+                activeRecords = _.filter(recurringComponent.recordData(), function (elem) {
+                    return elem && elem['is_delete'] !== '1';
+                }, this);
             if (!activeRecords.length) {
                 throw new Error($t('Please add billing frequency.'));
             }
@@ -34,6 +35,7 @@ define([
             if (this._isChildrenHasErrors(false, this)) {
                 throw new Error($t('Please check fields below.'));
             }
+            recurringComponent.processNewRecords();
         },
 
         back: function () {

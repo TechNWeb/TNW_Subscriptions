@@ -325,6 +325,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 'sortOrder'         => $sortOrder,
                 'dataScope'         => $elemName,
                 'imports'           => $this->getImportsData($attributeCode),
+                'label'             => __($elemLabel),
             ],
         ];
 
@@ -521,7 +522,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         return $this->isShippingFieldSet()
             ? __('Shipping Information')
-            : __('Billing Information');
+            : '';
+//            : __('Billing Information');
     }
 
     /**

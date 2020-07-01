@@ -1040,6 +1040,9 @@ class Manager
             $data['term'] = $this->profile->getTerm();
             $data['period'] = $this->profile->getTotalBillingCycles();
         }
+        if ($profileProduct->getData('admin_modification')) {
+            $data['admin_modification'] = true;
+        }
 
         if (
             $isRebill

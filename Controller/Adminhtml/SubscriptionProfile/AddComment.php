@@ -78,14 +78,18 @@ class AddComment extends Action
         $subscriptionId = $this->dataPersistor->get('subscription_id');
 
         if ($subscriptionId) {
-            $comment = $this->_request->getParam('comment') ?: '';
-            $this->messageHistoryLogger->log(
-                $comment,
-                $subscriptionId,
-                true
-            );
+            $comment = $this->_request->getParam('comment') ?: false;
+            $notifyCustomer = (bool) $this->_request->getParam('notify') ?: false;
             if ($comment) {
-                $this->emailNotifierFactory->create()->addComment($subscriptionId, $comment);
+                $this->messageHistoryLogger->log(
+                    $comment,
+                    $subscriptionId,
+                    true,
+                    $notifyCustomer
+                );
+                if ($notifyCustomer) {
+                    $this->emailNotifierFactory->create()->addComment($subscriptionId, $comment);
+                }
             }
         } else {
             $response->setData('result', false);

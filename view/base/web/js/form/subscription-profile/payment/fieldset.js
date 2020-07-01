@@ -47,7 +47,7 @@ define([
             var postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {},
                 self = this;
             postData['cc_type'] =  this.ccType();
-            this.showLoader();
+            $j('body').trigger('processStart');
             this.resetErrors();
             $j.ajax({
                 url: this.options.orderSaveUrl,

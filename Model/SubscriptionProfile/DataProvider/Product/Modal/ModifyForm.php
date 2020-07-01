@@ -153,6 +153,7 @@ class ModifyForm extends Form
 
     /**
      * @inheritdoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getData()
     {
@@ -161,9 +162,9 @@ class ModifyForm extends Form
             /** @var Item $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $this->currentItem = $item;
-                $product = $this->getProductFromItem($item);
+                $this->currentProduct = $this->getProductFromItem($item);
                 $subBuyRequest = $item->getBuyRequest()->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
-                $presetQty = (int)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                $presetQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $this->getItemPrice(
                     $presetQty,
                     $subBuyRequest[Create::NON_UNIQUE]['price'],
@@ -176,18 +177,18 @@ class ModifyForm extends Form
                     'term' => (string)$subBuyRequest[Create::UNIQUE]['term'],
                     'period' => $subBuyRequest[Create::UNIQUE]['period'],
                     'start_on' => $subBuyRequest[Create::UNIQUE]['start_on'],
-                    'trial_period' => $this->getTrialPeriod($product->getId()),
-                    'name' => $product->getName(),
-                    'description' => $product->getData('short_description'),
+                    'trial_period' => $this->getTrialPeriod($this->currentProduct->getId()),
+                    'name' => $this->currentProduct->getName(),
+                    'description' => $this->currentProduct->getData('short_description'),
                     'qty' => $item->getQty(),
-                    'product_price' => $product->getPrice(),
+                    'product_price' => $this->currentProduct->getPrice(),
                     'unlock_preset_qty' => $presetQty,
-                    'frequency_data' => $this->getFrequenciesData(false, $product->getId(), $this->getAdditionalDataForProduct($item)),
+                    'frequency_data' => $this->getFrequenciesData(false, $this->currentProduct->getId(), $this->getAdditionalDataForProduct($item)),
                     'initial_values' => [
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
                     ],
-                    'savings_calculation' => $this->getSavingsCalculationType($product),
+                    'savings_calculation' => $this->getSavingsCalculationType($this->currentProduct),
                 ];
 
                 /** @var ModifierInterface $modifier */
@@ -245,7 +246,7 @@ class ModifyForm extends Form
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'label' => __('Subscription Plan') . ' #' . $iterator,
+                            'label' => false,
                             'collapsible' => false,
                             'componentType' => UiForm\Fieldset::NAME,
                             'additionalClasses' => 'subscription-container',
@@ -331,7 +332,6 @@ class ModifyForm extends Form
             ],
             'children' => [
                 'description_fieldset' => $this->getDescriptionFieldset(),
-                'edit_fieldset' => $this->getEditFieldsetDefinition()
             ]
         ];
     }
@@ -397,7 +397,8 @@ class ModifyForm extends Form
             ],
             'children' => [
                 'left_container' => $this->getLeftContainerDefinition(),
-                'middle_container' => $this->getMiddleContainerDefinition()
+                'middle_container' => $this->getMiddleContainerDefinition(),
+                'edit_fieldset' => $this->getEditFieldsetDefinition()
             ]
         ];
     }
@@ -409,7 +410,7 @@ class ModifyForm extends Form
      */
     protected function getEditFieldsetDefinition()
     {
-        return [
+        $result = [
             'arguments' => [
                 'data' => [
                     'config' => [
@@ -423,16 +424,55 @@ class ModifyForm extends Form
                 ],
             ],
             'children' => [
-                'edit_button' => $this->getEditButton(),
-                'billing_frequency' => $this->getBillingFrequencyDefinition(),
-                'term' => $this->getTermDefinition(),
-                'period' => $this->getPeriodDefenition(),
-                'start_on' => $this->getStartOnDefinition(),
-                'price' => $this->getPriceDefinition(),
-                'trial_period' => $this->getTrialPeriodDefenition(),
-                'initial_fee' => $this->getInitialFeeDefinition(),
+                'left' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => false,
+                                'collapsible' => false,
+                                'componentType' => UiForm\Fieldset::NAME,
+                                'additionalClasses' => 'edit-fieldset__left',
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                                'dataScope' => ''
+                            ],
+                        ],
+                    ],
+                    'children' => [
+                        'billing_frequency' => $this->getBillingFrequencyDefinition(),
+                        'price' => $this->getPriceDefinition(),
+                        'update_button' => $this->getUpdateButton(),
+                        'cancel_button' => $this->getCancelButton()
+                    ]
+                ],
+                'right' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'label' => false,
+                                'collapsible' => false,
+                                'componentType' => UiForm\Fieldset::NAME,
+                                'additionalClasses' => 'edit-fieldset__right',
+                                'template' => 'TNW_Subscriptions/form/element/template/fieldset',
+                                'dataScope' => ''
+                            ],
+                        ],
+                    ],
+                    'children' => [
+                        'term' => $this->getTermDefinition(),
+                        'period' => $this->getPeriodDefenition(),
+                        'start_on' => $this->getStartOnDefinition(),
+                        'trial_period' => $this->getTrialPeriodDefenition(),
+                        'initial_fee' => $this->getInitialFeeDefinition(),
+                    ]
+                ],
             ]
         ];
+
+        $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
+        if (!$hideQty) {
+            $result['children']['left']['children']['qty_container'] = $this->getQtyDefinition();
+        }
+        return $result;
     }
 
     /**
@@ -442,6 +482,12 @@ class ModifyForm extends Form
      */
     protected function getMiddleContainerDefinition()
     {
+
+        $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
+        $qty = false;
+        if (!$hideQty) {
+            $qty = (float)$this->currentItem->getQty() . 'x';
+        }
         $result =  [
             'arguments' => [
                 'data' => [
@@ -455,17 +501,12 @@ class ModifyForm extends Form
                 ],
             ],
             'children' => [
-                'name' => $this->getTextFieldDefenition('name'),
+                'name' => $this->getTextFieldDefenition('name', $qty),
                 'remove_button' => $this->getRemoveButton(),
+                'edit_button' => $this->getEditButton(),
                 'description' => $this->getTextFieldDefenition('description'),
-                'update_button' => $this->getUpdateButton()
             ]
         ];
-
-        $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
-        if (!$hideQty) {
-            $result['children']['qty_container'] = $this->getQtyContainerDefinition();
-        }
 
         return $result;
     }
@@ -491,7 +532,6 @@ class ModifyForm extends Form
             ],
             'children' => [
                 'qty' => $this->getQtyDefinition(),
-                'qty_edit_button' => $this->getQtyEditButton()
             ]
         ];
     }
@@ -549,15 +589,16 @@ class ModifyForm extends Form
      * Returns simple text field definition.
      *
      * @param $name
+     * @param bool $label
      * @return array
      */
-    protected function getTextFieldDefenition($name)
+    protected function getTextFieldDefenition($name, $label = false)
     {
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'label' => false,
+                        'label' => $label,
                         'dataType' => 'text',
                         'additionalClasses' => 'field-' . $name,
                         'formElement' => UiForm\Element\Input::NAME,
@@ -581,16 +622,54 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'sortOrder' => 40,
                         'formElement' => UiContainer::NAME,
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-primary action primary sub-button-right',
+                        'additionalClasses' => 'action-primary action primary sub-button-left',
                         'subButtonRight' => true,
                         'title' => __('Update'),
                         'actions' => [
                             [
                                 'targetName' => $this->currentFormName,
                                 'actionName' => 'save',
+                            ],
+                        ],
+                        'provider' => null,
+                        'imports' => [
+                            'visible' => '!' . $this->currentFormName . ':buttonPreviewMode'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Returns cancel button definition.
+     *
+     * @return array
+     */
+    protected function getCancelButton()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'sortOrder' => 50,
+                        'formElement' => UiContainer::NAME,
+                        'componentType' => UiContainer::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/edit-button',
+                        'additionalClasses' => 'action-primary action secondary sub-button-left',
+                        'title' => __('Cancel'),
+                        'actions' => [
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'togglePreviewMode',
+                            ],
+                            [
+                                'targetName' => $this->currentFormName,
+                                'actionName' => 'toggleButtonPreviewMode',
                             ],
                         ],
                         'provider' => null,
@@ -707,17 +786,20 @@ class ModifyForm extends Form
                 'data' => [
                     'multiple' => false,
                     'config' => [
+                        'sortOrder' => 10,
                         'label' => __('Billing Frequency:'),
-                        'dataType' => 'boolean',
-                        'formElement' => UiForm\Element\RadioSet::NAME,
-                        'componentType' => UiForm\Element\RadioSet::NAME,
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Select::NAME,
+                        'componentType' => UiForm\Field::NAME,
+                        'elementTmpl' => 'ui/form/element/select',
+                        'caption' => __('-- Please Select --'),
                         'dataScope' => 'billing_frequency',
                         'additionalClasses' => 'radio-options-one-column sub-legend field-wide',
                         'additionalForGroup' => false,
                         'validation' => ['required-entry' => true],
                         'options' => $this->getProductBillingFrequenciesAsOptionArray($this->currentProduct->getId()),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-set',
-                        'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-frequency',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
                             'onQtyUpdate' => $this->currentFormName . ':previewMode',
@@ -746,23 +828,28 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'multiple' => false,
                         'dataType' => 'boolean',
-                        'formElement' => UiForm\Element\Checkbox::NAME,
-                        'componentType' => UiForm\Element\Checkbox::NAME,
-                        'valueMap' => ['true' => '1', 'false' => '0'],
-                        'default' => '0',
-                        'description' => __('Until canceled'),
+                        'formElement' => UiForm\Element\RadioSet::NAME,
+                        'componentType' => UiForm\Element\RadioSet::NAME,
+                        'options' => [
+                            ['value' => 1, 'label' => __('until canceled')],
+                            ['value' => 0, 'label' => __('stop after')],
+                        ],
+                        'default' => '1',
+                        'disabled' => $infiniteSubscriptions,
+                        'description' => __('until canceled'),
                         'label' => __('Term:'),
                         'dataScope' => 'term',
                         'required' => true,
-                        'additionalClasses' => 'field-wide',
-                        'previewLabel' => __('Until canceled'),
+                        'additionalClasses' => 'field-wide field-term',
+                        'previewLabel' => __('until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'visibleOnEdit' => !$infiniteSubscriptions,
+                        'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'showPreview' => '${ $.parentFormName }:previewMode'
                         ],
+                        'parentFormName' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -776,6 +863,9 @@ class ModifyForm extends Form
      */
     protected function getPeriodDefenition()
     {
+        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+        );
         return [
             'arguments' => [
                 'data' => [
@@ -787,25 +877,27 @@ class ModifyForm extends Form
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
                         'elementTmpl' => 'TNW_Subscriptions/form/element/period-input',
-                        'first_phrase' => __('& bill'),
-                        'last_phrase' => __('times'),
+                        'first_phrase' => '',
+                        'last_phrase' => __('payments'),
                         'validation' => [
                             'validate-greater-than-zero' => true,
                             'required-entry' => true,
                             'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
                         ],
                         'imports' => [
-                            'visible' => '!' . $this->currentFormName . '.edit_fieldset.term' . ':checked',
-                            'showPreview' => $this->currentFormName . ':previewMode'
+                            'onTermChange' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':value',
+                            'showPreview' => '${ $.parentFormName }:previewMode'
                         ],
                         'exports' => [
-                            'completePreviewLabel' => $this->currentFormName . '.edit_fieldset.term' . ':periodPreviewLabel'
+                            'completePreviewLabel' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':periodPreviewLabel'
                         ],
+                        'visibleOnEdit' => !$infiniteSubscriptions,
                         'previewLabelVisible' => false,
-                        'previewLabel' => __('Bill %s times'),
-                        'previewLabelOnce' => __('Bill once'),
+                        'previewLabel' => __('Committed to %s orders'),
+                        'previewLabelOnce' => __('Committed to 1 order'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview'
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'parentFormName' => $this->currentFormName,
                     ]
                 ]
             ]
@@ -850,17 +942,26 @@ class ModifyForm extends Form
      * Returns price field definition.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getPriceDefinition()
     {
         $label = __('Price') . ':';
+        $isTrial = false;
+
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
+            $isTrial = true;
         }
+        $unlockQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        $notice = $unlockQty
+            ? __('The price is fo all items, excluding tax (if any)')
+            : __('The price is per item, excluding tax (if any)');
         return [
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'sortOrder' => 20,
                         'label' => $label,
                         'dataType' => 'text',
                         'formElement' => UiForm\Element\Input::NAME,
@@ -873,11 +974,12 @@ class ModifyForm extends Form
                         ],
                         'addSymbol' => false,
                         'addbefore' => $this->getCurrentCurrencySymbol(),
+                        'notice' => $notice,
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
-                            'showPreview' => $this->currentFormName . ':previewMode',
+                            'showPreview' => $isTrial ? false : $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
                             'priceInclTax' => '${ $.provider }'
                         ],
@@ -939,8 +1041,8 @@ class ModifyForm extends Form
                         'dataScope' => 'initial_fee',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                         'additionalClasses' => 'field-wide',
-                        'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
-                        'previewLabel' => '%s',
+                        'visible' => (bool)$this->getInitialFeeFromItem($this->currentItem),
+                        'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-initial-fee',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'imports' => [
@@ -966,11 +1068,12 @@ class ModifyForm extends Form
             'arguments' => [
                 'data' => [
                     'config' => [
+                        'sortOrder' => 30,
                         'label' => __('Qty:'),
                         'dataType' => 'text',
                         'formElement' => UiForm\Element\Input::NAME,
                         'componentType' => UiForm\Element\Input::NAME,
-                        'additionalClasses' => 'field-qty abs-field-size-x-small',
+                        'additionalClasses' => 'field-qty field-wide',
                         'dataScope' => 'qty',
                         'validation' => [
                             'validate-greater-than-zero' => true,
@@ -1129,7 +1232,7 @@ class ModifyForm extends Form
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
         if ($initialFees) {
-            $initialFee = $initialFees->getSubsInitialFee();
+            $initialFee = number_format($initialFees->getSubsInitialFee(), 2, '.', '');
         }
 
         return !empty($initialFee) ? $initialFee : 0;
@@ -1155,17 +1258,9 @@ class ModifyForm extends Form
      */
     protected function getFormEditButtons()
     {
-        $result = [
-            'form_button' => $this->currentFormName . '.edit_fieldset.edit_button',
+        return [
+            'form_button' => $this->currentFormName . '.description_fieldset.middle_container.edit_button',
         ];
-
-        $unlockPresetQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
-        if (!$unlockPresetQty) {
-            $result['qty_button'] = $this->currentFormName
-                . '.description_fieldset.middle_container.qty_container.qty_edit_button';
-        }
-
-        return $result;
     }
 
     /**

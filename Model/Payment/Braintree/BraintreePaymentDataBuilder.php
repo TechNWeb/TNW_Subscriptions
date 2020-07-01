@@ -106,6 +106,10 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      * @param $order
      * @param $paymentData
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws \Zend_Json_Exception
      */
     public function build($order, $paymentData)
     {

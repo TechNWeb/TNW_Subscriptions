@@ -50,7 +50,7 @@ class Product
                         return;
                     }
                 }, ARRAY_FILTER_USE_BOTH);
-                if(!$defaultBillingFrequencyChecked){
+                if (!$defaultBillingFrequencyChecked && isset($options[0])) {
                     $options[0]->setDefaultBillingFrequency(1);
                 }
                 $product->setIsRecurringOptionChanged(true);

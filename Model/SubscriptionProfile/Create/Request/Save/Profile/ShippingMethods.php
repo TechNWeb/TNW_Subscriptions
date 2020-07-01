@@ -16,9 +16,9 @@ class ShippingMethods extends Base
      */
     public function process(array $data)
     {
-        if (isset($data['shipping_methods'])) {
+        if (isset($data['shipping_method'])) {
             $this->errors = $this->getSubCreateModel()
-                ->setShippingMethods($data['shipping_methods']);
+                ->setShippingMethods($data['shipping_method']);
         }
     }
 }

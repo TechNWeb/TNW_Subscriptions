@@ -33,9 +33,10 @@ define([
          */
         action: function () {
             var url = typeof this.imports.url === "undefined" ? '' : this.imports.url,
-                comment = $("textarea[name='change_history[comment_area]']").val();
+                comment = this.source.get(this.parentScope + '.comment_area'),
+                notify = this.source.get(this.parentScope + '.comment_notify');
 
-            this.sendAjaxAddComment(url, comment)
+            this.sendAjaxAddComment(url, comment, notify)
         },
 
         /**
@@ -44,16 +45,18 @@ define([
          * @param url
          * @param comment
          *
+         * @param notify
          * @return void
          */
-        sendAjaxAddComment: function (url, comment) {
+        sendAjaxAddComment: function (url, comment, notify) {
             var _self = this;
             $.ajax({
                 showLoader: true,
                 url: url,
                 data: {
                     form_key: window.FORM_KEY,
-                    comment: comment
+                    comment: comment,
+                    notify: notify
                 },
                 type: "POST",
                 dataType: 'json'

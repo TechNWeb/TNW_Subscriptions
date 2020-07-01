@@ -118,7 +118,8 @@ class Save extends AbstractSave
     private function processRequestData()
     {
         $requestData = $this->getRequest()->getParams();
-        $result = $this->getSaveProcessor()->processSave($requestData);
+        $requestData['admin_modification'] = true;
+        $this->getSaveProcessor()->processSave($requestData);
     }
 
     /**

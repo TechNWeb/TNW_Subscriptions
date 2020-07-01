@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Quote\Model\Quote;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Block\Subscription\Info\Messages\ExpireWarningSupportInterface;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview\Message;
@@ -93,12 +94,18 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     private $subscriptionConfig;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \TNW\Subscriptions\Model\MessagePool $messagePool
      * @param ProfileOrderCollection $profileOrderCollection ,
      * @param ProfileManager $profileManager
      * @param SubscriptionConfig $subscriptionConfig
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param array $data
      */
     public function __construct(
@@ -108,12 +115,29 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
         ProfileOrderCollection $profileOrderCollection,
         ProfileManager $profileManager,
         SubscriptionConfig $subscriptionConfig,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         array $data = []
     ) {
         $this->profileOrderCollection = $profileOrderCollection;
         $this->profileManager = $profileManager;
         $this->subscriptionConfig = $subscriptionConfig;
+        $this->profileRepository = $profileRepository;
         parent::__construct($context, $registry, $messagePool, $data);
+    }
+
+    /**
+     * Get profile from registry or from request
+     * @return \TNW\Subscriptions\Api\Data\SubscriptionProfileInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getSubscriptionProfile()
+    {
+        $profile = parent::getSubscriptionProfile();
+        if (!$profile) {
+            $profileId = $this->getRequest()->getParam('subscription_profile_id', null);
+            $profile = $this->profileRepository->getById($profileId);
+        }
+        return $profile;
     }
 
     /**

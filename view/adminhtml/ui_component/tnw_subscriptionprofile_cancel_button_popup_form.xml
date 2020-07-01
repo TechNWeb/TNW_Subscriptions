@@ -42,6 +42,9 @@
         </argument>
     </dataSource>
     <fieldset name="general">
+        <settings>
+            <label></label>
+        </settings>
         <field name="cancel_button_popup_title">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -67,40 +70,38 @@
                 </item>
             </argument>
         </field>
-        <field name="cancel_button_popup_confirm">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="title" translate="true" xsi:type="string">Confirm</item>
-                    <item name="formElement" xsi:type="string">button</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
-                    <item name="additionalClasses" xsi:type="string">cancel-popup-float-right action-primary</item>
-                    <item name="actions" xsi:type="array">
-                        <item name="0" xsi:type="array">
-                            <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_cancel_button_popup_form</item>
-                            <item name="actionName" xsi:type="string">save</item>
-                        </item>
-                    </item>
-                </item>
-            </argument>
+        <field name="comment_area" formElement="textarea">
+            <settings>
+                <labelVisible>false</labelVisible>
+                <componentType>field</componentType>
+                <dataType>text</dataType>
+                <placeholder>Comment</placeholder>
+            </settings>
         </field>
-        <field name="cancel_button_popup_change_mind">
+        <field name="comment_notify" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="title" translate="true" xsi:type="string">I changed my mind</item>
-                    <item name="formElement" xsi:type="string">button</item>
-                    <item name="displayAsLink" xsi:type="string">true</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
-                    <item name="additionalClasses" xsi:type="string">cancel-popup-float-right cancel-popup-spaces cancel-popup-underlined action-advanced</item>
-                    <item name="actions" xsi:type="array">
-                        <item name="0" xsi:type="array">
-                            <item name="targetName" xsi:type="string">index = cancelModal</item>
-                            <item name="actionName" xsi:type="string">closeModal</item>
-                        </item>
+                    <item name="toggleLabels" xsi:type="array">
+                        <item name="on" xsi:type="string" translate="true">Send comment to Customer</item>
+                        <item name="off" xsi:type="string" translate="true">Comment for internal use only</item>
                     </item>
+                    <item name="default" xsi:type="string">1</item>
                 </item>
             </argument>
+            <settings>
+                <labelVisible>false</labelVisible>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
         </field>
     </fieldset>
 </form>

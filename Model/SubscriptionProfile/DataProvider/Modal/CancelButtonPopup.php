@@ -66,19 +66,6 @@ class CancelButtonPopup extends AbstractDataProvider
 
     public function getMeta()
     {
-        $meta = parent::getMeta();
-
-        $subscriptionId = $this->dataPersistor->get('subscription_id');
-        $label = __('Are you sure you want to cancel Subscription');
-
-        if ($subscriptionId) {
-            $label .= ' (' . SubscriptionProfileInterface::LABEL_PREFIX . $subscriptionId . ')?';
-        } else {
-            $label .= '?';
-        }
-
-        $meta['general']['arguments']['data']['config']['label'] = $label;
-
-        return $meta;
+        return parent::getMeta();
     }
 }

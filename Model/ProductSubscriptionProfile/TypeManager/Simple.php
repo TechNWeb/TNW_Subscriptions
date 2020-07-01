@@ -28,12 +28,28 @@ class Simple extends Base
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
 
-                $updateNonUnique = [
-                    'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
-                    'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
-                    'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
-                ];
+                if (isset($buyRequestValue['admin_modification']) && array_key_exists('price', $buyRequestValue)) {
+                    $subscriptionPart['price'] = $buyRequestValue['price'];
+                }
 
+                if (
+                    isset($buyRequestValue['rebill_processing'])
+                    && $buyRequestValue['rebill_processing']
+                    && isset($buyRequestValue['subscription_data']['unique']['use_preset_qty'])
+                    && $buyRequestValue['subscription_data']['unique']['use_preset_qty']
+                ) {
+                    $updateNonUnique = [
+                        'price' => $buyRequestValue['custom_price'],
+                        'current_preset_qty_price' => $buyRequestValue['custom_price'],
+                        'preset_qty_price' => $buyRequestValue['custom_price'],
+                    ];
+                } else {
+                    $updateNonUnique = [
+                        'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
+                        'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
+                        'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
+                    ];
+                }
                 $originalNonUnique = isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]) ?
                     $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] :
                     [];
@@ -42,6 +58,7 @@ class Simple extends Base
                     $originalNonUnique,
                     $updateNonUnique
                 );
+                unset($buyRequestValue['admin_modification']);
                 $request->setValue($this->serializer->serialize($buyRequestValue));
             }
         }
