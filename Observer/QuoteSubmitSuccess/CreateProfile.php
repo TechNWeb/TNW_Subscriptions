@@ -76,7 +76,8 @@ class CreateProfile implements ObserverInterface
     private $vaultTrialPaymentMap = [
         'tnw_authorize_cim_vault' => 'tnw_authorize_cim',
         'payflowpro_cc_vault' => 'payflowpro',
-        'chcybersource_cc_vault' => 'chcybersource'
+        'chcybersource_cc_vault' => 'chcybersource',
+        'tnw_stripe_vault' => 'tnw_stripe'
     ];
 
     /**

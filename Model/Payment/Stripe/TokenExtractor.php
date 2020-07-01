@@ -8,8 +8,12 @@ namespace TNW\Subscriptions\Model\Payment\Stripe;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
-use \Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 
+/**
+ * Class TokenExtractor
+ * @package TNW\Subscriptions\Model\Payment\Stripe
+ */
 class TokenExtractor
 {
     /**
@@ -21,11 +25,6 @@ class TokenExtractor
      * @var mixed
      */
     private $subjectReader;
-
-    /**
-     * @var mixed
-     */
-    private $config;
 
     /**
      * @var mixed
@@ -48,6 +47,11 @@ class TokenExtractor
     private $serializer;
 
     /**
+     * @var mixed
+     */
+    private $gatewayConfig;
+
+    /**
      * TokenExtractor constructor.
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param CreditCardTokenFactory $creditCardTokenFactory
@@ -67,6 +71,7 @@ class TokenExtractor
             $this->client = $objectManager->get(
                 "TNW\Stripe\Gateway\Http\Client\TransactionCustomer"
             );
+            $this->gatewayConfig = $objectManager->get("\TNW\Stripe\Gateway\Config\Config");
             $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
             $this->subjectReader = $objectManager->get("TNW\Stripe\Gateway\Helper\SubjectReader");
         }
@@ -82,41 +87,42 @@ class TokenExtractor
     public function getPaymentTokenWithTransactionId($response, $quote = null, $paymentData = null)
     {
         $transactionAuth = $this->subjectReader->readTransaction($response);
-        $transactionId = $transactionAuth->getTransactionResponse()->getTransId();
-        $maskedCC = $transactionAuth->getTransactionResponse()->getAccountNumber();
-        $data = [
-            'trans_id' => $transactionId,
-            'store_id' => $quote->getStoreId()
-        ];
-        $transferObject = $this->transferFactory->create($data);
-        $responseCC = $this->client->placeRequest($transferObject);
-        $customerId = $quote ? $quote->getCustomerId() : 0;
-        $transaction = $this->subjectReader->readTransaction($responseCC);
         return [
-            'payment_token' => $this->getVaultPaymentToken($transaction, $paymentData, $maskedCC, $customerId),
-            'transaction_id' => $transactionId
+            'payment_token' => $this->getVaultPaymentToken($paymentData, $transactionAuth, $quote->getCustomerId()),
+            'transaction_id' => $transactionAuth['id']
         ];
     }
 
-    private function getVaultPaymentToken($transaction, $paymentData, $maskedCC, $customerId = 0)
+    /**
+     * @param $paymentData
+     * @param $transaction
+     * @param int $customerId
+     * @return PaymentTokenInterface|null
+     */
+    private function getVaultPaymentToken($paymentData, $transaction, $customerId = 0)
     {
-        $profileId = $transaction->getCustomerProfileId();
-        $paymentProfileIdList = $transaction->getCustomerPaymentProfileIdList() ? : [];
-        $gateWayToken = sprintf('%s/%s', $profileId, reset($paymentProfileIdList));
+        $gateWayToken = $transaction['customer'];
 
         if (!$paymentToken = $this->tokenManagement->getByGatewayToken(
             $gateWayToken,
             'tnw_stripe',
             $customerId
         )) {
+            $last4 = '';
             /** @var PaymentTokenInterface $paymentToken */
             $paymentToken = $this->paymentTokenFactory->create()
                 ->setExpiresAt($this->_getExpirationDate($paymentData))
                 ->setGatewayToken($gateWayToken);
-
+            $ccMap = $this->gatewayConfig->getCcTypesMapper();
+            $transactionCharges = $transaction['charges'];
+            foreach ($transactionCharges as $charge) {
+                $details = $charge->__get('payment_method_details');
+                $cardData = $details->__get('card');
+                $last4 = $cardData->__get('last4');
+            }
             $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
-                'type' => $paymentData['additional_data']['cc_type'],
-                'maskedCC' => str_replace('XXXX', '', $maskedCC),
+                'type' => $ccMap[$paymentData['additional_data']['cc_type']],
+                'maskedCC' => $last4,
                 'expirationDate' => sprintf(
                     '%s/%s',
                     $paymentData['additional_data']['cc_exp_month'],

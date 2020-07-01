@@ -109,6 +109,9 @@ class Stripe extends Base
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
+        if (!isset($result['stripe_data'])) {
+            $result['stripe_data'] = $this->getPaymentAdditionalInfo($profile);
+        }
         if (isset($result['stripe_data']['public_hash'])) {
             $result[OrderPaymentInterface::METHOD] =  $this->getPaymentMethodCode() . '_vault';
         } else {
@@ -187,56 +190,10 @@ class Stripe extends Base
         $this->isRebill = true;
     }
 
-    /**
-     * @inheritdoc
-     * @param $requestData
-     * @return Stripe
-     * @throws PaymentException
-     * @throws \Magento\Payment\Gateway\Http\ClientException
-     * @throws \Magento\Payment\Gateway\Http\ConverterException
-     */
-    public function processProfileByRequestData($requestData)
+    public function getVaultPaymentCode()
     {
-        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
-            return $this;
-        }
-
-        $customer = $this->getProfile()->getCustomer();
-        if (!$customer instanceof \Magento\Customer\Api\Data\CustomerInterface) {
-            return $this;
-        }
-
-        /** @var string[] $additionalData */
-        $additionalData = $requestData['payment'][$this->getPaymentMethodCode()]['additional'];
-        $paymentData = $requestData['payment'][$this->getPaymentMethodCode()];
-        $transfer = $this->transferFactory->create([
-            'firstName' => $customer->getFirstname(),
-            'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail()
-        ]);
-
-        $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Stripe\Error\Card) {
-            $errors = [];
-            foreach ($response->errors->deepAll() as $error) {
-                $errors[] = "{$error->code}: {$error->message}";
-            }
-
-            throw new PaymentException(__('Stripe message: %1', implode(', ', $errors)));
-        }
-        /** @var \Stripe\Card $paymentMethod */
-        $this->getProfile()->getPayment()
-            ->setPaymentToken($paymentData['client_secret'])
-            ->setEncodedPaymentAdditionalInfo([
-                OrderPaymentInterface::CC_TYPE => $additionalData['cc_type'],
-                OrderPaymentInterface::CC_LAST_4 => $paymentData['cc_last_4'],
-                OrderPaymentInterface::CC_EXP_MONTH => $additionalData['cc_exp_month'],
-                OrderPaymentInterface::CC_EXP_YEAR => $additionalData['cc_exp_year'],
-            ]);
-
-        return $this;
+        return $this->getPaymentMethodCode() . '_vault';
     }
-
 
     /**
      * @param \Magento\Quote\Model\Quote $quote
