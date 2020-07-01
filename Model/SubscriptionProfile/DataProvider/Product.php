@@ -296,7 +296,6 @@ class Product extends AbstractDataProvider
 
         $meta = array_merge_recursive(
             $meta,
-            $this->getProductColumnsData(),
             $this->getMetaData()
         );
 

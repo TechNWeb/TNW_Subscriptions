@@ -313,9 +313,44 @@ class Product extends Create
                 $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
                 && isset($this->data['custom_price'])
             ) {
-                $customProductPrice = (float) $this->data['custom_price'];
+                if (
+                    isset($this->data['use_preset_qty'])
+                    && $this->data['use_preset_qty']
+                    && isset($this->data['subscription_data']['non_unique']['current_preset_qty_price'])
+                ) {
+                    $customProductPrice = (float) $this->data
+                    ['subscription_data']
+                    ['non_unique']
+                    ['current_preset_qty_price'];
+                } else {
+                    $customProductPrice = (float) $this->data['custom_price'];
+                }
+            }
+            if (
+                $this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
+                && isset($productData['admin_modification'])
+                && $productData['admin_modification']
+            ) {
+                if (
+                    $productData['use_preset_qty']
+                    && isset($productData['subscription_data']['non_unique']['current_preset_qty_price'])
+                ) {
+                    $customProductPrice = $productData['subscription_data']['non_unique']['current_preset_qty_price'];
+                }
+                $currentProductCustomPrice = $customProductPrice;
+                $productData['price'] = $customProductPrice;
+            } elseif (
+                isset($productData['rebill_processing'])
+                && $productData['rebill_processing']
+                && $productData['use_preset_qty']
+            ) {
+                $customProductPrice = $currentProductCustomPrice = $productData
+                ['subscription_data']
+                ['non_unique']
+                ['current_preset_qty_price'];
             }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
+
 
             $data = [
                 'custom_price' => sprintf('%F', $customProductPrice),

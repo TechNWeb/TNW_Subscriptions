@@ -1,174 +1,168 @@
 .overview-content {
-    margin: -30px -15px 10px;
+  margin: -30px -15px 10px;
 }
 .overview-content .overview-table {
-    border-collapse: separate;
-    border-spacing: 15px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 400;
+  border-collapse: separate;
+  border-spacing: 15px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 400;
 }
 .overview-content .bordered {
-    border: 1px solid #999;
+  border: 1px solid #999;
 }
 .overview-content .green {
-    background: #009e0f;
+  background: #009e0f;
 }
 .overview-content .light-green {
-    background: #b6d7a8;
+  background: #b6d7a8;
 }
 .overview-content .red {
-    background: #CF2A27;
+  background: #CF2A27;
 }
 .overview-content .orange {
-    background: #FFD966;
+  background: #FFD966;
 }
 .overview-content .title {
-    padding: 10px 0 10px;
+  padding: 10px 0 10px;
 }
-
 .overview-content .next-payment .date.day {
-    padding-top: 10px;
-    font-size: 9rem;
-    line-height: 9rem;
+  padding-top: 10px;
+  font-size: 9rem;
+  line-height: 9rem;
 }
 .overview-content .next-payment .date.month {
-    font-size: 3rem;
-    padding: 4px 0;
-    text-transform: capitalize;
+  font-size: 3rem;
+  padding: 4px 0;
+  text-transform: capitalize;
 }
 .overview-content .next-payment .cost {
-    margin-top: 30px;
-    padding: 5px 0 10px;
-    font-size: 4rem;
-    background-color: #eee;
-    border-top: 1px solid #999;
+  margin-top: 30px;
+  padding: 5px 0 10px;
+  font-size: 4rem;
+  background-color: #eee;
+  border-top: 1px solid #999;
+}
+.overview-content .next-payment .cost .delivery-cost {
+  font-size: 1.8rem;
 }
 .overview-content .block-next-payment {
-    margin-right: 10px;
+  margin-right: 10px;
 }
-
 .overview-content .subscription-message {
-    font-size: 3rem;
+  font-size: 3rem;
 }
 .overview-content .block-subscription-message {
-    padding: 20px 0;
+  padding: 20px 0;
 }
 .overview-content .missed-payments {
-    vertical-align: top;
+  vertical-align: top;
 }
 .overview-content .missed-payments .value {
-    font-size: 9rem;
-    line-height: 15rem;
+  font-size: 9rem;
+  line-height: 15rem;
 }
-
 .overview-content .status {
-    vertical-align: top;
-    color: white;
+  vertical-align: top;
+  color: white;
 }
 .overview-content .status .value {
-    font-size: 5rem;
-    line-height: 15rem;
+  font-size: 5rem;
+  line-height: 15rem;
 }
-
 .admin__profile-dashboard-profit {
-    width: 47%;
-    float: left;
-    margin-bottom: 2%;
+  width: 47%;
+  float: left;
+  margin-bottom: 2%;
 }
-
+.admin__profile-dashboard-profit .admin__fieldset {
+  padding-top: 1rem;
+}
+.admin__profile-dashboard-profit .fieldset-wrapper-title {
+  padding-bottom: 1rem;
+}
+.admin__profile-dashboard-profit .fieldset-wrapper-title strong.title {
+  font-size: 2rem;
+  font-weight: normal;
+}
 .admin__profile-dashboard-subscription-details {
-    width: 47%;
-    float: right;
-    margin-bottom: 9%;
+  width: 47%;
+  float: right;
+  margin-bottom: 9%;
 }
 .admin__profile-dashboard-subscription-details .fieldset-wrapper-title {
-    border: none;
-    padding-bottom: 1rem;
+  border: none;
+  padding-bottom: 1rem;
 }
-
+.admin__profile-dashboard-subscription-details .fieldset-wrapper-title strong.title {
+  font-size: 2rem;
+  font-weight: normal;
+}
 .admin__profile-dashboard-subscription-details .admin__fieldset {
-    padding-top: 0rem;
-}
-
-.admin__profile-dashboard-profit  .admin__fieldset {
-    padding-top: 1rem;
+  padding-top: 0rem;
 }
 .admin__profile-dashboard-subscription-details .message-warning {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
-
-.admin__profile-dashboard-profit .fieldset-wrapper-title {
-    padding-bottom: 1rem;
-}
-.admin__profile-dashboard-subscription-details .fieldset-wrapper-title strong.title,
-.admin__profile-dashboard-profit .fieldset-wrapper-title strong.title {
-    font-size: 2rem;
-    font-weight: normal;
-}
-
 .profile-dashboard-subscription-details-title-wrapper {
-    border-bottom: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
 }
-
-.page-actions .page-actions-buttons>button.red-text {
-    color: #e22626;
+.page-actions .page-actions-buttons > button.red-text {
+  color: #e22626;
 }
-
-/* todo: replace with actual diagram*/
 .admin__profile-dashboard-profit-diagram {
-    margin: 0 3% 0 3%;
+  margin: 0 3% 0 3%;
 }
-
 .profit-color {
-    display: inline-block;
-    border: 2px solid;
-    width: 9%;
-    padding-top: 9%;
+  display: inline-block;
+  border: 2px solid;
+  width: 9%;
+  padding-top: 9%;
 }
-
 .profit-text {
-    position: absolute;
-    padding: 2%;
+  position: absolute;
+  padding: 2%;
 }
-
 .profit-content {
-    overflow: hidden;
+  overflow: hidden;
 }
-
 .message-history .user-message {
-    font-size: 1.8rem;
-}
-.message-history .comment .user-message {
-    padding-left: 40px;
-    padding-top: 5px;
+  font-size: 1.8rem;
 }
 .message-history .comment {
-    font-size: 1.8rem;
+  font-size: 1.8rem;
+}
+.message-history .comment .user-message {
+  padding-left: 40px;
+  padding-top: 5px;
 }
 .message-history .author-information {
-    font-style: italic;
-    display: inline-block;
-    padding-top: 10px;
+  font-style: italic;
+  display: inline-block;
+  padding-top: 10px;
 }
 .message-history .date {
-    float:right;
-    padding-top: 10px;
+  float: right;
+  padding-top: 10px;
 }
 .message-history-block {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 .message-history-block:nth-child(odd) {
-    background-color: #DCDCDC;
+  background-color: #DCDCDC;
 }
 .float-left {
-    float: left;
+  float: left;
 }
-.additional-form-field-set .fieldset-wrapper-title .title,
+.additional-form-field-set .fieldset-wrapper-title .title {
+  font-size: 2rem;
+  font-weight: 400;
+}
 .additional-form-field-set .admin__fieldset-wrapper-title .title {
-    font-size: 2rem;
-    font-weight: 400;
+  font-size: 2rem;
+  font-weight: 400;
 }
+/*# sourceMappingURL=update-subscription.css.map */

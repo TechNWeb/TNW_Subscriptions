@@ -49,50 +49,50 @@
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="tnw_subscriptionprofile_columns">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="childDefaults" xsi:type="array">
-                    <item name="fieldAction" xsi:type="array">
-                        <item name="provider"
-                              xsi:type="string">tnw_subscriptionprofile_index.tnw_subscriptionprofile_index.tnw_subscriptionprofile_columns_editor</item>
-                        <item name="target" xsi:type="string">startEdit</item>
-                        <item name="params" xsi:type="array">
-                            <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
-                            <item name="1" xsi:type="boolean">true</item>
-                        </item>
-                    </item>
-                </item>
-            </item>
-        </argument>
-        <column name="entity_id">
+        <column name="entity_id" sortOrder="10">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="visible" xsi:type="boolean">true</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="sorting" xsi:type="string">desc</item>
                     <item name="label" translate="true" xsi:type="string">ID</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn name="label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Label">
+        <actionsColumn name="label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Label" sortOrder="20">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="sortOrder" xsi:type="number">1</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" translate="true" xsi:type="string">Label</item>
                     <item name="sortable" xsi:type="boolean">true</item>
-                    <item name="fieldClass" xsi:type="string"></item>
                 </item>
             </argument>
         </actionsColumn>
-        <column name="customer_name">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="label" translate="true" xsi:type="string">Customer name</item>
-                </item>
-            </argument>
+        <actionsColumn name="customer_id" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Customer" sortOrder="60">
+            <settings>
+                <label translate="true">Customer name</label>
+                <sortable>true</sortable>
+                <draggable>true</draggable>
+                <filter>text</filter>
+            </settings>
+        </actionsColumn>
+        <column name="thumbnail" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\ProductThumbnail" component="Magento_Ui/js/grid/columns/thumbnail" sortOrder="40">
+            <settings>
+                <hasPreview>0</hasPreview>
+                <label translate="true">Thumbnail</label>
+                <sortable>false</sortable>
+            </settings>
         </column>
-        <column name="customer_email">
+        <column name="product_name" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Product" sortOrder="50" component="TNW_Subscriptions/js/grid/columns/product">
+            <settings>
+                <label translate="true">Product</label>
+                <sortable>true</sortable>
+                <filter>text</filter>
+                <bodyTmpl>TNW_Subscriptions/grid/cells/product</bodyTmpl>
+            </settings>
+        </column>
+        <column name="customer_email" sortOrder="70">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
@@ -100,7 +100,7 @@
                 </item>
             </argument>
         </column>
-        <column name="frequency_label">
+        <column name="frequency_label" sortOrder="30">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
@@ -108,7 +108,7 @@
                 </item>
             </argument>
         </column>
-        <column name="website_id">
+        <column name="website_id" sortOrder="200">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Magento\Config\Model\Config\Source\Website</item>
                 <item name="config" xsi:type="array">
@@ -119,16 +119,7 @@
                 </item>
             </argument>
         </column>
-        <column name="status">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" translate="true" xsi:type="string">Status</item>
-                </item>
-            </argument>
-        </column>
-
-        <column name="status">
+        <column name="status" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options</item>
                 <item name="config" xsi:type="array">
@@ -139,8 +130,7 @@
                 </item>
             </argument>
         </column>
-
-        <column name="start_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\TrialEndDate">
+        <column name="start_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\TrialEndDate" sortOrder="100">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">dateRange</item>
@@ -151,34 +141,42 @@
                 </item>
             </argument>
         </column>
-        <column name="next_billing_cycle_date" class="Magento\Ui\Component\Listing\Columns\Date">
+        <column name="next_billing_cycle_date" class="Magento\Ui\Component\Listing\Columns\Date" sortOrder="110">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">dateRange</item>
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="dataType" xsi:type="string">date</item>
-                    <item name="label" xsi:type="string" translate="true">Next billing cycle date</item>
+                    <item name="label" xsi:type="string" translate="true">Next payment on</item>
                     <item name="dateFormat" xsi:type="string">MMMM dd, YYYY</item>
                 </item>
             </argument>
         </column>
-        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
+        <column name="lifetime_value" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\LifetimeValue" sortOrder="85">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Next Payment</item>
+                    <item name="label" xsi:type="string" translate="true">Lifetime Value</item>
                     <item name="sortable" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </column>
-        <column name="current_value" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\CurrentValue">
+        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total" sortOrder="120">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Current Value</item>
+                    <item name="label" xsi:type="string" translate="true">Amount</item>
                     <item name="sortable" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfileActions" name="actions">
+        <column name="current_value" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\CurrentValue" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Profit</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </column>
+        <actionsColumn class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfileActions" name="actions" sortOrder="190">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="indexField" xsi:type="string">entity_id</item>

@@ -375,6 +375,9 @@ class Manager
                                     $requestData['price']
                                 ));
                                 $product->setPrice($requestPrice);
+                                if (isset($data['admin_modification'])) {
+                                    $product->setData('admin_modification', true);
+                                }
                             }
                             if (!empty($requestData['qty'])) {
                                 $product->setQty(number_format($requestData['qty'], 4, '.', ''));

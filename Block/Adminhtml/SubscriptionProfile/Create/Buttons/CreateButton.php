@@ -25,8 +25,8 @@ class CreateButton extends GenericButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => 'index = ' . Payment::DATA_SCOPE_PAYMENT_FORM,
-                                'actionName' => 'beforeSubmit',
+                                'targetName' => 'index = tnw_subscriptionprofile_create_summary_form',
+                                'actionName' => 'save',
                             ]
                         ]
                     ]

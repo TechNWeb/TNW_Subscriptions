@@ -56,6 +56,45 @@
                 <item name="tabLabel" translate="true" xsi:type="string">Dashboard</item>
             </item>
         </argument>
+        <modal name="change_status">
+            <settings>
+                <options>
+                    <option name="title" xsi:type="string" translate="true">Change subscription status</option>
+                    <option name="type" xsi:type="string">popup</option>
+                    <option name="buttons" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="text" xsi:type="string" translate="true">I changed my mind</item>
+                            <item name="class" xsi:type="string">action-secondary</item>
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="string">actionCancel</item>
+                            </item>
+                        </item>
+                        <item name="1" xsi:type="array">
+                            <item name="text" xsi:type="string" translate="true">Confirm</item>
+                            <item name="class" xsi:type="string">action-primary</item>
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_change_status_popup_form</item>
+                                    <item name="actionName" xsi:type="string">save</item>
+                                </item>
+                            </item>
+                        </item>
+                    </option>
+                </options>
+            </settings>
+            <insertForm name="tnw_subscriptionprofile_change_status_popup_form_loader" component="TNW_Subscriptions/js/components/insert-form">
+                <settings>
+                    <formSubmitType>ajax</formSubmitType>
+                    <renderUrl path="mui/index/render">
+                        <param name="change_status_popup">change_status_popup</param>
+                    </renderUrl>
+                    <externalProvider>tnw_subscriptionprofile_change_status_popup_form.tnw_subscriptionprofile_change_status_popup_form_data_source</externalProvider>
+                    <loading>true</loading>
+                    <autoRender>true</autoRender>
+                    <ns>tnw_subscriptionprofile_change_status_popup_form</ns>
+                </settings>
+            </insertForm>
+        </modal>
         <container name="overview">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -129,7 +168,7 @@
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">false</item>
                 <item name="label" translate="true" xsi:type="string">Subscription &amp; Account Information</item>
-                <item name="tabLabel" translate="true" xsi:type="string">Summary</item>
+                <item name="tabLabel" translate="true" xsi:type="string">Details</item>
                 <item name="additionalClasses" xsi:type="string">admin__profile_summary</item>
             </item>
         </argument>
@@ -205,6 +244,31 @@
                     <item name="additionalClasses" xsi:type="string">change-history-field-set</item>
                 </item>
             </argument>
+        </field>
+        <field name="comment_notify" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="toggleLabels" xsi:type="array">
+                        <item name="on" xsi:type="string" translate="true">Send comment to Customer</item>
+                        <item name="off" xsi:type="string" translate="true">Comment for internal use only</item>
+                    </item>
+                    <item name="default" xsi:type="string">1</item>
+                </item>
+            </argument>
+            <settings>
+                <labelVisible>false</labelVisible>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="string">0</map>
+                            <map name="true" xsi:type="string">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
         </field>
         <field name="submit_comment" class="TNW\Subscriptions\Ui\Component\Field\AddCommentButton">
             <argument name="data" xsi:type="array">

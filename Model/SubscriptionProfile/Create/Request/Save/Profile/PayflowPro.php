@@ -54,7 +54,10 @@ class PayflowPro extends Base
      */
     public function process(array $data)
     {
-        if (empty($data['payment'][$this->getPaymentMethodCode()]['method'])) {
+        if (
+            empty($data['payment'][$this->getPaymentMethodCode()]['method'])
+            || empty($data['payment'][$this->getPaymentMethodCode()]['additional'])
+        ) {
             return;
         }
         $paymentData = $data['payment'][$this->getPaymentMethodCode()];

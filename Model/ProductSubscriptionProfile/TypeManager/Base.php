@@ -233,6 +233,12 @@ abstract class Base implements TypeInterface
             }
         }
         if (!$rowPrice && $usePresetQty) {
+            if (
+                isset($productData['rebill_processing'])
+                && $productData['rebill_processing']
+            ) {
+                $price = $productData['subscription_data']['non_unique']['current_preset_qty_price'];
+            }
             $price = $productQty ? round($price, 4) : 0;
         }
 

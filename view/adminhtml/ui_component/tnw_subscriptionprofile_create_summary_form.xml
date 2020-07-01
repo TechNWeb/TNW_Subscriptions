@@ -1,0 +1,249 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_create_summary_form.tnw_subscriptionprofile_create_summary_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_create_summary_form.tnw_subscriptionprofile_create_summary_form_data_source</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/payment-form</item>
+            <item name="namespace" xsi:type="string">tnw_subscriptionprofile_create_summary_form</item>
+            <item name="addPaymentValidation" xsi:type="boolean">true</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\BackButton</item>
+            <item name="cancel" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\CancelButton</item>
+            <item name="continue" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\CreateButton</item>
+        </item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_create_summary_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Summary</argument>
+            <argument name="name" xsi:type="string">tnw_subscriptionprofile_create_summary_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">payment_form_data</argument>
+            <argument name="requestFieldName" xsi:type="string">payment_form_data</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="tnw_subscriptions/subscriptionprofile/save"/>
+        </settings>
+    </dataSource>
+    <fieldset name="subscription_and_account_information">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Subscription and Account Information</item>
+                <item name="sortOrder" xsi:type="number">20</item>
+                <item name="additionalClasses" xsi:type="string">admin__subscription-account-information</item>
+            </item>
+        </argument>
+        <container name="subscription_and_account_information_left">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/simple-container</item>
+                    <item name="sortOrder" xsi:type="number">0</item>
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                    <item name="additionalClasses" xsi:type="string">admin__subscription-account-information-container-left</item>
+                </item>
+            </argument>
+            <field name="website_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Website</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="currency_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Currency</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="status_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Status</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    </item>
+                </argument>
+            </field>
+        </container>
+        <container name="subscription_and_account_information_right">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/simple-container</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="label" xsi:type="boolean">false</item>
+                    <item name="formElement" xsi:type="string">container</item>
+                    <item name="componentType" xsi:type="string">container</item>
+                    <item name="additionalClasses" xsi:type="string">admin__subscription-account-information-container-right</item>
+                </item>
+            </argument>
+            <field name="customer_name_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Customer Name</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="email_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Email</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/mailto-label</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="customer_group_information">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" translate="true" xsi:type="string">Customer Group</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/simple-label</item>
+                    </item>
+                </argument>
+            </field>
+        </container>
+    </fieldset>
+    <fieldset name="shipping_information">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Shipping Information</item>
+                <item name="sortOrder" xsi:type="number">30</item>
+                <item name="additionalClasses" xsi:type="string">admin__address-information-preview</item>
+            </item>
+        </argument>
+        <container name="shipping_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">SubscriptionProfileCreatePreviewShippingAddress</argument>
+            </htmlContent>
+        </container>
+    </fieldset>
+    <fieldset name="shipping_method">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sortOrder" xsi:type="number">50</item>
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Shipping Method</item>
+                <item name="additionalClasses" xsi:type="string">admin__panel-information-preview</item>
+            </item>
+        </argument>
+        <field name="shipping_method_content">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/text</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="payment_method">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sortOrder" xsi:type="number">60</item>
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Payment Details</item>
+                <item name="additionalClasses" xsi:type="string">admin__panel-information-preview</item>
+            </item>
+        </argument>
+        <field name="payment_method_content">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" translate="true" xsi:type="string">Payment Method</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/text</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="billing_information">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Billing Information</item>
+                <item name="sortOrder" xsi:type="number">40</item>
+                <item name="additionalClasses" xsi:type="string">admin__address-information-preview</item>
+            </item>
+        </argument>
+        <container name="billing_address">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">SubscriptionProfileCreatePreviewBillingAddress</argument>
+            </htmlContent>
+        </container>
+    </fieldset>
+    <fieldset name="buttons">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="boolean">false</item>
+                <item name="sortOrder" xsi:type="number">70</item>
+                <item name="additionalClasses" xsi:type="string">admin__address-information-buttons</item>
+            </item>
+        </argument>
+        <field name="create">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="title" translate="true" xsi:type="string">Create</item>
+                    <item name="formElement" xsi:type="string">button</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/components/primary-button</item>
+                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/primary-button</item>
+                    <item name="subButtonLeft" xsi:type="string">true</item>
+                    <item name="displayPrimary" xsi:type="string">true</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = tnw_subscriptionprofile_create_summary_form</item>
+                            <item name="actionName" xsi:type="string">save</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>

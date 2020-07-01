@@ -15,6 +15,10 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class ProfileProcessor
+ * @package TNW\Subscriptions\Cron
+ */
 class ProfileProcessor
 {
     /**
@@ -44,6 +48,11 @@ class ProfileProcessor
      * @var SubscriptionProfileRepository
      */
     private $profileRepository;
+
+    /**
+     * @var array
+     */
+    private $tokenHashGroupMap = [];
 
     /**
      * @var SerializerInterface
@@ -209,6 +218,15 @@ class ProfileProcessor
     {
         $part[] = $profile->getCustomerId();
         $part[] = $profile->getPayment()->getEngineCode();
+
+        $gatewayToken = $profile->getPayment()->getPaymentToken();
+        $hashTempId = array_search($gatewayToken, $this->tokenHashGroupMap);
+        if ($hashTempId !== false) {
+            $part[] = $hashTempId;
+        } else {
+            $this->tokenHashGroupMap[] = $gatewayToken;
+            $part[] = count($this->tokenHashGroupMap) - 1;
+        }
 
         if (!$profile->getIsVirtual()) {
             /** @var \TNW\Subscriptions\Model\SubscriptionProfile\Address $address */

@@ -135,6 +135,15 @@ class ShippingMethods
     }
 
     /**
+     * Returns available shipping rates
+     * @return array
+     */
+    public function getShippingRates()
+    {
+        return $this->getQuote()->getShippingAddress()->getAllShippingRates();
+    }
+
+    /**
      * Returns label for shipping method from quote.
      *
      * @return string

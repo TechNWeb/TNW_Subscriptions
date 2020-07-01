@@ -51,7 +51,7 @@ define([
 
             if (parent) {
                 currentItemData = parent.source.data['item_' + parent.additionalData.objectItemId];
-                unlockPresetQty = currentItemData.unlock_preset_qty;
+                unlockPresetQty = !!parseInt(currentItemData.unlock_preset_qty);
             }
 
             if (!unlockPresetQty) {

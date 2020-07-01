@@ -57,7 +57,7 @@ define([
 
             if (value){
                 form = registry.get('index = ' + this.options.formName);
-                this.showLoader();
+                $j('body').trigger('processStart');
                 this.resetErrors();
                 //creating post data, this structure is needed to proper saving
                 postData = (typeof FORM_KEY !== 'undefined') ? {'form_key': FORM_KEY} : {};
@@ -75,10 +75,11 @@ define([
                         if (response.error) {
                             this.processErrors(response.error_messages);
                         }
-                        this.hideLoader();
+                        $j('body').trigger('processStop');
+
                     },
                     complete: function () {
-                        this.hideLoader();
+                        $j('body').trigger('processStop');
                     }
                 });
             }
@@ -88,6 +89,7 @@ define([
          * Before submit action for payment method.
          */
         beforeSubmit: function () {
+            $j('body').trigger('processStart');
             registry.get('index = '+this.options.formName).triggerSave([]);
         },
 

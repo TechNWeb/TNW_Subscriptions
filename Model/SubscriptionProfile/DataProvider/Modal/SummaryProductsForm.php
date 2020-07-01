@@ -145,6 +145,7 @@ class SummaryProductsForm extends ModifyForm
 
     /**
      * @inheritdoc
+     * @throws NoSuchEntityException
      */
     public function getData()
     {
@@ -159,7 +160,7 @@ class SummaryProductsForm extends ModifyForm
             foreach ($this->getObjectItems($subQuote) as $item) {
                 $product = $this->getProductFromItem($item);
                 $isProductDeleted = !isset($product);
-                $presetQty = (int)$product->getTnwSubscrUnlockPresetQty();
+                $presetQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $item->getPrice();
                 $taxAmount = (float) $item->getTaxAmount($subQuote) ?: 0;
                 $priceInclTax = $taxAmount ? ($taxAmount + $itemPrice) : null;
@@ -167,11 +168,12 @@ class SummaryProductsForm extends ModifyForm
                 $trialStartDate = $subQuote->getTrialStartDate();
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getOriginalStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
-                    'price' => (bool) $presetQty ? $itemPrice : (float) $itemPrice * (int) $item->getQty(),
+                    'price' => $itemPrice,
                     'billing_frequency' => $subQuote->getBillingFrequencyId(),
                     'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
+                    'trial_period' => $this->getTrialPeriod($product->getId()),
                     'unlock_preset_qty' => $presetQty,
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
@@ -179,7 +181,7 @@ class SummaryProductsForm extends ModifyForm
                         : $product->getData('short_description'),
                     'qty' => (float)$item->getQty(),
                     'is_product_deleted' => $isProductDeleted,
-                    'price_incl_tax' => (float) $priceInclTax * (int) $item->getQty(),
+                    'price_incl_tax' => $priceInclTax,
                 ];
 
                 /** @var Base $modifier */
@@ -217,22 +219,6 @@ class SummaryProductsForm extends ModifyForm
                                 'template' => 'TNW_Subscriptions/form/element/template/fieldset-buttons',
                                 'dataScope' => '',
                                 'sortOrder' => $iterator,
-                                'buttons' => [
-                                    [
-                                        'label' => __('Add products'),
-                                        'actions' => [
-                                            [
-                                                'targetName' => '${ $.parentName }.addProductsModal',
-                                                'actionName' => 'openModal',
-                                            ],
-                                            [
-                                                'targetName' => '${ $.parentName }.addProductsModal.grid_container.' .
-                                                    self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
-                                                'actionName' => 'render',
-                                            ]
-                                        ]
-                                    ]
-                                ]
                             ]
                         ]
                     ]
@@ -521,152 +507,6 @@ class SummaryProductsForm extends ModifyForm
     /**
      * @inheritdoc
      */
-    protected function getInitialFeeDefinition()
-    {
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'label' => __('Initial Fee'),
-                        'dataType' => 'text',
-                        'formElement' => UiForm\Element\Input::NAME,
-                        'componentType' => UiForm\Element\Input::NAME,
-                        'dataScope' => 'initial_fee',
-                        'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
-                        'additionalClasses' => 'field-wide',
-                        'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
-                        'previewLabel' => '%s',
-                        'component' => 'TNW_Subscriptions/js/components/add-product-form-initial-fee',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'imports' => [
-                            'changeValue' => '${ $.parentName}.billing_frequency:value',
-                        ],
-                        'modifySubscription' => false,
-                        'parentForm' => $this->getCurrentFormName(),
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getEditFieldsetDefinition()
-    {
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'label' => false,
-                        'collapsible' => false,
-                        'componentType' => UiForm\Fieldset::NAME,
-                        'additionalClasses' => 'edit-fieldset',
-                        'template' => 'TNW_Subscriptions/form/element/template/fieldset',
-                        'dataScope' => '',
-                    ],
-                ],
-            ],
-            'children' => [
-                'edit_button' => $this->getEditButton(),
-                'billing_frequency' => $this->getBillingFrequencyDefinition(),
-                'term' => $this->getTermDefinition(),
-                'period' => $this->getPeriodDefenition(),
-                'start_on' => $this->getStartOnDefinition(),
-                'price' => $this->getPriceDefinition()
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getTermDefinition()
-    {
-        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
-            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
-        );
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'multiple' => false,
-                        'dataType' => 'boolean',
-                        'formElement' => UiForm\Element\RadioSet::NAME,
-                        'componentType' => UiForm\Element\RadioSet::NAME,
-                        'options' => [
-                            ['value' => 1, 'label' => __('until canceled')],
-                            ['value' => 0, 'label' => __('stop after')],
-                        ],
-                        'default' => '1',
-                        'disabled' => $infiniteSubscriptions,
-                        'description' => __('until canceled'),
-                        'label' => __('Term:'),
-                        'dataScope' => 'term',
-                        'required' => true,
-                        'additionalClasses' => 'field-wide',
-                        'previewLabel' => __('until canceled'),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
-                        'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
-                        'imports' => [
-                            'showPreview' => '${ $.parentFormName }:previewMode'
-                        ],
-                        'parentFormName' => $this->currentFormName,
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getPeriodDefenition()
-    {
-        $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
-            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
-        );
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'label' => false,
-                        'additionalClasses' => 'field-wide sub-period-input',
-                        'dataType' => 'string',
-                        'dataScope' => 'period',
-                        'formElement' => UiForm\Element\Input::NAME,
-                        'componentType' => UiForm\Element\Input::NAME,
-                        'elementTmpl' => 'TNW_Subscriptions/form/element/period-input',
-                        'first_phrase' => '',
-                        'last_phrase' => __('times'),
-                        'validation' => [
-                            'validate-greater-than-zero' => true,
-                            'required-entry' => true,
-                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
-                        ],
-                        'imports' => [
-                            'onTermChange' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':value',
-                            'showPreview' => '${ $.parentFormName }:previewMode'
-                        ],
-                        'exports' => [
-                            'completePreviewLabel' => $this->getCurrentFormName() . '.edit_fieldset.term' . ':periodPreviewLabel'
-                        ],
-                        'visibleOnEdit' => !$infiniteSubscriptions,
-                        'previewLabelVisible' => false,
-                        'previewLabel' => __('Bill %s times'),
-                        'previewLabelOnce' => __('Bill once'),
-                        'component' => 'TNW_Subscriptions/js/components/field/preview-field-period',
-                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-                        'parentFormName' => $this->currentFormName,
-                    ]
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     protected function getStartOnDefinition()
     {
         $visible = isset($this->currentProduct)
@@ -746,31 +586,19 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getUpdateButton()
     {
-        return [
-            'arguments' => [
-                'data' => [
-                    'config' => [
-                        'formElement' => UiContainer::NAME,
-                        'componentType' => UiContainer::NAME,
-                        'component' => 'TNW_Subscriptions/js/components/edit-button',
-                        'additionalClasses' => 'action-primary action primary sub-button-right',
-                        'sortOrder' => 150,
-                        'subButtonRight' => true,
-                        'title' => __('Update'),
-                        'actions' => [
-                            [
-                                'targetName' => $this->getCurrentFormName(),
-                                'actionName' => 'save',
-                            ],
-                        ],
-                        'provider' => null,
-                        'imports' => [
-                            'visible' => '!' . $this->getCurrentFormName() . ':buttonPreviewMode'
-                        ]
-                    ]
-                ]
-            ]
-        ];
+        $result = Parent::getUpdateButton();
+        $result['arguments']['data']['config']['sortOrder'] = 150;
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getCancelButton()
+    {
+        $result = Parent::getCancelButton();
+        $result['arguments']['data']['config']['sortOrder'] = 160;
+        return $result;
     }
 
     /**

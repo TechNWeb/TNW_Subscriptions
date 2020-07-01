@@ -102,6 +102,7 @@ define(
              */
             triggerSave: function (errors) {
                 var current = this;
+                $('body.account').trigger('processStart');
                 _.each(this.source.data.payment, function (fields, code) {
                     if (fields.method === "1") {
                         if (errors && errors.length > 0) {
@@ -111,7 +112,7 @@ define(
                             }
                             fieldset.processErrors(errors);
                             current.updateButtons(false);
-                            current.hideLoader();
+                            $('body').trigger('processStop');
                             return;
                         }
                         switch (code) {
@@ -124,9 +125,9 @@ define(
                                 break;
                         }
                         current.save();
-                        current.hideLoader();
                     }
                 });
+                $('body').trigger('processStop');
             },
 
             /**

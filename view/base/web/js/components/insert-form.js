@@ -62,6 +62,9 @@ define([
                 prefix: '${ $.toolbarContainer }:rootSelector',
                 messagesClass: '${ $.externalFormName }:messagesClass'
             },
+            listens: {
+                '${ $.externalFormName }:responseData':'handleResponse'
+            },
             settings: {
                 ajax: {
                     ajaxSave: true,
@@ -155,6 +158,21 @@ define([
             if (this.externalSource()) {
                 this.externalSource().trigger('data.reset');
                 this.responseStatus(undefined);
+            }
+        },
+
+        /**
+         * Redirect if ajaxRedirect is set in response
+         * @param response
+         */
+        handleResponse: function (response) {
+            var modal = registry.get(this.parentName);
+
+            if (modal.closeModal && typeof modal.closeModal === 'function') {
+                modal.closeModal();
+            }
+            if (response.ajaxRedirect) {
+                window.location = response.ajaxRedirect;
             }
         }
     });
