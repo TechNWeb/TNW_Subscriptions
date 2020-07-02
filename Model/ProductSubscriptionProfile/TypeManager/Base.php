@@ -202,6 +202,9 @@ abstract class Base implements TypeInterface
     ) {
         $productQty  = !empty($productData['qty']) ? $productData['qty'] : 0;
         $usePresetQty = !empty($productData['use_preset_qty']) && $productQty;
+        $full = !empty($productData['modify_profile']) && $productData['modify_profile']
+            ? false
+            : $full;
         //Calculate product Price
         $lockProductPriceStatus =
             (bool) $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE);
