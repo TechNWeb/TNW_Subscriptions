@@ -106,9 +106,11 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
 
         try {
             $token = $this->secureTokenService->requestToken($object);
+
             if (!$token->getData('securetoken')) {
                 throw new \LogicException();
             }
+            $this->sessionTransparent->setSecureToken($token->getData('securetoken'));
 
             return $this->resultJsonFactory->create()->setData(
                 [
