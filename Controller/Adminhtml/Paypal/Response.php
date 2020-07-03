@@ -198,6 +198,9 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      */
     public function validateForCsrf(RequestInterface $request): ?bool
     {
+        if (!$request->getPostValue('SECURETOKEN')) {
+            return false;
+        }
         return $this->quoteSession->getData('secure_token', true) == $request->getPostValue('SECURETOKEN');
     }
 }
