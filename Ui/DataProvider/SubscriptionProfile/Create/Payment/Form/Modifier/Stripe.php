@@ -99,24 +99,92 @@ class Stripe extends Base
     protected function getAdditionalFields()
     {
         $result = [
-            'stripe_container' => [
+            'credit_card_type' => [
                 'arguments' => [
                     'data' => [
-                         "config" => [
-                             "formElement" => "container",
-                             "componentType" => "container",
-                             'component' => 'Magento_Ui/js/form/components/html',
-                             "label" => __("Custom Information"),
-                             "required" => 0,
-                             "sortOrder" => 1,
-                             "content" => $this->layoutFactory->create()->createBlock(
-                                 "TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments\Stripe"
-                             )->toHtml(),
-                         ]
+                        'config' => [
+                            'label' => __('Credit Card Type'),
+                            'componentType' => Form\Field::NAME,
+                            'formElement' => Form\Element\Select::NAME,
+                            'dataScope' => 'cc_type',
+                            'dataType' => Form\Element\DataType\Text::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/select',
+                            'dataContainer' => $this->getPaymentCode() . '-cc_type',
+                            'additionalClasses' => 'credit-card-type',
+                            'sortOrder' => 10,
+                            'options' => $this->getPaymentCcTypes(),
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ],
+                            'validation' => [
+                                'required-entry' => true,
+                            ]
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
+            'credit_card_number' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Credit Card Number'),
+                            'placeholder' => __('Credit card number'),
+                            'componentType' => Form\Field::NAME,
+                            'formElement' => Form\Element\Input::NAME,
+                            'dataScope' => 'cc_number',
+                            'dataType' => Form\Element\DataType\Text::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'additionalClasses' => 'credit-card-number admin__field-medium',
+                            'dataContainer' => $this->getPaymentCode() . '-cc_number',
+                            'sortOrder' => 20,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ]
+                        ],
+                    ],
+                ],
+            ],
+            'exp_date' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Expiration Date'),
+                            'componentType' => Form\Field::NAME,
+                            'formElement' => Form\Element\Input::NAME,
+                            'dataScope' => 'cc_exp',
+                            'dataType' => Form\Element\DataType\Text::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'dataContainer' => $this->getPaymentCode() . '-cc_exp',
+                            'additionalClasses' => 'admin__field-small',
+                            'sortOrder' => 30,
+                        ],
+                    ],
+                ],
+            ],
         ];
+        if ($this->hasVerification()) {
+            $result['credit_card_cvv'] = [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'label' => __('Card Verification Number'),
+                            'name' => '',
+                            'componentType' => Form\Field::NAME,
+                            'formElement' => Form\Element\Input::NAME,
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'dataContainer' => $this->getPaymentCode() . '-cc_cid',
+                            'dataScope' => 'cc_cid',
+                            'dataType' => Form\Element\DataType\Text::NAME,
+                            'additionalClasses' => 'payment-cvv admin__field-x-small',
+                            'sortOrder' => 40,
+                            'imports' => [
+                                'visible' => $this->getFieldsetName() . '.additional_fields:visible',
+                            ]
+                        ],
+                    ],
+                ],
+            ];
+        }
 
         return $result;
     }
@@ -132,7 +200,9 @@ class Stripe extends Base
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sdkUrl' => $this->stripeConfig->getSdkUrl(),
-            'publishableKey' => $this->stripeConfig->getPublishableKey(),
+            'stripe' => [
+                'publishableKey' => $this->stripeConfig->getPublishableKey(),
+            ],
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->stripeConfig->getAvailableCardTypes(),
