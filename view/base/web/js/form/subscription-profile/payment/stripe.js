@@ -58,8 +58,7 @@ define([
 
                 var style = {
                     base: {
-                        fontSize: '17px',
-                        height: '100%'
+                        fontSize: '17px'
                     }
                 };
 
@@ -122,14 +121,17 @@ define([
         },
 
         /**
-         * Convert card information to stripe token
+         * Create stripe api payment method
+         * @returns promise
          */
-        createToken: function () {
-            var self = this;
+        createPaymentMethod: function() {
+            var self = this,
+                defer = $.Deferred();
 
-            var defer = $.Deferred();
-
-            self.stripe.client.createSource(self.stripeCardNumber).then(function (response) {
+            self.stripe.client.createPaymentMethod({
+                type: 'card',
+                card: self.stripeCardNumber,
+            }).then(function (response) {
                 if (response.error) {
                     defer.reject(response.error.message);
                 } else {
@@ -144,12 +146,12 @@ define([
             var self = this;
             $('body').trigger('processStart');
 
-            $.when(this.createToken()).done(function (result) {
-                if (result.source.id.length) {
-                    var cc_last = result.source.card.last4;
-                    var exp_month = result.source.card.exp_month;
-                    var exp_year = result.source.card.exp_year;
-                    var brand = result.source.card.brand;
+            $.when(this.createPaymentMethod()).done(function (result) {
+                if (result.paymentMethod.id.length) {
+                    var cc_last = result.paymentMethod.card.last4,
+                        exp_month = result.paymentMethod.card.exp_month,
+                        exp_year = result.paymentMethod.card.exp_year,
+                        brand = result.paymentMethod.card.brand;
                     self.source.set(
                         self.dataScope + '.cc_last_4',
                         cc_last
@@ -160,19 +162,15 @@ define([
                     self.source.set(self.dataScope + '.additional.cc_exp_month', exp_month);
                     self.source.set(self.dataScope + '.additional.cc_exp_year', exp_year);
                     self.source.set(self.dataScope + '.cc_last_4', cc_last);
-                    self.source.set(self.dataScope + '.cc_token', result.source.id);
+                    self.source.set(self.dataScope + '.paymentMethod', JSON.stringify(result.paymentMethod));
                     var form = registry.get('index = '+ self.options.formName);
-
                     form.triggerSave([]);
                 } else {
                     self.set('payment_errors', ['Could not save card.']);
                 }
-                $('body').trigger('processStop');
-
             }).fail(function (result) {
                 self.set('payment_errors', [result]);
                 $('body').trigger('processStop');
-
             });
         },
 
