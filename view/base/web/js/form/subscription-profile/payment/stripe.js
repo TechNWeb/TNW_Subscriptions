@@ -20,6 +20,7 @@ define([
                 publishableKey: null
             },
             scriptLoaded: null,
+            scriptLoading: null,
             stripeClient: null,
             grandTotal: null,
             selectedCardType: null,
@@ -34,6 +35,8 @@ define([
         loadScript: function() {
             var self = this;
 
+            if (self.scriptLoaded || self.scriptLoading) return;
+            self.scriptLoading = true;
             $('body').trigger('processStart');
             require([this.sdkUrl], function () {
                 self.stripe.client = window.Stripe(self.stripe.publishableKey);

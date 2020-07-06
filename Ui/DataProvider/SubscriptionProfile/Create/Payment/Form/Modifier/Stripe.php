@@ -133,7 +133,7 @@ class Stripe extends Base
                             'formElement' => Form\Element\Input::NAME,
                             'dataScope' => 'cc_number',
                             'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
                             'additionalClasses' => 'credit-card-number admin__field-medium',
                             'dataContainer' => $this->getPaymentCode() . '-cc_number',
                             'sortOrder' => 20,
@@ -153,7 +153,7 @@ class Stripe extends Base
                             'formElement' => Form\Element\Input::NAME,
                             'dataScope' => 'cc_exp',
                             'dataType' => Form\Element\DataType\Text::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
                             'dataContainer' => $this->getPaymentCode() . '-cc_exp',
                             'additionalClasses' => 'admin__field-small',
                             'sortOrder' => 30,
@@ -171,7 +171,7 @@ class Stripe extends Base
                             'name' => '',
                             'componentType' => Form\Field::NAME,
                             'formElement' => Form\Element\Input::NAME,
-                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                            'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe-input',
                             'dataContainer' => $this->getPaymentCode() . '-cc_cid',
                             'dataScope' => 'cc_cid',
                             'dataType' => Form\Element\DataType\Text::NAME,
@@ -209,9 +209,6 @@ class Stripe extends Base
             'ccTypesMapper' => $this->stripeConfig->getCcTypesMapper(),
             'options' => [
                 'formName' => $this->getPaymentFormName(),
-            ],
-            'imports' => [
-                'changeVisibility' => "{$this->getFieldsetName()}.method:checked",
             ],
         ];
     }
