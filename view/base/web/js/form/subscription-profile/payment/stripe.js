@@ -126,17 +126,11 @@ define([
          */
         createPaymentMethod: function() {
             var self = this,
-                defer = $.Deferred(),
-                billingInfo = registry.get(
-                    "index = tnw_subscriptionprofile_create_shipping_and_billing_form_data_source"
-                ).data.billing_info;
+                defer = $.Deferred();
 
             self.stripe.client.createPaymentMethod({
                 type: 'card',
                 card: self.stripeCardNumber,
-                billing_details: {
-                    name: billingInfo.firstname + ' ' + billingInfo.lastname
-                }
             }).then(function (response) {
                 if (response.error) {
                     defer.reject(response.error.message);

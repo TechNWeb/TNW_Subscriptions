@@ -1229,11 +1229,6 @@
             <argument name="collectionProcessor" xsi:type="object">Magento\Quote\Model\Api\SearchCriteria\QuoteCollectionProcessor</argument>
         </arguments>
     </type>
-    <type name="TNW\Subscriptions\Model\Payment\Stripe\StripePaymentDataBuilder">
-        <arguments>
-            <argument name="config" xsi:type="string">TNW\Stripe\Gateway\Config\Config</argument>
-        </arguments>
-    </type>
     <type name="TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization">
         <arguments>
             <argument name="paymentProcessors" xsi:type="array">
