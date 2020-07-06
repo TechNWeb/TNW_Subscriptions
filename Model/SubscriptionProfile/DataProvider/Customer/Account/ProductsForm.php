@@ -209,8 +209,11 @@ class ProductsForm extends SummaryProductsForm
         $params = [];
         /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem($productId, $websiteId);
+        foreach ($this->profileManager->getProfile()->getProducts() as $item) {
+            $product = $item->getChildren() ? $item->getChildren() : $item;
+        }
         $productSalableQty = $this->productSalableQty->execute(
-            current($this->profileManager->getProfile()->getProducts())->getSku(),
+            $product->getSku(),
             $websiteId
         );
 
@@ -219,8 +222,7 @@ class ProductsForm extends SummaryProductsForm
             $params['maxAllowed'] = $productSalableQty < $stockItem->getMaxSaleQty()
                 ? $productSalableQty
                 : $stockItem->getMaxSaleQty();
-        }
-        else {
+        } else {
             $params['maxAllowed'] = $stockItem->getMaxSaleQty();
         }
 
