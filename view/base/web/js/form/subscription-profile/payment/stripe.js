@@ -164,13 +164,10 @@ define([
                     self.source.set(self.dataScope + '.cc_last_4', cc_last);
                     self.source.set(self.dataScope + '.paymentMethod', JSON.stringify(result.paymentMethod));
                     var form = registry.get('index = '+ self.options.formName);
-
                     form.triggerSave([]);
                 } else {
                     self.set('payment_errors', ['Could not save card.']);
                 }
-                $('body').trigger('processStop');
-
             }).fail(function (result) {
                 self.set('payment_errors', [result]);
                 $('body').trigger('processStop');
