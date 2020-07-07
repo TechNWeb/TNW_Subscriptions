@@ -25,6 +25,10 @@
         <plugin name="add_proposed_shipping_date"
                 type="TNW\Subscriptions\Plugin\Sales\Model\Order\ItemRepository" />
     </type>
+    <type name="TNW\Stripe\Model\Adapter\StripeAdapter">
+        <plugin name="before_create_payment_intent"
+                type="TNW\Subscriptions\Plugin\Stripe\Model\Adapter\StripeAdapter" />
+    </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -523,7 +527,7 @@
                     <item name="sortOrder" xsi:type="number">140</item>
                 </item>
                 <item name="stripe_vault_payment" xsi:type="array">
-                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Stripe</item>
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\StripeVault</item>
                     <item name="sortOrder" xsi:type="number">150</item>
                 </item>
                 <item name="cybersoruce_vault_payment" xsi:type="array">
