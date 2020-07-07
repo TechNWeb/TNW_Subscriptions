@@ -365,7 +365,7 @@ class LinkedProducts extends AbstractModifier
             'label' => null,
             'renderDefaultRecord' => false,
             'template' => 'ui/dynamic-rows/templates/grid',
-            'component' => 'Magento_Ui/js/dynamic-rows/dynamic-rows-grid',
+            'component' => 'TNW_Subscriptions/js/components/billing-frequency-dynamic-rows-grid',
             'columnsHeader' => false,
             'columnsHeaderAfterRender' => true,
             'addButton' => false,
