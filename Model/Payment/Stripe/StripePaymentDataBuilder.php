@@ -67,18 +67,16 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
      * @param \Magento\Framework\Module\Manager $moduleManager
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
-     * @param string $config
      */
     public function __construct(
        SubscriptionConfig $subscriptionConfig,
        Manager $manager,
        \Magento\Framework\Module\Manager $moduleManager,
        \Magento\Framework\ObjectManagerInterface $objectManager,
-       \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
-       $config = ''
+       \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
     ) {
-        if ($moduleManager->isEnabled("TNW_Stripe") && $config) {
-            $this->config = $objectManager->get($config);
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->config = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
             $this->adapterFactory = $objectManager->get('TNW\Stripe\Model\Adapter\StripeAdapterFactory');
             $this->customerClient = $objectManager->get('TNW\Stripe\Gateway\Http\Client\TransactionCustomer');
             $this->transferFactory = $objectManager->get('TNW\Stripe\Gateway\Http\TransferFactory');
@@ -112,11 +110,12 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
         if ($this->config->isReceiptEmailEnabled()) {
             $result[self::RECEIPT_EMAIL] = $billingAddress->getEmail() ? : $paymentData['customer_guest_email'];
         }
+        $addtionalDataToken = isset($paymentData['additional_data']['cc_token'])
+            ? $paymentData['additional_data']['cc_token']
+            : '';
         $token = isset($paymentData['cc_token'])
             ? $paymentData['cc_token']
-            : isset($paymentData['additional_data']['cc_token'])
-                ? $paymentData['additional_data']['cc_token']
-                : '';
+            : $addtionalDataToken;
         if ($token) {
             if (strpos($token, 'pi_') !== false) {
                 $result[self::PI] = $token;
@@ -175,7 +174,11 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
                 $customerRequestData['payment_method'] = $pm;
             }
             $customerRequestData['invoice_settings'] = ['default_payment_method' => $pm];
-            $this->customerClient->placeRequest($this->transferFactory->create($customerRequestData));
+            try {
+                $this->customerClient->placeRequest($this->transferFactory->create($customerRequestData));
+            } catch (\Magento\Payment\Gateway\Http\ClientException $e){
+                $result[self::CUSTOMER] = $paymentData['additional_data']['customer'];
+            }
         }
 
         return $result;

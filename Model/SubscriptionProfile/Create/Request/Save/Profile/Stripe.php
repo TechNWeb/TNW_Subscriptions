@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+use \TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
+
 /**
  * Class Stripe
  * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
@@ -21,18 +23,41 @@ class Stripe extends Base
      */
     private $encryptor;
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
     private $paymentTokenRepository;
 
+    /**
+     * @var mixed
+     */
+    private $adapterFactory;
+
+    /**
+     * Stripe constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->adapterFactory = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");
+        }
         parent::__construct($createModel, $session);
     }
 
@@ -57,6 +82,36 @@ class Stripe extends Base
         if (!$quote->getCustomerId()) {
             $guestEmail = $this->getSession()->getCustomerEmail();
         }
+        $payment = json_decode(
+            $paymentData['paymentMethod'],
+            true
+        );
+        $amount = '1';
+        $currency = $quote->getQuoteCurrencyCode();
+        $paymentId = $payment['id'];
+        $stripeAdapter = $this->adapterFactory->create();
+        $cs = $stripeAdapter->customer([
+            'email' => $guestEmail ? : $quote->getCustomerEmail(),
+            'payment_method' => $paymentId,
+            'invoice_settings' => ['default_payment_method' => $paymentId]
+        ]);
+        $params = [
+            StripeEngine::CUSTOMER => $cs->id,
+            StripeEngine::AMOUNT => $this->formatPrice($amount),
+            StripeEngine::CURRENCY => $currency,
+            StripeEngine::PAYMENT_METHOD_TYPES => ['card'],
+            StripeEngine::CONFIRMATION_METHOD => 'manual',
+            StripeEngine::CAPTURE_METHOD => 'manual',
+            StripeEngine::SETUP_FUTURE_USAGE => 'off_session'
+        ];
+        $params[StripeEngine::PAYMENT_METHOD] = $paymentId;
+        $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+
+        $paymentMethod = $paymentIntent->payment_method;
+        $paymentData['cc_token'] = $paymentMethod;
+        $paymentData['additional_data']['cc_token'] = $paymentMethod;
+        $paymentData['additional_data']['customer'] = $cs->id;
+
         $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote, $guestEmail);
         $paymentToken = $result['payment_token'];
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
@@ -95,5 +150,16 @@ class Stripe extends Base
             . $paymentToken->getTokenDetails();
 
         return $this->encryptor->getHash($hashKey);
+    }
+
+    /**
+     * @param $price
+     * @return mixed
+     */
+    public function formatPrice($price)
+    {
+        $price = sprintf('%.2F', $price);
+
+        return str_replace('.', '', $price);
     }
 }

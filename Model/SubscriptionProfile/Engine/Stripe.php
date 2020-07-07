@@ -16,10 +16,16 @@ use Magento\Framework\Exception\PaymentException;
  */
 class Stripe extends Base
 {
-    /**
-     * @var \Magento\Braintree\Gateway\Http\TransferFactory
-     */
-    private $transferFactory;
+    const AMOUNT = 'amount';
+    const CURRENCY = 'currency';
+    const DESCRIPTION = 'description';
+    const CONFIRMATION_METHOD = 'confirmation_method';
+    const PAYMENT_METHOD = 'payment_method';
+    const PAYMENT_METHOD_TYPES = 'payment_method_types';
+    const RECEIPT_EMAIL = 'receipt_email';
+    const CUSTOMER = 'customer';
+    const CAPTURE_METHOD = 'capture_method';
+    const SETUP_FUTURE_USAGE = 'setup_future_usage';
 
     /**
      * @var \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer
@@ -31,6 +37,24 @@ class Stripe extends Base
      */
     private $isRebill = false;
 
+    private $adapterFactory;
+
+    /**
+     * Stripe constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param \TNW\Subscriptions\Model\Context $context
+     * @param \Magento\Quote\Api\CartManagementInterface $cartManagement
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $persistor
+     * @param \Magento\Payment\Model\Checks\ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         \TNW\Subscriptions\Model\Context $context,
@@ -59,7 +83,7 @@ class Stripe extends Base
             $paymentTokenManagement
         );
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
+            $this->adapterFactory = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");
         }
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -190,9 +214,52 @@ class Stripe extends Base
         $this->isRebill = true;
     }
 
+    /**
+     * @return string
+     */
     public function getVaultPaymentCode()
     {
         return $this->getPaymentMethodCode() . '_vault';
+    }
+
+    /**
+     * @param $requestData
+     * @return $this|Base|EngineInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
+    public function processProfileByRequestData($requestData)
+    {
+        if (!empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
+            return parent::processProfileByRequestData($requestData);
+        }
+        if (empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
+            return $this;
+        }
+        $payment = json_decode(
+            $requestData['payment'][$this->getPaymentMethodCode()]['paymentMethod'],
+            true
+        );
+        $quote = $this->manager->getTempQuote($this->getProfile());
+        $amount = '1';
+        $currency = $quote->getQuoteCurrencyCode();
+        $paymentId = $payment['id'];
+            $stripeAdapter = $this->adapterFactory->create();
+            $cs = $stripeAdapter->customer(['payment_method' => $paymentId]);
+            $params = [
+                self::CUSTOMER => $cs->id,
+                self::AMOUNT => $this->formatPrice($amount),
+                self::CURRENCY => $currency,
+                self::PAYMENT_METHOD_TYPES => ['card'],
+                self::CONFIRMATION_METHOD => 'manual',
+                self::CAPTURE_METHOD => 'manual',
+                self::SETUP_FUTURE_USAGE => 'off_session'
+            ];
+            $params[self::PAYMENT_METHOD] = $paymentId;
+            $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+            $requestData['payment'][$this->getPaymentMethodCode()]['cc_token'] = $paymentIntent->id;
+
+            return parent::processProfileByRequestData($requestData);
     }
 
     /**
@@ -209,5 +276,16 @@ class Stripe extends Base
         } else {
             parent::validatePayment($quote);
         }
+    }
+
+    /**
+     * @param $price
+     * @return mixed
+     */
+    public function formatPrice($price)
+    {
+        $price = sprintf('%.2F', $price);
+
+        return str_replace('.', '', $price);
     }
 }
