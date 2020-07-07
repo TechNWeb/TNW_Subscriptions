@@ -294,7 +294,8 @@ button.profile__cancel-edit_button:before {
   float: left;
   width: 19%;
   text-align: center;
-  margin-right: 2rem;
+  margin-right: 2%;
+  padding-bottom: 10%;
 }
 .subscription-item-form .description-fieldset .left-container .sub-product-image {
   margin-bottom: 0;
@@ -838,6 +839,7 @@ button.action-editor.active:before {
 }
 .product-options .admin__fieldset > .admin__field.edit-product {
   margin-top: 0;
+  margin-bottom: 0;
 }
 .product-options .admin__fieldset > .admin__field.edit-product > .admin__field-label {
   margin-left: 3rem;

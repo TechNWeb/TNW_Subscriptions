@@ -283,7 +283,7 @@ class Manager
 
     /**
      * @param $profile
-     * @param $quote
+     * @param Quote $quote
      */
     public function populateTotals($profile, $quote)
     {
@@ -1048,7 +1048,9 @@ class Manager
             $isRebill
             && $this->profile->getOrigData('billing_frequency_id') == $this->profile->getData('billing_frequency_id')
         ) {
-            $data['rebill_processing'] = $isRebill;
+            $data['rebill_processing'] = $data['modify_profile'] = $isRebill;
+        } elseif ($isRebill) {
+            $data['modify_profile'] = $isRebill;
         }
         return $this->dataObjectFactory->create($data);
     }

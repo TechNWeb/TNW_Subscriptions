@@ -252,12 +252,14 @@ class Product extends Create
             }
             // add preset qty param to product request array
             $productData['use_preset_qty'] = $this->getChildProduct()
-                ? (bool)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
-                : (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+                ? (bool) $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY)
+                : (bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
             $productData['hide_qty'] =
-                (bool)$this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
+                (bool) $this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
             $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_START_DATE);
-            $isTrial = $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS) ? true : false;
+            $isTrial = !empty($productData['modify_profile']) && $productData['modify_profile']
+                ? false
+                : (bool) $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS);
             $trialPeriod = $trialUnitId = null;
             if ($isTrial) {
                 $childTrial = $this->getInheritanceConfig(Attribute::SUBSCRIPTION_TRIAL_STATUS);
@@ -265,8 +267,8 @@ class Product extends Create
                     ? $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
                     : $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH);
                 $trialUnitId = $childTrial
-                    ? (int)$this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
-                    : (int)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
+                    ? (int) $this->getChildProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT)
+                    : (int) $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
                 //Note: If product "is trial" then "start on" is start date of trial period,
                 // otherwise "start on" is start date of subscription
                 $startOn = $childTrial
