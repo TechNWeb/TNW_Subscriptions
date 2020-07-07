@@ -6,12 +6,8 @@
 
 namespace TNW\Subscriptions\Api;
 
-use Magento\Framework\Api\SearchCriteriaInterface;
-
 interface ProductBillingFrequencyRepositoryInterface
 {
-
-
     /**
      * Save ProductBillingFrequency
      * @param \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface $productBillingFrequency
