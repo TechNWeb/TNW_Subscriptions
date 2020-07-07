@@ -58,7 +58,7 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $id = $this->getRequest()->getParam('id');
-        if (is_int($id)) {
+        if (is_numeric($id)) {
             $billingFrequency = $this->productBillingFrequency->isBillingFrequencyAllowedToProduct($id);
         } else {
             $this->messageManager->addErrorMessage(__(
