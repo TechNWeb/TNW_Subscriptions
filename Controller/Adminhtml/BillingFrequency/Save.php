@@ -85,26 +85,38 @@ class Save extends \Magento\Backend\App\Action
                 $this->messageManager->addErrorMessage(__('This Billing Frequency no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
             }
-            $filterByProductId = $this->filterBuilder
-                ->setField(\TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID)
-                ->setConditionType('eq')
-                ->setValue($id)
-                ->create();
-            $filterByState = $this->filterBuilder
-                ->setField('status')
-                ->setConditionType('nin')
-                ->setValue([
-                    ProfileStatus::STATUS_CANCELED,
-                    ProfileStatus::STATUS_COMPLETE
-                ])
-                ->create();
-            $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filterByProductId, $filterByState])->create();
-            $activeSubscriptionProfiles = $this->subscriptionProfileRepository->getList($searchCriteria)->getItems();
-            if (count($activeSubscriptionProfiles) > 1) {
-                $this->messageManager->addErrorMessage(
-                    __('Cannot change billing frequency. There are active subscription Profiles.')
-                );
-                return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+            $canBeModified = true;
+            foreach ($model->getData() as $dataKey => $storedDataValue) {
+                if (isset($data[$dataKey]) && $data[$dataKey] != $storedDataValue) {
+                    $canBeModified = false;
+                    break;
+                }
+            }
+            if (!$canBeModified) {
+                $filterByProductId = $this->filterBuilder
+                    ->setField(\TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID)
+                    ->setConditionType('eq')
+                    ->setValue($id)
+                    ->create();
+                $filterByState = $this->filterBuilder
+                    ->setField('status')
+                    ->setConditionType('nin')
+                    ->setValue([
+                        ProfileStatus::STATUS_CANCELED,
+                        ProfileStatus::STATUS_COMPLETE
+                    ])
+                    ->create();
+                $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filterByProductId, $filterByState])
+                    ->create();
+                $activeSubscriptionProfiles = $this->subscriptionProfileRepository->getList($searchCriteria)
+                    ->getItems();
+                if (count($activeSubscriptionProfiles) > 1) {
+                    $this->messageManager->addErrorMessage(
+                        __('Cannot change billing frequency. There are active subscription Profiles.')
+                    );
+                    return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()
+                        ->getParam('id')]);
+                }
             }
 
             $model->setData($data);
