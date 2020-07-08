@@ -108,7 +108,7 @@ class TokenExtractor
             'tnw_stripe',
             $customerId
         )) {
-            $last4 = '';
+            $last4 = isset($paymentData['cc_last_4']) ? $paymentData['cc_last_4'] : '';
             /** @var PaymentTokenInterface $paymentToken */
             $paymentToken = $this->paymentTokenFactory->create()
                 ->setExpiresAt($this->_getExpirationDate($paymentData))

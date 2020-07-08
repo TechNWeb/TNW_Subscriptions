@@ -13,6 +13,10 @@ use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency;
 use TNW\Subscriptions\Model\BillingFrequency;
 
+/**
+ * Class Delete
+ * @package TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
+ */
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {
     /**
@@ -54,7 +58,15 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $id = $this->getRequest()->getParam('id');
-        $billingFrequency = $this->productBillingFrequency->isBillingFrequencyAllowedToProduct($id);
+        if (is_numeric($id)) {
+            $billingFrequency = $this->productBillingFrequency->isBillingFrequencyAllowedToProduct($id);
+        } else {
+            $this->messageManager->addErrorMessage(__(
+                'Invalid ID param provided.'
+            ));
+            // go to grid
+            return $resultRedirect->setPath('*/*/');
+        }
         // check if we know what should be deleted and it not have any associated products
         if ($id && empty($billingFrequency)) {
             try {

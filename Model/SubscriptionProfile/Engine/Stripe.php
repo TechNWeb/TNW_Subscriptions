@@ -102,16 +102,23 @@ class Stripe extends Base
         }
         if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
             $cardDetails = [
-                'type' => $payment->getCcType()
+                'type' => $payment->getCcType() ? : $payment->getType()
             ];
-            $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
+            if ($payment->getCcExpMonth() && $payment->getCcExpYear()) {
+                $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
+            } else {
+                $expirationDate = $payment->getData('expirationDate')
+                    ? explode('/' , $payment->getData('expirationDate'))
+                    : ["", ""]
+                ;
+            }
         }
         $result = [
             'encoded_payment_additional_info' => [
                 OrderPaymentInterface::CC_TYPE => isset($additionalInfo[OrderPaymentInterface::CC_TYPE])
                     ? $additionalInfo[OrderPaymentInterface::CC_TYPE]
                     : $cardDetails['type'],
-                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
+                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4() ? : $payment->getData('maskedCC'),
                 OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
                     : $expirationDate[0],
