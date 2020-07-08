@@ -7,28 +7,68 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
 use Magento\Framework\Exception\LocalizedException;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
+/**
+ * Class Save
+ * @package TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
+ */
 class Save extends \Magento\Backend\App\Action
 {
-
+    /**
+     * @var \Magento\Framework\App\Request\DataPersistorInterface
+     */
     protected $dataPersistor;
 
     /**
+     * @var \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * @var \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface
+     */
+    private $billingFrequencyRepository;
+
+    /**
+     * @var \Magento\Framework\Api\FilterBuilder
+     */
+    private $filterBuilder;
+
+    /**
+     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * Save constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+     * @param \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface $billingFrequencyRepository
+     * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
+        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
+        \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface $billingFrequencyRepository,
+        \Magento\Framework\Api\FilterBuilder $filterBuilder,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->dataPersistor = $dataPersistor;
+        $this->filterBuilder = $filterBuilder;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         parent::__construct($context);
     }
 
     /**
-     * Save action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return \Magento\Backend\Model\View\Result\Redirect|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute()
     {
@@ -40,10 +80,43 @@ class Save extends \Magento\Backend\App\Action
         if ($data) {
             $id = $this->getRequest()->getParam('id');
 
-            $model = $this->_objectManager->create('TNW\Subscriptions\Model\BillingFrequency')->load($id);
+            $model = $this->billingFrequencyRepository->getById($id);
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Billing Frequency no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
+            }
+            $canBeModified = true;
+            foreach ($model->getData() as $dataKey => $storedDataValue) {
+                if (isset($data[$dataKey]) && $data[$dataKey] != $storedDataValue) {
+                    $canBeModified = false;
+                    break;
+                }
+            }
+            if (!$canBeModified) {
+                $filterByProductId = $this->filterBuilder
+                    ->setField(\TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID)
+                    ->setConditionType('eq')
+                    ->setValue($id)
+                    ->create();
+                $filterByState = $this->filterBuilder
+                    ->setField('status')
+                    ->setConditionType('nin')
+                    ->setValue([
+                        ProfileStatus::STATUS_CANCELED,
+                        ProfileStatus::STATUS_COMPLETE
+                    ])
+                    ->create();
+                $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filterByProductId, $filterByState])
+                    ->create();
+                $activeSubscriptionProfiles = $this->subscriptionProfileRepository->getList($searchCriteria)
+                    ->getItems();
+                if (count($activeSubscriptionProfiles) > 1) {
+                    $this->messageManager->addErrorMessage(
+                        __('Cannot change billing frequency. There are active subscription Profiles.')
+                    );
+                    return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()
+                        ->getParam('id')]);
+                }
             }
 
             $model->setData($data);
