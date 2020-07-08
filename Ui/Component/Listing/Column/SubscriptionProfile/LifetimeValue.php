@@ -12,7 +12,6 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 
 /**
  * Class Current Value column
@@ -32,15 +31,9 @@ class LifetimeValue extends Column
     private $profileRepository;
 
     /**
-     * @var ProfitCalculator
-     */
-    private $profitCalculator;
-
-    /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param SubscriptionProfileRepositoryInterface $profileRepository
-     * @param ProfitCalculator $profitCalculator
      * @param PriceCurrencyInterface $priceFormatter
      * @param array $components
      * @param array $data
@@ -49,14 +42,12 @@ class LifetimeValue extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         SubscriptionProfileRepositoryInterface $profileRepository,
-        ProfitCalculator $profitCalculator,
         PriceCurrencyInterface $priceFormatter,
         array $components = [],
         array $data = []
     ) {
         $this->priceFormatter = $priceFormatter;
         $this->profileRepository = $profileRepository;
-        $this->profitCalculator = $profitCalculator;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -72,17 +63,17 @@ class LifetimeValue extends Column
                 $profileId = $item['entity_id'];
                 /** @var \TNW\Subscriptions\Model\SubscriptionProfile $profile */
                 $profile = $this->profileRepository->getById($profileId);
-                $remainingProfit = $this->profitCalculator->getTotalProfit($profile);
+                $currentValue = $profile->getCurrentValue();
                 $currencyCode = isset($item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE]) ?
                     $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] : null;
-                $remainingProfit = $this->priceFormatter->format(
-                    $remainingProfit,
+                $currentValue = $this->priceFormatter->format(
+                    $currentValue,
                     false,
                     null,
                     null,
                     $currencyCode
                 );
-                $item[$this->getData('name')] = $remainingProfit;
+                $item[$this->getData('name')] = $currentValue;
             }
         }
 
