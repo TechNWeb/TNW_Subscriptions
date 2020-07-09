@@ -258,6 +258,8 @@ class GridMetadata
 
         $skuColumn = $this->getColumnBaseData('sku', false, __('SKU'), 30);
         $skuColumn = $this->setColumnSpecialData($skuColumn);
+        $isActiveColumn = $this->getColumnBaseData('is_active', false, __('Is Active'), 120);
+        $isActiveColumn = $this->setColumnSpecialData($isActiveColumn);
 
         $priceColumn = $this->getColumnBaseData('price', false, __($this->getPriceLabel()), 40);
         $priceColumn = $this->setColumnSpecialData(
@@ -410,6 +412,7 @@ class GridMetadata
             'status' => $statusColumn,
             'preset_qty' => $presetQtyColumn,
             'unlock_preset_qty' => $unlockPresetQtyColumn,
+            'is_active' => $isActiveColumn,
         ];
 
         return $columns;

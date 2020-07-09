@@ -148,4 +148,20 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     {
         return $this->setData(self::PRESET_QTY, $presetQty);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIsActive()
+    {
+        return $this->getData(self::IS_ACTIVE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsActive($isActive)
+    {
+        return $this->setData(self::IS_ACTIVE, $isActive);
+    }
 }
