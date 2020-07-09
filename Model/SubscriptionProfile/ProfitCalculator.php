@@ -226,7 +226,12 @@ class ProfitCalculator
                 ->where('profileItem.subscription_profile_id = ?', $profile->getId());
 
             $invoiceItems = $connection->fetchAll($select);
+            $initialFeeAdded = false;
             foreach ($invoiceItems as $item) {
+                if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
+                    $initialFeeAdded = true;
+                    $profit += $recurringOption['initial_fee'];
+                }
                 $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
             }
 
