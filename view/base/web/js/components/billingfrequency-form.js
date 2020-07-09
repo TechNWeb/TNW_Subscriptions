@@ -21,6 +21,7 @@ define([
                         initial_fee: linked_data[key].initial_fee,
                         preset_qty: linked_data[key].preset_qty,
                         sort_order: linked_data[key].sort_order,
+                        is_disabled: linked_data[key].is_disabled,
                     };
                 }
                 data.links.linked = JSON.stringify(linked);

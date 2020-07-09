@@ -208,7 +208,7 @@ class ListProductButtons extends Template
                 ->getListByProductId($productId)
                 ->getItems();
             foreach ($productBillingFrequencies as $productBillingFrequency) {
-                if ($productBillingFrequency->getData()['default_billing_frequency'] ==  1) {
+                if ($productBillingFrequency->getData()['default_billing_frequency'] == 1) {
                     $this->setData('product_billing_frequencies', $productBillingFrequency);
                 }
             }
