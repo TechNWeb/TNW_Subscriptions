@@ -321,21 +321,23 @@ class Subscribe extends View
             ->getListByProductId($productId)
             ->getItems();
         foreach ($productBillingFrequencies as $productBillingFrequency) {
-            $frequency = $this->frequencyRepository->getById($productBillingFrequency->getBillingFrequencyId());
-            $frequencyPrice = $this->priceCalculator->getUnitPrice(
-                $productDataObject,
-                $productBillingFrequency->getBillingFrequencyId()
-            );
-            $data = [
-                'label' => $frequency->getLabel(),
-                'value' => $productBillingFrequency->getBillingFrequencyId(),
-                'frequency_unit' => $frequency->getFrequency(),
-                'frequency_unit_type' => $frequency->getUnit(),
-                'is_default' => $productBillingFrequency->getDefaultBillingFrequency(),
-                'price' => $frequencyPrice,
-                'preset_qty' => $productBillingFrequency->getPresetQty()
-            ];
-            $result[] = $data;
+            if ($productBillingFrequency->getIsActive()) {
+                $frequency = $this->frequencyRepository->getById($productBillingFrequency->getBillingFrequencyId());
+                $frequencyPrice = $this->priceCalculator->getUnitPrice(
+                    $productDataObject,
+                    $productBillingFrequency->getBillingFrequencyId()
+                );
+                $data = [
+                    'label' => $frequency->getLabel(),
+                    'value' => $productBillingFrequency->getBillingFrequencyId(),
+                    'frequency_unit' => $frequency->getFrequency(),
+                    'frequency_unit_type' => $frequency->getUnit(),
+                    'is_default' => $productBillingFrequency->getDefaultBillingFrequency(),
+                    'price' => $frequencyPrice,
+                    'preset_qty' => $productBillingFrequency->getPresetQty()
+                ];
+                $result[] = $data;
+            }
         }
         return !empty($result) ? $result : null;
     }
