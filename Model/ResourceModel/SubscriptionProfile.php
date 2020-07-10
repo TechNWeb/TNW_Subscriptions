@@ -68,8 +68,7 @@ class SubscriptionProfile extends AbstractEntity
      */
     public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($object instanceof \TNW\Subscriptions\Model\SubscriptionProfile) {
-            $profileProducts = $object->getProducts();
+        if ($profileProducts = $object->getProducts()) {
             $product = array_shift($profileProducts);
             $profit = $product->getData('initial_fee') ? : 0;
         } else {
