@@ -201,7 +201,7 @@ class NotificationProcessor
                     tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )
-                ->addFieldToFilter('engine_code', array('neq' => 'checkmo'))
+                ->addFieldToFilter('engine_code', array('nin' => ['checkmo', 'banktransfer']))
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToFilter('sent_mail', 0)
                 ->addFieldToSelect('subscription_profile_id');

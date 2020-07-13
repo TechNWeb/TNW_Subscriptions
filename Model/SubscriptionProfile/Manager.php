@@ -1347,7 +1347,10 @@ class Manager
             ->reset()
             ->populateProfileData($quote, $quoteItems);
         $notCCMethod = false;
-        if (isset($trialData['method']) && $trialData['method'] == 'checkmo') {
+        if (
+            isset($trialData['method'])
+            && ($trialData['method'] == 'checkmo' || $trialData['method'] == 'banktransfer')
+        ) {
             $notCCMethod = true;
             $quotePayment->setMethod($trialData['method']);
             $this->getProfile()->getPayment()->setEngineCode($trialData['method']);
