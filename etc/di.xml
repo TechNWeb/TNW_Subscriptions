@@ -825,6 +825,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="banktransfer" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\BankTransfer</item>
+                    <item name="sortOrder" xsi:type="number">11</item>
+                </item>
                 <item name="payflowpro" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
@@ -947,6 +951,11 @@
                 <item name="checkmo" xsi:type="array">
                     <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Checkmo::PAYMENT_METHOD_CHECKMO_CODE</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CheckmoFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
+                </item>
+                <item name="banktransfer" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Banktransfer::PAYMENT_METHOD_BANKTRANSFER_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BankTransferFactory</item>
                     <item name="cc" xsi:type="boolean">false</item>
                 </item>
                 <item name="payflowpro" xsi:type="array">
