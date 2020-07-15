@@ -103,6 +103,21 @@ class EmailDetails extends BaseSummary
     }
 
     /**
+     * Returns purchase order number
+     * @return string
+     */
+    public function getPurchaseOrderNumber()
+    {
+        $additionalInfo = $this->getPaymentAdditionalInfo();
+        $poNumber = '';
+        if (isset($additionalInfo['po_number'])) {
+            $poNumber = $additionalInfo['po_number'];
+        }
+
+        return $poNumber;
+    }
+
+    /**
      * Returns credit card type label
      * @return string
      */

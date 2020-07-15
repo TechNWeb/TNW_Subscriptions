@@ -123,6 +123,11 @@ define([
             return row.payment_description;
         },
 
+        getPoNumber: function (row) {
+            if (!row.payment_description) return false;
+            return row.payment_description.po_number;
+        },
+
         getCcType: function (row) {
             if (!row.payment_description) return false;
             return row.payment_description.cc_type;

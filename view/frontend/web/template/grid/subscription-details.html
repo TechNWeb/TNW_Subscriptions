@@ -100,12 +100,18 @@
                         <dt class="label" translate="'Payment method'"/>
                         <dd class="right" html="$col.getPaymentMethodTitle($row())"/>
                         <!-- ko if: $col.getPaymentDescription($row()) -->
-                        <dt class="label" translate="'Card Type'"/>
-                        <dd class="right" text="$col.getCcType($row())"/>
-                        <dt class="label" translate="'Card Number'"/>
-                        <dd class="right" text="$col.getCcNumber($row())"/>
-                        <dt class="label" translate="'Exp. Date'"/>
-                        <dd class="right" text="$col.getCcExp($row())"/>
+                            <!-- ko if: $col.getCcNumber($row()) -->
+                            <dt class="label" translate="'Card Type'"/>
+                            <dd class="right" text="$col.getCcType($row())"/>
+                            <dt class="label" translate="'Card Number'"/>
+                            <dd class="right" text="$col.getCcNumber($row())"/>
+                            <dt class="label" translate="'Exp. Date'"/>
+                            <dd class="right" text="$col.getCcExp($row())"/>
+                            <!-- /ko -->
+                            <!-- ko if: $col.getPoNumber($row()) -->
+                            <dt class="label" translate="'Purchase Order Number'"/>
+                            <dd class="right" text="$col.getPoNumber($row())"/>
+                            <!-- /ko -->
                         <dt class="label" translate="'Currency'"/>
                         <dd class="right" text="$col.getCurrency($row())"/>
                         <!-- /ko -->

@@ -7,7 +7,8 @@
     <br>
     <?php echo $block->getPaymentMethodTitle() ?>
 </p>
-<?php if ($block->getPaymentAdditionalInfo()) :?>
+<?php if ($additionalInfo = $block->getPaymentAdditionalInfo()):?>
+    <?php if (isset($additionalInfo['cc_type']) || isset($additionalInfo['cc_last_4'])): ?>
     <p>
         <strong><?php echo __('Card Type') ?></strong>
         <br>
@@ -23,6 +24,14 @@
         <br>
         <?php echo $block->getCreditCardExpDate() ?>
     </p>
+    <?php endif; ?>
+    <?php if (isset($additionalInfo['po_number'])): ?>
+        <p>
+            <strong><?php echo __('Purchase Order Number') ?></strong>
+            <br>
+            <?php echo $block->getPurchaseOrderNumber() ?>
+        </p>
+    <?php endif; ?>
 <?php endif; ?>
 <p>
     <strong><?php echo __('Currency') ?></strong>
