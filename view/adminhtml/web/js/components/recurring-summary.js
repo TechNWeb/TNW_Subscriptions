@@ -93,8 +93,8 @@ define([
             return record.default_billing_frequency === '1' ? 'V' : '';
         },
 
-        getIsActive: function (record) {
-            return record.is_active === '1' ? 'V' : '';
+        getIsDisabled: function (record) {
+            return record.is_disabled === '1' ? 'V' : '';
         },
 
         getTrialUnit: function () {

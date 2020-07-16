@@ -139,7 +139,7 @@ class LinkedDataProvider extends AbstractDataProvider
                 ProductBillingFrequencyInterface::INITIAL_FEE,
                 ProductBillingFrequencyInterface::PRESET_QTY,
                 ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
-                ProductBillingFrequencyInterface::IS_ACTIVE,
+                ProductBillingFrequencyInterface::IS_DISABLED,
                 'tnw_' . ProductBillingFrequencyInterface::PRICE => ProductBillingFrequencyInterface::PRICE,
             ],
             $alias . '.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=' .  $frequencyId,

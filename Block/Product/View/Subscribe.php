@@ -321,7 +321,7 @@ class Subscribe extends View
             ->getListByProductId($productId)
             ->getItems();
         foreach ($productBillingFrequencies as $productBillingFrequency) {
-            if ($productBillingFrequency->getIsActive()) {
+            if (!$productBillingFrequency->getIsDisabled()) {
                 $frequency = $this->frequencyRepository->getById($productBillingFrequency->getBillingFrequencyId());
                 $frequencyPrice = $this->priceCalculator->getUnitPrice(
                     $productDataObject,

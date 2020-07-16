@@ -112,18 +112,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        if (version_compare($context->getVersion(), '2.2.53', '<')) {
+        if (version_compare($context->getVersion(), '2.2.55', '<')) {
             $setup->getConnection()
                 ->addColumn(
                     $setup->getTable(
                         ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
                     ),
-                    'is_active',
+                    'is_disabled',
                     [
                         'type' => Table::TYPE_BOOLEAN,
                         'nullable' => false,
-                        'default' => 1,
-                        'comment' => 'Is Active'
+                        'default' => 0,
+                        'comment' => 'Is Disabled'
                     ]
                 );
         }

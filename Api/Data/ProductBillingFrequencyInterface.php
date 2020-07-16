@@ -23,7 +23,7 @@ interface ProductBillingFrequencyInterface
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const PRESET_QTY = 'preset_qty';
     const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
-    const IS_ACTIVE = 'is_active';
+    const IS_DISABLED = 'is_disabled';
 
     /**
      * Get id
@@ -122,11 +122,11 @@ interface ProductBillingFrequencyInterface
     /**
      * @return mixed
      */
-    public function getIsActive();
+    public function getIsDisabled();
 
     /**
-     * @param $isActive
+     * @param $isDisabled
      * @return mixed
      */
-    public function setIsActive($isActive);
+    public function setIsDisabled($isDisabled);
 }

@@ -152,16 +152,16 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     /**
      * {@inheritdoc}
      */
-    public function getIsActive()
+    public function getIsDisabled()
     {
-        return $this->getData(self::IS_ACTIVE);
+        return $this->getData(self::IS_DISABLED);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setIsActive($isActive)
+    public function setIsDisabled($isDisabled)
     {
-        return $this->setData(self::IS_ACTIVE, $isActive);
+        return $this->setData(self::IS_DISABLED, $isDisabled);
     }
 }

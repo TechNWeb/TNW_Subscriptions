@@ -449,7 +449,7 @@ class LinkedProducts extends AbstractModifier
                 $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
             Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT =>
                 $linkedProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
-            ProductBillingFrequencyInterface::IS_ACTIVE => $linkItem->getIsActive(),
+            ProductBillingFrequencyInterface::IS_DISABLED => $linkItem->getIsDisabled(),
         ];
     }
 

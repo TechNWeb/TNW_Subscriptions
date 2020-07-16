@@ -84,7 +84,7 @@ class RecurringOptions extends BaseModifier
     const FIELD_IS_DELETE = 'is_delete';
     const FIELD_TITLE_NAME = 'title';
     const FIELD_PRESET_QTY = 'preset_qty';
-    const FIELD_IS_ACTIVE = 'is_active';
+    const FIELD_IS_DISABLED = 'is_disabled';
     /**#@-*/
 
     /**#@+
@@ -494,7 +494,7 @@ class RecurringOptions extends BaseModifier
                 static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(60),
                 static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(60),
                 static::FIELD_PRESET_QTY => $this->getPresetQtyFieldConfig(50),
-                static::FIELD_PRESET_QTY => $this->getIsActiveFieldConfig(70),
+                static::FIELD_IS_DISABLED => $this->getIsDisabledFieldConfig(70),
             ]
         ];
         if ($this->getIsConfigurableProduct()) {
@@ -624,7 +624,7 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
-    private function getIsActiveFieldConfig($sortOrder)
+    private function getIsDisabledFieldConfig($sortOrder)
     {
         return [
             'arguments' => [
@@ -636,15 +636,15 @@ class RecurringOptions extends BaseModifier
                         'parentContainer' => static::CONTAINER_OPTION,
                         'parentSelections' => static::GRID_OPTIONS_NAME,
                         'dataType' => Boolean::NAME,
-                        'label' => __('Is Active'),
-                        'dataScope' => static::FIELD_IS_ACTIVE,
+                        'label' => __('Is Disabled'),
+                        'dataScope' => static::FIELD_IS_DISABLED,
                         'prefer' => 'checkbox',
                         'sortOrder' => $sortOrder,
                         'valueMap' => [
                             'false' => '0',
                             'true' => '1'
                         ],
-                        'default' => '1',
+                        'default' => '0',
                     ],
                 ],
             ],
