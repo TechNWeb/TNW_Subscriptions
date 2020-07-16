@@ -191,6 +191,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     ) {
         $oldStatus = $this->statusHistoryManager->getProfileOldStatus($subscriptionProfile);
         $oldConfigOption = $this->statusHistoryManager->getProfileOldConfigOption($subscriptionProfile);
+        $oldPaymentData =  $this->statusHistoryManager->getProfileOldPaymentData($subscriptionProfile);
 
         try {
             $this->entityManager->save($subscriptionProfile);
@@ -249,6 +250,28 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                     //TODO: add this to log, as it should not prevent the current process
                 }
             }
+        }
+        if (
+            isset($oldPaymentData['engine_code'])
+            && $oldPaymentData['payment_additional_info']
+            && $subscriptionProfile->getPayment()->getEngineCode() == $oldPaymentData['engine_code']
+            && $subscriptionProfile->getPayment()->getPaymentAdditionalInfo()
+                != $oldPaymentData['payment_additional_info']
+            && $subscriptionProfile->getPayment()->getEngineCode() == 'purchaseorder'
+        ) {
+            $oldPO = json_decode($oldPaymentData['payment_additional_info'], true);
+            $oldPO = $oldPO['po_number'];
+            $newPO = json_decode($subscriptionProfile->getPayment()->getPaymentAdditionalInfo(), true);
+            $newPO = $newPO['po_number'];
+            $this->messageHistoryLogger->message(
+                MessageHistoryLogger::PAYMENT_METHOD_DATA_CHANGED,
+                [
+                    __('Purchase Order Number'),
+                    $oldPO,
+                    $newPO
+                ],
+                $subscriptionProfile->getId()
+            );
         }
 
         unset($this->profileById[$subscriptionProfile->getId()]);
