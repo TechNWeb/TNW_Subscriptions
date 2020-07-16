@@ -130,6 +130,7 @@ class VaultPaymentAuthorization
         } elseif (
             $paymentData['method'] == 'checkmo'
             || $paymentData['method'] == 'banktransfer'
+            || $paymentData['method'] == 'purchaseorder'
         ) {
             $this->createProfileObserver->setTrialPaymentData($paymentData);
         }

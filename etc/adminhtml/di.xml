@@ -201,6 +201,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\BankTransfer</item>
                     <item name="sortOrder" xsi:type="number">11</item>
                 </item>
+                <item name="purchaseorder" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Purchaseorder</item>
+                    <item name="sortOrder" xsi:type="number">12</item>
+                </item>
                 <item name="payflowpro" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
