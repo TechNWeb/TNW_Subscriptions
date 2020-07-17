@@ -183,6 +183,22 @@ class HistoryManager
     }
 
     /**
+     * @param SubscriptionProfileInterface $profile
+     * @return |null
+     */
+    public function getProfileOldPaymentData(SubscriptionProfileInterface $profile)
+    {
+        $result = null;
+        if ($profile) {
+            $profileDB = $this->profileFactory->create();
+            $profileDB->load($profile->getId());
+            $result = $profileDB->getPayment()->getData();
+        }
+
+        return $result;
+    }
+
+    /**
      * Get subscription profile current status from DB.
      *
      * @param int|string $profileId
