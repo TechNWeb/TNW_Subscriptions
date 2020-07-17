@@ -130,6 +130,21 @@ class Details extends BaseSummary
     }
 
     /**
+     * Returns purchase order number
+     * @return string
+     */
+    public function getPurchaseOrderNumber()
+    {
+        $additionalInfo = $this->getPaymentAdditionalInfo();
+        $poNumber = '';
+        if (isset($additionalInfo['po_number'])) {
+            $poNumber = $additionalInfo['po_number'];
+        }
+
+        return $poNumber;
+    }
+
+    /**
      * Retrieves payment additional info
      * @return null|array
      */

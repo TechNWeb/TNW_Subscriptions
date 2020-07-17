@@ -27,6 +27,7 @@ class MessageHistoryLogger
     const MESSAGE_ORDER_CREATED_FROM_QUOTE = 7;
     const MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED = 8;
     const MESSAGE_SUBSCRIPTION_PRODUCT_STOCK = 9;
+    const PAYMENT_METHOD_DATA_CHANGED = 10;
     /**#@-*/
 
     /**#@+
@@ -87,8 +88,8 @@ class MessageHistoryLogger
         self::MESSAGE_ORDER_CREATED_FROM_QUOTE => 'Order <a href="{orderUrl|%d}">#%s</a> created from quote #%s.',
         self::MESSAGE_SUBSCRIPTION_STATUS_CHANGED => 'Subscription status changed from <b>%s</b> to <b>%s</b>',
         self::MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED => 'Changed [Product %s] to [Product %s]',
-        self::MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED => 'Changed [Product %s] to [Product %s]',
-        self::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK => 'Products %s were out of stock and not ordered.'
+        self::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK => 'Products %s were out of stock and not ordered.',
+        self::PAYMENT_METHOD_DATA_CHANGED => 'Payment data changed for %s from %s to %s'
     ];
 
     /**

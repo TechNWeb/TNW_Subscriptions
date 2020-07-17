@@ -20,6 +20,10 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
+/**
+ * Class Details
+ * @package TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile
+ */
 class Details extends Column
 {
     /**
@@ -226,13 +230,24 @@ class Details extends Column
         if (!$additionalInfo) {
             return false;
         }
-        $additionalInfo = (array)json_decode($additionalInfo);
-        return [
-            'currency' => $this->getSubscriptionProfile($id)->getProfileCurrencyCode(),
-            'cc_type' => $this->getCreditCardTypeLabel($additionalInfo),
-            'cc_number' => $this->getCreditCardNumber($additionalInfo),
-            'cc_exp' => $this->getCreditCardExpDate($additionalInfo)
-        ];
+        $additionalInfo = (array) json_decode($additionalInfo);
+        $result = ['currency' => $this->getSubscriptionProfile($id)->getProfileCurrencyCode()];
+        $resultAdditional = [];
+        if ($this->getCreditCardTypeLabel($additionalInfo) && $this->getCreditCardNumber($additionalInfo))  {
+            $resultAdditional =
+                [
+                    'cc_type' => $this->getCreditCardTypeLabel($additionalInfo),
+                    'cc_number' => $this->getCreditCardNumber($additionalInfo),
+                    'cc_exp' => $this->getCreditCardExpDate($additionalInfo)
+                ];
+        }
+        if ($this->getPurchaseOrderNumber($additionalInfo)) {
+            $resultAdditional =
+                [
+                    'po_number' => $this->getPurchaseOrderNumber($additionalInfo)
+                ];
+        }
+        return array_merge($result, $resultAdditional);
     }
 
     /**
@@ -283,6 +298,20 @@ class Details extends Column
         }
 
         return $creditCardTypeLabel;
+    }
+
+    /**
+     * @param $additionalInfo
+     * @return string
+     */
+    public function getPurchaseOrderNumber($additionalInfo)
+    {
+        $poNumber = '';
+        if (isset($additionalInfo['po_number'])) {
+            $poNumber = $additionalInfo['po_number'];
+        }
+
+        return $poNumber;
     }
 
     /**

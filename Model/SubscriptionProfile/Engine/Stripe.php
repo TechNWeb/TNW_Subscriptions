@@ -189,6 +189,10 @@ class Stripe extends Base
                 $this->getPaymentMethodCode(),
                 0
             );
+            if ($gateWayToken) {
+                $gateWayToken->setCustomerId($profile->getCustomerId());
+                $this->paymentTokenRepository->save($gateWayToken);
+            }
         }
         $publicHash = $gateWayToken ? $gateWayToken->getPublicHash() : '';
         $result = isset($addtionalInfo['stripe_data']) ? $addtionalInfo['stripe_data'] : $addtionalInfo;
