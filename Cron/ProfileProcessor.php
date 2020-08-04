@@ -111,12 +111,21 @@ class ProfileProcessor
             try {
                 $this->queueManager->placeOrderByGroupQueue($queues);
                 $this->queueManager->makeCompleted($queueIds);
+                $orderProcessHasError = false;
             } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
                 $this->context->messageError($e->getMessage());
                 $this->queueManager->makeCompleted($queueIds, $e->getMessage());
+                $orderProcessHasError = false;
             } catch (\Exception $e) {
                 $this->context->messageError('Error on processing profile: %s', $e);
                 $this->queueManager->makeError($queueIds, $e->getMessage());
+                $orderProcessHasError = false;
+            } finally {
+                if (!isset($orderProcessHasError)) {
+                    $this->context->messageError('Error on processing profile. (See cron log).');
+                    $this->queueManager->makeError($queueIds, __('Error on processing profile. (See cron log).'));
+                    $this->updateProfilesStatuses($profileIds);
+                }
             }
         }
 
