@@ -24,6 +24,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class ModifyForm
@@ -951,7 +952,12 @@ class ModifyForm extends Form
 
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
-            $isTrial = true;
+            if (
+                !isset($this->profileManager)
+            || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
+            ) {
+                $isTrial = true;
+            }
         }
         $unlockQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
         $notice = $unlockQty
