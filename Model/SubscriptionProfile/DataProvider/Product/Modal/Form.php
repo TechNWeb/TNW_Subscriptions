@@ -452,37 +452,6 @@ class Form extends AbstractDataProvider
         return $result;
     }
 
-    public function getProductBillingFrequenciesPricesJson($productId = null)
-    {
-        $result = [];
-        $productId = $productId ?: $this->getRequestProductId();
-        if (!$productId) return $result;
-        $childProduct = $this->getChildProductFromRequest();
-        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
-        if ($childProduct) {
-            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
-                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
-            }
-        }
-        try {
-            /** @var ProductBillingFrequencyInterface $productFrequency */
-            foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
-                if (
-                    !empty($childProduct)
-                    && empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
-                ) {
-                    //Child product has no such frequency set
-                    continue;
-                }
-                $result[$productFrequency->getBillingFrequencyId()] = $productFrequency->getPrice();
-            }
-        } catch (\Exception $e) {
-            $this->context->log($e->getMessage());
-        }
-
-        return json_encode($result);
-    }
-
     /**
      * Get trial period as string for product.
      *
