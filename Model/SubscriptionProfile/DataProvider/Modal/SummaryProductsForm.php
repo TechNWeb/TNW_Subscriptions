@@ -155,6 +155,7 @@ class SummaryProductsForm extends ModifyForm
             $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
             $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
             $data[$subQuote->getId()]['subscription_shipping'] = (float)$subQuote->getData('shipping');
+            $data[$subQuote->getId()]['changed_price'] = false;
 
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {

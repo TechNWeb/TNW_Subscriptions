@@ -59,6 +59,20 @@ define([
                 currentItemData,
                 parent;
 
+            if (frequencyPrices === undefined) {
+                var sourceParts = this.parentScope.split('.');
+                var itemData = this.source[sourceParts[0]][sourceParts[1]];
+                if (
+                    itemData !== undefined
+                    && (
+                        this.source.data.billing_frequency_id !== itemData.billing_frequency
+                        || this.source.data.changed_price
+                    )
+                ) {
+                    frequencyPrices =itemData.frequency_data.product_frequencies;
+                    this.source.data.changed_price = true;
+                }
+            }
             if (this.modifySubscription && this.getParentForm()) {
                 parent = this.getParentForm();
                 if (parent) {
