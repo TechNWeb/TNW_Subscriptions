@@ -115,10 +115,14 @@ class TokenExtractor
                 ->setGatewayToken($gateWayToken);
             $ccMap = $this->gatewayConfig->getCcTypesMapper();
             $transactionCharges = $transaction['charges'];
-            foreach ($transactionCharges as $charge) {
-                $details = $charge->__get('payment_method_details');
-                $cardData = $details->__get('card');
-                $last4 = $cardData->__get('last4');
+            if (is_array($transactionCharges) && isset($transactionCharges['data']) && !$last4) {
+                $last4 = $transactionCharges['data'][0]['payment_method_details']['card']['last4'];
+            } elseif (!$last4) {
+                foreach ($transactionCharges as $charge) {
+                    $details = $charge->__get('payment_method_details');
+                    $cardData = $details->__get('card');
+                    $last4 = $cardData->__get('last4');
+                }
             }
             $paymentToken->setTokenDetails($this->_convertDetailsToJSON([
                 'type' => $ccMap[$paymentData['additional_data']['cc_type']],
