@@ -59,7 +59,7 @@ define([
                 currentItemData,
                 parent;
 
-            if (frequencyPrices === undefined) {
+            if (frequencyPrices === undefined && !this.source.data.locked_price) {
                 var sourceParts = this.parentScope.split('.');
                 var itemData = this.source[sourceParts[0]][sourceParts[1]];
                 if (
@@ -69,7 +69,7 @@ define([
                         || this.source.data.changed_price
                     )
                 ) {
-                    frequencyPrices =itemData.frequency_data.product_frequencies;
+                    frequencyPrices = itemData.frequency_data.product_frequencies;
                     this.source.data.changed_price = true;
                 }
             }
@@ -79,7 +79,8 @@ define([
                     currentItemData = parent.source.data['item_' + parent.additionalData.objectItemId];
                 }
 
-                if (currentItemData.initial_values
+                if (
+                    currentItemData.initial_values
                     && currentItemData.initial_values.billing_frequency
                     && currentItemData.initial_values.price
                     && currentItemData.frequency_data

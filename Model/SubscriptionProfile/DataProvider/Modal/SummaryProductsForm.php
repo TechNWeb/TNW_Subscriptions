@@ -183,6 +183,7 @@ class SummaryProductsForm extends ModifyForm
                     'is_product_deleted' => $isProductDeleted,
                     'price_incl_tax' => $priceInclTax,
                 ];
+                $data[$subQuote->getId()]['locked_price'] = $this->priceCalculator->getProductLockPriceSatus($product);
 
                 /** @var Base $modifier */
                 foreach ($this->pool->getModifiersInstances() as $modifier) {
