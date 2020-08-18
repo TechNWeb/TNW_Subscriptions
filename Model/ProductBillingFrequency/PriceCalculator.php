@@ -194,7 +194,7 @@ class PriceCalculator
      * @param DataObject $product
      * @return bool
      */
-    private function getProductLockPriceSatus(DataObject $product)
+    public function getProductLockPriceSatus(DataObject $product)
     {
         return $product->hasData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
             ? (bool)$product->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
