@@ -881,9 +881,8 @@ class ModifyForm extends Form
                         'first_phrase' => '',
                         'last_phrase' => __('payments'),
                         'validation' => [
-                            'validate-greater-than-zero' => true,
                             'required-entry' => true,
-                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
+                            'validate-number-range' => self::DEFAULT_PERIOD_VALUE.'-9999999999',
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':value',

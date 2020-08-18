@@ -108,7 +108,7 @@
                     <item name="first_phrase" xsi:type="string" translate="true">&amp; bill</item>
                     <item name="last_phrase" xsi:type="string" translate="true">times</item>
                     <item name="validation" xsi:type="array">
-                        <item name="validate-greater-than-zero" xsi:type="boolean">true</item>
+                        <item name="validate-number-range" xsi:type="string">2-9999999999</item>
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
                     <item name="required" xsi:type="boolean">true</item>
