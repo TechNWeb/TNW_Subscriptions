@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
+
 /**
  * Class Validator
  * @package TNW\Subscriptions\Model\Payment\Paypal
@@ -12,12 +15,12 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 class Validator
 {
     /**
-     * @var \Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator
+     * @var mixed
      */
     private $responseValidator;
 
     /**
-     * @var \Magento\Paypal\Model\Payflow\Transparent
+     * @var mixed
      */
     private $payflowFacade;
 
@@ -28,25 +31,26 @@ class Validator
 
     /**
      * Validator constructor.
-     * @param \Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator $responseValidator
-     * @param \Magento\Paypal\Model\Payflow\Transparent $payflowFacade
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      * @param ValidationResultFactory $validationResultFactory
      */
     public function __construct(
-        \Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator $responseValidator,
-        \Magento\Paypal\Model\Payflow\Transparent $payflowFacade,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
         \TNW\Subscriptions\Model\Payment\Paypal\ValidationResultFactory $validationResultFactory
     ) {
-        $this->payflowFacade = $payflowFacade;
-        $this->responseValidator = $responseValidator;
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->payflowFacade = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+            $this->responseValidator = $objectManager
+                ->get("Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator");
+        }
         $this->validationResultFactory = $validationResultFactory;
     }
 
     /**
      * @param $data
-     * @return bool
-     * @throws \Magento\Framework\Exception\State\InvalidTransitionException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @return ValidationResult
      */
     public function validate($data)
     {

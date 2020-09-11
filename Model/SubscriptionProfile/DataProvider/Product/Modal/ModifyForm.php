@@ -804,7 +804,10 @@ class ModifyForm extends Form
                         'imports' => [
                             'showPreview' => $this->currentFormName . ':previewMode',
                             'onQtyUpdate' => $this->currentFormName . ':previewMode',
-                            'onPriceUpdate' => '${ $.parentName}.price:value'
+                            'onPriceUpdate' => '${ $.parentName}.price:value',
+                            '__disableTmpl' => [
+                                'onPriceUpdate' => false
+                            ]
                         ],
                         'parentForm' => $this->currentFormName,
                         'priceFormat' => $this->getPriceFormatData(),
@@ -848,7 +851,10 @@ class ModifyForm extends Form
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
                         'imports' => [
-                            'showPreview' => '${ $.parentFormName }:previewMode'
+                            'showPreview' => '${ $.parentFormName }:previewMode',
+                            '__disableTmpl' => [
+                                'showPreview' => false
+                            ]
                         ],
                         'parentFormName' => $this->currentFormName,
                     ]
@@ -887,7 +893,10 @@ class ModifyForm extends Form
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':value',
-                            'showPreview' => '${ $.parentFormName }:previewMode'
+                            'showPreview' => '${ $.parentFormName }:previewMode',
+                            '__disableTmpl' => [
+                                'showPreview' => false
+                            ]
                         ],
                         'exports' => [
                             'completePreviewLabel' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':periodPreviewLabel'
@@ -987,7 +996,11 @@ class ModifyForm extends Form
                         'imports' => [
                             'showPreview' => $isTrial ? false : $this->currentFormName . ':previewMode',
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
-                            'priceInclTax' => '${ $.provider }'
+                            'priceInclTax' => '${ $.provider }',
+                            '__disableTmpl' => [
+                                'changeValue' => false,
+                                'priceInclTax' => false
+                            ]
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                         'modifySubscription' => true,
@@ -1053,6 +1066,9 @@ class ModifyForm extends Form
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'imports' => [
                             'changeValue' => '${ $.parentName}.billing_frequency:value',
+                            '__disableTmpl' => [
+                                'changeValue' => false
+                            ]
                         ],
                         'modifySubscription' => true,
                         'parentForm' => $this->currentFormName,

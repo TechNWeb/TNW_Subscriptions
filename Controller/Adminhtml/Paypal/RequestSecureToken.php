@@ -12,7 +12,8 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
 use Magento\Framework\Session\Generic;
 use TNW\Subscriptions\Model\Payment\Paypal\SecureToken;
-use Magento\Paypal\Model\Payflow\Transparent;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -23,7 +24,13 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
  */
 class RequestSecureToken extends \Magento\Framework\App\Action\Action
 {
+    /**
+     *
+     */
     const STATE_EDIT = 'edit';
+    /**
+     *
+     */
     const STATE_NAME = 'state';
 
     /**
@@ -49,7 +56,7 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
     private $session;
 
     /**
-     * @var Transparent
+     * @var mixed
      */
     private $transparent;
 
@@ -64,23 +71,27 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
      * @param JsonFactory $resultJsonFactory
      * @param QuoteSessionInterface $session
      * @param Generic $sessionTransparent
-     * @param Transparent $transparent
      * @param SecureToken $secureTokenService
      * @param ProfileManager $profileManager
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         QuoteSessionInterface $session,
         Generic $sessionTransparent,
-        Transparent $transparent,
         SecureToken $secureTokenService,
-        ProfileManager $profileManager
+        ProfileManager $profileManager,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->session = $session;
         $this->sessionTransparent = $sessionTransparent;
-        $this->transparent = $transparent;
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+        }
         $this->secureTokenService = $secureTokenService;
         $this->profileManager = $profileManager;
         parent::__construct($context);

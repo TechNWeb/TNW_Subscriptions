@@ -5,14 +5,16 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Braintree;
 
-use Braintree\Transaction;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use Magento\Framework\App\ObjectManager;
-use Magento\Braintree\Gateway\Config\Config;
-use Magento\Braintree\Gateway\SubjectReader;
+use Magento\Framework\ObjectManagerInterface as ObjectManager;
+use Magento\Framework\Module\Manager as ModuleManager;
 
+/**
+ * Class TokenExtractor
+ * @package TNW\Subscriptions\Model\Payment\Braintree
+ */
 class TokenExtractor
 {
     /**
@@ -26,33 +28,34 @@ class TokenExtractor
     private $serializer;
 
     /**
-     * @var Config
+     * @var mixed
      */
     private $config;
 
     /**
-     * @var SubjectReader
+     * @var mixed
      */
     private $subjectReader;
 
     /**
      * TokenExtractor constructor.
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
-     * @param Config $config
-     * @param SubjectReader $subjectReader
+     * @param ModuleManager $moduleManager
+     * @param ObjectManager $objectManager
      * @param SerializerInterface|null $serializer
      */
     public function __construct(
         PaymentTokenFactoryInterface $paymentTokenFactory,
-        Config $config,
-        SubjectReader $subjectReader,
+        ModuleManager $moduleManager,
+        ObjectManager $objectManager,
         SerializerInterface $serializer = null
     ) {
-        $this->config = $config;
+        if ($moduleManager->isEnabled("PayPal_Braintree")) {
+            $this->config = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
+            $this->subjectReader = $objectManager->get("PayPal\Braintree\Gateway\Helper\SubjectReader");
+        }
         $this->paymentTokenFactory = $paymentTokenFactory;
-        $this->subjectReader = $subjectReader;
-        $this->serializer = $serializer ?: ObjectManager::getInstance()
-            ->get(SerializerInterface::class);
+        $this->serializer = $serializer ?: $objectManager->get(SerializerInterface::class);
     }
 
     /**
@@ -72,11 +75,11 @@ class TokenExtractor
     }
 
     /**
-     * @param Transaction $transaction
+     * @param $transaction
      * @return PaymentTokenInterface|null
      * @throws \Exception
      */
-    protected function getVaultPaymentToken(Transaction $transaction)
+    protected function getVaultPaymentToken($transaction)
     {
         // Check token existing in gateway response
         $token = $transaction->creditCardDetails->token;
@@ -99,11 +102,11 @@ class TokenExtractor
     }
 
     /**
-     * @param Transaction $transaction
+     * @param $transaction
      * @return string
      * @throws \Exception
      */
-    private function getExpirationDate(Transaction $transaction)
+    private function getExpirationDate($transaction)
     {
         $expDate = new \DateTime(
             $transaction->creditCardDetails->expirationYear

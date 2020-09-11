@@ -10,9 +10,10 @@ define(
         'uiRegistry',
         'underscore',
         'Magento_Ui/js/lib/validation/validator',
+        'Magento_Ui/js/modal/alert',
         'mage/translate'
     ],
-    function ($, Component, registry, _, validator) {
+    function ($, Component, registry, _, validator, alert) {
         'use strict';
 
         return Component.extend({
@@ -156,7 +157,13 @@ define(
             processResponseData: function (data) {
                 if (data.error) {
                     this.updateButtons(false);
-                    this.formRight().updateData();
+                    if (!(data.error_messages && data.error_messages.length)) return;
+                    data.error_messages.forEach(function (message) {
+                        alert({
+                            title: $.mage.__('Error'),
+                            content: message
+                        });
+                    });
                 }
             },
 

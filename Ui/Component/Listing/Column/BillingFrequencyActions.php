@@ -62,7 +62,11 @@ class BillingFrequencyActions extends \Magento\Ui\Component\Listing\Columns\Colu
                             'label' => __('Delete'),
                             'confirm' => [
                                 'title' => __('Delete "${ $.$data.label }"'),
-                                'message' => __('Are you sure you wan\'t to delete a "${ $.$data.label }" record?')
+                                'message' => __('Are you sure you wan\'t to delete a "${ $.$data.label }" record?'),
+                                '__disableTmpl' => [
+                                    'title' => false,
+                                    'message' => false
+                                ]
                             ]
                         ]
                     ];

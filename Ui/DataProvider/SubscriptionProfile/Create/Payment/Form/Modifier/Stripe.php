@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Payment\Model\Config;
-use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
@@ -19,6 +18,9 @@ use Magento\Framework\View\LayoutFactory;
  */
 class Stripe extends Base
 {
+    /**
+     *
+     */
     const SORT_ORDER = 25;
 
     /**
@@ -27,32 +29,26 @@ class Stripe extends Base
     private $paymentConfig;
 
     /**
-     * @var \Magento\Braintree\Gateway\Config\Config
+     * @var mixed
      */
     private $stripeConfig;
 
     /**
-     * @var StripeAdapterFactory
-     */
-    private $stripeAdapterFactory;
-
-    /**
-     * @var string
-     */
-    private $clientToken = '';
-    /**
      * @var LayoutFactory
      */
     private $layoutFactory;
+
     /**
+     * Stripe constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Braintree\Gateway\Config\Config $stripeConfig
      * @param Config $paymentConfig
-     * @param StripeAdapterFactory $stripeAdapterFactory
+     * @param LayoutFactory $layoutFactory
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -67,8 +63,6 @@ class Stripe extends Base
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            /*$this->stripeAdapterFactory
-                = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");*/
             $this->stripeConfig
                 = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
         }

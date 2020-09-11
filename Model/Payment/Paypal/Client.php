@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
+
 /**
  * Class Client
  * @package TNW\Subscriptions\Model\Payment\Paypal
@@ -18,12 +21,16 @@ class Client
 
     /**
      * Client constructor.
-     * @param \Magento\Paypal\Model\Payflow\Service\Gateway $gateway
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
-      \Magento\Paypal\Model\Payflow\Service\Gateway $gateway
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
-        $this->gateway = $gateway;
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->gateway  = $objectManager->get("Magento\Paypal\Model\Payflow\Service\Gateway");
+        }
     }
 
     /**

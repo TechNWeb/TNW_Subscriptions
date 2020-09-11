@@ -351,8 +351,15 @@ class Product extends Create
                 ['non_unique']
                 ['current_preset_qty_price'];
             }
+            if (
+                isset($productData['modify_profile'])
+                && isset($productData['admin_modification'])
+                && $productData['modify_profile']
+                && $productData['admin_modification']
+            ) {
+                $currentProductCustomPrice = $customProductPrice;
+            }
             $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
-
 
             $data = [
                 'custom_price' => sprintf('%F', $customProductPrice),

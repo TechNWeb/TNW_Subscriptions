@@ -28,11 +28,12 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     protected $messagePool;
 
     /**
-     * @var \TNW\Subscriptions\Block\Subscription\Info\Tab\Messages
+     * @var
      */
     private $messagesBlock;
 
     /**
+     * ContentAbstract constructor.
      * @param Context $context
      * @param Registry $registry
      * @param MessagePool $messagePool
@@ -70,9 +71,7 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
             if ($this->getLayout()->getBlock($names)) {
                 $this->initChildBlock($this->getLayout()->getBlock($names));
             }
-
         }
-
         return parent::_prepareLayout();
     }
 

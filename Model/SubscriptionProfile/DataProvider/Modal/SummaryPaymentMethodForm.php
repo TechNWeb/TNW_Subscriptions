@@ -214,7 +214,10 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
                     'config' => [
                         'visible' => $isEditVisible,
                         'imports' => [
-                            'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = payment_method:preview' : ''
+                            'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = payment_method:preview' : '',
+                            '__disableTmpl' => [
+                                'visible' => false
+                            ]
                         ],
                     ],
                 ],

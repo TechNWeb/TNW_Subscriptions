@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Block\System\Config\Form\Field\Extension;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Locale\CurrencyInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -42,19 +41,13 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      */
     private $pricingHelper;
 
-    /**
-     * @param PriceCurrencyInterface|null $priceCurrency
-     * @param CurrencyInterface|null $localeCurrency
-     * @param StoreManagerInterface|null $storeManager
-     * @param ScopeCodeResolver|null $scopeCodeResolver
-     */
     protected function _construct(
         PriceCurrencyInterface $priceCurrency = null,
         CurrencyInterface $localeCurrency = null,
         StoreManagerInterface $storeManager = null,
         ScopeCodeResolver $scopeCodeResolver = null
     ) {
-        $objectManager = ObjectManager::getInstance();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $this->priceCurrency = $objectManager->create(PriceCurrencyInterface::class);
         $this->localeCurrency = $objectManager->create(CurrencyInterface::class);
         $this->storeManager = $objectManager->create(StoreManagerInterface::class);

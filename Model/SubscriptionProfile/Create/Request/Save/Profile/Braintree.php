@@ -7,6 +7,8 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 use Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Save payment data processor.
@@ -14,7 +16,7 @@ use Magento\Framework\Exception\PaymentException;
 class Braintree extends Base
 {
     /**
-     * @var \Magento\Braintree\Gateway\Http\TransferFactory
+     * @var \PayPal\Braintree\Gateway\Http\TransferFactory
      */
     private $transferFactory;
 
@@ -48,37 +50,28 @@ class Braintree extends Base
      */
     private $braintreePaymentDataBuilder;
 
-    /**
-     * Braintree constructor.
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
-     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
-     * @param \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
-     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
-     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
-     * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
-     * @param \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder
-     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
-        \Magento\Braintree\Gateway\Http\TransferFactory $transferFactory,
         \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory,
-        \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder
+        \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
         parent::__construct($createModel, $session);
         $this->braintreePaymentDataBuilder = $braintreePaymentDataBuilder;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
-        $this->transferFactory = $transferFactory;
         $this->transactionCustomer = $transactionCustomer;
         $this->encryptor = $encryptor;
+        if ($moduleManager->isEnabled("PayPal_Braintree")) {
+            $this->transferFactory = $objectManager->get("PayPal\Braintree\Gateway\Http\TransferFactory");
+        }
     }
 
     /**
@@ -107,7 +100,7 @@ class Braintree extends Base
 
         /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */
         $response = $this->transactionCustomer->placeRequest($transfer);
-        if ($response['object'] instanceof \Braintree\Result\Error) {
+        if (class_exists('\Braintree\Result\Error') &&  $response['object'] instanceof \Braintree\Result\Error) {
             $errors = [];
             foreach($response->errors->deepAll() AS $error) {
                 $errors[] = "{$error->code}: {$error->message}";

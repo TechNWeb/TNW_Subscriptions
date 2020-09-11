@@ -17,12 +17,10 @@ use Magento\Framework\Registry;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Result\LayoutFactory;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Block\Transparent\Iframe;
-use Magento\Paypal\Model\Payflow\Service\Response\Transaction;
-use Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator;
-use Magento\Paypal\Model\Payflow\Transparent;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
@@ -45,12 +43,12 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     private $coreRegistry;
 
     /**
-     * @var Transaction
+     * @var mixed
      */
     private $transaction;
 
     /**
-     * @var ResponseValidator
+     * @var mixed
      */
     private $responseValidator;
 
@@ -60,7 +58,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     private $resultLayoutFactory;
 
     /**
-     * @var Transparent
+     * @var mixed
      */
     private $transparent;
 
@@ -85,47 +83,52 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      */
     private $encryptor;
 
+    /**
+     * @var QuoteSessionInterface
+     */
     private $quoteSession;
 
     /**
-     * Constructor
-     *
+     * Response constructor.
      * @param Context $context
      * @param Registry $coreRegistry
-     * @param Transaction $transaction
-     * @param ResponseValidator $responseValidator
      * @param LayoutFactory $resultLayoutFactory
-     * @param Transparent $transparent
      * @param ProfileManager $profileManager
      * @param DataPersistorInterface $dataPersistor
      * @param EncryptorInterface $encryptor
+     * @param QuoteSessionInterface $quoteSession
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
-        Transaction $transaction,
-        ResponseValidator $responseValidator,
         LayoutFactory $resultLayoutFactory,
-        Transparent $transparent,
         ProfileManager $profileManager,
         DataPersistorInterface $dataPersistor,
         EncryptorInterface $encryptor,
-        QuoteSessionInterface $quoteSession
+        QuoteSessionInterface $quoteSession,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
         parent::__construct($context);
         $this->quoteSession = $quoteSession;
         $this->coreRegistry = $coreRegistry;
-        $this->transaction = $transaction;
-        $this->responseValidator = $responseValidator;
         $this->resultLayoutFactory = $resultLayoutFactory;
-        $this->transparent = $transparent;
         $this->profileManager = $profileManager;
         $this->dataPersistor = $dataPersistor;
         $this->encryptor = $encryptor;
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->transaction = $objectManager->get("Magento\Paypal\Model\Payflow\Service\Response\Transaction");
+            $this->responseValidator = $objectManager
+                ->get("Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator");
+            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");;
+        }
     }
 
     /**
-     * @return ResultInterface
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Layout
+     * @throws LocalizedException
      */
     public function execute()
     {

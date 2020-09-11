@@ -71,6 +71,9 @@ class Trial extends BaseModifier
                 'imports' => [
                     'changeComment' => 'index = ' . Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT . ':value',
                     'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled',
+                    '__disableTmpl' => [
+                        'disabled' => false
+                    ]
                 ],
                 'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
@@ -86,6 +89,9 @@ class Trial extends BaseModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, dataScope = ${ $.parentScope }.product.' .
                         Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    '__disableTmpl' => [
+                        'visible' => false
+                    ]
                 ],
             ]
         );
@@ -95,6 +101,9 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
+                    '__disableTmpl' => [
+                        'disabled' => false
+                    ]
                 ],
             ]
         );
@@ -120,6 +129,10 @@ class Trial extends BaseModifier
                     'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                     'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
                     'changeComment' => 'index = price:value',
+                    '__disableTmpl' => [
+                        'visible' => false,
+                        'disabled' => false
+                    ]
                 ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
@@ -140,6 +153,10 @@ class Trial extends BaseModifier
                 'imports' => [
                     'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
                     'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':disabled',
+                    '__disableTmpl' => [
+                        'visible' => false,
+                        'disabled' => false
+                    ]
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',
@@ -157,6 +174,9 @@ class Trial extends BaseModifier
             [
                 'imports' => [
                     'visible' => '!ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    '__disableTmpl' => [
+                        'visible' => false
+                    ]
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',

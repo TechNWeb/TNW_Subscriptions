@@ -247,7 +247,10 @@ class SummaryAddressForm extends AbstractDataProvider
                                             'dataScope' => $this->getInfoFieldSetDataScope(),
                                             'imports' => [
                                                 'visible' => '!ns = ${ $.ns }, index = ' .
-                                                    $addressInfoFieldSetName . ':preview'
+                                                    $addressInfoFieldSetName . ':preview',
+                                                '__disableTmpl' => [
+                                                    'visible' => false
+                                                ]
                                             ]
                                         ],
                                     ],
@@ -466,6 +469,9 @@ class SummaryAddressForm extends AbstractDataProvider
                     'filterBy' => [
                         'target' => '${ $.provider }:${ $.parentScope }.country_id',
                         'field' => 'country_id',
+                        '__disableTmpl' => [
+                            'target' => false
+                        ]
                     ],
                     'validation' => [
                         'required-entry' => (!($this->getAddressId())),
@@ -473,6 +479,9 @@ class SummaryAddressForm extends AbstractDataProvider
                     'additionalClass' => ($this->getAddressId())? ' hidden': '',
                     'imports' => [
                         'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
+                        '__disableTmpl' => [
+                            'checkVisibility' => false
+                        ]
                     ],
                     'customScope' => 'region'
                 ],
@@ -631,6 +640,7 @@ class SummaryAddressForm extends AbstractDataProvider
         if (!in_array($attributeCode, $this->infoAttributes)) {
             if ($attributeCode != 'region_id') {
                 $imports['visible'] = '!ns = ${ $.ns }, index = add_new_address_button:visible';
+                $imports['__disableTmpl'] = ['visible' => false];
             }
         }
 
@@ -861,7 +871,7 @@ class SummaryAddressForm extends AbstractDataProvider
 
     /**
      * Checks if customer has any address.
-     * 
+     *
      * @return bool
      */
     private function hasCustomerAddresses()
@@ -1010,6 +1020,9 @@ class SummaryAddressForm extends AbstractDataProvider
                 'imports' => [
                     'visible' => $isEditVisible ?
                         'ns = ${ $.ns }, index = ' . $this->getAddressInfoFieldsetName() . ':preview' : '',
+                    '__disableTmpl' => [
+                        'visible' => false
+                    ]
                 ]
             ],
         ];
