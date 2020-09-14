@@ -282,19 +282,25 @@ workflows:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
 
       - m233-commerce-php72:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
 
       - m233-open_source-php71:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
 
 #      - m2210-commerce-php72:
 #          context: powersync
@@ -312,7 +318,9 @@ workflows:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
 
       - deploy:
           context: powersync
@@ -324,7 +332,9 @@ workflows:
             - magento-coding-standard
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
 
       - tag-release:
           context: powersync
@@ -342,4 +352,6 @@ workflows:
             - check-composer-installation
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
