@@ -576,7 +576,11 @@ class Product extends AbstractDataProvider
                         'groupCode' => 'products_grid',
                         'groupName' => 'Products grid',
                         'groupSortOrder' => 10,
-                        'loading' => false
+                        'loading' => false,
+                        '__disableTmpl' => [
+                            'selectionsProvider' => false,
+                            'formProvider' => false
+                        ]
                     ],
                 ],
             ]
@@ -612,7 +616,10 @@ class Product extends AbstractDataProvider
                         'ns' => Form::DATA_SCOPE_MODAL_FORM,
                         'externalProvider' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
-                        'formSubmitType' => 'ajax'
+                        'formSubmitType' => 'ajax',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ]
@@ -647,7 +654,10 @@ class Product extends AbstractDataProvider
                         'ns' => ModifyForm::DATA_SCOPE_MODAL_FORM,
                         'externalProvider' => ModifyForm::DATA_SCOPE_MODAL_FORM . '.' . ModifyForm::DATA_SCOPE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
-                        'formSubmitType' => 'ajax'
+                        'formSubmitType' => 'ajax',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ]
@@ -736,6 +746,9 @@ class Product extends AbstractDataProvider
                         'externalProvider' => EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
                             . '.' . EditProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ]
@@ -770,7 +783,10 @@ class Product extends AbstractDataProvider
                         'autoRender' => false,
                         'ns' => '' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
                         'externalProvider' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '.' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '_data_source',
-                        'toolbarContainer' => '${ $.parentName }'
+                        'toolbarContainer' => '${ $.parentName }',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ]

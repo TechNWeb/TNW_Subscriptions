@@ -16,7 +16,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 class Authorizenet extends Base
 {
     /**
-     * @var \Magento\Braintree\Gateway\Http\TransferFactory
+     * @var mixed
      */
     private $transferFactory;
 

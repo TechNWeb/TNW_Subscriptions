@@ -151,6 +151,9 @@ class ProductsForm extends SummaryProductsForm
                         'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
                         'imports' => [
                             'changeValue' => '${ $.parentName}.middle_container.edit_fieldset.billing_frequency:value',
+                            '__disableTmpl' => [
+                                'changeValue' => false
+                            ]
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                         'modifySubscription' => true,
@@ -510,7 +513,10 @@ class ProductsForm extends SummaryProductsForm
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName()
                                 . '.description_fieldset.middle_container.edit_fieldset.term' . ':value',
-                            'showPreview' => '${ $.parentFormName }:previewMode'
+                            'showPreview' => '${ $.parentFormName }:previewMode',
+                            '__disableTmpl' => [
+                                'showPreview' => false
+                            ]
                         ],
                         'exports' => [
                             'completePreviewLabel' => $this->getCurrentFormName()

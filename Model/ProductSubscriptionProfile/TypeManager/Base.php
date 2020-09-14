@@ -223,6 +223,8 @@ abstract class Base implements TypeInterface
                 && $currentProfile
                 && $currentProfile->getOrigData('billing_frequency_id')
                     == $currentProfile->getData('billing_frequency_id')
+                && $originProfileProductData['qty']
+                    != $productData['qty']
             ) {
                 $price = min($originUnitPrice, $price);
             }

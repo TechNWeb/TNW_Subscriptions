@@ -14,7 +14,8 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
-use Magento\Paypal\Model\Config as PaypalConfig;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class Config
@@ -22,6 +23,9 @@ use Magento\Paypal\Model\Config as PaypalConfig;
 class Config
 {
     const MESSAGE_MAX_OBJECT_DEEP = 8;
+    const METHOD_PAYMENT_PRO = 'paypal_payment_pro';
+    const METHOD_PAYFLOWPRO = 'payflowpro';
+    const METHOD_BRAINTREE = 'braintree';
 
     /**#@+
      * Config xml path for General section
@@ -98,9 +102,9 @@ class Config
     private $request;
 
     /**
-     * @var PaypalConfig
+     * @var mixed|null
      */
-    private $paypalConfig;
+    private $paypalConfig = null;
 
     /**
      * @var bool
@@ -108,21 +112,26 @@ class Config
     private $isSubscriptionsActive;
 
     /**
+     * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
-     * @param PaypalConfig $paypalConfig
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         Http $request,
-        PaypalConfig $paypalConfig
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+             $this->paypalConfig = $objectManager->get("Magento\Paypal\Model\Config");
+        }
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
-        $this->paypalConfig = $paypalConfig;
     }
 
     /**
@@ -490,13 +499,13 @@ class Config
      */
     public function isPaymentAvailable($paymentCode, $websiteId = null)
     {
-        if ($paymentCode === PaypalConfig::METHOD_PAYFLOWPRO || $paymentCode === PaypalConfig::METHOD_PAYMENT_PRO) {
+        if ($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO) {
             $pathPayFLowPro = ActiveMethods::SECTION_ID . '/'
                 . ActiveMethods::GROUP_ID . '/'
-                . PaypalConfig::METHOD_PAYFLOWPRO;
+                . self::METHOD_PAYFLOWPRO;
             $pathPaymentPro = ActiveMethods::SECTION_ID . '/'
                 . ActiveMethods::GROUP_ID . '/'
-                . PaypalConfig::METHOD_PAYMENT_PRO;
+                . self::METHOD_PAYMENT_PRO;
 
             return (bool)(
                 $this->getStoreConfig($pathPayFLowPro, $websiteId)
@@ -543,7 +552,7 @@ class Config
         $title = __('Payments Pro');
 
         if ($this->getStoreConfig(
-            'payment/' . \Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO . '/active',
+            'payment/' . self::METHOD_PAYFLOWPRO . '/active',
             $websiteId
         )) {
             $title = __('Payflow Pro');
@@ -565,9 +574,14 @@ class Config
         $isAvailable = false;
         if ($storeId){
             $websiteId = $this->getStore($storeId)->getWebsiteId();
-            $this->paypalConfig->setStoreId($storeId);
+            if ($this->paypalConfig) {
+                $this->paypalConfig->setStoreId($storeId);
+            }
         }
-        if ($paymentCode === PaypalConfig::METHOD_PAYFLOWPRO || $paymentCode === PaypalConfig::METHOD_PAYMENT_PRO) {
+        if (
+            ($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO)
+            && $this->paypalConfig
+        ) {
             $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode);
         } else {
             $isAvailableInMagento = (bool)$this->getStoreConfig(

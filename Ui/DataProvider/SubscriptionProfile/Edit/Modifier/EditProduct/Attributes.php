@@ -176,6 +176,9 @@ class Attributes extends Base
                                     [
                                         'targetName' => '${ $.name }',
                                         'actionName' => 'toggle',
+                                        '__disableTmpl' => [
+                                            'targetName' => false
+                                        ]
                                     ],
                                 ],
                             ],
@@ -195,6 +198,9 @@ class Attributes extends Base
                                 'additionalClasses' => 'product-attributes',
                                 'imports' => [
                                     'visible' => '${ $.parentName }.edit_attributes:active',
+                                    '__disableTmpl' => [
+                                        'visible' => false
+                                    ]
                                 ],
                             ],
                         ],

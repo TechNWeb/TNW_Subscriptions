@@ -14,7 +14,6 @@ use Magento\Config\Model\Config\Source\Yesno;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\Js;
 use Magento\Payment\Helper\Data as PaymentHelper;
-use Magento\Paypal\Model\Config;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use Magento\Framework\Data\Form\Element\Fieldset as DataFieldset;
 use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
@@ -183,7 +182,7 @@ class ActiveMethods extends Fieldset
         foreach ($paymentMethods as $code => $data) {
             $active = isset($data['active']) ? (bool)($data['active']) : false;
             if (in_array($code, $this->enginePool->getEngineList()) && $active) {
-                if (in_array($code, [Config::METHOD_PAYFLOWPRO, Config::METHOD_PAYMENT_PRO])) {
+                if (in_array($code, [SubscriptionConfig::METHOD_PAYFLOWPRO, SubscriptionConfig::METHOD_PAYMENT_PRO])) {
                     $title = $this->config->getTitleForPaypal();
                 } else {
                     $title = isset($data['title']) ? $data['title'] : '';

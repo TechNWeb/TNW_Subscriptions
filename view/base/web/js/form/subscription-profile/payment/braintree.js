@@ -7,7 +7,7 @@ define([
     'mage/translate',
     'TNW_Subscriptions/js/form/subscription-profile/payment/base',
     'uiRegistry',
-    'Magento_Braintree/js/validator',
+    'PayPal_Braintree/js/validator',
     'underscore',
     'Magento_Ui/js/lib/spinner'
 ], function ($, $t, PaymentBase, registry, validator, _) {
@@ -25,8 +25,6 @@ define([
             grandTotal: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
-            sdkUrl: null,
-            hostedFieldsSdkUrl: null,
             clientToken: null,
             selectorsMapper: {
                 'expirationMonth': 'cc-month',
@@ -125,7 +123,7 @@ define([
                 state = self.scriptLoaded;
 
             $('body').trigger('processStart');
-            require([this.sdkUrl, this.hostedFieldsSdkUrl], function (braintreeClient, hostedFields) {
+            require(['braintree', 'braintreeHostedFields'], function (braintreeClient, hostedFields) {
                 state(true);
                 self.braintree.client = braintreeClient;
                 self.braintree.hostedFields = hostedFields;

@@ -180,7 +180,10 @@ class SummaryShippingMethodForm extends AbstractDataProvider
             'config' => [
                 'visible' => $isEditVisible,
                 'imports' => [
-                    'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = shipping_method:preview' : ''
+                    'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = shipping_method:preview' : '',
+                    '__disableTmpl' => [
+                        'visible' => false
+                    ]
                 ]
             ],
         ];

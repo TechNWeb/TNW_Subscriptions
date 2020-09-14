@@ -6,12 +6,11 @@
 
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
-use Magento\Quote\Model\Quote;
 use Magento\Framework\Math\Random;
 use Magento\Framework\DataObject;
 use Magento\Framework\UrlInterface;
-use Magento\Paypal\Model\Payflow\Transparent;
-use Magento\Paypal\Model\Payflowpro;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
@@ -20,6 +19,11 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
  */
 class SecureToken
 {
+    /**
+     *
+     */
+    const TRXTYPE_AUTH_ONLY = 'A';
+
     /**
      * @var UrlInterface
      */
@@ -31,23 +35,28 @@ class SecureToken
     private $mathRandom;
 
     /**
-     * @var Transparent
+     * @var mixed
      */
     private $transparent;
 
     /**
+     * SecureToken constructor.
      * @param UrlInterface $url
      * @param Random $mathRandom
-     * @param Transparent $transparent
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         UrlInterface $url,
         Random $mathRandom,
-        Transparent $transparent
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
         $this->url = $url;
         $this->mathRandom = $mathRandom;
-        $this->transparent = $transparent;
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+        }
     }
 
     /**
@@ -62,7 +71,7 @@ class SecureToken
     {
         $request = $this->transparent->buildBasicRequest();
 
-        $request->setTrxtype(Payflowpro::TRXTYPE_AUTH_ONLY);
+        $request->setTrxtype(self::TRXTYPE_AUTH_ONLY);
         $request->setVerbosity('HIGH');
         $request->setAmt(0);
         $request->setCreatesecuretoken('Y');

@@ -6,8 +6,6 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal;
 
-use Magento\Payment\Model\Config;
-use Magento\Paypal\Model\Payflow\Transparent;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
@@ -25,12 +23,17 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Payment\Model\Method\TransparentInterface;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * PayPal payment methods form modifier.
  */
 class PaymentsPro extends Base implements PaymentModifierInterface
 {
+    /**
+     *
+     */
     const SORT_ORDER = 20;
 
     /**
@@ -39,7 +42,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     private $config;
 
     /**
-     * @var Transparent
+     * @var mixed
      */
     private $paymentPro;
 
@@ -49,7 +52,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     private $context;
 
     /**
-     * @var Config
+     * @var mixed
      */
     private $paymentConfig;
 
@@ -69,17 +72,18 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     private $urlBuilder;
 
     /**
+     * PaymentsPro constructor.
      * @param SubscriptionConfig $config
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param Context $context
-     * @param Transparent $paymentPro
-     * @param Config $paymentConfig
      * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         SubscriptionConfig $config,
@@ -88,16 +92,19 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         Context $context,
-        Transparent $paymentPro,
-        Config $paymentConfig,
         Repository $assetRepository,
         RequestInterface $request,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
+
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->paymentConfig = $objectManager->get("Magento\Payment\Model\Config");
+            $this->paymentPro = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+        }
         $this->config = $config;
         $this->context = $context;
-        $this->paymentPro = $paymentPro;
-        $this->paymentConfig = $paymentConfig;
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
@@ -132,7 +139,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      */
     protected function getPaymentCode()
     {
-        return $this->paymentPro->getCode();
+        return $this->paymentPro ? $this->paymentPro->getCode() : SubscriptionConfig::METHOD_PAYMENT_PRO;
     }
 
     /**
@@ -140,7 +147,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      */
     protected function getPaymentTitle()
     {
-        return $this->paymentPro->getTitle();
+        return $this->paymentPro ? $this->paymentPro->getTitle() : '';
     }
 
     /**
@@ -341,8 +348,8 @@ class PaymentsPro extends Base implements PaymentModifierInterface
             'label' =>  __('Type'),
             'value' => ''
         ];
-        $types = $this->paymentConfig->getCcTypes();
-        $availableTypes = $this->paymentPro->getConfigData('cctypes');
+        $types = $this->paymentConfig ? $this->paymentConfig->getCcTypes() : [];
+        $availableTypes = $this->paymentPro ? $this->paymentPro->getConfigData('cctypes') : '';
 
         if ($availableTypes) {
             $availableTypes = explode(',', $availableTypes);
@@ -387,7 +394,8 @@ class PaymentsPro extends Base implements PaymentModifierInterface
             'label' =>  __('Month'),
             'value' => ''
         ];
-        foreach ($this->paymentConfig->getMonths() as $value => $label) {
+        $ccMonths = $this->paymentConfig ? $this->paymentConfig->getMonths() : [];
+        foreach ($ccMonths as $value => $label) {
             $result[] = [
                 'value' => $value,
                 'label' => $label
@@ -408,7 +416,8 @@ class PaymentsPro extends Base implements PaymentModifierInterface
             'label' =>  __('Year'),
             'value' => ''
         ];
-        foreach ($this->paymentConfig->getYears() as $value => $label) {
+        $ccYears = $this->paymentConfig ? $this->paymentConfig->getYears() : [];
+        foreach ($ccYears as $value => $label) {
             $result[] = [
                 'value' => $value,
                 'label' => (string)$label
@@ -425,7 +434,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      */
     private function hasVerification()
     {
-        return (bool)$this->paymentPro->getConfigData('useccv');
+        return $this->paymentPro ? (bool) $this->paymentPro->getConfigData('useccv') : false;
     }
 
     /**
@@ -515,7 +524,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         if ($this->paymentPro instanceof TransparentInterface) {
             $result = $this->paymentPro->getConfigInterface()->getValue($fieldName);
         }else{
-            $result = $this->paymentPro->getConfigData($fieldName);
+            $result = $this->paymentPro ? $this->paymentPro->getConfigData($fieldName) : null;
         }
         return $result;
     }

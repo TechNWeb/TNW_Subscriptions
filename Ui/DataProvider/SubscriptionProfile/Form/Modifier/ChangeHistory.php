@@ -69,10 +69,16 @@ class ChangeHistory extends BaseFormModifier
                                 'behaviourType' => 'simple',
                                 'externalFilterMode' => true,
                                 'imports' => [
-                                    'profileId' => '${ $.provider }:data.subscription_profile_id'
+                                    'profileId' => '${ $.provider }:data.subscription_profile_id',
+                                    '__disableTmpl' => [
+                                        'profileId' => false
+                                    ]
                                 ],
                                 'exports' => [
-                                    'profileId' => '${ $.externalProvider }:params.subscription_profile_id'
+                                    'profileId' => '${ $.externalProvider }:params.subscription_profile_id',
+                                    '__disableTmpl' => [
+                                        'profileId' => false
+                                    ]
                                 ],
                                 'listens' => [
                                     'tnw_subscriptionprofile_form.areas.change_history:active' => 'forceRender',

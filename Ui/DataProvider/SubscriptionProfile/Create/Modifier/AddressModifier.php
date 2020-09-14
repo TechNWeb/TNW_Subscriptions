@@ -347,7 +347,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                 '!index=same_as_shipping:checked',
                 '!index=customer_address_id:visible',
             ];
-            $fieldConfig['config']['imports']['disabled'] = '!${$.parentName}:visible';
+            $fieldConfig['config']['imports']['disabled'] = '!${ $.parentName }:visible';
+            $fieldConfig['config']['imports']['__disableTmpl'] = ['disabled' => false];
         }
 
         $attributeMeta = array_replace_recursive(
@@ -431,6 +432,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                     'filterBy' => [
                         'target' => '${ $.provider }:${ $.parentScope }.country_id',
                         'field' => 'country_id',
+                        '__disableTmpl' => [
+                            'target' => false
+                        ]
                     ],
                     'validation' => [
                         'required-entry' => true,
@@ -439,6 +443,10 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                     'imports' => [
                         'checkValidation' => '!ns = ${ $.ns }, index = same_as_shipping:checked',
                         'checkVisibility' => 'ns = ${ $.ns }, index = country_id:visible',
+                        '__disableTmpl' => [
+                            'checkValidation' => false,
+                            'checkVisibility' => false
+                        ]
                     ],
                     'customScope' => 'region'
                 ],
@@ -686,8 +694,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             }
 
         } else {
-            $imports['visible'] = '!${$.parentName}.same_as_shipping:checked';
+            $imports['visible'] = '!${ $.parentName }.same_as_shipping:checked';
         }
+        $imports['__disableTmpl'] = ['visible' => false];
 
         return $imports;
     }

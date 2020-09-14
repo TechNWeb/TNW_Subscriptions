@@ -968,7 +968,7 @@
                     <item name="cc" xsi:type="boolean">false</item>
                 </item>
                 <item name="payflowpro" xsi:type="array">
-                    <item name="code" xsi:type="const">Magento\Paypal\Model\Config::METHOD_PAYFLOWPRO</item>
+                    <item name="code" xsi:type="const">TNW\Subscriptions\Model\Config::METHOD_PAYFLOWPRO</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PayflowproFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
@@ -978,7 +978,7 @@
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
                 <item name="braintree" xsi:type="array">
-                    <item name="code" xsi:type="const">Magento\Braintree\Model\Ui\ConfigProvider::CODE</item>
+                    <item name="code" xsi:type="const">TNW\Subscriptions\Model\Config::METHOD_BRAINTREE</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\BraintreeFactory</item>
                     <item name="cc" xsi:type="boolean">true</item>
                 </item>
@@ -1025,15 +1025,7 @@
             </argument>
         </arguments>
     </type>
-
-    <preference for="Magento\Braintree\Model\Adapter\BraintreeAdapter"
-                type="TNW\Subscriptions\Model\Payment\Braintree\Adapter" />
-    <type name="TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer">
-        <arguments>
-            <argument name="customLogger" xsi:type="object">BraintreeLoggerForTransactionSale</argument>
-        </arguments>
-    </type>
-    <type name="Magento\Braintree\Gateway\Request\PaymentDataBuilder">
+    <type name="PayPal\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
     </type>
     <type name="Magento\Checkout\Model\PaymentInformationManagement">
@@ -1251,13 +1243,13 @@
         <arguments>
             <argument name="paymentProcessors" xsi:type="array">
                 <item name="braintree" xsi:type="array">
-                    <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
+                    <item name="factory" xsi:type="string">PayPal\Braintree\Gateway\Http\TransferFactory</item>
                     <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
-                    <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
-                    <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="authClient" xsi:type="string">PayPal\Braintree\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="string">PayPal\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
-                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
-                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="validator" xsi:type="string">PayPal\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="string">PayPal\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                     <item name="extendedVoid" xsi:type="boolean">false</item>
                     <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                 </item>
@@ -1284,13 +1276,13 @@
                     <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                 </item>
                 <item name="braintree_cc_vault" xsi:type="array">
-                    <item name="factory" xsi:type="object">Magento\Braintree\Gateway\Http\TransferFactory</item>
+                    <item name="factory" xsi:type="string">PayPal\Braintree\Gateway\Http\TransferFactory</item>
                     <item name="dataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder</item>
-                    <item name="authClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionSale</item>
-                    <item name="cancelClient" xsi:type="object">Magento\Braintree\Gateway\Http\Client\TransactionVoid</item>
+                    <item name="authClient" xsi:type="string">PayPal\Braintree\Gateway\Http\Client\TransactionSale</item>
+                    <item name="cancelClient" xsi:type="string">PayPal\Braintree\Gateway\Http\Client\TransactionVoid</item>
                     <item name="vaultTokenExtractor" xsi:type="object">TNW\Subscriptions\Model\Payment\Braintree\TokenExtractor</item>
-                    <item name="validator" xsi:type="object">Magento\Braintree\Gateway\Validator\ResponseValidator</item>
-                    <item name="voidValidator" xsi:type="object">Magento\Braintree\Gateway\Validator\GeneralResponseValidator</item>
+                    <item name="validator" xsi:type="string">PayPal\Braintree\Gateway\Validator\ResponseValidator</item>
+                    <item name="voidValidator" xsi:type="string">PayPal\Braintree\Gateway\Validator\GeneralResponseValidator</item>
                     <item name="voidDataBuilder" xsi:type="object">TNW\Subscriptions\Model\Payment\VoidDataBuilder</item>
                     <item name="extendedVoid" xsi:type="boolean">false</item>
                 </item>
@@ -1369,7 +1361,7 @@
     <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
         <plugin name="tnw_subscriptions_item_price" type="TNW\Subscriptions\Plugin\Checkout\Model\QuoteGroupConfig"/>
     </type>
-    <type name="Magento\Braintree\Gateway\Validator\ErrorCodeProvider">
+    <type name="PayPal\Braintree\Gateway\Validator\ErrorCodeProvider">
         <plugin name="validator_fix" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Validator\ErrorCodeProvider"/>
     </type>
     <type name="Magento\Quote\Model\Quote">

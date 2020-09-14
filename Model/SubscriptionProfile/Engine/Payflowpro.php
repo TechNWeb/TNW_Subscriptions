@@ -6,8 +6,7 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use Magento\Paypal\Model\Config;
-use Magento\Paypal\Model\Payflowpro as PaypalPayflow;
+use TNW\Subscriptions\Model\Config;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
@@ -17,12 +16,14 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
  */
 class Payflowpro extends Base
 {
+    const PNREF = 'pnref';
+
     /**
      * {@inheritdoc}
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        $paymentToken = $payment->getAdditionalInformation(PaypalPayflow::PNREF);
+        $paymentToken = $payment->getAdditionalInformation(self::PNREF);
         if (!$paymentToken && $payment->getAdditionalInformation('public_hash')) {
             $token = $this->paymentTokenManagement->getByPublicHash(
                 $payment->getAdditionalInformation('public_hash'),
@@ -94,7 +95,7 @@ class Payflowpro extends Base
             $editData = $this->persistor->get(
                 \TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface::PAYMENT_DATA_KEY
             );
-            $requestData['payment'][$this->getPaymentMethodCode()]['additional_information'][PaypalPayflow::PNREF]
+            $requestData['payment'][$this->getPaymentMethodCode()]['additional_information'][self::PNREF]
                 = isset($editData['pnref'])
                 ? $editData['pnref']
                 : '';
@@ -137,7 +138,7 @@ class Payflowpro extends Base
     public function getPaymentAdditionalInfo(SubscriptionProfileInterface $profile)
     {
         return [
-            PaypalPayflow::PNREF => $profile->getPayment()->getPaymentToken()
+            self::PNREF => $profile->getPayment()->getPaymentToken()
         ];
     }
 

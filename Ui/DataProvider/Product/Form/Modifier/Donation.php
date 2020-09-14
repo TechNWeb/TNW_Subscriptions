@@ -68,6 +68,9 @@ class Donation extends BaseModifier
             $meta = $this->arrayManager->merge("$recurringOptionsPath/arguments/data/config", $meta, [
                 'imports' => [
                     'visible' => '!ns = ${ $.ns }, index = tnw_subscr_schedule:selectDefinedByCustomer',
+                    '__disableTmpl' => [
+                        'visible' => false
+                    ]
                 ]
             ]);
         }

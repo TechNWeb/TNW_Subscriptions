@@ -895,6 +895,9 @@ class Form extends AbstractDataProvider
         $result = [
             'imports' => [
                 'visible' => '!ns = ${ $.ns }, index = term:checked',
+                '__disableTmpl' => [
+                    'visible' => false
+                ]
             ],
         ];
 

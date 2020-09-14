@@ -12,7 +12,7 @@ define([
         },
 
         validate: function () {
-            if (this.value() !== '1' && !this.frequencyRecords.length) {
+            if (this.value() !== '1' && (!this.frequencyRecords || !this.frequencyRecords.length)) {
                 var message = $t('Please add billing frequencies by clicking \'manage\' button!');
                 this.error(message);
                 this.error.valueHasMutated();

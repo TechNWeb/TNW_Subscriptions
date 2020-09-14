@@ -6,20 +6,24 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use Magento\Braintree\Model\Adapter\BraintreeAdapterFactory;
+use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use Magento\Braintree\Model\Ui\ConfigProvider as BraintreeConfigProvider;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Braintree payment methods form modifier.
  */
 class Braintree extends Base
 {
+    /**
+     *
+     */
     const SORT_ORDER = 25;
 
     /**
@@ -28,12 +32,12 @@ class Braintree extends Base
     private $paymentConfig;
 
     /**
-     * @var \Magento\Braintree\Gateway\Config\Config
+     * @var mixed
      */
     private $braintreeConfig;
 
     /**
-     * @var BraintreeAdapterFactory
+     * @var AdapterFactory
      */
     private $braintreeAdapterFactory;
 
@@ -43,14 +47,16 @@ class Braintree extends Base
     private $clientToken = '';
 
     /**
+     * Braintree constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Braintree\Gateway\Config\Config $braintreeConfig
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      * @param Config $paymentConfig
-     * @param BraintreeAdapterFactory $braintreeAdapterFactory
+     * @param AdapterFactory $braintreeAdapterFactory
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -58,13 +64,15 @@ class Braintree extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Braintree\Gateway\Config\Config $braintreeConfig,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
         Config $paymentConfig,
-        BraintreeAdapterFactory $braintreeAdapterFactory
+        AdapterFactory $braintreeAdapterFactory
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
-
-        $this->braintreeConfig = $braintreeConfig;
+        if ($moduleManager->isEnabled("PayPal_Braintree")) {
+            $this->braintreeConfig = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
+        }
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
     }
@@ -74,7 +82,7 @@ class Braintree extends Base
      */
     protected function getPaymentCode()
     {
-        return BraintreeConfigProvider::CODE;
+        return 'braintree';
     }
 
     /**
@@ -231,8 +239,6 @@ class Braintree extends Base
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
-            'sdkUrl' => $this->braintreeConfig->getSdkUrl(),
-            'hostedFieldsSdkUrl' => $this->braintreeConfig->getHostedFieldsSdkUrl(),
             'clientToken' => $this->getClientToken(),
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),
@@ -297,7 +303,7 @@ class Braintree extends Base
 
             $merchantAccountId = $this->braintreeConfig->getMerchantAccountId();
             if (!empty($merchantAccountId)) {
-                $params[\Magento\Braintree\Gateway\Request\PaymentDataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
+                $params[\PayPal\Braintree\Gateway\Request\PaymentDataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
             }
 
             $this->clientToken = $this->braintreeAdapterFactory->create()->generate($params);

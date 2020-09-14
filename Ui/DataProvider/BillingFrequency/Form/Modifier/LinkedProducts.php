@@ -390,7 +390,10 @@ class LinkedProducts extends AbstractModifier
                 Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
             ],
             'links' => [
-                'insertData' => '${ $.provider }:${ $.dataProvider }'
+                'insertData' => '${ $.provider }:${ $.dataProvider }',
+                '__disableTmpl' => [
+                    'insertData' => false
+                ]
             ],
             'sortOrder' => 2,
         ]);

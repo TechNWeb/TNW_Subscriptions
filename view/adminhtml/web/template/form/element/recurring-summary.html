@@ -15,7 +15,7 @@
          keyboard="13: toggleOpened"
          if="label">
 
-        <strong if="frequencyRecords.length" css="'admin__collapsible-title': collapsible,
+        <strong if="frequencyRecords && frequencyRecords.length" css="'admin__collapsible-title': collapsible,
                       title: !collapsible,
                       '_changed': changed,
                       '_loading': loading,
@@ -27,15 +27,15 @@
     <div class="admin__fieldset-wrapper-content"
          css="'admin__collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
         <fieldset if="opened() || _wasOpened || initializeFieldsetDataByDefault" class="admin__fieldset">
-            <p ifnot="frequencyRecords.length">
+            <p ifnot="frequencyRecords && frequencyRecords.length">
                 <span translate="'Please add billing frequencies by clicking \'manage\' button!'"/>
             </p>
-            <p if="frequencyRecords.length">
+            <p if="frequencyRecords && frequencyRecords.length">
                 <span if="getTrialDescription()" text="getTrialDescription()"/>
                 <span if="getDiscountDescription()" text="getDiscountDescription()"/>
                 <span if="getBillingDescription()" text="getBillingDescription()"/>
             </p>
-            <table if="frequencyRecords.length" class="data-grid">
+            <table if="frequencyRecords && frequencyRecords.length" class="data-grid">
                 <thead>
                     <tr>
                         <th class="data-grid-th" translate="'Billing Frequency'"/>

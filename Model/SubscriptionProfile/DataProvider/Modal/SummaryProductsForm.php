@@ -290,6 +290,9 @@ class SummaryProductsForm extends ModifyForm
                         'externalProvider' => EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
                             . '.' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ],
@@ -390,10 +393,21 @@ class SummaryProductsForm extends ModifyForm
                         'imports' => [
                             'billingFrequencyId' => '${ $.provider }:data.billing_frequency_id',
                             'subscriptionProfileId' => '${ $.provider }:data.subscription_profile_id',
+                            '__disableTmpl' => [
+                                'billingFrequencyId' => false,
+                                'subscriptionProfileId' => false
+                            ]
                         ],
                         'exports' => [
                             'billingFrequencyId' => '${ $.externalProvider }:data.billing_frequency',
                             'subscriptionProfileId' => '${ $.externalProvider }:data.subscription_profile_id',
+                            '__disableTmpl' => [
+                                'billingFrequencyId' => false,
+                                'subscriptionProfileId' => false
+                            ]
+                        ],
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
                         ]
                     ],
                 ],
@@ -434,9 +448,19 @@ class SummaryProductsForm extends ModifyForm
                         'loading' => false,
                         'imports' => [
                             'billingfrequencyId' => '${ $.provider }:data.billing_frequency_id',
+                            '__disableTmpl' => [
+                                'billingfrequencyId' => false
+                            ]
                         ],
                         'exports' => [
                             'billingfrequencyId' => '${ $.externalProvider }:params.billing_frequency_id',
+                            '__disableTmpl' => [
+                                'billingfrequencyId' => false
+                            ]
+                        ],
+                        '__disableTmpl' => [
+                            'selectionsProvider' => false,
+                            'formProvider' => false
                         ]
                     ],
                 ],
@@ -498,7 +522,10 @@ class SummaryProductsForm extends ModifyForm
                         'autoRender' => false,
                         'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form',
                         'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form.tnw_subscriptionprofile_summary_add_product_modal_configurable_form_data_source',
-                        'toolbarContainer' => '${ $.parentName }'
+                        'toolbarContainer' => '${ $.parentName }',
+                        '__disableTmpl' => [
+                            'toolbarContainer' => false
+                        ]
                     ],
                 ],
             ]
@@ -513,7 +540,12 @@ class SummaryProductsForm extends ModifyForm
         $visible = isset($this->currentProduct)
             ? $this->getStartOnFieldConfig($this->currentProduct->getId())['visible'] : false;
         $nowDate = new \DateTime();
-        $imports = $visible ? ['showPreview' => '${ $.parentFormName }:previewMode'] : [];
+        $imports = $visible ? [
+                'showPreview' => '${ $.parentFormName }:previewMode',
+                '__disableTmpl' => [
+                    'showPreview' => false
+                ]
+            ] : [];
 
         return [
             'arguments' => [
@@ -577,8 +609,11 @@ class SummaryProductsForm extends ModifyForm
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => '%s',
                         'imports' => [
-                            'onPriceUpdate' => '${ $.parentName}.price:value',
                             'showPreview' =>  $isTrial ? false : $this->currentFormName . ':previewMode',
+                            'onPriceUpdate' => '${ $.parentName}.price:value',
+                            '__disableTmpl' => [
+                                'onPriceUpdate' => false
+                            ]
                         ],
                         'parentFormName' => $this->currentFormName,
                         'parentForm' => $this->getCurrentFormName(),

@@ -595,7 +595,21 @@ class StepsWizard extends BaseModifier
                             'offerFlatDiscount' => '${ $.provider }:data.product.tnw_subscr_offer_flat_discount',
                             'flatDiscountType' => '${ $.provider }:data.product.tnw_subscr_discount_type',
                             'flatDiscountAmount' => '${ $.provider }:data.product.tnw_subscr_discount_amount',
-                            'infiniteSubscription' => '${ $.provider }:data.product.tnw_subscr_inf_subscriptions'
+                            'infiniteSubscription' => '${ $.provider }:data.product.tnw_subscr_inf_subscriptions',
+                            '__disableTmpl' => [
+                                'setFrequencyRecords' => false,
+                                'originalPrice' => false,
+                                'trialStatus' => false,
+                                'trialLength' => false,
+                                'trialUnit' => false,
+                                'trialPrice' => false,
+                                'trialStart' => false,
+                                'lockPrice' => false,
+                                'offerFlatDiscount' => false,
+                                'flatDiscountType' => false,
+                                'flatDiscountAmount' => false,
+                                'infiniteSubscription' => false
+                            ]
                         ]
                     ]
                 ]
@@ -650,7 +664,8 @@ class StepsWizard extends BaseModifier
                         'actions' => [
                             [
                                 'targetName' => 'ns = ${ $.ns }, index = management_modal',
-                                'actionName' => 'openModal'
+                                'actionName' => 'openModal',
+                                '__disableTmpl' => ['targetName' => false]
                             ]
                         ]
                     ]

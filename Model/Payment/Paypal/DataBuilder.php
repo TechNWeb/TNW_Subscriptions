@@ -7,6 +7,8 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use Magento\Framework\ObjectManagerInterface as ObjectManager;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class DataBuilder
@@ -17,7 +19,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     use \Magento\Payment\Helper\Formatter;
 
     /**
-     * @var \Magento\Paypal\Model\PayflowConfigFactory
+     * @var mixed
      */
     private $configFactory;
 
@@ -35,21 +37,25 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 
     /**
      * DataBuilder constructor.
-     * @param \Magento\Paypal\Model\PayflowConfigFactory $configFactory
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param SubscriptionConfig $subscriptionConfig
      * @param Manager $manager
+     * @param ObjectManager $objectManager
+     * @param ModuleManager $moduleManager
      */
     public function __construct(
-        \Magento\Paypal\Model\PayflowConfigFactory $configFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         SubscriptionConfig $subscriptionConfig,
-        Manager $manager
+        Manager $manager,
+        ObjectManager $objectManager,
+        ModuleManager $moduleManager
     ) {
+        if ($moduleManager->isEnabled("Magento_Paypal")) {
+            $this->configFactory = $objectManager->get("Magento\Paypal\Model\PayflowConfigFactory");
+        }
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
         $this->scopeConfig = $scopeConfig;
-        $this->configFactory = $configFactory;
         parent::__construct($subscriptionConfig, $manager);
     }
 
@@ -81,9 +87,9 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         $orderIncrementId = $quote->getReservedOrderId();
         $billing = $quote->getBillingAddress();
         $totals = $quote->getTotals();
-        $token = isset($paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF])
-        ? $paymentData['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF]
-        : $paymentInfo['additional_information'][\Magento\Paypal\Model\Payflowpro::PNREF];
+        $token = isset($paymentData['additional_information'][VaultDataBuilder::PNREF])
+        ? $paymentData['additional_information'][VaultDataBuilder::PNREF]
+        : $paymentInfo['additional_information'][VaultDataBuilder::PNREF];
         $requestData = [
             'user' => $this->getConfigData('user'),
             'vendor' => $this->getConfigData('vendor'),
@@ -91,7 +97,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
             'pwd' => $this->getConfigData('pwd'),
             'verbosity' => $this->getConfigData('verbosity'),
             'BUTTONSOURCE' => $config->getBuildNotationCode(),
-            'tender' => \Magento\Paypal\Model\Payflowpro::TENDER_CC,
+            'tender' => VaultDataBuilder::TENDER_CC,
             'custref' => $orderIncrementId,
             'invnum' => $orderIncrementId,
             'comment1' => $orderIncrementId,
@@ -103,7 +109,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
             'state' =>  $billing->getRegionCode(),
             'zip' => $billing->getPostcode(),
             'county' => $billing->getCountryId(),
-            'trxtype' => \Magento\Paypal\Model\Payflowpro::TRXTYPE_AUTH_ONLY,
+            'trxtype' => VaultDataBuilder::TRXTYPE_AUTH_ONLY,
             'origid' => $token,
             'amt' => $this->formatPrice($amount),
             'currency' => $quote->getBaseCurrencyCode(),

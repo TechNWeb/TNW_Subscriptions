@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 use \Magento\Payment\Gateway\Config\Config;
 use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use \Magento\Framework\App\ObjectManager;
+use \Magento\Framework\ObjectManagerInterface as ObjectManager;
 use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
@@ -34,23 +34,17 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
      */
     private $tokenManagement;
 
-    /**
-     * VaultDataBuilder constructor.
-     * @param PaymentTokenManagementInterface $tokenManagement
-     * @param SubscriptionConfig $subscriptionConfig
-     * @param Manager $manager
-     * @param Config|null $config
-     */
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
         SubscriptionConfig $subscriptionConfig,
         Manager $manager,
+        ObjectManager $objectManager,
         Config $config = null
     ) {
         $this->tokenManagement = $tokenManagement;
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
-        $this->config = $config ?: ObjectManager::getInstance()->get(Config::class);
+        $this->config = $config ? : $objectManager->get(Config::class);
         parent::__construct($subscriptionConfig, $manager);
     }
 

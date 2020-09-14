@@ -358,7 +358,7 @@ class RecurringOptions extends BaseModifier
                                 'sortOrder' => 20,
                                 'actions' => [
                                     [
-                                        'targetName' => 'ns = ${ $.ns }, index = ' . static::GRID_OPTIONS_NAME,
+                                        'targetName' => 'ns = product_form, index = ' . static::GRID_OPTIONS_NAME,
                                         'actionName' => 'processingAddChild',
                                     ]
                                 ]
@@ -396,7 +396,12 @@ class RecurringOptions extends BaseModifier
                         'collapsibleHeader' => true,
                         'sortOrder' => $sortOrder,
                         'dataProvider' => static::RECURRING_OPTIONS_LISTING,
-                        'imports' => ['insertData' => '${ $.provider }:${ $.dataProvider }'],
+                        'imports' => [
+                            'insertData' => '${ $.provider }:${ $.dataProvider }',
+                            '__disableTmpl' => [
+                                'insertData' => false
+                            ]
+                        ],
                         'periodLabels' => $billingFrequenciesData['periodLabels'],
                         'billingFrequenciesCount' => count($billingFrequenciesData['periodLabels']),
                     ],
@@ -677,6 +682,9 @@ class RecurringOptions extends BaseModifier
                             'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
                             'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT . ':value',
                             'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                     ],
