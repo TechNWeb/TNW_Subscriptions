@@ -71,7 +71,7 @@ class Form extends AbstractDataProvider
      *
      * @var PriceCalculator
      */
-    private $priceCalculator;
+    protected $priceCalculator;
 
     /**
      * @var Currency

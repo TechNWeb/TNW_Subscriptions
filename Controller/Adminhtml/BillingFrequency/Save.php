@@ -41,6 +41,11 @@ class Save extends \Magento\Backend\App\Action
     private $searchCriteriaBuilder;
 
     /**
+     * @var \TNW\Subscriptions\Model\BillingFrequencyFactory
+     */
+    protected $billingFrequencyFactory;
+
+    /**
      * Save constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
@@ -48,6 +53,7 @@ class Save extends \Magento\Backend\App\Action
      * @param \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface $billingFrequencyRepository
      * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \TNW\Subscriptions\Model\BillingFrequencyFactory $billingFrequencyFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -55,8 +61,10 @@ class Save extends \Magento\Backend\App\Action
         \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface $billingFrequencyRepository,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \TNW\Subscriptions\Model\BillingFrequencyFactory $billingFrequencyFactory
     ) {
+        $this->billingFrequencyFactory = $billingFrequencyFactory;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->dataPersistor = $dataPersistor;
@@ -80,43 +88,49 @@ class Save extends \Magento\Backend\App\Action
         if ($data) {
             $id = $this->getRequest()->getParam('id');
 
-            $model = $this->billingFrequencyRepository->getById($id);
-            if (!$model->getId() && $id) {
-                $this->messageManager->addErrorMessage(__('This Billing Frequency no longer exists.'));
-                return $resultRedirect->setPath('*/*/');
-            }
-            $canBeModified = true;
-            foreach ($model->getData() as $dataKey => $storedDataValue) {
-                if (isset($data[$dataKey]) && $data[$dataKey] != $storedDataValue) {
-                    $canBeModified = false;
-                    break;
+            if ($id) {
+                $model = $this->billingFrequencyRepository->getById($id);
+                if (!$model->getId() && $id) {
+                    $this->messageManager->addErrorMessage(__('This Billing Frequency no longer exists.'));
+                    return $resultRedirect->setPath('*/*/');
                 }
-            }
-            if (!$canBeModified) {
-                $filterByProductId = $this->filterBuilder
-                    ->setField(\TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID)
-                    ->setConditionType('eq')
-                    ->setValue($id)
-                    ->create();
-                $filterByState = $this->filterBuilder
-                    ->setField('status')
-                    ->setConditionType('nin')
-                    ->setValue([
-                        ProfileStatus::STATUS_CANCELED,
-                        ProfileStatus::STATUS_COMPLETE
-                    ])
-                    ->create();
-                $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filterByProductId, $filterByState])
-                    ->create();
-                $activeSubscriptionProfiles = $this->subscriptionProfileRepository->getList($searchCriteria)
-                    ->getItems();
-                if (count($activeSubscriptionProfiles) > 1) {
-                    $this->messageManager->addErrorMessage(
-                        __('Cannot change billing frequency. There are active subscription Profiles.')
-                    );
-                    return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()
-                        ->getParam('id')]);
+                $canBeModified = true;
+                foreach ($model->getData() as $dataKey => $storedDataValue) {
+                    if (isset($data[$dataKey]) && $data[$dataKey] != $storedDataValue) {
+                        $canBeModified = false;
+                        break;
+                    }
                 }
+                if (!$canBeModified) {
+                    $filterByProductId = $this->filterBuilder
+                        ->setField(
+                            \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID
+                        )
+                        ->setConditionType('eq')
+                        ->setValue($id)
+                        ->create();
+                    $filterByState = $this->filterBuilder
+                        ->setField('status')
+                        ->setConditionType('nin')
+                        ->setValue([
+                            ProfileStatus::STATUS_CANCELED,
+                            ProfileStatus::STATUS_COMPLETE
+                        ])
+                        ->create();
+                    $searchCriteria = $this->searchCriteriaBuilder->addFilters([$filterByProductId, $filterByState])
+                        ->create();
+                    $activeSubscriptionProfiles = $this->subscriptionProfileRepository->getList($searchCriteria)
+                        ->getItems();
+                    if (count($activeSubscriptionProfiles) > 1) {
+                        $this->messageManager->addErrorMessage(
+                            __('Cannot change billing frequency. There are active subscription Profiles.')
+                        );
+                        return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()
+                            ->getParam('id')]);
+                    }
+                }
+            } else {
+                $model = $this->billingFrequencyFactory->create();
             }
 
             $model->setData($data);
