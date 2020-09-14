@@ -391,3 +391,4 @@ The number of future quotes to generate at a time for the new subscription profi
 "Product %s has been removed.", "Product %s has been removed."
 "Invalid ID param provided.", "Invalid ID param provided."
 "Cannot change billing frequency. There are active subscription Profiles.", "Cannot change billing frequency. There are active subscription Profiles."
+"Error on processing profile. (See cron log).", "Error on processing profile. (See cron log)."

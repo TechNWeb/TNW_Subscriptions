@@ -12,7 +12,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
-use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
@@ -27,12 +26,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Base;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Subscription items form data provider for subscription admin edit page.
@@ -155,6 +154,7 @@ class SummaryProductsForm extends ModifyForm
             $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
             $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
             $data[$subQuote->getId()]['subscription_shipping'] = (float)$subQuote->getData('shipping');
+            $data[$subQuote->getId()]['changed_price'] = false;
 
             /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $item */
             foreach ($this->getObjectItems($subQuote) as $item) {
@@ -183,6 +183,7 @@ class SummaryProductsForm extends ModifyForm
                     'is_product_deleted' => $isProductDeleted,
                     'price_incl_tax' => $priceInclTax,
                 ];
+                $data[$subQuote->getId()]['locked_price'] = $this->priceCalculator->getProductLockPriceSatus($product);
 
                 /** @var Base $modifier */
                 foreach ($this->pool->getModifiersInstances() as $modifier) {
@@ -546,6 +547,16 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getBillingFrequencyDefinition()
     {
+        $isTrial = false;
+
+        if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
+            if (
+                !isset($this->profileManager)
+                || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
+            ) {
+                $isTrial = true;
+            }
+        }
         return [
             'arguments' => [
                 'data' => [
@@ -566,12 +577,10 @@ class SummaryProductsForm extends ModifyForm
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => '%s',
                         'imports' => [
-                            'onPriceUpdate' => '${ $.parentName}.price:value'
+                            'onPriceUpdate' => '${ $.parentName}.price:value',
+                            'showPreview' =>  $isTrial ? false : $this->currentFormName . ':previewMode',
                         ],
                         'parentFormName' => $this->currentFormName,
-                        'links' => [
-                            'showPreview' => '${ $.parentFormName }:previewMode'
-                        ],
                         'parentForm' => $this->getCurrentFormName(),
                         'priceFormat' => $this->getPriceFormatData(),
                         'currencySymbol' => $this->getCurrentCurrencySymbol(),
