@@ -333,6 +333,8 @@ workflows:
 
       - tag-release:
           context: powersync
+          requires:
+            - magento-coding-standard
 
       - check-composer-installation:
           context: powersync
