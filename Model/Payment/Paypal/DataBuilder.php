@@ -21,7 +21,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     /**
      * @var mixed
      */
-    private $configFactory;
+    private $config;
 
     /**
      * @var
@@ -51,7 +51,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         ModuleManager $moduleManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->configFactory = $objectManager->get("Magento\Paypal\Model\PayflowConfigFactory");
+            $this->config = $objectManager->get("Magento\Paypal\Model\PayflowConfig");
         }
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
@@ -77,7 +77,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
             $this->methodCode = $paymentInfo['method'];
             $quote->getPayment()->setMethod($this->methodCode);
         }
-        $config = $this->configFactory->create();
+        $config = $this->config;
         $config->setStoreId($storeId);
         if (!$quote->getPayment()->getQuote()) {
             $quote->getPayment()->setQuote($quote);
