@@ -325,13 +325,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="Magento\Sales\Cron\CleanExpiredQuotes">
-        <plugin name="tnw_clean_expired_quotes"
-                type="TNW\Subscriptions\Plugin\Sales\Cron\CleanExpiredQuotes"
-                sortOrder="1000"
-                disabled="false"/>
-    </type>
-
     <type name="TNW\Subscriptions\Model\SubscriptionProfile\Manager">
         <arguments>
             <argument name="shippingMethods" xsi:type="object">TNW\Subscriptions\Model\Source\ShippingMethods\Proxy</argument>
