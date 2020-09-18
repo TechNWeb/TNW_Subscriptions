@@ -272,29 +272,35 @@ workflows:
 
   test-deploy-wiki:
     jobs:
-      - m234-commerce-php72:
-          context: powersync
-          filters:
-            branches:
-              only: /.*/
-
-      - m234-open_source-php72:
-          context: powersync
-          filters:
-            branches:
-              only: master
-
-      - m233-commerce-php72:
-          context: powersync
-          filters:
-            branches:
-              only: master
-
-      - m233-open_source-php71:
-          context: powersync
-          filters:
-            branches:
-              only: master
+#      - m234-commerce-php72:
+#          context: powersync
+#          filters:
+#            branches:
+#              only: /.*/
+#
+#      - m234-open_source-php72:
+#          context: powersync
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - master-2.4.x
+#
+#      - m233-commerce-php72:
+#          context: powersync
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - master-2.4.x
+#
+#      - m233-open_source-php71:
+#          context: powersync
+#          filters:
+#            branches:
+#              only:
+#                - master
+#                - master-2.4.x
 
 #      - m2210-commerce-php72:
 #          context: powersync
@@ -312,24 +318,23 @@ workflows:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master-2.4.x
 
       - deploy:
           context: powersync
           requires:
-            - m233-commerce-php72
-            - m233-open_source-php71
-            - m234-commerce-php72
-            - m234-open_source-php72
             - magento-coding-standard
+            - tag-release
           filters:
             branches:
-              only: master
+              only:
+                - master-2.4.x
 
       - tag-release:
           context: powersync
           requires:
-            - deploy
+            - magento-coding-standard
 
       - check-composer-installation:
           context: powersync
@@ -342,4 +347,6 @@ workflows:
             - check-composer-installation
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - master-2.4.x
