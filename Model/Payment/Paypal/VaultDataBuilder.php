@@ -37,7 +37,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     /**
      * @var mixed
      */
-    private $configFactory;
+    private $config;
 
     /**
      * @var string
@@ -74,7 +74,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         ModuleManager $moduleManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->configFactory = $objectManager->get("Magento\Paypal\Model\PayflowConfigFactory");
+            $this->config = $objectManager->get("Magento\Paypal\Model\PayflowConfig");
         }
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->manager = $manager;
@@ -98,7 +98,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         if (!$quote->getPayment()->getMethod()) {
             $quote->getPayment()->setMethod($this->methodCode);
         }
-        $config = $this->configFactory->create();
+        $config = $this->config;
         $config->setStoreId($storeId);
         $config->setMethodInstance($quote->getPayment()->getMethodInstance());
         $config->setMethod($this->methodCode);
