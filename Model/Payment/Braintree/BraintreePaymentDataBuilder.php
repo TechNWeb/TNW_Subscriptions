@@ -21,6 +21,8 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
 {
     use \Magento\Payment\Helper\Formatter;
 
+    const CODE_3DSECURE = 'three_d_secure';
+
     /**
      * Additional data for Advanced Fraud Tools
      */
@@ -270,8 +272,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
             self::$channel => $channel ?: sprintf(self::$channelValue, $this->productMetadata->getEdition()),
             self::OPTIONS => [
                 self::STORE_IN_VAULT_ON_SUCCESS => true
-            ],
-            'store_id' => $order->getStoreId()
+            ]
         ];
 
         $billingAddress = $order->getBillingAddress();
@@ -307,7 +308,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $amount = $this->formatPrice($this->subjectReader->readAmount($amount));
 
         if ($this->is3DSecureEnabled($order, $amount)) {
-            $result['options'][BraintreeConfig::CODE_3DSECURE] = ['required' => true];
+            $result['options'][self::CODE_3DSECURE] = ['required' => true];
         }
 
         if (!$this->braintreeConfig->hasFraudProtection($order->getStoreId())) {

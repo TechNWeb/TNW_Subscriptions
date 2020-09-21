@@ -155,9 +155,13 @@ class CreateProfile implements ObserverInterface
 
         // Create customer
         if ($order->getCustomerIsGuest()) {
-            $customer = $this->orderCustomerService->create($order->getEntityId());
-            //ISSUE: https://github.com/magento/magento2/issues/7597
-            $this->customerFactory->create()->setId($customer->getId())->reindex();
+            try {
+                $customer = $this->orderCustomerService->create($order->getEntityId());
+                //ISSUE: https://github.com/magento/magento2/issues/7597
+                $this->customerFactory->create()->setId($customer->getId())->reindex();
+            } catch (\Exception $e) {
+                $customer = $this->customerRepository->get($order->getCustomerEmail());
+            }
             $quote->setCustomer($customer);
             $this->changeQuoteControl->setNewCustomer($customer);
         }
