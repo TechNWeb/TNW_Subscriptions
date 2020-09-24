@@ -32,7 +32,12 @@ class CustomerGrid extends AbstractDataProvider
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 }

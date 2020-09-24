@@ -299,7 +299,7 @@ class ShippingMethods
                 $options[$key]['css'] = 'subscription-shipping-attention';
                 $options[$key]['title'] = $this->getShippingAttentionMessage();
                 foreach ($shippingMethodsCodesWithoutWarning as $code) {
-                    if(strpos($option['value'], $code) === 0) {
+                    if (strpos($option['value'], $code) === 0) {
                         $options[$key]['css'] = '';
                         $options[$key]['title'] = '';
                         break;

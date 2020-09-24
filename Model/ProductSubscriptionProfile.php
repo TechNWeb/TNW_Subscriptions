@@ -21,9 +21,7 @@ use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface
 /**
  * Product subscription profile model.
  */
-class ProductSubscriptionProfile
-    extends AbstractExtensibleModel
-    implements ProductSubscriptionProfileInterface
+class ProductSubscriptionProfile extends AbstractExtensibleModel implements ProductSubscriptionProfileInterface
 {
     /**
      * Entity code.
@@ -311,7 +309,7 @@ class ProductSubscriptionProfile
     public function getProfileUnitPrice($divideByQty = false)
     {
         $result = null;
-        if (is_array($this->getData(self::PRICE))){
+        if (is_array($this->getData(self::PRICE))) {
             $result = $this->getData(self::PRICE)[0];
         } else {
             $result = $this->getData(self::PRICE);
@@ -330,7 +328,7 @@ class ProductSubscriptionProfile
     public function setPrice($price)
     {
         $result = null;
-        if (is_array($price)){
+        if (is_array($price)) {
             $result = $this->setData(self::PRICE, $price[0]);
         } else {
             $result = $this->setData(self::PRICE, $price);

@@ -6,7 +6,7 @@
 
 /** @var \TNW\Subscriptions\Pricing\Render\SubscriptionAmount $block */
 ?>
-<?php if($topMessage = $block->getMessage('top')): ?>
+<?php if ($topMessage = $block->getMessage('top')): ?>
     <div class="subscription-price-top-messages">
         <?php echo $block->getMessage('top') ?>
     </div>
@@ -25,7 +25,7 @@
         <meta itemprop="priceCurrency" content="<?php /* @escapeNotVerified */ echo $block->getDisplayCurrencyCode()?>" />
     <?php endif; ?>
 </span>
-<?php if($bottomMessage = $block->getMessage('bottom')): ?>
+<?php if ($bottomMessage = $block->getMessage('bottom')): ?>
     <div class="subscription-price-bottom-messages">
         <?php echo $bottomMessage ?>
     </div>

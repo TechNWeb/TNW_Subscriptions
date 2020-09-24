@@ -14,7 +14,6 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class BankTransfer
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
  */
 class BankTransfer extends Base implements PaymentModifierInterface
 {

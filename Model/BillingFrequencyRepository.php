@@ -133,8 +133,10 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
             $billingFrequency = $this->billingFrequencyFactory->create();
             $billingFrequency->load($billingFrequencyId);
             if (!$billingFrequency->getId()) {
-                throw new NoSuchEntityException(__('BillingFrequency with id "%1" does not exist.',
-                    $billingFrequencyId));
+                throw new NoSuchEntityException(__(
+                    'BillingFrequency with id "%1" does not exist.',
+                    $billingFrequencyId
+                ));
             }
             $this->instances[$billingFrequencyId] = $billingFrequency;
         }

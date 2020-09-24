@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Status block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
  */
@@ -48,7 +48,7 @@ class Status extends Template
 
     /**
      * Retrieve profile status label
-     * 
+     *
      * @return string
      */
     public function getStatusLabel()

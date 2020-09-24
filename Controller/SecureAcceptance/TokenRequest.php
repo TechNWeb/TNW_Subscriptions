@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Controller\SecureAcceptance;
 
 /**
  * Class TokenRequest
- * @package TNW\Subscriptions\Controller\SecureAcceptance
  */
 class TokenRequest extends \Magento\Framework\App\Action\Action
 {
@@ -89,9 +88,9 @@ class TokenRequest extends \Magento\Framework\App\Action\Action
         if ($profileId = $this->getRequest()->getParam('profile_id')) {
             $quote = $this->manager->getTempQuote($this->profileRepository->getById($profileId));
             $billingAddress = $quote->getBillingAddress();
-        try {
-            $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
-                [
+            try {
+                $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
+                    [
                     'order_id' => $quote->getId(),
                     'session_id' => $this->customerSession->getSessionId(),
                     'card_type' => $this->getRequest()->getParam('cc_type'),
@@ -107,20 +106,20 @@ class TokenRequest extends \Magento\Framework\App\Action\Action
                         'street_line_2' => $billingAddress->getStreetLine(2),
                         'postcode' => $billingAddress->getPostcode(),
                     ]
-                ]
-            )]);
-            $requestFields = $commandResult->get();
-            $this->customerSession->setData('chcybersource_security_key', $requestFields['transaction_uuid']);
-            $result->setData(
-                [
+                    ]
+                )]);
+                $requestFields = $commandResult->get();
+                $this->customerSession->setData('chcybersource_security_key', $requestFields['transaction_uuid']);
+                $result->setData(
+                    [
                     'success' => true,
                     \CyberSource\SecureAcceptance\Model\Ui\ConfigProvider::CODE => ['fields' => $requestFields]
-                ]
-            );
+                    ]
+                );
 
-        } catch (\Exception $e) {
-            $result->setData(['error' => __('Unable to build Token request')]);
-        }
+            } catch (\Exception $e) {
+                $result->setData(['error' => __('Unable to build Token request')]);
+            }
         }
         return $result;
     }

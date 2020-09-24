@@ -143,7 +143,6 @@ class SummaryInsertForm extends BaseFormModifier
             ];
         }
 
-
         $meta = array_merge_recursive($meta, $result);
 
         return $meta;
@@ -243,8 +242,7 @@ class SummaryInsertForm extends BaseFormModifier
 
         if ($profile && $this->utils->isCcPayment($profile)) {
             $relation = $this->getNextProfileRelation($profile);
-            if (
-                false !== $relation &&
+            if (false !== $relation &&
                 $this->utils->isCcExpireBy($profile, $relation->getScheduledAt())
             ) {
                 $messages[] = __('Credit Card will expire before next billing cycle.');
@@ -277,7 +275,7 @@ class SummaryInsertForm extends BaseFormModifier
         switch ($formType) {
             case self::SHIPPING_METHODS_INSERT_FORM:
             case self::SHIPPING_INFORMATION_INSERT_FORM:
-            if ((bool)$this->getProfile()->getIsVirtual()) {
+                if ((bool)$this->getProfile()->getIsVirtual()) {
                     $result = false;
                 }
                 break;

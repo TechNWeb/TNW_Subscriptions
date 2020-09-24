@@ -54,7 +54,7 @@ class Download implements ButtonProviderInterface
     public function getOptions()
     {
         $directoryRead = $this->fileSystem->getDirectoryRead(DirectoryList::LOG);
-        return array_map(function($fileName) use($directoryRead) {
+        return array_map(function ($fileName) use ($directoryRead) {
             $relativePath = $directoryRead->getRelativePath($fileName);
             $urlDownload = $this->urlBuilder->getUrl('tnw_subscriptions/message/download', [
                 'fileName'=>$relativePath

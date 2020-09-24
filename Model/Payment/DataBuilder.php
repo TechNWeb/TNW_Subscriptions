@@ -10,7 +10,6 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class DataBuilder
- * @package TNW\Subscriptions\Model\Payment
  */
 class DataBuilder
 {

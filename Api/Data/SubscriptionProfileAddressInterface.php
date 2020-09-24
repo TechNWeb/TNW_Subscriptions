@@ -76,7 +76,6 @@ interface SubscriptionProfileAddressInterface
      */
     public function getCompany();
 
-
     /**
      * Sets the company for the profile address.
      *

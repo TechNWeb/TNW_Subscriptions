@@ -133,15 +133,14 @@ class ListProduct extends OrigListProduct
     public function getTopMessage($product)
     {
         $productArray = $product->getData();
-        if (
-            isset($productArray['tnw_subscr_trial_status'])
+        if (isset($productArray['tnw_subscr_trial_status'])
             && $productArray['tnw_subscr_trial_status'] != 0
             && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
                 $productArray['tnw_subscr_trial_length'],
-                $productArray['tnw_subscr_trial_length_unit'])
-            );
+                $productArray['tnw_subscr_trial_length_unit']
+            ));
         } else {
             $topMessage = '';
         }
@@ -173,8 +172,7 @@ class ListProduct extends OrigListProduct
             ->getListByProductId($product->getId())
             ->getItems();
 
-        if (
-            empty($productBillingFrequencies)
+        if (empty($productBillingFrequencies)
             || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
             return $this->formatCurrency($product->getPrice(), false);

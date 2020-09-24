@@ -9,7 +9,6 @@ use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class ProfileProductsUnsaleableException
- * @package TNW\Subscriptions\Exception
  */
 class ProfileProductsUnsaleableException extends LocalizedException
 {

@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
@@ -11,6 +10,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -18,7 +18,6 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
@@ -54,6 +53,7 @@ class UpgradeData implements UpgradeDataInterface
 
     /**
      * UpgradeData constructor.
+     *
      * @param EavSetupFactory $eavSetupFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductAttributeRepositoryInterface $attributeRepository
@@ -140,7 +140,8 @@ class UpgradeData implements UpgradeDataInterface
      * Adds 'savings calculator type' product attribute.
      *
      * @param EavSetup $eavSetup
-     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
      */
     private function addSavingsCalculatorProductAttributes(EavSetup $eavSetup)
     {
@@ -175,10 +176,11 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     * Adds 'hide qty' product attribute.
+     *  Adds 'hide qty' product attribute.
      *
      * @param EavSetup $eavSetup
-     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
      */
     private function addHideQtyProductAttributes(EavSetup $eavSetup)
     {
@@ -208,7 +210,8 @@ class UpgradeData implements UpgradeDataInterface
      * Adds 'inheritance' product attribute.
      *
      * @param EavSetup $eavSetup
-     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
      */
     private function addInheritProductAttribute(EavSetup $eavSetup)
     {
@@ -244,7 +247,8 @@ class UpgradeData implements UpgradeDataInterface
      * Adds 'infinite subscriptions' product attribute.
      *
      * @param EavSetup $eavSetup
-     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
      */
     private function addInfiniteSubscriptionsProductAttributes(EavSetup $eavSetup)
     {
@@ -460,12 +464,14 @@ class UpgradeData implements UpgradeDataInterface
             )
             ->joinInner(
                 ['quoteItem' => $setup->getTable('quote_item')],
-                'relation.magento_quote_id = quoteItem.quote_id AND profileItem.magento_product_id = quoteItem.product_id AND profileItem.qty = quoteItem.qty',
+                'relation.magento_quote_id = quoteItem.quote_id AND profileItem.magento_product_id'
+        . ' = quoteItem.product_id AND profileItem.qty = quoteItem.qty',
                 ['quote_item_id' => 'item_id']
             )
             ->joinInner(
                 ['orderItem' => $setup->getTable('sales_order_item')],
-                'relation.magento_order_id = orderItem.order_id AND profileItem.magento_product_id = orderItem.product_id AND profileItem.qty = orderItem.qty_ordered',
+                'relation.magento_order_id = orderItem.order_id AND profileItem.magento_product_id'
+        . ' = orderItem.product_id AND profileItem.qty = orderItem.qty_ordered',
                 ['order_item_id' => 'item_id']
             );
 
@@ -498,7 +504,9 @@ class UpgradeData implements UpgradeDataInterface
 
             $connection->update(
                 $productSubscriptionTable,
-                ['custom_options' => $this->serializer->serialize(['info_buyRequest' => ['super_attribute' => $options]])],
+                ['custom_options' => $this->serializer->serialize(
+                    ['info_buyRequest' => ['super_attribute' => $options]]
+                )],
                 $connection->prepareSqlCondition('entity_id', $entityId)
             );
         }
@@ -508,6 +516,8 @@ class UpgradeData implements UpgradeDataInterface
      * Adds attributes for the next payment calculation.
      *
      * @param EavSetup $eavSetup
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
      */
     private function addNextPaymentAttributes(EavSetup $eavSetup)
     {

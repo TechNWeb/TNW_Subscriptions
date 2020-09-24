@@ -16,7 +16,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Next Payment block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextProfileRelation()
  * @method Quote getNextQuote()
@@ -129,7 +129,7 @@ class NextPayment extends Template
 
     /**
      * Retrieve Cost with price formatting
-     * 
+     *
      * @return string
      */
     public function getCostFormatting()

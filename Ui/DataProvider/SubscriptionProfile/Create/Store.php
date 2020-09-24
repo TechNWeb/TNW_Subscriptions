@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create;
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-
 class Store implements OptionSourceInterface
 {
     /** @var StoreManagerInterface */

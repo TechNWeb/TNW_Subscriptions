@@ -25,7 +25,6 @@ class MassDelete extends Action
      */
     private $collectionFactory;
 
-
     /**
      * Filter.
      *

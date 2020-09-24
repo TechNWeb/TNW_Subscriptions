@@ -67,7 +67,6 @@ class ChangeHistory extends ContentAbstract
             }
         }
 
-
         return $this->messagesCollection;
     }
 

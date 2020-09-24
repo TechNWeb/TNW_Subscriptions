@@ -17,7 +17,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 /**
  * Class ProfileProcessor
- * @package TNW\Subscriptions\Cron
  */
 class ProfileProcessor
 {

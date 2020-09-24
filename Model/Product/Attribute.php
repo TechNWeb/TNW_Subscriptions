@@ -57,5 +57,4 @@ class Attribute
             self::SUBSCRIPTION_INHERITANCE
         ];
     }
-
 }

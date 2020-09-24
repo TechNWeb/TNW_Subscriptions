@@ -89,7 +89,7 @@ class Authorizenet extends Base
         $expirationDate = [];
         if (array_key_exists('extension_attributes', $additionalInfo)) {
             $cardDetails = json_decode($additionalInfo['extension_attributes'], true);
-            $expirationDate = explode('/' , $cardDetails['expirationDate']);
+            $expirationDate = explode('/', $cardDetails['expirationDate']);
         }
         if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
             $cardDetails = [
@@ -207,9 +207,9 @@ class Authorizenet extends Base
      *
      */
     public function setRebillProcessFlag()
-     {
+    {
          $this->isRebill = true;
-     }
+    }
 
     /**
      * @param \Magento\Quote\Model\Quote $quote

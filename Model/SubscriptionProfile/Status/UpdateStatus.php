@@ -84,10 +84,10 @@ class UpdateStatus
         /* @var SubscriptionProfile $model */
         $model = $this->profileRepository->getById($profileId);
 
-        if (
-            !$this->statusManager->canChangeStatus($model, $newStatus)
+        if (!$this->statusManager->canChangeStatus($model, $newStatus)
             || (int) $model->getData('status') === ProfileStatus::STATUS_TRIAL
-        ) {            $this->messageManager->addErrorMessage(
+        ) {
+            $this->messageManager->addErrorMessage(
                 __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
             );
         } else {
@@ -102,7 +102,6 @@ class UpdateStatus
             ));
         }
     }
-
 
     /**
      * Log change status in to Subscription Profile history.

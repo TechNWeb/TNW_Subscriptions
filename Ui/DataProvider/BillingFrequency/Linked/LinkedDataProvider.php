@@ -62,7 +62,8 @@ class LinkedDataProvider extends AbstractDataProvider
     ) {
         $this->dataPersistor = $dataPersistor;
 
-        parent::__construct($name,
+        parent::__construct(
+            $name,
             $primaryFieldName,
             $requestFieldName,
             $collectionFactory,

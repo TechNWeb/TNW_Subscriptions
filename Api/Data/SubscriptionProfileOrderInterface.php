@@ -84,7 +84,6 @@ interface SubscriptionProfileOrderInterface
      */
     public function setMagentoQuoteId($magentoQuoteId);
 
-
     /**
      * Gets the scheduled date for order.
      *

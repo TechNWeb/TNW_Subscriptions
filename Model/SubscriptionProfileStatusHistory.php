@@ -14,8 +14,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as Resource;
 /**
  * Model for subscription profile status history.
  */
-class SubscriptionProfileStatusHistory extends AbstractModel
-    implements SubscriptionProfileStatusHistoryInterface
+class SubscriptionProfileStatusHistory extends AbstractModel implements SubscriptionProfileStatusHistoryInterface
 {
     /**#@+
      * Main table name.

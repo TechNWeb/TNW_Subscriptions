@@ -10,7 +10,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
 /**
  * Class CustomerGridActions
- * @package TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile
  */
 class AddProductGridActions extends Column
 {

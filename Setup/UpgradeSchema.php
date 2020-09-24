@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Framework\DB\Ddl\Table;
@@ -198,8 +197,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
-    )
-    {
+    ) {
         $table = $setup->getTable('tnw_subscriptions_order_item_extension_entity');
 
         $setup->getConnection()
@@ -410,8 +408,16 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ['website_id']
             )
             ->addForeignKey(
-                $setup->getFkName('tnw_subscriptions_message', 'website_id', 'store_website', 'website_id'),
-                'website_id', $setup->getTable('store_website'), 'website_id', Table::ACTION_CASCADE
+                $setup->getFkName(
+                    'tnw_subscriptions_message',
+                    'website_id',
+                    'store_website',
+                    'website_id'
+                ),
+                'website_id',
+                $setup->getTable('store_website'),
+                'website_id',
+                Table::ACTION_CASCADE
             );
 
         $setup->getConnection()->createTable($table);
@@ -631,11 +637,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->getConnection()->createTable($table);
     }
 
-
     /**
-     * Adds attributes for the next payment calculation.
-     *
-     * @param EavSetup $eavSetup
+     * @param SchemaSetupInterface $setup
      */
     private function addNextPaymentAttributes(SchemaSetupInterface $setup)
     {
@@ -650,7 +653,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
 
             $setup->getConnection()
-                ->addColumn($setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY), $nextPaymentAttribute, [
+                ->addColumn($setup->getTable(
+                    SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY
+                ), $nextPaymentAttribute, [
                     'type' => Table::TYPE_DECIMAL,
                     'nullable' => false,
                     'default' => 0,
@@ -667,20 +672,23 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addCheckSendMailColumn(SchemaSetupInterface $setup)
     {
         $setup->getConnection()
-            ->addColumn($setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
-                'sent_mail', [
+            ->addColumn(
+                $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
+                'sent_mail',
+                [
                 'type' => Table::TYPE_BOOLEAN,
                 'nullable' => false,
                 'default' => 0,
                 'comment' => 'sent_mail'
 
-            ]);
+                ]
+            );
     }
 
     /**
      * Updates attributes for the next payment calculation.
      *
-     * @param EavSetup $eavSetup
+     * @param SchemaSetupInterface $setup
      */
     private function updateNextPaymentAttributes(SchemaSetupInterface $setup)
     {
@@ -735,7 +743,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @param SchemaSetupInterface $setup
      */
-    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup) {
+    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup)
+    {
         $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
         $connection = $setup->getConnection();
         $connection->addColumn(

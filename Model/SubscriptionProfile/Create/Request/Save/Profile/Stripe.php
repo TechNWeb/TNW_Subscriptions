@@ -9,7 +9,6 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
 
 /**
  * Class Stripe
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
  */
 class Stripe extends Base
 {

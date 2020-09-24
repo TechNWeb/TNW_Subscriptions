@@ -31,6 +31,4 @@ class Checkmo extends Base
         $this->getProfile()->getPayment()->setTokenHash('');
         return $this;
     }
-
-
 }

@@ -55,8 +55,7 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
         \Magento\Framework\Registry $coreRegistry,
         \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options $profileStatusOption,
         array $data = []
-    )
-    {
+    ) {
         $this->_coreRegistry = $coreRegistry;
         $this->_salesReorder = $salesReorder;
         $this->_collectionFactory = $collectionFactory;

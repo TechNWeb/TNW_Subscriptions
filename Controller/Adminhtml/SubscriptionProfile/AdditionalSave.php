@@ -6,7 +6,6 @@ use Magento\Framework\App\ResponseInterface;
 
 /**
  * Additional save action
- * @package TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
  */
 class AdditionalSave extends \Magento\Backend\App\Action
 {

@@ -3,21 +3,17 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 interface BillingFrequencyInterface
 {
     const SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE = 'tnw_subscriptions_billing_frequency';
-
-
     const WEBSITE_ID = 'website_id';
     const UNIT = 'unit';
     const ID = 'id';
     const STATUS = 'status';
     const FREQUENCY = 'frequency';
     const LABEL = 'label';
-
 
     /**
      * Get id

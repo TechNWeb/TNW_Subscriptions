@@ -48,8 +48,7 @@ class ExpireWarningProcessor
     {
         if ($block instanceof ExpireWarningSupportInterface && $block->isSupported()) {
             $relation = $this->getNextProfileRelation($block->getSubscriptionProfile());
-            if (
-                false !== $relation &&
+            if (false !== $relation &&
                 $this->profileCcUtils->isCcExpireBy($block->getSubscriptionProfile(), $relation->getScheduledAt(), true)
             ) {
                 $block->getMessagePool()->addMessage(

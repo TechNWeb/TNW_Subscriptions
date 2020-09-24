@@ -32,8 +32,7 @@ class Simple extends Base
                     $subscriptionPart['price'] = $buyRequestValue['price'];
                 }
 
-                if (
-                    isset($buyRequestValue['rebill_processing'])
+                if (isset($buyRequestValue['rebill_processing'])
                     && $buyRequestValue['rebill_processing']
                     && isset($buyRequestValue['subscription_data']['unique']['use_preset_qty'])
                     && $buyRequestValue['subscription_data']['unique']['use_preset_qty']

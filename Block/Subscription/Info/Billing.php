@@ -167,7 +167,7 @@ class Billing extends ContentAbstract implements ExpireWarningSupportInterface
         foreach ($addressesList as $address) {
             $streetData = [];
             if ($address->getStreet()) {
-                foreach ($address->getStreet() as $key =>$streetValue) {
+                foreach ($address->getStreet() as $key => $streetValue) {
                     $streetKey = 'street_' . ($key+1);
                     $streetData[$streetKey] = $streetValue;
                 }

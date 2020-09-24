@@ -93,7 +93,6 @@ class Totals extends Template
         return [$result, $baseResult];
     }
 
-
     /**
      * Returns item subscription initial fee extension attribute.
      *

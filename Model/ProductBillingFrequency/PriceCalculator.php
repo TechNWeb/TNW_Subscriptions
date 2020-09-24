@@ -135,7 +135,8 @@ class PriceCalculator
             } else {
                 $billingFrequencyPrice = $this->getBillingFrequencyPrice(
                     $billingFrequencyId,
-                    $product->getChildProductId())
+                    $product->getChildProductId()
+                )
                 ;
                 $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
             }

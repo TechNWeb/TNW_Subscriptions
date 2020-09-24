@@ -5,6 +5,7 @@
  */
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Edit\Response\Save\Profile;
+
 use TNW\Subscriptions\Block\Subscription\Summary\Payment\Details as PaymentDetailsBlock;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 

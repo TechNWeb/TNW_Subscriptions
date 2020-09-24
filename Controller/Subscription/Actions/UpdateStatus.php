@@ -90,7 +90,7 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
         $newStatus = $this->getRequest()->getParam('status');
 
         try {
-            if(!$this->subscriptionItems->canViewSubscriptionById($profileId)){
+            if (!$this->subscriptionItems->canViewSubscriptionById($profileId)) {
                 throw new \Magento\Framework\Exception\NoSuchEntityException();
             }
             /* @var SubscriptionProfile $model */

@@ -108,7 +108,6 @@ class Payment extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

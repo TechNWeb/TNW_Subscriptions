@@ -30,10 +30,10 @@ class ProfileLink extends Column
      * @param array $data
      */
     public function __construct(
-        ContextInterface $context, 
+        ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         UrlBuilderInterface $profileUrlBuilder,
-        array $components, 
+        array $components,
         array $data
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);

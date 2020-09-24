@@ -233,8 +233,7 @@ class StepPool
         if ($this->session->getCustomerId()) {
             $customerName = $this->getCustomerName($this->session->getCustomerId());
             $title .= ' ' . sprintf(__('for %s'), $customerName);
-        } elseif (
-            $this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER
+        } elseif ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER
             && $this->session->getCreateNewCustomer()
         ) {
             $title .= ' ' . __('for a new customer');

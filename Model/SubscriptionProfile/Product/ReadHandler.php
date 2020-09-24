@@ -24,7 +24,6 @@ class ReadHandler implements ExtensionInterface
      */
     private $productProfileRepository;
 
-
     /**
      * Search criteria builder.
      *

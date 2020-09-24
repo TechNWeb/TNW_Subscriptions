@@ -12,7 +12,6 @@ use Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
  * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Stripe
  */
 class TokenExtractor
 {

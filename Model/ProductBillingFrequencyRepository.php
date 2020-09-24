@@ -136,8 +136,10 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
                     throw new CouldNotSaveException(__('ProductSku should be specified'));
                 }
                 $product = $this->productRepository->get($productSku);
-                $productBillingFrequency->setData(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                    $product->getId());
+                $productBillingFrequency->setData(
+                    ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                    $product->getId()
+                );
             }
 
             $this->resource->save($productBillingFrequency);
@@ -162,8 +164,10 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $productBillingFrequency = $this->productBillingFrequencyFactory->create();
         $productBillingFrequency->load($productBillingFrequencyId);
         if (!$productBillingFrequency->getId()) {
-            throw new NoSuchEntityException(__('ProductBillingFrequency with id "%1" does not exist.',
-                $productBillingFrequencyId));
+            throw new NoSuchEntityException(__(
+                'ProductBillingFrequency with id "%1" does not exist.',
+                $productBillingFrequencyId
+            ));
         }
         return $productBillingFrequency;
     }

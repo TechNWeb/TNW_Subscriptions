@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Missed Payments block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
  */
@@ -32,11 +32,10 @@ class MissedPayments extends Template
 
     /**
      * Count of missed payments
-     * 
+     *
      * @var int
      */
     private $countOfMissedPayments;
-    
 
     /**
      * @param Context $context

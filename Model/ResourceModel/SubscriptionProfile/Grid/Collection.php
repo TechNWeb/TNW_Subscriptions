@@ -163,7 +163,8 @@ class Collection extends SearchResult
         )->where(
             SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NULL'
         )->where(
-            'main_table.status not in (?)', [
+            'main_table.status not in (?)',
+            [
                 ProfileStatus::STATUS_COMPLETE,
                 ProfileStatus::STATUS_CANCELED,
             ]

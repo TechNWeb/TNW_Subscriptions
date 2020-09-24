@@ -31,7 +31,7 @@ class Account extends Base
 
             $result = $this->getSubCreateModel()->setShippingAddress($address, $customerAddressId);
 
-            if (is_array($result)){
+            if (is_array($result)) {
                 $this->errors = $result;
             }
         }

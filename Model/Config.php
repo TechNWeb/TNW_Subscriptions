@@ -174,7 +174,7 @@ class Config
     {
         $result = false;
 
-        if ($websiteId){
+        if ($websiteId) {
             $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
         } else {
             if ($this->isSubscriptionsActive === null) {
@@ -477,7 +477,7 @@ class Config
                 ScopeInterface::SCOPE_STORE,
                 $this->getStore($storeId)->getCode()
             );
-        } else if ($websiteId) {
+        } elseif ($websiteId) {
             $result = $this->scopeConfig->getValue(
                 $path,
                 ScopeInterface::SCOPE_WEBSITE,
@@ -572,14 +572,13 @@ class Config
     {
         $websiteId = null;
         $isAvailable = false;
-        if ($storeId){
+        if ($storeId) {
             $websiteId = $this->getStore($storeId)->getWebsiteId();
             if ($this->paypalConfig) {
                 $this->paypalConfig->setStoreId($storeId);
             }
         }
-        if (
-            ($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO)
+        if (($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO)
             && $this->paypalConfig
         ) {
             $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode);

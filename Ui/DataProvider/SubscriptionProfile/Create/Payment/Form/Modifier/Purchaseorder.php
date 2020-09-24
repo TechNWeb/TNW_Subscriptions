@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Purchaseorder
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
  */
 class Purchaseorder extends Base implements PaymentModifierInterface
 {

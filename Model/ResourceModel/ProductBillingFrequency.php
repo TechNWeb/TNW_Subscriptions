@@ -37,7 +37,8 @@ class ProductBillingFrequency extends AbstractDb
         $sql = $connection->select()
             ->from(
                 ['main' => $this->getTable(
-                    ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)
+                    ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+                )
                 ],
                 [ProductBillingFrequencyInterface::ID]
             )->where('main.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=?', $id);

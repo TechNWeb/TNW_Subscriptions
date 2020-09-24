@@ -185,7 +185,6 @@ class Form extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**
@@ -348,8 +347,7 @@ class Form extends AbstractDataProvider
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
             if ($productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
-                if (
-                    $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                if ($productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
                     == StartDateType::DEFINED_BY_CUSTOMER
                 ) {
                     $visible = true;
@@ -357,8 +355,7 @@ class Form extends AbstractDataProvider
                     $value = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
                 }
             } else {
-                if (
-                    $productData->getData(Attribute::SUBSCRIPTION_START_DATE)
+                if ($productData->getData(Attribute::SUBSCRIPTION_START_DATE)
                     == StartDateType::DEFINED_BY_CUSTOMER
                 ) {
                     $visible = true;
@@ -412,7 +409,9 @@ class Form extends AbstractDataProvider
     {
         $result = [];
         $productId = $productId ?: $this->getRequestProductId();
-        if (!$productId) return $result;
+        if (!$productId) {
+            return $result;
+        }
 
         $childProduct = $this->getChildProductFromRequest();
         $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
@@ -424,8 +423,7 @@ class Form extends AbstractDataProvider
         try {
             /** @var ProductBillingFrequencyInterface $productFrequency */
             foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
-                if (
-                    !empty($childProduct)
+                if (!empty($childProduct)
                     && empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
                 ) {
                     //Child product has no such frequency set
@@ -704,8 +702,7 @@ class Form extends AbstractDataProvider
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $additionalData['billing_frequency'] = $billingFrequencyId;
             $productDataObject = $this->getProductObjectData($productId, $additionalData);
-            if (
-                $productDataObject->getTypeId() === Configurable::TYPE_CODE
+            if ($productDataObject->getTypeId() === Configurable::TYPE_CODE
                 && $productDataObject->getId() === $productDataObject->getChildProductId()
             ) {
                 continue;
@@ -717,7 +714,8 @@ class Form extends AbstractDataProvider
             if (!empty($productFrequencies[$billingFrequencyId])) {
                 $data['product_frequencies'][$billingFrequencyId] =
                     $this->getBillingFrequencyData(
-                        $productDataObject, $productFrequencies[$billingFrequencyId]
+                        $productDataObject,
+                        $productFrequencies[$billingFrequencyId]
                     );
             }
             if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
@@ -770,7 +768,9 @@ class Form extends AbstractDataProvider
     protected function getChildProductFromRequest()
     {
         $productId = $this->getRequestProductId();
-        if (!$productId) return null;
+        if (!$productId) {
+            return null;
+        }
         $product = $this->formContext->getProductRepository()->getById($productId);
         $superAttribute = $this->formContext->getRequest()->getParam('super_attribute');
         if (!empty($product) && $product->getTypeId() === Configurable::TYPE_CODE && !empty($superAttribute)) {
@@ -847,7 +847,7 @@ class Form extends AbstractDataProvider
         }
 
         return array_merge($result, $frequencyData);
-   }
+    }
 
     /**
      * Returns field term config.
@@ -924,7 +924,7 @@ class Form extends AbstractDataProvider
      * @param ProductInterface|DataObject $product
      * @return int
      */
-    protected  function getSavingsCalculationType($product)
+    protected function getSavingsCalculationType($product)
     {
         return $this->formContext->getSavingsCalculation()
             ->getSavingsCalculationType($product);

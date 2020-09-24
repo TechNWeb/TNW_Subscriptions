@@ -63,5 +63,4 @@ interface CustomerQuoteInterface
      * @return $this
      */
     public function setCustomerId($customerId);
-
 }

@@ -10,7 +10,6 @@ use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class Client
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class Client
 {

@@ -51,7 +51,6 @@ class CustomerExistsPopup implements OptionSourceInterface
                 ]
             ];
 
-
         return $result;
     }
 }

@@ -10,7 +10,6 @@ use Braintree\Result\Error;
 
 /**
  * Class ErrorCodeProvider
- * @package TNW\Subscriptions\Plugin\Braintree\Gateway\Validator
  */
 class ErrorCodeProvider
 {
@@ -23,8 +22,7 @@ class ErrorCodeProvider
     public function aroundGetErrorCodes($subject, $proceed, $response)
     {
         $result = [];
-        if (
-            $response instanceof Error
+        if ($response instanceof Error
             && isset($response->transaction)
             && !isset($response->transaction->status)
         ) {

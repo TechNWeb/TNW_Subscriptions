@@ -153,7 +153,6 @@ class Account extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

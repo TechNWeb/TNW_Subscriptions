@@ -63,7 +63,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     /**#@-*/
 
     /**
-     * Label prefix
+     * Label prefix value
      */
     const LABEL_PREFIX = '#S-';
 

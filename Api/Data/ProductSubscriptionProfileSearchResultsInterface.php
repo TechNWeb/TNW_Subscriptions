@@ -3,13 +3,10 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 interface ProductSubscriptionProfileSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
-
-
     /**
      * Get ProductSubscriptionProfile list.
      * @return \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface[]

@@ -176,7 +176,7 @@ class CreateProfile extends BaseCreate
      */
     public function getSubQuotes()
     {
-        if (!$this->subQuotes){
+        if (!$this->subQuotes) {
             $this->subQuotes = $this->getSession()->getSubQuotes();
         }
 

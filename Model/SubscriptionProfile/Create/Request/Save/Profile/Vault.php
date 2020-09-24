@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profil
 
 /**
  * Class Vault
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
  */
 class Vault extends Base
 {

@@ -84,7 +84,9 @@ class Manager
         $this->config = $config;
     }
 
-
+    /**
+     * @return $this
+     */
     public function reset()
     {
         $this->profileOrderRelation = null;
@@ -153,7 +155,8 @@ class Manager
     public function getAllProfileRelations($profileId)
     {
         $this->criteriaBuilder->addFilter(
-            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profileId
+            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+            $profileId
         );
         /** @var SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->criteriaBuilder->create();

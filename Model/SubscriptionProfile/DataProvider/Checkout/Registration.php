@@ -84,7 +84,6 @@ class Registration extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

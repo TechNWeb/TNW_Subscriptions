@@ -16,8 +16,8 @@
         </tr>
     </thead>
     <tbody>
-    <?php if ($block->getSubscriptionProfiles()) : ?>
-        <?php foreach ($block->getSubscriptionProfiles() as $subscriptionProfile) : ?>
+    <?php if ($block->getSubscriptionProfiles()): ?>
+        <?php foreach ($block->getSubscriptionProfiles() as $subscriptionProfile): ?>
             <?php $block->setSubscriptionProfile($subscriptionProfile) ?>
             <?php foreach ($block->getItems() as $item): ?>
                 <tr>

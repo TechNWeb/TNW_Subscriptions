@@ -107,7 +107,8 @@ class GridMetadata
                         ],
                     ],
                 ],
-            ]);
+            ]
+        );
     }
 
     /**
@@ -379,7 +380,8 @@ class GridMetadata
             ''
         );
 
-        $unlockPresetQtyColumn = $this->getColumnBaseData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+        $unlockPresetQtyColumn = $this->getColumnBaseData(
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             false,
             __(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY),
             120

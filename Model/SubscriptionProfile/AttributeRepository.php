@@ -9,7 +9,6 @@ use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
 
 /**
  * Attribute repository
- * @package TNW\Subscriptions\Model\SubscriptionProfile
  */
 class AttributeRepository implements SubscriptionProfileAttributeRepositoryInterface
 {

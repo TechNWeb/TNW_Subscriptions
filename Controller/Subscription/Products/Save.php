@@ -83,7 +83,7 @@ class Save extends Action
                     $this->currentProfile->setNeedRecollect(true);
                 }
                 $this->profileManager->saveProfile();
-            } elseif ( is_string($this->currentProfile)) {
+            } elseif (is_string($this->currentProfile)) {
                 throw new LocalizedException(__($this->currentProfile));
             }
         } catch (\Exception $e) {

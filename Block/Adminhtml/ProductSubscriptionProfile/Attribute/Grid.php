@@ -55,4 +55,3 @@ class Grid extends AbstractGrid
         return parent::_prepareCollection();
     }
 }
-

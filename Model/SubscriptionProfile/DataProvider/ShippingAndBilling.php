@@ -70,8 +70,13 @@ class ShippingAndBilling extends AbstractDataProvider
         $this->urlBuilder = $urlBuilder;
         $this->stepPool = $stepPool;
         $this->pool = $pool;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 
     /**
@@ -96,7 +101,6 @@ class ShippingAndBilling extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

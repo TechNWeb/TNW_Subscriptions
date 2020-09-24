@@ -10,8 +10,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as Resource;
 
-class SubscriptionProfileOrder extends AbstractModel
-    implements SubscriptionProfileOrderInterface
+class SubscriptionProfileOrder extends AbstractModel implements SubscriptionProfileOrderInterface
 {
     /**
      * {@inheritdoc}

@@ -80,9 +80,9 @@ class TrialLengthUnitType extends AbstractSource
         foreach ($this->getAllOptions() as $option) {
             if ($value === $option['value']) {
                 $label = $option['label'];
-                 if ($length != 1) {
-                     $label = $label . self::PLURAL;
-                 }
+                if ($length != 1) {
+                    $label = $label . self::PLURAL;
+                }
                 break;
             }
         }

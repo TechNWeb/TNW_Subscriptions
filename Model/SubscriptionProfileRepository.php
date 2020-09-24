@@ -98,7 +98,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      */
     private $productProfileRepository;
 
-
     /**
      * Search criteria builder.
      *
@@ -251,8 +250,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 }
             }
         }
-        if (
-            isset($oldPaymentData['engine_code'])
+        if (isset($oldPaymentData['engine_code'])
             && $oldPaymentData['payment_additional_info']
             && $subscriptionProfile->getPayment()->getEngineCode() == $oldPaymentData['engine_code']
             && $subscriptionProfile->getPayment()->getPaymentAdditionalInfo()

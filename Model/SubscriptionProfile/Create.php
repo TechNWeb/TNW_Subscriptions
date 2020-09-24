@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
-
 /**
  * Base subscription create class.
  */

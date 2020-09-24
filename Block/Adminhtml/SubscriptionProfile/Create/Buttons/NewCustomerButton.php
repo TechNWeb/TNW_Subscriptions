@@ -36,7 +36,7 @@ class NewCustomerButton extends GenericButton implements ButtonProviderInterface
         $url = '*/*/';
         $params = [];
 
-        if ($step){
+        if ($step) {
             $url = 'tnw_subscriptions/subscriptionprofile_create/process';
             $params = [
                 StepPool::STEP_PARAM_NAME => $step,

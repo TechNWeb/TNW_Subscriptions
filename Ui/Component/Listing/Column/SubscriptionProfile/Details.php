@@ -22,7 +22,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
 /**
  * Class Details
- * @package TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile
  */
 class Details extends Column
 {
@@ -134,7 +133,9 @@ class Details extends Column
                 $itemId = $item[SubscriptionProfileInterface::ID];
                 if (isset($itemId)) {
                     $profileProduct = $this->getSubscriptionProfileProduct($itemId);
-                    if (!$profileProduct) continue;
+                    if (!$profileProduct) {
+                        continue;
+                    }
                     $product = $this->getProduct($profileProduct->getMagentoProductId());
                     $imageHelper = $this->imageHelper->init($product, 'mini_cart_product_thumbnail');
                     $item['subscription_product'] = [
@@ -233,7 +234,7 @@ class Details extends Column
         $additionalInfo = (array) json_decode($additionalInfo);
         $result = ['currency' => $this->getSubscriptionProfile($id)->getProfileCurrencyCode()];
         $resultAdditional = [];
-        if ($this->getCreditCardTypeLabel($additionalInfo) && $this->getCreditCardNumber($additionalInfo))  {
+        if ($this->getCreditCardTypeLabel($additionalInfo) && $this->getCreditCardNumber($additionalInfo)) {
             $resultAdditional =
                 [
                     'cc_type' => $this->getCreditCardTypeLabel($additionalInfo),
@@ -335,7 +336,9 @@ class Details extends Column
     protected function getProfileActions($id)
     {
         $profile = $this->getSubscriptionProfile($id);
-        if (!$profile) return [];
+        if (!$profile) {
+            return [];
+        }
         $result = [
             [
                 'type' => 'edit',

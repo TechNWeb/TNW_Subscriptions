@@ -100,13 +100,14 @@ class PaymentRepository implements PaymentRepositoryInterface
         $this->resourceModel->load($subscriptionProfile, $paymentId);
 
         if (!$subscriptionProfile->getId()) {
-            throw new NoSuchEntityException(__('SubscriptionProfile with id "%1" does not exist.',
-                $paymentId));
+            throw new NoSuchEntityException(__(
+                'SubscriptionProfile with id "%1" does not exist.',
+                $paymentId
+            ));
         }
 
         return $subscriptionProfile;
     }
-
 
     /**
      * Get subscription payment list

@@ -8,8 +8,6 @@ namespace TNW\Subscriptions\Api\Data;
 
 interface BillingFrequencySearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
-
-
     /**
      * Get BillingFrequency list.
      * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface[]

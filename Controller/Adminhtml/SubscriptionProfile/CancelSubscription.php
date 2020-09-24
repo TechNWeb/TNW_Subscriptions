@@ -86,8 +86,8 @@ class CancelSubscription extends Action
         $response->setData('result', true);
         $response->setData('ajaxRedirect', $this->_url->getUrl(
             'tnw_subscriptions/subscriptionprofile/edit',
-            ['entity_id' => $subscriptionId])
-        );
+            ['entity_id' => $subscriptionId]
+        ));
         try {
             if ($option == 'next') {
                 $this->updateStatusModel->updateStatusBeforeNextBillingCycle($subscriptionId);

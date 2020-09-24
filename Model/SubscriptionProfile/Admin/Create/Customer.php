@@ -136,7 +136,7 @@ class Customer extends Create
                     $subQuote->getShippingAddress()->setSaveInAddressBook(false);
                     $alreadySaveShipping = true;
                 }
-            }elseif (!$subQuote->isVirtual()){
+            } elseif (!$subQuote->isVirtual()) {
                 $address = $subQuote->getShippingAddress()->setCustomerId($customer->getId());
                 $address->setSaveInAddressBook(false);
                 $subQuote->setShippingAddress($address);

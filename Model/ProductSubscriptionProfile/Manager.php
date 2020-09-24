@@ -21,6 +21,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+
 /**
  * Class Manager
  */
@@ -415,16 +416,19 @@ class Manager
                                 if ($profileModel->hasDataChanges(SubscriptionProfileInterface::TERM)
                                     && $origBillingCycle != $billingCycle
                                 ) {
-                                    $message =  __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                    $message =  __(
+                                        'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
                                                      %3 changed from <b>%4</b> to <b>%5</b>.',
                                         $product->getMagentoProduct()->getId(),
                                         $product->getMagentoProduct()->getName(),
                                         'Term',
                                         $origBillingCycle == 0 ? __('Until canceled') : __(
-                                            'Bill %1 times', $origBillingCycle
+                                            'Bill %1 times',
+                                            $origBillingCycle
                                         ),
                                         $billingCycle == 0 ? __('Until canceled') : __(
-                                            'Bill %1 times', $billingCycle
+                                            'Bill %1 times',
+                                            $billingCycle
                                         )
                                     );
 
@@ -457,7 +461,8 @@ class Manager
                                     ->setOriginalStartDate($startOn);
 
                                 if ($profileModel->hasDataChanges(SubscriptionProfileInterface::START_DATE)) {
-                                    $message =  __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                    $message =  __(
+                                        'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
                                                      %3 changed from <b>%4</b> to <b>%5</b>.',
                                         $product->getMagentoProduct()->getId(),
                                         $product->getMagentoProduct()->getName(),
@@ -491,7 +496,8 @@ class Manager
                                     if ($profileModel->hasDataChanges(
                                         SubscriptionProfileInterface::BILLING_FREQUENCY_ID
                                     )) {
-                                        $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
+                                        $message = __(
+                                            'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
                                                         %3 changed from <b>%4</b> to <b>%5</b>.',
                                             $product->getMagentoProduct()->getId(),
                                             $product->getMagentoProduct()->getName(),
@@ -515,8 +521,8 @@ class Manager
                             if ((bool) $product->getTnwSubscrUnlockPresetQty()) {
                                 $billingFrequency = $data['item_' . $productId]['billing_frequency'];
                                 $recurringOptions = $product->getMagentoProduct()->getRecurringOptions();
-                                array_filter($recurringOptions, function($v) use ($billingFrequency, &$product) {
-                                    if($v->getBillingFrequencyId() == $billingFrequency){
+                                array_filter($recurringOptions, function ($v) use ($billingFrequency, &$product) {
+                                    if ($v->getBillingFrequencyId() == $billingFrequency) {
                                         $product->setQty($v->getPresetQty());
                                         $product->setPrice($v->getPrice());
                                     }
@@ -535,7 +541,8 @@ class Manager
                                     ->setProfile($profileModel)
                                     ->setOriginalProfileProduct($product)
                                     ->getSubscriptionPrice(
-                                        $product->getMagentoProduct(), $productData
+                                        $product->getMagentoProduct(),
+                                        $productData
                                     );
                                 $product->setPrice($price);
                             }
@@ -550,7 +557,8 @@ class Manager
                         ];
                         foreach ($fields as $fieldName => $fieldLabel) {
                             if ($product->dataHasChangedFor($fieldName)) {
-                                $message = __('Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. %3 changed from <b>%4</b> to <b>%5</b>.',
+                                $message = __(
+                                    'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. %3 changed from <b>%4</b> to <b>%5</b>.',
                                     $product->getMagentoProduct()->getId(),
                                     $product->getMagentoProduct()->getName(),
                                     $fieldLabel,
@@ -717,7 +725,8 @@ class Manager
      * @return string
      * @throws \Exception
      */
-    protected function getCurrentTimeExpression() {
+    protected function getCurrentTimeExpression()
+    {
         $date = new \DateTime();
         return
             'PT' . $date->format('H') . 'H' . $date->format('i') . 'M' . $date->format('s') . 'S';

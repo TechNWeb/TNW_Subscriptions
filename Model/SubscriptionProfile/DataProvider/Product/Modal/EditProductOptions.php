@@ -179,7 +179,6 @@ class EditProductOptions extends AbstractDataProvider
      */
     public function addFilter(\Magento\Framework\Api\Filter $filter)
     {
-
     }
 
     /**

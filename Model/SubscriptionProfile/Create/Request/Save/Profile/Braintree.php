@@ -100,9 +100,9 @@ class Braintree extends Base
 
         /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */
         $response = $this->transactionCustomer->placeRequest($transfer);
-        if (class_exists('\Braintree\Result\Error') &&  $response['object'] instanceof \Braintree\Result\Error) {
+        if (class_exists('\Braintree\Result\Error') && $response['object'] instanceof \Braintree\Result\Error) {
             $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
+            foreach ($response->errors->deepAll() as $error) {
                 $errors[] = "{$error->code}: {$error->message}";
             }
 

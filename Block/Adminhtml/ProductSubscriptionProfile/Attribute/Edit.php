@@ -25,7 +25,6 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
      */
     protected $_coreRegistry = null;
 
-
     /**
      * Edit constructor.
      *

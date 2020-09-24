@@ -26,8 +26,7 @@ class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Pr
     public function beforeSave($object)
     {
         $attrCode = $this->getAttribute()->getAttributeCode();
-        if (
-            $object->hasData($attrCode) && $object->getData($attrCode)
+        if ($object->hasData($attrCode) && $object->getData($attrCode)
             && $object instanceof ProductInterface
             && $object->getTypeId() !== Configurable::TYPE_CODE
         ) {

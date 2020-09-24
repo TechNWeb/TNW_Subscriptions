@@ -56,7 +56,7 @@ class TokenExtractor
             $paymentToken = $this->tokenManagement->getByPublicHash(
                 $paymentData['additional_data']['public_hash'],
                 $quote->getCustomerId()
-                );
+            );
         }
         if (!$paymentToken) {
             $paymentToken = $this->getVaultPaymentToken($quote);

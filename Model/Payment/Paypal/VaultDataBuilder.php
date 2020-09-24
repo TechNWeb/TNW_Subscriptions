@@ -13,7 +13,6 @@ use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class VaultDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {

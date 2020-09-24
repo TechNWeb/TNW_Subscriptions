@@ -72,7 +72,6 @@ class ProfileStatus implements OptionSourceInterface
         return $optionList;
     }
 
-
     /**
      * Retrieve option array.
      *

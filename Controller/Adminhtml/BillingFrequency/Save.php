@@ -11,7 +11,6 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class Save
- * @package TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
  */
 class Save extends \Magento\Backend\App\Action
 {

@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profil
 
 /**
  * Class Authorizenet
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
  */
 class Authorizenet extends Base
 {

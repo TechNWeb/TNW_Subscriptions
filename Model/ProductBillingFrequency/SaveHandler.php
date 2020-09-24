@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\EntityManager\Operation\ExtensionInterface;
@@ -19,7 +18,6 @@ class SaveHandler implements ExtensionInterface
      * @var RecurringOptionRepository
      */
     private $recurringOptionRepository;
-
 
     /**
      * @param RecurringOptionRepository $recurringOptionRepository
@@ -47,7 +45,7 @@ class SaveHandler implements ExtensionInterface
             }
         }
         /** @var ProductBillingFrequencyInterface $option */
-        foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option){
+        foreach ($this->recurringOptionRepository->getListByProductId($entity->getId())->getItems() as $option) {
             if (!in_array($option->getId(), $entityOptionIds)) {
                 $this->recurringOptionRepository->delete($option);
             }

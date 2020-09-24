@@ -9,7 +9,6 @@ namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Queu
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
-
 class ProfileLink extends Column
 {
     /**

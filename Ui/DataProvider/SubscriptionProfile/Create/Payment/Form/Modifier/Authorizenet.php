@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Authorizenet
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
  */
 class Authorizenet extends Base
 {

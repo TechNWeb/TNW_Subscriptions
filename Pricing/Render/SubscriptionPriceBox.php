@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Pricing\Render;
 
 use Magento\Framework\DataObject;
@@ -26,7 +25,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Class for subscription_price rendering
- *
  */
 class SubscriptionPriceBox extends BasePriceBox
 {
@@ -80,6 +78,7 @@ class SubscriptionPriceBox extends BasePriceBox
     private $subscriptionProductViewConfig;
 
     /**
+     * SubscriptionPriceBox constructor.
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -93,6 +92,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig
+     * @param array $data
      */
     public function __construct(
         Template\Context $context,
@@ -163,7 +163,7 @@ class SubscriptionPriceBox extends BasePriceBox
      */
     public function getCacheKey()
     {
-        return parent::getCacheKey() . ($this->getData('list_category_page') ? '-list-category-page': '');
+        return parent::getCacheKey() . ($this->getData('list_category_page') ? '-list-category-page' : '');
     }
 
     /**
@@ -171,6 +171,8 @@ class SubscriptionPriceBox extends BasePriceBox
      *
      * @param DataObject $product
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getProductBillingFrequencies(DataObject $product)
     {
@@ -214,13 +216,17 @@ class SubscriptionPriceBox extends BasePriceBox
                         $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
 
                         $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
-                        $bottomMessage = __('then %1 / every %2', $this->formatCurrency($price, false), $frequencyUnit);
+                        $bottomMessage = __(
+                            'then %1 / every %2',
+                            $this->formatCurrency($price, false),
+                            $frequencyUnit
+                        );
                         $price = $trialPrice + $initialFee;
                     } elseif ($initialFee) {
-                            $customPrice = $this->formatCurrency($price, false);
-                            $topMessage = __('Initial charge');
-                            $price = (float)$price + $initialFee;
-                            $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);
+                        $customPrice = $this->formatCurrency($price, false);
+                        $topMessage = __('Initial charge');
+                        $price = (float) $price + $initialFee;
+                        $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);
                     } else {
                         $frequencyUnitMessage = __(' / every %1', $frequencyUnit);
                     }

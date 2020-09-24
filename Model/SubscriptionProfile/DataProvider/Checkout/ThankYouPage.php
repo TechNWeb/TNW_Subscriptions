@@ -68,6 +68,5 @@ class ThankYouPage extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 }

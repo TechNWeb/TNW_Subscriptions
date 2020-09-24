@@ -582,8 +582,7 @@ class SummaryProductsForm extends ModifyForm
         $isTrial = false;
 
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
-            if (
-                !isset($this->profileManager)
+            if (!isset($this->profileManager)
                 || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
             ) {
                 $isTrial = true;
@@ -630,7 +629,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getUpdateButton()
     {
-        $result = Parent::getUpdateButton();
+        $result = parent::getUpdateButton();
         $result['arguments']['data']['config']['sortOrder'] = 150;
         return $result;
     }
@@ -640,7 +639,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getCancelButton()
     {
-        $result = Parent::getCancelButton();
+        $result = parent::getCancelButton();
         $result['arguments']['data']['config']['sortOrder'] = 160;
         return $result;
     }

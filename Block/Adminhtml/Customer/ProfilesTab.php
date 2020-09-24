@@ -13,7 +13,6 @@ use Magento\Ui\Component\Layout\Tabs\TabWrapper;
 /**
  * Class CustomerOrdersTab
  *
- * @package Magento\Sales\Block\Adminhtml
  */
 class ProfilesTab extends TabWrapper
 {

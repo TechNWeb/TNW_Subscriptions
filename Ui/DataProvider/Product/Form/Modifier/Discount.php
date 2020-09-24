@@ -13,8 +13,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
-* Customize Discount field
-*/
+ * Customize Discount field
+ */
 class Discount extends BaseModifier
 {
     /**

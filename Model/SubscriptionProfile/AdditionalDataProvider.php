@@ -5,7 +5,6 @@ use Magento\Ui\Component\Form;
 
 /**
  * Additional form data provider
- * @package TNW\Subscriptions\Model\SubscriptionProfile
  */
 class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {

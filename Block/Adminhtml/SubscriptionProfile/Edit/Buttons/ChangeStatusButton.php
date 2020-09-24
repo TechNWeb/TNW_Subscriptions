@@ -27,7 +27,7 @@ abstract class ChangeStatusButton extends GenericButton
 
     /**
      * The Manager that define logic of status change on Subscription Profile
-     * 
+     *
      * @var StatusManager
      */
     private $statusManager;
@@ -49,7 +49,7 @@ abstract class ChangeStatusButton extends GenericButton
 
     /**
      * Get value to change status
-     * 
+     *
      * @return int
      */
     abstract protected function getStatus();
@@ -76,7 +76,7 @@ abstract class ChangeStatusButton extends GenericButton
 
     /**
      * Can change status
-     * 
+     *
      * @return bool
      */
     protected function canChangeStatus()
@@ -94,7 +94,7 @@ abstract class ChangeStatusButton extends GenericButton
     protected function isProfileTrial()
     {
         $profile = $this->getCurrentSubscriptionProfile();
-        if($profile->getData('status') == ProfileStatus::STATUS_TRIAL) {
+        if ($profile->getData('status') == ProfileStatus::STATUS_TRIAL) {
             return true;
         }
         return false;

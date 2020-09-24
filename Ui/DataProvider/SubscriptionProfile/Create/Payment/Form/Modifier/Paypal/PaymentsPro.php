@@ -523,7 +523,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     {
         if ($this->paymentPro instanceof TransparentInterface) {
             $result = $this->paymentPro->getConfigInterface()->getValue($fieldName);
-        }else{
+        } else {
             $result = $this->paymentPro ? $this->paymentPro->getConfigData($fieldName) : null;
         }
         return $result;

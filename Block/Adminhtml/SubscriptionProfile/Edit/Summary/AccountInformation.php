@@ -82,7 +82,6 @@ class AccountInformation extends Template
         Registry $registry,
         Template\Context $context,
         array $data = []
-
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/account_information.phtml');
         parent::__construct($context, $data);
@@ -261,7 +260,6 @@ class AccountInformation extends Template
         return $this->getSubscriptionProfile()->getProfileCurrencyCode();
     }
 
-
     /**
      * Return subscription website name
      *
@@ -299,7 +297,6 @@ class AccountInformation extends Template
         return $result;
     }
 
-
     /**
      * Return subscription profile from registry
      *
@@ -313,5 +310,4 @@ class AccountInformation extends Template
 
         return $this->subscriptionProfile;
     }
-
 }

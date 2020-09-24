@@ -12,7 +12,6 @@ use \Magento\Framework\ObjectManagerInterface as ObjectManager;
 
 /**
  * Class AuthorizenetPaymentDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Authorizenet
  */
 class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {

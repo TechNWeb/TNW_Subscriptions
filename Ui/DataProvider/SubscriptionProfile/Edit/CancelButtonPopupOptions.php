@@ -30,7 +30,6 @@ class CancelButtonPopupOptions implements OptionSourceInterface
                 ]
             ];
 
-
         return $result;
     }
 }

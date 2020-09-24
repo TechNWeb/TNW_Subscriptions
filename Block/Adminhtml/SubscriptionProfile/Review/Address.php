@@ -92,12 +92,12 @@ class Address extends Template
     {
         $formattedAddress = '';
         switch ($this->profileState) {
-            case SubscriptionProfile::STATE_CREATE :
+            case SubscriptionProfile::STATE_CREATE:
                 $formattedAddress = $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
                     ? $this->formatQuoteAddress($this->create->getShippingAddress())
                     : $this->formatQuoteAddress($this->create->getBillingAddress());
                 break;
-            case SubscriptionProfile::STATE_EDIT :
+            case SubscriptionProfile::STATE_EDIT:
                 /** @var SubscriptionProfile $profile */
                 $profile = $this->getProfile();
                 if ($profile) {

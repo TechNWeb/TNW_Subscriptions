@@ -9,7 +9,6 @@ use \Magento\Framework\DataObject;
 
 /**
  * Class TransferFactory
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class TransferFactory
 {

@@ -16,8 +16,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 /**
  * Configure product's options in saved subscription.
  */
-class Edit extends \Magento\Framework\App\Action\Action
-    implements \Magento\Catalog\Controller\Product\View\ViewInterface
+class Edit extends \Magento\Framework\App\Action\Action implements \Magento\Catalog\Controller\Product\View\ViewInterface
 {
     /**
      * @var ProductSubscriptionProfileRepository

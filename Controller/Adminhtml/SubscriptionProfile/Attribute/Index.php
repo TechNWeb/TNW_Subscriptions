@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
 /**
  * Subscription Profile attributes grid controller.
-  */
+ */
 class Index extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
     /**

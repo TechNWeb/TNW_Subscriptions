@@ -38,7 +38,6 @@ class SubscriptionAndAccountInformation implements ModifierInterface
      */
     private $groupRegistry;
 
-
     /**
      * SubscriptionAndAccountInformation constructor.
      *

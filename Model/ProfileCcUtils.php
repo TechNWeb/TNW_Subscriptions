@@ -65,8 +65,7 @@ class ProfileCcUtils
     {
         $expiredAt = null;
 
-        if (
-            isset($paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]) &&
+        if (isset($paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]) &&
             isset($paymentInfo[OrderPaymentInterface::CC_EXP_YEAR])
         ) {
             $lastDayOfMonth = (int)date("t");

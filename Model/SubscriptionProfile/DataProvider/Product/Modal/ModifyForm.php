@@ -961,8 +961,7 @@ class ModifyForm extends Form
 
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
-            if (
-                !isset($this->profileManager)
+            if (!isset($this->profileManager)
             || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
             ) {
                 $isTrial = true;
@@ -1119,7 +1118,8 @@ class ModifyForm extends Form
     {
         return $this->stockRegistry->getStockItem(
             $this->currentProduct->getId(),
-            $this->currentProduct->getStore()->getWebsiteId())
+            $this->currentProduct->getStore()->getWebsiteId()
+        )
             ->getIsQtyDecimal();
     }
 

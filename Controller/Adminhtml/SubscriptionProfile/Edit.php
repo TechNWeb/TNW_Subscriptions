@@ -47,7 +47,6 @@ class Edit extends SubscriptionProfile
         $this->profileRepository = $profileRepository;
 
         parent::__construct($context, $coreRegistry, $dataPersistor);
-
     }
 
     /**

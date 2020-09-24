@@ -86,7 +86,6 @@ class SubscriptionProductView
             && !empty($this->getProductBillingFrequenciesById($productId));
     }
 
-
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *

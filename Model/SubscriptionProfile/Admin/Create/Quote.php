@@ -147,7 +147,7 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if ($session->getStoreId()) {
-            if ($session->getCurrencyId()){
+            if ($session->getCurrencyId()) {
                 $quote->setQuoteCurrencyCode($session->getCurrencyId());
             }
             $quote->setCustomerGroupId($this->groupManagement->getDefaultGroup()->getId());
@@ -216,8 +216,7 @@ class Quote extends Create implements QuoteCreateInterface
     public function fillCustomerData(CustomerInterface $customer, ModelQuote $quote)
     {
         $quoteData = [];
-        if (
-            !$quote->getCustomerId()
+        if (!$quote->getCustomerId()
             && !$quote->getPayment()->getAdditionalInformation('customer_id')
             && $quote->getPayment()->getAdditionalInformation('public_hash')
             && $customer->getId()
@@ -265,7 +264,6 @@ class Quote extends Create implements QuoteCreateInterface
 
         return $customerForm;
     }
-
 
     /**
      * @param ModelQuote $quote

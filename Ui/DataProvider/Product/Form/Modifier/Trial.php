@@ -13,8 +13,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
-* Customize Trial field
-*/
+ * Customize Trial field
+ */
 class Trial extends BaseModifier
 {
     /**

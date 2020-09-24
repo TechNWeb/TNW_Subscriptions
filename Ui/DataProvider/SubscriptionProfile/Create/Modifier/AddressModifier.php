@@ -334,8 +334,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
 
         // Change default field components to process complicated visibility logic
         // for billing address.
-        if (
-            !in_array($attribute->getAttributeCode(), $this->infoAttributes)
+        if (!in_array($attribute->getAttributeCode(), $this->infoAttributes)
             && $attribute->getAttributeCode() !== 'region_id'
             && !$this->isShippingFieldSet()
         ) {

@@ -39,5 +39,4 @@ class Version extends Field
 
         return $element->getElementHtml();
     }
-
 }

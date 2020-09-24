@@ -125,7 +125,7 @@ class Context
      */
     public function __call($name, $arguments)
     {
-        if (\stripos($name, 'message') !== 0){
+        if (\stripos($name, 'message') !== 0) {
             throw new \BadMethodCallException('Unknown method');
         }
 
@@ -304,7 +304,6 @@ class Context
 
         return json_encode($priceFormatData);
     }
-
 
     /**
      * Inserts element before element in array.

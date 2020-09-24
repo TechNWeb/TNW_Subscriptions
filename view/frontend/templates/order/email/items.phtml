@@ -12,7 +12,7 @@
     $itemOptions = $tmpBlock->getItem()->getProductOptions();
     $productImages = $magentoProduct->getMediaAttributeValues('thumbnail');
 ?>
-<?php if (key_exists('subscription_data', $itemOptions['info_buyRequest'])) : ?>
+<?php if (key_exists('subscription_data', $itemOptions['info_buyRequest'])): ?>
     <table>
         <tr>
             <td><img class="product-image" src="<?= $block->getImageThumbnail($magentoProduct) ?>"></td>

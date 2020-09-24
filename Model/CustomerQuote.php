@@ -60,5 +60,4 @@ class CustomerQuote extends AbstractModel implements CustomerQuoteInterface
     {
         return $this->setData(self::CUSTOMER_ID, $customerId);
     }
-
 }

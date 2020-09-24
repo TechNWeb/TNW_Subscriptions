@@ -53,7 +53,6 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
      */
     private $dataProductSubscriptionProfileFactory;
 
-
     /**
      * @param ResourceProductSubscriptionProfile $resource
      * @param ProductSubscriptionProfileFactory $productSubscriptionProfileFactory
@@ -103,8 +102,10 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
         $productSubscriptionProfile = $this->productSubscriptionProfileFactory->create();
         $productSubscriptionProfile->load($productSubscriptionProfileId);
         if (!$productSubscriptionProfile->getId()) {
-            throw new NoSuchEntityException(__('ProductSubscriptionProfile with id "%1" does not exist.',
-                $productSubscriptionProfileId));
+            throw new NoSuchEntityException(__(
+                'ProductSubscriptionProfile with id "%1" does not exist.',
+                $productSubscriptionProfileId
+            ));
         }
         $this->addChildren($productSubscriptionProfile);
         return $productSubscriptionProfile;

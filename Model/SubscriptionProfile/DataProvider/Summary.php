@@ -69,6 +69,5 @@ class Summary extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 }

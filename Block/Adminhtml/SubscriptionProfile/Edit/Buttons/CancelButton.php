@@ -41,8 +41,10 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                                 'targetName' => 'index = cancelModal',
                                 'actionName' => 'setTitle',
                                 'params' => [
-                                    __('Are you sure you want to cancel Subscription %1?',
-                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId())
+                                    __(
+                                        'Are you sure you want to cancel Subscription %1?',
+                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId()
+                                    )
                                 ]
                             ],
                             [

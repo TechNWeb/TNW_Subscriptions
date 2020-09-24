@@ -44,7 +44,6 @@ class UpdateStatus extends Action
      */
     private $emailNotifierFactory;
 
-
     /**
      * @param Context $context
      * @param UpdateStatusModel $updateStatusModel
@@ -80,8 +79,8 @@ class UpdateStatus extends Action
         $response->setData('result', true);
         $response->setData('ajaxRedirect', $this->_url->getUrl(
             'tnw_subscriptions/subscriptionprofile/edit',
-            ['entity_id' => $profileId])
-        );
+            ['entity_id' => $profileId]
+        ));
         try {
             $this->updateStatusModel->updateStatus($profileId, $newStatus);
             $comment = $this->_request->getParam('comment_area') ?: false;

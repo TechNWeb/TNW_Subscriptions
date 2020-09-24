@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 /**
  * Class ValidationResult
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class ValidationResult
 {

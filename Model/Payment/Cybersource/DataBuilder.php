@@ -10,7 +10,6 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class DataBuilder
- * @package TNW\Subscriptions\Model\Payment\Cybersource
  */
 class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -295,6 +294,4 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         $message = $this->giftMessageHelper->getGiftMessage($this->getQuote()->getGiftMessageId());
         return $message->getMessage() ? $message->getMessage() : '';
     }
-
-
 }

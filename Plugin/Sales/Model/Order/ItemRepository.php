@@ -15,8 +15,7 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
- * Class ItemRepository
- * @package TNW\Subscriptions\Plugin\Sales\Model\Order
+ * Class ItemRepository - plugin to add new extension attribute
  */
 class ItemRepository
 {
@@ -102,8 +101,7 @@ class ItemRepository
     private function setItemExtensionAttribute($item)
     {
         $options = $item->getProductOptions();
-        if (
-            array_key_exists('info_buyRequest', $options)
+        if (array_key_exists('info_buyRequest', $options)
             && array_key_exists('subscription_data', $options['info_buyRequest'])
         ) {
             $orderId = $item->getOrderId();
@@ -125,8 +123,7 @@ class ItemRepository
                         $profile = $this->subscriptionProfileRepository->getById($relation->getSubscriptionProfileId());
                         foreach ($profile->getProducts() as $product) {
                             $profileStartDate = $profile->getTrialStartDate() ? : $profile->getStartDate();
-                            if (
-                                $product->getMagentoProductId() == $item->getProductId()
+                            if ($product->getMagentoProductId() == $item->getProductId()
                                 && strtotime($profileStartDate) > strtotime($item->getCreatedAt())
                             ) {
                                 $proposedShippingDate = $profileStartDate;

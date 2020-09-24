@@ -169,9 +169,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
-
     }
-
 
     /**
      * @inheritdoc
@@ -238,8 +236,10 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function setBillingFrequencyId($billingFrequencyId)
     {
-        return $this->setData(self::BILLING_FREQUENCY_ID,
-            $billingFrequencyId);
+        return $this->setData(
+            self::BILLING_FREQUENCY_ID,
+            $billingFrequencyId
+        );
     }
 
     /**

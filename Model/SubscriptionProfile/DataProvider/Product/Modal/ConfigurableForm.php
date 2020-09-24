@@ -177,7 +177,6 @@ class ConfigurableForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

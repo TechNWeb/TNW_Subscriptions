@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\BillingFrequency;
 
 /**
  * Class Delete
- * @package TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
  */
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {

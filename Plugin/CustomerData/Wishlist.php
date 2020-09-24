@@ -1,5 +1,8 @@
 <?php
-
+/**
+ *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ *  See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Plugin\CustomerData;
 
 use Magento\Wishlist\Helper\Data as WishlistHelper;
@@ -57,7 +60,7 @@ class Wishlist
         $onlySubscribeData = $this->subscriptionProductViewConfig->isOnlySubscribePurchaseByIds($productsPreset);
         $subscribeAndAddtocartData = $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchaseByIds($productsPreset);
         foreach ($result['items'] as $key => &$element) {
-            $rt = array_filter($productsPreset, function($value) use($element) {
+            $rt = array_filter($productsPreset, function ($value) use ($element) {
                 return $value == $element['product_name'];
             });
             $element['is_subscribe'] = false;

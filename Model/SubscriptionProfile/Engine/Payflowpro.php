@@ -105,7 +105,7 @@ class Payflowpro extends Base
 
     protected function populateProfilePayment($paymentToken)
     {
-        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $this->getProfile()->getPayment()
             ->setEngineCode($this->getPaymentMethodCode())
             ->setPaymentToken($paymentToken->getGatewayToken())

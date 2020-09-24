@@ -75,7 +75,6 @@ class DataProvider extends AbstractDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -176,5 +175,4 @@ class DataProvider extends AbstractDataProvider
 
         return $quoteData;
     }
-
 }

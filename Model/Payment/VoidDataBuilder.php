@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model\Payment;
 
 /**
  * Class VoidDataBuilder
- * @package TNW\Subscriptions\Model\Payment
  */
 class VoidDataBuilder
 {

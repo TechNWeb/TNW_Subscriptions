@@ -47,8 +47,7 @@ class ClearDbProductDeleteAfter implements ObserverInterface
         ProductSubscriptionProfileCollectionFactory $productsSubscriptionProfileCollection,
         MagentoProductCollectionFactory $magentoProductCollection,
         MessageHistoryLogger $historyLogger
-    )
-    {
+    ) {
         $this->productBillFrequencyCollection = $productsBillFrequencyCollection;
         $this->productSubscriptionProfileCollection = $productsSubscriptionProfileCollection;
         $this->magentoProductCollection = $magentoProductCollection;

@@ -135,7 +135,6 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
         }
     }
 
-
     /**
      * @return Json
      */

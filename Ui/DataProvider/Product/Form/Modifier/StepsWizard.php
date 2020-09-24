@@ -26,8 +26,8 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Service\Serializer;
 
 /**
-* Customize tnw attributes to use steps wizard component.
-*/
+ * Customize tnw attributes to use steps wizard component.
+ */
 class StepsWizard extends BaseModifier
 {
     /**
@@ -136,7 +136,9 @@ class StepsWizard extends BaseModifier
             'children'
         );
         $meta = $this->arrayManager->merge(
-            $purchaseTypePath . '/arguments/data/config', $meta, [
+            $purchaseTypePath . '/arguments/data/config',
+            $meta,
+            [
                 'component' => 'TNW_Subscriptions/js/components/purchase-type',
                 'componentType' => Field::NAME,
                 'formElement' => Select::NAME,
@@ -154,7 +156,8 @@ class StepsWizard extends BaseModifier
             null
         );
         $this->setScopeLabel($this->arrayManager->get(
-            $inheritancePath . '/arguments/data/config/scopeLabel', $meta
+            $inheritancePath . '/arguments/data/config/scopeLabel',
+            $meta
         ));
         // Move all fields to container
         if (!empty($rootArray)) {
@@ -163,7 +166,9 @@ class StepsWizard extends BaseModifier
             foreach ($rootArray as $key => $value) {
                 if ($key == 'container_' . Attribute::SUBSCRIPTION_PURCHASE_TYPE) {
                     $meta = $this->arrayManager->set(
-                        $rootPath . '/' . $key . '/arguments/data/config/sortOrder', $meta, 20
+                        $rootPath . '/' . $key . '/arguments/data/config/sortOrder',
+                        $meta,
+                        20
                     );
                 } elseif ($key == 'container_recurring_options') {
                     $recurringChildren[$key] = $value;
@@ -259,8 +264,10 @@ class StepsWizard extends BaseModifier
             ]
         ];
         if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-            array_unshift($result['data']['config']['stepsNames'],
-                $this->stepWizardName . '.' . $this->inheritanceContainerName);
+            array_unshift(
+                $result['data']['config']['stepsNames'],
+                $this->stepWizardName . '.' . $this->inheritanceContainerName
+            );
         }
 
         return $result;
@@ -710,5 +717,4 @@ class StepsWizard extends BaseModifier
     {
         $this->scopeLabel = $scopeLabel;
     }
-
 }

@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model;
 
 /**
  * Class EmailNotifier
- * @package TNW\Subscriptions\Model
  */
 class EmailNotifier
 {
@@ -334,12 +333,12 @@ class EmailNotifier
     private function checkEmailTemplateSetting($configPath)
     {
         if (!$this->scopeConfig->getValue(
-                $configPath,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            ) || !$this->scopeConfig->getValue(
-                self::XML_PATH_EMAIL_IDENTITY,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            )
+            $configPath,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ) || !$this->scopeConfig->getValue(
+            self::XML_PATH_EMAIL_IDENTITY,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        )
         ) {
             return false;
         }

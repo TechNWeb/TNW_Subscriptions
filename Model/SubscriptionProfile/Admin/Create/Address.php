@@ -71,14 +71,12 @@ class Address extends Create
         parent::__construct($context, $session);
     }
 
-
     /**
-     * Validates and sets address by type to all subscription quotes.
-     *
-     * @param [] $address
-     * @param string $addressType
-     * @param int|null $customerAddressId
+     * @param $address
+     * @param $addressType
+     * @param null $customerAddressId
      * @return array|bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setAddress($address, $addressType, $customerAddressId = null)
     {

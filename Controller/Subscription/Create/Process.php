@@ -43,7 +43,6 @@ class Process extends AbstractSave
         parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
-
     /**
      * Save action
      *

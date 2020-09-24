@@ -10,7 +10,6 @@ use Magento\Framework\View\Element\AbstractBlock;
 
 /**
  * Class ShippingMethodsComment
- * @package TNW\Subscriptions\Block\Adminhtml\System\Config
  */
 class ShippingMethodsComment extends AbstractBlock implements CommentInterface
 {

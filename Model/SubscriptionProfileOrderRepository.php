@@ -61,7 +61,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      */
     private $subscriptionProfileOrderCollectionFactory;
 
-
     /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
@@ -121,8 +120,10 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $subscriptionProfileOrder = $this->subscriptionProfileOrderFactory->create();
         $subscriptionProfileOrder->load($subscriptionProfileOrderId);
         if (!$subscriptionProfileOrder->getId()) {
-            throw new NoSuchEntityException(__('SubscriptionProfileOrder with id "%1" does not exist.',
-                $subscriptionProfileOrderId));
+            throw new NoSuchEntityException(__(
+                'SubscriptionProfileOrder with id "%1" does not exist.',
+                $subscriptionProfileOrderId
+            ));
         }
         return $subscriptionProfileOrder;
     }

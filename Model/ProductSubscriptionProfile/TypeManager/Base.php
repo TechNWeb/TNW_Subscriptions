@@ -218,8 +218,7 @@ abstract class Base implements TypeInterface
             $originProfileProductData = $this->profileProduct->getOrigData();
             $originUnitPrice = (float) $originProfileProductData['price'];
             $currentProfile = $this->getProfile();
-            if (
-                $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
                 && $currentProfile
                 && $currentProfile->getOrigData('billing_frequency_id')
                     == $currentProfile->getData('billing_frequency_id')
@@ -238,8 +237,7 @@ abstract class Base implements TypeInterface
             }
         }
         if (!$rowPrice && $usePresetQty) {
-            if (
-                isset($productData['rebill_processing'])
+            if (isset($productData['rebill_processing'])
                 && $productData['rebill_processing']
             ) {
                 $price = $productData['subscription_data']['non_unique']['current_preset_qty_price'];

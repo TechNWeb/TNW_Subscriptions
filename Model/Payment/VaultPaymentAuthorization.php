@@ -11,7 +11,6 @@ use Magento\Payment\Gateway\Command\CommandException;
 
 /**
  * Class VaultPaymentAuthorization
- * @package TNW\Subscriptions\Model\Payment
  */
 class VaultPaymentAuthorization
 {
@@ -127,8 +126,7 @@ class VaultPaymentAuthorization
 
             $this->createProfileObserver->setTrialPaymentData($trialPaymentData);
             $result = $trialPaymentData;
-        } elseif (
-            $paymentData['method'] == 'checkmo'
+        } elseif ($paymentData['method'] == 'checkmo'
             || $paymentData['method'] == 'banktransfer'
             || $paymentData['method'] == 'purchaseorder'
         ) {

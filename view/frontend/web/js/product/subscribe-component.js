@@ -36,7 +36,6 @@ define([
             template: 'TNW_Subscriptions/product/subscribe-component'
         },
 
-
         initialize: function () {
             var self = this;
             this._super();

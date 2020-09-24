@@ -32,17 +32,17 @@ class SaveHandler implements ExtensionInterface
         $this->addressRepository = $addressRepository;
     }
 
-
     /**
-     * @param SubscriptionProfileInterface $entity
+     * @param object $entity
      * @param array $arguments
-     * @return SubscriptionProfileInterface
+     * @return bool|object
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute($entity, $arguments = [])
     {
         $addresses = $entity->getAddresses();
 
-        if (!empty($addresses)){
+        if (!empty($addresses)) {
             foreach ($addresses as $address) {
                 $address->setProfileId($entity->getId());
                 if ($address->getStreet() && is_array($address->getStreet())) {

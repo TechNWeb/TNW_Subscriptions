@@ -122,7 +122,8 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
             $this->transaction = $objectManager->get("Magento\Paypal\Model\Payflow\Service\Response\Transaction");
             $this->responseValidator = $objectManager
                 ->get("Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator");
-            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");;
+            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+            ;
         }
     }
 
@@ -144,7 +145,8 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
             $this->responseValidator->validate($response, $this->transparent);
             $pnref = $response->getPnref();
             if (isset($profile)) {
-                $this->dataPersistor->set(EngineInterface::PAYMENT_DATA_KEY,
+                $this->dataPersistor->set(
+                    EngineInterface::PAYMENT_DATA_KEY,
                     [
                         SubscriptionProfileInterface::ID => $profile->getId(),
                         SubscriptionProfilePaymentInterface::TOKEN_HASH => $this->encryptor->encrypt($pnref),

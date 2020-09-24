@@ -3,15 +3,10 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api;
-
-use Magento\Framework\Api\SearchCriteriaInterface;
 
 interface ProductSubscriptionProfileRepositoryInterface
 {
-
-
     /**
      * Save ProductSubscriptionProfile
      * @param \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface $productSubscriptionProfile

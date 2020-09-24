@@ -77,8 +77,13 @@ class Store extends AbstractDataProvider
         $this->stepPool = $stepPool;
         $this->session = $session;
         $this->storeManager = $storeManager;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 
     /**
@@ -120,7 +125,6 @@ class Store extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
     }
 
     /**

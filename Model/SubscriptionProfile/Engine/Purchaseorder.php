@@ -11,7 +11,6 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
  * Class Purchaseorder
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
  */
 class Purchaseorder extends Base
 {

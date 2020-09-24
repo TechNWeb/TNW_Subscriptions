@@ -12,7 +12,6 @@ use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class DataBuilder
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {

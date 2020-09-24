@@ -110,7 +110,7 @@
             <?php foreach ($this->helper('Magento\Catalog\Helper\Data')->getAttributeHiddenFields() as $type => $fields): ?>
                 case '<?php /* @escapeNotVerified */ echo $type; ?>':
                 <?php foreach ($fields as $one): ?>
-                <?php if ($one == '_front_fieldset'): ?>
+                    <?php if ($one == '_front_fieldset'): ?>
                     //getFrontTab().hide();
                 <?php elseif ($one == '_default_value'): ?>
                     defaultValueTextVisibility =

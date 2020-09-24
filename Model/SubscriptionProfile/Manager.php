@@ -550,17 +550,21 @@ class Manager
 
             if (strcasecmp($oldEngine, $engine) !== 0) {
                 if ($ccType) {
-                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                    $message = __(
+                        'Payment method changed from <b>%1</b> to <b>%2</b>',
                         $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
-                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                        $this->scopeConfig->getValue("payment/{$engine}/title")
+                    );
                     $message .= '<br/>';
                     $message .= __('Credit Card type was added <b>%1</b>', $ccType);
                     $message .= '<br/>';
                     $message .= __('Credit Card number was added <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                 } else {
-                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
+                    $message = __(
+                        'Payment method changed from <b>%1</b> to <b>%2</b>',
                         $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
-                        $this->scopeConfig->getValue("payment/{$engine}/title"));
+                        $this->scopeConfig->getValue("payment/{$engine}/title")
+                    );
                 }
 
                 $this->historyLogger->log($message, $this->getProfile()->getId());
@@ -643,8 +647,11 @@ class Manager
             $this->getProfile()->setShippingDescription($shippingDescription);
 
             if (strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
-                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription,
-                    $shippingDescription);
+                $message = __(
+                    'Shipping method changed from <b>%1</b> to <b>%2</b>',
+                    $oldShippingDescription,
+                    $shippingDescription
+                );
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             }
         }
@@ -991,8 +998,7 @@ class Manager
                 }
             }
         }
-        if (
-            !$shippingMethodAvailable
+        if (!$shippingMethodAvailable
             && $this->mpowerConfig->getFreeShippingStrategy() == FreeShipping::HONOR_MAGENTO_VALUE
             && $shippingMethodToSet == 'freeshipping_freeshipping'
         ) {
@@ -1044,8 +1050,7 @@ class Manager
             $data['admin_modification'] = true;
         }
 
-        if (
-            $isRebill
+        if ($isRebill
             && $this->profile->getOrigData('billing_frequency_id') == $this->profile->getData('billing_frequency_id')
         ) {
             $data['rebill_processing'] = $data['modify_profile'] = $isRebill;
@@ -1312,8 +1317,7 @@ class Manager
             'cc_exp_year' => $orderPayment->getCcExpYear(),
         ];
         $extensionAttributes = $orderPayment->getExtensionAttributes();
-        if (
-            $orderPaymentDataToAdd['cc_type'] == null
+        if ($orderPaymentDataToAdd['cc_type'] == null
             && $extensionAttributes
         ) {
             $vaultPaymentToken = $extensionAttributes->getVaultPaymentToken();
@@ -1347,8 +1351,7 @@ class Manager
             ->reset()
             ->populateProfileData($quote, $quoteItems);
         $notCCMethod = false;
-        if (
-            isset($trialData['method'])
+        if (isset($trialData['method'])
             && (
                 $trialData['method'] == 'checkmo'
                 || $trialData['method'] == 'banktransfer'
@@ -1368,8 +1371,7 @@ class Manager
         } else {
             $this->populatePaymentData($quotePayment);
             $profile = $this->getProfile();
-            if (
-                $extensionAttributes instanceof OrderPaymentExtensionInterface &&
+            if ($extensionAttributes instanceof OrderPaymentExtensionInterface &&
                 ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
             ) {
                 /** @var $paymentToken PaymentTokenInterface */

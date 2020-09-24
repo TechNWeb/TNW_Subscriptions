@@ -58,7 +58,6 @@ class ProcessCommand extends Base
         parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager);
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -91,8 +90,8 @@ class ProcessCommand extends Base
 
         try {
             $this->setAreaCode();
-            foreach ($this->getStoreManager()->getWebsites() as $website){
-                if ($this->getConfig()->isSubscriptionsActive($website->getId())){
+            foreach ($this->getStoreManager()->getWebsites() as $website) {
+                if ($this->getConfig()->isSubscriptionsActive($website->getId())) {
                     $this->profileProcessor->process($website->getId());
                 }
             }

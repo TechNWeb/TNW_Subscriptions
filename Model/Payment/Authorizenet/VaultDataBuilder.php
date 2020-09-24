@@ -13,7 +13,6 @@ use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
  * Class VaultDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Authorizenet
  */
 class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {

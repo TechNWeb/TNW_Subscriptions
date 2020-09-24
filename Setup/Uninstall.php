@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Catalog\Model\Product;
@@ -18,7 +17,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
- * Class Uninstall
+ * Class Uninstall - object used for extension uninstall
  */
 class Uninstall implements UninstallInterface
 {

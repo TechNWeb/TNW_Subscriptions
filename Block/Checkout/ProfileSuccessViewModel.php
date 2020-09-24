@@ -138,12 +138,12 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
      */
     public function getNextPaymentDate($profileId)
     {
-        try{
+        try {
             $date = $this->profileOrderManager
                 ->getNextProfileRelation($this->profileRepository->getById($profileId))
                 ->getScheduledAt();
             return $this->_localeDate->formatDate($date, \IntlDateFormatter::LONG);
-        } catch (NoSuchEntityException $e){
+        } catch (NoSuchEntityException $e) {
             $this->messageManager->addExceptionMessage($e);
         }
     }

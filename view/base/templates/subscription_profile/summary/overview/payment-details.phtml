@@ -1,10 +1,10 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\Details $block */ ?>
 <?php if (!$block->isOnlyTableContent()): ?>
 <div class="block">
-    <?php if ($block->isShowTitle()) :?>
+    <?php if ($block->isShowTitle()):?>
     <div class="block-title">
         <strong><?php echo __("Payment Details") ?></strong>
-        <?php if ($block->isShowEditLink()) : ?>
+        <?php if ($block->isShowEditLink()): ?>
             <a href="<?php echo $block->getEditUrl('billing'); ?>"
                class="profile__edit_button"
                id="payment-details-edit-button">
@@ -20,7 +20,7 @@
                 <td class="label"><?php echo __('Payment Type') ?></td>
                 <td class="right"><?php echo $block->getPaymentMethodTitle() ?></td>
             </tr>
-            <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()) :?>
+            <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()):?>
                 <?php if (isset($additionalInfo['cc_type']) || isset($additionalInfo['cc_last_4'])): ?>
                     <tr class="col-1">
                         <td class="label"><?php echo __('Card Type') ?></td>

@@ -9,7 +9,6 @@ use Magento\Framework\Option\ArrayInterface;
 
 /**
  * Class Environment
- * @package TNW\Subscriptions\Model\Payment\Braintree
  */
 class Environment implements ArrayInterface
 {

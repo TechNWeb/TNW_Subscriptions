@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 /**
  * Interface ModifierInterface
  */
-interface ProcessInterface  extends ErrorInterface
+interface ProcessInterface extends ErrorInterface
 {
     /**
      * Processes data.

@@ -9,7 +9,6 @@ use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 
 /**
  * Class PriceStrategy
- * @package TNW\Subscriptions\Model\Config\Source
  */
 class PriceStrategy extends AbstractSource
 {

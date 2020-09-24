@@ -12,7 +12,6 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
  * Class BankTransfer
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
  */
 class BankTransfer extends Base
 {

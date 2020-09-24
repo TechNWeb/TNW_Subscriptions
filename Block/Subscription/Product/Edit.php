@@ -84,10 +84,27 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
-            $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
-            $config, $frequencyOptionRepository, $frequencyRepository, $savingsCalculation, $subscriptionTypeResolver,
-            $priceCalculator, $trialLengthUnitType, $data);
+        parent::__construct(
+            $context,
+            $urlEncoder,
+            $jsonEncoder,
+            $string,
+            $productHelper,
+            $productTypeConfig,
+            $localeFormat,
+            $customerSession,
+            $productRepository,
+            $priceCurrency,
+            $subscriptionProductViewConfig,
+            $config,
+            $frequencyOptionRepository,
+            $frequencyRepository,
+            $savingsCalculation,
+            $subscriptionTypeResolver,
+            $priceCalculator,
+            $trialLengthUnitType,
+            $data
+        );
     }
 
     /**

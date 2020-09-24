@@ -135,10 +135,20 @@ class Subscribe extends View
         $this->subscriptionTypeResolver = $subscriptionTypeResolver;
         $this->priceCalculator = $priceCalculator;
         $this->trialLengthUnitType = $trialLengthUnitType;
-        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
-            $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
+        parent::__construct(
+            $context,
+            $urlEncoder,
+            $jsonEncoder,
+            $string,
+            $productHelper,
+            $productTypeConfig,
+            $localeFormat,
+            $customerSession,
+            $productRepository,
+            $priceCurrency,
+            $data
+        );
     }
-
 
     /**
      * Retrieve current product model.
@@ -206,8 +216,7 @@ class Subscribe extends View
      */
     public function IsOnlySubscribePurchase()
     {
-        if (
-            $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
+        if ($this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
             && $this->getPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
         ) {
             return true;
@@ -690,8 +699,8 @@ class Subscribe extends View
                 'trial_start_date' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
                 'trial_label' => strtolower($this->trialLengthUnitType->getLabelByValueAndLength(
                     (int)$productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
-                    $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH))
-                )
+                    $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
+                ))
             ];
         }
         return null;

@@ -219,12 +219,12 @@ class RecurringOptions extends BaseModifier
                         foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
                             $productSubscription = $this->productSubscriptionProfileRepository
                                 ->getById($subscriptionProfile['entity_id']);
-                            if (
-                                $productSubscription->getData()['magento_product_id']
+                            if ($productSubscription->getData()['magento_product_id']
                                 == $this->locator->getProduct()->getId()
                             ) {
                                 $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
-                                    $subscriptionProfile['entity_id'], true
+                                    $subscriptionProfile['entity_id'],
+                                    true
                                 );
                             }
                         }
@@ -693,6 +693,10 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
+    /**
+     * @param $sortOrder
+     * @return array
+     */
     private function getPriceFieldDescriptionConfig($sortOrder)
     {
         return [
@@ -750,11 +754,9 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
-
     /**
-     * Get data for drop-down control with billing frequencies
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getBillingFrequencies()
     {

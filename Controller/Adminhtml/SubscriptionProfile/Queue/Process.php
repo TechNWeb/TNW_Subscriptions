@@ -66,7 +66,7 @@ class Process extends Action
                 $collection->addFieldToFilter(Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
-                if ($item && $item->getId()){
+                if ($item && $item->getId()) {
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->processItem($item);

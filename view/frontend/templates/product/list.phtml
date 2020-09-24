@@ -71,7 +71,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         <strong class="product name product-item-name">
                             <?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTopMessage($_product) ?>
                         </strong>
-                        <?php if($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
+                        <?php if ($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
                             <div class="price-box price-final_price">
                             <span class="price-wrapper" data-role="priceBox">
                                 <span class="price"><?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTrialPriceForCategory($_product) ?></span>
@@ -86,11 +86,11 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                             <div class="product actions product-item-actions"<?php echo strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
                                 $block->getChildBlock('helper.category.products.list')->prepareParamsToButtonsBlock(
-                                        $_product,
-                                        $pos,
-                                        $viewMode,
-                                        $position,
-                                        $block->getAddToCartPostParams($_product)
+                                    $_product,
+                                    $pos,
+                                    $viewMode,
+                                    $position,
+                                    $block->getAddToCartPostParams($_product)
                                 );
                                 echo $block->getChildBlock('helper.category.products.list')->getButtonsHtml();
                                 ?>
@@ -115,7 +115,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
         </ol>
     </div>
     <?php echo $block->getToolbarHtml() ?>
-    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+    <?php if (!$block->isRedirectToCartEnabled()): ?>
         <script type="text/x-magento-init">
         {
             "[data-role=tocart-subscriptions-form]": {

@@ -20,7 +20,6 @@ use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
  * Class NotificationProcessor
- * @package TNW\Subscriptions\Cron
  */
 class NotificationProcessor
 {
@@ -146,8 +145,7 @@ class NotificationProcessor
                 } catch (\Exception $e) {
                     $profile = null;
                 }
-                if (
-                    $profile
+                if ($profile
                     && (
                         $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
                         || $profile->getStatus() == ProfileStatus::STATUS_TRIAL
@@ -201,7 +199,7 @@ class NotificationProcessor
                     tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )
-                ->addFieldToFilter('engine_code', array('nin' => ['checkmo', 'banktransfer', 'purchaseorder']))
+                ->addFieldToFilter('engine_code', ['nin' => ['checkmo', 'banktransfer', 'purchaseorder']])
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToFilter('sent_mail', 0)
                 ->addFieldToSelect('subscription_profile_id');

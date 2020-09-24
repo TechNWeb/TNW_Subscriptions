@@ -23,8 +23,7 @@ class SubscriptionItems extends Template
         Image $imageHelper,
         BillingFrequencyRepository $billingFrequencyRepository,
         array $data = []
-    )
-    {
+    ) {
         $this->imageHelper = $imageHelper;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         parent::__construct($context, $data);

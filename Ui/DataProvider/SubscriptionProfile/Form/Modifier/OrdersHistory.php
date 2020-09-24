@@ -80,11 +80,10 @@ class OrdersHistory extends BaseFormModifier
     {
         $profile =  $this->getProfile();
 
-         if ($profile && $profile->getId()){
-             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
-         }
+        if ($profile && $profile->getId()) {
+            $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
+        }
 
         return $data;
     }
-
 }

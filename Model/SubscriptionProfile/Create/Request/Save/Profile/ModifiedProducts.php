@@ -38,8 +38,7 @@ class ModifiedProducts extends Base
                 } else {
                     try {
                         $saveModel->getQuoteCreator()->getCartRepository()->get($quoteId);
-                    }
-                    catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                    } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
                         //remove quote from session if quote does not exist.
                         $this->getSession()->removeSubQuote($quoteId);
                     }

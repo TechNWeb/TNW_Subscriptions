@@ -1,8 +1,6 @@
 <?php
 
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
-
 
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
@@ -82,7 +80,8 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
                         ]
                     ]
                 ]
-            ]);
+            ]
+        );
         return $meta;
     }
 

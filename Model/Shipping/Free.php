@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Model\Shipping;
 
 /**
  * Class Free
- * @package TNW\Subscriptions\Model\Shipping
  */
 class Free
 {
@@ -48,7 +47,7 @@ class Free
      * @return \Magento\Quote\Model\Quote\Address\Rate
      */
     public function getCarrierRate($quote)
-     {
+    {
          /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
          $method = $this->methodFactory->create();
          $method->setCarrier('freeshipping');
@@ -58,7 +57,7 @@ class Free
          $method->setPrice('0.00');
          $method->setCost('0.00');
         return $this->rateFactory->create()->importShippingRate($method);
-     }
+    }
 
     /**
      * @param $methodCode

@@ -12,8 +12,8 @@ use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
-* Customize Price field
-*/
+ * Customize Price field
+ */
 class LockPrice extends AbstractModifier
 {
     /**

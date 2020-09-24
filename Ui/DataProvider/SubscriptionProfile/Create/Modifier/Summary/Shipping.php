@@ -63,7 +63,8 @@ class Shipping implements ModifierInterface
                         ]
                     ]
                 ]
-            ]);
+            ]
+        );
         return $meta;
     }
 
@@ -78,7 +79,9 @@ class Shipping implements ModifierInterface
         }
         $subQuotes = $this->formContext->getSession()->getSubQuotes();
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->getIsVirtual()) continue;
+            if ($subQuote->getIsVirtual()) {
+                continue;
+            }
             $this->shippingMethods->setQuote($subQuote);
             if ($methodTitle = $this->shippingMethods->getCurrentMethodLabel(false)) {
                 return $methodTitle;
@@ -94,10 +97,14 @@ class Shipping implements ModifierInterface
     private function getShippingMethodAmount()
     {
         $amount = 0;
-        if ($this->getIsVirtual()) return null;
+        if ($this->getIsVirtual()) {
+            return null;
+        }
         $subQuotes = $this->formContext->getSession()->getSubQuotes();
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->getIsVirtual()) continue;
+            if ($subQuote->getIsVirtual()) {
+                continue;
+            }
             $this->shippingMethods->setQuote($subQuote);
             $method = $subQuote->getShippingAddress()->getShippingMethod();
             $rates = $this->shippingMethods->getShippingRates();

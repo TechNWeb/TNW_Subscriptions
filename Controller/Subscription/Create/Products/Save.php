@@ -53,7 +53,7 @@ class Save extends AbstractSave
             $this->getRequest()->getParams()
         );
         $response = $this->getJsonResponse($result);
-        if (!$result){
+        if (!$result) {
             $response['objects_count'] = count(
                 $this->createModel->getSession()->getSubQuoteIds()
             );

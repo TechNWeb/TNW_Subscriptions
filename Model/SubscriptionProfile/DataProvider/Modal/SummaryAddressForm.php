@@ -323,7 +323,7 @@ class SummaryAddressForm extends AbstractDataProvider
                         ],
                     ],
                 ]
-            ]],
+                ]],
         ];
         $sortOrder = 2;
         /** @var Attribute $attribute */
@@ -337,7 +337,7 @@ class SummaryAddressForm extends AbstractDataProvider
                     //Get meta data for attribute
                     $childrenData = array_merge_recursive(
                         $childrenData,
-                        $this->getAttributeMeta($attribute, $sortOrder, $i )
+                        $this->getAttributeMeta($attribute, $sortOrder, $i)
                     );
                     $i++;
                     $lineCount--;
@@ -515,7 +515,7 @@ class SummaryAddressForm extends AbstractDataProvider
             $additionalClasses = $additionalClasses . ' wide-select';
         }
 
-        return array($attributeMeta, $additionalClasses);
+        return [$attributeMeta, $additionalClasses];
     }
 
     /**
@@ -595,7 +595,7 @@ class SummaryAddressForm extends AbstractDataProvider
             $elemLabel = $attribute->getStoreLabel() . ' ' . sprintf(__('(Line %s)'), $attributeLine + 1);
         }
 
-        return array($elemName, $elemLabel);
+        return [$elemName, $elemLabel];
     }
 
     /**

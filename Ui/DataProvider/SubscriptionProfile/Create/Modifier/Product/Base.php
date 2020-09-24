@@ -34,7 +34,8 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * @param Context $formContext
      */
-    public function __construct(Context $formContext) {
+    public function __construct(Context $formContext)
+    {
         $this->formContext = $formContext;
     }
 

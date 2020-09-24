@@ -15,7 +15,6 @@ use TNW\Subscriptions\Model\Config\Source\StartDateType;
 
 /**
  * Class BillingCyclesManager
- * @package TNW\Subscriptions\Model\SubscriptionProfile
  */
 class BillingCyclesManager
 {
@@ -150,12 +149,12 @@ class BillingCyclesManager
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
              $date = $this->calculateScheduledDate(
-                $startDate,
-                $profile->getUnit(),
-                $profile->getFrequency(),
-                $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
-                $startDay
-            );
+                 $startDate,
+                 $profile->getUnit(),
+                 $profile->getFrequency(),
+                 $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
+                 $startDay
+             );
             $neededDates[] = $this->format($date);
         }
         $neededDates = array_diff($neededDates, $existDates);

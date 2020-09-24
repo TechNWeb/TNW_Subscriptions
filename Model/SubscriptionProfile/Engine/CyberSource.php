@@ -13,7 +13,6 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Class CyberSource
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
  */
 class CyberSource extends Base
 {
@@ -86,8 +85,7 @@ class CyberSource extends Base
         );
         $this->paymentTokenFactory = $paymentTokenFactory;
         $cyberSourceConfig->reBillProcess();
-        if (
-            $moduleManager->isEnabled("CyberSource_Core")
+        if ($moduleManager->isEnabled("CyberSource_Core")
             && $moduleManager->isEnabled("CyberSource_SecureAcceptance")
         ) {
             $this->transferFactory = $objectManager->get("CyberSource\Core\Gateway\Http\TransferFactory");

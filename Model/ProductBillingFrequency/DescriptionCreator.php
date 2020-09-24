@@ -113,16 +113,18 @@ class DescriptionCreator
         if ($isTrial) {
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
-                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
+                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']
+            );
             $description[] = __('%1 for %2 and then ', $formattedTotalPrice, $frequencyTrialPeriod);
-        } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
+        } elseif ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
             $description[] = __('%1 initial payment and then ', $formattedTotalPrice);
         }
 
         $description[] = __('%1 / every %2. ', $formattedPrice, $frequencyUnit);
 
         if (!$subscriptionData[CreateProfile::UNIQUE]['term']) {
-            $description[] = __('Total of %1 %2. ',
+            $description[] = __(
+                'Total of %1 %2. ',
                 $subscriptionPeriod,
                 $this->getShipmentLabel($subscriptionPeriod)
             );

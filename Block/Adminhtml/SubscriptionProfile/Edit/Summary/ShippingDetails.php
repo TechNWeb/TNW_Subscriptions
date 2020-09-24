@@ -41,7 +41,6 @@ class ShippingDetails extends Template
         ProfileManager $profileManager,
         Template\Context $context,
         array $data = []
-
     ) {
         $this->profileManager = $profileManager;
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/shipping_details.phtml');

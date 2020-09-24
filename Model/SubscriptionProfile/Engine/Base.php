@@ -299,7 +299,7 @@ class Base implements EngineInterface
      */
     protected function populateProfilePayment($paymentToken)
     {
-        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $expiration = explode('/', $tokenDetails['expirationDate']);
         $this->getProfile()->getPayment()
             ->setEngineCode($this->getPaymentMethodCode())

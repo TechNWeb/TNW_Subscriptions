@@ -91,7 +91,6 @@ class CurrencySelect extends AbstractSource
         return $result;
     }
 
-
     /**
      * Retrieve currency name by code
      *

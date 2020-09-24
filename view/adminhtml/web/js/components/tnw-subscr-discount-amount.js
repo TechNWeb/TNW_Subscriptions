@@ -151,7 +151,6 @@ define([
             var discountAmount = this.value();
             var discountTypeComponent = this.getDiscountTypeComponent();
 
-
             if (typeof discountAmount == 'undefined' || discountAmount == '') {
                 discountAmount = 0;
             } else if (typeof discountAmount == 'string') {

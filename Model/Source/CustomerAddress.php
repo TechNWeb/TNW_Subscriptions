@@ -138,9 +138,9 @@ class CustomerAddress implements OptionSourceInterface
         $this->appState = $appState;
     }
 
-
     /**
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function toOptionArray()
     {
@@ -220,10 +220,10 @@ class CustomerAddress implements OptionSourceInterface
     {
         $customerId = null;
         switch ($this->profileState) {
-            case SubscriptionProfile::STATE_EDIT :
+            case SubscriptionProfile::STATE_EDIT:
                 $customerId = $this->getCustomerIdFromProfile();
                 break;
-            case SubscriptionProfile::STATE_CREATE :
+            case SubscriptionProfile::STATE_CREATE:
                 $customerId = $this->getCustomerIdFromSession();
                 break;
         }

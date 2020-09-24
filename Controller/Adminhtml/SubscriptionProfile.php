@@ -59,8 +59,10 @@ abstract class SubscriptionProfile extends Action
     {
         $resultPage->setActiveMenu('TNW_Subscriptions::tnw_subscriptions_subscription_profile')
             ->addBreadcrumb(__('TNW'), __('TNW'))
-            ->addBreadcrumb(__('Subscription Profile'),
-                __('Subscription Profile'));
+            ->addBreadcrumb(
+                __('Subscription Profile'),
+                __('Subscription Profile')
+            );
 
         return $resultPage;
     }

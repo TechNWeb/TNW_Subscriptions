@@ -107,7 +107,7 @@ class Payment implements ModifierInterface
         $data['new_subscription'][OrderPaymentInterface::CC_LAST_4] = $this->getCardLastFour();
         foreach ($this->getTotalsData() as $key => $total) {
             $data['new_subscription'][$key] =
-                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'],false);
+                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'], false);
         }
         return $data;
     }
@@ -132,7 +132,8 @@ class Payment implements ModifierInterface
         $method = $this->getPayment()->getMethod();
         $path = 'payment/' . $method . '/title';
         return $this->scopeConfig->getValue(
-            $path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $path,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $this->getSubQuote()->getStore()
         );
     }
@@ -273,7 +274,9 @@ class Payment implements ModifierInterface
         $config = [];
         $sortOrder = 50;
         foreach ($this->getTotalsData() as $key => $segment) {
-            if (($key !== 'shipping' && $key !== 'tax') && empty($segment['value'])) continue;
+            if (($key !== 'shipping' && $key !== 'tax') && empty($segment['value'])) {
+                continue;
+            }
             $config[$key] = [
                 'arguments' => [
                     'data' => [

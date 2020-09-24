@@ -30,6 +30,4 @@ class Free extends Base
         $this->getProfile()->getPayment()->setTokenHash('');
         return $this;
     }
-
-
 }

@@ -10,7 +10,6 @@ use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class Validator
- * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class Validator
 {

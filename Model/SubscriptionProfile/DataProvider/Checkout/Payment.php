@@ -18,7 +18,6 @@ class Payment extends BasePayment
      */
     const DATA_SCOPE_PAYMENT_FORM = 'tnw_subscriptionprofile_checkout_payment_form';
 
-
     /**
      * @inheritdoc
      */

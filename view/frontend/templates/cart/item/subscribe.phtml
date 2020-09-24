@@ -14,29 +14,29 @@ $groupsViewModel = $block->getParentBlock()->getGroupsViewModel();
 $configurableOptions = $block->getPreconfiguredOptions();
 $customOptions = $block->getPreconfiguredCustomOptions();
 ?>
-<?php if ($block->isSubscribeAvailable()) : ?>
-    <?php if ($block->IsOneTimeAndSubscribePurchase() || $block->IsOnlySubscribePurchase()) : ?>
+<?php if ($block->isSubscribeAvailable()): ?>
+    <?php if ($block->IsOneTimeAndSubscribePurchase() || $block->IsOnlySubscribePurchase()): ?>
     <div class="product-item-subscription-details">
         <div class="tnw-addtocart-container">
             <input type="hidden" name="cart[<?= $_itemId; ?>][addtocart_type]" value="1"/>
-            <?php if (is_array($configurableOptions)) : ?>
-                <?php foreach ($configurableOptions as $attributeId => $attributeValue) : ?>
+            <?php if (is_array($configurableOptions)): ?>
+                <?php foreach ($configurableOptions as $attributeId => $attributeValue): ?>
                     <input type="hidden"
                            name="cart[<?= $_itemId; ?>][super_attribute][<?= $attributeId; ?>]"
                            value="<?= $attributeValue; ?>"
                     >
                 <?php endforeach; ?>
             <?php endif; ?>
-            <?php if (is_array($customOptions)) : ?>
-                <?php foreach ($customOptions as $optionId => $optionValue) : ?>
-                    <?php if (is_array($optionValue)) : ?>
-                        <?php foreach ($optionValue as $checkboxValue) : ?>
+            <?php if (is_array($customOptions)): ?>
+                <?php foreach ($customOptions as $optionId => $optionValue): ?>
+                    <?php if (is_array($optionValue)): ?>
+                        <?php foreach ($optionValue as $checkboxValue): ?>
                         <input type="hidden"
                                name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>][]"
                                value="<?= $checkboxValue; ?>"
                         >
                         <?php endforeach; ?>
-                    <?php else : ?>
+                    <?php else: ?>
                         <input type="hidden"
                                    name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>]"
                                    value="<?= $optionValue; ?>"
@@ -46,9 +46,9 @@ $customOptions = $block->getPreconfiguredCustomOptions();
             <?php endif; ?>
             <div class="addtocart-subscribe">
                 <input
-                    <?php if ($block->IsOnlySubscribePurchase()) : ?>
+                    <?php if ($block->IsOnlySubscribePurchase()): ?>
                        type="hidden"
-                    <?php else : ?>
+                    <?php else: ?>
                        type="radio"
                     <?php endif; ?>
                        id="cart-<?= $_itemId; ?>-subscribe"

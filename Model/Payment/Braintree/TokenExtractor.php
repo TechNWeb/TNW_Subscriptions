@@ -13,7 +13,6 @@ use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Braintree
  */
 class TokenExtractor
 {

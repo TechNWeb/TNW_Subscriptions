@@ -10,7 +10,6 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class StripePaymentDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Stripe
  */
 class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -69,11 +68,11 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
      * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      */
     public function __construct(
-       SubscriptionConfig $subscriptionConfig,
-       Manager $manager,
-       \Magento\Framework\Module\Manager $moduleManager,
-       \Magento\Framework\ObjectManagerInterface $objectManager,
-       \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+        SubscriptionConfig $subscriptionConfig,
+        Manager $manager,
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
+        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
     ) {
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->config = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
@@ -176,7 +175,7 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
             $customerRequestData['invoice_settings'] = ['default_payment_method' => $pm];
             try {
                 $this->customerClient->placeRequest($this->transferFactory->create($customerRequestData));
-            } catch (\Magento\Payment\Gateway\Http\ClientException $e){
+            } catch (\Magento\Payment\Gateway\Http\ClientException $e) {
                 $result[self::CUSTOMER] = $paymentData['additional_data']['customer'];
             }
         }

@@ -98,7 +98,7 @@ class Stripe extends Base
         $expirationDate = [];
         if (array_key_exists('extension_attributes', $additionalInfo)) {
             $cardDetails = json_decode($additionalInfo['extension_attributes'], true);
-            $expirationDate = explode('/' , $cardDetails['expirationDate']);
+            $expirationDate = explode('/', $cardDetails['expirationDate']);
         }
         if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
             $cardDetails = [
@@ -108,7 +108,7 @@ class Stripe extends Base
                 $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
             } else {
                 $expirationDate = $payment->getData('expirationDate')
-                    ? explode('/' , $payment->getData('expirationDate'))
+                    ? explode('/', $payment->getData('expirationDate'))
                     : ["", ""]
                 ;
             }

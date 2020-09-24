@@ -42,7 +42,6 @@ class ShippingDetails extends Column
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
-
     /**
      * Prepare Data Source
      *
@@ -65,7 +64,8 @@ class ShippingDetails extends Column
                         null,
                         $currencyCode
                     );
-                    $item[$fieldName] = implode(' - ',
+                    $item[$fieldName] = implode(
+                        ' - ',
                         [
                             $item['shipping_information'],
                             $shippingPrice

@@ -199,7 +199,7 @@ class Creator extends Base
     public function getProfilesIdsToProcess($websiteId)
     {
         $collection = $this->getBaseCollection()
-            ->addFieldToFilter( SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [
+            ->addFieldToFilter(SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [
                 SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
                 SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
             ]])

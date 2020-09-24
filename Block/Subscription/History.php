@@ -295,8 +295,7 @@ class History extends \Magento\Framework\View\Element\Template
             ProfileStatus::STATUS_TRIAL,
         ];
 
-        if (
-            in_array($subscription->getStatus(), $activeStatuses) &&
+        if (in_array($subscription->getStatus(), $activeStatuses) &&
             $this->checkCreditCardExpire($subscription)
         ) {
             return __('Credit Card will expire before next billing cycle.');
@@ -449,7 +448,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getNextPaymentFormatted(\Magento\Framework\DataObject $subscription)
     {
         return $subscription->getNextBillingCycleDate()
-            ? $this->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG)
+            ? $this->formatDate($subscription->getNextBillingCycleDate(), \IntlDateFormatter::LONG)
             : '';
     }
 

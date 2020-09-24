@@ -79,7 +79,7 @@ class Label extends Column
             && $sorting['field'] === $this->getName()
         ) {
             $this->getContext()->getDataProvider()->addOrder(
-               'entity_id',
+                'entity_id',
                 strtoupper($sorting['direction'])
             );
         }

@@ -24,7 +24,7 @@ class TrialEndDate extends Date
                         $date = new \DateTime($item[$this->getData('name')]);
                     }
                     $item[$this->getData('name')] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                    if (empty($item['trial_start_date'])){
+                    if (empty($item['trial_start_date'])) {
                         $item[$this->getData('name')] = '';
                     }
                 }
