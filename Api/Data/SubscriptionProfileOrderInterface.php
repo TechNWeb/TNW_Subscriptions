@@ -3,9 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface SubscriptionProfileOrderInterface - determines the functionality to implement for subscription order
+ */
 interface SubscriptionProfileOrderInterface
 {
     /**#@+

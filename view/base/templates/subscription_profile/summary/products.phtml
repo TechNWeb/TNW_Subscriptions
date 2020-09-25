@@ -1,9 +1,9 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block */ ?>
 <div class="block products">
     <div class="block-title products-title">
-        <strong><?php echo __('Products') ?></strong>
+        <strong><?= __('Products') ?></strong>
         <?php if ($block->isShowEditLink()): ?>
-            <a href="<?php echo $block->getEditUrl('items')?>" class="profile__edit_button"></a>
+            <a href="<?= $block->getEditUrl('items')?>" class="profile__edit_button"></a>
         <?php endif;?>
     </div>
     <div class="block-content">
@@ -11,17 +11,17 @@
             <?php foreach ($block->getItems() as $item): ?>
             <li class="item">
                 <div class="product-item-photo">
-                    <img class="photo image" src="<?php echo $block->getImageUrl($item); ?>" />
+                    <img class="photo image" src="<?= $block->getImageUrl($item); ?>" />
                 </div>
                 <div class="product-item-details">
-                    <strong class="product-item-name"><?php echo $block->getName($item) ?></strong>
-                    <span class="product-item-qty">(x<?php echo (int)$item->getQty() ?>)</span>
-                    <div class="product-item-description"><?php echo $block->getDescription($item) ?></div>
+                    <strong class="product-item-name"><?= $block->getName($item) ?></strong>
+                    <span class="product-item-qty">(x<?= (int)$item->getQty() ?>)</span>
+                    <div class="product-item-description"><?= $block->getDescription($item) ?></div>
                     <dl class="item-options <?php if ((bool) $item->getMagentoProduct()->getData('tnw_subscr_hide_qty')): ?>
                      hidden
                      <?php endif; ?>">
-                        <dt class="qty"><?php echo __('Qty') ?></dt>
-                        <dd><?php echo (int)$item->getQty() ?></dd>
+                        <dt class="qty"><?= __('Qty') ?></dt>
+                        <dd><?= (int)$item->getQty() ?></dd>
                     </dl>
                     <dl class="item-options custom-attributes">
                     <?php foreach ($block->getItemOptions($item) as $option): ?>
@@ -36,25 +36,25 @@
                         </dd>
                     <?php endforeach; ?>
                     <?php foreach ($block->customAttributes($item) as $attribute): ?>
-                        <dt><?php echo $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
-                        <dd><?php echo $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
+                        <dt><?= $block->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
+                        <dd><?= $block->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
                     <?php endforeach; ?>
                     </dl>
                 </div>
                 <div class="additional">
                     <dl>
-                        <dt><?php echo __('Billing Frequency') ?></dt>
-                        <dd><?php echo $block->getBillingFrequencyLabel() ?></dd>
-                        <dt><?php echo __('Term') ?></dt>
-                        <dd><?php echo $block->getTerm() ?></dd>
-                        <dt><?php echo __('Start on') ?></dt>
-                        <dd><?php echo $block->getStartOnFormatted() ?></dd>
-                        <dt><?php echo __('Price') ?></dt>
+                        <dt><?= __('Billing Frequency') ?></dt>
+                        <dd><?= $block->getBillingFrequencyLabel() ?></dd>
+                        <dt><?= __('Term') ?></dt>
+                        <dd><?= $block->getTerm() ?></dd>
+                        <dt><?= __('Start on') ?></dt>
+                        <dd><?= $block->getStartOnFormatted() ?></dd>
+                        <dt><?= __('Price') ?></dt>
                         <?php $taxAmount = (float) $item->getTaxAmount($block->getSubscriptionProfile()) ?>
                         <dd>
-                            <?php echo $block->formatPrice($item->getPrice() + $taxAmount) ?>
+                            <?= $block->formatPrice($item->getPrice() + $taxAmount) ?>
                             <?php if ($taxAmount): ?>
-                                <?php echo '(' .  __('Incl. Tax') . ')' ?>
+                                <?= '(' .  __('Incl. Tax') . ')' ?>
                             <?php endif; ?>
                         </dd>
                     </dl>
@@ -62,6 +62,6 @@
             </li>
             <?php endforeach; ?>
         </ol>
-        <div class="product-frequency-description"><?php echo $block->getFrequencyDescription() ?></div>
+        <div class="product-frequency-description"><?= $block->getFrequencyDescription() ?></div>
     </div>
 </div>

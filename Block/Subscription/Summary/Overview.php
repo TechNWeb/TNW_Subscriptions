@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use Magento\Quote\Model\Quote;
@@ -143,7 +142,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve next Subscription profile order
      *
-     * @return SubscriptionProfileOrder|false
+     * @return bool|\TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface|SubscriptionProfileOrder|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getNextProfileRelation()
     {
@@ -160,9 +160,10 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     }
 
     /**
-     * Retrieve next Subscription profile order
+     * Retrieve next Subscription profile quote
      *
-     * @return Quote|false
+     * @return bool|Quote|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getNextQuote()
     {
@@ -183,6 +184,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      *
      * @param \Magento\Framework\View\Element\AbstractBlock $block
      * @return \Magento\Framework\View\Element\AbstractBlock
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function initChildBlock(\Magento\Framework\View\Element\AbstractBlock $block)
     {
@@ -212,7 +214,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Prepare messages for tab.
      *
-     * @return void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function prepareTabMessages()
     {
@@ -236,7 +238,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve cancel date in case of cancellation is delayed.
      *
-     * @return string
+     * @return bool|string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getCancelBeforeNextCycleDate()
     {
@@ -252,7 +255,9 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve instance of Next Payment block
      *
-     * @return NextPayment
+     * @return \Magento\Framework\View\Element\BlockInterface|NextPayment
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getBlockNextPayment()
     {
@@ -271,6 +276,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Return HTML of Next Payment block
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getNextPaymentHtml()
     {
@@ -280,7 +287,9 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve instance of Message block
      *
-     * @return Message
+     * @return \Magento\Framework\View\Element\BlockInterface|Message
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getBlockMessage()
     {
@@ -299,6 +308,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Return HTML of Message block
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getMessageHtml()
     {
@@ -308,7 +319,9 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve instance of Missed Payments block
      *
-     * @return MissedPayments
+     * @return \Magento\Framework\View\Element\BlockInterface|MissedPayments
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getBlockMissedPayments()
     {
@@ -327,6 +340,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Return HTML of Missed Payments block
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getMissedPaymentsHtml()
     {
@@ -336,7 +351,9 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve instance of Status block
      *
-     * @return Status
+     * @return \Magento\Framework\View\Element\BlockInterface|Status
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getBlockStatus()
     {
@@ -355,6 +372,8 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Return HTML of Status block
      *
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getStatusHtml()
     {
@@ -365,6 +384,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Can show Next payment block
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getCanShowNextPayment()
     {
@@ -399,6 +419,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Check if it necessary to show shipping details block.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function canShowShippingDetailsBlock()
     {
@@ -484,6 +505,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
 
     /**
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function isSupported()
     {
@@ -495,9 +517,10 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
      * Depends on whether the next payment block is displayed.
      *
      * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getStatusMessageBlockClass()
     {
-        return !$this->getCanShowNextPayment() ? 'full-block': '';
+        return !$this->getCanShowNextPayment() ? 'full-block' : '';
     }
 }

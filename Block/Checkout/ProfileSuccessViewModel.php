@@ -16,6 +16,9 @@ use TNW\Subscriptions\Model\Backend\UrlBuilder;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrderRepository;
 
+/**
+ * Class ProfileSuccessViewModel - block for profile success on checkout
+ */
 class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
     /**
@@ -51,7 +54,7 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
     /**
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
-    private $_localeDate;
+    private $localeDate;
 
     /**
      * @var ManagerInterface
@@ -85,7 +88,7 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
         SubscriptionProfileRepositoryInterface $profileRepository,
         ManagerInterface $messageManager
     ) {
-        $this->_localeDate = $context->getLocaleDate();
+        $this->localeDate = $context->getLocaleDate();
         $this->messageManager = $messageManager;
         $this->checkoutSession = $checkoutSession;
         $this->filterBuilder = $filterBuilder;
@@ -142,7 +145,7 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
             $date = $this->profileOrderManager
                 ->getNextProfileRelation($this->profileRepository->getById($profileId))
                 ->getScheduledAt();
-            return $this->_localeDate->formatDate($date, \IntlDateFormatter::LONG);
+            return $this->localeDate->formatDate($date, \IntlDateFormatter::LONG);
         } catch (NoSuchEntityException $e) {
             $this->messageManager->addExceptionMessage($e);
         }

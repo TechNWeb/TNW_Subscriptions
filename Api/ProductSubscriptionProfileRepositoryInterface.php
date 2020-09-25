@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface ProductSubscriptionProfileRepositoryInterface - determines the functionality to implement for
+ * product subscription profile repository
+ */
 interface ProductSubscriptionProfileRepositoryInterface
 {
     /**

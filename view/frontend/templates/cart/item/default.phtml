@@ -94,7 +94,7 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
             <?php endif; ?>
         <?php endif; ?>
         <td class="col qty" data-th="<?= $block->escapeHtmlAttr(__('Qty')) ?>">
-            <div class="field qty <?php echo $groupsViewModel->allowDisplaySubscribeQty($_item) ? : 'hidden' ?>">
+            <div class="field qty <?= $groupsViewModel->allowDisplaySubscribeQty($_item) ? : 'hidden' ?>">
                 <div class="control qty">
                     <label for="cart-<?= $block->escapeHtmlAttr($_item->getId()) ?>-qty">
                         <span class="label"><?= $block->escapeHtml(__('Qty')) ?></span>

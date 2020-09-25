@@ -3,11 +3,9 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Product\ListProduct;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\Product;
 use Magento\Framework\View\Element\Template;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
@@ -164,6 +162,8 @@ class ListProductButtons extends Template
      * Returns product billing frequencies as array.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getFrequencyOption()
     {
@@ -230,7 +230,9 @@ class ListProductButtons extends Template
     /**
      * Get default value for Subscribe Qty
      *
-     * @return int
+     * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getDefaultSubscribeQty()
     {
@@ -295,6 +297,8 @@ class ListProductButtons extends Template
      * Get array of options to add in cart from category page
      *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getSubscribeOptions()
     {

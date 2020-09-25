@@ -58,7 +58,8 @@ class Edit extends \Magento\Framework\App\Action\Action implements \Magento\Cata
     /**
      * Action to reconfigure subscriptions item
      *
-     * @return \Magento\Framework\View\Result\Page|\Magento\Framework\Controller\Result\Redirect
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {

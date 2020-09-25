@@ -3,14 +3,18 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit;
 
 use Magento\Backend\Block\Widget\Context;
 
+/**
+ * Class GenericButton - class used as base for admingrnl buttons on edit page of SP
+ */
 abstract class GenericButton
 {
-
+    /**
+     * @var Context
+     */
     protected $context;
 
     /**

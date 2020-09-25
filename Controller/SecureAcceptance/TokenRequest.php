@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Controller\SecureAcceptance;
 
 /**
- * Class TokenRequest
+ * Class TokenRequest - controller
  */
 class TokenRequest extends \Magento\Framework\App\Action\Action
 {

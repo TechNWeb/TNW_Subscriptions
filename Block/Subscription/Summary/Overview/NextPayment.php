@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
@@ -63,7 +62,8 @@ class NextPayment extends Template
     /**
      * Retrieve next payment date
      *
-     * @return \DateTime|false
+     * @return bool|\DateTime
+     * @throws \Exception
      */
     public function getNextPaymentDate()
     {
@@ -79,7 +79,8 @@ class NextPayment extends Template
     /**
      * Get next payment date as array of date parts.
      *
-     * @return array
+     * @return array|bool
+     * @throws \Exception
      */
     public function getNextPaymentDateParts()
     {

@@ -3,11 +3,10 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\Framework\View\Element\Template;
 use Magento\Customer\Model\Address\Config as AddressConfig;
+use Magento\Framework\View\Element\Template;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
@@ -91,7 +90,7 @@ class Address extends BaseSummary
      */
     public function getEditUrl($tabName = 'shipment', array $params = [])
     {
-        $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing': $tabName;
+        $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing' : $tabName;
 
         $params['shipping_address'] = 1;
 

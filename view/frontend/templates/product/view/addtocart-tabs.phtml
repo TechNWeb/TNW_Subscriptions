@@ -13,7 +13,7 @@
         <div class="tnw-addtocart-container">
             <div class="addtocart-subscribe">
                 <div class="box-tocart">
-                    <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                    <?= $block->getChildHtml('addtocart_subscribe') ?>
                 </div>
             </div>
         </div>
@@ -29,28 +29,28 @@
         <div class="tnw-addtocart-container">
             <div class="addtocart-onetime">
                 <input type="radio" id="addtocart_onetime" name="addtocart_type" value="0"/>
-                <label for="addtocart_onetime"><?php /* @escapeNotVerified */ echo __('One Time Purchase') ?></label>
+                <label for="addtocart_onetime"><?= /* @escapeNotVerified */ __('One Time Purchase') ?></label>
                 <div class="onetime-final-price"></div>
                 <div class="addtocart-wrapper">
-                    <?php echo $block->getChildHtml('addtocart_orig') ?>
+                    <?= $block->getChildHtml('addtocart_orig') ?>
                 </div>
             </div>
             <div class="addtocart-subscribe">
                 <div class="box-tocart">
                 <input type="radio" id="addtocart_subscribe" name="addtocart_type" value="1" checked/>
-                <label for="addtocart_subscribe"><?php /* @escapeNotVerified */ echo __('Subscribe') ?></label>
+                <label for="addtocart_subscribe"><?= /* @escapeNotVerified */ __('Subscribe') ?></label>
                 <div class="subscription-price-with-savings"></div>
                 <div class="addtocart-wrapper">
-                    <?php echo $block->getChildHtml('addtocart_subscribe') ?>
+                    <?= $block->getChildHtml('addtocart_subscribe') ?>
                 </div>
                 </div>
             </div>
         </div>
     <?php else: ?>
         <input type="hidden" name="subscribe_active" value="0" />
-        <?php echo $block->getChildHtml('addtocart_orig') ?>
+        <?= $block->getChildHtml('addtocart_orig') ?>
     <?php endif ?>
 <?php else: ?>
     <input type="hidden" name="subscribe_active" value="0" />
-    <?php echo $block->getChildHtml('addtocart_orig') ?>
+    <?= $block->getChildHtml('addtocart_orig') ?>
 <?php endif ?>

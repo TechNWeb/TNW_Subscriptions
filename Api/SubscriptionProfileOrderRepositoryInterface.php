@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface SubscriptionProfileOrderRepositoryInterface - determines the functionality to implement for
+ * subscription profile order repository
+ */
 interface SubscriptionProfileOrderRepositoryInterface
 {
     /**

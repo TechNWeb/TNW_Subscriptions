@@ -147,7 +147,8 @@ class Billing extends ContentAbstract implements ExpireWarningSupportInterface
     /**
      * Retrieve customer addresses data to display.
      *
-     * @return string
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomerAddressesData()
     {

@@ -14,24 +14,24 @@
             <table class="admin__table-secondary data-table">
                 <tbody>
                 <tr class="col-0">
-                    <td class="label"><?php echo __("Status") ?></td>
-                    <td><span class="text"><?php echo $block->getStatus() ?></span></td>
+                    <td class="label"><?= __("Status") ?></td>
+                    <td><span class="text"><?= $block->getStatus() ?></span></td>
                 </tr>
                 <tr class="col-1">
-                    <td class="label"><?php echo __('Created On') ?></td>
-                    <td><span class="date"><?php echo $block->getCreatedOn() ?></span></td>
+                    <td class="label"><?= __('Created On') ?></td>
+                    <td><span class="date"><?= $block->getCreatedOn() ?></span></td>
                 </tr>
                 <tr class="col-2">
-                    <td class="label"><?php echo __('Last Successful Order') ?></td>
-                    <td><span class="date"><?php echo $block->getLastSuccessfulOrder() ?></span></td>
+                    <td class="label"><?= __('Last Successful Order') ?></td>
+                    <td><span class="date"><?= $block->getLastSuccessfulOrder() ?></span></td>
                 </tr>
                 <tr class="col-3">
-                    <td class="label"><?php echo __('Trial Ends On') ?></td>
-                    <td><span class="date"><?php echo $block->getTrialEndsOn() ?></span></td>
+                    <td class="label"><?= __('Trial Ends On') ?></td>
+                    <td><span class="date"><?= $block->getTrialEndsOn() ?></span></td>
                 </tr>
                 <tr class="col-4">
-                    <td class="label"><?php echo __('Subscription Ends On') ?></td>
-                    <td><span class="date"><?php echo $block->getSubscriptionEndsOn() ?></span></td>
+                    <td class="label"><?= __('Subscription Ends On') ?></td>
+                    <td><span class="date"><?= $block->getSubscriptionEndsOn() ?></span></td>
                 </tr>
                 </tbody>
             </table>
@@ -40,27 +40,27 @@
             <table class="admin__table-secondary data-table">
                 <tbody>
                 <tr class="col-0">
-                    <td class="label"><?php echo __("Customer Name") ?></td>
-                    <td><span class="text"><a href="<?php echo $this->getCustomerUrl(); ?>" ><?php echo $block->getCustomerName() ?></a></span></td>
+                    <td class="label"><?= __("Customer Name") ?></td>
+                    <td><span class="text"><a href="<?= $this->getCustomerUrl(); ?>" ><?= $block->getCustomerName() ?></a></span></td>
                 </tr>
                 <tr class="col-1">
-                    <td class="label"><?php echo __('Email') ?></td>
+                    <td class="label"><?= __('Email') ?></td>
                     <td><span class="text">
-                            <a href="mailto:<?php echo $block->getEmail() ?>"><?php echo $block->getEmail() ?></a>
+                            <a href="mailto:<?= $block->getEmail() ?>"><?= $block->getEmail() ?></a>
                         </span>
                     </td>
                 </tr>
                 <tr class="col-2">
-                    <td class="label"><?php echo __('Customer Group') ?></td>
-                    <td><span class="text"><?php echo $block->getCustomerGroup() ?></span></td>
+                    <td class="label"><?= __('Customer Group') ?></td>
+                    <td><span class="text"><?= $block->getCustomerGroup() ?></span></td>
                 </tr>
                 <tr class="col-3">
-                    <td class="label"><?php echo __('Currency') ?></td>
-                    <td><span class="text"><?php echo $block->getCurrency() ?></span></td>
+                    <td class="label"><?= __('Currency') ?></td>
+                    <td><span class="text"><?= $block->getCurrency() ?></span></td>
                 </tr>
                 <tr class="col-4">
-                    <td class="label"><?php echo __('Website') ?></td>
-                    <td><span class="text"><?php echo $block->getWebsite() ?></span></td>
+                    <td class="label"><?= __('Website') ?></td>
+                    <td><span class="text"><?= $block->getWebsite() ?></span></td>
                 </tr>
                 </tbody>
             </table>

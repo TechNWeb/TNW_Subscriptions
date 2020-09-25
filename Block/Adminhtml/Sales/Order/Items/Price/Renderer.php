@@ -3,16 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\Items\Price;
 
-use Magento\Weee\Block\Adminhtml\Items\Price\Renderer as WeeRenderer;
 use Magento\Sales\Model\Order\CreditMemo\Item as CreditMemoItem;
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
+use Magento\Weee\Block\Adminhtml\Items\Price\Renderer as WeeRenderer;
 
 /**
- * Class Renderer
+ * Class Renderer - renderer  block for price
  */
 class Renderer extends WeeRenderer
 {

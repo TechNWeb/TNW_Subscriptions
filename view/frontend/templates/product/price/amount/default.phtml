@@ -8,25 +8,25 @@
 ?>
 <?php if ($topMessage = $block->getMessage('top')): ?>
     <div class="subscription-price-top-messages">
-        <?php echo $block->getMessage('top') ?>
+        <?= $block->getMessage('top') ?>
     </div>
 <?php endif; ?>
-<span class="price-container <?php /* @escapeNotVerified */ echo $block->getAdjustmentCssClasses() ?>"
-        <?php echo $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
-    <span <?php if ($block->getPriceId()): ?> id="<?php /* @escapeNotVerified */ echo $block->getPriceId() ?>"<?php endif;?>
-        <?php echo($block->getPriceDisplayLabel()) ? 'data-label="' . $block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes() . '"' : '' ?>
-        data-price-amount="<?php /* @escapeNotVerified */ echo $block->getPrice(); ?>"
-        data-price-type="<?php /* @escapeNotVerified */ echo $block->getPriceType(); ?>"
-        class="price-wrapper <?php /* @escapeNotVerified */ echo $block->getPriceWrapperCss(); ?>"
-        <?php echo $block->getSchema() ? ' itemprop="price"' : '' ?>>
-        <?php echo $block->getDisplayPrice() ?>
+<span class="price-container <?= /* @escapeNotVerified */ $block->getAdjustmentCssClasses() ?>"
+        <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
+    <span <?php if ($block->getPriceId()): ?> id="<?= /* @escapeNotVerified */ $block->getPriceId() ?>"<?php endif;?>
+        <?=($block->getPriceDisplayLabel()) ? 'data-label="' . $block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes() . '"' : '' ?>
+        data-price-amount="<?= /* @escapeNotVerified */ $block->getPrice(); ?>"
+        data-price-type="<?= /* @escapeNotVerified */ $block->getPriceType(); ?>"
+        class="price-wrapper <?= /* @escapeNotVerified */ $block->getPriceWrapperCss(); ?>"
+        <?= $block->getSchema() ? ' itemprop="price"' : '' ?>>
+        <?= $block->getDisplayPrice() ?>
     </span>
     <?php if ($block->getSchema()): ?>
-        <meta itemprop="priceCurrency" content="<?php /* @escapeNotVerified */ echo $block->getDisplayCurrencyCode()?>" />
+        <meta itemprop="priceCurrency" content="<?= /* @escapeNotVerified */ $block->getDisplayCurrencyCode()?>" />
     <?php endif; ?>
 </span>
 <?php if ($bottomMessage = $block->getMessage('bottom')): ?>
     <div class="subscription-price-bottom-messages">
-        <?php echo $bottomMessage ?>
+        <?= $bottomMessage ?>
     </div>
 <?php endif; ?>

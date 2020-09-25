@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface ProductBillingFrequencySearchResultsInterface - used to define additional functionality to be implemented
+ * for product BF
+ */
 interface ProductBillingFrequencySearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
     /**

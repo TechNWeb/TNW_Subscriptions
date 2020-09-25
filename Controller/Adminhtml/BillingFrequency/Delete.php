@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
 use Magento\Backend\App\Action\Context;
@@ -14,7 +13,7 @@ use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency;
 use TNW\Subscriptions\Model\BillingFrequency;
 
 /**
- * Class Delete
+ * Class Delete controller class
  */
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {
@@ -85,7 +84,8 @@ class Delete extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
         }
         // display error message
         $this->messageManager->addErrorMessage(__(
-            'Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then try again.'
+            'Cannot delete Billing Frequency. Remove all products from using this Billing Frequency first then'
+            . ' try again.'
         ));
         // go to grid
         return $resultRedirect->setPath('*/*/');

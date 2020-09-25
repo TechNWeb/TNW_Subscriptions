@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Product;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
@@ -112,7 +111,8 @@ class ListProduct extends OrigListProduct
     /**
      * Create and return buttons block HTML with params.
      *
-     * @return string
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getButtonsHtml()
     {
@@ -156,7 +156,9 @@ class ListProduct extends OrigListProduct
      */
     private function getFrequencyTrialWithUnit($period, $unitId)
     {
-        return strtolower($period . ' ' . $this->trialLengthUnitType->getLabelByValueAndLength((int) $unitId, $period));
+        return strtolower(
+            $period . ' ' . $this->trialLengthUnitType->getLabelByValueAndLength((int) $unitId, $period)
+        );
     }
 
     /**

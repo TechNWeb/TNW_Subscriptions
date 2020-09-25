@@ -3,18 +3,17 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\Paypal;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
-use Magento\Framework\Session\Generic;
-use TNW\Subscriptions\Model\Payment\Paypal\SecureToken;
 use Magento\Framework\Module\Manager;
+use Magento\Framework\Session\Generic;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Quote\Model\Quote;
+use TNW\Subscriptions\Model\Payment\Paypal\SecureToken;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -25,11 +24,12 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 class RequestSecureToken extends \Magento\Framework\App\Action\Action
 {
     /**
-     *
+     *  Edit state value
      */
     const STATE_EDIT = 'edit';
+
     /**
-     *
+     * State name value
      */
     const STATE_NAME = 'state';
 

@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Controller\Adminhtml\Message;
 
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class View - action controller
+ */
 class View extends \Magento\Backend\App\Action
 {
     /**

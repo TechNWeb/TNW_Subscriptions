@@ -3,13 +3,18 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
 use Magento\Framework\DataObject;
 
+/**
+ * Class Validate - controller
+ */
 class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
+    /**
+     *  Message key value
+     */
     const DEFAULT_MESSAGE_KEY = 'message';
 
     /**

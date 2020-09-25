@@ -11,10 +11,10 @@
     <div class="addtocart-tabs" data-mage-init='{"tabs":{"openedState":"active"}}'>
         <div class="content-container">
             <div class="tab-content subscribe-tab" id="subscribe-tab" data-role="content">
-                <?php echo $block->getChildHtml('updatecart_subscribe') ?>
+                <?= $block->getChildHtml('updatecart_subscribe') ?>
             </div>
         </div>
     </div>
  <?php else: ?>
-     <?php echo $block->getChildHtml('addtocart_orig') ?>
+     <?= $block->getChildHtml('addtocart_orig') ?>
 <?php endif ?>

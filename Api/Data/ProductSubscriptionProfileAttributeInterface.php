@@ -10,6 +10,9 @@ namespace TNW\Subscriptions\Api\Data;
  */
 interface ProductSubscriptionProfileAttributeInterface extends \Magento\Eav\Api\Data\AttributeInterface
 {
+    /**
+     * Is visible on front field name
+     */
     const IS_VISIBLE_ON_FRONT = 'is_visible_on_front';
 
     /**

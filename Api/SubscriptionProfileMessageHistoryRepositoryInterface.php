@@ -11,6 +11,10 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileMessageHistoryInterface;
 
+/**
+ * Interface SubscriptionProfileMessageHistoryRepositoryInterface - determines the functionality to implement for
+ * subscription profile message history repository
+ */
 interface SubscriptionProfileMessageHistoryRepositoryInterface
 {
     /**

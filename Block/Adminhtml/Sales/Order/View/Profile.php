@@ -1,6 +1,13 @@
 <?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\View;
 
+/**
+ * Class Profile- adminhtml block for profile view
+ */
 class Profile extends \Magento\Backend\Block\Template
 {
     /**
@@ -8,6 +15,13 @@ class Profile extends \Magento\Backend\Block\Template
      */
     private $itemRelationResource;
 
+    /**
+     * Profile constructor.
+     *
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource
+     * @param array $data
+     */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,

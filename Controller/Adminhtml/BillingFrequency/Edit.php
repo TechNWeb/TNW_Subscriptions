@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
+/**
+ * Class Edit - controller for edit billing frequency
+ */
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 {
     /**
@@ -78,7 +80,9 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
             $id ? __('Edit Billing Frequency') : __('New Billing Frequency')
         );
         $resultPage->getConfig()->getTitle()->prepend(__('Billing Frequencys'));
-        $resultPage->getConfig()->getTitle()->prepend($model->getId() ? $model->getTitle() : __('New Billing Frequency'));
+        $resultPage->getConfig()->getTitle()->prepend(
+            $model->getId() ? $model->getTitle() : __('New Billing Frequency')
+        );
 
         return $resultPage;
     }

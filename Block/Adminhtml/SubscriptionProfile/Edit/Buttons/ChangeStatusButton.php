@@ -3,15 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\GenericButton;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Abstract class of change status button block on Subscription Profile edit form
@@ -31,8 +30,9 @@ abstract class ChangeStatusButton extends GenericButton
      * @var StatusManager
      */
     private $statusManager;
-    
+
     /**
+     * ChangeStatusButton constructor.
      * @param Context $context
      * @param Registry $registry
      * @param StatusManager $statusManager
@@ -61,7 +61,10 @@ abstract class ChangeStatusButton extends GenericButton
      */
     protected function getUpdateUrl()
     {
-        return $this->getUrl('*/*/updatestatus', ['entity_id' => $this->getModelId(), 'status' => $this->getStatus()]);
+        return $this->getUrl('*/*/updatestatus', [
+            'entity_id' => $this->getModelId(),
+            'status' => $this->getStatus()
+        ]);
     }
 
     /**
@@ -82,7 +85,6 @@ abstract class ChangeStatusButton extends GenericButton
     protected function canChangeStatus()
     {
         $profile = $this->getCurrentSubscriptionProfile();
-        
         return $this->statusManager->canChangeStatus($profile, $this->getStatus());
     }
 

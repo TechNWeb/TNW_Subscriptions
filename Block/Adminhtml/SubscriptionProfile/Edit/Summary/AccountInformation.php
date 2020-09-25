@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -231,6 +229,8 @@ class AccountInformation extends Template
      * Return customer group
      *
      * @return string
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomerGroup()
     {

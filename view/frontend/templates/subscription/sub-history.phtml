@@ -10,16 +10,16 @@
 <?php if ($subscriptionsCollection && count($subscriptionsCollection)): ?>
     <div class="table-wrapper subscriptions-history">
         <table class="data table table-subscriptions-items history" id="my-subscriptions-table">
-            <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Subscriptions') ?></caption>
+            <caption class="table-caption"><?= /* @escapeNotVerified */ __('Subscriptions') ?></caption>
             <thead>
             <tr>
                 <th scope="col" class="col icon"></th>
-                <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Subscription #') ?></th>
-                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Next Payment On') ?></th>
-                <th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Billing Frequency') ?></th>
-                <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Status') ?></th>
-                <th scope="col" class="col next-payment"><?php /* @escapeNotVerified */ echo __('Next Payment') ?></th>
-                <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Action') ?></th>
+                <th scope="col" class="col id"><?= /* @escapeNotVerified */ __('Subscription #') ?></th>
+                <th scope="col" class="col date"><?= /* @escapeNotVerified */ __('Next Payment On') ?></th>
+                <th scope="col" class="col date"><?= /* @escapeNotVerified */ __('Billing Frequency') ?></th>
+                <th scope="col" class="col status"><?= /* @escapeNotVerified */ __('Status') ?></th>
+                <th scope="col" class="col next-payment"><?= /* @escapeNotVerified */ __('Next Payment') ?></th>
+                <th scope="col" class="col actions"><?= /* @escapeNotVerified */ __('Action') ?></th>
             </tr>
             </thead>
             <tbody>
@@ -27,44 +27,44 @@
                 <tr>
                     <td data-th="" class="sub-icons-container">
                         <?php if ($block->getIconSubClass($subscription)): ?>
-                            <div class="sub-icon tooltip-toggle <?php echo $block->getIconSubClass($subscription) ?>"></div>
+                            <div class="sub-icon tooltip-toggle <?= $block->getIconSubClass($subscription) ?>"></div>
                         <?php endif; ?>
                         <div class="sub-message tooltip-content">
-                            <?php echo $block->getStatusMessage($subscription) ?>
+                            <?= $block->getStatusMessage($subscription) ?>
                         </div>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Subscription #')) ?>" class="col id">
-                        <a href="<?php echo $block->getEditUrl($subscription) ?>">
-                            <?php /* @escapeNotVerified */ echo $subscription->getLabel() ?>
+                    <td data-th="<?= $block->escapeHtml(__('Subscription #')) ?>" class="col id">
+                        <a href="<?= $block->getEditUrl($subscription) ?>">
+                            <?= /* @escapeNotVerified */ $subscription->getLabel() ?>
                         </a>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Next Payment On')) ?>" class="col date">
-                        <?php /* @escapeNotVerified */ echo $block->getNextPaymentFormatted($subscription); ?>
+                    <td data-th="<?= $block->escapeHtml(__('Next Payment On')) ?>" class="col date">
+                        <?= /* @escapeNotVerified */ $block->getNextPaymentFormatted($subscription); ?>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Billing Frequency')) ?>" class="col date">
-                        <?php /* @escapeNotVerified */ echo $block->getBillingFrequency($subscription->getId()); ?>
+                    <td data-th="<?= $block->escapeHtml(__('Billing Frequency')) ?>" class="col date">
+                        <?= /* @escapeNotVerified */ $block->getBillingFrequency($subscription->getId()); ?>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>"
-                        class="col status <?php echo $block->getStatusClass($subscription->getStatus())?>">
-                        <?php /* @escapeNotVerified */ echo $block->getStatusLabel($subscription->getStatus()) ?>
+                    <td data-th="<?= $block->escapeHtml(__('Status')) ?>"
+                        class="col status <?= $block->getStatusClass($subscription->getStatus())?>">
+                        <?= /* @escapeNotVerified */ $block->getStatusLabel($subscription->getStatus()) ?>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Next Payment')) ?>" class="col next-payment">
-                        <?php /* @escapeNotVerified */ echo $block->formatPrice($subscription->getGrandTotal(), $subscription->getCurrencyCode()) ?>
+                    <td data-th="<?= $block->escapeHtml(__('Next Payment')) ?>" class="col next-payment">
+                        <?= /* @escapeNotVerified */ $block->formatPrice($subscription->getGrandTotal(), $subscription->getCurrencyCode()) ?>
                     </td>
-                    <td data-th="<?php echo $block->escapeHtml(__('Action')) ?>" class="col actions">
+                    <td data-th="<?= $block->escapeHtml(__('Action')) ?>" class="col actions">
                         <?php if ($block->canHoldSubscription($subscription)): ?>
-                            <a href="<?php /* @escapeNotVerified */ echo $block->getHoldUrl($subscription->getId()) ?>" class="action sub-hold">
-                                <span><?php /* @escapeNotVerified */ echo __('Hold') ?></span>
+                            <a href="<?= /* @escapeNotVerified */ $block->getHoldUrl($subscription->getId()) ?>" class="action sub-hold">
+                                <span><?= /* @escapeNotVerified */ __('Hold') ?></span>
                             </a>
                         <?php endif; ?>
                         <?php if ($block->canReActiveSubscription($subscription)): ?>
-                            <a href="<?php /* @escapeNotVerified */ echo $block->getReActivateUrl($subscription->getId()) ?>" class="action sub-reactivate">
-                                <span><?php /* @escapeNotVerified */ echo __('Re-activate') ?></span>
+                            <a href="<?= /* @escapeNotVerified */ $block->getReActivateUrl($subscription->getId()) ?>" class="action sub-reactivate">
+                                <span><?= /* @escapeNotVerified */ __('Re-activate') ?></span>
                             </a>
                         <?php endif; ?>
                         <?php if ($block->canCancelSubscription($subscription)): ?>
-                            <a href="<?php /* @escapeNotVerified */ echo $block->getCancelUrl($subscription->getId()) ?>" class="action sub-cancel">
-                                <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
+                            <a href="<?= /* @escapeNotVerified */ $block->getCancelUrl($subscription->getId()) ?>" class="action sub-cancel">
+                                <span><?= /* @escapeNotVerified */ __('Cancel') ?></span>
                             </a>
                         <?php endif; ?>
                     </td>
@@ -74,10 +74,10 @@
         </table>
     </div>
     <?php if ($block->getPagerHtml()): ?>
-        <div class="subscriptions-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+        <div class="subscriptions-products-toolbar toolbar bottom"><?= $block->getPagerHtml(); ?></div>
     <?php endif ?>
 <?php else: ?>
     <div class="message info empty">
-        <span><?php /* @escapeNotVerified */ echo __('You have placed no subscriptions.'); ?></span>
+        <span><?= /* @escapeNotVerified */ __('You have placed no subscriptions.'); ?></span>
     </div>
 <?php endif ?>

@@ -3,12 +3,16 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
+/**
+ * Class Index - controller for index billing frequency action
+ */
 class Index extends \Magento\Backend\App\Action
 {
-
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
     protected $resultPageFactory;
 
     /**

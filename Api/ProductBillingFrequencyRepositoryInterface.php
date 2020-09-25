@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface ProductBillingFrequencyRepositoryInterface - determines the functionality to implement for
+ * product billing frequency repository
+ */
 interface ProductBillingFrequencyRepositoryInterface
 {
     /**

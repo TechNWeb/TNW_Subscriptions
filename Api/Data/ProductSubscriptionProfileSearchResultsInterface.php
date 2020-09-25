@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface ProductSubscriptionProfileSearchResultsInterface - extends default to be implemented functionality for
+ * product subscription profile search results
+ */
 interface ProductSubscriptionProfileSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
     /**

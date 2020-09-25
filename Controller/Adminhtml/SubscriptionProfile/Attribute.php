@@ -3,15 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
-/**
- * Subscription profile attribute controller
- */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
-use Magento\Framework\Controller\Result;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+* Subscription profile attribute controller
+*/
 abstract class Attribute extends \Magento\Backend\App\Action
 {
     /**
@@ -20,11 +18,6 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * @see _isAllowed()
      */
     const ADMIN_RESOURCE = 'TNW_Subscriptions::SubscriptionProfile_attributes';
-
-//    /**
-//     * @var \Magento\Framework\Cache\FrontendInterface
-//     */
-//    protected $_attributeLabelCache;
 
     /**
      * @var string
@@ -56,7 +49,6 @@ abstract class Attribute extends \Magento\Backend\App\Action
         PageFactory $resultPageFactory
     ) {
         $this->_coreRegistry = $coreRegistry;
-        //$this->_attributeLabelCache = $attributeLabelCache;
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
@@ -103,8 +95,9 @@ abstract class Attribute extends \Magento\Backend\App\Action
     /**
      * Generate code from label
      *
-     * @param string $label
-     * @return string
+     * @param $label
+     * @return bool|string
+     * @throws \Zend_Validate_Exception
      */
     protected function generateCode($label)
     {

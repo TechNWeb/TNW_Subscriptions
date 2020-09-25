@@ -9,6 +9,9 @@ use Magento\Backend\Block\Widget\Button\SplitButton;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
+/**
+ * Class Download - Adminhtml for message download button
+ */
 class Download implements ButtonProviderInterface
 {
     /**

@@ -5,13 +5,15 @@
  */
 namespace TNW\Subscriptions\Controller\SecureAcceptance;
 
-use \Magento\Framework\App\RequestInterface;
-use \Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
 
 /**
- * Class ReceiveToken
+ * Class ReceiveToken - controller
  */
-class ReceiveToken extends \Magento\Framework\App\Action\Action implements \Magento\Framework\App\CsrfAwareActionInterface
+class ReceiveToken extends Action implements CsrfAwareActionInterface
 {
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory

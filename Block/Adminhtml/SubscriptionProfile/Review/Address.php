@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review;
 
 use Magento\Backend\Block\Template;
@@ -53,23 +52,21 @@ class Address extends Template
 
     /**
      * Address constructor.
-     *
      * @param Template\Context $context
      * @param CreateProfile $create
      * @param Config $addressConfig
      * @param SubscriptionProfileRepositoryInterface $profileRepository
-     * @param string $addressType
      * @param $profileState
+     * @param string $addressType
      * @param array $data
-     * @internal param Registry $registry
      */
     public function __construct(
         Template\Context $context,
         CreateProfile $create,
         Config $addressConfig,
         SubscriptionProfileRepositoryInterface $profileRepository,
-        $addressType = QuoteAddress::ADDRESS_TYPE_SHIPPING,
         $profileState,
+        $addressType = QuoteAddress::ADDRESS_TYPE_SHIPPING,
         array $data = []
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/address.phtml');

@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface SubscriptionProfileMessageHistoryInterface - defaines functionality to implement in subscription
+ * messange history
+ */
 interface SubscriptionProfileMessageHistoryInterface
 {
     /**#@+

@@ -11,6 +11,10 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface;
 
+/**
+ * Interface SubscriptionProfileAddressRepositoryInterface - determines the functionality to implement for
+ * for subscription profile address repository
+ */
 interface SubscriptionProfileAddressRepositoryInterface
 {
     /**

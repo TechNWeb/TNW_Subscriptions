@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Console\Command;
 
 use Magento\Framework\App\State;
@@ -44,6 +43,7 @@ class ProcessCommand extends Base
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
      * @param ProfileProcessor $profileProcessor
+     * @throws FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,

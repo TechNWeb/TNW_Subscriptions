@@ -3,14 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action;
+use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\DataObject;
-use Magento\Customer\Model\ResourceModel\CustomerRepository;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
@@ -76,11 +75,11 @@ class CheckCustomerEmail extends Action
         }
 
         if (isset($customer) && $customer && $customer->getId()) {
-            $customerName = $customer->getFirstname() . ' ' .  $customer->getLastname();
+            $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
             $response->setData('customerName', $customerName);
             $response->setData('customerEmail', $email);
 
-            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . ' ' .  $customer->getLastname());
+            $this->dataPersistor->set('existsCustomerName', $customer->getFirstname() . ' ' . $customer->getLastname());
             $this->dataPersistor->set('existsCustomerEmail', $email);
             $this->dataPersistor->set('existsCustomerId', $customer->getId());
         } else {

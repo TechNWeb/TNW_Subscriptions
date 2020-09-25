@@ -4,13 +4,11 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Block\Subscription;
 
 use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProfileCcUtils;

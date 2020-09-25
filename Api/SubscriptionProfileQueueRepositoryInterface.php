@@ -11,6 +11,10 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface;
 
+/**
+ * Interface SubscriptionProfileQueueRepositoryInterface - determines the functionality to implement for
+ * subscription profile queue repository
+ */
 interface SubscriptionProfileQueueRepositoryInterface
 {
     /**

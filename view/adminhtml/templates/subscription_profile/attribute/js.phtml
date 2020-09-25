@@ -108,7 +108,7 @@
 
             switch (currentValue) {
             <?php foreach ($this->helper('Magento\Catalog\Helper\Data')->getAttributeHiddenFields() as $type => $fields): ?>
-                case '<?php /* @escapeNotVerified */ echo $type; ?>':
+                case '<?= /* @escapeNotVerified */ $type; ?>':
                 <?php foreach ($fields as $one): ?>
                     <?php if ($one == '_front_fieldset'): ?>
                     //getFrontTab().hide();
@@ -120,7 +120,7 @@
                 <?php elseif ($one == '_scope'): ?>
                     scopeVisibility = false;
                 <?php else: ?>
-                    setRowVisibility('<?php /* @escapeNotVerified */ echo $one; ?>', false);
+                    setRowVisibility('<?= /* @escapeNotVerified */ $one; ?>', false);
                 <?php endif; ?>
                 <?php endforeach; ?>
                     break;

@@ -7,6 +7,10 @@ namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Framework\Api\SearchResultsInterface;
 
+/**
+ * Interface SubscriptionProfileOrderSearchResultsInterface - determines the additional functionality to implement for
+ * subscription profile order search result
+ */
 interface SubscriptionProfileOrderSearchResultsInterface extends SearchResultsInterface
 {
     /**

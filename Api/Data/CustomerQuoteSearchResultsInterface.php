@@ -8,7 +8,8 @@ namespace TNW\Subscriptions\Api\Data;
 use Magento\Framework\Api\SearchResultsInterface;
 
 /**
- * Interface CustomerQuoteSearchResultsInterface
+ * Interface CustomerQuoteSearchResultsInterface - determines additional functionality to be implemented in Customer
+ * Quote search result
  */
 interface CustomerQuoteSearchResultsInterface extends SearchResultsInterface
 {
