@@ -6,18 +6,51 @@
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
+use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Service\Serializer;
 
 /**
  * Configurable product manager.
  */
 class Configurable extends Base
 {
+    /**
+     * Configurable constructor.
+     * @param Config $config
+     * @param PriceCalculator $priceCalculator
+     * @param ProductFrequencyRepository $productFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductRepositoryInterface $productRepository
+     * @param Serializer $serializer
+     */
+    public function __construct(
+        Config $config,
+        PriceCalculator $priceCalculator,
+        ProductFrequencyRepository $productFrequencyRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductRepositoryInterface $productRepository,
+        Serializer $serializer
+    ) {
+        parent::__construct(
+            $config,
+            $priceCalculator,
+            $productFrequencyRepository,
+            $searchCriteriaBuilder,
+            $productRepository,
+            $serializer
+        );
+    }
+
     /**
      * @inheritdoc
      */
