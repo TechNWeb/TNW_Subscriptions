@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
 
 use Magento\Customer\Api\AddressMetadataInterface;
@@ -174,6 +173,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         $fieldSetsChildren = $this->getFieldSetsChildren();
 
+        $children = array_merge(
+            $this->getButtonsSet(),
+            $fieldSetsChildren[static::ADDRESS_FIELDSET_NAME],
+            $this->getAddressIdMeta()
+        );
         $meta = array_merge_recursive(
             $meta,
             [
@@ -201,11 +205,7 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                             ],
                         ],
                     ],
-                    'children' => array_merge(
-                        $this->getButtonsSet(),
-                        $fieldSetsChildren[static::ADDRESS_FIELDSET_NAME],
-                        $this->getAddressIdMeta()
-                    )
+                    'children' => $children
                 ],
             ]
         );
@@ -943,13 +943,9 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             $lineCount = $addressAttribute->getMultilineCount();
             $i = 0;
             do {
-                $attributeLineData = [
-                    $attributeCode . $i => isset($addressData[$attributeCode][$i])
+                $attributeData[$attributeCode . $i] = isset($addressData[$attributeCode][$i])
                         ? $addressData[$attributeCode][$i]
-                        : '',
-                ];
-
-                $attributeData = array_merge($attributeData, $attributeLineData);
+                        : '';
                 $i++;
                 $lineCount--;
             } while ($lineCount > 0);

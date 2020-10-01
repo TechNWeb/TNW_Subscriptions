@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model\Config\Source;
 
 /**
- * Class FreeShipping
+ * Class FreeShipping - config source
  */
 class FreeShipping implements \Magento\Framework\Option\ArrayInterface
 {

@@ -8,8 +8,11 @@ namespace TNW\Subscriptions\Model\Payment\Cybersource;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
-use \Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 
+/**
+ * Class TokenExtractor - cybersource
+ */
 class TokenExtractor
 {
     /**
@@ -67,6 +70,10 @@ class TokenExtractor
         ];
     }
 
+    /**
+     * @param $quote
+     * @return PaymentTokenInterface
+     */
     private function getVaultPaymentToken($quote)
     {
         $quotePayment = $quote->getPayment();
@@ -90,6 +97,10 @@ class TokenExtractor
         return $paymentToken;
     }
 
+    /**
+     * @param $paymentData
+     * @return string
+     */
     private function _getExpirationDate($paymentData)
     {
         $time = sprintf(

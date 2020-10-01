@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
@@ -99,14 +98,14 @@ class ConfigurableForm extends AbstractDataProvider
         $this->registry = $registry;
         $this->pool = $pool;
         $this->formContext = $formContext;
-        $this->scopeName = $scope ? $scope : self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM .'.'.  self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM;
+        $this->scopeName = $scope ? $scope : self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM
+            . '.' . self::DATA_SCOPE_CONFIGURABLE_MODAL_FORM;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
     /**
-     * Get data
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -177,6 +176,7 @@ class ConfigurableForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+        return $this;
     }
 
     /**
@@ -190,9 +190,8 @@ class ConfigurableForm extends AbstractDataProvider
     }
 
     /**
-     * Returns product.
-     *
-     * @return MagentoProduct
+     * @return \Magento\Catalog\Api\Data\ProductInterface|MagentoProduct
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getCurrentProduct()
     {
@@ -212,11 +211,12 @@ class ConfigurableForm extends AbstractDataProvider
      * Check product preset qty field.
      *
      * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function isSubscriptionPresetQty()
     {
         $product = $this->getCurrentProduct();
 
-        return (bool)$product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
+        return (bool) $product->getData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
     }
 }

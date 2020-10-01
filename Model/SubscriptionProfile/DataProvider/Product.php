@@ -11,22 +11,22 @@ use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
-use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Form\Element\Select;
+use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\Source\CurrencySelect;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
-use TNW\Subscriptions\Model\Source\CurrencySelect;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 /**
  * Class Product - dataprovider for susbcription profile porudct
@@ -170,9 +170,8 @@ class Product extends AbstractDataProvider
     }
 
     /**
-     * Get data
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -202,7 +201,7 @@ class Product extends AbstractDataProvider
                 }
                 $qty = !empty($fullSubscriptionData[Create::UNIQUE]['use_preset_qty']) ? 1 : $item->getQty();
                 $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
-                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty: 0;
+                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
 
                 $imageHelper = $this->formContext->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
 
@@ -232,7 +231,7 @@ class Product extends AbstractDataProvider
             $fullSubscriptionData[Create::NON_UNIQUE]['isVirtual'] = $subQuote->isVirtual();
 
             $items[] = [
-                'title' => __('Subscription') . ' #' . $counter++,
+                'title' => __('Subscription') . ' #' . ($counter++),
                 'products' => $products,
                 'frequency_description' => $this->frequencyDescriptionCreator->getDescription($fullSubscriptionData),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
@@ -316,6 +315,7 @@ class Product extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+        return $this;
     }
 
     /**
@@ -440,8 +440,8 @@ class Product extends AbstractDataProvider
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'additionalClasses'=>
-                                    'admin__fieldset-section subscription-profile-products-container',
+                                'additionalClasses' => 'admin__fieldset-section '
+                                    . 'subscription-profile-products-container',
                                 'label' => false,
                                 'collapsible' => false,
                                 'componentType' => Fieldset::NAME,

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface;
@@ -16,7 +15,8 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as ResourceProductSubscriptionProfile;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory as ProductSubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory
+    as ProductSubscriptionProfileCollectionFactory;
 
 /**
  * Repository for subscription profile products
@@ -95,7 +95,9 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     }
 
     /**
-     * @inheritdoc
+     * @param string $productSubscriptionProfileId
+     * @return ProductSubscriptionProfileInterface|ProductSubscriptionProfile
+     * @throws NoSuchEntityException
      */
     public function getById($productSubscriptionProfileId)
     {

@@ -17,18 +17,6 @@ use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 class Totals extends Template
 {
     /**
-     * Totals constructor.
-     * @param Template\Context $context
-     * @param array $data
-     */
-    public function __construct(
-        Template\Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
-    /**
      * Get totals source object
      *
      * @return Order

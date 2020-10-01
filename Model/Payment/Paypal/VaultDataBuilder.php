@@ -12,7 +12,7 @@ use Magento\Framework\ObjectManagerInterface as ObjectManager;
 use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
- * Class VaultDataBuilder
+ * Class VaultDataBuilder - vault paypal data builder
  */
 class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -24,12 +24,12 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
     const TENDER_CC = 'C';
 
     /**
-     *
+     * Pnref field name
      */
     const PNREF = 'pnref';
 
     /**
-     *
+     * Auth type transaction code
      */
     const TRXTYPE_AUTH_ONLY = 'A';
 
@@ -73,7 +73,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         ModuleManager $moduleManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->config = $objectManager->get("Magento\Paypal\Model\PayflowConfig");
+            $this->config = $objectManager->get(\Magento\Paypal\Model\PayflowConfig::class);
         }
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->manager = $manager;

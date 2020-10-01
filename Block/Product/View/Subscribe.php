@@ -215,9 +215,9 @@ class Subscribe extends View
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function IsOnlySubscribePurchase()
+    public function isOnlySubscribePurchase()
     {
-        if ($this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
+        if ($this->subscriptionProductViewConfig->isOneTimeAndSubscribePurchase($this->getProduct())
             && $this->getPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
         ) {
             return true;
@@ -231,10 +231,10 @@ class Subscribe extends View
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function IsOneTimeAndSubscribePurchase()
+    public function isOneTimeAndSubscribePurchase()
     {
         return $this->getPurchaseType() ===  PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
-            && $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
+            && $this->subscriptionProductViewConfig->isOneTimeAndSubscribePurchase($this->getProduct());
     }
 
     /**

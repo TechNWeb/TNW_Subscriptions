@@ -57,9 +57,8 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     }
 
     /**
-     * @return \Magento\Framework\Controller\ResultInterface
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
+     * @throws \Zend_Validate_Exception
      */
     public function execute()
     {
@@ -111,7 +110,7 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     {
         $adminValues = [];
         foreach ($optionsValues as $optionKey => $values) {
-            if (!(isset($deletedOptions[$optionKey]) and $deletedOptions[$optionKey] === '1')) {
+            if (!(isset($deletedOptions[$optionKey]) && $deletedOptions[$optionKey] === '1')) {
                 $adminValues[] = reset($values);
             }
         }

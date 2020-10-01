@@ -5,12 +5,6 @@
  */
 namespace TNW\Subscriptions\Pricing\Render;
 
-use Magento\Framework\Pricing\Amount\AmountInterface;
-use Magento\Framework\Pricing\SaleableInterface;
-use Magento\Framework\Pricing\Price\PriceInterface;
-use Magento\Framework\Pricing\PriceCurrencyInterface;
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\Pricing\Render\RendererPool;
 use Magento\Framework\Pricing\Render\Amount as BaseAmount;
 
 /**
@@ -18,29 +12,6 @@ use Magento\Framework\Pricing\Render\Amount as BaseAmount;
  */
 class SubscriptionAmount extends BaseAmount
 {
-    /**
-     * Subscription Amount constructor.
-     *
-     * @param Template\Context $context
-     * @param AmountInterface $amount
-     * @param PriceCurrencyInterface $priceCurrency
-     * @param RendererPool $rendererPool
-     * @param SaleableInterface|null $saleableItem
-     * @param PriceInterface|null $price
-     * @param array $data
-     */
-    public function __construct(
-        Template\Context $context,
-        AmountInterface $amount,
-        PriceCurrencyInterface $priceCurrency,
-        RendererPool $rendererPool,
-        SaleableInterface $saleableItem = null,
-        PriceInterface $price = null,
-        array $data = []
-    ) {
-        parent::__construct($context, $amount, $priceCurrency, $rendererPool, $saleableItem, $price, $data);
-    }
-
     /**
      * Retrieve top|bottom message to subscription price.
      *

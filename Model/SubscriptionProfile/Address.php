@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Customer\Api\Data\AddressInterface;
@@ -15,7 +14,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Address as ResourceAddress;
 
 /**
- * Class Address
+ * Class Address - subscription profile address model
  */
 class Address extends AbstractModel implements SubscriptionProfileAddressInterface
 {

@@ -10,7 +10,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
- * Class Address
+ * Class Address - block address summary
  */
 class Address extends BaseSummary
 {

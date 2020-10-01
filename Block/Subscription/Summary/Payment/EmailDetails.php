@@ -68,7 +68,11 @@ class EmailDetails extends BaseSummary
             return null;
         }
         $path = 'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title';
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->getStore());
+        return $this->_scopeConfig->getValue(
+            $path,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()
+        );
     }
 
     /**

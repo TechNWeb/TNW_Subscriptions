@@ -9,7 +9,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Client
+ * Class Client - paypal client
  */
 class Client
 {
@@ -28,7 +28,7 @@ class Client
         ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->gateway  = $objectManager->get("Magento\Paypal\Model\Payflow\Service\Gateway");
+            $this->gateway  = $objectManager->get(\Magento\Paypal\Model\Payflow\Service\Gateway::class);
         }
     }
 

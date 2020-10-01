@@ -68,8 +68,11 @@ class Details extends BaseSummary
      */
     public function getPaymentMethodTitle()
     {
-        $path = 'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title';
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->getStore());
+        return $this->_scopeConfig->getValue(
+            'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()
+        );
     }
 
     /**

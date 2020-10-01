@@ -1106,7 +1106,10 @@ class InstallSchema implements InstallSchemaInterface
             )->addIndex(
                 $setup->getIdxName(
                     $entityTable,
-                    [ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID, ProductSubscriptionProfile::MAGENTO_PRODUCT_ID]
+                    [
+                        ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID,
+                        ProductSubscriptionProfile::MAGENTO_PRODUCT_ID
+                    ]
                 ),
                 [ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID, ProductSubscriptionProfile::MAGENTO_PRODUCT_ID],
                 ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]

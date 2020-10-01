@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Directory\Model\Currency;
@@ -15,7 +14,7 @@ use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
- * Class CurrencySelect
+ * Class CurrencySelect - source for currencies
  */
 class CurrencySelect extends AbstractSource
 {

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -21,6 +20,9 @@ use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency as ResourceBillingFrequency;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory as BillingFrequencyCollectionFactory;
 
+/**
+ * Class BillingFrequencyRepository - repository model for billing frequencies
+ */
 class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
 {
     /**
@@ -184,7 +186,7 @@ class BillingFrequencyRepository implements BillingFrequencyRepositoryInterface
             $this->dataObjectHelper->populateWithArray(
                 $billingFrequencyData,
                 $billingFrequencyModel->getData(),
-                'TNW\Subscriptions\Api\Data\BillingFrequencyInterface'
+                \TNW\Subscriptions\Api\Data\BillingFrequencyInterface::class
             );
             $items[] = $billingFrequencyData;
         }

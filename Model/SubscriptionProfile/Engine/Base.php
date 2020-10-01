@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -19,7 +18,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
- * Class Base
+ * Class Base- base class for payment processors
  */
 class Base implements EngineInterface
 {

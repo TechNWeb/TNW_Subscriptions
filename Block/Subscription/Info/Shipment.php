@@ -176,14 +176,6 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
             ->getItems();
 
         foreach ($addressesList as $address) {
-            $streetData = [];
-            if ($address->getStreet()) {
-                foreach ($address->getStreet() as $key => $streetValue) {
-                    $streetKey = 'street_' . ($key + 1);
-                    $streetData[$streetKey] = $streetValue;
-                }
-            }
-
             $addressData = [
                 'firstname' => $address->getFirstname(),
                 'lastname' => $address->getLastname(),
@@ -198,7 +190,14 @@ class Shipment extends ContentAbstract implements ExpireWarningSupportInterface
                 'country' => $address->getCountryId(),
             ];
 
-            $result[$address->getId()] = array_merge($addressData, $streetData);
+            if ($address->getStreet()) {
+                foreach ($address->getStreet() as $key => $streetValue) {
+                    $streetKey = 'street_' . ($key + 1);
+                    $addressData[$streetKey] = $streetValue;
+                }
+            }
+
+            $result[$address->getId()] = $addressData;
 
         }
 

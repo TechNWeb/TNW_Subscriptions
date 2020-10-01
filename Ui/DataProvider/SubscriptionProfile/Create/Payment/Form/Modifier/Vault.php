@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Framework\DataObject;
@@ -18,7 +17,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class Vault
+ * Class Vault modifier
  */
 class Vault extends Base
 {
@@ -142,7 +141,7 @@ class Vault extends Base
         }
         if ($this->tokensConfigProvider) {
             switch (get_class($this->tokensConfigProvider)) {
-                case 'Magento\Vault\Model\Ui\TokensConfigProvider':
+                case \Magento\Vault\Model\Ui\TokensConfigProvider::class:
                     $this->processTokensConfigData($this->tokensConfigProvider->getConfig());
                     foreach ($this->vaultMethods as $method) {
                         if (empty($this->tokensConfig[$method])) {
@@ -155,7 +154,7 @@ class Vault extends Base
                         );
                     }
                     break;
-                case 'Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider':
+                case \Magento\Vault\Model\Ui\Adminhtml\TokensConfigProvider::class:
                     foreach ($this->vaultMethods as $method) {
                         $this->tokensConfig[$method] = $this->tokensConfigProvider->getTokensComponents($method);
                         if (empty($this->tokensConfig[$method])) {

@@ -258,7 +258,6 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
      */
     public function getTaxAmount($subscriptionProfile)
     {
-        $taxDetails = [];
         try {
             $taxClassKey = $this->taxClassKeyFactory->create();
             $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
@@ -287,7 +286,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
             $storeId = null;
             $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
         } catch (\Exception $e) {
-            //empty catch for backward compatibility
+            $taxDetails = [];
         }
         return isset($taxDetails['tax_amount']) ? $taxDetails['tax_amount'] : 0;
     }

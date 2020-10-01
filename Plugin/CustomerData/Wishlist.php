@@ -58,7 +58,9 @@ class Wishlist
             }
         }
         $onlySubscribeData = $this->subscriptionProductViewConfig->isOnlySubscribePurchaseByIds($productsPreset);
-        $subscribeAndAddtocartData = $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchaseByIds($productsPreset);
+        $subscribeAndAddtocartData = $this
+            ->subscriptionProductViewConfig
+            ->isOneTimeAndSubscribePurchaseByIds($productsPreset);
         foreach ($result['items'] as $key => &$element) {
             $rt = array_filter($productsPreset, function ($value) use ($element) {
                 return $value == $element['product_name'];

@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
- * Class PayflowPro
+ * Class PayflowPro - used to rpocess save of subscription payed via payflowpro
  */
 class PayflowPro extends Base
 {
@@ -27,6 +27,7 @@ class PayflowPro extends Base
 
     /**
      * PayflowPro constructor.
+     *
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization

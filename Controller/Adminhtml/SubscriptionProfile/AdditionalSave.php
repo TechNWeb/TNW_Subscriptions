@@ -50,7 +50,7 @@ class AdditionalSave extends \Magento\Backend\App\Action
             $profile = $this->subscriptionProfileRepository->getById($attributesData['entity_id']);
             foreach ($attributesData as $attributeCode => $value) {
                 /** @var \Magento\Eav\Model\Entity\Attribute\AbstractAttribute $attribute */
-                $attribute = $this->_objectManager->get('Magento\Eav\Model\Config')
+                $attribute = $this->_objectManager->get(\Magento\Eav\Model\Config::class)
                     ->getAttribute(\TNW\Subscriptions\Model\SubscriptionProfile::ENTITY, $attributeCode);
 
                 if (!$attribute->getAttributeId()) {

@@ -86,7 +86,7 @@ class Attribute
      */
     private function getDefaultValues()
     {
-        if (is_null($this->defaultValues)) {
+        if ($this->defaultValues === null) {
             $this->defaultValues = $this->productDefaultAttributes->getDefaultValues();
         }
 

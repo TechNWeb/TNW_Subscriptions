@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Plugin\BillingFrequency;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;

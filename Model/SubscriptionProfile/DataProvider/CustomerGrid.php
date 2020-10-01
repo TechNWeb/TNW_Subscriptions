@@ -3,14 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Customer\Model\ResourceModel\Grid\CollectionFactory;
 
 /**
- * Class CustomerGrid
+ * Class CustomerGrid - dataProvider for customer grid
  */
 class CustomerGrid extends AbstractDataProvider
 {

@@ -5,10 +5,12 @@
  */
 namespace TNW\Subscriptions\Controller\Subscription\Products;
 
+use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
+use Magento\Catalog\Controller\Product\View\ViewInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -16,7 +18,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 /**
  * Configure product's options in saved subscription.
  */
-class Edit extends \Magento\Framework\App\Action\Action implements \Magento\Catalog\Controller\Product\View\ViewInterface
+class Edit extends Action implements ViewInterface
 {
     /**
      * @var ProductSubscriptionProfileRepository
@@ -73,7 +75,10 @@ class Edit extends \Magento\Framework\App\Action\Action implements \Magento\Cata
         } catch (NoSuchEntityException $e) {
             $this->messageManager->addExceptionMessage(
                 $e,
-                __('Product with ID %1 could not be found. Cannot Edit the product on the Subscription Profile.', $productId)
+                __(
+                    'Product with ID %1 could not be found. Cannot Edit the product on the Subscription Profile.',
+                    $productId
+                )
             );
 
             return $this->goBack('customer/account');

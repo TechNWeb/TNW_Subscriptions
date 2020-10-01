@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -7,14 +11,14 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Config\Source\StartDateType;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Model\Config\Source\StartDateType;
 
 /**
- * Class BillingCyclesManager
+ * Class BillingCyclesManager- billing cycles managing model
  */
 class BillingCyclesManager
 {
@@ -130,7 +134,7 @@ class BillingCyclesManager
                     $cyclesCount = floor($months / $profile->getFrequency());
                     break;
                 default:
-                    throw new \Exception('Undefined length unit type.');
+                    throw new \Magento\Framework\Exception\LocalizedException(__('Undefined length unit type.'));
             }
         } else {
             // Profile has a finite count of cycles
@@ -148,13 +152,13 @@ class BillingCyclesManager
         $product = array_shift($products);
         //Calculate the list of dates for profile
         for ($i = 1; $i <= $cyclesCount; $i++) {
-             $date = $this->calculateScheduledDate(
-                 $startDate,
-                 $profile->getUnit(),
-                 $profile->getFrequency(),
-                 $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
-                 $startDay
-             );
+            $date = $this->calculateScheduledDate(
+                $startDate,
+                $profile->getUnit(),
+                $profile->getFrequency(),
+                $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
+                $startDay
+            );
             $neededDates[] = $this->format($date);
         }
         $neededDates = array_diff($neededDates, $existDates);
@@ -239,7 +243,7 @@ class BillingCyclesManager
                 $date->setDate($date->format('Y'), $date->format('n'), $startDay);
                 break;
             default:
-                throw new \Exception('Undefined length unit type.');
+                throw new \Magento\Framework\Exception\LocalizedException(__('Undefined length unit type.'));
         }
 
         return $date;

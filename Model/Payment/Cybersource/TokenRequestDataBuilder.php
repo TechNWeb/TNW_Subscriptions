@@ -90,9 +90,9 @@ class TokenRequestDataBuilder
         \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
-            $this->gatewayConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+            $this->gatewayConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
             $this->requestDataBuilder = $objectManager
-                ->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
+                ->get(\CyberSource\SecureAcceptance\Helper\RequestDataBuilder::class);
         }
         $this->localeResolver = $localeResolver;
         $this->urlBuilder = $urlBuilder;

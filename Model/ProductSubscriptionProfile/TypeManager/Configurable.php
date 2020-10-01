@@ -3,55 +3,21 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as ProductFrequencyRepository;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Service\Serializer;
+use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
  * Configurable product manager.
  */
 class Configurable extends Base
 {
-    /**
-     * Configurable constructor.
-     * @param Config $config
-     * @param PriceCalculator $priceCalculator
-     * @param ProductFrequencyRepository $productFrequencyRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ProductRepositoryInterface $productRepository
-     * @param Serializer $serializer
-     */
-    public function __construct(
-        Config $config,
-        PriceCalculator $priceCalculator,
-        ProductFrequencyRepository $productFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository,
-        Serializer $serializer
-    ) {
-        parent::__construct(
-            $config,
-            $priceCalculator,
-            $productFrequencyRepository,
-            $searchCriteriaBuilder,
-            $productRepository,
-            $serializer
-        );
-    }
-
     /**
      * @inheritdoc
      */
@@ -79,8 +45,14 @@ class Configurable extends Base
                                     $mainProduct,
                                     $subscriptionPart
                                 ),
-                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($mainProduct, $subscriptionPart),
-                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($mainProduct, $subscriptionPart),
+                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice(
+                                    $mainProduct,
+                                    $subscriptionPart
+                                ),
+                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice(
+                                    $mainProduct,
+                                    $subscriptionPart
+                                ),
                             ],
                         ],
                     ],
@@ -190,24 +162,30 @@ class Configurable extends Base
                     $productData->setData($key, $childProduct->getData($key));
                     if ($key === Attribute::SUBSCRIPTION_TRIAL_STATUS) {
                         $trialData = [
-                            Attribute::SUBSCRIPTION_TRIAL_LENGTH =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
-                            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
-                            Attribute::SUBSCRIPTION_TRIAL_PRICE =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
-                            Attribute::SUBSCRIPTION_TRIAL_START_DATE =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_TRIAL_LENGTH
+                            ),
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT
+                            ),
+                            Attribute::SUBSCRIPTION_TRIAL_PRICE => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_TRIAL_PRICE
+                            ),
+                            Attribute::SUBSCRIPTION_TRIAL_START_DATE => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_TRIAL_START_DATE
+                            )
                         ];
 
                         $productData->addData($trialData);
                     }
                     if ($key === Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT) {
                         $discountData = [
-                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
-                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
+                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT
+                            ),
+                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $childProduct->getData(
+                                Attribute::SUBSCRIPTION_DISCOUNT_TYPE
+                            ),
                         ];
 
                         $productData->addData($discountData);

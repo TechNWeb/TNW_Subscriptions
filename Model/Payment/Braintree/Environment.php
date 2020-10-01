@@ -8,16 +8,17 @@ namespace TNW\Subscriptions\Model\Payment\Braintree;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
- * Class Environment
+ * Class Environment - braintree
  */
 class Environment implements ArrayInterface
 {
     /**
-     *
+     * Production Environment value
      */
     const ENVIRONMENT_PRODUCTION = 'production';
+
     /**
-     *
+     * Sandbox Environment value
      */
     const ENVIRONMENT_SANDBOX = 'sandbox';
 

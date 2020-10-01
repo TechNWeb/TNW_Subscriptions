@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Class LoadExtensionAttributes - observer
+ */
 class LoadExtensionAttributes implements ObserverInterface
 {
     /**
@@ -15,6 +18,10 @@ class LoadExtensionAttributes implements ObserverInterface
      */
     private $extensionAttributes;
 
+    /**
+     * LoadExtensionAttributes constructor.
+     * @param \TNW\Subscriptions\Model\ResourceModel\ExtensionAttributes $extensionAttributes
+     */
     public function __construct(
         \TNW\Subscriptions\Model\ResourceModel\ExtensionAttributes $extensionAttributes
     ) {

@@ -90,7 +90,7 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
         $this->session = $session;
         $this->sessionTransparent = $sessionTransparent;
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+            $this->transparent = $objectManager->get(\Magento\Paypal\Model\Payflow\Transparent::class);
         }
         $this->secureTokenService = $secureTokenService;
         $this->profileManager = $profileManager;

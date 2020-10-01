@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Validator;
 
 use Braintree\Result\Error;
 
 /**
- * Class ErrorCodeProvider
+ * Class ErrorCodeProvider - plugin
  */
 class ErrorCodeProvider
 {

@@ -39,7 +39,6 @@ class Config
         \Closure $proceed
     ) {
         if (in_array($subject->getSection(), $this->sections)) {
-            //$subject['groups']['trial']['fields']['trial_price']['value']
             $groups = $subject->getGroups();
             foreach ($groups as $groupName => $group) {
                 foreach ($group['fields'] as $fieldName => $field) {

@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -18,7 +17,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Config
+ * Class Config - config model for subscriptions
  */
 class Config
 {
@@ -127,7 +126,7 @@ class Config
         ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-             $this->paypalConfig = $objectManager->get("Magento\Paypal\Model\Config");
+             $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
         }
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -175,7 +174,8 @@ class Config
         $result = false;
 
         if ($websiteId) {
-            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
+            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId)
+                && !empty($this->getAvailablePaymentsList($websiteId));
         } else {
             if ($this->isSubscriptionsActive === null) {
                 $this->isSubscriptionsActive = false;

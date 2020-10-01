@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -28,7 +27,9 @@ class Simple extends Base
                 $subscriptionPart = $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::UNIQUE];
                 $subscriptionPart['qty'] = $buyRequestValue['qty'];
 
-                if (isset($buyRequestValue['admin_modification']) && array_key_exists('price', $buyRequestValue)) {
+                if (isset($buyRequestValue['admin_modification'])
+                    && array_key_exists('price', $buyRequestValue)
+                ) {
                     $subscriptionPart['price'] = $buyRequestValue['price'];
                 }
 
@@ -45,13 +46,15 @@ class Simple extends Base
                 } else {
                     $updateNonUnique = [
                         'price' => $this->getSubscriptionPrice($product, $subscriptionPart),
-                        'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
+                        'current_preset_qty_price' => $this
+                            ->getSubscriptionCurrentPresetQtyPrice($product, $subscriptionPart),
                         'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($product, $subscriptionPart),
                     ];
                 }
-                $originalNonUnique = isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]) ?
-                    $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] :
-                    [];
+                $originalNonUnique =
+                    isset($buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE])
+                        ? $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE]
+                        : [];
 
                 $buyRequestValue[Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME][Create::NON_UNIQUE] = array_merge(
                     $originalNonUnique,

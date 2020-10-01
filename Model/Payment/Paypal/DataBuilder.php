@@ -11,7 +11,7 @@ use Magento\Framework\ObjectManagerInterface as ObjectManager;
 use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
- * Class DataBuilder
+ * Class DataBuilder - data builder for paypal transactions
  */
 class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -50,7 +50,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         ModuleManager $moduleManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->config = $objectManager->get("Magento\Paypal\Model\PayflowConfig");
+            $this->config = $objectManager->get(\Magento\Paypal\Model\PayflowConfig::class);
         }
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
@@ -60,7 +60,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 
     /**
      * @param \Magento\Quote\Model\Quote $quote
-     * @param $paymentData
+     * @param $paymentInfo
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Framework\UrlInterface;
@@ -7,6 +10,9 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
+/**
+ * Class Customer - ui component
+ */
 class Customer extends Column
 {
     /**
@@ -14,6 +20,14 @@ class Customer extends Column
      */
     private $urlBuilder;
 
+    /**
+     * Customer constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param UrlInterface $urlBuilder
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,

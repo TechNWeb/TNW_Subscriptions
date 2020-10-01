@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model\Config\Source;
 
 /**
- * Class ShippingMethods
+ * Class ShippingMethods - config source
  */
 class ShippingMethods implements \Magento\Framework\Option\ArrayInterface
 {

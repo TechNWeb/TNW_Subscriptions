@@ -7,10 +7,10 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use \Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
- * Class TokenExtractor
+ * Class TokenExtractor - pyapal transactions token extractor
  */
 class TokenExtractor
 {

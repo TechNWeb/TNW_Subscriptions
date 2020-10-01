@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use Magento\Framework\DataObject;
@@ -23,7 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 
 /**
- * Class Manager
+ * Class Manager - subscription products manager model
  */
 class Manager
 {
@@ -126,6 +125,9 @@ class Manager
         $this->productTypeResolver = $productTypeResolver;
     }
 
+    /**
+     * @return $this
+     */
     public function reset()
     {
         $this->profileProduct = null;
@@ -222,7 +224,7 @@ class Manager
                         $configurableProducts = $this->getConfigurableProducts($item, $profileProduct);
                         if (!empty($configurableProducts)) {
                             $profileProduct->setChildren($configurableProducts);
-                            $childProducts = array_merge($childProducts, $configurableProducts);
+                            $childProducts[] = $configurableProducts;
                         }
                     }
                     break;
@@ -230,8 +232,15 @@ class Manager
                     throw new \InvalidArgumentException(__('Unsupported product type - %1', $item->getProductType()));
             }
         }
-
-        return $childProducts;
+        $result = [];
+        if ($childProducts) {
+            foreach ($childProducts as $configurableProducts) {
+                foreach ($configurableProducts as $configurableProduct) {
+                    $result[] = $configurableProduct;
+                }
+            }
+        }
+        return $result;
     }
 
     /**
@@ -333,7 +342,6 @@ class Manager
             if ($objectItemId) {
                 /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
                 foreach ($profileProducts as $product) {
-
                     // Restore original data
                     $product->setOrigData();
                     $productId = $product->getId();
@@ -344,236 +352,388 @@ class Manager
                         $remove = isset($data['remove']);
                         $requestData = isset($data['item_' . $objectItemId]) ? $data['item_' . $objectItemId] : [];
                         if ($remove) {
-                            $product->delete();
-                            $this->historyLogger->log(
-                                __('Deleted product %1.', $product->getMagentoProduct()->getName()),
-                                $profileModel->getId()
-                            );
-
-                            foreach ($product->getChildren() as $children) {
-                                foreach ($profileProducts as $profileProduct) {
-                                    if ($profileProduct->getId() != $children->getId()) {
-                                        continue;
-                                    }
-
-                                    $profileProduct->delete();
-                                }
-                            }
+                            $this->processRemove($product, $profileModel, $profileProducts);
                         } else {
-                            $priceFormat = $this->serializer->unserialize(
-                                $this->subscriptionContext->getPriceFormatData(
-                                    $profileModel->getProfileCurrencyCode()
-                                )
-                            );
-
-                            if (!empty($requestData['price'])) {
-                                $requestPrice = floatval(preg_replace(
-                                    [
-                                        '/[^\d' . $priceFormat['decimalSymbol'] . ']/',
-                                        '/\\' . $priceFormat['decimalSymbol'] . '/'
-                                    ],
-                                    ['', '.'],
-                                    $requestData['price']
-                                ));
-                                $product->setPrice($requestPrice);
-                                if (isset($data['admin_modification'])) {
-                                    $product->setData('admin_modification', true);
-                                }
-                            }
-                            if (!empty($requestData['qty'])) {
-                                $product->setQty(number_format($requestData['qty'], 4, '.', ''));
-                            }
-                            if (!empty($requestData['additional_attribute'])) {
-                                foreach ($requestData['additional_attribute'] as $attributeCode => $attributeValue) {
-                                    if (is_array($attributeValue)) {
-                                        $attributeValue = implode(',', $attributeValue);
-                                    }
-
-                                    $product->setCustomAttribute($attributeCode, $attributeValue);
-                                }
-                            }
-                            if (isset($data['item_' . $productId]['term'])) {
-                                $term = $data['item_' . $productId]['term'];
-                                $profileModel->setTerm($term);
-                                if (1 == $term) {
-                                    $periodValue = 0;
-                                } else {
-                                    $periodValue = isset($data['item_' . $productId]['period'])
-                                        ? $data['item_' . $productId]['period']
-                                        : 0;
-                                    if (1 > $periodValue) {
-                                        return strval(__('Bill times must be greater than 0.'));
-                                    }
-                                }
-                                $profileModel->setTotalBillingCycles($periodValue);
-
-                                $origBillingCycle = $profileModel->getOrigData(
-                                    SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
-                                );
-                                $billingCycle = $profileModel->getData(
-                                    SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
-                                );
-                                if ($profileModel->hasDataChanges(SubscriptionProfileInterface::TERM)
-                                    && $origBillingCycle != $billingCycle
-                                ) {
-                                    $message =  __(
-                                        'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
-                                                     %3 changed from <b>%4</b> to <b>%5</b>.',
-                                        $product->getMagentoProduct()->getId(),
-                                        $product->getMagentoProduct()->getName(),
-                                        'Term',
-                                        $origBillingCycle == 0 ? __('Until canceled') : __(
-                                            'Bill %1 times',
-                                            $origBillingCycle
-                                        ),
-                                        $billingCycle == 0 ? __('Until canceled') : __(
-                                            'Bill %1 times',
-                                            $billingCycle
-                                        )
-                                    );
-
-                                    $this->historyLogger->log($message, $profileModel->getId());
-                                }
-                            }
-                            $trialLength = $profileModel->getTrialLength();
-                            $originalStartDate = $trialLength
-                                ? date('Y-m-d', strtotime($profileModel->getTrialStartDate()))
-                                : date('Y-m-d', strtotime($profileModel->getOriginalStartDate()));
-                            if (isset($data['item_' . $productId]['start_on'])
-                                && (date('Y-m-d', strtotime($data['item_' . $productId]['start_on']))
-                                    !== $originalStartDate)
-                            ) {
-                                $startOn = (new \DateTime($data['item_' . $productId]['start_on']))
-                                    ->add(new \DateInterval($this->getCurrentTimeExpression()))
-                                    ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                if ($trialLength) {
-                                    $profileModel->setTrialStartDate($startOn);
-                                    $intervalUnit = $profileModel->getTrialLengthUnit()
-                                        == \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::MONTHS
-                                        ? 'M'
-                                        : 'D';
-                                    $expression = 'P' . $trialLength . $intervalUnit;
-                                    $startOn =  (new \DateTime($startOn))
-                                        ->add(new \DateInterval($expression))
-                                        ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                }
-                                $profileModel->setStartDate($startOn)
-                                    ->setOriginalStartDate($startOn);
-
-                                if ($profileModel->hasDataChanges(SubscriptionProfileInterface::START_DATE)) {
-                                    $message =  __(
-                                        'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
-                                                     %3 changed from <b>%4</b> to <b>%5</b>.',
-                                        $product->getMagentoProduct()->getId(),
-                                        $product->getMagentoProduct()->getName(),
-                                        'Start on',
-                                        $profileModel->getOrigData(SubscriptionProfileInterface::START_DATE),
-                                        $profileModel->getData(SubscriptionProfileInterface::START_DATE)
-                                    );
-
-                                    $this->historyLogger->log($message, $profileModel->getId());
-                                }
-                            }
-                            if (isset($data['item_' . $productId]['billing_frequency'])) {
-                                $frequencyId = $data['item_' . $productId]['billing_frequency'];
-                                if ($profileModel->getBillingFrequencyId() != $frequencyId) {
-                                    if (!isset($startOn)
-                                        && (strtotime(date('Y-m-d')) >= strtotime($originalStartDate))
-                                    ) {
-                                        $nextPaymentDate = $this->orderRelationManager
-                                            ->getNextProfileRelation($profileModel)->getScheduledAt();
-                                        $startOn = $this->getNewStartDate($product, $nextPaymentDate);
-                                        $startOn = (new \DateTime($startOn))
-                                            ->add(new \DateInterval($this->getCurrentTimeExpression()))
-                                            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
-                                        $profileModel->setStartDate($startOn);
-                                    }
-                                    $frequency = $this->frequencyRepository->getById($frequencyId);
-                                    $profileModel->setBillingFrequencyId($frequencyId)
-                                        ->setFrequency($frequency->getFrequency())
-                                        ->setUnit($frequency->getUnit());
-
-                                    if ($profileModel->hasDataChanges(
-                                        SubscriptionProfileInterface::BILLING_FREQUENCY_ID
-                                    )) {
-                                        $message = __(
-                                            'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.
-                                                        %3 changed from <b>%4</b> to <b>%5</b>.',
-                                            $product->getMagentoProduct()->getId(),
-                                            $product->getMagentoProduct()->getName(),
-                                            'Billing Frequency',
-                                            $this->frequencyRepository->getById(
-                                                $profileModel->getOrigData(
-                                                    SubscriptionProfileInterface::BILLING_FREQUENCY_ID
-                                                )
-                                            )->getLabel(),
-                                            $this->frequencyRepository->getById(
-                                                $profileModel->getData(
-                                                    SubscriptionProfileInterface::BILLING_FREQUENCY_ID
-                                                )
-                                            )->getLabel()
-                                        );
-
-                                        $this->historyLogger->log($message, $profileModel->getId());
-                                    }
-                                }
-                            }
-                            if ((bool) $product->getTnwSubscrUnlockPresetQty()) {
-                                $billingFrequency = $data['item_' . $productId]['billing_frequency'];
-                                $recurringOptions = $product->getMagentoProduct()->getRecurringOptions();
-                                array_filter($recurringOptions, function ($v) use ($billingFrequency, &$product) {
-                                    if ($v->getBillingFrequencyId() == $billingFrequency) {
-                                        $product->setQty($v->getPresetQty());
-                                        $product->setPrice($v->getPrice());
-                                    }
-                                });
-                            }
-                            if (isset($data['item_' . $productId]['qty'])) {
-                                $children = $product->getChildren();
-                                $child = !empty($children) && is_array($children) ? reset($children) : null;
-                                $productData = $child
-                                    ? array_merge(
-                                        $data['item_' . $productId],
-                                        ['child_product' => $child->getMagentoProduct()]
-                                    )
-                                    : $data['item_' . $productId];
-                                $price = $this->productTypeResolver->resolve($product->getMagentoProduct()->getTypeId())
-                                    ->setProfile($profileModel)
-                                    ->setOriginalProfileProduct($product)
-                                    ->getSubscriptionPrice(
-                                        $product->getMagentoProduct(),
-                                        $productData
-                                    );
-                                $product->setPrice($price);
-                            }
+                            $this->processData($profileModel, $product, $productId, $data, $requestData);
                         }
                         if ($product->hasDataChanges()) {
                             $product->setNeedRecollect('1');
                         }
-
-                        $fields = [
-                            ProductSubscriptionProfileInterface::PRICE => 'Price',
-                            ProductSubscriptionProfileInterface::QTY => 'Qty',
-                        ];
-                        foreach ($fields as $fieldName => $fieldLabel) {
-                            if ($product->dataHasChangedFor($fieldName)) {
-                                $message = __(
-                                    'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>. %3 changed from <b>%4</b> to <b>%5</b>.',
-                                    $product->getMagentoProduct()->getId(),
-                                    $product->getMagentoProduct()->getName(),
-                                    $fieldLabel,
-                                    $product->getOrigData($fieldName),
-                                    $product->getData($fieldName)
-                                );
-                                $this->historyLogger->log($message, $profileModel->getId());
-                            }
-                        }
-
+                        $this->logFieldChanges($product, $profileModel);
                         $product->setDataChanges($productDataChanges || $product->hasDataChanges());
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @param $profileModel
+     * @param $product
+     * @param $productId
+     * @param $data
+     * @param $requestData
+     * @return $this
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function processData(&$profileModel, &$product, $productId, $data, $requestData)
+    {
+        $priceFormat = $this->serializer->unserialize(
+            $this->subscriptionContext->getPriceFormatData(
+                $profileModel->getProfileCurrencyCode()
+            )
+        );
+        if (!empty($requestData['price'])) {
+            $product = $this->processPriceData($priceFormat, $requestData, $product);
+        }
+        if (!empty($requestData['qty'])) {
+            $product->setQty(number_format($requestData['qty'], 4, '.', ''));
+        }
+        if (!empty($requestData['additional_attribute'])) {
+            $product = $this->processAttributeChange($requestData, $product);
+        }
+        if (isset($data['item_' . $productId]['term'])) {
+            $profileModel = $this->processTermChange(
+                $data,
+                $productId,
+                $profileModel,
+                $product
+            );
+        }
+        $trialLength = $profileModel->getTrialLength();
+        $originalStartDate = $trialLength
+            ? date('Y-m-d', strtotime($profileModel->getTrialStartDate()))
+            : date('Y-m-d', strtotime($profileModel->getOriginalStartDate()));
+        if (isset($data['item_' . $productId]['start_on'])
+            && (date('Y-m-d', strtotime($data['item_' . $productId]['start_on']))
+                !== $originalStartDate)
+        ) {
+            $profileModel = $this->processStartOnDate(
+                $data,
+                $productId,
+                $trialLength,
+                $profileModel,
+                $product
+            );
+        }
+        if (isset($data['item_' . $productId]['billing_frequency'])) {
+            $profileModel = $this->processBillingFrequencyData(
+                $profileModel,
+                $data,
+                $productId,
+                $originalStartDate,
+                $product
+            );
+        }
+        if ((bool) $product->getTnwSubscrUnlockPresetQty()) {
+            $product = $this->processProductUnlockQty(
+                $data,
+                $productId,
+                $product
+            );
+        }
+        if (isset($data['item_' . $productId]['qty'])) {
+            $product = $this->processProductQty(
+                $product,
+                $data,
+                $productId,
+                $profileModel
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * @param $product
+     * @param $profileModel
+     * @param $profileProducts
+     * @return $this
+     */
+    protected function processRemove($product, $profileModel, $profileProducts)
+    {
+        $product->delete();
+        $this->historyLogger->log(
+            __('Deleted product %1.', $product->getMagentoProduct()->getName()),
+            $profileModel->getId()
+        );
+
+        foreach ($product->getChildren() as $children) {
+            foreach ($profileProducts as $profileProduct) {
+                if ($profileProduct->getId() != $children->getId()) {
+                    continue;
+                }
+                $profileProduct->delete();
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param $priceFormat
+     * @param $requestData
+     * @param $product
+     * @return mixed
+     */
+    private function processPriceData($priceFormat, $requestData, $product)
+    {
+        $requestPrice = floatval(preg_replace(
+            [
+                '/[^\d' . $priceFormat['decimalSymbol'] . ']/',
+                '/\\' . $priceFormat['decimalSymbol'] . '/'
+            ],
+            ['', '.'],
+            $requestData['price']
+        ));
+        $product->setPrice($requestPrice);
+        if (isset($data['admin_modification'])) {
+            $product->setData('admin_modification', true);
+        }
+        return $product;
+    }
+
+    /**
+     * @param $product
+     * @param $profileModel
+     * @return $this
+     */
+    private function logFieldChanges($product, $profileModel)
+    {
+        $fields = [
+            ProductSubscriptionProfileInterface::PRICE => 'Price',
+            ProductSubscriptionProfileInterface::QTY => 'Qty',
+        ];
+        foreach ($fields as $fieldName => $fieldLabel) {
+            if ($product->dataHasChangedFor($fieldName)) {
+                $message = __(
+                    'Updated product <a href="{productUrl|%1}" '
+                    . 'target="_blank">%2</a>. %3 changed from <b>%4</b> to <b>%5</b>.',
+                    $product->getMagentoProduct()->getId(),
+                    $product->getMagentoProduct()->getName(),
+                    $fieldLabel,
+                    $product->getOrigData($fieldName),
+                    $product->getData($fieldName)
+                );
+                $this->historyLogger->log($message, $profileModel->getId());
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param $requestData
+     * @param $product
+     * @return mixed
+     */
+    private function processAttributeChange($requestData, $product)
+    {
+        foreach ($requestData['additional_attribute'] as $attributeCode => $attributeValue) {
+            if (is_array($attributeValue)) {
+                $attributeValue = implode(',', $attributeValue);
+            }
+
+            $product->setCustomAttribute($attributeCode, $attributeValue);
+        }
+        return $product;
+    }
+
+    /**
+     * @param $data
+     * @param $productId
+     * @param $profileModel
+     * @param $product
+     * @return string
+     */
+    private function processTermChange($data, $productId, $profileModel, $product)
+    {
+        $term = $data['item_' . $productId]['term'];
+        $profileModel->setTerm($term);
+        if (1 == $term) {
+            $periodValue = 0;
+        } else {
+            $periodValue = isset($data['item_' . $productId]['period'])
+                ? $data['item_' . $productId]['period']
+                : 0;
+            if (1 > $periodValue) {
+                return (string) (__('Bill times must be greater than 0.'));
+            }
+        }
+        $profileModel->setTotalBillingCycles($periodValue);
+
+        $origBillingCycle = $profileModel->getOrigData(
+            SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
+        );
+        $billingCycle = $profileModel->getData(
+            SubscriptionProfileInterface::TOTAL_BILLING_CYCLES
+        );
+        if ($profileModel->hasDataChanges(SubscriptionProfileInterface::TERM)
+            && $origBillingCycle != $billingCycle
+        ) {
+            $message =  __(
+                'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.'
+                . '%3 changed from <b>%4</b> to <b>%5</b>.',
+                $product->getMagentoProduct()->getId(),
+                $product->getMagentoProduct()->getName(),
+                'Term',
+                $origBillingCycle == 0 ? __('Until canceled') : __(
+                    'Bill %1 times',
+                    $origBillingCycle
+                ),
+                $billingCycle == 0 ? __('Until canceled') : __(
+                    'Bill %1 times',
+                    $billingCycle
+                )
+            );
+
+            $this->historyLogger->log($message, $profileModel->getId());
+        }
+        return $profileModel;
+    }
+
+    /**
+     * @param $data
+     * @param $productId
+     * @param $trialLength
+     * @param $profileModel
+     * @param $product
+     * @return mixed
+     * @throws \Exception
+     */
+    private function processStartOnDate($data, $productId, $trialLength, $profileModel, $product)
+    {
+        $startOn = (new \DateTime($data['item_' . $productId]['start_on']))
+            ->add(new \DateInterval($this->getCurrentTimeExpression()))
+            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        if ($trialLength) {
+            $profileModel->setTrialStartDate($startOn);
+            $intervalUnit = $profileModel->getTrialLengthUnit()
+            == \TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType::MONTHS
+                ? 'M'
+                : 'D';
+            $expression = 'P' . $trialLength . $intervalUnit;
+            $startOn =  (new \DateTime($startOn))
+                ->add(new \DateInterval($expression))
+                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        }
+        $profileModel->setStartDate($startOn)
+            ->setOriginalStartDate($startOn);
+
+        if ($profileModel->hasDataChanges(SubscriptionProfileInterface::START_DATE)) {
+            $message =  __(
+                'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.'
+                . '%3 changed from <b>%4</b> to <b>%5</b>.',
+                $product->getMagentoProduct()->getId(),
+                $product->getMagentoProduct()->getName(),
+                'Start on',
+                $profileModel->getOrigData(SubscriptionProfileInterface::START_DATE),
+                $profileModel->getData(SubscriptionProfileInterface::START_DATE)
+            );
+
+            $this->historyLogger->log($message, $profileModel->getId());
+        }
+        return $profileModel;
+    }
+
+    /**
+     * @param $data
+     * @param $productId
+     * @param $product
+     * @return mixed
+     */
+    private function processProductUnlockQty($data, $productId, $product)
+    {
+        $billingFrequency = $data['item_' . $productId]['billing_frequency'];
+        $recurringOptions = $product->getMagentoProduct()->getRecurringOptions();
+        array_filter($recurringOptions, function ($v) use ($billingFrequency, &$product) {
+            if ($v->getBillingFrequencyId() == $billingFrequency) {
+                $product->setQty($v->getPresetQty());
+                $product->setPrice($v->getPrice());
+            }
+        });
+        return $product;
+    }
+
+    /**
+     * @param $product
+     * @param $data
+     * @param $productId
+     * @param $profileModel
+     * @return mixed
+     */
+    private function processProductQty($product, $data, $productId, $profileModel)
+    {
+        $children = $product->getChildren();
+        $child = !empty($children) && is_array($children) ? reset($children) : null;
+        $productData = $child
+            ? array_merge(
+                $data['item_' . $productId],
+                ['child_product' => $child->getMagentoProduct()]
+            )
+            : $data['item_' . $productId];
+        $price = $this->productTypeResolver->resolve($product->getMagentoProduct()->getTypeId())
+            ->setProfile($profileModel)
+            ->setOriginalProfileProduct($product)
+            ->getSubscriptionPrice(
+                $product->getMagentoProduct(),
+                $productData
+            );
+        $product->setPrice($price);
+        return $product;
+    }
+
+    /**
+     * @param $profileModel
+     * @param $data
+     * @param $productId
+     * @param $originalStartDate
+     * @param $product
+     * @return mixed
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function processBillingFrequencyData($profileModel, $data, $productId, $originalStartDate, $product)
+    {
+        $frequencyId = $data['item_' . $productId]['billing_frequency'];
+        if ($profileModel->getBillingFrequencyId() != $frequencyId) {
+            if (!isset($startOn)
+                && (strtotime(date('Y-m-d')) >= strtotime($originalStartDate))
+            ) {
+                $nextPaymentDate = $this->orderRelationManager
+                    ->getNextProfileRelation($profileModel)->getScheduledAt();
+                $startOn = $this->getNewStartDate($product, $nextPaymentDate);
+                $startOn = (new \DateTime($startOn))
+                    ->add(new \DateInterval($this->getCurrentTimeExpression()))
+                    ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                $profileModel->setStartDate($startOn);
+            }
+            $frequency = $this->frequencyRepository->getById($frequencyId);
+            $profileModel->setBillingFrequencyId($frequencyId)
+                ->setFrequency($frequency->getFrequency())
+                ->setUnit($frequency->getUnit());
+
+            if ($profileModel->hasDataChanges(
+                SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+            )) {
+                $message = __(
+                    'Updated product <a href="{productUrl|%1}" target="_blank">%2</a>.'
+                    . '%3 changed from <b>%4</b> to <b>%5</b>.',
+                    $product->getMagentoProduct()->getId(),
+                    $product->getMagentoProduct()->getName(),
+                    'Billing Frequency',
+                    $this->frequencyRepository->getById(
+                        $profileModel->getOrigData(
+                            SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+                        )
+                    )->getLabel(),
+                    $this->frequencyRepository->getById(
+                        $profileModel->getData(
+                            SubscriptionProfileInterface::BILLING_FREQUENCY_ID
+                        )
+                    )->getLabel()
+                );
+
+                $this->historyLogger->log($message, $profileModel->getId());
+            }
+        }
+        return $profileModel;
     }
 
     /**

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Change\History;
 
 use Magento\FrameWork\App\RequestInterface;
@@ -15,7 +14,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Col
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
 /**
- * Class DataProvider
+ * Class DataProvider for history
  */
 class DataProvider extends AbstractDataProvider
 {

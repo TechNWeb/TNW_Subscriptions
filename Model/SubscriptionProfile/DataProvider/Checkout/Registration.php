@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use Magento\Customer\Model\Url as CustomerUrl;
@@ -84,6 +83,7 @@ class Registration extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+        return $this;
     }
 
     /**

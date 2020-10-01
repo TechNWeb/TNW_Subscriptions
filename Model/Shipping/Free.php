@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model\Shipping;
 
 /**
- * Class Free
+ * Class Free - model for shipping free
  */
 class Free
 {
@@ -48,14 +48,14 @@ class Free
      */
     public function getCarrierRate($quote)
     {
-         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
-         $method = $this->methodFactory->create();
-         $method->setCarrier('freeshipping');
-         $method->setCarrierTitle($this->getConfigData('freeshipping', $quote->getStoreId(), 'title'));
-         $method->setMethod('freeshipping');
-         $method->setMethodTitle($this->getConfigData('freeshipping', $quote->getStoreId(), 'name'));
-         $method->setPrice('0.00');
-         $method->setCost('0.00');
+        /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
+        $method = $this->methodFactory->create();
+        $method->setCarrier('freeshipping');
+        $method->setCarrierTitle($this->getConfigData('freeshipping', $quote->getStoreId(), 'title'));
+        $method->setMethod('freeshipping');
+        $method->setMethodTitle($this->getConfigData('freeshipping', $quote->getStoreId(), 'name'));
+        $method->setPrice('0.00');
+        $method->setCost('0.00');
         return $this->rateFactory->create()->importShippingRate($method);
     }
 

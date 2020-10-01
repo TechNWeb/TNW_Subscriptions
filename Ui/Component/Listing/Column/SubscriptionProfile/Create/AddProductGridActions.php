@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Create;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -9,7 +12,7 @@ use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
 /**
- * Class CustomerGridActions
+ * Class CustomerGridActions - ui component
  */
 class AddProductGridActions extends Column
 {

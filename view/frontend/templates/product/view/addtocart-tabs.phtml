@@ -8,7 +8,7 @@
 ?>
 
 <?php if ($block->isSubscribeAvailable()): ?>
-    <?php if ($block->IsOnlySubscribePurchase()): ?>
+    <?php if ($block->isOnlySubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="1" />
         <div class="tnw-addtocart-container">
             <div class="addtocart-subscribe">
@@ -24,7 +24,7 @@
                 }
             }
         </script>
-    <?php elseif ($block->IsOneTimeAndSubscribePurchase()): ?>
+    <?php elseif ($block->isOneTimeAndSubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="1" />
         <div class="tnw-addtocart-container">
             <div class="addtocart-onetime">

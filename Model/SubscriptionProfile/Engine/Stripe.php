@@ -3,19 +3,20 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
-use Magento\Framework\Exception\PaymentException;
 
 /**
- * Stripe Engine
+ * Stripe Engine - used to process stripe payments
  */
 class Stripe extends Base
 {
+    /**#@+
+     * Constants for field names
+     */
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
     const DESCRIPTION = 'description';
@@ -26,6 +27,7 @@ class Stripe extends Base
     const CUSTOMER = 'customer';
     const CAPTURE_METHOD = 'capture_method';
     const SETUP_FUTURE_USAGE = 'setup_future_usage';
+    /**#@-*/
 
     /**
      * @var \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer
@@ -37,6 +39,9 @@ class Stripe extends Base
      */
     private $isRebill = false;
 
+    /**
+     * @var mixed
+     */
     private $adapterFactory;
 
     /**
@@ -83,7 +88,7 @@ class Stripe extends Base
             $paymentTokenManagement
         );
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->adapterFactory = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");
+            $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
         }
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -102,15 +107,14 @@ class Stripe extends Base
         }
         if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
             $cardDetails = [
-                'type' => $payment->getCcType() ? : $payment->getType()
+                'type' => $payment->getCcType() ?: $payment->getType()
             ];
             if ($payment->getCcExpMonth() && $payment->getCcExpYear()) {
                 $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
             } else {
                 $expirationDate = $payment->getData('expirationDate')
                     ? explode('/', $payment->getData('expirationDate'))
-                    : ["", ""]
-                ;
+                    : ["", ""];
             }
         }
         $result = [
@@ -118,7 +122,7 @@ class Stripe extends Base
                 OrderPaymentInterface::CC_TYPE => isset($additionalInfo[OrderPaymentInterface::CC_TYPE])
                     ? $additionalInfo[OrderPaymentInterface::CC_TYPE]
                     : $cardDetails['type'],
-                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4() ? : $payment->getData('maskedCC'),
+                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4() ?: $payment->getData('maskedCC'),
                 OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
                     : $expirationDate[0],
@@ -218,7 +222,7 @@ class Stripe extends Base
     }
 
     /**
-     *
+     *  Sets reBillProcessingFlag
      */
     public function setRebillProcessFlag()
     {
@@ -255,22 +259,22 @@ class Stripe extends Base
         $amount = '1';
         $currency = $quote->getQuoteCurrencyCode();
         $paymentId = $payment['id'];
-            $stripeAdapter = $this->adapterFactory->create();
-            $cs = $stripeAdapter->customer(['payment_method' => $paymentId]);
-            $params = [
-                self::CUSTOMER => $cs->id,
-                self::AMOUNT => $this->formatPrice($amount),
-                self::CURRENCY => $currency,
-                self::PAYMENT_METHOD_TYPES => ['card'],
-                self::CONFIRMATION_METHOD => 'manual',
-                self::CAPTURE_METHOD => 'manual',
-                self::SETUP_FUTURE_USAGE => 'off_session'
-            ];
-            $params[self::PAYMENT_METHOD] = $paymentId;
-            $paymentIntent = $stripeAdapter->createPaymentIntent($params);
-            $requestData['payment'][$this->getPaymentMethodCode()]['cc_token'] = $paymentIntent->id;
+        $stripeAdapter = $this->adapterFactory->create();
+        $cs = $stripeAdapter->customer(['payment_method' => $paymentId]);
+        $params = [
+            self::CUSTOMER => $cs->id,
+            self::AMOUNT => $this->formatPrice($amount),
+            self::CURRENCY => $currency,
+            self::PAYMENT_METHOD_TYPES => ['card'],
+            self::CONFIRMATION_METHOD => 'manual',
+            self::CAPTURE_METHOD => 'manual',
+            self::SETUP_FUTURE_USAGE => 'off_session'
+        ];
+        $params[self::PAYMENT_METHOD] = $paymentId;
+        $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+        $requestData['payment'][$this->getPaymentMethodCode()]['cc_token'] = $paymentIntent->id;
 
-            return parent::processProfileByRequestData($requestData);
+        return parent::processProfileByRequestData($requestData);
     }
 
     /**
@@ -296,7 +300,6 @@ class Stripe extends Base
     public function formatPrice($price)
     {
         $price = sprintf('%.2F', $price);
-
         return str_replace('.', '', $price);
     }
 }

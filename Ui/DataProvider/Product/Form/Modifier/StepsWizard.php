@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Backend\Model\UrlInterface;
@@ -540,13 +539,19 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '1' => __('Child controls if the customer can choose when to stop recurring orders'),
-                                    '0' => __('Parent controls if the customer can choose when to stop recurring orders')
+                                    '1' => __(
+                                        'Child controls if the customer can choose when to stop recurring orders'
+                                    ),
+                                    '0' => __(
+                                        'Parent controls if the customer can choose when to stop recurring orders'
+                                    )
                                 ],
                                 'exports' => [
-                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS . ':disabled'
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+                                        . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+                                'dataScope' => 'tnw_subscr_inheritance.'
+                                    . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -640,7 +645,9 @@ class StepsWizard extends BaseModifier
                         'label' => null,
                         'template' => 'ui/form/components/complex',
                         'sortOrder' => 10,
-                        'content' => __('Recurring options enable your products and services for recurring purchases. A product must be linked with at least one <a href="%1">billing frequency</a>, if recurring can be purchased on a schedule.', $frequencyUrl)
+                        'content' => __('Recurring options enable your products and services for recurring'
+                            . ' purchases. A product must be linked with at least one <a href="%1">'
+                            . 'billing frequency</a>, if recurring can be purchased on a schedule.', $frequencyUrl)
                     ]
                 ]
             ],

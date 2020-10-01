@@ -95,10 +95,10 @@ class AddEmailToSession extends Action
      */
     private function tryToGetCustomer($email)
     {
-        $customer = null;
         try {
             $customer = $this->customerRepository->get($email);
         } catch (\Exception $e) {
+            $customer = null;
         }
 
         return $customer;

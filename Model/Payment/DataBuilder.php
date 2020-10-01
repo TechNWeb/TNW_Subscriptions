@@ -5,11 +5,11 @@
  */
 namespace TNW\Subscriptions\Model\Payment;
 
-use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
- * Class DataBuilder
+ * Class DataBuilder - base payment data builder
  */
 class DataBuilder
 {

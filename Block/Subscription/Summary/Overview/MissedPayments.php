@@ -66,7 +66,7 @@ class MissedPayments extends Template
                     ->reset(\Zend_Db_Select::COLUMNS)
                     ->columns(['attempt_count'])
                     ->where('profile_order_id = ?', $nextOrder->getId());
-                $this->countOfMissedPayments = intval($this->profileQueueCollection->getConnection()->fetchOne($select));
+                $this->countOfMissedPayments = (int) $this->profileQueueCollection->getConnection()->fetchOne($select);
             }
         }
 

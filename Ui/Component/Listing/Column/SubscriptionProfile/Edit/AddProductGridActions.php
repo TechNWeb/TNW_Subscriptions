@@ -1,15 +1,17 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Edit;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\UrlInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
 /**
- * Class CustomerGridActions
+ * Class AddProductGridActions - ui component
  */
 class AddProductGridActions extends Column
 {
@@ -48,7 +50,8 @@ class AddProductGridActions extends Column
                         'view' => [
                             'label' => $label,
                             'callback' => [
-                                'provider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form',
+                                'provider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.'
+                                    . 'tnw_subscriptionprofile_summary_add_product_modal_form',
                                 'target' => 'setProductId'
                             ]
                         ]

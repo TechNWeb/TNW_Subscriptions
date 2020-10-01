@@ -118,10 +118,10 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         $this->dataPersistor = $dataPersistor;
         $this->encryptor = $encryptor;
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->transaction = $objectManager->get("Magento\Paypal\Model\Payflow\Service\Response\Transaction");
+            $this->transaction = $objectManager->get(\Magento\Paypal\Model\Payflow\Service\Response\Transaction::class);
             $this->responseValidator = $objectManager
-                ->get("Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator");
-            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+                ->get(\Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator::class);
+            $this->transparent = $objectManager->get(\Magento\Paypal\Model\Payflow\Transparent::class);
             ;
         }
     }

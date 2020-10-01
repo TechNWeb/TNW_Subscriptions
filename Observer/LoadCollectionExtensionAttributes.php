@@ -8,6 +8,9 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Class LoadCollectionExtensionAttributes - observer
+ */
 class LoadCollectionExtensionAttributes implements ObserverInterface
 {
     /**
@@ -15,6 +18,10 @@ class LoadCollectionExtensionAttributes implements ObserverInterface
      */
     private $joinProcessor;
 
+    /**
+     * LoadCollectionExtensionAttributes constructor.
+     * @param \Magento\Framework\Api\ExtensionAttribute\JoinProcessor $joinProcessor
+     */
     public function __construct(
         \Magento\Framework\Api\ExtensionAttribute\JoinProcessor $joinProcessor
     ) {

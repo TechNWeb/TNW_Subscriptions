@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model;
 
 /**
- * Class EmailNotifier
+ * Class EmailNotifier - used for email notifications
  */
 class EmailNotifier
 {
@@ -262,6 +262,7 @@ class EmailNotifier
                     try {
                         $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
                     } catch (\Exception $e) {
+                        continue;
                     }
                 }
             } else {

@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Locale\Format;
@@ -253,7 +252,8 @@ class Context
 
     public function throwException($message)
     {
-        throw new \Exception($message);
+        $message = is_string($message) ? __($message) : $message;
+        throw new \Magento\Framework\Exception\LocalizedException($message);
     }
 
     /**

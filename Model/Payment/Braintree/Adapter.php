@@ -7,7 +7,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Braintree Adapter
+ * Braintree Adapter - braintree
  */
 class Adapter
 {
@@ -31,8 +31,6 @@ class Adapter
      * @param LoggerInterface $logger
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function __construct(
         LoggerInterface $logger,
@@ -40,12 +38,36 @@ class Adapter
         ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->config = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
-            $this->storeConfigResolver = $objectManager->get("PayPal\Braintree\Model\StoreConfigResolver");
+            $this->config = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
+            $this->storeConfigResolver = $objectManager->get(\PayPal\Braintree\Model\StoreConfigResolver::class);
         }
         $this->logger = $logger;
 
         $this->initCredentials();
+    }
+
+    /**
+     * @param mixed $config
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * @param mixed $storeConfigResolver
+     */
+    public function setStoreConfigResolver($storeConfigResolver)
+    {
+        $this->storeConfigResolver = $storeConfigResolver;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 
     /**

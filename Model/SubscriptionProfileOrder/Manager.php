@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -18,7 +17,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Config;
 
 /**
- * Class Manager
+ * Class Manager - for subscription profile order
  */
 class Manager
 {

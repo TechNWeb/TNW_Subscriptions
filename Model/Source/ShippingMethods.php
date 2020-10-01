@@ -3,14 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Rate;
-use Magento\Quote\Model\Quote\Item;
 use Magento\Tax\Helper\Data;
 use TNW\Subscriptions\Model\Context;
 

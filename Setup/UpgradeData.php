@@ -465,13 +465,13 @@ class UpgradeData implements UpgradeDataInterface
             ->joinInner(
                 ['quoteItem' => $setup->getTable('quote_item')],
                 'relation.magento_quote_id = quoteItem.quote_id AND profileItem.magento_product_id'
-        . ' = quoteItem.product_id AND profileItem.qty = quoteItem.qty',
+                . ' = quoteItem.product_id AND profileItem.qty = quoteItem.qty',
                 ['quote_item_id' => 'item_id']
             )
             ->joinInner(
                 ['orderItem' => $setup->getTable('sales_order_item')],
                 'relation.magento_order_id = orderItem.order_id AND profileItem.magento_product_id'
-        . ' = orderItem.product_id AND profileItem.qty = orderItem.qty_ordered',
+                . ' = orderItem.product_id AND profileItem.qty = orderItem.qty_ordered',
                 ['order_item_id' => 'item_id']
             );
 

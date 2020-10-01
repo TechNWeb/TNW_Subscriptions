@@ -11,7 +11,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 /**
- * Class CreateProfile
+ * Class CreateProfile - observer
  */
 class CreateProfile implements ObserverInterface
 {

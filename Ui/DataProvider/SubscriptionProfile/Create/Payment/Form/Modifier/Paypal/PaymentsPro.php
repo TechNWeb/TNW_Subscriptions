@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal;
 
 use Magento\Ui\Component\Container;
@@ -32,7 +31,7 @@ use Magento\Framework\ObjectManagerInterface;
 class PaymentsPro extends Base implements PaymentModifierInterface
 {
     /**
-     *
+     * Sort order value
      */
     const SORT_ORDER = 20;
 
@@ -100,8 +99,8 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     ) {
 
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->paymentConfig = $objectManager->get("Magento\Payment\Model\Config");
-            $this->paymentPro = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+            $this->paymentConfig = $objectManager->get(\Magento\Payment\Model\Config::class);
+            $this->paymentPro = $objectManager->get(\Magento\Paypal\Model\Payflow\Transparent::class);
         }
         $this->config = $config;
         $this->context = $context;
@@ -331,7 +330,9 @@ class PaymentsPro extends Base implements PaymentModifierInterface
                 'cardFieldsMap' => $this->getCardFieldsMap(),
                 'orderSaveUrl' => $this->context->getEscaper()->escapeUrl($this->getOrderUrl()),
                 'cgiUrl' => $this->context->getEscaper()->escapeUrl($this->getCgiUrl()),
-                'expireYearLength' => $this->context->getEscaper()->escapeHtml($this->getMethodConfigData('cc_year_length')),
+                'expireYearLength' => $this->context->getEscaper()->escapeHtml(
+                    $this->getMethodConfigData('cc_year_length')
+                ),
                 'formName' => $this->getPaymentFormName(),
             ]
         ];

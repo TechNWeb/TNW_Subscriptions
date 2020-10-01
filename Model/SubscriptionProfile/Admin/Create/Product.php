@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -27,7 +26,7 @@ use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 use TNW\Subscriptions\Service\Serializer;
 
 /**
- * Class Product
+ * Class Product - model for subcription profile product
  */
 class Product extends Create
 {
@@ -521,7 +520,10 @@ class Product extends Create
                         'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
                         'initial_fee' =>  (float)$initialFee,
                         'price' => $this->getPrice($this->getProduct(), $productData),
-                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice($this->getProduct(), $productData),
+                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice(
+                            $this->getProduct(),
+                            $productData
+                        ),
                         'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData),
                     ]
                 ],

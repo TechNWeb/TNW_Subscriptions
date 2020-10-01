@@ -169,7 +169,7 @@ class ListProductButtons extends Template
     {
         $productFrequency = $this->getProductBillingFrequencies();
 
-        if (is_null($productFrequency)) {
+        if ($productFrequency === null) {
             return [];
         }
 
@@ -202,7 +202,7 @@ class ListProductButtons extends Template
      */
     private function getProductBillingFrequencies()
     {
-        if (is_null($this->getData('product_billing_frequencies'))) {
+        if ($this->getData('product_billing_frequencies') === null) {
             $productId = $this->getProduct()->getId();
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($productId)

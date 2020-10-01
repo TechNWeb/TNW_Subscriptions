@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Framework\Api\Filter;
@@ -13,6 +12,9 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
+/**
+ * Class ShippingAndBilling - DataProvider
+ */
 class ShippingAndBilling extends AbstractDataProvider
 {
     /**#@+
@@ -101,6 +103,7 @@ class ShippingAndBilling extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+        return $this;
     }
 
     /**

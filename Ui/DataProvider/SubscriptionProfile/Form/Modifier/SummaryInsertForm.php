@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
@@ -18,7 +17,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProduc
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 
 /**
- * Class SummaryInsertForm
+ * Class SummaryInsertForm - ui from modifier
  */
 class SummaryInsertForm extends BaseFormModifier
 {
@@ -37,7 +36,7 @@ class SummaryInsertForm extends BaseFormModifier
     const DASHBOARD_FIELDSET = 'dashboard';
 
     /**
-     * Form data key
+     * Form data key value
      */
     const FORM_DATA_KEY = 'subscription_profile_id';
 

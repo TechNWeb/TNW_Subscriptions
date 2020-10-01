@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -171,6 +170,7 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
     public function delete(SubscriptionProfileMessageHistoryInterface $messageHistory)
     {
         //todo
+        return $this;
     }
 
     /**
@@ -179,5 +179,6 @@ class MessageHistoryRepository implements SubscriptionProfileMessageHistoryRepos
     public function deleteById($id)
     {
         //todo
+        return $this;
     }
 }

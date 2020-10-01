@@ -8,8 +8,8 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
-* Subscription profile attribute controller
-*/
+ * Subscription profile attribute controller
+ */
 abstract class Attribute extends \Magento\Backend\App\Action
 {
     /**

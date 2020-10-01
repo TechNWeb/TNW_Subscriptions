@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Queue;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -62,7 +61,8 @@ class DataProvider extends AbstractDataProvider
 
         $collection->getSelect()->join(
             ['relation' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-            'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.' . SubscriptionProfileOrderInterface::ID,
+            'main_table.' . SubscriptionProfileQueueInterface::PROFILE_ORDER_ID . '= relation.'
+            . SubscriptionProfileOrderInterface::ID,
             [
                 SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
                 SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID,

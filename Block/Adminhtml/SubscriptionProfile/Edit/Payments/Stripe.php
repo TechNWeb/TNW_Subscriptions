@@ -31,7 +31,7 @@ class Stripe extends Template
         $this->setTemplate('TNW_Subscriptions::subscription_profile/payments/stripe.phtml');
         parent::__construct($context, $data);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->configProvider = $objectManager->get("TNW\Stripe\Model\Ui\ConfigProvider");
+            $this->configProvider = $objectManager->get(\TNW\Stripe\Model\Ui\ConfigProvider::class);
         }
     }
 

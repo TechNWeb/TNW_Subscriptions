@@ -5,21 +5,20 @@
  */
 namespace TNW\Subscriptions\Cron;
 
-use TNW\Subscriptions\Model\EmailNotifierFactory;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\App\State;
 use TNW\Subscriptions\Model\EmailNotifier;
 use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use Magento\Framework\App\State;
+use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
- * Class NotificationProcessor
+ * Class NotificationProcessor - cron
  */
 class NotificationProcessor
 {
@@ -68,10 +67,29 @@ class NotificationProcessor
      */
     private $paymentFactory;
 
+    /**
+     * @var Manager
+     */
     private $queueManager;
 
+    /**
+     * @var ProfileProcessor
+     */
     private $processor;
 
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param State $appState
+     * @param Payment $paymentFactory
+     * @param Manager $queueManager
+     * @param ProfileProcessor $processor
+     */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
@@ -97,21 +115,22 @@ class NotificationProcessor
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            //NOTHING TO SET
+            //area already set check
+            $this->appState->getAreaCode();
         }
         $this->sendRenewalNotifications();
         $this->sendExpiredCardsNotifications();
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function sendRenewalNotifications()
     {

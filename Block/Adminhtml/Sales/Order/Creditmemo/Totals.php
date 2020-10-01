@@ -13,13 +13,6 @@ use Magento\Framework\View\Element\Template;
  */
 class Totals extends Template
 {
-    public function __construct(
-        Template\Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
     /**
      * Get totals source object
      *

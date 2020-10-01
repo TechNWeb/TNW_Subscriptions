@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -21,7 +24,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 
 /**
- * Class Details
+ * Class Details - ui component
  */
 class Details extends Column
 {

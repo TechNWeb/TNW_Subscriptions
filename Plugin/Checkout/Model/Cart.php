@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Class Cart
+ * Class Cart - plugin
  */
 class Cart
 {

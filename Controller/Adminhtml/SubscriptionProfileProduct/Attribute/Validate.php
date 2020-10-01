@@ -122,7 +122,7 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     {
         $adminValues = [];
         foreach ($optionsValues as $optionKey => $values) {
-            if (!(isset($deletedOptions[$optionKey]) and $deletedOptions[$optionKey] === '1')) {
+            if (!(isset($deletedOptions[$optionKey]) && $deletedOptions[$optionKey] === '1')) {
                 $adminValues[] = reset($values);
             }
         }

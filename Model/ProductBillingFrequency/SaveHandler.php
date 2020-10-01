@@ -10,7 +10,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 
 /**
- * Class SaveHandler
+ * Class SaveHandler - product billing frequencies save handler
  */
 class SaveHandler implements ExtensionInterface
 {

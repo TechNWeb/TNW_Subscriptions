@@ -15,7 +15,7 @@ $configurableOptions = $block->getPreconfiguredOptions();
 $customOptions = $block->getPreconfiguredCustomOptions();
 ?>
 <?php if ($block->isSubscribeAvailable()): ?>
-    <?php if ($block->IsOneTimeAndSubscribePurchase() || $block->IsOnlySubscribePurchase()): ?>
+    <?php if ($block->isOneTimeAndSubscribePurchase() || $block->isOnlySubscribePurchase()): ?>
     <div class="product-item-subscription-details">
         <div class="tnw-addtocart-container">
             <input type="hidden" name="cart[<?= $_itemId; ?>][addtocart_type]" value="1"/>
@@ -46,7 +46,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
             <?php endif; ?>
             <div class="addtocart-subscribe">
                 <input
-                    <?php if ($block->IsOnlySubscribePurchase()): ?>
+                    <?php if ($block->isOnlySubscribePurchase()): ?>
                        type="hidden"
                     <?php else: ?>
                        type="radio"
@@ -217,7 +217,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                 </div>
             </div>
     <?php endif; ?>
-    <?php if ($block->IsOneTimeAndSubscribePurchase()): ?>
+    <?php if ($block->isOneTimeAndSubscribePurchase()): ?>
             <div class="addtocart-onetime">
                 <input type="radio"
                        id="cart-<?= $_itemId; ?>-onetime"

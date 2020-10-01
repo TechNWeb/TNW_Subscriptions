@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profil
 use \TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
 
 /**
- * Class Stripe
+ * Class Stripe - used to save the stripe payed subscription profile
  */
 class Stripe extends Base
 {
@@ -55,7 +55,7 @@ class Stripe extends Base
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->adapterFactory = $objectManager->get("TNW\Stripe\Model\Adapter\StripeAdapterFactory");
+            $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
         }
         parent::__construct($createModel, $session);
     }
@@ -90,7 +90,7 @@ class Stripe extends Base
         $paymentId = $payment['id'];
         $stripeAdapter = $this->adapterFactory->create();
         $cs = $stripeAdapter->customer([
-            'email' => $guestEmail ? : $quote->getCustomerEmail(),
+            'email' => $guestEmail ?: $quote->getCustomerEmail(),
             'payment_method' => $paymentId,
             'invoice_settings' => ['default_payment_method' => $paymentId]
         ]);

@@ -56,7 +56,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
 
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('id');
-        $model = $this->_objectManager->create('TNW\Subscriptions\Model\BillingFrequency');
+        $model = $this->_objectManager->create(\TNW\Subscriptions\Model\BillingFrequency::class);
 
         // 2. Initial checking
         if ($id) {

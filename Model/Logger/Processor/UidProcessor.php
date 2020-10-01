@@ -5,10 +5,20 @@
  */
 namespace TNW\Subscriptions\Model\Logger\Processor;
 
+/**
+ * Class UidProcessor - uid Porcessor
+ */
 class UidProcessor
 {
+    /**
+     * @var bool|string
+     */
     private $uid;
 
+    /**
+     * UidProcessor constructor.
+     * @param int $length
+     */
     public function __construct($length = 7)
     {
         if (!is_int($length) || $length > 32 || $length < 1) {
@@ -18,6 +28,10 @@ class UidProcessor
         $this->uid = substr(hash('md5', uniqid('', true)), 0, $length);
     }
 
+    /**
+     * @param array $record
+     * @return array
+     */
     public function __invoke(array $record)
     {
         $record['extra']['uid'] = $this->uid;
@@ -25,6 +39,9 @@ class UidProcessor
         return $record;
     }
 
+    /**
+     * @return bool|string
+     */
     public function uid()
     {
         return $this->uid;

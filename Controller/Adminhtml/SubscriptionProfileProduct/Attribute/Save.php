@@ -160,7 +160,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                 }
             }
 
-            if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
+            if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {
                 $data['backend_type'] = $model->getBackendTypeByInput($data['frontend_input']);
             }
 

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -17,7 +16,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SortOrder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
-use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory as ProductBillingFrequencyCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory
+    as ProductBillingFrequencyCollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency as ResourceProductBillingFrequency;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -212,7 +212,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
             $this->dataObjectHelper->populateWithArray(
                 $productBillingFrequencyData,
                 $productBillingFrequencyModel->getData(),
-                'TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface'
+                \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::class
             );
             $items[] = $productBillingFrequencyData;
         }

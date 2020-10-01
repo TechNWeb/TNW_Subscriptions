@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Class LoadCustomerQuote - observer
+ */
 class LoadCustomerQuote implements ObserverInterface
 {
     /**

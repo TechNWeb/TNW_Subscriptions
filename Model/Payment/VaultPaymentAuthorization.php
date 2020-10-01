@@ -10,7 +10,7 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Command\CommandException;
 
 /**
- * Class VaultPaymentAuthorization
+ * Class VaultPaymentAuthorization - base vault payment
  */
 class VaultPaymentAuthorization
 {

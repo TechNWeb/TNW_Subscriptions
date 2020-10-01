@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Processor;
 
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -12,7 +11,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Process\ProcessInterface;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Class Processor
+ * Class Request - processor
  */
 class Request
 {

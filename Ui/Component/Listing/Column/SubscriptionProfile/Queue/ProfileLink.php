@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Queue;
 
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
+/**
+ * Class ProfileLink - ui
+ */
 class ProfileLink extends Column
 {
     /**
@@ -24,7 +26,10 @@ class ProfileLink extends Column
             foreach ($dataSource['data']['items'] as & $item) {
 
                 if (isset($item[$fieldName])) {
-                    $url = $this->context->getUrl('tnw_subscriptions/subscriptionprofile/edit/', ['entity_id' => $item['subscription_profile_id']]);
+                    $url = $this->context->getUrl(
+                        'tnw_subscriptions/subscriptionprofile/edit/',
+                        ['entity_id' => $item['subscription_profile_id']]
+                    );
                     $html = sprintf(
                         "<a target=\"_blank\" href ='%s'\">%s</a>",
                         $url,

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
@@ -22,7 +21,7 @@ use Magento\Framework\ObjectManagerInterface;
 class Braintree extends Base
 {
     /**
-     *
+     * Sort order value
      */
     const SORT_ORDER = 25;
 
@@ -71,7 +70,7 @@ class Braintree extends Base
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->braintreeConfig = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
+            $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
         }
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
@@ -172,7 +171,8 @@ class Braintree extends Base
                                     'formElement' => Form\Element\Input::NAME,
                                     'dataScope' => 'cc_exp_month',
                                     'dataType' => Form\Element\DataType\Text::NAME,
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/'
+                                        . 'braintree-input',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-month',
                                     'additionalClasses' => 'control-label-up select month',
                                     'sortOrder' => 10,
@@ -188,7 +188,8 @@ class Braintree extends Base
                                     'componentType' => Form\Field::NAME,
                                     'formElement' => Form\Element\Input::NAME,
                                     'dataScope' => 'cc_exp_year',
-                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree-input',
+                                    'elementTmpl' => 'TNW_Subscriptions/form/subscription-profile/payment/'
+                                        . 'braintree-input',
                                     'dataContainer' => $this->getPaymentCode() . '-cc-year',
                                     'additionalClasses' => 'control-label-up select year',
                                     'dataType' => Form\Element\DataType\Text::NAME,
@@ -270,7 +271,8 @@ class Braintree extends Base
                 'data' => [
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
+                            . 'additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree',
                         'label' => false,
                         'visible' => false,

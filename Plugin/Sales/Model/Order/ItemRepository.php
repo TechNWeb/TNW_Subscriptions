@@ -5,12 +5,12 @@
  */
 namespace TNW\Subscriptions\Plugin\Sales\Model\Order;
 
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\OrderItemSearchResultInterface;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
@@ -119,19 +119,7 @@ class ItemRepository
             }
             if ($profileRelations) {
                 foreach ($profileRelations as $relation) {
-                    try {
-                        $profile = $this->subscriptionProfileRepository->getById($relation->getSubscriptionProfileId());
-                        foreach ($profile->getProducts() as $product) {
-                            $profileStartDate = $profile->getTrialStartDate() ? : $profile->getStartDate();
-                            if ($product->getMagentoProductId() == $item->getProductId()
-                                && strtotime($profileStartDate) > strtotime($item->getCreatedAt())
-                            ) {
-                                $proposedShippingDate = $profileStartDate;
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        $proposedShippingDate = '';
-                    }
+                    $proposedShippingDate = $this->getProposedShippingDate($relation, $item);
                 }
                 if (isset($proposedShippingDate) && $proposedShippingDate) {
                     $extensionAttributes = $item->getExtensionAttributes();
@@ -143,5 +131,29 @@ class ItemRepository
                 }
             }
         }
+    }
+
+    /**
+     * @param $relation
+     * @param $item
+     * @return string|null
+     */
+    private function getProposedShippingDate($relation, $item)
+    {
+        $proposedShippingDate = '';
+        try {
+            $profile = $this->subscriptionProfileRepository->getById($relation->getSubscriptionProfileId());
+            foreach ($profile->getProducts() as $product) {
+                $profileStartDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
+                if ($product->getMagentoProductId() == $item->getProductId()
+                    && strtotime($profileStartDate) > strtotime($item->getCreatedAt())
+                ) {
+                    $proposedShippingDate = $profileStartDate;
+                }
+            }
+        } catch (\Exception $e) {
+            $proposedShippingDate = '';
+        }
+        return $proposedShippingDate;
     }
 }
