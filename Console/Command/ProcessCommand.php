@@ -14,7 +14,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TNW\Subscriptions\Cron\ProfileProcessor;
+use TNW\Subscriptions\Cron\ProfileProcessorFactory;
 use TNW\Subscriptions\Model\Config;
 
 /**
@@ -28,11 +28,11 @@ class ProcessCommand extends Base
     const PROCESS_LOCK_FILE = 'subscription_process.lock';
 
     /**
-     * Profile processor.
+     * Profile processor Factory.
      *
-     * @var ProfileProcessor
+     * @var ProfileProcessorFactory
      */
-    private $profileProcessor;
+    private $profileProcessorFactory;
 
     /**
      * ProcessCommand constructor.
@@ -42,7 +42,7 @@ class ProcessCommand extends Base
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
-     * @param ProfileProcessor $profileProcessor
+     * @param ProfileProcessorFactory $profileProcessorFactory
      * @throws FileSystemException
      */
     public function __construct(
@@ -52,9 +52,9 @@ class ProcessCommand extends Base
         Config $config,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
-        ProfileProcessor $profileProcessor
+        ProfileProcessorFactory $profileProcessorFactory
     ) {
-        $this->profileProcessor = $profileProcessor;
+        $this->profileProcessorFactory = $profileProcessorFactory;
         parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager);
     }
 
@@ -92,7 +92,7 @@ class ProcessCommand extends Base
             $this->setAreaCode();
             foreach ($this->getStoreManager()->getWebsites() as $website) {
                 if ($this->getConfig()->isSubscriptionsActive($website->getId())) {
-                    $this->profileProcessor->process($website->getId());
+                    $this->profileProcessorFactory->create()->process($website->getId());
                 }
             }
             $this->unlockProcess($fileStream);
