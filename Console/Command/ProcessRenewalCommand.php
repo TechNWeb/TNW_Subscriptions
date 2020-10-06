@@ -21,19 +21,19 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
     /**
      * @var \TNW\Subscriptions\Cron\NotificationProcessor
      */
-    protected $notificationProcessor;
+    protected $notificationProcessorFactory;
 
     /**
      * ProcessRenewalCommand constructor.
      * @param \Magento\Framework\App\State $appState
-     * @param \TNW\Subscriptions\Cron\NotificationProcessor $notificationProcessor
+     * @param \TNW\Subscriptions\Cron\NotificationProcessorFactory $notificationProcessorFactory
      */
     public function __construct(
         \Magento\Framework\App\State $appState,
-        \TNW\Subscriptions\Cron\NotificationProcessor $notificationProcessor
+        \TNW\Subscriptions\Cron\NotificationProcessorFactory $notificationProcessorFactory
     ) {
         $this->appState = $appState;
-        $this->notificationProcessor = $notificationProcessor;
+        $this->notificationProcessorFactory = $notificationProcessorFactory;
         parent::__construct();
     }
 
@@ -55,7 +55,7 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
-            $this->notificationProcessor->sendRenewalNotifications();
+            $this->notificationProcessorFactory->create()->sendRenewalNotifications();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
             // we must have an exit code higher than zero to indicate something was wrong
