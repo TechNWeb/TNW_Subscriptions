@@ -3,12 +3,10 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Class PaymentInformationManagement
- * @package TNW\Subscriptions\Plugin\Checkout\Model
+ * Class PaymentInformationManagement - plugin to before process payment info
  */
 class PaymentInformationManagement
 {
@@ -42,6 +40,7 @@ class PaymentInformationManagement
      * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
         $subject,
@@ -54,8 +53,7 @@ class PaymentInformationManagement
         $additionalData['is_active_payment_token_enabler'] = 1;
         $paymentMethod->setAdditionalData($additionalData);
 
-        if (
-            $this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001
+        if ($this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001
         ) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),

@@ -3,11 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Framework\Api\SearchResultsInterface;
 
+/**
+ * Interface SubscriptionProfileQueueSearchResultsInterface - determines the additional funcitonality to implement for
+ * subscription profile queue search result
+ */
 interface SubscriptionProfileQueueSearchResultsInterface extends SearchResultsInterface
 {
     /**

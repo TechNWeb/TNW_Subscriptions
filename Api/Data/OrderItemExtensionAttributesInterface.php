@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 /**
@@ -11,13 +10,14 @@ namespace TNW\Subscriptions\Api\Data;
  */
 interface OrderItemExtensionAttributesInterface extends SalesExtensionAttributesInterface
 {
-    /**
+    /**#@+
      * Refunded and invoiced subscription initial fee column names
      */
     const EXT_ATTRIBUTE_INITIAL_FEE_INVOICED = 'subs_initial_fee_invoiced';
     const EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED = 'base_subs_initial_fee_invoiced';
     const EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED = 'subs_initial_fee_refunded';
     const EXT_ATTRIBUTE_BASE_INITIAL_FEE_REFUNDED = 'base_subs_initial_fee_refunded';
+    /**#@-*/
 
     /**
      * Gets base invoiced initial fee.

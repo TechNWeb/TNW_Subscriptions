@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
@@ -16,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Next Payment block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextProfileRelation()
  * @method Quote getNextQuote()
@@ -63,7 +62,8 @@ class NextPayment extends Template
     /**
      * Retrieve next payment date
      *
-     * @return \DateTime|false
+     * @return bool|\DateTime
+     * @throws \Exception
      */
     public function getNextPaymentDate()
     {
@@ -79,7 +79,8 @@ class NextPayment extends Template
     /**
      * Get next payment date as array of date parts.
      *
-     * @return array
+     * @return array|bool
+     * @throws \Exception
      */
     public function getNextPaymentDateParts()
     {
@@ -129,7 +130,7 @@ class NextPayment extends Template
 
     /**
      * Retrieve Cost with price formatting
-     * 
+     *
      * @return string
      */
     public function getCostFormatting()

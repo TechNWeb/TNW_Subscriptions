@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Plugin\Quote\Model\Quote\Item;
 
+/**
+ * Class Processor - plugin to add additional logic for Magento\Quote\Model\Quote\Item\Processor::prepare method
+ */
 class Processor
 {
     /**
@@ -12,12 +15,23 @@ class Processor
      */
     private $productModifier;
 
+    /**
+     * Processor constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
     ) {
         $this->productModifier = $productModifier;
     }
 
+    /**
+     * @param \Magento\Quote\Model\Quote\Item\Processor $subject
+     * @param callable $callback
+     * @param \Magento\Quote\Model\Quote\Item $item
+     * @param \Magento\Framework\DataObject $request
+     * @param \Magento\Catalog\Model\Product $candidate
+     */
     public function aroundPrepare(
         \Magento\Quote\Model\Quote\Item\Processor $subject,
         callable $callback,

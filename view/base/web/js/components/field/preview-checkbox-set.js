@@ -74,7 +74,6 @@ define([
             this.setDiscountLabel('all');
         },
 
-
         /**
          * Return options labels.
          *

@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Block\Sales\Order\Creditmemo;
 
 use Magento\Framework\View\Element\Template;
 
+/**
+ * Class InitialFee - block to disaplay initial fee on creditmemo
+ */
 class InitialFee extends \Magento\Framework\View\Element\Template
 {
     /**
@@ -14,6 +17,12 @@ class InitialFee extends \Magento\Framework\View\Element\Template
      */
     private $dataObjectFactory;
 
+    /**
+     * InitialFee constructor.
+     * @param Template\Context $context
+     * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,

@@ -3,12 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency;
 
+/**
+ * Class Collection - ProductBillingFrequency ResourceModel
+ */
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
-
     /**
      * Define resource model
      *
@@ -17,8 +18,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            'TNW\Subscriptions\Model\ProductBillingFrequency',
-            'TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency'
+            \TNW\Subscriptions\Model\ProductBillingFrequency::class,
+            \TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency::class
         );
     }
 }

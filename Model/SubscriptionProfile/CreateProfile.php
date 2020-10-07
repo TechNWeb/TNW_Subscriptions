@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
@@ -11,8 +10,8 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
-use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
+use Magento\Quote\Model\Quote\Item;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
@@ -176,7 +175,7 @@ class CreateProfile extends BaseCreate
      */
     public function getSubQuotes()
     {
-        if (!$this->subQuotes){
+        if (!$this->subQuotes) {
             $this->subQuotes = $this->getSession()->getSubQuotes();
         }
 

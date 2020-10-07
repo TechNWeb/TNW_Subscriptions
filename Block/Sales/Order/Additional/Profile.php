@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Block\Sales\Order\Additional;
 
 use Magento\Framework\View\Element\Template;
 
+/**
+ * Class Profile - block to disaply the profile on product additional
+ */
 class Profile extends \Magento\Framework\View\Element\Template
 {
     /**
@@ -14,6 +17,12 @@ class Profile extends \Magento\Framework\View\Element\Template
      */
     private $itemRelationResource;
 
+    /**
+     * Profile constructor.
+     * @param Template\Context $context
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
@@ -69,7 +68,11 @@ class EmailDetails extends BaseSummary
             return null;
         }
         $path = 'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title';
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->getStore());
+        return $this->_scopeConfig->getValue(
+            $path,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->getStore()
+        );
     }
 
     /**

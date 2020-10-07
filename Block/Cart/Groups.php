@@ -11,9 +11,11 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Quote\ItemGroup;
 
+/**
+ * Class Groups - block for groups in cart
+ */
 class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
-
     /**
      * @var Session
      */
@@ -118,8 +120,9 @@ class Groups implements \Magento\Framework\View\Element\Block\ArgumentInterface
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote\Item $item
+     * @param $item
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getSubscriptionItemPrice($item)
     {

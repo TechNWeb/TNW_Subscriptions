@@ -5,12 +5,12 @@
  */
 /** @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\View\Profile $block */
 ?>
-<?php if($profileIds = $block->getProfileIds()) : ?>
+<?php if ($profileIds = $block->getProfileIds()): ?>
 <tr>
     <td colspan="10" class="last">
         <div class="sub-profile-option">
             <b><?= /* @escapeNotVerified */ __('Subscription Profile')?></b>
-            <?php foreach ($profileIds as $profileId) :?>
+            <?php foreach ($profileIds as $profileId):?>
             <br><span><a href="<?= /* @escapeNotVerified */ $block->linkProfileId($profileId) ?>" target="_blank"><?= /* @escapeNotVerified */ $block->textProfileId($profileId) ?></a></span>
             <?php endforeach; ?>
         </div>

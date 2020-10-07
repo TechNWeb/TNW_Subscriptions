@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
@@ -14,7 +13,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Missed Payments block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
  */
@@ -32,11 +31,10 @@ class MissedPayments extends Template
 
     /**
      * Count of missed payments
-     * 
+     *
      * @var int
      */
     private $countOfMissedPayments;
-    
 
     /**
      * @param Context $context
@@ -68,7 +66,7 @@ class MissedPayments extends Template
                     ->reset(\Zend_Db_Select::COLUMNS)
                     ->columns(['attempt_count'])
                     ->where('profile_order_id = ?', $nextOrder->getId());
-                $this->countOfMissedPayments = intval($this->profileQueueCollection->getConnection()->fetchOne($select));
+                $this->countOfMissedPayments = (int) $this->profileQueueCollection->getConnection()->fetchOne($select);
             }
         }
 

@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Model\Logger\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 
+/**
+ * Class Admin - admin logger
+ */
 class Admin extends AbstractProcessingHandler
 {
     /**

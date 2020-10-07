@@ -64,5 +64,4 @@ class Link extends \Magento\Framework\View\Element\Html\Link\Current
 
         return parent::_toHtml();
     }
-
 }

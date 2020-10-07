@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 use Magento\Framework\Exception\PaymentException;
@@ -50,6 +49,19 @@ class Braintree extends Base
      */
     private $braintreePaymentDataBuilder;
 
+    /**
+     * Braintree constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client\TransactionCustomer $transactionCustomer
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+     * @param \TNW\Subscriptions\Model\Payment\Braintree\BraintreePaymentDataBuilder $braintreePaymentDataBuilder
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
@@ -70,16 +82,19 @@ class Braintree extends Base
         $this->transactionCustomer = $transactionCustomer;
         $this->encryptor = $encryptor;
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->transferFactory = $objectManager->get("PayPal\Braintree\Gateway\Http\TransferFactory");
+            $this->transferFactory = $objectManager->get(\PayPal\Braintree\Gateway\Http\TransferFactory::class);
         }
     }
 
     /**
-     * @inheritdoc
+     * @param array $data
      * @throws PaymentException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
      * @throws \Magento\Payment\Gateway\Http\ClientException
      * @throws \Magento\Payment\Gateway\Http\ConverterException
+     * @throws \Zend_Json_Exception
      */
     public function process(array $data)
     {
@@ -100,9 +115,12 @@ class Braintree extends Base
 
         /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */
         $response = $this->transactionCustomer->placeRequest($transfer);
-        if (class_exists('\Braintree\Result\Error') &&  $response['object'] instanceof \Braintree\Result\Error) {
+        if (isset($this->transferFactory)
+            && class_exists(\Braintree\Result\Error::class)
+            && $response['object'] instanceof \Braintree\Result\Error
+        ) {
             $errors = [];
-            foreach($response->errors->deepAll() AS $error) {
+            foreach ($response->errors->deepAll() as $error) {
                 $errors[] = "{$error->code}: {$error->message}";
             }
 
@@ -166,7 +184,8 @@ class Braintree extends Base
     }
 
     /**
-     * @param $paymentToken
+     * @param $paymentData
+     * @param $customerId
      * @return string
      */
     protected function generatePublicHash($paymentData, $customerId)

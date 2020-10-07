@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -27,7 +26,7 @@ use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 use TNW\Subscriptions\Service\Serializer;
 
 /**
- * Class Product
+ * Class Product - model for subcription profile product
  */
 class Product extends Create
 {
@@ -240,8 +239,7 @@ class Product extends Create
         if (!$this->buyRequest) {
             $productData = $this->getData();
             $product = $this->getProduct();
-            if (
-                $this->getProduct()->getTypeId() === Configurable::TYPE_CODE
+            if ($this->getProduct()->getTypeId() === Configurable::TYPE_CODE
                 && isset($productData['super_attribute'])
             ) {
                 $childProduct = $this->getProduct()->getTypeInstance()
@@ -311,12 +309,10 @@ class Product extends Create
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
-            if (
-                $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
                 && isset($this->data['custom_price'])
             ) {
-                if (
-                    isset($this->data['use_preset_qty'])
+                if (isset($this->data['use_preset_qty'])
                     && $this->data['use_preset_qty']
                     && isset($this->data['subscription_data']['non_unique']['current_preset_qty_price'])
                 ) {
@@ -328,21 +324,18 @@ class Product extends Create
                     $customProductPrice = (float) $this->data['custom_price'];
                 }
             }
-            if (
-                $this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
+            if ($this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
                 && isset($productData['admin_modification'])
                 && $productData['admin_modification']
             ) {
-                if (
-                    $productData['use_preset_qty']
+                if ($productData['use_preset_qty']
                     && isset($productData['subscription_data']['non_unique']['current_preset_qty_price'])
                 ) {
                     $customProductPrice = $productData['subscription_data']['non_unique']['current_preset_qty_price'];
                 }
                 $currentProductCustomPrice = $customProductPrice;
                 $productData['price'] = $customProductPrice;
-            } elseif (
-                isset($productData['rebill_processing'])
+            } elseif (isset($productData['rebill_processing'])
                 && $productData['rebill_processing']
                 && $productData['use_preset_qty']
             ) {
@@ -351,8 +344,7 @@ class Product extends Create
                 ['non_unique']
                 ['current_preset_qty_price'];
             }
-            if (
-                isset($productData['modify_profile'])
+            if (isset($productData['modify_profile'])
                 && isset($productData['admin_modification'])
                 && $productData['modify_profile']
                 && $productData['admin_modification']
@@ -528,7 +520,10 @@ class Product extends Create
                         'current_price' => $this->getCustomPrice($this->getProduct(), $productData),
                         'initial_fee' =>  (float)$initialFee,
                         'price' => $this->getPrice($this->getProduct(), $productData),
-                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice($this->getProduct(), $productData),
+                        'current_preset_qty_price' => $this->getCurrentPresetQtyPrice(
+                            $this->getProduct(),
+                            $productData
+                        ),
                         'preset_qty_price' => $this->getPresetQtyPrice($this->getProduct(), $productData),
                     ]
                 ],
@@ -599,8 +594,7 @@ class Product extends Create
      */
     private function getSubsAttribute($code)
     {
-        if (
-            $this->getChildProduct()
+        if ($this->getChildProduct()
             && $this->getInheritanceConfig()
             && isset($this->getInheritanceConfig()[$code])
             && (bool)$this->getInheritanceConfig()[$code]

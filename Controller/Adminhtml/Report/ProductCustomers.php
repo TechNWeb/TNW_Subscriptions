@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Report;
 
+/**
+ * Class ProductCustomers - controller
+ */
 class ProductCustomers extends \Magento\Backend\App\Action
 {
     /**

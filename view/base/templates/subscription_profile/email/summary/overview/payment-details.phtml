@@ -1,40 +1,40 @@
 <?php
 /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails $block */
 ?>
-<h3><?php echo __("Payment Details") ?></h3>
+<h3><?= __("Payment Details") ?></h3>
 <p>
-    <strong><?php echo __('Payment Type') ?>:</strong>
+    <strong><?= __('Payment Type') ?>:</strong>
     <br>
-    <?php echo $block->getPaymentMethodTitle() ?>
+    <?= $block->getPaymentMethodTitle() ?>
 </p>
 <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()):?>
     <?php if (isset($additionalInfo['cc_type']) || isset($additionalInfo['cc_last_4'])): ?>
     <p>
-        <strong><?php echo __('Card Type') ?></strong>
+        <strong><?= __('Card Type') ?></strong>
         <br>
-        <?php echo $block->getCreditCardTypeLabel() ?>
+        <?= $block->getCreditCardTypeLabel() ?>
     </p>
     <p>
-        <strong><?php echo __('Card Number') ?></strong>
+        <strong><?= __('Card Number') ?></strong>
         <br>
-        <?php echo $block->getCreditCardNumber() ?>
+        <?= $block->getCreditCardNumber() ?>
     </p>
     <p>
-        <strong><?php echo __('Exp. Date') ?></strong>
+        <strong><?= __('Exp. Date') ?></strong>
         <br>
-        <?php echo $block->getCreditCardExpDate() ?>
+        <?= $block->getCreditCardExpDate() ?>
     </p>
     <?php endif; ?>
     <?php if (isset($additionalInfo['po_number'])): ?>
         <p>
-            <strong><?php echo __('Purchase Order Number') ?></strong>
+            <strong><?= __('Purchase Order Number') ?></strong>
             <br>
-            <?php echo $block->getPurchaseOrderNumber() ?>
+            <?= $block->getPurchaseOrderNumber() ?>
         </p>
     <?php endif; ?>
 <?php endif; ?>
 <p>
-    <strong><?php echo __('Currency') ?></strong>
+    <strong><?= __('Currency') ?></strong>
     <br>
-    <?php echo $block->getProfileCurrencyCode() ?>
+    <?= $block->getProfileCurrencyCode() ?>
 </p>

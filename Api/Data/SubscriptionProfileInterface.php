@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Framework\Api\CustomAttributesDataInterface;
 
 /**
- * Interface SubscriptionProfileInterface
+ * Interface SubscriptionProfileInterface - defaines the functionality required for SP
  */
 interface SubscriptionProfileInterface extends CustomAttributesDataInterface
 {
@@ -63,7 +62,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     /**#@-*/
 
     /**
-     * Label prefix
+     * Label prefix value
      */
     const LABEL_PREFIX = '#S-';
 

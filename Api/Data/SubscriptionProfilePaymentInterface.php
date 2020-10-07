@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 /**
@@ -14,7 +13,7 @@ interface SubscriptionProfilePaymentInterface
     /** subscription profile payment table name */
     const SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE = 'tnw_subscriptions_subscription_profile_payment';
 
-    /**
+    /**#@+
      * Constants for field names
      */
     const PAYMENT_ID = 'payment_id';
@@ -25,6 +24,7 @@ interface SubscriptionProfilePaymentInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const SENT_MAIL = 'sent_mail';
+    /**#@-*/
 
     /**
      * Gets id.
@@ -149,7 +149,8 @@ interface SubscriptionProfilePaymentInterface
     /**
      * Set sent mail flag
      *
-     * @return $this
+     * @param bool $flag
+     * @return mixed
      */
     public function setSentMail(bool $flag);
 

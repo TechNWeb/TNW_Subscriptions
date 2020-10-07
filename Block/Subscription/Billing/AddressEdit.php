@@ -115,7 +115,8 @@ class AddressEdit extends Edit
     /**
      * Return customer addresses select
      *
-     * @return string
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomerAddressesSelect()
     {

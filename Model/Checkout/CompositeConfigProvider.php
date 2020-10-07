@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Model\Checkout;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 
+/**
+ * Class CompositeConfigProvider - dataprovider for checkout
+ */
 class CompositeConfigProvider implements ConfigProviderInterface
 {
     /**

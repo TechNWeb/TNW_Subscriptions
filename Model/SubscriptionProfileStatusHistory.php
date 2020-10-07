@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as Resource;
@@ -14,8 +12,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as Resource;
 /**
  * Model for subscription profile status history.
  */
-class SubscriptionProfileStatusHistory extends AbstractModel
-    implements SubscriptionProfileStatusHistoryInterface
+class SubscriptionProfileStatusHistory extends AbstractModel implements SubscriptionProfileStatusHistoryInterface
 {
     /**#@+
      * Main table name.

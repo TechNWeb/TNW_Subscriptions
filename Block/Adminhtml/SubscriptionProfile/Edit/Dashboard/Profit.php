@@ -46,6 +46,9 @@ class Profit extends Template
         $this->profitCalculator = $profitCalculator;
     }
 
+    /**
+     * @return mixed
+     */
     public function subscriptionProfile()
     {
         return $this->registry->registry('tnw_subscription_profile');
@@ -86,7 +89,9 @@ class Profit extends Template
     }
 
     /**
+     * @param bool $includeContainer
      * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getRenderedRemainingProfit($includeContainer = true)
     {

@@ -1,9 +1,16 @@
 <?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\Level;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Monolog\Logger;
 
+/**
+ * Class Options - ui
+ */
 class Options implements OptionSourceInterface
 {
     /**

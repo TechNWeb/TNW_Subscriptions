@@ -7,8 +7,7 @@
 /** @var \TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Review\Address $this */
 ?>
 
-<div class="admin__page-section-item subscription-profile-<?php echo $this->getAddressType() ?>-address">
-    <div class="admin__page-section-item-content"><?php /* @escapeNotVerified */
-        echo $this->getAddress(); ?></div>
+<div class="admin__page-section-item subscription-profile-<?= $this->getAddressType() ?>-address">
+    <div class="admin__page-section-item-content"><?= /* @escapeNotVerified */ $this->getAddress(); ?></div>
 </div>
 </br>

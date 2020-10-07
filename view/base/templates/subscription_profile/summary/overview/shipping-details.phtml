@@ -2,18 +2,18 @@
 <?php if (!$block->isOnlyTableContent()): ?>
 <div class="block">
     <div class="block-title">
-        <strong><?php echo __("Shipping Details") ?></strong>
-        <?php if ($block->isShowEditLink()) : ?>
-            <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-details-edit-button"></a>
+        <strong><?= __("Shipping Details") ?></strong>
+        <?php if ($block->isShowEditLink()): ?>
+            <a href="<?= $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-details-edit-button"></a>
         <?php endif;?>
     </div>
-    <div class="block-content subscription-profile-<?php echo $block->getTabName() ?>-details" id="shipping-details-view">
+    <div class="block-content subscription-profile-<?= $block->getTabName() ?>-details" id="shipping-details-view">
 <?php endif; ?>
             <table class="table-secondary data-table">
                 <tbody>
                 <tr class="col-0">
-                    <td class="label"><?php echo __("Shipping Method") ?></td>
-                    <td class="right"><?php echo $block->getShippingDescription() ?>: <?php echo $block->getShippingAmount() ?></td>
+                    <td class="label"><?= __("Shipping Method") ?></td>
+                    <td class="right"><?= $block->getShippingDescription() ?>: <?= $block->getShippingAmount() ?></td>
                 </tr>
                 </tbody>
             </table>

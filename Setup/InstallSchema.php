@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Framework\DB\Adapter\AdapterInterface;
@@ -51,7 +50,6 @@ class InstallSchema implements InstallSchemaInterface
 
         $setup->endSetup();
     }
-
 
     /**
      * Create table 'tnw_subscriptions_billing_frequency'.
@@ -190,15 +188,17 @@ class InstallSchema implements InstallSchemaInterface
                 ['unsigned' => true, 'nullable' => true, 'default' => null,],
                 'Preset Qty'
             )->addIndex(
-                $setup->getIdxName($tableName,
-                    ['billing_frequency_id', 'magento_product_id']),
+                $setup->getIdxName(
+                    $tableName,
+                    ['billing_frequency_id', 'magento_product_id']
+                ),
                 ['billing_frequency_id', 'magento_product_id'],
                 ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
             )->addForeignKey(
                 $setup->getConnection()->getForeignKeyName(
                     $tableName,
                     'billing_frequency_id',
-                   BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE,
+                    BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE,
                     'id'
                 ),
                 'billing_frequency_id',
@@ -541,7 +541,8 @@ class InstallSchema implements InstallSchemaInterface
         if (!$setup->tableExists($tableName)) {
             $table = $setup->getConnection()->newTable($tableName)
                 ->addColumn(
-                    SalesExtensionAttributesInterface::MAGENTO_ITEM_ID, Table::TYPE_INTEGER,
+                    SalesExtensionAttributesInterface::MAGENTO_ITEM_ID,
+                    Table::TYPE_INTEGER,
                     null,
                     [
                         'identity' => true,
@@ -834,7 +835,6 @@ class InstallSchema implements InstallSchemaInterface
         }
     }
 
-
     /**
      * Create table 'tnw_subscriptions_subscription_profile_queue'.
      *
@@ -954,7 +954,6 @@ class InstallSchema implements InstallSchemaInterface
             $setup->getConnection()->createTable($table);
         }
     }
-
 
     /**
      * Create Product Subscription Profile Eav structure.
@@ -1107,7 +1106,10 @@ class InstallSchema implements InstallSchemaInterface
             )->addIndex(
                 $setup->getIdxName(
                     $entityTable,
-                    [ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID, ProductSubscriptionProfile::MAGENTO_PRODUCT_ID]
+                    [
+                        ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID,
+                        ProductSubscriptionProfile::MAGENTO_PRODUCT_ID
+                    ]
                 ),
                 [ProductSubscriptionProfile::SUBSCRIPTION_PROFILE_ID, ProductSubscriptionProfile::MAGENTO_PRODUCT_ID],
                 ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
@@ -1211,7 +1213,8 @@ class InstallSchema implements InstallSchemaInterface
                 'entity_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_datetime',
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE . '_datetime',
                     'store_id',
                     'store',
                     'store_id'
@@ -1298,7 +1301,8 @@ class InstallSchema implements InstallSchemaInterface
                 'entity_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE . '_decimal',
                     'store_id',
                     'store',
                     'store_id'
@@ -1385,7 +1389,8 @@ class InstallSchema implements InstallSchemaInterface
                 'entity_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_int',
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE . '_int',
                     'store_id',
                     'store',
                     'store_id'
@@ -1472,7 +1477,8 @@ class InstallSchema implements InstallSchemaInterface
                 'entity_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_text',
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE . '_text',
                     'store_id',
                     'store',
                     'store_id'
@@ -1559,7 +1565,8 @@ class InstallSchema implements InstallSchemaInterface
                 'entity_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )->addForeignKey(
-                $setup->getFkName(ProductSubscriptionProfile::ENTITY_TABLE . '_varchar',
+                $setup->getFkName(
+                    ProductSubscriptionProfile::ENTITY_TABLE . '_varchar',
                     'store_id',
                     'store',
                     'store_id'

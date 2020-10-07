@@ -104,7 +104,6 @@ define([
                 }
             }
 
-
             if (notice != '') {     //if calculated notice isn't empty we form whole necessary message to show
                 notice += ' ' + $.mage.__('savings to the customer');
             } else {

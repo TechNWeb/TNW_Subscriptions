@@ -10,5 +10,4 @@ namespace TNW\Subscriptions\Controller\Subscription;
  */
 class Shipment extends \TNW\Subscriptions\Controller\Subscription\AbstractView
 {
-
 }

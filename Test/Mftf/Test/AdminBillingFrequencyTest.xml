@@ -28,7 +28,6 @@
         <wait time="5" stepKey="BillingFrequencyDataSave1"/>
         <click stepKey="save1" selector="{{AdminBillingFrequencySection.save}}"/>
 
-
         <!--CREATE MONTHLY BILLING FREQUENCY-->
         <!--Open Grid list page -->
         <amOnPage url="{{AdminBillingFrequencyPage.url}}" stepKey="gridListPageOpen2"/>
@@ -42,6 +41,5 @@
         <fillField userInput="{{AdminBillingFrequencyMonthData.frequency}}" selector="{{AdminBillingFrequencySection.frequency}}" stepKey="frequency2"/>
         <wait time="5" stepKey="BillingFrequencyDataSave2"/>
         <click stepKey="save2" selector="{{AdminBillingFrequencySection.save}}"/>
-
     </test>
 </tests>

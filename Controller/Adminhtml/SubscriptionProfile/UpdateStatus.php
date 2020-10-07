@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action;
@@ -16,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
- * Action To update status in Subscription Profile
+ * Controller To update status in Subscription Profile
  */
 class UpdateStatus extends Action
 {
@@ -43,7 +42,6 @@ class UpdateStatus extends Action
      * @var EmailNotifierFactory
      */
     private $emailNotifierFactory;
-
 
     /**
      * @param Context $context
@@ -80,8 +78,8 @@ class UpdateStatus extends Action
         $response->setData('result', true);
         $response->setData('ajaxRedirect', $this->_url->getUrl(
             'tnw_subscriptions/subscriptionprofile/edit',
-            ['entity_id' => $profileId])
-        );
+            ['entity_id' => $profileId]
+        ));
         try {
             $this->updateStatusModel->updateStatus($profileId, $newStatus);
             $comment = $this->_request->getParam('comment_area') ?: false;

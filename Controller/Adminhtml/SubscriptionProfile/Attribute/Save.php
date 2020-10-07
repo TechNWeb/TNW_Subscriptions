@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
-use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Controller\ResultFactory;
 
 /**
@@ -62,10 +60,8 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Redirect
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return \Magento\Backend\Model\View\Result\Redirect|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
+     * @throws \Zend_Validate_Exception
      */
     public function execute()
     {
@@ -145,7 +141,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
                 );
             }
 
-            if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
+            if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {
                 $data['backend_type'] = $model->getBackendTypeByInput($data['frontend_input']);
             }
 

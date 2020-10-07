@@ -3,13 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Data provider for cancel button form in popup.
@@ -62,10 +60,6 @@ class CancelButtonPopup extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-    }
-
-    public function getMeta()
-    {
-        return parent::getMeta();
+        return $this;
     }
 }

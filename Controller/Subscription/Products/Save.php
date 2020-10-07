@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Subscription\Products;
 
 use Magento\Framework\App\Action\Action;
@@ -83,7 +82,7 @@ class Save extends Action
                     $this->currentProfile->setNeedRecollect(true);
                 }
                 $this->profileManager->saveProfile();
-            } elseif ( is_string($this->currentProfile)) {
+            } elseif (is_string($this->currentProfile)) {
                 throw new LocalizedException(__($this->currentProfile));
             }
         } catch (\Exception $e) {
@@ -116,6 +115,7 @@ class Save extends Action
      *
      * @param array $request
      * @return bool|\TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface
+     * @throws LocalizedException
      */
     private function getSubProduct(array $request)
     {

@@ -5,21 +5,22 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Braintree;
 
-use \Magento\Framework\App\ProductMetadataInterface;
-use \Magento\Payment\Gateway\Config\Config;
-use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use \Magento\Framework\ObjectManagerInterface;
-use \Magento\Vault\Api\Data\PaymentTokenInterface;
-use \Magento\Framework\Module\Manager as ModuleManager;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Payment\Gateway\Config\Config;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
- * Class BraintreePaymentDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Braintree
+ * Class BraintreePaymentDataBuilder used for build data for braintree payments
  */
 class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
     use \Magento\Payment\Helper\Formatter;
+
+    const CODE_3DSECURE = 'three_d_secure';
 
     /**
      * Additional data for Advanced Fraud Tools
@@ -145,11 +146,12 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
     const STORE_IN_VAULT_ON_SUCCESS = 'storeInVaultOnSuccess';
 
     /**
-     *
+     * Payment method nonce param name
      */
     const DATA_PAYMENT_METHOD_NONCE = 'payment_method_nonce';
+
     /**
-     *
+     * Device Data param name
      */
     const DATA_DEVICE_DATA = 'device_data';
 
@@ -210,20 +212,22 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      * @param Config|null $config
      */
     public function __construct(
-       ProductMetadataInterface $productMetadata,
-       SubscriptionConfig $subscriptionConfig,
-       Manager $manager,
-       ModuleManager $moduleManager,
-       ObjectManagerInterface $objectManager,
-       Config $config = null
+        ProductMetadataInterface $productMetadata,
+        SubscriptionConfig $subscriptionConfig,
+        Manager $manager,
+        ModuleManager $moduleManager,
+        ObjectManagerInterface $objectManager,
+        Config $config = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->braintreeConfig = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
-            $this->subjectReader = $objectManager->get("PayPal\Braintree\Gateway\Helper\SubjectReader");
-            $this->paymentNonceCommand = $objectManager->get("PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand");
+            $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
+            $this->subjectReader = $objectManager->get(\PayPal\Braintree\Gateway\Helper\SubjectReader::class);
+            $this->paymentNonceCommand = $objectManager->get(
+                \PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand::class
+            );
         }
         $this->productMetadata = $productMetadata;
-        $this->config = $config ? :  $objectManager->get(Config::class);
+        $this->config = $config ?: $objectManager->get(Config::class);
         parent::__construct($subscriptionConfig, $manager);
     }
 
@@ -233,7 +237,6 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
      * @throws \Zend_Json_Exception
      */
     public function build($order, $paymentData)
@@ -243,8 +246,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $channel = $this->config->getValue('channel');
 
         $paymentAdditionalData = $paymentData['additional_data'];
-        if (
-            !array_key_exists(self::DATA_PAYMENT_METHOD_NONCE, $paymentAdditionalData)
+        if (!array_key_exists(self::DATA_PAYMENT_METHOD_NONCE, $paymentAdditionalData)
             && array_key_exists(PaymentTokenInterface::CUSTOMER_ID, $paymentAdditionalData)
             && array_key_exists(PaymentTokenInterface::PUBLIC_HASH, $paymentAdditionalData)
         ) {
@@ -263,15 +265,12 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
                 self::EMAIL => $billingAddress->getEmail(),
             ],
             self::AMOUNT => $this->formatPrice($this->subjectReader->readAmount($amount)),
-            self::PAYMENT_METHOD_NONCE =>
-                $paymentData['additional_data']
-                [self::DATA_PAYMENT_METHOD_NONCE],
+            self::PAYMENT_METHOD_NONCE => $paymentData['additional_data'][self::DATA_PAYMENT_METHOD_NONCE],
             self::ORDER_ID => $order->getOrderIncrementId(),
             self::$channel => $channel ?: sprintf(self::$channelValue, $this->productMetadata->getEdition()),
             self::OPTIONS => [
                 self::STORE_IN_VAULT_ON_SUCCESS => true
-            ],
-            'store_id' => $order->getStoreId()
+            ]
         ];
 
         $billingAddress = $order->getBillingAddress();
@@ -307,7 +306,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $amount = $this->formatPrice($this->subjectReader->readAmount($amount));
 
         if ($this->is3DSecureEnabled($order, $amount)) {
-            $result['options'][BraintreeConfig::CODE_3DSECURE] = ['required' => true];
+            $result['options'][self::CODE_3DSECURE] = ['required' => true];
         }
 
         if (!$this->braintreeConfig->hasFraudProtection($order->getStoreId())) {
@@ -329,7 +328,6 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         }
 
         return $result;
-
     }
 
     /**

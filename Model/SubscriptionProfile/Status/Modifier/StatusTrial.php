@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -36,11 +35,14 @@ class StatusTrial extends Base
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status NOT IN (?)', $this->getIgnoredStatuses()
+            'profile.status NOT IN (?)',
+            $this->getIgnoredStatuses()
         )->where(
-            'main_table.status IN (?)', $this->getQueueStatuses()
+            'main_table.status IN (?)',
+            $this->getQueueStatuses()
         )->where(
-            'profile.entity_id IN (?)', $allIds
+            'profile.entity_id IN (?)',
+            $allIds
         )->where(
             'profile.trial_start_date IS NOT NULL'
         )->where(

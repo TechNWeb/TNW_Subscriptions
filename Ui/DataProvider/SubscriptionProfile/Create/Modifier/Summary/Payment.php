@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Summary;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -14,6 +17,9 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
+/**
+ * Class Payment - modifier
+ */
 class Payment implements ModifierInterface
 {
     /**
@@ -100,6 +106,10 @@ class Payment implements ModifierInterface
         $this->context = $context;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function modifyData(array $data)
     {
         $data['new_subscription']['payment_method_content'] = $this->getPaymentMethodTitle();
@@ -107,11 +117,15 @@ class Payment implements ModifierInterface
         $data['new_subscription'][OrderPaymentInterface::CC_LAST_4] = $this->getCardLastFour();
         foreach ($this->getTotalsData() as $key => $total) {
             $data['new_subscription'][$key] =
-                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'],false);
+                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'], false);
         }
         return $data;
     }
 
+    /**
+     * @param array $meta
+     * @return array
+     */
     public function modifyMeta(array $meta)
     {
         $meta['payment_method']['children'] = $this->getTotalsConfig();
@@ -132,7 +146,8 @@ class Payment implements ModifierInterface
         $method = $this->getPayment()->getMethod();
         $path = 'payment/' . $method . '/title';
         return $this->scopeConfig->getValue(
-            $path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $path,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $this->getSubQuote()->getStore()
         );
     }
@@ -273,7 +288,9 @@ class Payment implements ModifierInterface
         $config = [];
         $sortOrder = 50;
         foreach ($this->getTotalsData() as $key => $segment) {
-            if (($key !== 'shipping' && $key !== 'tax') && empty($segment['value'])) continue;
+            if (($key !== 'shipping' && $key !== 'tax') && empty($segment['value'])) {
+                continue;
+            }
             $config[$key] = [
                 'arguments' => [
                     'data' => [

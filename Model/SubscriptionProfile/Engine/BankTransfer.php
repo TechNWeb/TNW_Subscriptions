@@ -3,16 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\OfflinePayments\Model\Banktransfer as BanktransferPayment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
- * Class BankTransfer
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
+ * Class BankTransfer - engine to process bank transfer payments
  */
 class BankTransfer extends Base
 {

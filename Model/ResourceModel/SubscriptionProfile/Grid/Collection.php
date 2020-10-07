@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Grid;
 
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
@@ -106,7 +105,7 @@ class Collection extends SearchResult
             )
             ->joinLeft(
                 ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-                'relation.id = (' . (string)$this->getRelationJoinSelect(). ')',
+                'relation.id = (' . (string) $this->getRelationJoinSelect() . ')',
                 ['next_billing_cycle_date' => 'relation.scheduled_at']
             )
             ->joinLeft(
@@ -124,7 +123,9 @@ class Collection extends SearchResult
                 ]
             )
             ->joinLeft(
-                ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
+                ['payment' => $this->getTable(
+                    SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE
+                )],
                 'main_table.entity_id = payment.subscription_profile_id',
                 [
                     'engine_code' => 'payment.engine_code',
@@ -163,7 +164,8 @@ class Collection extends SearchResult
         )->where(
             SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NULL'
         )->where(
-            'main_table.status not in (?)', [
+            'main_table.status not in (?)',
+            [
                 ProfileStatus::STATUS_COMPLETE,
                 ProfileStatus::STATUS_CANCELED,
             ]

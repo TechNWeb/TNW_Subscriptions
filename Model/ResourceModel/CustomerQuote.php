@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
- * Class CustomerQuote
+ * Class CustomerQuote - resource model
  */
 class CustomerQuote extends AbstractDb
 {

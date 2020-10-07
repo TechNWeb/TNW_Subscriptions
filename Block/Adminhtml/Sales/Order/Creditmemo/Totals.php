@@ -9,17 +9,10 @@ use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Template;
 
 /**
- * Class Totals
+ * Class Totals - block class for totals block
  */
 class Totals extends Template
 {
-    public function __construct(
-        Template\Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
     /**
      * Get totals source object
      *

@@ -3,16 +3,18 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
-use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\Api\Filter;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
+/**
+ * Class Store - DataProvider
+ */
 class Store extends AbstractDataProvider
 {
     /**#@+
@@ -77,14 +79,18 @@ class Store extends AbstractDataProvider
         $this->stepPool = $stepPool;
         $this->session = $session;
         $this->storeManager = $storeManager;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
-            $data);
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $meta,
+            $data
+        );
     }
 
     /**
-     * Get data
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getData()
     {
@@ -120,13 +126,12 @@ class Store extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
+        return $this;
     }
 
     /**
-     * Get default store id
-     *
      * @return int
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getDefaultStoreId()
     {

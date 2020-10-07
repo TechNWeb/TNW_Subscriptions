@@ -3,10 +3,9 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
-use \Magento\Framework\UrlInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
@@ -14,10 +13,13 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
+/**
+ * Class CyberSource - modifier
+ */
 class CyberSource extends Base
 {
     /**
-     *
+     * Sort order value
      */
     const SORT_ORDER = 35;
 
@@ -26,6 +28,9 @@ class CyberSource extends Base
      */
     private $paymentConfig;
 
+    /**
+     * @var mixed
+     */
     private $cybersourceConfig;
 
     /**
@@ -66,8 +71,8 @@ class CyberSource extends Base
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
-            $this->cybersourceConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
-            $this->fingerprintBlock = $objectManager->get("CyberSource\Core\Block\Fingerprint");
+            $this->cybersourceConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
+            $this->fingerprintBlock = $objectManager->get(\CyberSource\Core\Block\Fingerprint::class);
         }
         $this->paymentConfig = $paymentConfig;
         $this->urlBuilder = $urlBuilder;
@@ -315,7 +320,8 @@ class CyberSource extends Base
                 'data' => [
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
+                            . 'additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree',
                         'label' => false,
                         'visible' => false,

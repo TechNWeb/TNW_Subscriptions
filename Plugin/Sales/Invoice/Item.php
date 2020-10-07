@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Sales\Invoice;
 
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
@@ -33,10 +32,12 @@ class Item
 
         if ($orderInitialFees && $invoiceInitialFees) {
             $orderInitialFees->setSubsInitialFeeInvoiced(
-                $orderInitialFees->getSubsInitialFeeInvoiced() + $invoiceInitialFees->getSubsInitialFee()
+                $orderInitialFees->getSubsInitialFeeInvoiced()
+                + $invoiceInitialFees->getSubsInitialFee()
             );
             $orderInitialFees->setBaseSubsInitialFeeInvoiced(
-                $orderInitialFees->getBaseSubsInitialFeeInvoiced() + $invoiceInitialFees->getBaseSubsInitialFee()
+                $orderInitialFees->getBaseSubsInitialFeeInvoiced()
+                + $invoiceInitialFees->getBaseSubsInitialFee()
             );
 
             if ($orderItem->getExtensionAttributes()) {
@@ -64,10 +65,12 @@ class Item
 
         if ($orderInitialFees && $invoiceInitialFees) {
             $orderInitialFees->setSubsInitialFeeInvoiced(
-                $orderInitialFees->getSubsInitialFeeInvoiced() - $invoiceInitialFees->getSubsInitialFee()
+                $orderInitialFees->getSubsInitialFeeInvoiced()
+                - $invoiceInitialFees->getSubsInitialFee()
             );
             $orderInitialFees->setBaseSubsInitialFeeInvoiced(
-                $orderInitialFees->getBaseSubsInitialFeeInvoiced() - $invoiceInitialFees->getBaseSubsInitialFee()
+                $orderInitialFees->getBaseSubsInitialFeeInvoiced()
+                - $invoiceInitialFees->getBaseSubsInitialFee()
             );
 
             if ($orderItem->getExtensionAttributes()) {

@@ -6,12 +6,10 @@
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Framework\Registry;
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection as MessagesCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory;
 
 /**
@@ -67,7 +65,6 @@ class ChangeHistory extends ContentAbstract
             }
         }
 
-
         return $this->messagesCollection;
     }
 
@@ -91,7 +88,8 @@ class ChangeHistory extends ContentAbstract
     }
 
     /**
-     * @return $this
+     * @return $this|ContentAbstract
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _prepareLayout()
     {

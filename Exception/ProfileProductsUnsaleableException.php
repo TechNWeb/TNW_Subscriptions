@@ -8,8 +8,7 @@ namespace TNW\Subscriptions\Exception;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Class ProfileProductsUnsaleableException
- * @package TNW\Subscriptions\Exception
+ * Class ProfileProductsUnsaleableException - used to define the product unsalability
  */
 class ProfileProductsUnsaleableException extends LocalizedException
 {
