@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Summary;
 
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
@@ -7,6 +10,9 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
 
+/**
+ * Class Shipping - modifier
+ */
 class Shipping implements ModifierInterface
 {
     /**
@@ -39,12 +45,20 @@ class Shipping implements ModifierInterface
         $this->formContext = $formContext;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function modifyData(array $data)
     {
         $data['new_subscription']['shipping_method_content'] = $this->getShippingMethodAmount();
         return $data;
     }
 
+    /**
+     * @param array $meta
+     * @return array
+     */
     public function modifyMeta(array $meta)
     {
         $meta = array_merge_recursive(
@@ -63,7 +77,8 @@ class Shipping implements ModifierInterface
                         ]
                     ]
                 ]
-            ]);
+            ]
+        );
         return $meta;
     }
 
@@ -78,7 +93,9 @@ class Shipping implements ModifierInterface
         }
         $subQuotes = $this->formContext->getSession()->getSubQuotes();
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->getIsVirtual()) continue;
+            if ($subQuote->getIsVirtual()) {
+                continue;
+            }
             $this->shippingMethods->setQuote($subQuote);
             if ($methodTitle = $this->shippingMethods->getCurrentMethodLabel(false)) {
                 return $methodTitle;
@@ -94,10 +111,14 @@ class Shipping implements ModifierInterface
     private function getShippingMethodAmount()
     {
         $amount = 0;
-        if ($this->getIsVirtual()) return null;
+        if ($this->getIsVirtual()) {
+            return null;
+        }
         $subQuotes = $this->formContext->getSession()->getSubQuotes();
         foreach ($subQuotes as $subQuote) {
-            if ($subQuote->getIsVirtual()) continue;
+            if ($subQuote->getIsVirtual()) {
+                continue;
+            }
             $this->shippingMethods->setQuote($subQuote);
             $method = $subQuote->getShippingAddress()->getShippingMethod();
             $rates = $this->shippingMethods->getShippingRates();

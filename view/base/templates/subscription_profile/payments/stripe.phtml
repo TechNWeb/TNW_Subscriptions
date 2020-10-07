@@ -9,7 +9,6 @@
  * https://opensource.org/licenses/osl-3.0.php
  *
  * @category  TNW
- * @package   TNW_Stripe
  * @copyright Copyright (c) 2017-2018
  * @license   Open Software License (OSL 3.0)
  */
@@ -26,7 +25,7 @@ $code = 'tnw_stripe';
     ], function ($, stripes) {
             var self = this,
                 stripeCardElement;
-            var stripe = window.Stripe("<?php echo $block->getPublishableKey(); ?>");
+            var stripe = window.Stripe("<?= $block->getPublishableKey(); ?>");
             stripeCardElement = stripe.elements();
             var style = {
                 base: {

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Quote\Item;
 
 use Magento\Quote\Model\Quote\Item as QuoteItem;
@@ -13,7 +12,7 @@ use Magento\Sales\Model\Order\Item as OrderItem;
 use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 
 /**
- * Class ToOrderItem
+ * Class ToOrderItem - plugin to add additional logic to MagentoToOrderItem convert method
  */
 class ToOrderItem
 {
@@ -34,10 +33,9 @@ class ToOrderItem
         $this->extensionManager = $extensionManager;
     }
 
-
     /**
      * @param MagentoToOrderItem $subject
-     * @param callable $proceed
+     * @param \Closure $proceed
      * @param AbstractItem $item
      * @param array $additional
      * @return OrderItem

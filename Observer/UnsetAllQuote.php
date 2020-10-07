@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 
+/**
+ * Class UnsetAllQuote - observer
+ */
 class UnsetAllQuote implements ObserverInterface
 {
     /**

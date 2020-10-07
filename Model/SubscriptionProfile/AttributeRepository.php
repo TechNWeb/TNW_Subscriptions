@@ -8,8 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
 
 /**
- * Attribute repository
- * @package TNW\Subscriptions\Model\SubscriptionProfile
+ * Attribute repository - model used as attribute repository
  */
 class AttributeRepository implements SubscriptionProfileAttributeRepositoryInterface
 {

@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance;
 
 /**
- * Class TokenRequest
- * @package TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance
+ * Class TokenRequest - controller
  */
 class TokenRequest extends \Magento\Backend\App\Action
 {
@@ -31,12 +30,32 @@ class TokenRequest extends \Magento\Backend\App\Action
      */
     private $tokenRequestDataBuilder;
 
+    /**
+     * @var \TNW\Subscriptions\Model\QuoteSessionInterface
+     */
     private $quoteSession;
 
+    /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     */
     private $manager;
 
+    /**
+     * @var \TNW\Subscriptions\Model\SubscriptionProfileRepository
+     */
     private $profileRepository;
 
+    /**
+     * TokenRequest constructor.
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Payment\Gateway\Command\Result\ArrayResultFactory $resultFactory
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Magento\Framework\Data\Form\FormKey\Validator $formKeyValidator
+     * @param \TNW\Subscriptions\Model\Payment\Cybersource\TokenRequestDataBuilder $tokenRequestDataBuilder
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $quoteSession
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\SubscriptionProfileRepository $profileRepository
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Payment\Gateway\Command\Result\ArrayResultFactory $resultFactory,
@@ -57,6 +76,11 @@ class TokenRequest extends \Magento\Backend\App\Action
         $this->tokenRequestDataBuilder = $tokenRequestDataBuilder;
     }
 
+    /**
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function execute()
     {
         $result = $this->resultJsonFactory->create();

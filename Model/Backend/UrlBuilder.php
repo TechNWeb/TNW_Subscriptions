@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Backend;
 
 use Magento\Framework\App\Area;
@@ -19,8 +18,8 @@ class UrlBuilder implements UrlBuilderInterface
 {
     /**
      * URL admin path to edit subscription
-     * 
-     * @var string 
+     *
+     * @var string
      */
     private $adminEditPath = 'tnw_subscriptions/subscriptionprofile/edit/';
 
@@ -57,7 +56,7 @@ class UrlBuilder implements UrlBuilderInterface
 
     /**
      * Get subscription edit URL
-     * 
+     *
      * @param int $id
      * @return string
      */
@@ -83,7 +82,7 @@ class UrlBuilder implements UrlBuilderInterface
 
     /**
      * Get subscription edit URL link
-     * 
+     *
      * @param int $id
      * @param bool $targetBlank
      * @return string

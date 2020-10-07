@@ -9,6 +9,9 @@ use Magento\Framework\Logger\Handler\Base;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 
+/**
+ * Class Filesystem - file log
+ */
 class Filesystem extends Base
 {
     /**
@@ -27,10 +30,11 @@ class Filesystem extends Base
     private $salesforceConfig;
 
     /**
-     * SForce constructor.
+     * Filesystem constructor.
      * @param \Magento\Framework\Filesystem\DriverInterface $filesystem
      * @param \TNW\Subscriptions\Model\Config $salesforceConfig
      * @param null $filePath
+     * @throws \Exception
      */
     public function __construct(
         \Magento\Framework\Filesystem\DriverInterface $filesystem,

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
@@ -14,7 +13,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 /**
  * Subscription Overview Status block
- * 
+ *
  * @method SubscriptionProfile getSubscriptionProfile()
  * @method SubscriptionProfileOrder getNextSubscriptionProfileOrder()
  */
@@ -48,7 +47,7 @@ class Status extends Template
 
     /**
      * Retrieve profile status label
-     * 
+     *
      * @return string
      */
     public function getStatusLabel()

@@ -7,11 +7,10 @@ namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use \Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
- * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Paypal
+ * Class TokenExtractor - pyapal transactions token extractor
  */
 class TokenExtractor
 {
@@ -62,8 +61,7 @@ class TokenExtractor
 
             $paymentToken->setGatewayToken($token);
             $payment = $quote->getPayment();
-            if (
-                !$payment->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
+            if (!$payment->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
                 && isset($paymentData['additional'])
             ) {
                 $paymentToken->setTokenDetails(json_encode($paymentData['additional']));
@@ -71,8 +69,7 @@ class TokenExtractor
             } else {
                 $paymentToken->setTokenDetails(
                     json_encode($payment
-                        ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS)
-                    )
+                        ->getAdditionalInformation(\Magento\Paypal\Model\Payflow\Transparent::CC_DETAILS))
                 );
                 $paymentToken->setExpiresAt(
                     $this->getExpirationDate($payment->getData())

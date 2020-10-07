@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 use Magento\Framework\Math\Random;
@@ -15,12 +14,12 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class SecureToken
+ * Class SecureToken - secure token model for paypal
  */
 class SecureToken
 {
     /**
-     *
+     * Auth only transaction code
      */
     const TRXTYPE_AUTH_ONLY = 'A';
 
@@ -55,7 +54,7 @@ class SecureToken
         $this->url = $url;
         $this->mathRandom = $mathRandom;
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->transparent = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
+            $this->transparent = $objectManager->get(\Magento\Paypal\Model\Payflow\Transparent::class);
         }
     }
 

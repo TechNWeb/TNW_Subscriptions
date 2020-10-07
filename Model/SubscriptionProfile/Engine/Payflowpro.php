@@ -3,19 +3,21 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
-use TNW\Subscriptions\Model\Config;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
- * Class Payflowpro
+ * Class Payflowpro - used as processor for payflowpro payments
  */
 class Payflowpro extends Base
 {
+    /**
+     * Token value field
+     */
     const PNREF = 'pnref';
 
     /**
@@ -89,6 +91,12 @@ class Payflowpro extends Base
         return $this;
     }
 
+    /**
+     * @param $requestData
+     * @return Base|EngineInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
     public function processProfileByRequestData($requestData)
     {
         if (!empty($requestData['payment'][$this->getPaymentMethodCode()]['method'])) {
@@ -103,9 +111,13 @@ class Payflowpro extends Base
         return parent::processProfileByRequestData($requestData);
     }
 
+    /**
+     * @param $paymentToken
+     * @return $this|Base
+     */
     protected function populateProfilePayment($paymentToken)
     {
-        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $this->getProfile()->getPayment()
             ->setEngineCode($this->getPaymentMethodCode())
             ->setPaymentToken($paymentToken->getGatewayToken())

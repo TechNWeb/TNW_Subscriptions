@@ -87,7 +87,7 @@ class DetailsEdit extends \Magento\Framework\View\Element\Template
     /**
      * Check if $shippingMethodName is subscription profile shipping method
      *
-     * @param string $optionValue
+     * @param string $shippingMethodName
      * @return string
      */
     public function isSubscriptionShippingMethod($shippingMethodName)

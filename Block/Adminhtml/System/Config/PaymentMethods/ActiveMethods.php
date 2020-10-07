@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods;
 
 use Magento\Backend\Block\Context;
@@ -19,7 +18,7 @@ use Magento\Framework\Data\Form\Element\Fieldset as DataFieldset;
 use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
 
 /**
- * Class ActiveMethods
+ * Class ActiveMethods - adminhtml block config ro active payment methods
  */
 class ActiveMethods extends Fieldset
 {
@@ -29,6 +28,11 @@ class ActiveMethods extends Fieldset
     const SECTION_ID = 'tnw_subscriptions_payment_methods';
     const GROUP_ID = 'active_methods';
     /**#@-*/
+
+    /**
+     * @var \Magento\Framework\View\Element\BlockInterface
+     */
+    private $fieldRenderer;
 
     /**
      * Yes/no model.
@@ -92,6 +96,7 @@ class ActiveMethods extends Fieldset
      *
      * @param AbstractElement $element
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function render(AbstractElement $element)
     {
@@ -117,7 +122,8 @@ class ActiveMethods extends Fieldset
     /**
      * Generates field for each payment method.
      *
-     * @param $element AbstractElement
+     * @param $element
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function generateFields($element)
     {
@@ -155,7 +161,8 @@ class ActiveMethods extends Fieldset
     /**
      * Get field renderer
      *
-     * @return Field
+     * @return \Magento\Framework\View\Element\BlockInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getFieldRenderer()
     {

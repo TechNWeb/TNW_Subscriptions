@@ -5,6 +5,10 @@
  */
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface SubscriptionProfileRepositoryInterface - determines the functionality to implement for
+ * subscription profile repository
+ */
 interface SubscriptionProfileRepositoryInterface
 {
     /**

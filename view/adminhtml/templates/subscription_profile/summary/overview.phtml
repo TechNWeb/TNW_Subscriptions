@@ -3,13 +3,13 @@
     <table class="overview-table" style="width:100%">
         <tr style="height:25%;">
             <?php if ($block->getCanShowNextPayment()): ?>
-            <td rowspan="2" class="next-payment"><?php echo $block->getNextPaymentHtml() ?></td>
+            <td rowspan="2" class="next-payment"><?= $block->getNextPaymentHtml() ?></td>
             <?php endif ?>
-            <td colspan="2" class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>"><?php echo $block->getMessageHtml() ?></td>
+            <td colspan="2" class="bordered subscription-message <?= $block->getBlockMessage()->getStatusClass() ?>"><?= $block->getMessageHtml() ?></td>
         </tr>
         <tr>
-            <td style="width:33%" class="bordered missed-payments"><?php echo $block->getMissedPaymentsHtml() ?></td>
-            <td style="width:33%" class="bordered status <?php echo $block->getBlockStatus()->getStatusClass() ?>"><?php echo $block->getStatusHtml() ?></td>
+            <td style="width:33%" class="bordered missed-payments"><?= $block->getMissedPaymentsHtml() ?></td>
+            <td style="width:33%" class="bordered status <?= $block->getBlockStatus()->getStatusClass() ?>"><?= $block->getStatusHtml() ?></td>
         </tr>
     </table>
 </div>

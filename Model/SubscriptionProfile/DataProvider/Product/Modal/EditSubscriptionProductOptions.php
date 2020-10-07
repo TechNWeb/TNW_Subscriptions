@@ -3,11 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
-
-use Magento\Catalog\Model\Product as MagentoProduct;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 /**
  * Modal form for editing product options on edit subscription page.

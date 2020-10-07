@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Session;
 
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
@@ -96,10 +95,10 @@ class AddEmailToSession extends Action
      */
     private function tryToGetCustomer($email)
     {
-        $customer = null;
         try {
             $customer = $this->customerRepository->get($email);
         } catch (\Exception $e) {
+            $customer = null;
         }
 
         return $customer;

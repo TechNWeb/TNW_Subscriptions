@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
- * Class Authorizenet
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
+ * Class Authorizenet - used as save process for authorizenet payment
  */
 class Authorizenet extends Base
 {
@@ -21,8 +20,19 @@ class Authorizenet extends Base
      */
     private $encryptor;
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
     private $paymentTokenRepository;
 
+    /**
+     * Authorizenet constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,

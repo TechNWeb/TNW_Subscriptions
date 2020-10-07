@@ -3,12 +3,10 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Config\Model\Structure\Element;
 
 /**
- * Class Field
- * @package TNW\Subscriptions\Plugin\Config\Model\Structure\Element
+ * Class Field - plugin to modify result on showInDefaultMethod
  */
 class Field
 {

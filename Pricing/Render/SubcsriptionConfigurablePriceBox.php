@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Pricing\Render;
 
 use Magento\Catalog\Helper\Product as HelperProduct;
@@ -20,6 +19,9 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use Magento\Framework\Module\Manager;
+use Magento\Swatches\Helper\Data;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 
 /**
  * Class for subscription price rendering for configurable products.
@@ -42,6 +44,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
     private $swatchHelper;
 
     /**
+     * SubcsriptionConfigurablePriceBox constructor.
+     *
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -55,8 +59,9 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param HelperProduct $helperProduct
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Swatches\Helper\Data $swatchHelper
+     * @param Manager $moduleManager
+     * @param Data $swatchHelper
+     * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param array $data
      */
     public function __construct(
@@ -73,9 +78,9 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         ProfileManager $profileManager,
         ProductTypeManagerResolver $productTypeResolver,
         HelperProduct $helperProduct,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Swatches\Helper\Data $swatchHelper,
-        \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig,
+        Manager $moduleManager,
+        Data $swatchHelper,
+        SubscriptionProductView $subscriptionProductViewConfig,
         array $data = []
     ) {
         parent::__construct(

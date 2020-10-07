@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance;
 
 /**
- * Class ReceiveToken
- * @package TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance
+ * Class ReceiveToken - controller
  */
 class ReceiveToken extends \Magento\Backend\App\Action
 {
@@ -46,7 +45,10 @@ class ReceiveToken extends \Magento\Backend\App\Action
                 'chcybersource_payment_token',
                 $this->getRequest()->getParam('payment_token')
             );
-            $result->setData(['success' => true, 'payment_token' => $this->getRequest()->getParam('payment_token')]);
+            $result->setData([
+                'success' => true,
+                'payment_token' => $this->getRequest()->getParam('payment_token')
+            ]);
         }
 
         return $result;

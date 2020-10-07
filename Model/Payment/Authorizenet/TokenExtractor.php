@@ -7,9 +7,12 @@ namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
-use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
+/**
+ * Class TokenExtractor - authorizenet
+ */
 class TokenExtractor
 {
     /**
@@ -47,6 +50,14 @@ class TokenExtractor
      */
     private $serializer;
 
+    /**
+     * TokenExtractor constructor.
+     * @param PaymentTokenManagementInterface $tokenManagement
+     * @param CreditCardTokenFactory $creditCardTokenFactory
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param SerializerInterface $serializer
+     */
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
@@ -58,11 +69,11 @@ class TokenExtractor
         $this->tokenManagement = $tokenManagement;
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->client = $objectManager->get(
-                "TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction"
+                \TNW\AuthorizeCim\Gateway\Http\Client\CreateCustomerProfileFromTransaction::class
             );
-            $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
-            $this->subjectReader = $objectManager->get("TNW\AuthorizeCim\Gateway\Helper\SubjectReader");
-            $this->config = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
+            $this->transferFactory = $objectManager->get(\TNW\AuthorizeCim\Gateway\Http\TransferFactory::class);
+            $this->subjectReader = $objectManager->get(\TNW\AuthorizeCim\Gateway\Helper\SubjectReader::class);
+            $this->config = $objectManager->get(\TNW\AuthorizeCim\Gateway\Config\Config::class);
         }
 
         $this->serializer = $serializer;
@@ -93,10 +104,17 @@ class TokenExtractor
         ];
     }
 
+    /**
+     * @param $transaction
+     * @param $paymentData
+     * @param $maskedCC
+     * @param int $customerId
+     * @return PaymentTokenInterface|null
+     */
     private function getVaultPaymentToken($transaction, $paymentData, $maskedCC, $customerId = 0)
     {
         $profileId = $transaction->getCustomerProfileId();
-        $paymentProfileIdList = $transaction->getCustomerPaymentProfileIdList() ? : [];
+        $paymentProfileIdList = $transaction->getCustomerPaymentProfileIdList() ?: [];
         $gateWayToken = sprintf('%s/%s', $profileId, reset($paymentProfileIdList));
 
         if (!$paymentToken = $this->tokenManagement->getByGatewayToken(

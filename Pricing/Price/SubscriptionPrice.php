@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Pricing\Price;
 
 use Magento\Framework\Pricing\Price\AbstractPrice;
@@ -19,7 +18,7 @@ class SubscriptionPrice extends AbstractPrice
     const PRICE_CODE = 'subscription_price';
 
     /**
-     * @var BasePrice
+     * @var \Magento\Framework\Pricing\Price\PriceInterface
      */
     private $basePrice;
 
@@ -46,7 +45,7 @@ class SubscriptionPrice extends AbstractPrice
     /**
      * Retrieve base price instance lazily
      *
-     * @return BasePrice|\Magento\Framework\Pricing\Price\PriceInterface
+     * @return \Magento\Framework\Pricing\Price\PriceInterface
      */
     protected function getBasePrice()
     {

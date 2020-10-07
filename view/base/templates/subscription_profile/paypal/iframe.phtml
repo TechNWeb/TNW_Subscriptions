@@ -15,8 +15,8 @@ $errors = !empty($params['error_messages']) ? $params['error_messages'] : [];
 <script>
     var require = window.top.require;
     require(['uiRegistry'], function(registry) {
-        registry.get('index = <?php echo $block->getData('index')?>').triggerSave(
-            <?php /* @noEscape */ echo $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($errors); ?>
+        registry.get('index = <?= $block->getData('index')?>').triggerSave(
+            <?=/* @noEscape */ $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($errors); ?>
         );
     });
 </script>

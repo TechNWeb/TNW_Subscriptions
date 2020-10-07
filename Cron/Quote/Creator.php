@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Cron\Quote;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -21,7 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class Creator
+ * Class Creator -quotes creator
  */
 class Creator extends Base
 {
@@ -199,7 +198,7 @@ class Creator extends Base
     public function getProfilesIdsToProcess($websiteId)
     {
         $collection = $this->getBaseCollection()
-            ->addFieldToFilter( SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [
+            ->addFieldToFilter(SubscriptionProfileInterface::GENERATE_QUOTES_STATE, ['in' => [
                 SubscriptionProfileInterface::GENERATE_QUOTES_STATE_NEED_GENERATE,
                 SubscriptionProfileInterface::GENERATE_QUOTES_STATE_GENERATED_FOR_YEAR
             ]])

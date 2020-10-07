@@ -3,11 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api;
 
 /**
- * Class to retrieve subscription url
+ * Interface UrlBuilderInterface - determines the functionality to implement for
+ * url builder
  */
 interface UrlBuilderInterface
 {

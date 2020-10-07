@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -82,7 +80,6 @@ class AccountInformation extends Template
         Registry $registry,
         Template\Context $context,
         array $data = []
-
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/account_information.phtml');
         parent::__construct($context, $data);
@@ -232,6 +229,8 @@ class AccountInformation extends Template
      * Return customer group
      *
      * @return string
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomerGroup()
     {
@@ -260,7 +259,6 @@ class AccountInformation extends Template
     {
         return $this->getSubscriptionProfile()->getProfileCurrencyCode();
     }
-
 
     /**
      * Return subscription website name
@@ -299,7 +297,6 @@ class AccountInformation extends Template
         return $result;
     }
 
-
     /**
      * Return subscription profile from registry
      *
@@ -313,5 +310,4 @@ class AccountInformation extends Template
 
         return $this->subscriptionProfile;
     }
-
 }

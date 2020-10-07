@@ -9,19 +9,13 @@ use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Template;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
+use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 
 /**
- * Class Totals
+ * Class Totals - order totals block
  */
 class Totals extends Template
 {
-    public function __construct(
-        Template\Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
     /**
      * Get totals source object
      *
@@ -74,11 +68,11 @@ class Totals extends Template
         $baseResult = 0;
         foreach ($items as $item) {
             switch (true) {
-                case $item instanceof \Magento\Sales\Model\Order\Item:
+                case $item instanceof Item:
                     $qty = $item->getQtyOrdered();
                     break;
 
-                case $item instanceof \Magento\Sales\Model\Order\Invoice\Item:
+                case $item instanceof InvoiceItem:
                     $qty = $item->getQty();
                     $item = $item->getOrderItem();
                     break;
@@ -92,7 +86,6 @@ class Totals extends Template
 
         return [$result, $baseResult];
     }
-
 
     /**
      * Returns item subscription initial fee extension attribute.

@@ -3,16 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
 use Magento\Framework\UrlInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\PaymentModifierInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**

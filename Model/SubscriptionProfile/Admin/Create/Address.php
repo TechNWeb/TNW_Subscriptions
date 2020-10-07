@@ -3,14 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Model\Metadata\Form;
 use Magento\Customer\Model\Metadata\FormFactory;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\AddressFactory;
 use TNW\Subscriptions\Model\Context;
@@ -18,7 +16,7 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
- * Class Address
+ * Class Address - address create admin model
  */
 class Address extends Create
 {
@@ -71,14 +69,12 @@ class Address extends Create
         parent::__construct($context, $session);
     }
 
-
     /**
-     * Validates and sets address by type to all subscription quotes.
-     *
-     * @param [] $address
-     * @param string $addressType
-     * @param int|null $customerAddressId
+     * @param $address
+     * @param $addressType
+     * @param null $customerAddressId
      * @return array|bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function setAddress($address, $addressType, $customerAddressId = null)
     {
@@ -89,14 +85,13 @@ class Address extends Create
         $addressObject->setAddressType($addressType);
 
         if ($customerAddressId) {
-            $addressData = null;
             try {
                 $addressData = $this->addressRepository->getById($customerAddressId);
-            } catch (NoSuchEntityException $e) {
-                // do nothing if customer is not found by id
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                $addressData = null;
             }
 
-            $addressCustomerId = (int)$addressData->getCustomerId();
+            $addressCustomerId = $addressData ? (int) $addressData->getCustomerId() : '';
             $sessionCustomerId = (int)$session->getCustomerId();
 
             if ($addressCustomerId !== $sessionCustomerId) {
@@ -209,7 +204,7 @@ class Address extends Create
      */
     private function checkCustomerAddress(
         QuoteAddress $address,
-        AddressInterface$customerAddressData
+        AddressInterface $customerAddressData
     ) {
         $address->importCustomerAddressData($customerAddressData)->setSaveInAddressBook(0);
         return $this->getCustomerForm()->validateData($address->getData());
@@ -219,7 +214,7 @@ class Address extends Create
      * Prepares and validates address data in customer form.
      *
      * @param QuoteAddress $address
-     * @param [] $data
+     * @param array $data
      * @return array|bool
      */
     private function checkQuoteAddress(QuoteAddress $address, array $data)

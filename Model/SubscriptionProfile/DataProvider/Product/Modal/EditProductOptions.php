@@ -3,10 +3,8 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
-use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Framework\Registry;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
@@ -14,7 +12,6 @@ use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
 /**
  * Modal form for editing product options.
@@ -31,7 +28,8 @@ class EditProductOptions extends AbstractDataProvider
     /**#@+
      * Form data scope
      */
-    const DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM = 'tnw_subscriptionprofile_create_add_product_modal_edit_product_options_form';
+    const DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM =
+        'tnw_subscriptionprofile_create_add_product_modal_edit_product_options_form';
     /**#@-*/
 
     /**
@@ -45,11 +43,6 @@ class EditProductOptions extends AbstractDataProvider
      * @var Context
      */
     private $formContext;
-
-    /**
-     * @var Registry
-     */
-    private $registry;
 
     /**
      * @param string $name
@@ -179,7 +172,7 @@ class EditProductOptions extends AbstractDataProvider
      */
     public function addFilter(\Magento\Framework\Api\Filter $filter)
     {
-
+        return $this;
     }
 
     /**
@@ -189,7 +182,7 @@ class EditProductOptions extends AbstractDataProvider
      */
     private function getProductId()
     {
-        return (int)$this->formContext->getRequest()->getParam('product_id', 0);
+        return (int) $this->formContext->getRequest()->getParam('product_id', 0);
     }
 
     /**
@@ -199,7 +192,7 @@ class EditProductOptions extends AbstractDataProvider
      */
     private function getItemId()
     {
-        return (int)$this->formContext->getRequest()->getParam('item_id', 0);
+        return (int) $this->formContext->getRequest()->getParam('item_id', 0);
     }
 
     /**
@@ -209,6 +202,6 @@ class EditProductOptions extends AbstractDataProvider
      */
     private function getQuoteId()
     {
-        return (int)$this->formContext->getRequest()->getParam('quote_id', 0);
+        return (int) $this->formContext->getRequest()->getParam('quote_id', 0);
     }
 }

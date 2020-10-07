@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Payment\Model\Config;
@@ -19,7 +18,7 @@ use Magento\Framework\View\LayoutFactory;
 class Stripe extends Base
 {
     /**
-     *
+     * Sort Order value
      */
     const SORT_ORDER = 25;
 
@@ -64,7 +63,7 @@ class Stripe extends Base
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->stripeConfig
-                = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
+                = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
         }
 
         $this->paymentConfig = $paymentConfig;
@@ -225,7 +224,8 @@ class Stripe extends Base
                 'data' => [
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
+                            . 'additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe',
                         'label' => false,
                         'visible' => false,

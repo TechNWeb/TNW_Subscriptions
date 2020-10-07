@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Block\Sales\Order\Additional;
 
+/**
+ * Class InitialFee - block for initial fee on sales order additional
+ */
 class InitialFee extends \Magento\Framework\View\Element\Template
 {
     /**

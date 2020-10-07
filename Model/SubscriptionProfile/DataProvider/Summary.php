@@ -1,11 +1,17 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Framework\Api\Filter;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 
+/**
+ * Class Summary - DataProvider
+ */
 class Summary extends AbstractDataProvider
 {
     /**
@@ -35,9 +41,8 @@ class Summary extends AbstractDataProvider
     }
 
     /**
-     * Get data
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -69,6 +74,6 @@ class Summary extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
+        return $this;
     }
 }

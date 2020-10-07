@@ -5,16 +5,15 @@
  */
 namespace TNW\Subscriptions\Controller\SecureAcceptance;
 
-use \Magento\Framework\App\RequestInterface;
-use \Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
 
 /**
- * Class ReceiveToken
- * @package TNW\Subscriptions\Controller\SecureAcceptance
+ * Class ReceiveToken - controller
  */
-class ReceiveToken
-    extends \Magento\Framework\App\Action\Action
-    implements \Magento\Framework\App\CsrfAwareActionInterface
+class ReceiveToken extends Action implements CsrfAwareActionInterface
 {
     /**
      * @var \Magento\Framework\Controller\Result\JsonFactory
@@ -72,8 +71,7 @@ class ReceiveToken
     public function validateForCsrf(RequestInterface $request): ?bool
     {
         $result = false;
-        if (
-            $request->getParam('req_transaction_uuid')
+        if ($request->getParam('req_transaction_uuid')
             == $this->customerSession->getData('chcybersource_security_key')
         ) {
             $this->customerSession->setData('chcybersource_security_key', null);

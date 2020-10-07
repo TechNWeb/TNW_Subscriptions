@@ -3,13 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Request;
 
 use PayPal\Braintree\Gateway\Request\PaymentDataBuilder as DataBuilder;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Framework\Encryption\EncryptorInterface;
 
+/**
+ * Class PaymentDataBuilder - plugin
+ */
 class PaymentDataBuilder
 {
     /**
@@ -22,6 +24,11 @@ class PaymentDataBuilder
      */
     private $encryptor;
 
+    /**
+     * PaymentDataBuilder constructor.
+     * @param SubjectReader $subjectReader
+     * @param EncryptorInterface $encryptor
+     */
     public function __construct(
         SubjectReader $subjectReader,
         EncryptorInterface $encryptor

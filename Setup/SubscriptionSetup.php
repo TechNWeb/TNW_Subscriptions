@@ -4,13 +4,12 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Eav\Setup\EavSetup;
-use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\ResourceModel\Eav\ProductSubscriptionProfileAttribute;
 
 /**
  * Setup for subscription.
@@ -25,7 +24,7 @@ class SubscriptionSetup extends EavSetup
     public function getDefaultEntities()
     {
         return [
-            \TNW\Subscriptions\Model\SubscriptionProfile::ENTITY => [
+            SubscriptionProfile::ENTITY => [
                 'entity_model' => \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile::class,
                 'table' => SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY,
                 'attributes' => [
@@ -217,11 +216,10 @@ class SubscriptionSetup extends EavSetup
                     ],
                 ],
             ],
-            \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY => [
+            ProductSubscriptionProfile::ENTITY => [
                 'entity_model' => \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile::class,
-                'table' => \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY_TABLE,
-                'attribute_model' =>
-                    \TNW\Subscriptions\Model\ResourceModel\Eav\ProductSubscriptionProfileAttribute::class,
+                'table' => ProductSubscriptionProfile::ENTITY_TABLE,
+                'attribute_model' => ProductSubscriptionProfileAttribute::class,
                 'entity_attribute_collection' =>
                     \TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Attribute\Collection::class,
                 'additional_attribute_table' => 'tnw_subscriptions_product_subscription_profile_eav_attribute',

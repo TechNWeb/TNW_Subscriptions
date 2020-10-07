@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute;
 
 use Magento\Framework\DataObject;
@@ -123,7 +122,7 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     {
         $adminValues = [];
         foreach ($optionsValues as $optionKey => $values) {
-            if (!(isset($deletedOptions[$optionKey]) and $deletedOptions[$optionKey] === '1')) {
+            if (!(isset($deletedOptions[$optionKey]) && $deletedOptions[$optionKey] === '1')) {
                 $adminValues[] = reset($values);
             }
         }

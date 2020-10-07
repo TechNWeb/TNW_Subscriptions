@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action\Context;
@@ -17,6 +16,9 @@ use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile as ProfileModel;
 
+/**
+ * Class Edit - controller
+ */
 class Edit extends SubscriptionProfile
 {
     /**
@@ -47,13 +49,13 @@ class Edit extends SubscriptionProfile
         $this->profileRepository = $profileRepository;
 
         parent::__construct($context, $coreRegistry, $dataPersistor);
-
     }
 
     /**
      * Edit action.
      *
-     * @return ResultInterface
+     * @return Page|Redirect|\Magento\Framework\App\ResponseInterface|ResultInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
@@ -106,6 +108,7 @@ class Edit extends SubscriptionProfile
      *
      * @param ProfileModel $model
      * @return \Magento\Framework\Phrase
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getSubscriptionTitle(ProfileModel $model)
     {

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account;
 
 use Magento\Customer\Model\Session;
@@ -9,6 +12,9 @@ use Magento\Framework\Api\Search\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Grid as SubscriptionsGrid;
 
+/**
+ * Class Grid - dataProvider
+ */
 class Grid extends SubscriptionsGrid
 {
     /**
@@ -42,6 +48,9 @@ class Grid extends SubscriptionsGrid
         );
     }
 
+    /**
+     *
+     */
     public function prepareUpdateUrl()
     {
         $this->data['config']['filter_url_params']['customer_id'] = $this->customerSession->getCustomer()->getId();

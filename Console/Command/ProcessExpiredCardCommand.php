@@ -3,15 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class Products
- * @package Babenkocommerce\Catalog\Console\Command
+ * Class ProcessExpiredCardCommand - cli command class
  */
 class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Command
 {
@@ -21,21 +19,21 @@ class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Comma
     protected $appState;
 
     /**
-     * @var \TNW\Subscriptions\Cron\NotificationProcessor
+     * @var \TNW\Subscriptions\Cron\NotificationProcessorFactory
      */
-    protected $notificationProcessor;
+    protected $notificationProcessorFactory;
 
     /**
      * ProcessRenewalCommand constructor.
      * @param \Magento\Framework\App\State $appState
-     * @param \TNW\Subscriptions\Cron\NotificationProcessor $notificationProcessor
+     * @param \TNW\Subscriptions\Cron\NotificationProcessorFactory $notificationProcessorFactory
      */
     public function __construct(
         \Magento\Framework\App\State $appState,
-        \TNW\Subscriptions\Cron\NotificationProcessor $notificationProcessor
+        \TNW\Subscriptions\Cron\NotificationProcessorFactory $notificationProcessorFactory
     ) {
         $this->appState = $appState;
-        $this->notificationProcessor = $notificationProcessor;
+        $this->notificationProcessorFactory = $notificationProcessorFactory;
         parent::__construct();
     }
 
@@ -57,7 +55,7 @@ class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Comma
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
-            $this->notificationProcessor->sendExpiredCardsNotifications();
+            $this->notificationProcessorFactory->create()->sendExpiredCardsNotifications();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
             // we must have an exit code higher than zero to indicate something was wrong

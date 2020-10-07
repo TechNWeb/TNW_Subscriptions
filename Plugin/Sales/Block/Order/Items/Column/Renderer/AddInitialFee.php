@@ -3,14 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Sales\Block\Order\Items\Column\Renderer;
 
 use Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Class AddInitialFee
+ * Class AddInitialFee - plugin to modify columns
  */
 class AddInitialFee
 {
@@ -30,7 +29,6 @@ class AddInitialFee
     ) {
         $this->context = $context;
     }
-
 
     /**
      * @param DefaultRenderer $subject

@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 /**
- * Interface ModifierInterface
+ * Interface ProcessInterface- required for processes
  */
-interface ProcessInterface  extends ErrorInterface
+interface ProcessInterface extends ErrorInterface
 {
     /**
      * Processes data.

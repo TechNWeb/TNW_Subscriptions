@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
 use Magento\Backend\App\Action;
@@ -12,7 +11,7 @@ use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use Magento\Framework\Controller\Result\Redirect;
 
 /**
- * Class Delete
+ * Class Delete - controller
  */
 class Delete extends Action
 {

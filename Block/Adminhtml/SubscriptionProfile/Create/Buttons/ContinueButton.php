@@ -3,11 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
+/**
+ * Class ContinueButton - adminhtml block for create profile button continue
+ */
 class ContinueButton extends GenericButton implements ButtonProviderInterface
 {
     /**
