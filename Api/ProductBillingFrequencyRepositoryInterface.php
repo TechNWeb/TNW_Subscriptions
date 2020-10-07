@@ -3,9 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api;
 
+/**
+ * Interface ProductBillingFrequencyRepositoryInterface - determines the functionality to implement for
+ * product billing frequency repository
+ */
 interface ProductBillingFrequencyRepositoryInterface
 {
     /**

@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Plugin\Catalog\Model\Product\Type;
 
+/**
+ * Class AbstractType - plugin to modify data for all products on adding to cart
+ */
 class AbstractType
 {
     /**
@@ -17,6 +20,11 @@ class AbstractType
      */
     private $localeResolver;
 
+    /**
+     * AbstractType constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
+     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier,
         \Magento\Framework\Locale\ResolverInterface $localeResolver

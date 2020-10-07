@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Model\AbstractModel;
@@ -72,7 +71,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getParentId()
     {
         return $this->getData(self::PARENT_ID);
-
     }
 
     /**
@@ -91,7 +89,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getIsVisibleOnFront()
     {
         return $this->getData(self::IS_VISIBLE_ON_FRONT);
-
     }
 
     /**
@@ -110,7 +107,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getMessage()
     {
         return $this->getData(self::MESSAGE);
-
     }
 
     /**
@@ -129,7 +125,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getIsComment()
     {
         return $this->getData(self::IS_COMMENT);
-
     }
 
     /**
@@ -148,7 +143,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getCreatedAt()
     {
         return $this->getData(self::CREATED_AT);
-
     }
 
     /**
@@ -167,7 +161,6 @@ class MessageHistory extends AbstractModel implements SubscriptionProfileMessage
     public function getUserId()
     {
         return $this->getData(self::USER_ID);
-
     }
 
     /**

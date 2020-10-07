@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -97,7 +96,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @var ProductSubscriptionProfileRepository
      */
     private $productProfileRepository;
-
 
     /**
      * Search criteria builder.
@@ -247,12 +245,17 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                         $newStatus
                     );
                 } catch (\Exception $exception) {
-                    //TODO: add this to log, as it should not prevent the current process
+                    $this->messageHistoryLogger->log(
+                        __('Profile Status change email was not send due to some email sender error.'),
+                        $subscriptionProfile->getId(),
+                        true,
+                        false,
+                        true
+                    );
                 }
             }
         }
-        if (
-            isset($oldPaymentData['engine_code'])
+        if (isset($oldPaymentData['engine_code'])
             && $oldPaymentData['payment_additional_info']
             && $subscriptionProfile->getPayment()->getEngineCode() == $oldPaymentData['engine_code']
             && $subscriptionProfile->getPayment()->getPaymentAdditionalInfo()

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
@@ -34,7 +33,8 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     /**
      * @param Context $formContext
      */
-    public function __construct(Context $formContext) {
+    public function __construct(Context $formContext)
+    {
         $this->formContext = $formContext;
     }
 

@@ -3,13 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
+/**
+ * Class Delete - controller
+ */
 class Delete extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
     /**
-     * @return \Magento\Backend\Model\View\Result\Redirect
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {

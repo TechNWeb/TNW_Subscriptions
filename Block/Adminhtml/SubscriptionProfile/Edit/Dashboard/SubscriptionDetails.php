@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard;
 
 use Magento\Backend\Block\Template;
@@ -17,8 +16,15 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
  */
 class SubscriptionDetails extends Template
 {
-    const ANNUAL = 'Annual Value';//Subscription profile has not duration(infinite).
-    const TOTAL = 'Total Value';// Subscription profile has duration.
+    /**
+     * Subscription profile has not duration(infinite).
+     */
+    const ANNUAL = 'Annual Value';
+
+    /**
+     * Subscription profile has duration.
+     */
+    const TOTAL = 'Total Value';
 
     /**
      * Subscription profile instance holder.
@@ -90,7 +96,7 @@ class SubscriptionDetails extends Template
      */
     public function getValueType()
     {
-        return $this->subscriptionProfile->getTerm() ? self::ANNUAL :self::TOTAL;
+        return $this->subscriptionProfile->getTerm() ? self::ANNUAL : self::TOTAL;
     }
 
     /**

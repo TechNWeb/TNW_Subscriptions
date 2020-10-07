@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Product;
 
 /**
@@ -35,7 +34,7 @@ class Attribute
     /**
      * @return array
      */
-    public static function getAttributeCodes()
+    public function getAttributeCodes()
     {
         return [
             self::SUBSCRIPTION_PURCHASE_TYPE,
@@ -57,5 +56,4 @@ class Attribute
             self::SUBSCRIPTION_INHERITANCE
         ];
     }
-
 }

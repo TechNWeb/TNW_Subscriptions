@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Plugin\Payment\Model\Checks;
 
 /**
- * Class ZeroTotal
- * @package TNW\Subscriptions\Plugin\Payment\Model\Checks
+ * Class ZeroTotal -  modify the result for trial payment method availability
  */
 class ZeroTotal
 {

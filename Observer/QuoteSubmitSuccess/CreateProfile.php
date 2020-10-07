@@ -11,8 +11,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 /**
- * Class CreateProfile
- * @package TNW\Subscriptions\Observer\QuoteSubmitSuccess
+ * Class CreateProfile - observer
  */
 class CreateProfile implements ObserverInterface
 {
@@ -139,7 +138,7 @@ class CreateProfile implements ObserverInterface
             return;
         }
 
-        $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function($key) {
+        $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function ($key) {
             return strcasecmp($key, 'no_option') !== 0;
         }, ARRAY_FILTER_USE_KEY);
 

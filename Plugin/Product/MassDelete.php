@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Catalog\Controller\Adminhtml\Product\MassDelete as ControllerMassDelete;
@@ -15,7 +14,6 @@ use Magento\Framework\Message\Manager;
  * Plugin for mass delete product
  *
  * Class MassDelete
- * @package TNW\Subscriptions\Plugin\Product
  */
 class MassDelete
 {

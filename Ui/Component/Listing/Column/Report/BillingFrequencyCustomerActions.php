@@ -11,7 +11,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\UrlInterface;
 
 /**
- * Customer Actions
+ * Customer Actions - ui component
  */
 class BillingFrequencyCustomerActions extends Column
 {

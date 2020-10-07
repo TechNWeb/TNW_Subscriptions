@@ -3,21 +3,47 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface BillingFrequencyInterface - used to determine the billing frequency functionality to be implemented
+ */
 interface BillingFrequencyInterface
 {
+    /**
+     * The BF table name
+     */
     const SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE = 'tnw_subscriptions_billing_frequency';
 
-
+    /**
+     *  Website Id field name
+     */
     const WEBSITE_ID = 'website_id';
-    const UNIT = 'unit';
-    const ID = 'id';
-    const STATUS = 'status';
-    const FREQUENCY = 'frequency';
-    const LABEL = 'label';
 
+    /**
+     *  Unit field name
+     */
+    const UNIT = 'unit';
+
+    /**
+     *  Id field name
+     */
+    const ID = 'id';
+
+    /**
+     * Tstaus Field name
+     */
+    const STATUS = 'status';
+
+    /**
+     * Frequency field name
+     */
+    const FREQUENCY = 'frequency';
+
+    /**
+     * Label field name
+     */
+    const LABEL = 'label';
 
     /**
      * Get id

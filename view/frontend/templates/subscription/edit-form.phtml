@@ -6,27 +6,27 @@
 
 /** @var $block TNW\Subscriptions\Block\Subscription\EditForm */
 ?>
-<form class="<?php echo $block->getFormClass()?>"
-      id="<?php echo $block->getFormId()?>"
+<form class="<?= $block->getFormClass()?>"
+      id="<?= $block->getFormId()?>"
       enctype="multipart/form-data"
-      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
+      data-hasrequired="<?= /* @escapeNotVerified */ __('* Required Fields') ?>"
       method="post">
-    <?php echo $block->getFormContentHtml() ?>
+    <?= $block->getFormContentHtml() ?>
     <div class="actions-toolbar">
         <div class="grid-row">
             <div class="primary grid-col2-xs">
-                <button id="<?php echo $block->getSaveButtonId()?>"
+                <button id="<?= $block->getSaveButtonId()?>"
                         class="action save primary"
-                        title="<?php /* @escapeNotVerified */ echo __('Save') ?>">
-                    <span><?php /* @escapeNotVerified */ echo __('Save') ?></span>
+                        title="<?= /* @escapeNotVerified */ __('Save') ?>">
+                    <span><?= /* @escapeNotVerified */ __('Save') ?></span>
                 </button>
             </div>
             <div class="secondary grid-col2-xs">
-                <button id="<?php echo $block->getCancelButtonId()?>"
+                <button id="<?= $block->getCancelButtonId()?>"
                         class="action cancel"
                         data-action="cancel"
-                        title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
-                    <span><?php /* @escapeNotVerified */ echo __('Cancel') ?></span>
+                        title="<?= /* @escapeNotVerified */ __('Cancel') ?>">
+                    <span><?= /* @escapeNotVerified */ __('Cancel') ?></span>
                 </button>
             </div>
         </div>

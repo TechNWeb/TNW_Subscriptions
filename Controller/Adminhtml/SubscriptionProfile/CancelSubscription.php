@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
 use Magento\Backend\App\Action;
@@ -16,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
- * Cancel subscription.
+ * Cancel subscription - controller
  */
 class CancelSubscription extends Action
 {
@@ -86,8 +85,8 @@ class CancelSubscription extends Action
         $response->setData('result', true);
         $response->setData('ajaxRedirect', $this->_url->getUrl(
             'tnw_subscriptions/subscriptionprofile/edit',
-            ['entity_id' => $subscriptionId])
-        );
+            ['entity_id' => $subscriptionId]
+        ));
         try {
             if ($option == 'next') {
                 $this->updateStatusModel->updateStatusBeforeNextBillingCycle($subscriptionId);

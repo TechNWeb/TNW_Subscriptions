@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -50,7 +49,6 @@ class CustomerExistsPopup implements OptionSourceInterface
                     'value' => 'cancel'
                 ]
             ];
-
 
         return $result;
     }

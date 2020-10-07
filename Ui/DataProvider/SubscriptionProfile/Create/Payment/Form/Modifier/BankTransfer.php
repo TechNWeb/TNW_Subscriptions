@@ -13,13 +13,12 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class BankTransfer
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
+ * Class BankTransfer -modifier
  */
 class BankTransfer extends Base implements PaymentModifierInterface
 {
     /**
-     *
+     * Sort order value
      */
     const SORT_ORDER = 11;
 

@@ -12,8 +12,7 @@ use Magento\Framework\ObjectManagerInterface as ObjectManager;
 use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
- * Class TokenExtractor
- * @package TNW\Subscriptions\Model\Payment\Braintree
+ * Class TokenExtractor - braintree
  */
 class TokenExtractor
 {
@@ -51,8 +50,8 @@ class TokenExtractor
         SerializerInterface $serializer = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->config = $objectManager->get("PayPal\Braintree\Gateway\Config\Config");
-            $this->subjectReader = $objectManager->get("PayPal\Braintree\Gateway\Helper\SubjectReader");
+            $this->config = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
+            $this->subjectReader = $objectManager->get(\PayPal\Braintree\Gateway\Helper\SubjectReader::class);
         }
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->serializer = $serializer ?: $objectManager->get(SerializerInterface::class);

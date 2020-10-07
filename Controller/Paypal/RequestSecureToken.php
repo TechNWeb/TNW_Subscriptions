@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Paypal;
 
 use TNW\Subscriptions\Controller\Adminhtml\Paypal\RequestSecureToken as Base;
@@ -13,5 +12,4 @@ use TNW\Subscriptions\Controller\Adminhtml\Paypal\RequestSecureToken as Base;
  */
 class RequestSecureToken extends Base
 {
-
 }

@@ -3,15 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider;
 use Magento\CatalogInventory\Api\StockItemCriteriaInterfaceFactory;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
 /**
  * Data provider for "Add product" modal product grid.
@@ -137,17 +136,19 @@ class Grid extends ProductDataProvider
             parent::getCollection()
                 ->getSelect()
                 ->join(
-                    ['sub_table' =>
-                        parent::getCollection()->getTable(ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE)],
+                    ['sub_table' => parent::getCollection()->getTable(
+                        ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+                    )],
                     'e.entity_id = sub_table.' . ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
                     []
                 )
                 ->join(
-                    ['sub_frequency_table' =>
-                        parent::getCollection()->getTable(BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE)],
-                    'sub_frequency_table.' . BillingFrequencyInterface::ID.' = sub_table.'
+                    ['sub_frequency_table' => parent::getCollection()->getTable(
+                        BillingFrequencyInterface::SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE
+                    )],
+                    'sub_frequency_table.' . BillingFrequencyInterface::ID . ' = sub_table.'
                     . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID
-                    . ' AND sub_frequency_table.'. BillingFrequencyInterface::STATUS .' = 1',
+                    . ' AND sub_frequency_table.' . BillingFrequencyInterface::STATUS . ' = 1',
                     []
                 )
                 ->group('e.entity_id');

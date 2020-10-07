@@ -5,12 +5,11 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Cybersource;
 
-use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
- * Class DataBuilder
- * @package TNW\Subscriptions\Model\Payment\Cybersource
+ * Class DataBuilder - cybersource
  */
 class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -67,7 +66,7 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         $this->giftMessageHelper = $giftMessageHelper;
         $this->auth = $auth;
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
-            $this->gatewayConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+            $this->gatewayConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
         }
         parent::__construct($subscriptionConfig, $manager);
     }
@@ -295,6 +294,4 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         $message = $this->giftMessageHelper->getGiftMessage($this->getQuote()->getGiftMessageId());
         return $message->getMessage() ? $message->getMessage() : '';
     }
-
-
 }

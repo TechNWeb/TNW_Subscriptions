@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+/**
+ * Class Cybersource -used for process save action for cybersource payed subscriptions
+ */
 class Cybersource extends Base
 {
     /**
@@ -17,10 +20,25 @@ class Cybersource extends Base
      */
     private $encryptor;
 
+    /**
+     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     */
     private $paymentTokenRepository;
 
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenFactory
+     */
     private $paymentTokenFactory;
 
+    /**
+     * Cybersource constructor.
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
+     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+     */
     public function __construct(
         \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
         \TNW\Subscriptions\Model\QuoteSessionInterface $session,
@@ -85,6 +103,9 @@ class Cybersource extends Base
         $this->getSubCreateModel()->setNeedCollect(true);
     }
 
+    /**
+     * @return string
+     */
     public function getVaultMethodCode()
     {
         return 'chcybersource_cc_vault';

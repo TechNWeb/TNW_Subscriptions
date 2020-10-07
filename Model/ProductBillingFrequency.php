@@ -3,11 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 
+/**
+ * Class ProductBillingFrequency - model
+ */
 class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel implements ProductBillingFrequencyInterface
 {
 

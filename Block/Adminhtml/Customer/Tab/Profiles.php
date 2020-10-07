@@ -1,34 +1,23 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\Customer\Tab;
 
 use Magento\Customer\Controller\RegistryConstants;
 
 /**
- * Adminhtml customer orders grid block
- *
- * @api
- * @since 100.0.2
+ * Adminhtml customer profiles grid block
  */
 class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
 {
-    /**
-     * Sales reorder
-     *
-     * @var \Magento\Sales\Helper\Reorder
-     */
-    protected $_salesReorder = null;
-
     /**
      * Core registry
      *
      * @var \Magento\Framework\Registry
      */
-    protected $_coreRegistry = null;
+    protected $coreRegistry = null;
 
     /**
      * @var  \Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory
@@ -39,27 +28,27 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
      * @var \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options
      */
     protected $profileStatusOption;
+
     /**
+     * Profiles constructor.
+     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
      * @param \Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory $collectionFactory
-     * @param \Magento\Sales\Helper\Reorder $salesReorder
      * @param \Magento\Framework\Registry $coreRegistry
+     * @param \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options $profileStatusOption
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Backend\Helper\Data $backendHelper,
         \Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory $collectionFactory,
-        \Magento\Sales\Helper\Reorder $salesReorder,
         \Magento\Framework\Registry $coreRegistry,
         \TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options $profileStatusOption,
         array $data = []
-    )
-    {
-        $this->_coreRegistry = $coreRegistry;
-        $this->_salesReorder = $salesReorder;
-        $this->_collectionFactory = $collectionFactory;
+    ) {
+        $this->coreRegistry = $coreRegistry;
+        $this->collectionFactory = $collectionFactory;
         $this->profileStatusOption = $profileStatusOption;
         parent::__construct($context, $backendHelper, $data);
     }
@@ -78,11 +67,12 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
     /**
      * Apply various selection filters to prepare the sales order grid collection.
      *
-     * @return $this
+     * @return \Magento\Backend\Block\Widget\Grid\Extended
+     * @throws \Exception
      */
     protected function _prepareCollection()
     {
-        $collection = $this->_collectionFactory->getReport('tnw_subscriptionprofile_grid_data_source')->addFieldToSelect(
+        $collection = $this->collectionFactory->getReport('tnw_subscriptionprofile_grid_data_source')->addFieldToSelect(
             'entity_id'
         )->addFieldToSelect(
             'customer_id'
@@ -92,7 +82,7 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $collection->addFieldToFilter(
             'main_table.customer_id',
-            $this->_coreRegistry->registry(RegistryConstants::CURRENT_CUSTOMER_ID)
+            $this->coreRegistry->registry(RegistryConstants::CURRENT_CUSTOMER_ID)
         );
 
         $this->setCollection($collection);

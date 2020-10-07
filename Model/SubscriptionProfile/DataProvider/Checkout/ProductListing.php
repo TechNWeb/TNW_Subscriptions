@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
@@ -14,12 +13,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 class ProductListing extends Product
 {
     /**
-     * Listing render url.
+     * Listing render url path
      */
     const LISTING_RENDER_URL = 'tnw_subscriptions/ui/render';
 
     /**
-     * Listing image id.
+     * Listing image id field name
      */
     const LISTING_IMAGE_ID = 'product_thumbnail_image';
 

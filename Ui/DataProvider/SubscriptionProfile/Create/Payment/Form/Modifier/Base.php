@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Quote\Model\Quote\Item;
@@ -322,7 +321,8 @@ class Base implements PaymentModifierInterface
                 'data' => [
                     'config' => [
                         'componentType' => Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
+                            . 'additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/element/template/fieldset',
                         'label' => false,
                         'visible' => false,

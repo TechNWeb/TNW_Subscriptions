@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
@@ -31,7 +30,7 @@ class Account extends Base
 
             $result = $this->getSubCreateModel()->setShippingAddress($address, $customerAddressId);
 
-            if (is_array($result)){
+            if (is_array($result)) {
                 $this->errors = $result;
             }
         }

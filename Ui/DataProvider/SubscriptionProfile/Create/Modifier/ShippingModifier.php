@@ -1,13 +1,17 @@
 <?php
-
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
-
 
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
 
+/**
+ * Class ShippingModifier - modifier
+ */
 class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
 {
     const SHIPPING_FIELDSET = 'shipping_methods';
@@ -50,7 +54,6 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
      */
     public function modifyData(array $data)
     {
-//        $data['new_subscription']['shipping_method'] = 'cheapest';
         return $data;
     }
 
@@ -82,7 +85,8 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
                         ]
                     ]
                 ]
-            ]);
+            ]
+        );
         return $meta;
     }
 

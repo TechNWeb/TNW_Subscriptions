@@ -1,9 +1,16 @@
 <?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\Product;
 
 use Magento\Framework\Data\Collection;
 use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
+/**
+ * Class AddBillingFrequencyIdFieldToCollection - dataProvider
+ */
 class AddBillingFrequencyIdFieldToCollection implements AddFilterToCollectionInterface
 {
     /**

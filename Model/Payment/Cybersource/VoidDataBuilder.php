@@ -5,9 +5,12 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Cybersource;
 
-use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
+/**
+ * Class VoidDataBuilder - cybersource
+ */
 class VoidDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
     use \Magento\Payment\Helper\Formatter;
@@ -17,6 +20,13 @@ class VoidDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
      */
     private $gatewayConfig;
 
+    /**
+     * VoidDataBuilder constructor.
+     * @param SubscriptionConfig $subscriptionConfig
+     * @param Manager $manager
+     * @param \Magento\Framework\Module\Manager $moduleManager
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         SubscriptionConfig $subscriptionConfig,
         Manager $manager,
@@ -24,11 +34,15 @@ class VoidDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
-            $this->gatewayConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
+            $this->gatewayConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
         }
         parent::__construct($subscriptionConfig, $manager);
     }
 
+    /**
+     * @param $data
+     * @return array
+     */
     public function build($data)
     {
         $request = [];

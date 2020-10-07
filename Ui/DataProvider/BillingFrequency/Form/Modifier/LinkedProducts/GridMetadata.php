@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
 use Magento\Framework\Phrase;
@@ -107,7 +106,8 @@ class GridMetadata
                         ],
                     ],
                 ],
-            ]);
+            ]
+        );
     }
 
     /**
@@ -379,7 +379,8 @@ class GridMetadata
             ''
         );
 
-        $unlockPresetQtyColumn = $this->getColumnBaseData(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
+        $unlockPresetQtyColumn = $this->getColumnBaseData(
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             false,
             __(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY),
             120

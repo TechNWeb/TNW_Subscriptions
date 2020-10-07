@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct;
 
 use Magento\Backend\App\Action;
@@ -92,8 +91,9 @@ abstract class Attribute extends Action
     /**
      * Generate code from label.
      *
-     * @param string $label
-     * @return string
+     * @param $label
+     * @return bool|string
+     * @throws \Zend_Validate_Exception
      */
     protected function generateCode($label)
     {

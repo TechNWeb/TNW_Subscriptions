@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Subscription\Create\Products;
 
 use Magento\Framework\App\Action\Context;
@@ -53,7 +52,7 @@ class Save extends AbstractSave
             $this->getRequest()->getParams()
         );
         $response = $this->getJsonResponse($result);
-        if (!$result){
+        if (!$result) {
             $response['objects_count'] = count(
                 $this->createModel->getSession()->getSubQuoteIds()
             );

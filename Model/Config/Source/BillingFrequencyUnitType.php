@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
@@ -75,8 +74,8 @@ class BillingFrequencyUnitType implements ArrayInterface
     {
         $result = null;
 
-        foreach ($this->toOptionArray() as $option){
-            if ($option['value'] == $value){
+        foreach ($this->toOptionArray() as $option) {
+            if ($option['value'] == $value) {
                 $result = $option['label'];
                 if ($frequency != 1) {
                     $result = $result . self::PLURAL;
@@ -94,7 +93,7 @@ class BillingFrequencyUnitType implements ArrayInterface
      * @param int $frequency
      * @return string
      */
-    public function  getPeriodLabel($unit, $frequency)
+    public function getPeriodLabel($unit, $frequency)
     {
         $label = $this->getLabelByValueAndFrequency($unit, $frequency);
 

@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Customer;
 
+/**
+ * Class Profiles - admin controller to get the customer profiles
+ */
 class Profiles extends \Magento\Customer\Controller\Adminhtml\Index
 {
     /**

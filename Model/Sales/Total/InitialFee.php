@@ -83,7 +83,7 @@ class InitialFee extends AbstractTotal
         return [
             'code'  => 'subs_initial_fee',
             'title' => __('Initial Fee'),
-            'value' => $amount ? $amount : NULL
+            'value' => $amount ? $amount : null
         ];
     }
 

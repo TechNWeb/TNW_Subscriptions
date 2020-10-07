@@ -3,20 +3,17 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
-use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
- * Class Process
+ * Class Process- controller
  */
 class Process extends Action
 {
@@ -66,7 +63,7 @@ class Process extends Action
                 $collection->addFieldToFilter(Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
-                if ($item && $item->getId()){
+                if ($item && $item->getId()) {
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->processItem($item);

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use CyberSource\Core\Model\Config as ConfigProvider;
@@ -12,8 +11,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
- * Class CyberSource
- * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
+ * Class CyberSource - model for processing the cybersource payments
  */
 class CyberSource extends Base
 {
@@ -86,12 +84,11 @@ class CyberSource extends Base
         );
         $this->paymentTokenFactory = $paymentTokenFactory;
         $cyberSourceConfig->reBillProcess();
-        if (
-            $moduleManager->isEnabled("CyberSource_Core")
+        if ($moduleManager->isEnabled("CyberSource_Core")
             && $moduleManager->isEnabled("CyberSource_SecureAcceptance")
         ) {
-            $this->transferFactory = $objectManager->get("CyberSource\Core\Gateway\Http\TransferFactory");
-            $this->requestHelper = $objectManager->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
+            $this->transferFactory = $objectManager->get(\CyberSource\Core\Gateway\Http\TransferFactory::class);
+            $this->requestHelper = $objectManager->get(\CyberSource\SecureAcceptance\Helper\RequestDataBuilder::class);
         }
         $this->transactionCustomer = $transactionCustomer;
     }
