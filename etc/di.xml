@@ -175,6 +175,13 @@
                 disabled="false"/>
     </type>
 
+    <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
+        <plugin name="cybersouce_tax_collector"
+                type="TNW\Subscriptions\Plugin\CyberSource\Tax\Model\Tax\Sales\Total\Quote\Tax"
+                sortOrder="200"
+                disabled="false"/>
+    </type>
+
     <type name="Magento\Catalog\Controller\Adminhtml\Product\MassDelete">
         <plugin name="subscriptions_product_mass_delete"
                 type="TNW\Subscriptions\Plugin\Product\MassDelete"
