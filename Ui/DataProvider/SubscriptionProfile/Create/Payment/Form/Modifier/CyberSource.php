@@ -6,10 +6,17 @@
 
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use CyberSource\Core\Block\Fingerprint;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use \Magento\Framework\UrlInterface;
+use Magento\Framework\View\Asset\Repository;
 use Magento\Payment\Model\Config;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -32,14 +39,31 @@ class CyberSource extends Base
      * @var string
      */
     private $clientToken = '';
+
     /**
      * @var UrlInterface
      */
     private $urlBuilder;
+
     /**
-     * @var \CyberSource\Core\Block\Fingerprint
+     * @var Fingerprint
      */
     private $fingerprintBlock;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var Repository
+     */
+    private $assetRepository;
+
+    /**
+     * @var Context
+     */
+    private $context;
 
     /**
      * CyberSource constructor.
@@ -47,22 +71,28 @@ class CyberSource extends Base
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param CartRepositoryInterface $cartRepository
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      * @param Config $paymentConfig
      * @param UrlInterface $urlBuilder
+     * @param RequestInterface $request
+     * @param Repository $assetRepository
+     * @param Context $context
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
+        CartRepositoryInterface $cartRepository,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
         Config $paymentConfig,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        RequestInterface $request,
+        Repository $assetRepository,
+        Context $context
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
@@ -71,6 +101,9 @@ class CyberSource extends Base
         }
         $this->paymentConfig = $paymentConfig;
         $this->urlBuilder = $urlBuilder;
+        $this->request = $request;
+        $this->assetRepository = $assetRepository;
+        $this->context = $context;
     }
 
     /**
@@ -268,6 +301,7 @@ class CyberSource extends Base
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     protected function getAdditionalConfig()
     {
@@ -281,6 +315,7 @@ class CyberSource extends Base
 
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
+            'template' => 'TNW_Subscriptions/form/subscription-profile/payment/cybersource',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
@@ -288,6 +323,7 @@ class CyberSource extends Base
             'loadSilentDataUrl' => $loadSilentDataUrl,
             'useCvv' => $this->hasVerification(),
             'availableCardTypes' => explode(',', $this->cybersourceConfig->getCcTypes()),
+            'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
@@ -453,5 +489,26 @@ class CyberSource extends Base
     private function getMethodConfigData($fieldName)
     {
         return $this->cybersourceConfig->getValue($fieldName);
+    }
+
+    /**
+     * Retrieves url of a view file.
+     *
+     * @param string $fileId
+     * @param array $params
+     * @return string
+     * @throws \Exception
+     */
+    private function getViewFileUrl($fileId, array $params = [])
+    {
+        $result = false;
+        try {
+            $params = array_merge(['_secure' => $this->request->isSecure()], $params);
+            $result = $this->assetRepository->getUrlWithParams($fileId, $params);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $this->context->throwException($e->getMessage());
+        }
+
+        return $result;
     }
 }

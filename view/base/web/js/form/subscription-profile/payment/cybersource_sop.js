@@ -36,15 +36,6 @@ define([
         },
 
         /**
-         * Init configuration
-         * Load Accept.js component
-         */
-        initConfig: function () {
-            var self = this;
-            this._super();
-        },
-
-        /**
          * Before submit action for payment method.
          * @return void
          */
@@ -52,7 +43,7 @@ define([
             var self = this;
             $('body').trigger('processStart');
 
-            this. loadSilentData()
+            this.loadSilentData()
                 .done(function (response) {
                     self.postPaymentToGateway(response);
                 })
@@ -63,12 +54,11 @@ define([
         },
 
         postPaymentToGateway: function (response) {
-            var self = this,
-                $iframe = $('#' + this.getCode() + '-transparent-iframe'),
+            var $iframe = $('#' + this.getCode() + '-transparent-iframe'),
                 data = this.preparePaymentData(response),
                 tmpl = this.hiddenFormTmpl({
                     data: {
-                        target: 'iframeTransparent',
+                        target: $iframe.attr('name'),
                         action: this.sopServiceUrl,
                         inputs: data
                     }
@@ -77,16 +67,9 @@ define([
             $iframe.on('submit', function (event) {
                 event.stopPropagation();
             });
-            $('[name=iframeTransparent]').on('load', function (event) {
-                var result = JSON.parse(event.target.contentWindow.document.body.innerText);
-                if (result.success && result.payment_token) {
-                    var form = registry.get('index = '+self.options.formName);
-                    form.source.data.payment.chcybersource.payment_token = result.payment_token;
-                    $('body').trigger('processStop');
-                    form.triggerSave([]);
-                }
-            })
+
             $(tmpl).appendTo($iframe).submit();
+            $iframe.html('');
         },
 
         preparePaymentData: function (response) {
@@ -123,7 +106,6 @@ define([
                 context: this,
                 data: postData,
                 dataType: 'json',
-
                 success: function (response) {
                     if (response.success && response[this.getCode()]) {
                         silentData.resolve(response);
@@ -134,9 +116,6 @@ define([
             });
 
             return silentData.promise();
-        },
-
-        validate: function () {
         },
 
         /**
@@ -163,9 +142,7 @@ define([
          * @returns {boolean}
          */
         setCardType: function (value) {
-            if (value === '' || value === null) {
-                return false;
-            }
+            if (value === '' || value === null) return false;
             var result = cardNumberValidator(value);
 
             if (!result.isPotentiallyValid && !result.isValid) {
@@ -183,7 +160,6 @@ define([
                             .replace('%1', result.card.title)]
                     );
                 }
-
             }
         }
     });
