@@ -60,6 +60,11 @@
 
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
 
+    <preference for="CyberSource\SecureAcceptance\Gateway\Request\Soap\DecisionManagerMddBuilder"
+                type="TNW\Subscriptions\Model\Payment\Cybersource\Gateway\Request\Soap\DecisionManagerMddBuilder" />
+    <preference for="CyberSource\SecureAcceptance\Plugin\Model\Method\VaultPlugin"
+                type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin" />
+
     <preference for="TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface"
                 type="TNW\Subscriptions\Model\BillingFrequencyRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\BillingFrequencyInterface"

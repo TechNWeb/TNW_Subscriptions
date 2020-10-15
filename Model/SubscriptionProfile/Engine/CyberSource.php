@@ -52,6 +52,7 @@ class CyberSource extends Base
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
      * @param \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+     * @param \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin $vaultChecker
      */
     public function __construct(
         \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement,
@@ -68,7 +69,8 @@ class CyberSource extends Base
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
         \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
-        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory,
+        \TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin $vaultChecker
     ) {
         parent::__construct(
             $config,
@@ -84,6 +86,7 @@ class CyberSource extends Base
         );
         $this->paymentTokenFactory = $paymentTokenFactory;
         $cyberSourceConfig->reBillProcess();
+        $vaultChecker->setIsReBill();
         if ($moduleManager->isEnabled("CyberSource_Core")
             && $moduleManager->isEnabled("CyberSource_SecureAcceptance")
         ) {
@@ -129,7 +132,7 @@ class CyberSource extends Base
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
 
-        $result[OrderPaymentInterface::METHOD] = ConfigProvider::CODE;
+        $result[OrderPaymentInterface::METHOD] = ConfigProvider::CODE . '_cc_vault';
 
         return $result;
     }
@@ -143,11 +146,42 @@ class CyberSource extends Base
         $result = !empty($profile->getPayment()->getDecodedPaymentAdditionalInfo())
             ? $profile->getPayment()->getDecodedPaymentAdditionalInfo()
             : [];
-        $cyberSourceData = isset($result['cybersource_data']) ? $result['cybersource_data'] : [];
+
+        if (isset($result['cybersource_data'])) {
+            $cyberSourceData = $result['cybersource_data'];
+            if (isset($cyberSourceData['cybersource_token'])) {
+                $vaultToken = $this->paymentTokenManagement->getByGatewayToken(
+                    $cyberSourceData['cybersource_token'],
+                    ConfigProvider::CODE,
+                    $profile->getCustomerId()
+                );
+                if (!$vaultToken) {
+                    $vaultToken = $this->createNewPaymentToken($result, $profile);
+                }
+                $cyberSourceData['public_hash'] = $vaultToken->getPublicHash();
+            }
+
+        } else {
+            $cyberSourceData = [];
+            $vaultToken = $this->paymentTokenManagement->getByGatewayToken(
+                $profilePayment->getPaymentToken(),
+                ConfigProvider::CODE,
+                $profile->getCustomerId()
+            );
+            if (!$vaultToken) {
+                $vaultToken = $this->paymentTokenManagement->getByPublicHash(
+                    $profilePayment->getPaymentToken(),
+                    $profile->getCustomerId()
+                );
+            }
+            $cyberSourceData['public_hash'] = $vaultToken
+                ? $vaultToken->getPublicHash()
+                : $profilePayment->getPaymentToken();
+        }
         if (!isset($result['cybersource_data'])) {
             $paymentToken = $this->paymentTokenManagement->getByGatewayToken(
                 $profilePayment->getPaymentToken(),
-                'cybersource',
+                ConfigProvider::CODE,
                 $profile->getCustomerId()
             );
             $cyberSourceData = [
@@ -160,15 +194,17 @@ class CyberSource extends Base
                     "card_type" => $this->requestHelper->getCardType($result['cc_type']),
                     "cc_last4" => $result['cc_last_4'],
                     "card_expiry_date" => $result['cc_exp_month'] . '-' . $result['cc_exp_year']
-                ]
+                ],
+                'public_hash' => $paymentToken ? $paymentToken->getPublicHash() : ''
             ];
             if ($paymentToken) {
                 $cyberSourceData['extension_attributes'] = json_decode($paymentToken->getTokenDetails(), true);
             }
         }
+        $cyberSourceData['customer_id'] = $profile->getCustomerId();
         return array_merge(
             $cyberSourceData,
-            [OrderPaymentInterface::METHOD => ConfigProvider::CODE]
+            [OrderPaymentInterface::METHOD => ConfigProvider::CODE . '_cc_vault']
         );
     }
 
@@ -250,6 +286,39 @@ class CyberSource extends Base
         return $this->encryptor->getHash($hashKey);
     }
 
+    private function createNewPaymentToken($data, $profile)
+    {
+        $newToken = $this->paymentTokenManagement->getByGatewayToken(
+            $data['cybersource_data']['cybersource_token'],
+            ConfigProvider::CODE,
+            null
+        );
+        if ($newToken) {
+            $newToken->setCustomerId($profile->getCustomerId());
+        } else {
+            $newTokenData = [
+                'additional' => array_merge(
+                    $data,
+                    ['cc_number' => $data['cybersource_data']['cardNumber']]
+                ),
+                'payment_token' => $data['cybersource_data']['cybersource_token']
+            ];
+            $newToken = $this->paymentTokenFactory->create()
+                ->setTokenDetails($this->getNewTokenDetails($newTokenData['additional']))
+                ->setCustomerId($profile->getCustomerId())
+                ->setPaymentMethodCode(ConfigProvider::CODE)
+                ->setIsVisible(1)
+                ->setIsActive(1)
+                ->setType('card')
+                ->setGatewayToken($data['cybersource_data']['cybersource_token'])
+                ->setPublicHash($this->generateNewTokenPublicHash(
+                    $newTokenData,
+                    $profile->getCustomerId()
+                ));
+        }
+        return $this->paymentTokenRepository->save($newToken);
+    }
+
     /**
      * @param $paymentData
      * @return false|string
@@ -263,7 +332,7 @@ class CyberSource extends Base
                 "maskedCC" => "****-****-****-" . substr($paymentData['cc_number'], -4),
                 "incrementId" => null,
                 "expirationDate" => $paymentData['cc_exp_month'] . "/" . $paymentData['cc_exp_year'],
-                "title"=>"CyberSource Stored Cards"
+                "title" => "CyberSource Stored Cards"
             ]
         );
     }
