@@ -58,7 +58,9 @@ class VaultPlugin
         if (!$result) {
             return $result;
         }
-        if ($subject->getCode() != \CyberSource\SecureAcceptance\Model\Ui\ConfigProvider::CC_VAULT_CODE) {
+        if (class_exists('\CyberSource\SecureAcceptance\Model\Ui\ConfigProvider')
+            && $subject->getCode() != \CyberSource\SecureAcceptance\Model\Ui\ConfigProvider::CC_VAULT_CODE
+        ) {
             return $result;
         }
 

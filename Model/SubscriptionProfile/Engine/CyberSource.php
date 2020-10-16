@@ -235,6 +235,9 @@ class CyberSource extends Base
             );
             $paymentToken->setIsActive(true);
             $paymentToken->setIsVisible(true);
+            $paymentToken->setExpiresAt(
+                $this->getExpiresAt($requestData['payment'][ConfigProvider::CODE]['additional'])
+            );
             $this->paymentTokenRepository->save($paymentToken);
             $requestData['payment'][ConfigProvider::CODE]['additional']['public_hash'] = $paymentToken->getPublicHash();
         }
@@ -314,9 +317,15 @@ class CyberSource extends Base
                 ->setPublicHash($this->generateNewTokenPublicHash(
                     $newTokenData,
                     $profile->getCustomerId()
-                ));
+                ))
+                ->setExpiresAt($this->getExpiresAt($newTokenData['additional']));
         }
         return $this->paymentTokenRepository->save($newToken);
+    }
+
+    private function getExpiresAt($paymentData)
+    {
+        return strtotime($paymentData['cc_exp_year'] . '-' . $paymentData['cc_exp_month'] . '-01');
     }
 
     /**
