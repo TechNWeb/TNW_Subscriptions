@@ -511,7 +511,7 @@ class CyberSource extends Base
         try {
             $params = array_merge(['_secure' => $this->request->isSecure()], $params);
             $result = $this->assetRepository->getUrlWithParams($fileId, $params);
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+        } catch (\Exception $e) {
             $this->context->throwException($e->getMessage());
         }
 

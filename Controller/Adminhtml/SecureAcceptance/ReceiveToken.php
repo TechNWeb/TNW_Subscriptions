@@ -20,8 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class ReceiveToken
- * @package TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance
+ * Class ReceiveToken - controller used to get the token from cybersource
  */
 class ReceiveToken extends Action
 {
@@ -103,9 +102,7 @@ class ReceiveToken extends Action
      */
     protected function getFormIndex($profile = null)
     {
-        return isset($profile)
-            ? SummaryPaymentMethodForm::FORM_NAME
-            : Payment::DATA_SCOPE_PAYMENT_FORM;
+        return $profile ? SummaryPaymentMethodForm::FORM_NAME : Payment::DATA_SCOPE_PAYMENT_FORM;
     }
 
     /**
