@@ -289,6 +289,27 @@ class CyberSource extends Base
         return $this->encryptor->getHash($hashKey);
     }
 
+    /**
+     * @param \Magento\Quote\Model\Quote $quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validatePayment(\Magento\Quote\Model\Quote $quote)
+    {
+        if ($quote->getBaseGrandTotal() < 0.0001) {
+            /** @var Payment $payment */
+            $payment = $quote->getPayment();
+            $payment->importData(['method' => \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE]);
+            $payment->setAdditionalInformation([]);
+        } else {
+            parent::validatePayment($quote);
+        }
+    }
+
+    /**
+     * @param $data
+     * @param $profile
+     * @return \Magento\Vault\Api\Data\PaymentTokenInterface
+     */
     private function createNewPaymentToken($data, $profile)
     {
         $newToken = $this->paymentTokenManagement->getByGatewayToken(
@@ -323,6 +344,10 @@ class CyberSource extends Base
         return $this->paymentTokenRepository->save($newToken);
     }
 
+    /**
+     * @param $paymentData
+     * @return false|int
+     */
     private function getExpiresAt($paymentData)
     {
         return strtotime($paymentData['cc_exp_year'] . '-' . $paymentData['cc_exp_month'] . '-01');
