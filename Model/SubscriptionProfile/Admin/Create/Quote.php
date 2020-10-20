@@ -89,8 +89,26 @@ class Quote extends Create implements QuoteCreateInterface
      */
     private $paymentTokenRepository;
 
+    /**
+     * @var VaultPlugin
+     */
     private $methodValidator;
 
+    /**
+     * Quote constructor.
+     * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param ModelQuoteFactory $quoteFactory
+     * @param GroupManagementInterface $groupManagement
+     * @param Address $addressCreator
+     * @param CartRepositoryInterface $cartRepository
+     * @param CustomerRepositoryInterface $customerRepository
+     * @param FormFactory $customerFormFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param Mapper $customerMapper
+     * @param VaultPlugin $methodValidator
+     */
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
