@@ -11,6 +11,21 @@ namespace TNW\Subscriptions\Plugin\Quote\Model;
 class UpdateQuoteItem
 {
     /**
+     * @var Quote\Item
+     */
+    private $quoteItemPlugin;
+
+    /**
+     * UpdateQuoteItem constructor.
+     * @param Quote\Item $quoteItemPlugin
+     */
+    public function __construct(
+        \TNW\Subscriptions\Plugin\Quote\Model\Quote\Item $quoteItemPlugin
+    ) {
+        $this->quoteItemPlugin = $quoteItemPlugin;
+    }
+
+    /**
      * @param \Magento\Quote\Model\Quote $subject
      * @param \Magento\Catalog\Model\Product $product
      * @param $request
@@ -23,6 +38,9 @@ class UpdateQuoteItem
         $request = null,
         $processMode = \Magento\Catalog\Model\Product\Type\AbstractType::PROCESS_MODE_FULL
     ) {
+        if ($request && $request->getData('subscribe_active') && $request->getData('rebill_processing')) {
+            $this->quoteItemPlugin->setIsReBillForProduct($product);
+        }
         if ($request->getAddtocartType()) {
             return [$product, $request, $processMode];
         }
