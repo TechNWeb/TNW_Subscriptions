@@ -60,6 +60,11 @@
 
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
 
+    <preference for="CyberSource\SecureAcceptance\Gateway\Request\Soap\DecisionManagerMddBuilder"
+                type="TNW\Subscriptions\Model\Payment\Cybersource\Gateway\Request\Soap\DecisionManagerMddBuilder" />
+    <preference for="CyberSource\SecureAcceptance\Plugin\Model\Method\VaultPlugin"
+                type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin" />
+
     <preference for="TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface"
                 type="TNW\Subscriptions\Model\BillingFrequencyRepository"/>
     <preference for="TNW\Subscriptions\Api\Data\BillingFrequencyInterface"
@@ -172,6 +177,13 @@
         <plugin name="subscriptions_product_initialization"
                 type="TNW\Subscriptions\Plugin\Product\Initialization"
                 sortOrder="50"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
+        <plugin name="cybersouce_tax_collector"
+                type="TNW\Subscriptions\Plugin\CyberSource\Tax\Model\Tax\Sales\Total\Quote\Tax"
+                sortOrder="200"
                 disabled="false"/>
     </type>
 

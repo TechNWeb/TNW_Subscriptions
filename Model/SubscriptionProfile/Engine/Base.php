@@ -18,7 +18,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
- * Class Base- base class for payment processors
+ * Class Base - base class for payment processors
  */
 class Base implements EngineInterface
 {
@@ -82,8 +82,24 @@ class Base implements EngineInterface
      */
     protected $vaultPaymentAuthorization;
 
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenManagement
+     */
     protected $paymentTokenManagement;
 
+    /**
+     * Base constructor.
+     * @param Config $config
+     * @param Context $context
+     * @param CartManagementInterface $cartManagement
+     * @param DataPersistorInterface $persistor
+     * @param ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     */
     public function __construct(
         Config $config,
         Context $context,
@@ -258,6 +274,12 @@ class Base implements EngineInterface
         return $this;
     }
 
+    /**
+     * @param $requestData
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
     public function processProfileByRequestDataVault($requestData)
     {
         if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
@@ -287,6 +309,9 @@ class Base implements EngineInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getVaultPaymentCode()
     {
         return '';

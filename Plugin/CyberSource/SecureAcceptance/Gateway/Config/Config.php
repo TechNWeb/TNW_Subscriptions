@@ -25,7 +25,7 @@ class Config
         $result
     ) {
         if ($result && $this->isReBill) {
-            $result = $subject->getValue(\CyberSource\SecureAcceptance\Gateway\Config\Config::KEY_MODE);
+            $result = $subject->getValue(\CyberSource\SecureAcceptance\Gateway\Config\Config::KEY_FLOW_MODE);
         }
         return $result;
     }

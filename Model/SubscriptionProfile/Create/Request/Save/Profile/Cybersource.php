@@ -89,6 +89,9 @@ class Cybersource extends Base
         $paymentToken->setTokenDetails($this->getTokenDetails($paymentData['additional']));
         $paymentToken->setIsActive(true);
         $paymentToken->setIsVisible(true);
+        $time = $paymentData['additional']['cc_exp_year']
+            . '-' . $paymentData['additional']['cc_exp_month'] . '-01';
+        $paymentToken->setExpiresAt(strtotime($time));
         $this->paymentTokenRepository->save($paymentToken);
         /** @var Quote $subQuote */
         foreach ($subQuotes as $subQuote) {

@@ -23,6 +23,7 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
+use TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin;
 
 /**
  * Create quotes for subscription in admin area.
@@ -89,6 +90,11 @@ class Quote extends Create implements QuoteCreateInterface
     private $paymentTokenRepository;
 
     /**
+     * @var VaultPlugin
+     */
+    private $methodValidator;
+
+    /**
      * Quote constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -101,6 +107,7 @@ class Quote extends Create implements QuoteCreateInterface
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param Mapper $customerMapper
+     * @param VaultPlugin $methodValidator
      */
     public function __construct(
         Context $context,
@@ -113,8 +120,10 @@ class Quote extends Create implements QuoteCreateInterface
         FormFactory $customerFormFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Mapper $customerMapper
+        Mapper $customerMapper,
+        VaultPlugin $methodValidator
     ) {
+        $this->methodValidator = $methodValidator;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->quoteFactory = $quoteFactory;
@@ -302,6 +311,7 @@ class Quote extends Create implements QuoteCreateInterface
         if (!$quote->getPayment()->getMethod()) {
             $errors[] = __('Please specify a payment method.');
         } else {
+            $this->methodValidator->setIsReBill();
             $method = $quote->getPayment()->getMethodInstance();
             if (!$method->isAvailable($quote)) {
                 $errors[] = __('This payment method is not available.');

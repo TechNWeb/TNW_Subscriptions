@@ -96,6 +96,9 @@ class TokenRequest extends \Magento\Backend\App\Action
                 break;
             }
         }
+        if (!$billingAddress->getEmail() && !$billingAddress->getFirstname()) {
+            $billingAddress = $quote->getShippingAddress();
+        }
         try {
             $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
                 [
@@ -106,7 +109,7 @@ class TokenRequest extends \Magento\Backend\App\Action
                     'billing_address' => [
                         'firstname' => $billingAddress->getFirstname(),
                         'lastname' => $billingAddress->getLastname(),
-                        'email' => $billingAddress->getEmail(),
+                        'email' => $billingAddress->getEmail() ?: $this->quoteSession->getCustomerEmail(),
                         'country_id' => $billingAddress->getCountryId(),
                         'city' => $billingAddress->getCity(),
                         'region_code' => $billingAddress->getRegionCode(),
