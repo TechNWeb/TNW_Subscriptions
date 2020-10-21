@@ -100,7 +100,6 @@ class Purchaseorder extends Base implements PaymentModifierInterface
     protected function getAdditionalConfig()
     {
         return [
-            'listens'=> $this->getListens(),
             'options' => [
                 'gateway' => $this->getPaymentCode(),
                 'formName' => $this->getPaymentFormName()
