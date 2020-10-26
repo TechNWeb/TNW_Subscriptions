@@ -105,7 +105,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                                                name="cart[<?= $_itemId ?>][period]"
                                                id="cart-<?= $_itemId ?>-period"
                                                class="input-text qty"
-                                               data-validate='{"required-number":true}'
+                                               data-validate='{"required-number":true, "validate-number-range":"2-9999999999"}'
                                                value="<?php echo $block->getDefaultPeriod() ?>"
                                         />
                                     <?php else: ?>
@@ -139,7 +139,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                                                        class="input-text period"
                                                        data-validate='{
                                                        "required-number":true,
-                                                       "min": <?php echo $block->getDefaultPeriod() ?>
+                                                       "validate-number-range":"2-9999999999"
                                                        }'
                                                        value="<?php echo $block->getDefaultPeriod() ?>"
                                                 >
