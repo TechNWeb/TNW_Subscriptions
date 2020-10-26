@@ -510,9 +510,8 @@ class ProductsForm extends SummaryProductsForm
                         'first_phrase' => '',
                         'last_phrase' => __('times'),
                         'validation' => [
-                            'validate-greater-than-zero' => true,
                             'required-entry' => true,
-                            'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
+                            'validate-number-range' => self::DEFAULT_PERIOD_VALUE.'-9999999999'
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName()
