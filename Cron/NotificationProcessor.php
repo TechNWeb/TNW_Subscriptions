@@ -6,12 +6,12 @@
 namespace TNW\Subscriptions\Cron;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\App\State;
-use TNW\Subscriptions\Model\EmailNotifier;
-use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
@@ -152,7 +152,7 @@ class NotificationProcessor
     }
 
     /**
-     *
+     * Send Notification on expired cards
      */
     public function sendExpiredCardsNotifications()
     {
@@ -179,34 +179,9 @@ class NotificationProcessor
     }
 
     /**
-     * @param $dayModifier
-     * @return mixed
-     */
-    private function getFutureOrderCollection($dayModifier)
-    {
-        if (!$dayModifier || !isset($this->loadedCollections[$dayModifier])) {
-            $currentDate = $this->timezone->date();
-            if ($dayModifier) {
-                $currentDate->modify($dayModifier);
-            }
-            $this->loadedCollections[$dayModifier] = $this->subscriptionProfileFactory->create()
-                ->addFieldToFilter('scheduled_at', [
-                    'date' => true,
-                    'from' => $currentDate->format('Y-m-d 00:00:00'),
-                    'to' => $currentDate->format('Y-m-d 23:59:59')
-                ])
-                ->addFieldToFilter('magento_order_id', ['null' => true])
-                ->addFieldToSelect('subscription_profile_id')
-                ->addFieldToSelect('scheduled_at')
-            ;
-        }
-        return $this->loadedCollections[$dayModifier];
-    }
-
-    /**
      * Get order with Cc payment method
      *
-     * @return \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
+     * @return bool
      */
     private function getOrderWithCcPayment()
     {
@@ -218,7 +193,10 @@ class NotificationProcessor
                     tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )
-                ->addFieldToFilter('engine_code', ['nin' => ['checkmo', 'banktransfer', 'purchaseorder']])
+                ->addFieldToFilter(
+                    'engine_code',
+                    ['nin' => ['checkmo', 'banktransfer', 'purchaseorder', 'cashondelivery']]
+                )
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToFilter('sent_mail', 0)
                 ->addFieldToSelect('subscription_profile_id');

@@ -203,6 +203,16 @@ class Manager
     private $serializer;
 
     /**
+     * @var array
+     */
+    private $offlineMethods = [
+        'checkmo',
+        'banktransfer',
+        'purchaseorder',
+        'cashondelivery'
+    ];
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -1357,11 +1367,7 @@ class Manager
             ->populateProfileData($quote, $quoteItems);
         $notCCMethod = false;
         if (isset($trialData['method'])
-            && (
-                $trialData['method'] == 'checkmo'
-                || $trialData['method'] == 'banktransfer'
-                || $trialData['method'] == 'purchaseorder'
-            )
+            && in_array($trialData['method'], $this->offlineMethods)
         ) {
             $notCCMethod = true;
             $quotePayment->setMethod($trialData['method']);

@@ -48,6 +48,16 @@ class VaultPaymentAuthorization
     private $objectManager;
 
     /**
+     * @var array
+     */
+    private $offlineMethods = [
+        'checkmo',
+        'banktransfer',
+        'purchaseorder',
+        'cashondelivery'
+    ];
+
+    /**
      * VaultPaymentAuthorization constructor.
      * @param CreateProfile $createProfileObserver
      * @param \Psr\Log\LoggerInterface $logger
@@ -66,6 +76,13 @@ class VaultPaymentAuthorization
         $this->logger = $logger;
     }
 
+    /**
+     * @param $paymentData
+     * @param $quote
+     * @param null $email
+     * @return array
+     * @throws CommandException
+     */
     public function processPreAuthForTrial($paymentData, $quote, $email = null)
     {
         $result = $paymentData;
@@ -126,10 +143,7 @@ class VaultPaymentAuthorization
 
             $this->createProfileObserver->setTrialPaymentData($trialPaymentData);
             $result = $trialPaymentData;
-        } elseif ($paymentData['method'] == 'checkmo'
-            || $paymentData['method'] == 'banktransfer'
-            || $paymentData['method'] == 'purchaseorder'
-        ) {
+        } elseif (in_array($paymentData['method'], $this->offlineMethods)) {
             $this->createProfileObserver->setTrialPaymentData($paymentData);
         }
         return $result;
