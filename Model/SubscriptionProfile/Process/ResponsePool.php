@@ -3,13 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Process;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Response Pool - reponses pool
+ * Class Response Pool
  */
 class ResponsePool implements PoolInterface
 {

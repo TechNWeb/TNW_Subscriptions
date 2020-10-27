@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -16,8 +17,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\SortOrder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
-use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory
-    as ProductBillingFrequencyCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory as ProductBillingFrequencyCollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency as ResourceProductBillingFrequency;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -136,10 +136,8 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
                     throw new CouldNotSaveException(__('ProductSku should be specified'));
                 }
                 $product = $this->productRepository->get($productSku);
-                $productBillingFrequency->setData(
-                    ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                    $product->getId()
-                );
+                $productBillingFrequency->setData(ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                    $product->getId());
             }
 
             $this->resource->save($productBillingFrequency);
@@ -164,10 +162,8 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
         $productBillingFrequency = $this->productBillingFrequencyFactory->create();
         $productBillingFrequency->load($productBillingFrequencyId);
         if (!$productBillingFrequency->getId()) {
-            throw new NoSuchEntityException(__(
-                'ProductBillingFrequency with id "%1" does not exist.',
-                $productBillingFrequencyId
-            ));
+            throw new NoSuchEntityException(__('ProductBillingFrequency with id "%1" does not exist.',
+                $productBillingFrequencyId));
         }
         return $productBillingFrequency;
     }
@@ -212,7 +208,7 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
             $this->dataObjectHelper->populateWithArray(
                 $productBillingFrequencyData,
                 $productBillingFrequencyModel->getData(),
-                \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface::class
+                'TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface'
             );
             $items[] = $productBillingFrequencyData;
         }

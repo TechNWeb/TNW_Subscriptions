@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;

@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin;
 
 /**
@@ -39,9 +40,10 @@ class Config
         \Closure $proceed
     ) {
         if (in_array($subject->getSection(), $this->sections)) {
+            //$subject['groups']['trial']['fields']['trial_price']['value']
             $groups = $subject->getGroups();
-            foreach ($groups as $groupName => $group) {
-                foreach ($group['fields'] as $fieldName => $field) {
+            foreach($groups as $groupName => $group) {
+                foreach($group['fields'] as $fieldName => $field) {
                     if (in_array($fieldName, $this->fields)
                         && isset($field['value'])
                     ) {

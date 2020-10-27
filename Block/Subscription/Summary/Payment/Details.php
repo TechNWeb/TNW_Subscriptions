@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Summary\Payment;
 
 use Magento\Framework\View\Element\Template;
@@ -16,6 +17,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
  */
 class Details extends BaseSummary
 {
+
     /**
      * @var array
      */
@@ -68,11 +70,8 @@ class Details extends BaseSummary
      */
     public function getPaymentMethodTitle()
     {
-        return $this->_scopeConfig->getValue(
-            'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $this->getStore()
-        );
+        $path = 'payment/' . $this->getSubscriptionProfile()->getPayment()->getEngineCode() . '/title';
+        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $this->getStore());
     }
 
     /**

@@ -3,22 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml;
 
-/**
- * Class SubscriptionProfileOrder - abstract controller
- */
 abstract class SubscriptionProfileOrder extends \Magento\Backend\App\Action
 {
-    /**
-     * ACL VALUE
-     */
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
 
-    /**
-     * @var \Magento\Framework\Registry
-     */
     protected $_coreRegistry;
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
 
     /**
      * @param \Magento\Backend\App\Action\Context $context

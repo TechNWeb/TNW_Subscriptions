@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
 use Magento\Backend\App\Action;
@@ -13,7 +14,7 @@ use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
 
 /**
- * Class MassDelete - controller
+ * Class MassDelete
  */
 class MassDelete extends Action
 {
@@ -23,6 +24,7 @@ class MassDelete extends Action
      * @var CollectionFactory
      */
     private $collectionFactory;
+
 
     /**
      * Filter.
@@ -48,8 +50,7 @@ class MassDelete extends Action
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|Redirect|\Magento\Framework\Controller\ResultInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return Redirect
      */
     public function execute()
     {

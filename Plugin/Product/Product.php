@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -43,7 +44,7 @@ class Product
             $options = $product->getData('recurring_options');
             if (is_array($options)) {
                 $defaultBillingFrequencyChecked = 0;
-                array_filter($options, function ($option) use (&$defaultBillingFrequencyChecked) {
+                array_filter($options, function($option) use (&$defaultBillingFrequencyChecked) {
                     if ($option->getDefaultBillingFrequency()) {
                         $defaultBillingFrequencyChecked = 1;
                         return;

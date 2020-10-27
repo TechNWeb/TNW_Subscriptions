@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Plugin\BillingFrequency;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -201,10 +202,8 @@ class SaveLinkedProducts
         $resultData = [
             ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID => $result->getId(),
             ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID => $this->prepareValue($data, 'id'),
-            ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $this->prepareValue(
-                $data,
-                'default_billing_frequency'
-            ),
+            ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $this->prepareValue($data,
+                'default_billing_frequency'),
             ProductBillingFrequencyInterface::PRICE => $this->prepareValue($data, 'price'),
             ProductBillingFrequencyInterface::INITIAL_FEE => $this->prepareValue($data, 'initial_fee'),
             ProductBillingFrequencyInterface::PRESET_QTY => $this->prepareValue($data, 'preset_qty'),

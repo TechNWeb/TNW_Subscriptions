@@ -21,7 +21,9 @@ use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface
 /**
  * Product subscription profile model.
  */
-class ProductSubscriptionProfile extends AbstractExtensibleModel implements ProductSubscriptionProfileInterface
+class ProductSubscriptionProfile
+    extends AbstractExtensibleModel
+    implements ProductSubscriptionProfileInterface
 {
     /**
      * Entity code.
@@ -258,6 +260,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
      */
     public function getTaxAmount($subscriptionProfile)
     {
+        $taxDetails = [];
         try {
             $taxClassKey = $this->taxClassKeyFactory->create();
             $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
@@ -286,7 +289,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
             $storeId = null;
             $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
         } catch (\Exception $e) {
-            $taxDetails = [];
+            //empty catch for backward compatibility
         }
         return isset($taxDetails['tax_amount']) ? $taxDetails['tax_amount'] : 0;
     }
@@ -308,7 +311,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
     public function getProfileUnitPrice($divideByQty = false)
     {
         $result = null;
-        if (is_array($this->getData(self::PRICE))) {
+        if (is_array($this->getData(self::PRICE))){
             $result = $this->getData(self::PRICE)[0];
         } else {
             $result = $this->getData(self::PRICE);
@@ -327,7 +330,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
     public function setPrice($price)
     {
         $result = null;
-        if (is_array($price)) {
+        if (is_array($price)){
             $result = $this->setData(self::PRICE, $price[0]);
         } else {
             $result = $this->setData(self::PRICE, $price);

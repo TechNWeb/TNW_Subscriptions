@@ -5,11 +5,12 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Stripe;
 
-use TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
- * Class StripePaymentDataBuilder -stripe
+ * Class StripePaymentDataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Stripe
  */
 class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -68,17 +69,17 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
      * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      */
     public function __construct(
-        SubscriptionConfig $subscriptionConfig,
-        Manager $manager,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+       SubscriptionConfig $subscriptionConfig,
+       Manager $manager,
+       \Magento\Framework\Module\Manager $moduleManager,
+       \Magento\Framework\ObjectManagerInterface $objectManager,
+       \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
     ) {
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->config = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
-            $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
-            $this->customerClient = $objectManager->get(\TNW\Stripe\Gateway\Http\Client\TransactionCustomer::class);
-            $this->transferFactory = $objectManager->get(\TNW\Stripe\Gateway\Http\TransferFactory::class);
+            $this->config = $objectManager->get("TNW\Stripe\Gateway\Config\Config");
+            $this->adapterFactory = $objectManager->get('TNW\Stripe\Model\Adapter\StripeAdapterFactory');
+            $this->customerClient = $objectManager->get('TNW\Stripe\Gateway\Http\Client\TransactionCustomer');
+            $this->transferFactory = $objectManager->get('TNW\Stripe\Gateway\Http\TransferFactory');
         }
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
@@ -100,14 +101,14 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
         $result = [
             'store_id' => $order->getStoreId(),
             self::AMOUNT => $this->formatPrice($this->getAmount($order)),
-            self::CURRENCY => $order->getCurrencyCode() ?: $order->getQuoteCurrencyCode(),
+            self::CURRENCY => $order->getCurrencyCode() ? : $order->getQuoteCurrencyCode(),
             self::PAYMENT_METHOD_TYPES => ['card'],
             self::CONFIRMATION_METHOD => 'manual',
             self::CAPTURE_METHOD => 'manual'
         ];
 
         if ($this->config->isReceiptEmailEnabled()) {
-            $result[self::RECEIPT_EMAIL] = $billingAddress->getEmail() ?: $paymentData['customer_guest_email'];
+            $result[self::RECEIPT_EMAIL] = $billingAddress->getEmail() ? : $paymentData['customer_guest_email'];
         }
         $addtionalDataToken = isset($paymentData['additional_data']['cc_token'])
             ? $paymentData['additional_data']['cc_token']
@@ -168,14 +169,14 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
                     $customerRequestData['id'] = $cs->id;
                 }
             }
-            $customerRequestData['email'] = $billingAddress->getEmail() ?: $paymentData['customer_guest_email'];
+            $customerRequestData['email'] = $billingAddress->getEmail() ? : $paymentData['customer_guest_email'];
             if (!isset($customerRequestData['id'])) {
                 $customerRequestData['payment_method'] = $pm;
             }
             $customerRequestData['invoice_settings'] = ['default_payment_method' => $pm];
             try {
                 $this->customerClient->placeRequest($this->transferFactory->create($customerRequestData));
-            } catch (\Magento\Payment\Gateway\Http\ClientException $e) {
+            } catch (\Magento\Payment\Gateway\Http\ClientException $e){
                 $result[self::CUSTOMER] = $paymentData['additional_data']['customer'];
             }
         }

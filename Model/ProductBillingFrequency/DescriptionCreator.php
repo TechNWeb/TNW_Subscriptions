@@ -3,10 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Quote\Model\Quote as ModelQuote;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
@@ -18,6 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
  */
 class DescriptionCreator
 {
+
     /**
      * @var Context
      */
@@ -87,7 +90,7 @@ class DescriptionCreator
      *      "[total] / [Billing frequency Unit]. Total of [subscription period] shipments.
      *      Products will be shipped every [Billing frequency Unit] starting [subscription start date]".
      *
-     * Example: "$10.25 / every month(s). Total of 3 shipments. Products will be shipped every month(s) starting today".
+     *      Example: "$10.25 / every month(s). Total of 3 shipments. Products will be shipped every month(s) starting today".
      *
      * @param array $subscriptionData
      * @return string
@@ -101,7 +104,7 @@ class DescriptionCreator
             : __('Free');
         $formattedPrice = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
         $frequencyUnit = isset($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) ?
-            $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) : false;
+            $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']): false;
         $startDate = isset($subscriptionData[CreateProfile::UNIQUE]['start_on']) ?
             $this->formatStartDate($subscriptionData[CreateProfile::UNIQUE]['start_on']) : false;
 
@@ -110,18 +113,16 @@ class DescriptionCreator
         if ($isTrial) {
             $frequencyTrialPeriod = $this->getFrequencyTrialWithUnit(
                 $subscriptionData[CreateProfile::UNIQUE]['trial_period'],
-                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']
-            );
+                $subscriptionData[CreateProfile::UNIQUE]['trial_unit_id']);
             $description[] = __('%1 for %2 and then ', $formattedTotalPrice, $frequencyTrialPeriod);
-        } elseif ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
+        } else if ($subscriptionData[CreateProfile::NON_UNIQUE]['initialFee']) {
             $description[] = __('%1 initial payment and then ', $formattedTotalPrice);
         }
 
         $description[] = __('%1 / every %2. ', $formattedPrice, $frequencyUnit);
 
         if (!$subscriptionData[CreateProfile::UNIQUE]['term']) {
-            $description[] = __(
-                'Total of %1 %2. ',
+            $description[] = __('Total of %1 %2. ',
                 $subscriptionPeriod,
                 $this->getShipmentLabel($subscriptionPeriod)
             );
@@ -184,8 +185,7 @@ class DescriptionCreator
             }
 
             if ($isTrial) {
-                $infoBuyRequestData = $this->serializer->unserialize($item->getOptionByCode('info_buyRequest')
-                    ->getValue());
+                $infoBuyRequestData = $this->serializer->unserialize($item->getOptionByCode('info_buyRequest')->getValue());
                 $infoBuyRequestData = $infoBuyRequestData[CreateProfile::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME];
                 $price = $infoBuyRequestData[CreateProfile::NON_UNIQUE]['price'];
                 if (is_array($price)) {
@@ -277,7 +277,7 @@ class DescriptionCreator
             $result .= sprintf(
                 '%s %s ',
                 $formattedPrice,
-                $this->addContainer($middlePhrase . ' ' . $lastPhrase, 'middle-text')
+                $this->addContainer($middlePhrase .' '. $lastPhrase, 'middle-text')
             );
             $result .= '</div>';
             $thenPhrase = __('then');
@@ -290,7 +290,7 @@ class DescriptionCreator
         );
 
         $frequencyUnit = $this->addContainer(
-            '/' . $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
+            '/' .$this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']),
             'unit'
         );
 

@@ -10,9 +10,6 @@ use Magento\Backend\App\Action;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 
-/**
- * Class Add - controller
- */
 class Add extends Action
 {
     /**

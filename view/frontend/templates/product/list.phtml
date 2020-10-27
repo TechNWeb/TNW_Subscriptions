@@ -17,10 +17,10 @@ $_productCollection = $block->getLoadedProductCollection();
 $_helper = $this->helper('Magento\Catalog\Helper\Output');
 ?>
 <?php if (!$_productCollection->count()): ?>
-    <div class="message info empty"><div><?= /* @escapeNotVerified */ __('We can\'t find products matching the selection.') ?></div></div>
+    <div class="message info empty"><div><?php /* @escapeNotVerified */ echo __('We can\'t find products matching the selection.') ?></div></div>
 <?php else: ?>
-    <?= $block->getToolbarHtml() ?>
-    <?= $block->getAdditionalHtml() ?>
+    <?php echo $block->getToolbarHtml() ?>
+    <?php echo $block->getAdditionalHtml() ?>
     <?php
     if ($block->getMode() == 'grid') {
         $viewMode = 'grid';
@@ -38,12 +38,12 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
      */
     $pos = $block->getPositioned();
     ?>
-    <div class="products wrapper <?= /* @escapeNotVerified */ $viewMode; ?> products-<?= /* @escapeNotVerified */ $viewMode; ?>">
+    <div class="products wrapper <?php /* @escapeNotVerified */ echo $viewMode; ?> products-<?php /* @escapeNotVerified */ echo $viewMode; ?>">
         <?php $iterator = 1; ?>
         <ol class="products list items product-items">
             <?php /** @var $_product \Magento\Catalog\Model\Product */ ?>
             <?php foreach ($_productCollection as $_product): ?>
-                <?= /* @escapeNotVerified */($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                <?php /* @escapeNotVerified */ echo($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
                 <div class="product-item-info" data-container="product-grid">
                     <?php
                     $productImage = $block->getImage($_product, $imageDisplayArea);
@@ -54,8 +54,8 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                     }
                     ?>
                     <?php // Product Image ?>
-                    <a href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
-                        <?= $productImage->toHtml(); ?>
+                    <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+                        <?php echo $productImage->toHtml(); ?>
                     </a>
                     <div class="product details product-item-details">
                         <?php
@@ -63,64 +63,64 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         ?>
                         <strong class="product name product-item-name">
                             <a class="product-item-link"
-                               href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>">
-                                <?= /* @escapeNotVerified */ $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+                               href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>">
+                                <?php /* @escapeNotVerified */ echo $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
                             </a>
                         </strong>
-                        <?= $block->getReviewsSummaryHtml($_product, $templateType); ?>
+                        <?php echo $block->getReviewsSummaryHtml($_product, $templateType); ?>
                         <strong class="product name product-item-name">
-                            <?= /* @escapeNotVerified */ $block->getChildBlock('helper.category.products.list')->getTopMessage($_product) ?>
+                            <?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTopMessage($_product) ?>
                         </strong>
-                        <?php if ($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
+                        <?php if($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
                             <div class="price-box price-final_price">
                             <span class="price-wrapper" data-role="priceBox">
-                                <span class="price"><?= /* @escapeNotVerified */ $block->getChildBlock('helper.category.products.list')->getTrialPriceForCategory($_product) ?></span>
+                                <span class="price"><?php /* @escapeNotVerified */ echo $block->getChildBlock('helper.category.products.list')->getTrialPriceForCategory($_product) ?></span>
                             </span>
                             </div>
                         <?php else: ?>
-                            <?= /* @escapeNotVerified */ $block->getProductPrice($_product) ?>
+                            <?php /* @escapeNotVerified */ echo $block->getProductPrice($_product) ?>
                         <?php endif; ?>
-                        <?= $block->getProductDetailsHtml($_product); ?>
+                        <?php echo $block->getProductDetailsHtml($_product); ?>
 
                         <div class="product-item-inner">
-                            <div class="product actions product-item-actions"<?= strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
+                            <div class="product actions product-item-actions"<?php echo strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
                                 $block->getChildBlock('helper.category.products.list')->prepareParamsToButtonsBlock(
-                                    $_product,
-                                    $pos,
-                                    $viewMode,
-                                    $position,
-                                    $block->getAddToCartPostParams($_product)
+                                        $_product,
+                                        $pos,
+                                        $viewMode,
+                                        $position,
+                                        $block->getAddToCartPostParams($_product)
                                 );
                                 echo $block->getChildBlock('helper.category.products.list')->getButtonsHtml();
                                 ?>
-                                <div data-role="add-to-links" class="actions-secondary"<?= strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
+                                <div data-role="add-to-links" class="actions-secondary"<?php echo strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
                                     <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
-                                        <?= $addToBlock->setProduct($_product)->getChildHtml(); ?>
+                                        <?php echo $addToBlock->setProduct($_product)->getChildHtml(); ?>
                                     <?php endif; ?>
                                 </div>
                             </div>
                             <?php if ($showDescription):?>
                                 <div class="product description product-item-description">
-                                    <?= /* @escapeNotVerified */ $_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description') ?>
-                                    <a href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>" title="<?= /* @escapeNotVerified */ $_productNameStripped ?>"
-                                       class="action more"><?= /* @escapeNotVerified */ __('Learn More') ?></a>
+                                    <?php /* @escapeNotVerified */ echo $_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description') ?>
+                                    <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" title="<?php /* @escapeNotVerified */ echo $_productNameStripped ?>"
+                                       class="action more"><?php /* @escapeNotVerified */ echo __('Learn More') ?></a>
                                 </div>
                             <?php endif; ?>
                         </div>
                     </div>
                 </div>
-                <?=($iterator == count($_productCollection)+1) ? '</li>' : '' ?>
+                <?php echo($iterator == count($_productCollection)+1) ? '</li>' : '' ?>
             <?php endforeach; ?>
         </ol>
     </div>
-    <?= $block->getToolbarHtml() ?>
-    <?php if (!$block->isRedirectToCartEnabled()): ?>
+    <?php echo $block->getToolbarHtml() ?>
+    <?php if (!$block->isRedirectToCartEnabled()) : ?>
         <script type="text/x-magento-init">
         {
             "[data-role=tocart-subscriptions-form]": {
                 "catalogAddToCart": {
-                    "addToCartButtonTextDefault" : "<?= __('Subscribe') ?>"
+                    "addToCartButtonTextDefault" : "<?php echo __('Subscribe') ?>"
                     }
             },
             "[data-role=tocart-form], .form.map.checkout": {

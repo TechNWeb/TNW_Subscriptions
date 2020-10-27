@@ -11,7 +11,8 @@ use Magento\Vault\Model\CreditCardTokenFactory;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
- * Class TokenExtractor - stripe
+ * Class TokenExtractor
+ * @package TNW\Subscriptions\Model\Payment\Stripe
  */
 class TokenExtractor
 {
@@ -68,11 +69,11 @@ class TokenExtractor
         $this->tokenManagement = $tokenManagement;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->client = $objectManager->get(
-                \TNW\Stripe\Gateway\Http\Client\TransactionCustomer::class
+                "TNW\Stripe\Gateway\Http\Client\TransactionCustomer"
             );
-            $this->gatewayConfig = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
-            $this->transferFactory = $objectManager->get(\TNW\Stripe\Gateway\Http\TransferFactory::class);
-            $this->subjectReader = $objectManager->get(\TNW\Stripe\Gateway\Helper\SubjectReader::class);
+            $this->gatewayConfig = $objectManager->get("\TNW\Stripe\Gateway\Config\Config");
+            $this->transferFactory = $objectManager->get("TNW\Stripe\Gateway\Http\TransferFactory");
+            $this->subjectReader = $objectManager->get("TNW\Stripe\Gateway\Helper\SubjectReader");
         }
         $this->serializer = $serializer;
     }

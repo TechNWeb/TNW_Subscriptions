@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
  */
 namespace TNW\Subscriptions\Block\Adminhtml\Customer;
 
@@ -11,7 +11,9 @@ use Magento\Framework\Registry;
 use Magento\Ui\Component\Layout\Tabs\TabWrapper;
 
 /**
- * Class ProfilesTab - adminhtml block for customer profiles tab
+ * Class CustomerOrdersTab
+ *
+ * @package Magento\Sales\Block\Adminhtml
  */
 class ProfilesTab extends TabWrapper
 {

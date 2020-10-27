@@ -3,20 +3,20 @@
     <?= $block->getTabMessagesHtml()  ?>
     <div class="overview-content">
         <?php if ($block->getCanShowNextPayment()): ?>
-            <div class="summary-item next-payment"><?= $block->getNextPaymentHtml() ?></div>
+            <div class="summary-item next-payment"><?php echo $block->getNextPaymentHtml() ?></div>
         <?php endif ?>
-        <div class="summary-item status-message <?= $block->getStatusMessageBlockClass() ?>">
-            <div class="bordered subscription-message <?= $block->getBlockMessage()->getStatusClass() ?>">
-                <?= $block->getMessageHtml() ?>
+        <div class="summary-item status-message <?php echo $block->getStatusMessageBlockClass() ?>">
+            <div class="bordered subscription-message <?php echo $block->getBlockMessage()->getStatusClass() ?>">
+                <?php echo $block->getMessageHtml() ?>
             </div>
-            <div class="bordered subscription-status <?= $block->getBlockStatus()->getStatusClass() ?>">
-                <?= $block->getStatusHtml() ?>
+            <div class="bordered subscription-status <?php echo $block->getBlockStatus()->getStatusClass() ?>">
+                <?php echo $block->getStatusHtml() ?>
             </div>
         </div>
     </div>
     <div class="clear"></div>
-    <div class="summary-item subscription-products"><?= $block->getProductsHtml() ?></div>
+    <div class="summary-item subscription-products"><?php echo $block->getProductsHtml() ?></div>
     <?php if ($block->canShowDangerZone()): ?>
-        <div class="summary-item subscription-danger-zone"><?= $block->getDangerZoneHtml() ?></div>
+        <div class="summary-item subscription-danger-zone"><?php echo $block->getDangerZoneHtml() ?></div>
     <?php endif ?>
 </div>

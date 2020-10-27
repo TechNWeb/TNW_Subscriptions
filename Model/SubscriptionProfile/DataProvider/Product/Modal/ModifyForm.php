@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Helper\Image as ImageHelper;
@@ -19,14 +20,14 @@ use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
- * Class ModifyForm - form modification modal
+ * Class ModifyForm
  */
 class ModifyForm extends Form
 {
@@ -48,7 +49,7 @@ class ModifyForm extends Form
     const FORM_DATA_VALUE = 'new_subscription';
 
     /**
-     * Edit button name name
+     * Edit button name.
      */
     const EDIT_BUTTON_NAME = 'edit_button';
 
@@ -152,8 +153,7 @@ class ModifyForm extends Form
     }
 
     /**
-     * @return array|mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @inheritdoc
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getData()
@@ -184,11 +184,7 @@ class ModifyForm extends Form
                     'qty' => $item->getQty(),
                     'product_price' => $this->currentProduct->getPrice(),
                     'unlock_preset_qty' => $presetQty,
-                    'frequency_data' => $this->getFrequenciesData(
-                        false,
-                        $this->currentProduct->getId(),
-                        $this->getAdditionalDataForProduct($item)
-                    ),
+                    'frequency_data' => $this->getFrequenciesData(false, $this->currentProduct->getId(), $this->getAdditionalDataForProduct($item)),
                     'initial_values' => [
                         'billing_frequency' => $subBuyRequest[Create::UNIQUE]['billing_frequency'],
                         'price' => $itemPrice
@@ -268,9 +264,10 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns item children definition.
+     *
      * @param DataObject $subQuote
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getChildren(DataObject $subQuote)
     {
@@ -408,8 +405,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns edit fieldset definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getEditFieldsetDefinition()
     {
@@ -479,11 +477,13 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns middle container definition from description fieldset.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getMiddleContainerDefinition()
     {
+
         $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
         $qty = false;
         if (!$hideQty) {
@@ -545,9 +545,7 @@ class ModifyForm extends Form
     protected function getLeftContainerDefinition()
     {
         $imageHelper = $this->getImageHelper();
-        $imageUrl = $this->currentProduct
-            ? $imageHelper->getUrl()
-            : $imageHelper->getDefaultPlaceholderUrl('small_image');
+        $imageUrl = $this->currentProduct ? $imageHelper->getUrl() : $imageHelper->getDefaultPlaceholderUrl('small_image');
         return [
             'arguments' => [
                 'data' => [
@@ -692,7 +690,7 @@ class ModifyForm extends Form
      */
     protected function getEditButton()
     {
-        $additionalClasses = $this->getRemoveButtonVisibility() ? '' : 'right';
+        $additionalClasses = $this->getRemoveButtonVisibility() ? '': 'right';
         $additionalClasses .= ' action-editor';
 
         return [
@@ -778,8 +776,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns billing frequency field definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getBillingFrequencyDefinition()
     {
@@ -820,8 +819,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns term field definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getTermDefinition()
     {
@@ -864,8 +864,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns period field definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getPeriodDefenition()
     {
@@ -891,16 +892,14 @@ class ModifyForm extends Form
                             'greater-than-equals-to' => ModalForm::DEFAULT_PERIOD_VALUE,
                         ],
                         'imports' => [
-                            'onTermChange' => $this->getCurrentFormName()
-                                . '.description_fieldset.edit_fieldset.right.term' . ':value',
+                            'onTermChange' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':value',
                             'showPreview' => '${ $.parentFormName }:previewMode',
                             '__disableTmpl' => [
                                 'showPreview' => false
                             ]
                         ],
                         'exports' => [
-                            'completePreviewLabel' => $this->getCurrentFormName()
-                                . '.description_fieldset.edit_fieldset.right.term' . ':periodPreviewLabel'
+                            'completePreviewLabel' => $this->getCurrentFormName() . '.description_fieldset.edit_fieldset.right.term' . ':periodPreviewLabel'
                         ],
                         'visibleOnEdit' => !$infiniteSubscriptions,
                         'previewLabelVisible' => false,
@@ -916,8 +915,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns start on field definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getStartOnDefinition()
     {
@@ -961,7 +961,8 @@ class ModifyForm extends Form
 
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
             $label = __('Post trial price:');
-            if (!isset($this->profileManager)
+            if (
+                !isset($this->profileManager)
             || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
             ) {
                 $isTrial = true;
@@ -1042,8 +1043,9 @@ class ModifyForm extends Form
     }
 
     /**
+     * Returns initial fee field definition.
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getInitialFeeDefinition()
     {
@@ -1117,8 +1119,7 @@ class ModifyForm extends Form
     {
         return $this->stockRegistry->getStockItem(
             $this->currentProduct->getId(),
-            $this->currentProduct->getStore()->getWebsiteId()
-        )
+            $this->currentProduct->getStore()->getWebsiteId())
             ->getIsQtyDecimal();
     }
 

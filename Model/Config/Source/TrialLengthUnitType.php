@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\Config\Source;
 
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
@@ -79,9 +80,9 @@ class TrialLengthUnitType extends AbstractSource
         foreach ($this->getAllOptions() as $option) {
             if ($value === $option['value']) {
                 $label = $option['label'];
-                if ($length != 1) {
-                    $label = $label . self::PLURAL;
-                }
+                 if ($length != 1) {
+                     $label = $label . self::PLURAL;
+                 }
                 break;
             }
         }

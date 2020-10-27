@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Quote;
 
 use Magento\Framework\App\State;
@@ -85,68 +86,57 @@ class Validator
     /**
      * Validates and recalculates subscription quotes if need it.
      *
-     * @param array $quotes
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @param Quote[] $quotes
+     * @return Quote[]
      */
     public function validate(array $quotes)
     {
         $result = $quotes;
         foreach ($quotes as $quote) {
-            $result = $this->reCalculateQuote($quote, $result);
-        }
-        return $result;
-    }
-
-    /**
-     * @param $quote
-     * @param $result
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    private function reCalculateQuote($quote, $result)
-    {
-        if ($this->isBillingFrequencyExists($quote)) {
-            /** @var Item $item */
-            foreach ($quote->getAllVisibleItems() as $item) {
-                if ($this->productCanBeSubscribed($item)) {
-                    $currentRequest = $this->getCurrentBuyRequest($item);
-                    list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
-                    if ($currentRequest != $newRequest) {
+            if ($this->isBillingFrequencyExists($quote)) {
+                /** @var Item $item */
+                foreach ($quote->getAllVisibleItems() as $item) {
+                    $productCanBeSubscribed = $this->productCanBeSubscribed($item);
+                    if ($productCanBeSubscribed) {
+                        $currentRequest = $this->getCurrentBuyRequest($item);
+                        list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
+                        if ($currentRequest != $newRequest) {
+                            // Remove quote item
+                            if (!$this->createProfile->removeSubscriptions($item)) {
+                                $result = $this->filterResult($result, $quote);
+                            };
+                            // Add updated quote item if buy request was changed
+                            $this->createProfile->setSubQuotes($result);
+                            $newItem = $this->createProfile->addToSubscription($productsData);
+                            if ($newItem) {
+                                $newQuote = $newItem->getQuote();
+                                $result = $this->addQuoteToResult($result, $newQuote);
+                            }
+                        }
+                    } else {
                         // Remove quote item
+                        $this->addError(
+                            __('Quote item was removed because of product cannot be subscribed anymore.')
+                        );
                         if (!$this->createProfile->removeSubscriptions($item)) {
                             $result = $this->filterResult($result, $quote);
-                        }
-                        // Add updated quote item if buy request was changed
-                        $this->createProfile->setSubQuotes($result);
-                        $newItem = $this->createProfile->addToSubscription($productsData);
-                        if ($newItem) {
-                            $newQuote = $newItem->getQuote();
-                            $result = $this->addQuoteToResult($result, $newQuote);
-                        }
-                    }
-                } else {
-                    // Remove quote item
-                    $this->addError(
-                        __('Quote item was removed because of product cannot be subscribed anymore.')
-                    );
-                    if (!$this->createProfile->removeSubscriptions($item)) {
-                        $result = $this->filterResult($result, $quote);
-                        $this->addError([
-                            __('Quote was removed because of last item removal.'),
-                            'needReload' => true,
-                        ]);
+                            $this->addError([
+                                __('Quote was removed because of last item removal.'),
+                                'needReload' => true,
+                            ]);
+                        };
                     }
                 }
+            } else {
+                $result = $this->filterResult($result, $quote);
+                $this->createProfile->getQuoteCreator()->getCartRepository()->delete($quote);
+                $this->addError([
+                    __('Quote was removed because of billing frequency removal.'),
+                    'needReload' => true,
+                ]);
             }
-        } else {
-            $result = $this->filterResult($result, $quote);
-            $this->createProfile->getQuoteCreator()->getCartRepository()->delete($quote);
-            $this->addError([
-                __('Quote was removed because of billing frequency removal.'),
-                'needReload' => true,
-            ]);
         }
+
         return $result;
     }
 
@@ -193,7 +183,6 @@ class Validator
      * @param Item $item
      * @param array $currentRequest
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getNewBuyRequest(Item $item, array $currentRequest)
     {
@@ -248,7 +237,6 @@ class Validator
      *
      * @param Item $item
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getCurrentBuyRequest(Item $item)
     {

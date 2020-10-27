@@ -8,7 +8,8 @@ namespace TNW\Subscriptions\Model\Config\Source;
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 
 /**
- * Class PriceStrategy - config source
+ * Class PriceStrategy
+ * @package TNW\Subscriptions\Model\Config\Source
  */
 class PriceStrategy extends AbstractSource
 {

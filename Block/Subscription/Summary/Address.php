@@ -3,14 +3,16 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
-use Magento\Customer\Model\Address\Config as AddressConfig;
 use Magento\Framework\View\Element\Template;
+use Magento\Customer\Model\Address\Config as AddressConfig;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 
 /**
- * Class Address - block address summary
+ * Class Address
+ * @package TNW\Subscriptions\Block\Subscription\Summary
  */
 class Address extends BaseSummary
 {
@@ -90,7 +92,7 @@ class Address extends BaseSummary
      */
     public function getEditUrl($tabName = 'shipment', array $params = [])
     {
-        $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing' : $tabName;
+        $tabName = ($this->addressType === QuoteAddress::ADDRESS_TYPE_BILLING) ? 'billing': $tabName;
 
         $params['shipping_address'] = 1;
 
@@ -104,7 +106,8 @@ class Address extends BaseSummary
      */
     protected function _toHtml()
     {
-        if ($this->getSubscriptionProfile()
+        if (
+            $this->getSubscriptionProfile()
                 && $this->addressType === QuoteAddress::ADDRESS_TYPE_SHIPPING
                 && $this->getSubscriptionProfile()->getIsVirtual()
         ) {

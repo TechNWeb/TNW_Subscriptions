@@ -1,12 +1,12 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview\NextPayment $block */ ?>
 <div class="bordered block-next-payment">
-    <div class="title"><?= __('Estimated Payment') ?></div>
+    <div class="title"><?php echo __('Estimated Payment') ?></div>
     <?php $date = $block->getNextPaymentDateParts(); ?>
-    <div class="date day"><?= $date ? $date['day'] : '--' ?></div>
-    <div class="date month"><?= $date ? $date['month'] : '--' ?></div>
-    <div class="date year"><?= $date ? $date['year'] : '--' ?></div>
+    <div class="date day"><?php echo $date ? $date['day'] : '--' ?></div>
+    <div class="date month"><?php echo $date ? $date['month'] : '--' ?></div>
+    <div class="date year"><?php echo $date ? $date['year'] : '--' ?></div>
     <div class="cost">
-        <?= $block->getCostFormatting() ?>
-        <div class="delivery-cost"><?= $block->getShippingCostFormatting() ?></div>
+        <?php echo $block->getCostFormatting() ?>
+        <div class="delivery-cost"><?php echo $block->getShippingCostFormatting() ?></div>
     </div>
 </div>

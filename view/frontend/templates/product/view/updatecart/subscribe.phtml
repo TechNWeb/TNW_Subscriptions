@@ -19,15 +19,15 @@
                     "recurringAddToCart": {
                         "component": "TNW_Subscriptions/js/product/subscribe-component",
                         "config": {
-                            "defaultFrequency" : "<?= $block->getDefaultFrequency() ?>",
-                            "buttonLabel" : "<?= $block->escapeHtml(__('Update cart')) ?>",
-                            "dateFormat": "<?= $block->getDateFormat() ?>",
-                            "minStartOn" : "<?= $block->getMinStartOn() ?>",
-                            "defaultPeriod" : "<?= $block->getDefaultPeriod() ?>",
-                            "defaultUntilCancelled" : "<?= $block->getDefaultUntilCancelled() ?>",
-                            "defaultSubscribeQty" : "<?= $block->getDefaultSubscribeQty() ?>",
-                            "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
-                            "products" : <?= $block->getProductDataArray() ?>
+                            "defaultFrequency" : "<?php echo $block->getDefaultFrequency() ?>",
+                            "buttonLabel" : "<?php echo $block->escapeHtml(__('Update cart')) ?>",
+                            "dateFormat": "<?php echo $block->getDateFormat() ?>",
+                            "minStartOn" : "<?php echo $block->getMinStartOn() ?>",
+                            "defaultPeriod" : "<?php echo $block->getDefaultPeriod() ?>",
+                            "defaultUntilCancelled" : "<?php echo $block->getDefaultUntilCancelled() ?>",
+                            "defaultSubscribeQty" : "<?php echo $block->getDefaultSubscribeQty() ?>",
+                            "defaultStartOn" : "<?php echo $block->getDefaultStartOn() ?>",
+                            "products" : <?php echo $block->getProductDataArray() ?>
                         }
                     }
                 }

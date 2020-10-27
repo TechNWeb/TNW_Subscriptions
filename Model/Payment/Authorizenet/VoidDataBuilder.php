@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
 /**
- * Class VoidDataBuilder - authorizenet
+ * Class VoidDataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Authorizenet
  */
 class VoidDataBuilder extends \TNW\Subscriptions\Model\Payment\VoidDataBuilder
 {

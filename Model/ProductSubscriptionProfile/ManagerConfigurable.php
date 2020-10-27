@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use Magento\Catalog\Model\Product;
@@ -246,61 +247,41 @@ class ManagerConfigurable
 
                 /** $candidates is error message */
                 if (is_string($candidates) || $candidates instanceof \Magento\Framework\Phrase) {
-                    return (string) $candidates;
+                    return strval($candidates);
                 }
 
                 $price = $this->getSubscriptionItemPrice($request, $profile, $updatedSubProduct);
 
                 /** @var \Magento\Catalog\Model\Product $candidate */
                 foreach ($candidates as $candidate) {
-                    $profileChanged = $this->processCandidateChanges(
-                        $candidate,
-                        $updatedSubProduct,
-                        $profileChanged,
-                        $profileProducts,
-                        $price
-                    );
+                    if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
+                        //if $candidate is current updated product
+                        $updatedSubProduct
+                            ->setDataChanges(false)
+                            ->setQty($candidate->getQty())
+                            ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
+                            ->setPrice($price);
+                        $profileChanged = $profileChanged || $updatedSubProduct->hasDataChanges();
+                    } else {
+                        //if $candidate is a configurable child product.
+                        foreach ($profileProducts as $profileProduct) {
+                            if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
+                                $profileProduct->setMagentoProductId($candidate->getId())
+                                    ->setSku($candidate->getSku())
+                                    ->setName($candidate->getName())
+                                    ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
+                                    ->setQty($candidate->getQty());
+                                $profileChanged = $profileChanged || $profileProduct->hasDataChanges();
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             $profile->setDataChanges($profileChanged);
         }
 
         return $profile;
-    }
-
-    /**
-     * @param \Magento\Catalog\Model\Product $candidate
-     * @param $updatedSubProduct
-     * @param $result
-     * @param $profileProducts
-     * @param $price
-     * @return bool
-     */
-    private function processCandidateChanges($candidate, $updatedSubProduct, $result, $profileProducts, $price)
-    {
-        if ($candidate->getId() === $updatedSubProduct->getMagentoProductId()) {
-            //if $candidate is current updated product
-            $updatedSubProduct
-                ->setDataChanges(false)
-                ->setQty($candidate->getQty())
-                ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
-                ->setPrice($price);
-            $result = $result || $updatedSubProduct->hasDataChanges();
-        } else {
-            //if $candidate is a configurable child product.
-            foreach ($profileProducts as $profileProduct) {
-                if ($profileProduct->getParentId() === $updatedSubProduct->getId()) {
-                    $profileProduct->setMagentoProductId($candidate->getId())
-                        ->setSku($candidate->getSku())
-                        ->setName($candidate->getName())
-                        ->setCustomOptions($candidate->getTypeInstance()->getOrderOptions($candidate))
-                        ->setQty($candidate->getQty());
-                    $result = $result || $profileProduct->hasDataChanges();
-                    break;
-                }
-            }
-        }
-        return $result;
     }
 
     /**

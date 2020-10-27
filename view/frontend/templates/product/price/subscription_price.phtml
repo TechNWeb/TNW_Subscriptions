@@ -40,8 +40,8 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
 {
     ".product-info-price": {
         "tnwSubscribePrice": {
-            "subscriptionPricesData" : <?= /* @noEscape */ $data ?>,
-            "subBillingFrequencyId" : <?= /* @noEscape */ $block->getBillingFrequencyId() ?>
+            "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
+            "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>
         }
     }
 }

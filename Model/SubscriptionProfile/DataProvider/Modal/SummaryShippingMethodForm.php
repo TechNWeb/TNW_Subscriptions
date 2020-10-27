@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Quote\Model\Quote;
@@ -14,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class SummaryShippingMethodForm - used for shipping method summary
+ * Class SummaryShippingMethodForm
  */
 class SummaryShippingMethodForm extends AbstractDataProvider
 {
@@ -104,7 +105,6 @@ class SummaryShippingMethodForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
     }
 
     /**

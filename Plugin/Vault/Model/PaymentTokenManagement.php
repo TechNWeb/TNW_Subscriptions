@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Plugin\Vault\Model;
 
 /**
- * Class PaymentTokenManagement - plugin to add additional logic to after token save
+ * Class PaymentTokenManagement
+ * @package TNW\Subscriptions\Plugin\Vault\Model
  */
 class PaymentTokenManagement
 {

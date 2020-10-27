@@ -9,9 +9,6 @@ use Magento\Framework\Api\Filter;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor\CustomFilterInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 
-/**
- * Class QuoteEntityFilter - fielter for quotes
- */
 class QuoteEntityFilter implements CustomFilterInterface
 {
     /**

@@ -16,7 +16,8 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Framework\Serialize\SerializerInterface;
 
 /**
- * Class ProfileProcessor - cron
+ * Class ProfileProcessor
+ * @package TNW\Subscriptions\Cron
  */
 class ProfileProcessor
 {

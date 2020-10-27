@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Json\Helper\Data as JsonHelper;
@@ -10,6 +11,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\EnginePool;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
 
 /**
  *  Credit card utility methods.
@@ -63,7 +65,8 @@ class ProfileCcUtils
     {
         $expiredAt = null;
 
-        if (isset($paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]) &&
+        if (
+            isset($paymentInfo[OrderPaymentInterface::CC_EXP_MONTH]) &&
             isset($paymentInfo[OrderPaymentInterface::CC_EXP_YEAR])
         ) {
             $lastDayOfMonth = (int)date("t");

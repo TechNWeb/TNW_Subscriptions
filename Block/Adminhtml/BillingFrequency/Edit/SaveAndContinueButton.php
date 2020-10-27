@@ -3,15 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
-/**
- * Class SaveAndContinueButton - block to define data for save and continue button on billing frequency
- */
 class SaveAndContinueButton extends GenericButton implements ButtonProviderInterface
 {
+
     /**
      * @return array
      */

@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Plugin\Product;
 
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -22,7 +23,8 @@ class Initialization
      */
     public function __construct(
         ProductBillingFrequencyInterfaceFactory $productBillingFrequencyInterfaceFactory
-    ) {
+    )
+    {
         $this->productBillingFrequencyInterfaceFactory = $productBillingFrequencyInterfaceFactory;
     }
 
@@ -58,8 +60,7 @@ class Initialization
                 $recurringOptionData = $this->processPresetQty($product, $recurringOptionData);
                 if (empty($recurringOptionData['is_delete'])) {
                     /** @var ProductBillingFrequencyInterface $recurringOption */
-                    $recurringOption = $this->productBillingFrequencyInterfaceFactory
-                        ->create(['data' => $recurringOptionData]);
+                    $recurringOption = $this->productBillingFrequencyInterfaceFactory->create(['data' => $recurringOptionData]);
                     $recurringOption->setProductSku($product->getSku());
                     $recurringOption->setMagentoProductId($product->getId());
                     if ($recurringOption->getId() === '') {
@@ -74,6 +75,7 @@ class Initialization
         $product->setCanSaveRecurringOptions(
             !empty($product->getData('affect_product_recurring_options'))
         );
+
 
         return $product;
     }

@@ -7,9 +7,6 @@ namespace TNW\Subscriptions\Block\Sales\Order;
 
 use Magento\Framework\View\Element\Template;
 
-/**
- * Class InitialFee - block to display the initial fee on order
- */
 class InitialFee extends \Magento\Framework\View\Element\Template
 {
     /**
@@ -17,12 +14,6 @@ class InitialFee extends \Magento\Framework\View\Element\Template
      */
     private $dataObjectFactory;
 
-    /**
-     * InitialFee constructor.
-     * @param Template\Context $context
-     * @param \Magento\Framework\DataObject\Factory $dataObjectFactory
-     * @param array $data
-     */
     public function __construct(
         Template\Context $context,
         \Magento\Framework\DataObject\Factory $dataObjectFactory,

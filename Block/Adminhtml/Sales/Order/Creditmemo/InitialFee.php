@@ -15,12 +15,6 @@ class InitialFee extends \Magento\Backend\Block\Template
      */
     private $priceCurrency;
 
-    /**
-     * InitialFee constructor.
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param array $data
-     */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
@@ -46,10 +40,7 @@ class InitialFee extends \Magento\Backend\Block\Template
     {
         $parent = $this->getParentBlock();
         $this->source = $parent->getSource();
-        $total = new \Magento\Framework\DataObject([
-            'code' => 'tnw_subs_initial_fee',
-            'block_name' => $this->getNameInLayout()
-        ]);
+        $total = new \Magento\Framework\DataObject(['code' => 'tnw_subs_initial_fee', 'block_name' => $this->getNameInLayout()]);
         $parent->addTotal($total, 'agjustments');
 
         return $this;

@@ -1,8 +1,5 @@
 <?php
-/**
- *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
- *  See TNW_LICENSE.txt for license details.
- */
+
 namespace TNW\Subscriptions\Plugin\Multishipping\Controller\Checkout;
 
 use Magento\Framework\Controller\ResultFactory;
@@ -10,9 +7,6 @@ use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\UrlInterface;
 
-/**
- * Class Addresses - plugin to restrict multishipping on susbscription orders
- */
 class Addresses
 {
     /**
@@ -61,7 +55,8 @@ class Addresses
     public function afterExecute(\Magento\Multishipping\Controller\Checkout\Addresses $subject)
     {
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $this->managerInterface->addWarningMessage(__('Checkout with multiple addresses is not supported.'));
+
+        $this->managerInterface->addWarningMessage( __('Checkout with multiple addresses is not supported.') );
         return $resultRedirect->setUrl($this->urlBuilder->getUrl('checkout/cart', ['_secure' => true]));
     }
 }

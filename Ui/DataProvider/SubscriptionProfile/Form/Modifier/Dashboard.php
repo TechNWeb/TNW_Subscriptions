@@ -149,7 +149,8 @@ class Dashboard extends BaseFormModifier
 
         if ($profile && $this->utils->isCcPayment($profile)) {
             $relation = $this->getNextProfileRelation($profile);
-            if (false !== $relation &&
+            if (
+                false !== $relation &&
                 $this->utils->isCcExpireBy($profile, $relation->getScheduledAt())
             ) {
                 $messages[] = __('Credit Card will expire before next billing cycle.');

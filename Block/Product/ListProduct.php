@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Product;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
@@ -111,8 +112,7 @@ class ListProduct extends OrigListProduct
     /**
      * Create and return buttons block HTML with params.
      *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return string
      */
     public function getButtonsHtml()
     {
@@ -133,14 +133,15 @@ class ListProduct extends OrigListProduct
     public function getTopMessage($product)
     {
         $productArray = $product->getData();
-        if (isset($productArray['tnw_subscr_trial_status'])
+        if (
+            isset($productArray['tnw_subscr_trial_status'])
             && $productArray['tnw_subscr_trial_status'] != 0
             && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
                 $productArray['tnw_subscr_trial_length'],
-                $productArray['tnw_subscr_trial_length_unit']
-            ));
+                $productArray['tnw_subscr_trial_length_unit'])
+            );
         } else {
             $topMessage = '';
         }
@@ -156,9 +157,7 @@ class ListProduct extends OrigListProduct
      */
     private function getFrequencyTrialWithUnit($period, $unitId)
     {
-        return strtolower(
-            $period . ' ' . $this->trialLengthUnitType->getLabelByValueAndLength((int) $unitId, $period)
-        );
+        return strtolower($period . ' ' . $this->trialLengthUnitType->getLabelByValueAndLength((int) $unitId, $period));
     }
 
     /**
@@ -174,7 +173,8 @@ class ListProduct extends OrigListProduct
             ->getListByProductId($product->getId())
             ->getItems();
 
-        if (empty($productBillingFrequencies)
+        if (
+            empty($productBillingFrequencies)
             || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
             return $this->formatCurrency($product->getPrice(), false);

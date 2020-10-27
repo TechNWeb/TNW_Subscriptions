@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Store\Model\StoreManagerInterface;
@@ -57,12 +58,12 @@ class StatusManager
             case ProfileStatus::STATUS_ACTIVE:
             case ProfileStatus::STATUS_PAST_DUE:
             case ProfileStatus::STATUS_TRIAL:
-                $result = [
+            $result = [
                     ProfileStatus::STATUS_HOLDED,
                     ProfileStatus::STATUS_CANCELED,
                     ProfileStatus::STATUS_SUSPENDED,
                 ];
-                break;
+            break;
             case ProfileStatus::STATUS_SUSPENDED:
                 $result = [
                     ProfileStatus::STATUS_HOLDED,
@@ -109,7 +110,7 @@ class StatusManager
      * @param \Magento\Framework\DataObject $subscription
      * @return bool
      */
-    public function canHoldSubscription(\Magento\Framework\DataObject $subscription)
+    public function canHoldSubscription( \Magento\Framework\DataObject $subscription)
     {
         $result = ((int)$subscription->getStatus() === ProfileStatus::STATUS_ACTIVE) ? true : false;
 

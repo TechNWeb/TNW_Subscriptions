@@ -5,13 +5,14 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
-use Magento\Framework\ObjectManagerInterface as ObjectManager;
-use Magento\Payment\Gateway\Config\Config;
-use TNW\Subscriptions\Model\Config as SubscriptionConfig;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use \Magento\Payment\Gateway\Config\Config;
+use \TNW\Subscriptions\Model\Config as SubscriptionConfig;
+use \TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use \Magento\Framework\ObjectManagerInterface as ObjectManager;
 
 /**
- * Class AuthorizenetPaymentDataBuilder - payments builder
+ * Class AuthorizenetPaymentDataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Authorizenet
  */
 class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {
@@ -35,7 +36,7 @@ class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\Da
     ) {
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
-        $this->config = $config ?: $objectManager->get(Config::class);
+        $this->config = $config ? : $objectManager->get(Config::class);
         parent::__construct($subscriptionConfig, $manager);
     }
 

@@ -4,11 +4,13 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Block\Subscription;
 
 use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\View\Element\UiComponent\DataProvider\Document;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\ProfileCcUtils;
@@ -293,7 +295,8 @@ class History extends \Magento\Framework\View\Element\Template
             ProfileStatus::STATUS_TRIAL,
         ];
 
-        if (in_array($subscription->getStatus(), $activeStatuses) &&
+        if (
+            in_array($subscription->getStatus(), $activeStatuses) &&
             $this->checkCreditCardExpire($subscription)
         ) {
             return __('Credit Card will expire before next billing cycle.');
@@ -446,7 +449,7 @@ class History extends \Magento\Framework\View\Element\Template
     public function getNextPaymentFormatted(\Magento\Framework\DataObject $subscription)
     {
         return $subscription->getNextBillingCycleDate()
-            ? $this->formatDate($subscription->getNextBillingCycleDate(), \IntlDateFormatter::LONG)
+            ? $this->formatDate($subscription->getNextBillingCycleDate(),\IntlDateFormatter::LONG)
             : '';
     }
 

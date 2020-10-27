@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -17,15 +18,14 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Payment;
-use Magento\Quote\Model\QuoteFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\Manager as ProductManager;
@@ -40,10 +40,11 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Upcoming
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
+use Magento\Quote\Model\QuoteFactory;
 use TNW\Subscriptions\Model\Config\Source\FreeShipping;
 
 /**
- * Class Manager - used for managing the subscription profiles
+ * Class Manager
  */
 class Manager
 {
@@ -386,7 +387,6 @@ class Manager
      * Returns engine for current subscription profile.
      *
      * @return EngineInterface
-     * @throws Engine\InvalidEngineException
      */
     public function getEngine()
     {
@@ -546,26 +546,21 @@ class Manager
             $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
             $ccType = $ccType ? $types[$ccType] : $ccType;
             $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
-            $ccExp = $this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month') . '/'
-                . $this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year');
+            $ccExp = "{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year')}";
 
             if (strcasecmp($oldEngine, $engine) !== 0) {
                 if ($ccType) {
-                    $message = __(
-                        'Payment method changed from <b>%1</b> to <b>%2</b>',
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
                         $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
-                        $this->scopeConfig->getValue("payment/{$engine}/title")
-                    );
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
                     $message .= '<br/>';
                     $message .= __('Credit Card type was added <b>%1</b>', $ccType);
                     $message .= '<br/>';
                     $message .= __('Credit Card number was added <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                 } else {
-                    $message = __(
-                        'Payment method changed from <b>%1</b> to <b>%2</b>',
+                    $message = __('Payment method changed from <b>%1</b> to <b>%2</b>',
                         $this->scopeConfig->getValue("payment/{$oldEngine}/title"),
-                        $this->scopeConfig->getValue("payment/{$engine}/title")
-                    );
+                        $this->scopeConfig->getValue("payment/{$engine}/title"));
                 }
 
                 $this->historyLogger->log($message, $this->getProfile()->getId());
@@ -582,8 +577,7 @@ class Manager
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
-                $ccExpOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month') . '/'
-                    . $this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year');
+                $ccExpOld = "{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month')}/{$this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year')}";
                 if (strcasecmp($ccExpOld, $ccExp) !== 0) {
                     $message = __('Exp. Date was changed to <b>%1</b>', $ccExp);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
@@ -613,7 +607,7 @@ class Manager
         }
 
         if (is_string($additionalInfo)) {
-            $additionalInfo = (array) json_decode($additionalInfo);
+            $additionalInfo = (array)json_decode($additionalInfo);
         }
 
         if (empty($additionalInfo[$property])) {
@@ -649,11 +643,8 @@ class Manager
             $this->getProfile()->setShippingDescription($shippingDescription);
 
             if (strcasecmp($oldShippingDescription, $shippingDescription) !== 0) {
-                $message = __(
-                    'Shipping method changed from <b>%1</b> to <b>%2</b>',
-                    $oldShippingDescription,
-                    $shippingDescription
-                );
+                $message = __('Shipping method changed from <b>%1</b> to <b>%2</b>', $oldShippingDescription,
+                    $shippingDescription);
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             }
         }
@@ -665,8 +656,7 @@ class Manager
      *
      * @param SubscriptionProfileOrderInterface $relation
      * @param OrderInterface $order
-     * @return SubscriptionProfileOrderInterface
-     * @throws LocalizedException
+     * @return null|SubscriptionProfileOrderInterface
      */
     public function assignOrderToProfile(
         SubscriptionProfileOrderInterface $relation,
@@ -847,7 +837,6 @@ class Manager
      * @param SubscriptionProfileInterface $profile
      * @param bool $collectQuoteTotals
      * @param bool $isReBill
-     * @return array
      * @throws LocalizedException
      */
     public function populateQuoteData(
@@ -1002,7 +991,8 @@ class Manager
                 }
             }
         }
-        if (!$shippingMethodAvailable
+        if (
+            !$shippingMethodAvailable
             && $this->mpowerConfig->getFreeShippingStrategy() == FreeShipping::HONOR_MAGENTO_VALUE
             && $shippingMethodToSet == 'freeshipping_freeshipping'
         ) {
@@ -1054,7 +1044,8 @@ class Manager
             $data['admin_modification'] = true;
         }
 
-        if ($isRebill
+        if (
+            $isRebill
             && $this->profile->getOrigData('billing_frequency_id') == $this->profile->getData('billing_frequency_id')
         ) {
             $data['rebill_processing'] = $data['modify_profile'] = $isRebill;
@@ -1250,10 +1241,9 @@ class Manager
     /**
      * Returns full start date.
      *
-     * @param $startOn
-     * @param null $date
+     * @param string $startOn
+     * @param null|\DateTime $date
      * @return string
-     * @throws \Exception
      */
     private function getFullStartDate($startOn, $date = null)
     {
@@ -1322,7 +1312,8 @@ class Manager
             'cc_exp_year' => $orderPayment->getCcExpYear(),
         ];
         $extensionAttributes = $orderPayment->getExtensionAttributes();
-        if ($orderPaymentDataToAdd['cc_type'] == null
+        if (
+            $orderPaymentDataToAdd['cc_type'] == null
             && $extensionAttributes
         ) {
             $vaultPaymentToken = $extensionAttributes->getVaultPaymentToken();
@@ -1351,12 +1342,13 @@ class Manager
             }
         }
 
-        //TODO: Vault Payment Should be used
+        //TODO: Необходимо использовать Vault Payment
         $this
             ->reset()
             ->populateProfileData($quote, $quoteItems);
         $notCCMethod = false;
-        if (isset($trialData['method'])
+        if (
+            isset($trialData['method'])
             && (
                 $trialData['method'] == 'checkmo'
                 || $trialData['method'] == 'banktransfer'
@@ -1376,7 +1368,8 @@ class Manager
         } else {
             $this->populatePaymentData($quotePayment);
             $profile = $this->getProfile();
-            if ($extensionAttributes instanceof OrderPaymentExtensionInterface &&
+            if (
+                $extensionAttributes instanceof OrderPaymentExtensionInterface &&
                 ($paymentToken = $extensionAttributes->getVaultPaymentToken()) instanceof PaymentTokenInterface
             ) {
                 /** @var $paymentToken PaymentTokenInterface */

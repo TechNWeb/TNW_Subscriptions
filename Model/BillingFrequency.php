@@ -3,21 +3,20 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 
-/**
- * Class BillingFrequency billing frequency model
- */
 class BillingFrequency extends \Magento\Framework\Model\AbstractModel implements BillingFrequencyInterface
 {
+
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init(ResourceModel\BillingFrequency::class);
+        $this->_init('TNW\Subscriptions\Model\ResourceModel\BillingFrequency');
     }
 
     /**

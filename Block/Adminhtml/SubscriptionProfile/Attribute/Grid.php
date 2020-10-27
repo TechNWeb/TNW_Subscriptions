@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute;
 
 use Magento\Eav\Block\Adminhtml\Attribute\Grid\AbstractGrid;
@@ -10,6 +11,7 @@ use Magento\Eav\Block\Adminhtml\Attribute\Grid\AbstractGrid;
 /**
  * Subscription profile attributes grid.
  */
+
 class Grid extends AbstractGrid
 {
     /**
@@ -37,9 +39,9 @@ class Grid extends AbstractGrid
     }
 
     /**
-     * \Magento\Eav\Model\Entity\Type::getAttributeCollection
+     * Prepare subscription profile attributes grid collection object
      *
-     * @return AbstractGrid
+     * @return $this
      */
     protected function _prepareCollection()
     {

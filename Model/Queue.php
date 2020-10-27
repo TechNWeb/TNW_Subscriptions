@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface;
@@ -10,7 +11,7 @@ use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Model\ResourceModel\Queue as Resource;
 
 /**
- * Class Queue - model
+ * Class Queue
  */
 class Queue extends AbstractModel implements SubscriptionProfileQueueInterface
 {

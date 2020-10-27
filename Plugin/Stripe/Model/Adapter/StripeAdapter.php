@@ -3,10 +3,12 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Stripe\Model\Adapter;
 
 /**
- * Class StripeAdapter plugin to set the amount for cc auth
+ * Class StripeAdapter
+ * @package TNW\Subscriptions\Plugin\Stripe\Model\Adapter
  */
 class StripeAdapter
 {

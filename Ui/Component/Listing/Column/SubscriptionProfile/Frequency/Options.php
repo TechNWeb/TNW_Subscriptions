@@ -1,17 +1,11 @@
 <?php
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Frequency;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Data\OptionSourceInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
 
-/**
- * Class Options - ui component
- */
 class Options implements OptionSourceInterface
 {
     /**

@@ -3,13 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\BillingFrequency;
 
 use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
- * Class Save - save billing frequency action
+ * Class Save
+ * @package TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
  */
 class Save extends \Magento\Backend\App\Action
 {
@@ -72,8 +74,7 @@ class Save extends \Magento\Backend\App\Action
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Redirect
-     * |\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     * @return \Magento\Backend\Model\View\Result\Redirect|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -146,10 +147,7 @@ class Save extends \Magento\Backend\App\Action
             } catch (LocalizedException $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
             } catch (\Exception $e) {
-                $this->messageManager->addExceptionMessage(
-                    $e,
-                    __('Something went wrong while saving the Billing Frequency.')
-                );
+                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the Billing Frequency.'));
             }
 
             $this->dataPersistor->set('tnw_subscriptions_billingfrequency', $data);

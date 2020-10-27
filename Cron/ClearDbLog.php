@@ -5,9 +5,6 @@
  */
 namespace TNW\Subscriptions\Cron;
 
-/**
- * Class ClearDbLog - cron
- */
 class ClearDbLog
 {
     /**

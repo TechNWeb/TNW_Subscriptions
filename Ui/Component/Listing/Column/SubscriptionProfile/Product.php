@@ -1,8 +1,5 @@
 <?php
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Framework\UrlInterface;
@@ -11,9 +8,6 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Service\Serializer;
 
-/**
- * Class Product - ui component
- */
 class Product extends Column
 {
     /**

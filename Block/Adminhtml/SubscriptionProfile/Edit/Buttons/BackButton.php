@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -15,7 +16,7 @@ class BackButton extends GenericButton implements ButtonProviderInterface
 {
     /**
      * Retrieve button-specified settings
-     *
+     * 
      * @return array
      */
     public function getButtonData()

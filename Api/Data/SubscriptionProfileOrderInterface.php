@@ -3,11 +3,9 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api\Data;
 
-/**
- * Interface SubscriptionProfileOrderInterface - determines the functionality to implement for subscription order
- */
 interface SubscriptionProfileOrderInterface
 {
     /**#@+
@@ -85,6 +83,7 @@ interface SubscriptionProfileOrderInterface
      * @return $this
      */
     public function setMagentoQuoteId($magentoQuoteId);
+
 
     /**
      * Gets the scheduled date for order.

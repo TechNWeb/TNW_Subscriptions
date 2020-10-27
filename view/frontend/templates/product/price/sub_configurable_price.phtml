@@ -36,9 +36,9 @@ $optionsData = $block->getEncodedData($block->getOptions());
 {
     ".product-info-price": {
         "tnwSubscribePrice": {
-            "subscriptionPricesData" : <?= /* @noEscape */ $data ?>,
-            "productAttributesData" : <?= /* @noEscape */ $optionsData?>,
-            "subBillingFrequencyId" : <?= /* @noEscape */ $block->getBillingFrequencyId() ?>
+            "subscriptionPricesData" : <?php /* @noEscape */ echo $data ?>,
+            "productAttributesData" : <?php /* @noEscape */ echo $optionsData?>,
+            "subBillingFrequencyId" : <?php /* @noEscape */ echo $block->getBillingFrequencyId() ?>
         }
     }
 }
@@ -54,7 +54,7 @@ $optionsData = $block->getEncodedData($block->getOptions());
             swatchWidgetName = 'mageSwatchRenderer',
             widgetInitEvent = 'swatch.initialized',
             clickEventName = 'emulateClick',
-            swatchOptions = <?= /* @noEscape */ $optionsData ?>;
+            swatchOptions = <?php /* @noEscape */ echo $optionsData ?>;
 
             /**
              * Sets default configurable swatch attribute's selected

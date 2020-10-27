@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\Payment\Model\Config;
@@ -13,12 +14,13 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class Authorizenet - modifier
+ * Class Authorizenet
+ * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
  */
 class Authorizenet extends Base
 {
     /**
-     * Sort Order value
+     *
      */
     const SORT_ORDER = 35;
 
@@ -60,7 +62,7 @@ class Authorizenet extends Base
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
-            $this->authorizenetConfig = $objectManager->get(\TNW\AuthorizeCim\Gateway\Config\Config::class);
+            $this->authorizenetConfig = $objectManager->get("TNW\AuthorizeCim\Gateway\Config\Config");
         }
         $this->paymentConfig = $paymentConfig;
     }
@@ -291,8 +293,7 @@ class Authorizenet extends Base
                 'data' => [
                     'config' => [
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
-                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
-                            . 'additional-fields-fieldset',
+                        'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/subscription-profile/payment/authorizenet',
                         'label' => false,
                         'visible' => false,

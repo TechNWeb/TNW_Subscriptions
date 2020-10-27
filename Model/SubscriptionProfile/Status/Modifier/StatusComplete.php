@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -45,14 +46,11 @@ class StatusComplete extends Base
                 'trial_cycle_count' => new \Zend_Db_Expr('IF(profile.trial_start_date, 1, 0)')
             ]
         )->where(
-            'profile.term = ?',
-            0
+            'profile.term = ?', 0
         )->where(
-            'profile.status NOT IN (?)',
-            $this->getIgnoredStatuses()
+            'profile.status NOT IN (?)', $this->getIgnoredStatuses()
         )->where(
-            'profile.entity_id IN (?)',
-            $allIds
+            'profile.entity_id IN (?)', $allIds
         )->where(
             // We take in account items which order is created or quote was deleted (ex. in "hold" status)
             'orders.magento_order_id IS NOT NULL OR orders.magento_quote_id IS NULL'

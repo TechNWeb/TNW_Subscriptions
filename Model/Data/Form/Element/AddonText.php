@@ -3,7 +3,16 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\Data\Form\Element;
+
+use Magento\Framework\Data\Form\Element\CollectionFactory;
+use Magento\Framework\Data\Form\Element\Factory;
+use Magento\Framework\Escaper;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Locale\CurrencyInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Request\Http;
 
 /**
  * New form element for addon text field representation.
@@ -51,8 +60,7 @@ class AddonText extends \Magento\Framework\Data\Form\Element\Text
             . '</span></label>';
         $html .= '</div></div>';
         // Error container
-        $html .= '<label style="display: none;" id="' . $htmlId . '-error" class="mage-error" generated="true" for="'
-            . $htmlId . '"></label>';
+        $html .= '<label style="display: none;" id="' . $htmlId . '-error" class="mage-error" generated="true" for="' . $htmlId . '"></label>';
 
         $afterElementJs = $this->getAfterElementJs();
         if ($afterElementJs) {

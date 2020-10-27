@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -40,9 +41,7 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
     public function canShowShippingDetailsBlock()
     {
         $canShow = false;
-        if (!$this->getSubscriptionProfiles()) {
-            return false;
-        }
+        if (!$this->getSubscriptionProfiles()) return false;
         foreach ($this->getSubscriptionProfiles() as $profile) {
             if (!(bool)$profile->getIsVirtual()) {
                 $canShow = true;

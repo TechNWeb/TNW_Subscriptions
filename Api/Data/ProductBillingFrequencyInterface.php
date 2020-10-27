@@ -3,17 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api\Data;
 
-/**
- * Interface ProductBillingFrequencyInterface - determines the product BF to be implemented functionality
- */
 interface ProductBillingFrequencyInterface
 {
-    /**#@+
-     * Constants for field names
-     */
+
     const SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE = 'tnw_subscriptions_product_billing_frequency';
+
     const DEFAULT_BILLING_FREQUENCY = 'default_billing_frequency';
     const PRICE = 'price';
     const ID = 'id';
@@ -22,7 +19,6 @@ interface ProductBillingFrequencyInterface
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const PRESET_QTY = 'preset_qty';
     const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
-    /**#@-*/
 
     /**
      * Get id

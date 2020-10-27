@@ -8,9 +8,6 @@ namespace TNW\Subscriptions\Plugin\Checkout\CustomerData;
 use Magento\Framework\Serialize\SerializerInterface;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
 
-/**
- * Class AbstractItem - plugin
- */
 class AbstractItem
 {
     /**

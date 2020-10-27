@@ -5,10 +5,11 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
-use Magento\Framework\DataObject;
+use \Magento\Framework\DataObject;
 
 /**
- * Class TransferFactory - pyapal factory
+ * Class TransferFactory
+ * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class TransferFactory
 {

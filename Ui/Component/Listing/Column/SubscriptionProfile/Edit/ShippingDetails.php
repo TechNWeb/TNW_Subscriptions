@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Edit;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -41,6 +42,7 @@ class ShippingDetails extends Column
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
+
     /**
      * Prepare Data Source
      *
@@ -63,8 +65,7 @@ class ShippingDetails extends Column
                         null,
                         $currencyCode
                     );
-                    $item[$fieldName] = implode(
-                        ' - ',
+                    $item[$fieldName] = implode(' - ',
                         [
                             $item['shipping_information'],
                             $shippingPrice

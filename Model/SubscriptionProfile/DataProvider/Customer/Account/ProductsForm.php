@@ -3,26 +3,27 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
-use Magento\CatalogInventory\Api\StockRegistryInterface;
-use Magento\Framework\Registry;
-use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
-use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
-use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
+use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Context;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -314,10 +315,7 @@ class ProductsForm extends SummaryProductsForm
             $confirmBeforeSave = [
                 'type' => 'warning',
                 'title' => __('Warning!'),
-                'message' => __(
-                    'Product price will be re-calculated. If the current price for this product is higher'
-                    . ' than the original price, STOP, and give us a call.'
-                )
+                'message' => __('Product price will be re-calculated. If the current price for this product is higher than the original price, STOP, and give us a call.')
             ];
         }
         $formMessages = $confirmBeforeSave ? [$confirmBeforeSave] : null;
@@ -363,7 +361,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getEditButton()
     {
-        $additionalClasses = $this->getRemoveButtonVisibility() ? '' : 'right';
+        $additionalClasses = $this->getRemoveButtonVisibility() ? '': 'right';
         $additionalClasses .= ' action-editor';
 
         return [
@@ -398,7 +396,6 @@ class ProductsForm extends SummaryProductsForm
      * Returns middle container definition from description fieldset.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getMiddleContainerDefinition()
     {
@@ -434,7 +431,6 @@ class ProductsForm extends SummaryProductsForm
      * Return description fieldset definition.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getDescriptionFieldset()
     {

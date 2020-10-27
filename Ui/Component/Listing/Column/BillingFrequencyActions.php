@@ -3,18 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column;
 
-/**
- * Class BillingFrequencyActions - ui component
- */
 class BillingFrequencyActions extends \Magento\Ui\Component\Listing\Columns\Column
 {
-    /**
-     * @var \Magento\Framework\UrlInterface
-     */
-    protected $urlBuilder;
 
+    protected $urlBuilder;
     const URL_PATH_DELETE = 'tnw_subscriptions/billingfrequency/delete';
     const URL_PATH_EDIT = 'tnw_subscriptions/billingfrequency/edit';
 

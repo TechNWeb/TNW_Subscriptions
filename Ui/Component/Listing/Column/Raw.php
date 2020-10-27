@@ -1,17 +1,10 @@
 <?php
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
-/**
- * Class Raw - ui component
- */
 class Raw extends Column
 {
     /**
@@ -55,10 +48,7 @@ class Raw extends Column
                 continue;
             }
 
-            $item["{$name}_html"] = sprintf(
-                '<div style="white-space: pre-wrap">%s</div>',
-                $this->escaper->escapeHtml($item[$name])
-            );
+            $item["{$name}_html"] = sprintf('<div style="white-space: pre-wrap">%s</div>', $this->escaper->escapeHtml($item[$name]));
         }
 
         return $dataSource;

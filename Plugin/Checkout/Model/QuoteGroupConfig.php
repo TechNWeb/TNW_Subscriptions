@@ -1,13 +1,7 @@
 <?php
-/**
- *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
- *  See TNW_LICENSE.txt for license details.
- */
+
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
-/**
- * Class QuoteGroupConfig - plugin to modify after get config data
- */
 class QuoteGroupConfig
 {
     /**
@@ -91,8 +85,7 @@ class QuoteGroupConfig
         $totalsItem = $proceed($quoteItem);
         if (null !== $quoteItem->getOptionByCode('subscription')) {
             $totalsItem->getExtensionAttributes()->setTnwSubscriptionPrice(
-                $this->descriptionCreator->getDescribedItemPriceHtmlByQuoteItem($quoteItem)
-            );
+                $this->descriptionCreator->getDescribedItemPriceHtmlByQuoteItem($quoteItem));
         }
         return $totalsItem;
     }

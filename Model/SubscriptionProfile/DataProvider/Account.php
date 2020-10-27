@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
@@ -13,9 +14,6 @@ use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 
-/**
- * Class Account - dataprovider for account
- */
 class Account extends AbstractDataProvider
 {
     /**#@+
@@ -155,7 +153,7 @@ class Account extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
+
     }
 
     /**

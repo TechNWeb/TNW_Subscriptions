@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Validator;
 
 use Braintree\Result\Error;
 
 /**
- * Class ErrorCodeProvider - plugin
+ * Class ErrorCodeProvider
+ * @package TNW\Subscriptions\Plugin\Braintree\Gateway\Validator
  */
 class ErrorCodeProvider
 {
@@ -21,7 +23,8 @@ class ErrorCodeProvider
     public function aroundGetErrorCodes($subject, $proceed, $response)
     {
         $result = [];
-        if ($response instanceof Error
+        if (
+            $response instanceof Error
             && isset($response->transaction)
             && !isset($response->transaction->status)
         ) {

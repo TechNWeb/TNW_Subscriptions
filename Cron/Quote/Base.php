@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Cron\Quote;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -19,7 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class Base - abstract class used for cron classes
+ * Class Base
  */
 abstract class Base implements ProcessInterface
 {

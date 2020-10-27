@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Authorization\Model\UserContextInterface;
@@ -168,7 +169,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
+
     }
+
 
     /**
      * @inheritdoc
@@ -235,10 +238,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function setBillingFrequencyId($billingFrequencyId)
     {
-        return $this->setData(
-            self::BILLING_FREQUENCY_ID,
-            $billingFrequencyId
-        );
+        return $this->setData(self::BILLING_FREQUENCY_ID,
+            $billingFrequencyId);
     }
 
     /**
@@ -703,8 +704,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getShippingBillingChangesMadeMessageForUpcomingOrders()
     {
-        return __('Subscription changes made. Shipping Details and Grand Total may not reflect correct '
-            . 'information until recalculation is complete.');
+        return __('Subscription changes made. Shipping Details and Grand Total may not reflect correct information until recalculation is complete.');
     }
 
     /**
@@ -712,8 +712,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getShippingBillingChangesMadeMessageForSubscriptionDetails()
     {
-        return __('Subscription changes made. Current, Annual and Total values may not reflect correct '
-            . 'information until recalculation is complete.');
+        return __('Subscription changes made. Current, Annual and Total values may not reflect correct information until recalculation is complete.');
     }
 
     /**
@@ -721,8 +720,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getProductChangesMadeMessageForProfit()
     {
-        return __('Subscription products have changed. The graph may not show correct information until '
-            . 'recalculation is complete.');
+        return __('Subscription products have changed. The graph may not show correct information until recalculation is complete.');
     }
 
     /**

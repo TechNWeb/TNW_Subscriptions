@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\Backend\CreateProfile;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -232,7 +233,8 @@ class StepPool
         if ($this->session->getCustomerId()) {
             $customerName = $this->getCustomerName($this->session->getCustomerId());
             $title .= ' ' . sprintf(__('for %s'), $customerName);
-        } elseif ($this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER
+        } elseif (
+            $this->getCurrentStep() !== self::STEP_PARAM_TYPE_CUSTOMER
             && $this->session->getCreateNewCustomer()
         ) {
             $title .= ' ' . __('for a new customer');

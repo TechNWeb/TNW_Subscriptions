@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Edit;
 
 use Magento\Backend\App\Action\Context;
@@ -17,7 +18,7 @@ use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
- * Class Save - controller
+ * Class Save
  */
 class Save extends AbstractSave
 {

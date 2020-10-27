@@ -14,9 +14,9 @@ $baseInitialFee = $block->getInitialFeeAmount() * 1; ?>
             <input type="text"
                    name="creditmemo[subscription_initial_fee]"
                     <?php if (!$baseInitialFee):?>
-                        <?= ' disabled="disabled"'; ?>
+                        <?php echo ' disabled="disabled"'; ?>
                     <?php endif;?>
-                   value="<?= /* @escapeNotVerified */ $baseInitialFee ?>"
+                   value="<?php /* @escapeNotVerified */ echo $baseInitialFee ?>"
                    class="input-text admin__control-text not-negative-amount"
                    id="subscription_initial_fee"/>
             <script>

@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\Source;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Rate;
+use Magento\Quote\Model\Quote\Item;
 use Magento\Tax\Helper\Data;
 use TNW\Subscriptions\Model\Context;
 
@@ -297,7 +299,7 @@ class ShippingMethods
                 $options[$key]['css'] = 'subscription-shipping-attention';
                 $options[$key]['title'] = $this->getShippingAttentionMessage();
                 foreach ($shippingMethodsCodesWithoutWarning as $code) {
-                    if (strpos($option['value'], $code) === 0) {
+                    if(strpos($option['value'], $code) === 0) {
                         $options[$key]['css'] = '';
                         $options[$key]['title'] = '';
                         break;

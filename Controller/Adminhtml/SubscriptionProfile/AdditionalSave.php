@@ -6,6 +6,7 @@ use Magento\Framework\App\ResponseInterface;
 
 /**
  * Additional save action
+ * @package TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile
  */
 class AdditionalSave extends \Magento\Backend\App\Action
 {
@@ -40,6 +41,7 @@ class AdditionalSave extends \Magento\Backend\App\Action
      * Dispatch request
      *
      * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
+     * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute()
     {
@@ -50,7 +52,7 @@ class AdditionalSave extends \Magento\Backend\App\Action
             $profile = $this->subscriptionProfileRepository->getById($attributesData['entity_id']);
             foreach ($attributesData as $attributeCode => $value) {
                 /** @var \Magento\Eav\Model\Entity\Attribute\AbstractAttribute $attribute */
-                $attribute = $this->_objectManager->get(\Magento\Eav\Model\Config::class)
+                $attribute = $this->_objectManager->get('Magento\Eav\Model\Config')
                     ->getAttribute(\TNW\Subscriptions\Model\SubscriptionProfile::ENTITY, $attributeCode);
 
                 if (!$attribute->getAttributeId()) {

@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
- * Class Vault - used to save the vault payed subscription profiles
+ * Class Vault
+ * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
  */
 class Vault extends Base
 {

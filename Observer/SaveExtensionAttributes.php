@@ -8,9 +8,6 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
-/**
- * Class SaveExtensionAttributes - observer
- */
 class SaveExtensionAttributes implements ObserverInterface
 {
     /**
@@ -18,10 +15,6 @@ class SaveExtensionAttributes implements ObserverInterface
      */
     private $extensionAttributes;
 
-    /**
-     * SaveExtensionAttributes constructor.
-     * @param \TNW\Subscriptions\Model\ResourceModel\ExtensionAttributes $extensionAttributes
-     */
     public function __construct(
         \TNW\Subscriptions\Model\ResourceModel\ExtensionAttributes $extensionAttributes
     ) {

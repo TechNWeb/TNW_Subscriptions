@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface;
@@ -15,8 +16,7 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as ResourceProductSubscriptionProfile;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory
-    as ProductSubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory as ProductSubscriptionProfileCollectionFactory;
 
 /**
  * Repository for subscription profile products
@@ -52,6 +52,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
      * @var ProductSubscriptionProfileInterfaceFactory
      */
     private $dataProductSubscriptionProfileFactory;
+
 
     /**
      * @param ResourceProductSubscriptionProfile $resource
@@ -95,19 +96,15 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     }
 
     /**
-     * @param string $productSubscriptionProfileId
-     * @return ProductSubscriptionProfileInterface|ProductSubscriptionProfile
-     * @throws NoSuchEntityException
+     * @inheritdoc
      */
     public function getById($productSubscriptionProfileId)
     {
         $productSubscriptionProfile = $this->productSubscriptionProfileFactory->create();
         $productSubscriptionProfile->load($productSubscriptionProfileId);
         if (!$productSubscriptionProfile->getId()) {
-            throw new NoSuchEntityException(__(
-                'ProductSubscriptionProfile with id "%1" does not exist.',
-                $productSubscriptionProfileId
-            ));
+            throw new NoSuchEntityException(__('ProductSubscriptionProfile with id "%1" does not exist.',
+                $productSubscriptionProfileId));
         }
         $this->addChildren($productSubscriptionProfile);
         return $productSubscriptionProfile;

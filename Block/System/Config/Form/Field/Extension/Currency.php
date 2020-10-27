@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\System\Config\Form\Field\Extension;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
@@ -40,12 +41,6 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      */
     private $pricingHelper;
 
-    /**
-     * @param PriceCurrencyInterface|null $priceCurrency
-     * @param CurrencyInterface|null $localeCurrency
-     * @param StoreManagerInterface|null $storeManager
-     * @param ScopeCodeResolver|null $scopeCodeResolver
-     */
     protected function _construct(
         PriceCurrencyInterface $priceCurrency = null,
         CurrencyInterface $localeCurrency = null,
@@ -76,9 +71,6 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      * Setup element before render.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Currency_Exception
      */
     protected function setupElement(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
@@ -90,8 +82,7 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      * Setup currency symbol.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return void
      */
     private function setupCurrencySymbol(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
@@ -105,9 +96,7 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      * Setup currency value according to current currency format
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Currency_Exception
+     * @return void
      */
     private function setupCurrencyValue(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
@@ -139,8 +128,6 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      * @param $scope
      * @param $scopeId
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getScopeCurrencyCode($scope, $scopeId)
     {

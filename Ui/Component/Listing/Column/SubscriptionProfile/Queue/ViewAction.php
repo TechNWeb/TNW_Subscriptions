@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Queue;
 
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -12,9 +13,6 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Model\Source\Queue\Status;
 
-/**
- * Class ViewAction - ui
- */
 class ViewAction extends Column
 {
     /**

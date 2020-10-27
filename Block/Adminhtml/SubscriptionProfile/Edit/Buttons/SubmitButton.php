@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
-/**
- * Class SubmitButton - adminhtml block for edit profile button submit
- */
 class SubmitButton implements ButtonProviderInterface
 {
     /**
@@ -29,8 +28,7 @@ class SubmitButton implements ButtonProviderInterface
                                 'actionName' => 'toggleModal',
                             ],
                             [
-                                'targetName' => 'tnw_subscriptionprofile_summary_add_product_modal_form.'
-                                    . 'tnw_subscriptionprofile_summary_add_product_modal_form',
+                                'targetName' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form',
                                 'actionName' => 'setConfigurableData',
                             ]
                         ]

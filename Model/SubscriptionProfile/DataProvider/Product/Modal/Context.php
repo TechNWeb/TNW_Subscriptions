@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -259,9 +260,11 @@ class Context implements ContextInterface
                         ['type' => 'small_image', 'width' => '240', 'height' => '240']
                     );
                 }
+
                 break;
             default:
                 throw new \InvalidArgumentException(__('Unsupported product type -' . $quoteItem->getProductType()));
+                break;
         }
 
         return $imageHelper;

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -45,6 +46,20 @@ class Form extends AbstractDataProvider
     const DEFAULT_PERIOD_VALUE = 2;
 
     /**
+     * Data scope component name.
+     *
+     * @var string
+     */
+    private $scopeName;
+
+    /**
+     * Product billing frequencies cache.
+     *
+     * @var array
+     */
+    private $productBillingFrequencies;
+
+    /**
      * Trial period holder.
      *
      * @var array
@@ -57,6 +72,11 @@ class Form extends AbstractDataProvider
      * @var PriceCalculator
      */
     protected $priceCalculator;
+
+    /**
+     * @var Currency
+     */
+    private $currentCurrency;
 
     /**
      * @var SubscriptionContext
@@ -81,25 +101,6 @@ class Form extends AbstractDataProvider
      * @var ProductTypeManagerResolver
      */
     protected $productTypeResolver;
-
-    /**
-     * @var Currency
-     */
-    private $currentCurrency;
-
-    /**
-     * Data scope component name.
-     *
-     * @var string
-     */
-    private $scopeName;
-
-    /**
-     * Product billing frequencies cache.
-     *
-     * @var array
-     */
-    private $productBillingFrequencies;
 
     /**
      * @param string $name
@@ -184,84 +185,13 @@ class Form extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
-    }
 
-    /**
-     * Returns additional list of Ui component names.
-     *
-     * @return array
-     */
-    public function getAdditionalConfig()
-    {
-        return [
-            'subProductListing' => Product::DATA_SCOPE_SUBSCRIPTION_LISTING,
-            'insertForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
-            'configurableModal' => 'configurableModal',
-            'mainModal' => 'addProductsModal',
-            'insertConfigurableForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM,
-            'configurableForm' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
-            'modalGrid' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
-        ];
-    }
-
-    /**
-     * Returns product billing frequencies as array.
-     *
-     * @param null|int|string $productId
-     * @return array
-     * @throws NoSuchEntityException
-     */
-    public function getProductBillingFrequenciesAsOptionArray($productId = null)
-    {
-        $result = [];
-        $productId = $productId ?: $this->getRequestProductId();
-        if (!$productId) {
-            return $result;
-        }
-
-        $childProduct = $this->getChildProductFromRequest();
-        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
-        if ($childProduct) {
-            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
-                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
-            }
-        }
-        try {
-            /** @var ProductBillingFrequencyInterface $productFrequency */
-            foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
-                if (!empty($childProduct)
-                    && empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
-                ) {
-                    //Child product has no such frequency set
-                    continue;
-                }
-                $frequency = $this->formContext->getFrequencyRepository()
-                    ->getById($productFrequency->getBillingFrequencyId());
-                $label = $frequency->getLabel();
-                $isDefault = !empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
-                    ? (bool)$childFrequencies[$productFrequency->getBillingFrequencyId()]->getDefaultBillingFrequency()
-                    : (bool)$productFrequency->getDefaultBillingFrequency();
-                if ($isDefault) {
-                    $label = $label . ' ' . __('(most common)');
-                }
-                $result[] = [
-                    'label' => $label,
-                    'value' => $productFrequency->getBillingFrequencyId(),
-                ];
-            }
-        } catch (\Exception $e) {
-            $this->context->log($e->getMessage());
-        }
-
-        return $result;
     }
 
     /**
      * Returns billing frequency field set meta data.
      *
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getFieldsMetaData()
     {
@@ -346,11 +276,59 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns buttons meta data.
+     *
+     * @return array
+     */
+    private function getButtonsMetaData()
+    {
+        return [
+            'add_to_subscription' => [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'formElement' => 'container',
+                            'componentType' => 'container',
+                            'component' => 'TNW_Subscriptions/js/components/primary-button',
+                            'template' => 'TNW_Subscriptions/form/element/primary-button',
+                            'title' => 'Add to Subscription',
+                            'actions' => [
+                                [
+                                    'targetName' => $this->scopeName,
+                                    'actionName' => 'ajaxSubmit',
+                                ],
+                            ],
+                            'provider' => null,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Returns additional list of Ui component names.
+     *
+     * @return array
+     */
+    public function getAdditionalConfig()
+    {
+        return [
+            'subProductListing' => Product::DATA_SCOPE_SUBSCRIPTION_LISTING,
+            'insertForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_FORM,
+            'configurableModal' => 'configurableModal',
+            'mainModal' => 'addProductsModal',
+            'insertConfigurableForm' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_CONFIGURABLE_FORM,
+            'configurableForm' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
+            'modalGrid' => Product::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
+        ];
+    }
+
+    /**
      * Returns config for start on field.
      *
-     * @param null $productId
+     * @param null|int|string $productId
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getStartOnFieldConfig($productId = null)
     {
@@ -370,7 +348,8 @@ class Form extends AbstractDataProvider
             //Note: If product "is trial" then "start on" is start date of trial period,
             // otherwise "start on" is start date of subscription
             if ($productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
-                if ($productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                if (
+                    $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
                     == StartDateType::DEFINED_BY_CUSTOMER
                 ) {
                     $visible = true;
@@ -378,7 +357,8 @@ class Form extends AbstractDataProvider
                     $value = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE);
                 }
             } else {
-                if ($productData->getData(Attribute::SUBSCRIPTION_START_DATE)
+                if (
+                    $productData->getData(Attribute::SUBSCRIPTION_START_DATE)
                     == StartDateType::DEFINED_BY_CUSTOMER
                 ) {
                     $visible = true;
@@ -419,6 +399,57 @@ class Form extends AbstractDataProvider
             : [];
 
         return $return;
+    }
+
+    /**
+     * Returns product billing frequencies as array.
+     *
+     * @param null|int|string $productId
+     * @return array
+     * @throws NoSuchEntityException
+     */
+    public function getProductBillingFrequenciesAsOptionArray($productId = null)
+    {
+        $result = [];
+        $productId = $productId ?: $this->getRequestProductId();
+        if (!$productId) return $result;
+
+        $childProduct = $this->getChildProductFromRequest();
+        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+        if ($childProduct) {
+            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
+                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+            }
+        }
+        try {
+            /** @var ProductBillingFrequencyInterface $productFrequency */
+            foreach ($this->getProductBillingFrequencies($productId) as $productFrequency) {
+                if (
+                    !empty($childProduct)
+                    && empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
+                ) {
+                    //Child product has no such frequency set
+                    continue;
+                }
+                $frequency = $this->formContext->getFrequencyRepository()
+                    ->getById($productFrequency->getBillingFrequencyId());
+                $label = $frequency->getLabel();
+                $isDefault = !empty($childFrequencies[$productFrequency->getBillingFrequencyId()])
+                    ? (bool)$childFrequencies[$productFrequency->getBillingFrequencyId()]->getDefaultBillingFrequency()
+                    : (bool)$productFrequency->getDefaultBillingFrequency();
+                if ($isDefault) {
+                    $label = $label . ' ' . __('(most common)');
+                }
+                $result[] = [
+                    'label' => $label,
+                    'value' => $productFrequency->getBillingFrequencyId(),
+                ];
+            }
+        } catch (\Exception $e) {
+            $this->context->log($e->getMessage());
+        }
+
+        return $result;
     }
 
     /**
@@ -484,8 +515,21 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Get calculated product price for billing frequency.
+     *
+     * @param string $billingFrequencyId
+     * @param DataObject $productDataObject
      * @return string
-     * @throws NoSuchEntityException
+     */
+    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject)
+    {
+        return $this->priceCalculator->getUnitPrice($productDataObject, $billingFrequencyId, null, false);
+    }
+
+    /**
+     * Get currency symbol from session if exists here or from store manager.
+     *
+     * @return string
      */
     protected function getCurrentCurrencySymbol()
     {
@@ -493,9 +537,50 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param $price
+     * Get currency model for session currency_id if exists here or for base_currency from store manager.
+     *
+     * @return Currency
+     */
+    private function getCurrentCurrency()
+    {
+        if ($this->currentCurrency === null) {
+            $currencyCode = $this->formContext->getSession()->getCurrencyId();
+            if ($currencyCode) {
+                $this->currentCurrency = $this->formContext->getCurrencyFactory()
+                    ->create()
+                    ->load($currencyCode);
+            } else {
+                $this->currentCurrency = $this->formContext->getStoreManager()
+                    ->getStore()
+                    ->getBaseCurrency();
+            }
+        }
+
+        return $this->currentCurrency;
+    }
+
+    /**
+     * Format price according to locale settings.
+     *
+     * @param string|float $price
      * @return float
-     * @throws NoSuchEntityException
+     */
+    private function formatPrice($price)
+    {
+        return $this->context->getPriceCurrency()->format(
+            $price,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $this->formContext->getSession()->getStoreId(),
+            $this->getCurrentCurrency()
+        );
+    }
+
+    /**
+     * Returns converted to currecy price.
+     *
+     * @param string|float $price
+     * @return float
      */
     protected function convertPrice($price)
     {
@@ -507,8 +592,9 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Returns price locale format data.
+     *
      * @return string
-     * @throws NoSuchEntityException
      */
     protected function getPriceFormatData()
     {
@@ -518,10 +604,11 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param $billingFrequencyId
-     * @param $productId
-     * @return int|string
-     * @throws NoSuchEntityException
+     * Returns initial fee for billing frequency and product.
+     *
+     * @param string $billingFrequencyId
+     * @param int|string|null $productId
+     * @return float|int
      */
     protected function getInitialFee($billingFrequencyId, $productId)
     {
@@ -545,9 +632,41 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param null $productId
-     * @return int|null
-     * @throws NoSuchEntityException
+     * Returns price for current product.
+     *
+     * @param int|string|null $productId
+     * @param null|array $additionalData
+     * @return string
+     */
+    private function getProductPrice($productId = null, $additionalData = null)
+    {
+        $productPrice = null;
+        $productId = $productId ?: $this->getRequestProductId();
+        if ($productId) {
+            $product = $this->formContext->getProductRepository()->getById($productId);
+            $price = $product->getPrice();
+            if (!$price
+                && $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
+                && $additionalData && isset($additionalData['super_attribute'])
+            ) {
+                /** @var Configurable $typeInstance */
+                $typeInstance = $product->getTypeInstance();
+                $simpleProduct = $typeInstance
+                    ->getProductByAttributes($additionalData['super_attribute'], $product);
+                $price = $simpleProduct->getPrice();
+            }
+            $productPrice = $this->convertPrice($price);
+
+        }
+
+        return $productPrice;
+    }
+
+    /**
+     * Returns price for current product.
+     *
+     * @param int|string|null $productId
+     * @return string
      */
     protected function getSavingsCalculation($productId = null)
     {
@@ -568,11 +687,12 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param $needProductValues
-     * @param $productId
+     * Returns frequencies data for product.
+     *
+     * @param bool $needProductValues
+     * @param string|null $productId
      * @param array|null $additionalData
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getFrequenciesData($needProductValues, $productId, array $additionalData = null)
     {
@@ -584,22 +704,20 @@ class Form extends AbstractDataProvider
             $billingFrequencyId = $frequency->getBillingFrequencyId();
             $additionalData['billing_frequency'] = $billingFrequencyId;
             $productDataObject = $this->getProductObjectData($productId, $additionalData);
-            if ($productDataObject->getTypeId() === Configurable::TYPE_CODE
+            if (
+                $productDataObject->getTypeId() === Configurable::TYPE_CODE
                 && $productDataObject->getId() === $productDataObject->getChildProductId()
             ) {
                 continue;
             }
             $productFrequencies = [];
-            $childProductBillingFrequencies = $this
-                ->getProductBillingFrequencies($productDataObject->getChildProductId());
-            foreach ($childProductBillingFrequencies as $productFrequency) {
+            foreach ($this->getProductBillingFrequencies($productDataObject->getChildProductId()) as $productFrequency) {
                 $productFrequencies[$productFrequency->getBillingFrequencyId()] = $productFrequency;
             }
             if (!empty($productFrequencies[$billingFrequencyId])) {
                 $data['product_frequencies'][$billingFrequencyId] =
                     $this->getBillingFrequencyData(
-                        $productDataObject,
-                        $productFrequencies[$billingFrequencyId]
+                        $productDataObject, $productFrequencies[$billingFrequencyId]
                     );
             }
             if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
@@ -621,19 +739,20 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param $productId
-     * @param null $additionalData
+     * Return product DataObject from productId.
+     *
+     * @param string $productId
+     * @param array|null $additionalData
      * @return DataObject
-     * @throws NoSuchEntityException
      */
     protected function getProductObjectData($productId, $additionalData = null)
     {
         $product = $this->formContext->getProductRepository()->getById($productId);
+
         return $this->productTypeResolver
             ->resolve($product->getTypeId())
             ->getProductDataObject($product, $additionalData);
     }
-
     /**
      * Returns product id from request.
      *
@@ -651,9 +770,7 @@ class Form extends AbstractDataProvider
     protected function getChildProductFromRequest()
     {
         $productId = $this->getRequestProductId();
-        if (!$productId) {
-            return null;
-        }
+        if (!$productId) return null;
         $product = $this->formContext->getProductRepository()->getById($productId);
         $superAttribute = $this->formContext->getRequest()->getParam('super_attribute');
         if (!empty($product) && $product->getTypeId() === Configurable::TYPE_CODE && !empty($superAttribute)) {
@@ -701,10 +818,11 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * Return item billing frequency data.
+     *
      * @param DataObject $productDataObject
      * @param ProductBillingFrequencyInterface $frequency
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getBillingFrequencyData(
         DataObject $productDataObject,
@@ -729,7 +847,7 @@ class Form extends AbstractDataProvider
         }
 
         return array_merge($result, $frequencyData);
-    }
+   }
 
     /**
      * Returns field term config.
@@ -765,9 +883,10 @@ class Form extends AbstractDataProvider
     }
 
     /**
-     * @param null $productId
+     * Returns field period config.
+     *
+     * @param int|string|null $productId
      * @return array
-     * @throws NoSuchEntityException
      */
     protected function getFieldPeriodConfig($productId = null)
     {
@@ -805,121 +924,9 @@ class Form extends AbstractDataProvider
      * @param ProductInterface|DataObject $product
      * @return int
      */
-    protected function getSavingsCalculationType($product)
+    protected  function getSavingsCalculationType($product)
     {
         return $this->formContext->getSavingsCalculation()
             ->getSavingsCalculationType($product);
-    }
-
-    /**
-     * Get calculated product price for billing frequency.
-     *
-     * @param $billingFrequencyId
-     * @param $productDataObject
-     * @return string
-     * @throws NoSuchEntityException
-     */
-    private function getBillingFrequencyUnitPrice($billingFrequencyId, $productDataObject)
-    {
-        return $this->priceCalculator->getUnitPrice($productDataObject, $billingFrequencyId, null, false);
-    }
-
-    /**
-     * @return Currency
-     * @throws NoSuchEntityException
-     */
-    private function getCurrentCurrency()
-    {
-        if ($this->currentCurrency === null) {
-            $currencyCode = $this->formContext->getSession()->getCurrencyId();
-            if ($currencyCode) {
-                $this->currentCurrency = $this->formContext->getCurrencyFactory()
-                    ->create()
-                    ->load($currencyCode);
-            } else {
-                $this->currentCurrency = $this->formContext->getStoreManager()
-                    ->getStore()
-                    ->getBaseCurrency();
-            }
-        }
-
-        return $this->currentCurrency;
-    }
-
-    /**
-     * @param $price
-     * @return string
-     * @throws NoSuchEntityException
-     */
-    private function formatPrice($price)
-    {
-        return $this->context->getPriceCurrency()->format(
-            $price,
-            false,
-            PriceCurrencyInterface::DEFAULT_PRECISION,
-            $this->formContext->getSession()->getStoreId(),
-            $this->getCurrentCurrency()
-        );
-    }
-
-    /**
-     * @param null $productId
-     * @param null $additionalData
-     * @return float|null
-     * @throws NoSuchEntityException
-     */
-    private function getProductPrice($productId = null, $additionalData = null)
-    {
-        $productPrice = null;
-        $productId = $productId ?: $this->getRequestProductId();
-        if ($productId) {
-            $product = $this->formContext->getProductRepository()->getById($productId);
-            $price = $product->getPrice();
-            if (!$price
-                && $product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE
-                && $additionalData && isset($additionalData['super_attribute'])
-            ) {
-                /** @var Configurable $typeInstance */
-                $typeInstance = $product->getTypeInstance();
-                $simpleProduct = $typeInstance
-                    ->getProductByAttributes($additionalData['super_attribute'], $product);
-                $price = $simpleProduct->getPrice();
-            }
-            $productPrice = $this->convertPrice($price);
-
-        }
-
-        return $productPrice;
-    }
-
-    /**
-     * Returns buttons meta data.
-     *
-     * @return array
-     */
-    private function getButtonsMetaData()
-    {
-        return [
-            'add_to_subscription' => [
-                'arguments' => [
-                    'data' => [
-                        'config' => [
-                            'formElement' => 'container',
-                            'componentType' => 'container',
-                            'component' => 'TNW_Subscriptions/js/components/primary-button',
-                            'template' => 'TNW_Subscriptions/form/element/primary-button',
-                            'title' => 'Add to Subscription',
-                            'actions' => [
-                                [
-                                    'targetName' => $this->scopeName,
-                                    'actionName' => 'ajaxSubmit',
-                                ],
-                            ],
-                            'provider' => null,
-                        ],
-                    ],
-                ],
-            ],
-        ];
     }
 }

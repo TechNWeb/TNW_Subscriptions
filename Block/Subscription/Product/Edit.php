@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Product;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -83,27 +84,10 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         array $data = []
     ) {
         $this->profileManager = $profileManager;
-        parent::__construct(
-            $context,
-            $urlEncoder,
-            $jsonEncoder,
-            $string,
-            $productHelper,
-            $productTypeConfig,
-            $localeFormat,
-            $customerSession,
-            $productRepository,
-            $priceCurrency,
-            $subscriptionProductViewConfig,
-            $config,
-            $frequencyOptionRepository,
-            $frequencyRepository,
-            $savingsCalculation,
-            $subscriptionTypeResolver,
-            $priceCalculator,
-            $trialLengthUnitType,
-            $data
-        );
+        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
+            $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
+            $config, $frequencyOptionRepository, $frequencyRepository, $savingsCalculation, $subscriptionTypeResolver,
+            $priceCalculator, $trialLengthUnitType, $data);
     }
 
     /**
@@ -163,8 +147,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * Return current subscription profile billing frequency data.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getCurrentFrequencyData()
     {
@@ -211,7 +193,6 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * Return subscription profile start date.
      *
      * @return string
-     * @throws \Exception
      */
     public function getStartOn()
     {
@@ -228,9 +209,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     /**
      * Return subscription product qty.
      *
-     * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return int
      */
     public function getSubProductQty()
     {

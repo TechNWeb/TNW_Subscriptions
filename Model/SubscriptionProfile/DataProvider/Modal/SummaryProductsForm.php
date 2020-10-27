@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\CatalogInventory\Api\StockRegistryInterface;
@@ -21,11 +22,11 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditSubscriptionProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Base;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -72,7 +73,7 @@ class SummaryProductsForm extends ModifyForm
     const FORM_DATA_VALUE = 'new_subscription';
 
     /**
-     * Edit button name value
+     * Edit button name.
      */
     const EDIT_BUTTON_NAME = 'edit_button';
 
@@ -142,9 +143,8 @@ class SummaryProductsForm extends ModifyForm
     }
 
     /**
-     * @return array|mixed
+     * @inheritdoc
      * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -255,8 +255,7 @@ class SummaryProductsForm extends ModifyForm
                 ],
             ],
             'children' => [
-                self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this
-                    ->getEditProductOptionsForm(),
+                self::DATA_SCOPE_EDIT_SUBSCRIPTION_MODAL_EDIT_PRODUCT_OPTIONS_FORM => $this->getEditProductOptionsForm(),
             ]
         ];
     }
@@ -283,15 +282,13 @@ class SummaryProductsForm extends ModifyForm
                             [
                                 'handle' => self::EDIT_PRODUCT_OPTIONS_FORM_HANDLE,
                                 'buttons' => 1,
-                                EditSubscriptionProductOptions::FORM_DATA_KEY =>
-                                    EditSubscriptionProductOptions::FORM_DATA_VALUE,
+                                EditSubscriptionProductOptions::FORM_DATA_KEY => EditSubscriptionProductOptions::FORM_DATA_VALUE,
                             ]
                         ),
                         'autoRender' => false,
                         'ns' => '' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM,
                         'externalProvider' => EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
-                            . '.' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM
-                            . '_data_source',
+                            . '.' . EditSubscriptionProductOptions::DATA_SCOPE_EDIT_PRODUCT_OPTIONS_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         '__disableTmpl' => [
                             'toolbarContainer' => false
@@ -390,8 +387,7 @@ class SummaryProductsForm extends ModifyForm
                         ),
                         'autoRender' => true,
                         'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_form',
-                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.'
-                            . 'tnw_subscriptionprofile_summary_add_product_modal_form_data_source',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_form.tnw_subscriptionprofile_summary_add_product_modal_form_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         'formSubmitType' => 'ajax',
                         'imports' => [
@@ -433,8 +429,7 @@ class SummaryProductsForm extends ModifyForm
                         'autoRender' => false,
                         'componentType' => 'insertListing',
                         'dataScope' => 'tnw_subscriptionprofile_summary_add_product_modal_listing',
-                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_listing.'
-                            . 'tnw_subscriptionprofile_summary_add_product_modal_listing_data_source',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_listing.tnw_subscriptionprofile_summary_add_product_modal_listing_data_source',
                         'selectionsProvider' => '${ $.ns }.${ $.ns }.tnw_subscriptionprofile_product_columns.ids',
                         'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_listing',
                         'immediateUpdateBySelection' => true,
@@ -526,8 +521,7 @@ class SummaryProductsForm extends ModifyForm
                         ),
                         'autoRender' => false,
                         'ns' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form',
-                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form.'
-                            . 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form_data_source',
+                        'externalProvider' => 'tnw_subscriptionprofile_summary_add_product_modal_configurable_form.tnw_subscriptionprofile_summary_add_product_modal_configurable_form_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         '__disableTmpl' => [
                             'toolbarContainer' => false
@@ -588,7 +582,8 @@ class SummaryProductsForm extends ModifyForm
         $isTrial = false;
 
         if (isset($this->currentProduct) && $this->getTrialPeriod($this->currentProduct->getId())) {
-            if (!isset($this->profileManager)
+            if (
+                !isset($this->profileManager)
                 || $this->profileManager->getProfile()->getStatus() == ProfileStatus::STATUS_TRIAL
             ) {
                 $isTrial = true;
@@ -635,7 +630,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getUpdateButton()
     {
-        $result = parent::getUpdateButton();
+        $result = Parent::getUpdateButton();
         $result['arguments']['data']['config']['sortOrder'] = 150;
         return $result;
     }
@@ -645,7 +640,7 @@ class SummaryProductsForm extends ModifyForm
      */
     protected function getCancelButton()
     {
-        $result = parent::getCancelButton();
+        $result = Parent::getCancelButton();
         $result['arguments']['data']['config']['sortOrder'] = 160;
         return $result;
     }
@@ -797,7 +792,6 @@ class SummaryProductsForm extends ModifyForm
      *
      * @param DataObject $subQuote
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getChildren(DataObject $subQuote)
     {

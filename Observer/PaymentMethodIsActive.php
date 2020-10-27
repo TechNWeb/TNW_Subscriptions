@@ -9,7 +9,8 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
 /**
- * Class PaymentMethodIsActive - observer
+ * Class PaymentMethodIsActive
+ * @package TNW\Subscriptions\Observer
  */
 class PaymentMethodIsActive implements ObserverInterface
 {
@@ -48,7 +49,8 @@ class PaymentMethodIsActive implements ObserverInterface
         if (!$quote instanceof \Magento\Quote\Model\Quote) {
             return;
         }
-        if ($this->checkIsSubscriptionQuote($quote)
+        if (
+            $this->checkIsSubscriptionQuote($quote)
             && !($quote->getSubscriptionPaymentDataSet() && $paymentMethod->getCode() == 'free')
         ) {
             $checkResult->setData(
@@ -65,7 +67,8 @@ class PaymentMethodIsActive implements ObserverInterface
     private function checkIsSubscriptionQuote($quote)
     {
         $result = false;
-        foreach ($quote->getAllVisibleItems() as $item) {
+        foreach ($quote->getAllVisibleItems() as $item)
+        {
             $option = $item->getOptionByCode('subscription');
             if (null !== $option) {
                 $result = true;

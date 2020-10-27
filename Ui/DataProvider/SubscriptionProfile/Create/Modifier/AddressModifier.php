@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
 
 use Magento\Customer\Api\AddressMetadataInterface;
@@ -173,11 +174,6 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
     {
         $fieldSetsChildren = $this->getFieldSetsChildren();
 
-        $children = array_merge(
-            $this->getButtonsSet(),
-            $fieldSetsChildren[static::ADDRESS_FIELDSET_NAME],
-            $this->getAddressIdMeta()
-        );
         $meta = array_merge_recursive(
             $meta,
             [
@@ -205,7 +201,11 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
                             ],
                         ],
                     ],
-                    'children' => $children
+                    'children' => array_merge(
+                        $this->getButtonsSet(),
+                        $fieldSetsChildren[static::ADDRESS_FIELDSET_NAME],
+                        $this->getAddressIdMeta()
+                    )
                 ],
             ]
         );
@@ -334,7 +334,8 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
 
         // Change default field components to process complicated visibility logic
         // for billing address.
-        if (!in_array($attribute->getAttributeCode(), $this->infoAttributes)
+        if (
+            !in_array($attribute->getAttributeCode(), $this->infoAttributes)
             && $attribute->getAttributeCode() !== 'region_id'
             && !$this->isShippingFieldSet()
         ) {
@@ -943,9 +944,13 @@ class AddressModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInter
             $lineCount = $addressAttribute->getMultilineCount();
             $i = 0;
             do {
-                $attributeData[$attributeCode . $i] = isset($addressData[$attributeCode][$i])
+                $attributeLineData = [
+                    $attributeCode . $i => isset($addressData[$attributeCode][$i])
                         ? $addressData[$attributeCode][$i]
-                        : '';
+                        : '',
+                ];
+
+                $attributeData = array_merge($attributeData, $attributeLineData);
                 $i++;
                 $lineCount--;
             } while ($lineCount > 0);

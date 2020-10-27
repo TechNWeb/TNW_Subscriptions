@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Sales\Creditmemo;
 
 use Magento\Sales\Model\Order\Creditmemo\Item as CreditmemoItem;
@@ -32,12 +33,10 @@ class Item
 
         if ($orderInitialFees && $creditmemoInitialFees) {
             $orderInitialFees->setSubsInitialFeeRefunded(
-                $orderInitialFees->getSubsInitialFeeRefunded()
-                + $creditmemoInitialFees->getSubsInitialFee()
+                $orderInitialFees->getSubsInitialFeeRefunded() + $creditmemoInitialFees->getSubsInitialFee()
             );
             $orderInitialFees->setBaseSubsInitialFeeRefunded(
-                $orderInitialFees->getBaseSubsInitialFeeRefunded()
-                + $creditmemoInitialFees->getBaseSubsInitialFee()
+                $orderInitialFees->getBaseSubsInitialFeeRefunded() + $creditmemoInitialFees->getBaseSubsInitialFee()
             );
 
             if ($orderItem->getExtensionAttributes()) {
@@ -65,12 +64,10 @@ class Item
 
         if ($orderInitialFees && $creditmemoInitialFees) {
             $orderInitialFees->setSubsInitialFeeRefunded(
-                $orderInitialFees->getSubsInitialFeeRefunded()
-                - $creditmemoInitialFees->getSubsInitialFee()
+                $orderInitialFees->getSubsInitialFeeRefunded() - $creditmemoInitialFees->getSubsInitialFee()
             );
             $orderInitialFees->setBaseSubsInitialFeeRefunded(
-                $orderInitialFees->getBaseSubsInitialFeeRefunded()
-                - $creditmemoInitialFees->getBaseSubsInitialFee()
+                $orderInitialFees->getBaseSubsInitialFeeRefunded() - $creditmemoInitialFees->getBaseSubsInitialFee()
             );
 
             if ($orderItem->getExtensionAttributes()) {

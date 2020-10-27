@@ -11,7 +11,8 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 
 /**
- * Class CreateProfile - observer
+ * Class CreateProfile
+ * @package TNW\Subscriptions\Observer\QuoteSubmitSuccess
  */
 class CreateProfile implements ObserverInterface
 {
@@ -138,7 +139,7 @@ class CreateProfile implements ObserverInterface
             return;
         }
 
-        $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function ($key) {
+        $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function($key) {
             return strcasecmp($key, 'no_option') !== 0;
         }, ARRAY_FILTER_USE_KEY);
 
@@ -154,13 +155,9 @@ class CreateProfile implements ObserverInterface
 
         // Create customer
         if ($order->getCustomerIsGuest()) {
-            try {
-                $customer = $this->orderCustomerService->create($order->getEntityId());
-                //ISSUE: https://github.com/magento/magento2/issues/7597
-                $this->customerFactory->create()->setId($customer->getId())->reindex();
-            } catch (\Exception $e) {
-                $customer = $this->customerRepository->get($order->getCustomerEmail());
-            }
+            $customer = $this->orderCustomerService->create($order->getEntityId());
+            //ISSUE: https://github.com/magento/magento2/issues/7597
+            $this->customerFactory->create()->setId($customer->getId())->reindex();
             $quote->setCustomer($customer);
             $this->changeQuoteControl->setNewCustomer($customer);
         }

@@ -3,10 +3,12 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Class Cart - plugin
+ * Class Cart
+ * @package TNW\Subscriptions\Plugin\Checkout\Model
  */
 class Cart
 {

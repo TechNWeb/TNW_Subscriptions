@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute;
 
 use Magento\Backend\App\Action\Context;
@@ -160,7 +161,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                 }
             }
 
-            if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {
+            if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
                 $data['backend_type'] = $model->getBackendTypeByInput($data['frontend_input']);
             }
 

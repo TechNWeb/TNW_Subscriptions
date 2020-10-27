@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
@@ -40,10 +41,8 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                                 'targetName' => 'index = cancelModal',
                                 'actionName' => 'setTitle',
                                 'params' => [
-                                    __(
-                                        'Are you sure you want to cancel Subscription %1?',
-                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId()
-                                    )
+                                    __('Are you sure you want to cancel Subscription %1?',
+                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId())
                                 ]
                             ],
                             [

@@ -1,22 +1,22 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\EmailOverview $block */ ?>
-<?= $block->getProductsHtml() ?>
+<?php echo $block->getProductsHtml() ?>
 <table class="order-details">
     <tbody>
     <tr>
         <td>
             <?php if ($block->canShowShippingDetailsBlock()): ?>
-                <?= $block->getShippingInfoHtml() ?>
+                <?php echo $block->getShippingInfoHtml() ?>
             <?php endif; ?>
         </td>
         <td>
             <?php if ($block->canShowShippingDetailsBlock()): ?>
-                <?= $block->getShippingDetailsHtml() ?>
+                <?php echo $block->getShippingDetailsHtml() ?>
             <?php endif; ?>
         </td>
     </tr>
     <tr>
-        <td><?= $block->getBillingInfoHtml() ?></td>
-        <td><?= $block->getPaymentDetailsHtml() ?></td>
+        <td><?php echo $block->getBillingInfoHtml() ?></td>
+        <td><?php echo $block->getPaymentDetailsHtml() ?></td>
     </tr>
     </tbody>
 </table>

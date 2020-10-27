@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
@@ -11,10 +12,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressSearchResultsInterface;
 
-/**
- * Interface SubscriptionProfileAddressRepositoryInterface - determines the functionality to implement for
- * for subscription profile address repository
- */
 interface SubscriptionProfileAddressRepositoryInterface
 {
     /**

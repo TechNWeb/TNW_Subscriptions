@@ -3,15 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\BillingFrequency;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory;
 use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
-/**
- * Class DataProvider - for billing frequencies
- */
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
     /** @var \TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection */
@@ -20,9 +18,6 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
     /** @var DataPersistorInterface */
     protected $dataPersistor;
 
-    /**
-     * @var
-     */
     protected $loadedData;
 
     /** @var LinkedProducts */

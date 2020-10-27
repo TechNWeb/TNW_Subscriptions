@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Quote\Model\Quote\Payment;
@@ -12,17 +13,17 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Braintree Engine - processor for braintree payments
+ * Braintree Engine
  */
 class Braintree extends Base
 {
     /**
-     * Payment method code
+     *
      */
     const CODE = 'braintree';
 
     /**
-     * Braintree nonce field name
+     *
      */
     const PAYMENT_METHOD_NONCE = 'payment_method_nonce';
 
@@ -85,8 +86,8 @@ class Braintree extends Base
             $paymentTokenManagement
         );
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
-            $this->command = $objectManager->get(\PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand::class);
-            $this->transferFactory = $objectManager->get(\PayPal\Braintree\Gateway\Http\TransferFactory::class);
+            $this->command = $objectManager->get("PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand");
+            $this->transferFactory = $objectManager->get("PayPal\Braintree\Gateway\Http\TransferFactory");
         }
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -180,7 +181,7 @@ class Braintree extends Base
                 $paymentMethodNonce = $result['paymentMethodNonce'];
                 $paymentCode = $this->getVaultPaymentCode();
             } catch (\Exception $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(__('Sorry, but something went wrong'));
+                throw new \Exception(__('Sorry, but something went wrong'));
             }
         }
         $requestData['payment'][$paymentCode]['additional']

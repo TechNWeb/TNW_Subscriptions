@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Customer\Api\Data\AddressInterface;
@@ -14,7 +15,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Address as ResourceAddress;
 
 /**
- * Class Address - subscription profile address model
+ * Class Address
  */
 class Address extends AbstractModel implements SubscriptionProfileAddressInterface
 {
@@ -452,20 +453,11 @@ class Address extends AbstractModel implements SubscriptionProfileAddressInterfa
             $newValue = (string)$this->getData($field);
 
             if (!$this->getOrigData($field)) {
-                $message = __(
-                    '%1 %2 changed to <b>%3</b>',
-                    $type,
-                    $fieldName,
-                    $newValue
-                );
+                $message = __('%1 %2 changed to <b>%3</b>',
+                    $type, $fieldName, $newValue);
             } else {
-                $message = __(
-                    '%1 %2 changed from  <b>%3</b> to <b>%4</b>',
-                    $type,
-                    $fieldName,
-                    $oldValue,
-                    $newValue
-                );
+                $message = __('%1 %2 changed from  <b>%3</b> to <b>%4</b>',
+                    $type, $fieldName, $oldValue, $newValue);
             }
 
             $this->historyLogger->log($message, $this->getProfileId());

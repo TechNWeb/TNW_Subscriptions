@@ -5,16 +5,16 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
+use Magento\Framework\App\RequestInterface;
+use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Framework\Api\Filter;
+use Magento\Customer\Model\Customer;
 use Magento\Customer\Api\AddressMetadataInterface;
-use Magento\Customer\Model\Address\Mapper as AddressMapper;
 use Magento\Customer\Model\Attribute;
 use Magento\Customer\Model\AttributeMetadataDataProvider;
-use Magento\Customer\Model\Customer;
-use Magento\Framework\Api\Filter;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Json\Encoder;
 use Magento\Ui\Component\Form;
-use Magento\Ui\DataProvider\AbstractDataProvider;
+use Magento\Customer\Model\Address\Mapper as AddressMapper;
+use Magento\Framework\Json\Encoder;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
@@ -217,7 +217,6 @@ class SummaryAddressForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
     }
 
     /**
@@ -324,7 +323,7 @@ class SummaryAddressForm extends AbstractDataProvider
                         ],
                     ],
                 ]
-                ]],
+            ]],
         ];
         $sortOrder = 2;
         /** @var Attribute $attribute */
@@ -338,7 +337,7 @@ class SummaryAddressForm extends AbstractDataProvider
                     //Get meta data for attribute
                     $childrenData = array_merge_recursive(
                         $childrenData,
-                        $this->getAttributeMeta($attribute, $sortOrder, $i)
+                        $this->getAttributeMeta($attribute, $sortOrder, $i )
                     );
                     $i++;
                     $lineCount--;
@@ -477,7 +476,7 @@ class SummaryAddressForm extends AbstractDataProvider
                     'validation' => [
                         'required-entry' => (!($this->getAddressId())),
                     ],
-                    'additionalClass' => ($this->getAddressId()) ? ' hidden' : '',
+                    'additionalClass' => ($this->getAddressId())? ' hidden': '',
                     'imports' => [
                         'checkVisibility' => 'ns = ${ $.ns }, index = country_id:value',
                         '__disableTmpl' => [
@@ -495,10 +494,10 @@ class SummaryAddressForm extends AbstractDataProvider
     /**
      * Returns additional meta data for select/multiselect attributes.
      *
-     * @param $attribute
-     * @param $attributeMeta
-     * @param $elemLabel
-     * @param $additionalClasses
+     * @param Attribute $attribute
+     * @param array $attributeMeta
+     * @param string $elemLabel
+     * @param string $additionalClasses
      * @return array
      */
     private function getSourceAttributeMeta($attribute, $attributeMeta, $elemLabel, $additionalClasses)
@@ -516,7 +515,7 @@ class SummaryAddressForm extends AbstractDataProvider
             $additionalClasses = $additionalClasses . ' wide-select';
         }
 
-        return [$attributeMeta, $additionalClasses];
+        return array($attributeMeta, $additionalClasses);
     }
 
     /**
@@ -596,7 +595,7 @@ class SummaryAddressForm extends AbstractDataProvider
             $elemLabel = $attribute->getStoreLabel() . ' ' . sprintf(__('(Line %s)'), $attributeLine + 1);
         }
 
-        return [$elemName, $elemLabel];
+        return array($elemName, $elemLabel);
     }
 
     /**
@@ -863,8 +862,7 @@ class SummaryAddressForm extends AbstractDataProvider
     /**
      * Returns customer from subscription profile.
      *
-     * @return \Magento\Customer\Api\Data\CustomerInterface|null
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return Customer
      */
     private function getCustomer()
     {
@@ -875,7 +873,6 @@ class SummaryAddressForm extends AbstractDataProvider
      * Checks if customer has any address.
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function hasCustomerAddresses()
     {
@@ -1053,8 +1050,7 @@ class SummaryAddressForm extends AbstractDataProvider
     /**
      * Retrieve customer addresses data to display.
      *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return string
      */
     private function getCustomerAddressesData()
     {
@@ -1065,6 +1061,14 @@ class SummaryAddressForm extends AbstractDataProvider
             $addressesList = $customerModel->getAddresses();
 
             foreach ($addressesList as $address) {
+                $streetData = [];
+                if ($address->getStreet()) {
+                    foreach ($address->getStreet() as $key => $streetValue) {
+                        $streetKey = 'street' . $key;
+                        $streetData[$streetKey] = $streetValue;
+                    }
+                }
+
                 $addressData = [
                     'firstname' => $address->getFirstname(),
                     'lastname' => $address->getLastname(),
@@ -1078,14 +1082,8 @@ class SummaryAddressForm extends AbstractDataProvider
                     'fax' => $address->getFax(),
                     'vat_id' => $address->getVatId()
                 ];
-                if ($address->getStreet()) {
-                    foreach ($address->getStreet() as $key => $streetValue) {
-                        $streetKey = 'street' . $key;
-                        $addressData[$streetKey] = $streetValue;
-                    }
-                }
 
-                $result[$address->getId()] = $addressData;
+                $result[$address->getId()] = array_merge($addressData, $streetData);
 
             }
         }

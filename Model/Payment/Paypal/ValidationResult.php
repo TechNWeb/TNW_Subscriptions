@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
 /**
- * Class ValidationResult - used for validation result build for paypal
+ * Class ValidationResult
+ * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class ValidationResult
 {

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -13,7 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
- * Class SummaryPaymentMethodForm - modal form for payment method summary
+ * Class SummaryPaymentMethodForm
  */
 class SummaryPaymentMethodForm extends AbstractDataProvider
 {
@@ -105,7 +106,6 @@ class SummaryPaymentMethodForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
     }
 
     /**

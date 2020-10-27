@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Linked;
 
 use Magento\Catalog\Api\ProductLinkRepositoryInterface;
@@ -12,12 +13,12 @@ use Magento\Catalog\Ui\DataProvider\Product\Related\AbstractDataProvider;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
+use \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Class LinkedDataProvider - dataprovider
+ * Class LinkedDataProvider
  * @method \Magento\Catalog\Model\ResourceModel\Product\Collection getCollection()
  */
 class LinkedDataProvider extends AbstractDataProvider
@@ -61,8 +62,7 @@ class LinkedDataProvider extends AbstractDataProvider
     ) {
         $this->dataPersistor = $dataPersistor;
 
-        parent::__construct(
-            $name,
+        parent::__construct($name,
             $primaryFieldName,
             $requestFieldName,
             $collectionFactory,
@@ -91,6 +91,7 @@ class LinkedDataProvider extends AbstractDataProvider
     public function getData()
     {
         $collection = $this->getCollection();
+        //$collection->addPriceData();
         $collection->addAttributeToFilter(
             Attribute::SUBSCRIPTION_PURCHASE_TYPE,
             [
@@ -117,8 +118,9 @@ class LinkedDataProvider extends AbstractDataProvider
     }
 
     /**
+     * Join table(s) to collection.
+     *
      * @param \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function joinTables(\Magento\Catalog\Model\ResourceModel\Product\Collection $collection)
     {
@@ -139,7 +141,7 @@ class LinkedDataProvider extends AbstractDataProvider
                 ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
                 'tnw_' . ProductBillingFrequencyInterface::PRICE => ProductBillingFrequencyInterface::PRICE,
             ],
-            $alias . '.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=' . $frequencyId,
+            $alias . '.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=' .  $frequencyId,
             'left'
         );
     }

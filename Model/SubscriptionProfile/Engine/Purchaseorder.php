@@ -5,17 +5,18 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use Magento\OfflinePayments\Model\Purchaseorder as PurchaseorderPayment;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
- * Class Purchaseorder - used as purchase order payment processor
+ * Class Purchaseorder
+ * @package TNW\Subscriptions\Model\SubscriptionProfile\Engine
  */
 class Purchaseorder extends Base
 {
     /**
-     * Field name for purchase order number
+     *
      */
     const PO_FIELD = 'po_number';
 

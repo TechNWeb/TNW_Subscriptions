@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute\Edit\Tab;
 
 /**
@@ -13,4 +14,5 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute\Edit\T
  */
 class Options extends \Magento\Eav\Block\Adminhtml\Attribute\Edit\Options\AbstractOptions
 {
+
 }

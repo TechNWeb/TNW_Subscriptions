@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Ui\Component\Form;
@@ -32,11 +33,8 @@ class OrdersHistory extends BaseFormModifier
                                 'autoRender' => true,
                                 'componentType' => 'insertListing',
                                 'dataScope' => 'order_history_listing',
-                                'externalProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.'
-                                    . 'tnw_subscriptionprofile_edit_order_history_listing_data_source',
-                                'selectionsProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.'
-                                    . 'tnw_subscriptionprofile_edit_order_history_listing.'
-                                    . 'tnw_subscriptionprofile_order_history_columns.ids',
+                                'externalProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_edit_order_history_listing_data_source',
+                                'selectionsProvider' => 'tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_edit_order_history_listing.tnw_subscriptionprofile_order_history_columns.ids',
                                 'ns' => 'tnw_subscriptionprofile_edit_order_history_listing',
                                 'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                                 'realTimeLink' => false,
@@ -82,10 +80,11 @@ class OrdersHistory extends BaseFormModifier
     {
         $profile =  $this->getProfile();
 
-        if ($profile && $profile->getId()) {
-            $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
-        }
+         if ($profile && $profile->getId()){
+             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
+         }
 
         return $data;
     }
+
 }

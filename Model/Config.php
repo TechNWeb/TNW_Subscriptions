@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -17,7 +18,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Config - config model for subscriptions
+ * Class Config
  */
 class Config
 {
@@ -126,7 +127,7 @@ class Config
         ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-             $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
+             $this->paypalConfig = $objectManager->get("Magento\Paypal\Model\Config");
         }
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
@@ -173,9 +174,8 @@ class Config
     {
         $result = false;
 
-        if ($websiteId) {
-            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId)
-                && !empty($this->getAvailablePaymentsList($websiteId));
+        if ($websiteId){
+            $result = $this->getStoreConfig($this->xmlIsActive, $websiteId) && !empty($this->getAvailablePaymentsList($websiteId));
         } else {
             if ($this->isSubscriptionsActive === null) {
                 $this->isSubscriptionsActive = false;
@@ -477,7 +477,7 @@ class Config
                 ScopeInterface::SCOPE_STORE,
                 $this->getStore($storeId)->getCode()
             );
-        } elseif ($websiteId) {
+        } else if ($websiteId) {
             $result = $this->scopeConfig->getValue(
                 $path,
                 ScopeInterface::SCOPE_WEBSITE,
@@ -572,13 +572,14 @@ class Config
     {
         $websiteId = null;
         $isAvailable = false;
-        if ($storeId) {
+        if ($storeId){
             $websiteId = $this->getStore($storeId)->getWebsiteId();
             if ($this->paypalConfig) {
                 $this->paypalConfig->setStoreId($storeId);
             }
         }
-        if (($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO)
+        if (
+            ($paymentCode === self::METHOD_PAYFLOWPRO || $paymentCode === self::METHOD_PAYMENT_PRO)
             && $this->paypalConfig
         ) {
             $isAvailableInMagento = $this->paypalConfig->isMethodAvailable($paymentCode);

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -25,7 +26,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
 
 /**
- * Class LinkedProducts - dataprovider
+ * Class LinkedProducts
  */
 class LinkedProducts extends AbstractModifier
 {
@@ -187,8 +188,7 @@ class LinkedProducts extends AbstractModifier
     public function modifyMeta(array $meta)
     {
         $content = __(
-            'Merchants are able to configure recurring options for this iteration for all linked products in '
-            . 'the products administrative area.'
+            'Merchants are able to configure recurring options for this iteration for all linked products in the products administrative area.'
         );
 
         $meta = array_merge_recursive(

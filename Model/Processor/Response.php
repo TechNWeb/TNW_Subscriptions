@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\Processor;
 
 use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
@@ -27,9 +28,9 @@ class Response
     private $responseProcessorsPool;
 
     /**
-     * Response constructor.
+     * Processor constructor.
      * @param Context $context
-     * @param PoolInterface $responseProcessorsPool
+     * @param PoolInterface $requestSaveProcessorsPool
      */
     public function __construct(
         Context $context,

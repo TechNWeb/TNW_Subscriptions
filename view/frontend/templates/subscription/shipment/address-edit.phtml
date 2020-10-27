@@ -11,17 +11,17 @@
 <?php /** @var \Magento\Customer\Helper\Address $customerAddressHelper */
 $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);?>
 <fieldset class="fieldset-shipping" id="customer-data">
-    <legend class="legend"><span><?= /* @escapeNotVerified */ __('Shipping Information') ?></span></legend>
+    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Information') ?></span></legend>
 
     <div class="field field-name-firstname required">
         <div class="control">
             <input type="text"
                    id="firstname"
                    name="shipping_info[firstname]"
-                   value="<?= $block->escapeHtml($block->getAddress()->getFirstname()) ?>"
-                   title="<?= /* @escapeNotVerified */ __('First Name') ?>"
-                   placeholder="<?= /* @escapeNotVerified */ __('First Name') ?>"
-                   class="info-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('firstname') ?>"/>
+                   value="<?php echo $block->escapeHtml($block->getAddress()->getFirstname()) ?>"
+                   title="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
+                   placeholder="<?php /* @escapeNotVerified */ echo __('First Name') ?>"
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('firstname') ?>"/>
         </div>
     </div>
     <div class="field field-name-lastname required">
@@ -29,10 +29,10 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
             <input type="text"
                    id="lastname"
                    name="shipping_info[lastname]"
-                   value="<?= $block->escapeHtml($block->getAddress()->getLastname()) ?>"
-                   title="<?= /* @escapeNotVerified */ __('Last Name') ?>"
-                   placeholder="<?= /* @escapeNotVerified */ __('Last Name') ?>"
-                   class="info-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('lastname') ?>"/>
+                   value="<?php echo $block->escapeHtml($block->getAddress()->getLastname()) ?>"
+                   title="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
+                   placeholder="<?php /* @escapeNotVerified */ echo __('Last Name') ?>"
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('lastname') ?>"/>
         </div>
     </div>
     <div class="field company">
@@ -40,31 +40,31 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
             <input type="text"
                    name="shipping_info[company]"
                    id="company"
-                   title="<?= /* @escapeNotVerified */ __('Company') ?>"
-                   value="<?= $block->escapeHtml($block->getAddress()->getCompany()) ?>"
-                   placeholder="<?= /* @escapeNotVerified */ __('Company') ?>"
-                   class="info-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('company') ?>">
+                   title="<?php /* @escapeNotVerified */ echo __('Company') ?>"
+                   value="<?php echo $block->escapeHtml($block->getAddress()->getCompany()) ?>"
+                   placeholder="<?php /* @escapeNotVerified */ echo __('Company') ?>"
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('company') ?>">
         </div>
     </div>
     <div class="field telephone required">
         <div class="control">
             <input type="text"
                    name="shipping_info[telephone]"
-                   value="<?= $block->escapeHtml($block->getAddress()->getTelephone()) ?>"
-                   title="<?= /* @escapeNotVerified */ __('Phone Number') ?>"
-                   class="info-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('telephone') ?>"
-                   placeholder="<?= /* @escapeNotVerified */ __('Phone Number') ?>"
+                   value="<?php echo $block->escapeHtml($block->getAddress()->getTelephone()) ?>"
+                   title="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
+                   class="info-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('telephone') ?>"
+                   placeholder="<?php /* @escapeNotVerified */ echo __('Phone Number') ?>"
                    id="telephone">
         </div>
     </div>
 </fieldset>
 
 <fieldset class="fieldset-shipping">
-    <legend class="legend"><span><?= /* @escapeNotVerified */ __('Shipping Address') ?></span></legend>
-    <div class="customer-addresses"><?= $block->getCustomerAddressesSelect() ?></div>
+    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span></legend>
+    <div class="customer-addresses"><?php echo $block->getCustomerAddressesSelect() ?></div>
     <div class="shipping-actions">
-        <a id="pick" class="action" href="javascript:"><div><?= /* @escapeNotVerified */ __('Pick from saved addresses') ?></div></a>
-        <a id="add-new" class="action" href="javascript:"><div><?= /* @escapeNotVerified */ __('Add New Address') ?></div></a>
+        <a id="pick" class="action" href="javascript:"><div><?php /* @escapeNotVerified */ echo __('Pick from saved addresses') ?></div></a>
+        <a id="add-new" class="action" href="javascript:"><div><?php /* @escapeNotVerified */ echo __('Add New Address') ?></div></a>
     </div>
     <div id="shipping-fields-list">
         <?php $_streetValidationClass = $customerAddressHelper->getAttributeValidationClass('street'); ?>
@@ -72,23 +72,23 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
             <div class="control">
                 <input type="text"
                        name="shipping_address[street0]"
-                       value="<?= $block->escapeHtml($block->getStreetLine(1)) ?>"
-                       title="<?= /* @escapeNotVerified */ __('Street Address') ?>"
-                       placeholder="<?= /* @escapeNotVerified */ __('Street Address') ?>"
+                       value="<?php echo $block->escapeHtml($block->getStreetLine(1)) ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('Street Address') ?>"
+                       placeholder="<?php /* @escapeNotVerified */ echo __('Street Address') ?>"
                        id="street_1"
-                       class="address-field input-text <?= /* @escapeNotVerified */ $_streetValidationClass ?>"  />
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $_streetValidationClass ?>"  />
                 <div class="nested">
                     <?php $_streetValidationClass = trim(str_replace('required-entry', '', $_streetValidationClass)); ?>
                     <?php for ($_i = 1, $_n = $customerAddressHelper->getStreetLines(); $_i < $_n; $_i++): ?>
                         <div class="field additional">
                             <div class="control">
                                 <input type="text"
-                                       name="shipping_address[street<?= /* @escapeNotVerified */ $_i ?>]"
-                                       value="<?= $block->escapeHtml($block->getStreetLine($_i+1)) ?>"
-                                       title="<?= /* @escapeNotVerified */ __('Street Address %1', $_i+1) ?>"
-                                       id="street_<?= /* @escapeNotVerified */ $_i+1 ?>"
-                                       placeholder="<?= /* @escapeNotVerified */ __('Street Address %1', $_i+1) ?>"
-                                       class="address-field input-text <?= /* @escapeNotVerified */ $_streetValidationClass ?>">
+                                       name="shipping_address[street<?php /* @escapeNotVerified */ echo $_i ?>]"
+                                       value="<?php echo $block->escapeHtml($block->getStreetLine($_i+1)) ?>"
+                                       title="<?php /* @escapeNotVerified */ echo __('Street Address %1', $_i+1) ?>"
+                                       id="street_<?php /* @escapeNotVerified */ echo $_i+1 ?>"
+                                       placeholder="<?php /* @escapeNotVerified */ echo __('Street Address %1', $_i+1) ?>"
+                                       class="address-field input-text <?php /* @escapeNotVerified */ echo $_streetValidationClass ?>">
                             </div>
                         </div>
                     <?php endfor; ?>
@@ -101,10 +101,10 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
                 <div class="control">
                     <input type="text"
                            name="shipping_address[vat_id]"
-                           value="<?= $block->escapeHtml($block->getAddress()->getVatId()) ?>"
-                           title="<?= /* @escapeNotVerified */ __('VAT Number') ?>"
-                           class="address-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('vat_id') ?>"
-                           placeholder="<?= /* @escapeNotVerified */ __('VAT Number') ?>"
+                           value="<?php echo $block->escapeHtml($block->getAddress()->getVatId()) ?>"
+                           title="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
+                           class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('vat_id') ?>"
+                           placeholder="<?php /* @escapeNotVerified */ echo __('VAT Number') ?>"
                            id="vat_id">
                 </div>
             </div>
@@ -113,41 +113,41 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
             <div class="control">
                 <input type="text"
                        name="shipping_address[city]"
-                       value="<?= $block->escapeHtml($block->getAddress()->getCity()) ?>"
-                       title="<?= /* @escapeNotVerified */ __('City') ?>"
-                       placeholder="<?= /* @escapeNotVerified */ __('City') ?>"
-                       class="address-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('city') ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getCity()) ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('City') ?>"
+                       placeholder="<?php /* @escapeNotVerified */ echo __('City') ?>"
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('city') ?>"
                        id="city">
             </div>
         </div>
         <div class="field region required">
             <div class="control">
-                <select id="region_id" name="shipping_address[region_id]" title="<?= /* @escapeNotVerified */ __('State/Province') ?>" class="address-field validate-select" <?=(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
-                    <option value=""><?= /* @escapeNotVerified */ __('Please select a region, state or province.') ?></option>
+                <select id="region_id" name="shipping_address[region_id]" title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>" class="address-field validate-select" <?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>>
+                    <option value=""><?php /* @escapeNotVerified */ echo __('Please select a region, state or province.') ?></option>
                 </select>
                 <input type="text"
                        id="region"
                        name="shipping_address[region]"
-                       value="<?= $block->escapeHtml($block->getRegion()) ?>"
-                       title="<?= /* @escapeNotVerified */ __('State/Province') ?>"
-                       placeholder="<?= /* @escapeNotVerified */ __('State/Province') ?>"
-                       class="address-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('region') ?>"<?=(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
+                       value="<?php echo $block->escapeHtml($block->getRegion()) ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
+                       placeholder="<?php /* @escapeNotVerified */ echo __('State/Province') ?>"
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('region') ?>"<?php echo(!$block->getConfig('general/region/display_all')) ? ' disabled="disabled"' : '';?>/>
             </div>
         </div>
         <div class="field zip required">
             <div class="control">
                 <input type="text"
                        name="shipping_address[postcode]"
-                       value="<?= $block->escapeHtml($block->getAddress()->getPostcode()) ?>"
-                       title="<?= /* @escapeNotVerified */ __('Zip/Postal Code') ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getPostcode()) ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
                        id="zip"
-                       placeholder="<?= /* @escapeNotVerified */ __('Zip/Postal Code') ?>"
-                       class="address-field input-text validate-zip-international <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('postcode') ?>">
+                       placeholder="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>"
+                       class="address-field input-text validate-zip-international <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('postcode') ?>">
             </div>
         </div>
         <div class="field country required">
             <div class="control">
-                <?= $block->getCountryHtmlSelect(null, 'shipping_address[country_id]') ?>
+                <?php echo $block->getCountryHtmlSelect(null, 'shipping_address[country_id]') ?>
             </div>
         </div>
         <div class="field fax">
@@ -155,10 +155,10 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
                 <input type="text"
                        name="shipping_address[fax]"
                        id="fax"
-                       title="<?= /* @escapeNotVerified */ __('Fax') ?>"
-                       value="<?= $block->escapeHtml($block->getAddress()->getFax()) ?>"
-                       placeholder="<?= /* @escapeNotVerified */ __('Fax') ?>"
-                       class="address-field input-text <?= /* @escapeNotVerified */ $customerAddressHelper->getAttributeValidationClass('fax') ?>">
+                       title="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
+                       value="<?php echo $block->escapeHtml($block->getAddress()->getFax()) ?>"
+                       placeholder="<?php /* @escapeNotVerified */ echo __('Fax') ?>"
+                       class="address-field input-text <?php /* @escapeNotVerified */ echo $customerAddressHelper->getAttributeValidationClass('fax') ?>">
             </div>
         </div>
         <div class="field choice">
@@ -166,9 +166,9 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
                 type="checkbox"
                 name="shipping_address[save_address]"
                 id="save_in_address_book"
-                title="<?= /* @escapeNotVerified */ __('Save in address book') ?>"
+                title="<?php /* @escapeNotVerified */ echo __('Save in address book') ?>"
                 class="address-field checkbox" />
-            <label class="label" for="save_in_address_book"><span><?= /* @escapeNotVerified */ __('Save in address book') ?></span></label>
+            <label class="label" for="save_in_address_book"><span><?php /* @escapeNotVerified */ echo __('Save in address book') ?></span></label>
         </div>
     </div>
 </fieldset>
@@ -180,14 +180,14 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
         },
         "#country": {
             "regionUpdater": {
-                "optionalRegionAllowed": <?= /* @escapeNotVerified */($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,
+                "optionalRegionAllowed": <?php /* @escapeNotVerified */ echo($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,
                 "regionListId": "#region_id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#shipping-address-form",
-                "regionJson": <?= /* @escapeNotVerified */ $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
-                "defaultRegion": "<?= /* @escapeNotVerified */ $block->getRegionId() ?>",
-                "countriesWithOptionalZip": <?= /* @escapeNotVerified */ $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
+                "regionJson": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
+                "defaultRegion": "<?php /* @escapeNotVerified */ echo $block->getRegionId() ?>",
+                "countriesWithOptionalZip": <?php /* @escapeNotVerified */ echo $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
             }
         }
     }
