@@ -20,7 +20,11 @@ class Start extends SubscriptionProfile
      */
     public function execute()
     {
+        $twoFAActive = $this->_getSession()->getData('2fa_passed');
         $this->clearSessionData();
+        if ($twoFAActive) {
+            $this->_getSession()->setData('2fa_passed', $twoFAActive);
+        }
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
