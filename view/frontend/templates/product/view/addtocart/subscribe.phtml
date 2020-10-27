@@ -19,14 +19,14 @@
                     "recurringAddToCart": {
                         "component": "TNW_Subscriptions/js/product/subscribe-component",
                         "config": {
-                            "buttonLabel" : "<?= $block->escapeHtml(__('Subscribe')) ?>",
-                            "dateFormat": "<?= $block->getDateFormat() ?>",
-                            "minStartOn" : "<?= $block->getMinStartOn() ?>",
-                            "defaultPeriod" : "<?= $block->getDefaultPeriod() ?>",
-                            "defaultUntilCancelled" : "<?= $block->getDefaultUntilCancelled() ?>",
-                            "defaultSubscribeQty" : "<?= $block->getDefaultSubscribeQty() ?>",
-                            "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
-                            "products" : <?= $block->getProductDataArray() ?>
+                            "buttonLabel" : "<?php echo $block->escapeHtml(__('Subscribe')) ?>",
+                            "dateFormat": "<?php echo $block->getDateFormat() ?>",
+                            "minStartOn" : "<?php echo $block->getMinStartOn() ?>",
+                            "defaultPeriod" : "<?php echo $block->getDefaultPeriod() ?>",
+                            "defaultUntilCancelled" : "<?php echo $block->getDefaultUntilCancelled() ?>",
+                            "defaultSubscribeQty" : "<?php echo $block->getDefaultSubscribeQty() ?>",
+                            "defaultStartOn" : "<?php echo $block->getDefaultStartOn() ?>",
+                            "products" : <?php echo $block->getProductDataArray() ?>
                         }
                     }
                 }

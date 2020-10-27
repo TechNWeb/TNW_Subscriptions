@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 
 use Magento\Backend\Block\Template;
@@ -12,7 +13,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
- * Class ShippingDetails - adminhtml edit summary block for shipping details info
+ * Class ShippingDetails
  */
 class ShippingDetails extends Template
 {
@@ -40,6 +41,7 @@ class ShippingDetails extends Template
         ProfileManager $profileManager,
         Template\Context $context,
         array $data = []
+
     ) {
         $this->profileManager = $profileManager;
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/shipping_details.phtml');

@@ -7,6 +7,8 @@
 <div if="hasData()" class="sub-data-grid-title">
     <div class="sub-title" translate="'Summary'"/>
 </div>
+
+
 <div if="hasData()" class="sub-data-grid" data-role="grid-wrapper">
     <div data-bind="attr: {class: showBottomBorder($row()) ? 'sub-data-row border' : 'sub-data-row '}"
          repeat="foreach: rows, item: '$row'">

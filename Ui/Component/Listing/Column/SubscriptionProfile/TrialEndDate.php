@@ -3,13 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Ui\Component\Listing\Columns\Date;
 
-/**
- * Class TrialEndDate - ui component
- */
 class TrialEndDate extends Date
 {
     /**
@@ -25,10 +23,8 @@ class TrialEndDate extends Date
                     if (isset($this->getConfiguration()['timezone']) && !$this->getConfiguration()['timezone']) {
                         $date = new \DateTime($item[$this->getData('name')]);
                     }
-                    $item[$this->getData('name')] = $date->format(
-                        \Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT
-                    );
-                    if (empty($item['trial_start_date'])) {
+                    $item[$this->getData('name')] = $date->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                    if (empty($item['trial_start_date'])){
                         $item[$this->getData('name')] = '';
                     }
                 }

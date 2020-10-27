@@ -7,39 +7,39 @@
 <?php /* @var TNW\Subscriptions\Block\Subscription\Summary\Overview\DangerZone $block */ ?>
 <div class="block">
     <div class="block-title danger-zone">
-        <strong class="danger-zone-title"><?= __("Danger Zone") ?></strong>
+        <strong class="danger-zone-title"><?php echo __("Danger Zone") ?></strong>
     </div>
     <div class="block-content">
         <?php if ($block->isPlaceOnHoldActive()): ?>
             <div>
-                <button onclick="window.location.href='<?= $block->getPlaceOnHoldUrl() ?>'"
+                <button onclick="window.location.href='<?php echo $block->getPlaceOnHoldUrl() ?>'"
                         class="action primary place-on-hold">
-                    <?= __('Place on Hold') ?>
+                    <?php echo __('Place on Hold') ?>
                 </button>
                 <span class="place-on-hold-comment">
-                    <?= __('Place subscription On Hold. While "On Hold" you will not be billed.') ?>
+                    <?php echo __('Place subscription On Hold. While "On Hold" you will not be billed.') ?>
                 </span>
             </div>
         <?php endif ?>
         <?php if ($block->isReActiveActive()): ?>
             <div style="margin-top: 1%">
-                <button onclick="window.location.href='<?= $block->getReActivateUrl() ?>'"
+                <button onclick="window.location.href='<?php echo $block->getReActivateUrl() ?>'"
                         class="action primary place-on-hold">
-                    <?= __('Resume') ?>
+                    <?php echo __('Resume') ?>
                 </button>
                 <span class="re-activate-comment">
-                    <?= __('Resume subscription.') ?>
+                    <?php echo __('Resume subscription.') ?>
                 </span>
             </div>
         <?php endif ?>
         <?php if ($block->isCancelActive()): ?>
             <div style="margin-top: 1%">
-                <button onclick="window.location.href='<?= $block->getCancelUrl() ?>'"
+                <button onclick="window.location.href='<?php echo $block->getCancelUrl() ?>'"
                         class="action primary cancel-subscription">
-                    <?= __('Cancel Subscription') ?>
+                    <?php echo __('Cancel Subscription') ?>
                 </button>
                 <span class="cancel-subscription-comment">
-                <?= __('Cancel the subscription. This action cannot be reversed.') ?>
+                <?php echo __('Cancel the subscription. This action cannot be reversed.') ?>
                 </span>
             </div>
         <?php endif ?>

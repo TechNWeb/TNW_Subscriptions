@@ -1,11 +1,11 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\Details $block */ ?>
 <?php if (!$block->isOnlyTableContent()): ?>
 <div class="block">
-    <?php if ($block->isShowTitle()):?>
+    <?php if ($block->isShowTitle()) :?>
     <div class="block-title">
-        <strong><?= __("Payment Details") ?></strong>
-        <?php if ($block->isShowEditLink()): ?>
-            <a href="<?= $block->getEditUrl('billing'); ?>"
+        <strong><?php echo __("Payment Details") ?></strong>
+        <?php if ($block->isShowEditLink()) : ?>
+            <a href="<?php echo $block->getEditUrl('billing'); ?>"
                class="profile__edit_button"
                id="payment-details-edit-button">
             </a>
@@ -17,34 +17,34 @@
         <table class="table-secondary data-table">
             <tbody>
             <tr class="col-0">
-                <td class="label"><?= __('Payment Type') ?></td>
-                <td class="right"><?= $block->getPaymentMethodTitle() ?></td>
+                <td class="label"><?php echo __('Payment Type') ?></td>
+                <td class="right"><?php echo $block->getPaymentMethodTitle() ?></td>
             </tr>
-            <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()):?>
+            <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()) :?>
                 <?php if (isset($additionalInfo['cc_type']) || isset($additionalInfo['cc_last_4'])): ?>
                     <tr class="col-1">
-                        <td class="label"><?= __('Card Type') ?></td>
-                        <td class="right"><span class="text"><?= $block->getCreditCardTypeLabel() ?></span></td>
+                        <td class="label"><?php echo __('Card Type') ?></td>
+                        <td class="right"><span class="text"><?php echo $block->getCreditCardTypeLabel() ?></span></td>
                     </tr>
                     <tr class="col-2">
-                        <td class="label"><?= __('Card Number') ?></td>
-                        <td class="right"><span class="text"><?= $block->getCreditCardNumber() ?></span></td>
+                        <td class="label"><?php echo __('Card Number') ?></td>
+                        <td class="right"><span class="text"><?php echo $block->getCreditCardNumber() ?></span></td>
                     </tr>
                     <tr class="col-3">
-                        <td class="label"><?= __('Exp. Date') ?></td>
-                        <td class="right"><span class="text"><?= $block->getCreditCardExpDate() ?></span></td>
+                        <td class="label"><?php echo __('Exp. Date') ?></td>
+                        <td class="right"><span class="text"><?php echo $block->getCreditCardExpDate() ?></span></td>
                     </tr>
                 <?php endif; ?>
                 <?php if (isset($additionalInfo['po_number'])): ?>
                     <tr class="col-1">
-                        <td class="label"><?= __('Purchase Order Number') ?></td>
-                        <td class="right"><span class="text"><?= $block->getPurchaseOrderNumber() ?></span></td>
+                        <td class="label"><?php echo __('Purchase Order Number') ?></td>
+                        <td class="right"><span class="text"><?php echo $block->getPurchaseOrderNumber() ?></span></td>
                     </tr>
                 <?php endif; ?>
             <?php endif; ?>
             <tr class="col-4">
-                <td class="label"><?= __('Currency') ?></td>
-                <td class="right"><span class="text"><?= $block->getSubscriptionProfile()->getProfileCurrencyCode() ?></span></td>
+                <td class="label"><?php echo __('Currency') ?></td>
+                <td class="right"><span class="text"><?php echo $block->getSubscriptionProfile()->getProfileCurrencyCode() ?></span></td>
             </tr>
             </tbody>
         </table>

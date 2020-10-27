@@ -3,16 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Queue;
 
-/**
- * Class Index - controller
- */
 class Index extends \Magento\Backend\App\Action
 {
-    /**
-     * @var \Magento\Framework\View\Result\PageFactory
-     */
+
     protected $resultPageFactory;
 
     /**

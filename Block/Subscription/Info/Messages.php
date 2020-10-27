@@ -3,10 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Backend\Block\Template\Context;
 use TNW\Subscriptions\Model\MessagePool;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Subscription tab messages block.

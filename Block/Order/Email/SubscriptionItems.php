@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Order\Email;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -11,34 +12,19 @@ use Magento\Catalog\Helper\Image;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 
-/**
- * Class SubscriptionItems - block used for subscription items in order email
- */
 class SubscriptionItems extends Template
 {
-    /**
-     * @var Image
-     */
     protected $imageHelper;
 
-    /**
-     * @var BillingFrequencyRepository
-     */
     protected $billingFrequencyRepository;
 
-    /**
-     * SubscriptionItems constructor.
-     * @param Template\Context $context
-     * @param Image $imageHelper
-     * @param BillingFrequencyRepository $billingFrequencyRepository
-     * @param array $data
-     */
     public function __construct(
         Template\Context $context,
         Image $imageHelper,
         BillingFrequencyRepository $billingFrequencyRepository,
         array $data = []
-    ) {
+    )
+    {
         $this->imageHelper = $imageHelper;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         parent::__construct($context, $data);

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
@@ -11,8 +12,8 @@ use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Customize Price field
- */
+* Customize Price field
+*/
 class LockPrice extends AbstractModifier
 {
     /**

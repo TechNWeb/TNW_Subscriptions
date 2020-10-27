@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Framework\Registry;
@@ -60,11 +61,8 @@ class ChangeHistory extends BaseFormModifier
                                 'componentType' => Container::NAME,
                                 'component' => 'TNW_Subscriptions/js/grid/history-listing',
                                 'dataScope' => 'change_history_listing',
-                                'externalProvider' => self::CHANGE_HISTORY_LISTING . '.' . self::CHANGE_HISTORY_LISTING
-                                    . '_data_source',
-                                'selectionsProvider' => self::CHANGE_HISTORY_LISTING . '.'
-                                    . self::CHANGE_HISTORY_LISTING
-                                    . 'tnw_subscriptionprofile_change_history_columns.entity_id',
+                                'externalProvider' => self::CHANGE_HISTORY_LISTING . '.' . self::CHANGE_HISTORY_LISTING . '_data_source',
+                                'selectionsProvider' => self::CHANGE_HISTORY_LISTING . '.'.self::CHANGE_HISTORY_LISTING . 'tnw_subscriptionprofile_change_history_columns.entity_id',
                                 'ns' => self::CHANGE_HISTORY_LISTING,
                                 'render_url' => $this->getUrlBuilder()->getUrl('mui/index/render'),
                                 'realTimeLink' => false,

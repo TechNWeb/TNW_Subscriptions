@@ -5,43 +5,26 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Cybersource;
 
+use CyberSource\SecureAcceptance\Helper\RequestDataBuilder;
+
 /**
- * Class TokenRequestDataBuilder - builds request data for token request
+ * Class TokenRequestDataBuilder
+ * @package TNW\Subscriptions\Model\Payment\Cybersource
  */
 class TokenRequestDataBuilder
 {
     /**
-     * Token type param name
+     *
      */
     const TYPE_CREATE_TOKEN = 'create_payment_token';
 
     /**
-     * Quote Id param name
-     */
-    const KEY_QUOTE_ID = 'merchant_secure_data1';
-
-    /**
-     * Merchant additional secure data  param name
-     */
-    const KEY_SID = 'merchant_secure_data2';
-
-    /**
-     * Agreements ids param name
-     */
-    const KEY_AGREEMENT_IDS = 'merchant_defined_data12';
-
-    /**
-     * Skip decision manager param name
-     */
-    const KEY_TOKEN_SKIP_DM = 'token_skip_decision_manager';
-
-    /**
-     * @var mixed
+     * @var \CyberSource\SecureAcceptance\Gateway\Config\Config
      */
     private $gatewayConfig;
 
     /**
-     * @var mixed
+     * @var RequestDataBuilder
      */
     private $requestDataBuilder;
 
@@ -90,9 +73,9 @@ class TokenRequestDataBuilder
         \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
-            $this->gatewayConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
+            $this->gatewayConfig = $objectManager->get("CyberSource\SecureAcceptance\Gateway\Config\Config");
             $this->requestDataBuilder = $objectManager
-                ->get(\CyberSource\SecureAcceptance\Helper\RequestDataBuilder::class);
+                ->get("CyberSource\SecureAcceptance\Helper\RequestDataBuilder");
         }
         $this->localeResolver = $localeResolver;
         $this->urlBuilder = $urlBuilder;
@@ -125,9 +108,9 @@ class TokenRequestDataBuilder
         $data['locale'] = $this->requestDataBuilder->getLocale();
         $data['transaction_type'] = self::TYPE_CREATE_TOKEN;
         $data['reference_number'] = 'token_request_' . $orderId;
-        $data[self::KEY_QUOTE_ID] = $orderId;
+        $data[RequestDataBuilder::KEY_QUOTE_ID] = $orderId;
         if ($this->gatewayConfig->isSilent()) {
-            $data[self::KEY_SID] = $this->encryptor->encrypt($sessionId);
+            $data[RequestDataBuilder::KEY_SID] = $this->encryptor->encrypt($sessionId);
         }
         $data['amount'] = '0.00';
         $data['currency'] = $currency;
@@ -145,13 +128,13 @@ class TokenRequestDataBuilder
         $data['bill_to_address_postal_code'] = $billingAddress->getPostcode();
 
         $data['skip_decision_manager'] = $this->gatewayConfig->getValue(
-            self::KEY_TOKEN_SKIP_DM
+            \CyberSource\SecureAcceptance\Gateway\Config\Config::KEY_TOKEN_SKIP_DM
         ) ? 'true' : 'false';
 
         $data['skip_auto_auth'] = 'true';
 
         if (!empty($agreementIds)) {
-            $data[self::KEY_AGREEMENT_IDS] = implode(',', $agreementIds);
+            $data[RequestDataBuilder::KEY_AGREEMENT_IDS] = implode(',', $agreementIds);
         }
 
         $data['override_custom_receipt_page'] = $this->urlBuilder->getUrl(

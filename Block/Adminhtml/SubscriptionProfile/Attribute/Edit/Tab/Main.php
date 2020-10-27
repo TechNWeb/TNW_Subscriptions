@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute\Edit\Tab;
 
 use Magento\Eav\Block\Adminhtml\Attribute\Edit\Main\AbstractMain;

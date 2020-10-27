@@ -5,7 +5,7 @@
  */
 /** @var TNW\Subscriptions\Block\Sales\Order\Additional\InitialFee $block */
 ?>
-<?php if ($initialFee = $block->getInitialFee()): ?>
+<?php if($initialFee = $block->getInitialFee()) : ?>
     <div class="sub-profile-option">
         <b><?= /* @escapeNotVerified */ __('Initial fee included')?></b><br>
         <span><?= /* @escapeNotVerified */ $block->getOrder()->formatPrice($initialFee) ?></span>

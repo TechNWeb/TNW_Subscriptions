@@ -46,6 +46,7 @@ class Configurable extends Base
         return $data;
     }
 
+
     /**
      * @inheritdoc
      */

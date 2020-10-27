@@ -3,17 +3,26 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml;
 
-/**
- * Class ProductBillingFrequency - abstract controller
- */
 abstract class ProductBillingFrequency extends \Magento\Backend\App\Action
 {
-    /**
-     * ACL value
-     */
+
+    protected $_coreRegistry;
     const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+
+    /**
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\Registry $coreRegistry
+     */
+    public function __construct(
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\Registry $coreRegistry
+    ) {
+        $this->_coreRegistry = $coreRegistry;
+        parent::__construct($context);
+    }
 
     /**
      * Init page

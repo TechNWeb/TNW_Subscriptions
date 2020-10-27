@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Customer\Api\CustomerMetadataInterface;
@@ -17,12 +18,12 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
-use Magento\Vault\Api\PaymentTokenManagementInterface;
-use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 
 /**
  * Create quotes for subscription in admin area.
@@ -146,7 +147,7 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if ($session->getStoreId()) {
-            if ($session->getCurrencyId()) {
+            if ($session->getCurrencyId()){
                 $quote->setQuoteCurrencyCode($session->getCurrencyId());
             }
             $quote->setCustomerGroupId($this->groupManagement->getDefaultGroup()->getId());
@@ -215,7 +216,8 @@ class Quote extends Create implements QuoteCreateInterface
     public function fillCustomerData(CustomerInterface $customer, ModelQuote $quote)
     {
         $quoteData = [];
-        if (!$quote->getCustomerId()
+        if (
+            !$quote->getCustomerId()
             && !$quote->getPayment()->getAdditionalInformation('customer_id')
             && $quote->getPayment()->getAdditionalInformation('public_hash')
             && $customer->getId()
@@ -264,9 +266,10 @@ class Quote extends Create implements QuoteCreateInterface
         return $customerForm;
     }
 
+
     /**
      * @param ModelQuote $quote
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Exception
      */
     public function validate(ModelQuote $quote)
     {
@@ -275,7 +278,7 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if (!$session->getStore()->getId()) {
-            throw new \Magento\Framework\Exception\LocalizedException(__('Please select a store'));
+            throw new \Exception(__('Please select a store'));
         }
         $items = $quote->getAllVisibleItems();
 
@@ -287,9 +290,7 @@ class Quote extends Create implements QuoteCreateInterface
         foreach ($items as $item) {
             $messages = $item->getMessage(false);
             if ($item->getHasError() && is_array($messages) && !empty($messages)) {
-                foreach ($messages as $message) {
-                    $errors[] = $message;
-                }
+                $errors = array_merge($errors, $messages);
             }
         }
 
@@ -320,7 +321,7 @@ class Quote extends Create implements QuoteCreateInterface
                 $this->getContext()->getMessageManager()->addError($error);
             }
             //Maybe we need to delete customer in this case.
-            throw new  \Magento\Framework\Exception\LocalizedException(__('Quote validation is failed.'));
-        }
+            throw new \Exception(__('Quote validation is failed.'));
+        };
     }
 }

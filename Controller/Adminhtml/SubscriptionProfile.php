@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml;
 
 use Magento\Backend\App\Action;
@@ -58,10 +59,8 @@ abstract class SubscriptionProfile extends Action
     {
         $resultPage->setActiveMenu('TNW_Subscriptions::tnw_subscriptions_subscription_profile')
             ->addBreadcrumb(__('TNW'), __('TNW'))
-            ->addBreadcrumb(
-                __('Subscription Profile'),
-                __('Subscription Profile')
-            );
+            ->addBreadcrumb(__('Subscription Profile'),
+                __('Subscription Profile'));
 
         return $resultPage;
     }
@@ -84,9 +83,6 @@ abstract class SubscriptionProfile extends Action
         );
     }
 
-    /**
-     * Clear session data
-     */
     protected function clearSessionData()
     {
         $this->_getSession()->clearStorage();

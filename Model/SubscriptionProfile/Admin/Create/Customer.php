@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Customer\Api\AccountManagementInterface;
@@ -18,7 +19,7 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 /**
- * Class Customer - create customer admin model
+ * Class Customer
  */
 class Customer extends Create
 {
@@ -63,7 +64,6 @@ class Customer extends Create
      * @param AccountManagementInterface $accountManagement
      * @param AddressRepositoryInterface $addressRepository
      * @param DataObjectHelper $dataObjectHelper
-     * @param CustomerInterfaceFactory $customerDataFactory
      */
     public function __construct(
         Context $context,
@@ -83,11 +83,7 @@ class Customer extends Create
     }
 
     /**
-     * @return CustomerInterface|null
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\State\InputMismatchException
+     * @return CustomerInterface
      */
     public function prepareCustomer()
     {
@@ -140,7 +136,7 @@ class Customer extends Create
                     $subQuote->getShippingAddress()->setSaveInAddressBook(false);
                     $alreadySaveShipping = true;
                 }
-            } elseif (!$subQuote->isVirtual()) {
+            }elseif (!$subQuote->isVirtual()){
                 $address = $subQuote->getShippingAddress()->setCustomerId($customer->getId());
                 $address->setSaveInAddressBook(false);
                 $subQuote->setShippingAddress($address);
@@ -155,8 +151,6 @@ class Customer extends Create
      *
      * @param Store $store
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function customerIsInStore(Store $store)
     {
@@ -172,7 +166,7 @@ class Customer extends Create
      *
      * @param CustomerInterface $customer
      * @return CustomerInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Exception
      */
     private function validateCustomerData(CustomerInterface $customer)
     {
@@ -184,7 +178,7 @@ class Customer extends Create
                     $this->getContext()->log($error);
                     $this->getContext()->getMessageManager()->addError($error);
                 }
-                throw new \Magento\Framework\Exception\LocalizedException(__('Customer validation failed.'));
+                throw new \Exception(__('Customer validation failed.'));
             }
         }
 
@@ -195,11 +189,8 @@ class Customer extends Create
      * Create customer address and save it.
      *
      * @param CustomerInterface $customer
-     * @param MagentoQuote\Address $quoteCustomerAddress
-     * @return CustomerInterface
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\State\InputMismatchException
+     * @param Address $quoteCustomerAddress
+     * @return \Magento\Customer\Api\Data\CustomerInterface
      */
     private function saveCustomerAddress(
         CustomerInterface $customer,
@@ -224,12 +215,12 @@ class Customer extends Create
 
         switch ($addressType) {
             case MagentoQuote\Address::ADDRESS_TYPE_BILLING:
-                if ($customer->getDefaultBilling() === null) {
+                if (is_null($customer->getDefaultBilling())) {
                     $customerAddress->setIsDefaultBilling(true);
                 }
                 break;
             case MagentoQuote\Address::ADDRESS_TYPE_SHIPPING:
-                if ($customer->getDefaultShipping() === null) {
+                if (is_null($customer->getDefaultShipping())) {
                     $customerAddress->setIsDefaultShipping(true);
                 }
                 break;
@@ -246,10 +237,8 @@ class Customer extends Create
     /**
      * Returns customer by id.
      *
-     * @param null $customerId
-     * @return CustomerInterface|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @param int|null $customerId
+     * @return CustomerInterface
      */
     public function getCustomer($customerId = null)
     {

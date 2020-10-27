@@ -3,21 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml;
 
-/**
- * Class BillingFrequency - abstract controller
- */
 abstract class BillingFrequency extends \Magento\Backend\App\Action
 {
-    /**
-     * @var \Magento\Framework\Registry
-     */
-    protected $_coreRegistry;
 
-    /**
-     * ACL value
-     */
+    protected $_coreRegistry;
     const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
 
     /**

@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct;
 
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlFactory;
+use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Fieldset;
@@ -161,5 +163,53 @@ class Configurable extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * Return 'Edit options' button meta data.
+     *
+     * @return array
+     */
+    private function editOptionsButtonMeta()
+    {
+        $currentFormName = $this->registry->registry('form_full_name');
+        $leftContainerName = $currentFormName . '.description_fieldset.left_container';
+
+        $customOptions = $this->getItem()->getCustomOptions();
+
+        return [
+            'children' => [
+                'edit_options' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'formElement' => UiContainer::NAME,
+                                'componentType' => UiContainer::NAME,
+                                'component' => 'TNW_Subscriptions/js/components/options-button',
+                                'additionalClasses' => 'edit-options-button action-advanced action-additional',
+                                'additionalForGroup' => true,
+                                'displayAsLink' => true,
+                                'title' => '[' . __('Edit options') . ']',
+                                'actions' => [
+                                    [
+                                        'targetName' => $leftContainerName . '.edit_options',
+                                        'actionName' => 'editOptions',
+                                        'params' =>  [
+                                            $this->getProduct()->getId(), //product id
+                                            $this->getItem()->getId(),  //subscription item id
+                                            $this->getItem()->getSubscriptionProfileId(),  // subscription id
+                                            isset($customOptions['info_buyRequest']['super_attribute'])
+                                                ? $this->serializer->serialize($customOptions['info_buyRequest']['super_attribute'])
+                                                : '', //super attributes data
+                                        ],
+                                    ],
+                                ],
+                                'configureUrl' => $this->getConfigureUrl(),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

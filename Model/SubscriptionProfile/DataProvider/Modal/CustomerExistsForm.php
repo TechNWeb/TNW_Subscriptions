@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -31,6 +32,5 @@ class CustomerExistsForm extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
     }
 }

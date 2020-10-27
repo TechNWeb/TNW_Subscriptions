@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Eav\Setup\EavSetupFactory;
@@ -16,9 +17,6 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
-/**
- * Class InstallData - install data required for proper extension functioning
- */
 class InstallData implements InstallDataInterface
 {
     /**

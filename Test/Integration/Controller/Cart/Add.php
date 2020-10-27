@@ -120,8 +120,7 @@ class Add extends AbstractController
      */
     public function testProductAddToCartWithDisabledSubscriptions()
     {
-        $expectedResult = '{"error":true,"message":"We can\'t add this item'
-            . ' to your subscription shopping cart right now."}';
+        $expectedResult = '{"error":true,"message":"We can\'t add this item to your subscription shopping cart right now."}';
         /** @var ProductRepositoryInterface $productRepository */
         $productRepository = Bootstrap::getObjectManager()->get(ProductRepositoryInterface::class);
         $product = $productRepository->get('s1');

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Change\History;
 
 use Magento\FrameWork\App\RequestInterface;
@@ -14,7 +15,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Col
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 
 /**
- * Class DataProvider for history
+ * Class DataProvider
  */
 class DataProvider extends AbstractDataProvider
 {
@@ -107,8 +108,7 @@ class DataProvider extends AbstractDataProvider
         $convertedData['message'] = $messageHistoryData['is_comment']
             ? sprintf('"%s"', $messageHistoryData['message'])
             : $messageHistoryData['message'];
-        $convertedData['author'] = $this->getProfileChangeAuthor($messageHistoryData);
-        ;
+        $convertedData['author'] = $this->getProfileChangeAuthor($messageHistoryData);;
         // date format like "August 23rd, 2017   2:04:15 PM"
         $convertedData['date'] = $this->timezone->formatDateTime(
             $messageHistoryData['created_at'],

@@ -4,12 +4,13 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Phrase;
 
 /**
- * Messages pool - model
+ * Messages pool.
  */
 class MessagePool
 {

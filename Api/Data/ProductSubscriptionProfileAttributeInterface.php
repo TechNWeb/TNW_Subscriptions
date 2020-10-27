@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api\Data;
 
 /**
@@ -10,9 +11,6 @@ namespace TNW\Subscriptions\Api\Data;
  */
 interface ProductSubscriptionProfileAttributeInterface extends \Magento\Eav\Api\Data\AttributeInterface
 {
-    /**
-     * Is visible on front field name
-     */
     const IS_VISIBLE_ON_FRONT = 'is_visible_on_front';
 
     /**

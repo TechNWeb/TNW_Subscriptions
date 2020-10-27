@@ -9,9 +9,6 @@ use Magento\Framework\Api\ExtensionAttribute;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Api\SimpleDataObjectConverter;
 
-/**
- * Class ExtensionAttributes - ResourceModel
- */
 class ExtensionAttributes
 {
     /**
@@ -29,12 +26,6 @@ class ExtensionAttributes
      */
     private $joinProcessorHelper;
 
-    /**
-     * ExtensionAttributes constructor.
-     * @param ExtensionAttributesFactory $extensionAttributesFactory
-     * @param ExtensionAttribute\JoinProcessor $joinProcessor
-     * @param ExtensionAttribute\JoinProcessorHelper $joinProcessorHelper
-     */
     public function __construct(
         ExtensionAttributesFactory $extensionAttributesFactory,
         ExtensionAttribute\JoinProcessor $joinProcessor,
@@ -106,9 +97,7 @@ class ExtensionAttributes
 
             $tableAlias = $this->joinProcessorHelper->getReferenceTableAlias($attributeCode);
             $select->joinLeft(
-                [$tableAlias => $resource->getTable(
-                    $joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_TABLE]
-                )],
+                [$tableAlias => $resource->getTable($joinData[ExtensionAttribute\Config\Converter::JOIN_REFERENCE_TABLE])],
                 sprintf(
                     'main_table.%s = %s.%s',
                     $joinData[ExtensionAttribute\Config\Converter::JOIN_ON_FIELD],

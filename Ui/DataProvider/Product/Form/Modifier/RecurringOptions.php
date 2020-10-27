@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
@@ -29,9 +30,9 @@ use TNW\Subscriptions\Model\Backend\UrlBuilder;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 
 /**
  * Data provider for "Recurring Options" panel
@@ -213,7 +214,24 @@ class RecurringOptions extends BaseModifier
 
                 $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
                 if (!empty($subscriptionProfiles->getItems())) {
-                    $this->addSubscriptionProfileOptions($subscriptionProfiles, $optionArray, $options);
+                    try {
+                        $subscriptionArray = [];
+                        foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
+                            $productSubscription = $this->productSubscriptionProfileRepository
+                                ->getById($subscriptionProfile['entity_id']);
+                            if (
+                                $productSubscription->getData()['magento_product_id']
+                                == $this->locator->getProduct()->getId()
+                            ) {
+                                $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
+                                    $subscriptionProfile['entity_id'], true
+                                );
+                            }
+                        }
+                        $options[] = array_merge($optionArray, $subscriptionArray);
+                    } catch (NoSuchEntityException $e) {
+                        $options[] = $optionArray;
+                    }
                 } else {
                     $options[] = $optionArray;
                 }
@@ -233,33 +251,6 @@ class RecurringOptions extends BaseModifier
         }
 
         return $data;
-    }
-
-    /**
-     * @param $subscriptionProfiles
-     * @param $optionArray
-     * @param $options
-     */
-    private function addSubscriptionProfileOptions($subscriptionProfiles, &$optionArray, &$options)
-    {
-        try {
-            $subscriptionArray = [];
-            foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
-                $productSubscription = $this->productSubscriptionProfileRepository
-                    ->getById($subscriptionProfile['entity_id']);
-                if ($productSubscription->getData()['magento_product_id']
-                    == $this->locator->getProduct()->getId()
-                ) {
-                    $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
-                        $subscriptionProfile['entity_id'],
-                        true
-                    );
-                }
-            }
-            $options[] = array_merge($optionArray, $subscriptionArray);
-        } catch (NoSuchEntityException $e) {
-            $options[] = $optionArray;
-        }
     }
 
     /**
@@ -337,10 +328,11 @@ class RecurringOptions extends BaseModifier
      */
     private function getHeaderContainerConfig($sortOrder)
     {
+
         $content = __(
-            'Recurring option allows the merchant to specify the billing frequency '
-            . 'for the product along with other features'
+            'Recurring option allows the merchant to specify the billing frequency for the product along with other features'
         );
+
         return [
             'arguments' => [
                 'data' => [
@@ -684,17 +676,12 @@ class RecurringOptions extends BaseModifier
                         ],
                         'visible' => !$this->getIsConfigurableProduct(),
                         'imports' => [
-                            'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE
-                                . ':checked',
+                            'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
                             'changeCommentAndValue' => 'index = price:value',
-                            'changeCommentLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE
-                                . ':checked',
-                            'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT
-                                . ':checked',
-                            'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT
-                                . ':value',
-                            'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE
-                                . ':value',
+                            'changeCommentLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE  . ':checked',
+                            'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
+                            'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT . ':value',
+                            'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
                             '__disableTmpl' => [
                                 'disabled' => false
                             ]
@@ -706,10 +693,6 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
-    /**
-     * @param $sortOrder
-     * @return array
-     */
     private function getPriceFieldDescriptionConfig($sortOrder)
     {
         return [
@@ -767,9 +750,11 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
+
     /**
+     * Get data for drop-down control with billing frequencies
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getBillingFrequencies()
     {

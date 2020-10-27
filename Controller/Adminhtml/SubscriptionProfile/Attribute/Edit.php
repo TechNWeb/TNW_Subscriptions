@@ -3,11 +3,9 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
-/**
- * Class Edit - controller
- */
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
     /**
@@ -57,9 +55,9 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
         $item = $id ? __('Edit Subscription Profile Attribute') : __('New Subscription Profile Attribute');
 
         $resultPage = $this->createActionPage($item);
-        $resultPage->getConfig()->getTitle()->prepend($id
-            ? $model->getName()
-            : __('New Subscription Profile Attribute'));
+        $resultPage->getConfig()->getTitle()->prepend($id ? $model->getName() : __('New Subscription Profile Attribute'));
+//        $resultPage->getLayout()
+//            ->getBlock('attribute_edit_js');
 
         return $resultPage;
     }

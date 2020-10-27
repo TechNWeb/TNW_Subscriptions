@@ -7,25 +7,19 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Calculate "total" profit, "remaining" profit and "as of today" profit for given subscription profile.
  */
 class ProfitCalculator
 {
-    /**
-     * Profile type as of today value
-     */
+    /** Profit types. */
     const AS_OF_TODAY = 'as_of_today';
-
-    /**
-     * Profile type remaining value
-     */
     const REMAINING = 'remaining';
 
     /**
@@ -264,9 +258,11 @@ class ProfitCalculator
                     } else {
                         $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
                         return $profit;
+                        break;
                     }
                 default:
                     return null;
+                    break;
             }
         }
         return $profit;

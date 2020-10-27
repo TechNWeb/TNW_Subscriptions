@@ -3,14 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
-/**
- * Class NewCustomerButton - adminhtml block for create profile button new customer
- */
 class NewCustomerButton extends GenericButton implements ButtonProviderInterface
 {
     /**
@@ -38,7 +36,7 @@ class NewCustomerButton extends GenericButton implements ButtonProviderInterface
         $url = '*/*/';
         $params = [];
 
-        if ($step) {
+        if ($step){
             $url = 'tnw_subscriptions/subscriptionprofile_create/process';
             $params = [
                 StepPool::STEP_PARAM_NAME => $step,

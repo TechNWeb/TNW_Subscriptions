@@ -8,9 +8,6 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
-/**
- * Class SalesQuoteLoadAfter - observer
- */
 class SalesQuoteLoadAfter implements ObserverInterface
 {
     /**

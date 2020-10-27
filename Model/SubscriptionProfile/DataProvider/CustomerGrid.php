@@ -3,13 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Customer\Model\ResourceModel\Grid\CollectionFactory;
 
 /**
- * Class CustomerGrid - dataProvider for customer grid
+ * Class CustomerGrid
  */
 class CustomerGrid extends AbstractDataProvider
 {
@@ -31,12 +32,7 @@ class CustomerGrid extends AbstractDataProvider
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
-        parent::__construct(
-            $name,
-            $primaryFieldName,
-            $requestFieldName,
-            $meta,
-            $data
-        );
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
+            $data);
     }
 }

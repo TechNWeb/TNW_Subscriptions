@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Status\Modifier;
 
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
@@ -34,16 +35,14 @@ class StatusSuspended extends Base
             'relation.subscription_profile_id = profile.entity_id',
             []
         )->where(
-            'profile.status NOT IN (?)',
-            $this->getIgnoredStatuses()
+            'profile.status NOT IN (?)',  $this->getIgnoredStatuses()
         )->where(
             'relation.magento_order_id IS NULL'
         )->where(
             "relation.scheduled_at <= '{$this->getSuspendDate()}' 
             OR main_table.attempt_count >= '{$this->config->getAttemptCount()}'"
         )->where(
-            'profile.entity_id IN (?)',
-            $allIds
+            'profile.entity_id IN (?)', $allIds
         )->group(
             SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
         );
@@ -59,11 +58,11 @@ class StatusSuspended extends Base
         return ProfileStatus::STATUS_SUSPENDED;
     }
 
+
     /**
      * Returns formatted profile suspend date.
      *
-     * @return string
-     * @throws \Exception
+     * @return null|string
      */
     private function getSuspendDate()
     {

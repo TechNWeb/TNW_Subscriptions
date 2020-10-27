@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
@@ -11,7 +12,7 @@ use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
- * Base form modifier - Ui
+ * Base form modifier.
  */
 class BaseFormModifier implements ModifierInterface
 {

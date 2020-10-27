@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit;
 
 use Magento\Framework\Data\OptionSourceInterface;
@@ -28,6 +29,7 @@ class CancelButtonPopupOptions implements OptionSourceInterface
                     'value' => 'next'
                 ]
             ];
+
 
         return $result;
     }

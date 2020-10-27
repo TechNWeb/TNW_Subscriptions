@@ -3,13 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\InvalidEngineException;
 
 /**
- * Class EnginePool - poll for subscription profile engines
+ * Class EnginePool
  */
 class EnginePool
 {

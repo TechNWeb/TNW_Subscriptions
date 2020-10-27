@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Locale\Format;
@@ -124,7 +125,7 @@ class Context
      */
     public function __call($name, $arguments)
     {
-        if (\stripos($name, 'message') !== 0) {
+        if (\stripos($name, 'message') !== 0){
             throw new \BadMethodCallException('Unknown method');
         }
 
@@ -252,8 +253,7 @@ class Context
 
     public function throwException($message)
     {
-        $message = is_string($message) ? __($message) : $message;
-        throw new \Magento\Framework\Exception\LocalizedException($message);
+        throw new \Exception($message);
     }
 
     /**
@@ -304,6 +304,7 @@ class Context
 
         return json_encode($priceFormatData);
     }
+
 
     /**
      * Inserts element before element in array.

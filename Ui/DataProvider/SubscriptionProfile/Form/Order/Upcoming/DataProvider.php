@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Order\Upcoming;
 
 use Magento\Framework\App\RequestInterface;
@@ -74,6 +75,7 @@ class DataProvider extends AbstractDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -101,13 +103,11 @@ class DataProvider extends AbstractDataProvider
                 []
             )->join(
                 ['shipping_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
-                'main_table.entity_id=shipping_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID
-                . ' AND shipping_address_table.address_type = \'shipping\'',
+                'main_table.entity_id=shipping_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND shipping_address_table.address_type = \'shipping\'',
                 []
             )->join(
                 ['billing_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
-                'main_table.entity_id=billing_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID
-                . ' AND billing_address_table.address_type = \'billing\'',
+                'main_table.entity_id=billing_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND billing_address_table.address_type = \'billing\'',
                 []
             )->where(
                 'relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is NULL'
@@ -176,4 +176,5 @@ class DataProvider extends AbstractDataProvider
 
         return $quoteData;
     }
+
 }

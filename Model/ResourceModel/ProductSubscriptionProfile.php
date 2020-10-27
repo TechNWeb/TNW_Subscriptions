@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ResourceModel;
 
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -45,9 +46,10 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
     }
 
     /**
+     * Get profile ids by product ids
+     *
      * @param array $productIds
-     * @return array
-     * @throws \Zend_Db_Statement_Exception
+     * @return array [product_id(int), profile_id(int), profile_status(int)]
      */
     public function getProfileStatusByProductIds(array $productIds = [])
     {
@@ -65,9 +67,7 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
                 ]
             );
             $select->join(
-                ['profile' => $this->getTable(
-                    \TNW\Subscriptions\Model\SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY
-                )],
+                ['profile' => $this->getTable(\TNW\Subscriptions\Model\SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
                 sprintf(
                     "main.%s = profile.%s",
                     ProductSubscriptionProfileInterface::SUBSCRIPTION_PROFILE_ID,
@@ -85,7 +85,7 @@ class ProductSubscriptionProfile extends \Magento\Eav\Model\Entity\AbstractEntit
             $result = $this->getConnection()->query($select)->fetchAll();
         }
 
-        return $result ?: [];
+        return $result ? : [];
     }
 
     /**

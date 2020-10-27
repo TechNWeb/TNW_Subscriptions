@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\OrderItem;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
@@ -10,13 +11,10 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem;
 use TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\OrderItem as Resource;
 
 /**
- * Class Collection - ExtensionAttributes OrderItem resource model
+ * Class Collection
  */
 class Collection extends AbstractCollection
 {
-    /**
-     * @var string
-     */
     protected $_idFieldName = 'item_id';
 
     /**

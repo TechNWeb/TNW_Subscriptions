@@ -5,9 +5,6 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Report;
 
-/**
- * Class BillingFrequencyCustomers - controller
- */
 class BillingFrequencyCustomers extends \Magento\Backend\App\Action
 {
     /**

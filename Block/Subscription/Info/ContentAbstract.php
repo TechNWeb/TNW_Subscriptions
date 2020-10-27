@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Framework\App\ObjectManager;
@@ -88,8 +89,7 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
     /**
      * Return messages block.
      *
-     * @return \Magento\Framework\View\Element\BlockInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return \TNW\Subscriptions\Block\Subscription\Info\Messages|bool
      */
     public function getTabMessagesBlock()
     {
@@ -108,7 +108,6 @@ class ContentAbstract extends \Magento\Framework\View\Element\Template
      * Return messages HTML.
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getTabMessagesHtml()
     {

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Console\Command;
 
 use Magento\Framework\App\State;
@@ -14,7 +15,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TNW\Subscriptions\Cron\ProfileProcessorFactory;
+use TNW\Subscriptions\Cron\ProfileProcessor;
 use TNW\Subscriptions\Model\Config;
 
 /**
@@ -28,11 +29,11 @@ class ProcessCommand extends Base
     const PROCESS_LOCK_FILE = 'subscription_process.lock';
 
     /**
-     * Profile processor Factory.
+     * Profile processor.
      *
-     * @var ProfileProcessorFactory
+     * @var ProfileProcessor
      */
-    private $profileProcessorFactory;
+    private $profileProcessor;
 
     /**
      * ProcessCommand constructor.
@@ -42,8 +43,7 @@ class ProcessCommand extends Base
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
-     * @param ProfileProcessorFactory $profileProcessorFactory
-     * @throws FileSystemException
+     * @param ProfileProcessor $profileProcessor
      */
     public function __construct(
         Filesystem $filesystem,
@@ -52,11 +52,12 @@ class ProcessCommand extends Base
         Config $config,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
-        ProfileProcessorFactory $profileProcessorFactory
+        ProfileProcessor $profileProcessor
     ) {
-        $this->profileProcessorFactory = $profileProcessorFactory;
+        $this->profileProcessor = $profileProcessor;
         parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager);
     }
+
 
     /**
      * {@inheritdoc}
@@ -90,9 +91,9 @@ class ProcessCommand extends Base
 
         try {
             $this->setAreaCode();
-            foreach ($this->getStoreManager()->getWebsites() as $website) {
-                if ($this->getConfig()->isSubscriptionsActive($website->getId())) {
-                    $this->profileProcessorFactory->create()->process($website->getId());
+            foreach ($this->getStoreManager()->getWebsites() as $website){
+                if ($this->getConfig()->isSubscriptionsActive($website->getId())){
+                    $this->profileProcessor->process($website->getId());
                 }
             }
             $this->unlockProcess($fileStream);

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Quote\Model\Quote;
@@ -10,14 +11,8 @@ use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
-/**
- * Interface EngineInterface - used to define the logic required for implementation for payment processors
- */
 interface EngineInterface
 {
-    /**
-     * Payment data key value
-     */
     const PAYMENT_DATA_KEY = 'profile_edit_payment_data';
 
     /**

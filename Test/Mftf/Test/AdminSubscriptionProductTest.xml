@@ -42,9 +42,13 @@
         <!--<click stepKey="tnwSubscriptionsTabAddFrequency2" selector='.tnw-subscriptions-tab .action-select.admin__action-multiselect li.admin__action-multiselect-menu-inner-item .action-menu-item'/>-->
         <click stepKey="tnwSubscriptionsTabAddFrequency2" selector='Locator::firstElement(".tnw-subscriptions-tab li.admin__action-multiselect-menu-inner-item .action-menu-item")'/>
         <!--//*[@id="TWB1YTO"]/div[2]/ul/li[3]/div/label/span-->
+
+
         <!--<searchAndMultiSelectOption selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" parameterArray="['Day']" stepKey="searchAndSelectFrequency"/>-->
         <!--<selectOption userInput="Daily frequency5bf6c0273ae32" selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" stepKey="searchFrequency"/>-->
         <!--<searchAndMultiSelectOption selector=".tnw-subscriptions-tab .action-select.admin__action-multiselect" parameterArray="['Day']" stepKey="searchAndSelectFrequency"/>-->
+
         <wait time="60" stepKey="PageLoad6"/>
+
     </test>
 </tests>

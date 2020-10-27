@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info\Messages;
 
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
@@ -47,7 +48,8 @@ class ExpireWarningProcessor
     {
         if ($block instanceof ExpireWarningSupportInterface && $block->isSupported()) {
             $relation = $this->getNextProfileRelation($block->getSubscriptionProfile());
-            if (false !== $relation &&
+            if (
+                false !== $relation &&
                 $this->profileCcUtils->isCcExpireBy($block->getSubscriptionProfile(), $relation->getScheduledAt(), true)
             ) {
                 $block->getMessagePool()->addMessage(

@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Block\Product\View;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -134,20 +135,10 @@ class Subscribe extends View
         $this->subscriptionTypeResolver = $subscriptionTypeResolver;
         $this->priceCalculator = $priceCalculator;
         $this->trialLengthUnitType = $trialLengthUnitType;
-        parent::__construct(
-            $context,
-            $urlEncoder,
-            $jsonEncoder,
-            $string,
-            $productHelper,
-            $productTypeConfig,
-            $localeFormat,
-            $customerSession,
-            $productRepository,
-            $priceCurrency,
-            $data
-        );
+        parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
+            $localeFormat, $customerSession, $productRepository, $priceCurrency, $data);
     }
+
 
     /**
      * Retrieve current product model.
@@ -202,10 +193,8 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        return (
-            $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
-                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
-            )
+        return ( $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
+                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE )
             && $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
     }
 
@@ -215,9 +204,10 @@ class Subscribe extends View
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function isOnlySubscribePurchase()
+    public function IsOnlySubscribePurchase()
     {
-        if ($this->subscriptionProductViewConfig->isOneTimeAndSubscribePurchase($this->getProduct())
+        if (
+            $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct())
             && $this->getPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
         ) {
             return true;
@@ -231,10 +221,10 @@ class Subscribe extends View
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function isOneTimeAndSubscribePurchase()
+    public function IsOneTimeAndSubscribePurchase()
     {
         return $this->getPurchaseType() ===  PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
-            && $this->subscriptionProductViewConfig->isOneTimeAndSubscribePurchase($this->getProduct());
+            && $this->subscriptionProductViewConfig->IsOneTimeAndSubscribePurchase($this->getProduct());
     }
 
     /**
@@ -284,8 +274,6 @@ class Subscribe extends View
      * Returns product billing frequencies as array.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getFrequencyOptions()
     {
@@ -355,9 +343,7 @@ class Subscribe extends View
     /**
      * Returns list of product billing frequencies.
      *
-     * @return array|ProductBillingFrequencyInterface[]
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return array
      */
     private function getProductBillingFrequencies()
     {
@@ -397,7 +383,6 @@ class Subscribe extends View
      * Can allow display Subscribe Qty
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getAllowDisplaySubscribeQty()
     {
@@ -409,17 +394,12 @@ class Subscribe extends View
      * Returns product savings calculation type.
      *
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getSavingCalculationType()
     {
         return $this->savingsCalculation->getSavingsCalculationType($this->getProduct());
     }
 
-    /**
-     * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
     public function getDefaultFrequency()
     {
         return $this->preconfiguredValue('subscription_data/unique/billing_frequency');
@@ -428,9 +408,7 @@ class Subscribe extends View
     /**
      * Get default value for Subscribe Qty
      *
-     * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return int
      */
     public function getDefaultSubscribeQty()
     {
@@ -448,8 +426,7 @@ class Subscribe extends View
     /**
      * Get is need check until canceled by default
      *
-     * @return bool|mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return string
      */
     public function getDefaultUntilCancelled()
     {
@@ -458,10 +435,9 @@ class Subscribe extends View
     }
 
     /**
-     *  Get is only infinite subscriptions available.
+     * Get is only infinite subscriptions available.
      *
-     * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return string
      */
     public function getIsInfiniteSubscriptions()
     {
@@ -471,8 +447,7 @@ class Subscribe extends View
     /**
      * Get default period value
      *
-     * @return int|string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return string
      */
     public function getDefaultPeriod()
     {
@@ -484,8 +459,9 @@ class Subscribe extends View
     }
 
     /**
+     *
+     *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getIsVisibleStartOn()
     {
@@ -503,7 +479,6 @@ class Subscribe extends View
      * Get default value for Start on
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getDefaultStartOn()
     {
@@ -516,9 +491,7 @@ class Subscribe extends View
 
     /**
      * Get preconfigured options for configurable product
-     *
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getPreconfiguredOptions()
     {
@@ -528,9 +501,7 @@ class Subscribe extends View
 
     /**
      * Get preconfigured custom options for configurable product
-     *
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getPreconfiguredCustomOptions()
     {
@@ -563,6 +534,7 @@ class Subscribe extends View
      *
      * @param ProductInterface $product
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getQtyValidators(ProductInterface $product)
     {
@@ -591,8 +563,6 @@ class Subscribe extends View
      * Returns product data array to display subscription form
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getProductDataArray()
     {
@@ -720,17 +690,17 @@ class Subscribe extends View
                 'trial_start_date' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
                 'trial_label' => strtolower($this->trialLengthUnitType->getLabelByValueAndLength(
                     (int)$productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
-                    $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH)
-                ))
+                    $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH))
+                )
             ];
         }
         return null;
     }
 
     /**
-     * @param $field
-     * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @param string $field
+     *
+     * @return mixed
      */
     private function preconfiguredValue($field)
     {

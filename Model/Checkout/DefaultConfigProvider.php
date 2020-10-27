@@ -5,9 +5,6 @@
  */
 namespace TNW\Subscriptions\Model\Checkout;
 
-/**
- * Class DefaultConfigProvider - default config provider for checkout
- */
 class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInterface
 {
     /**
@@ -125,32 +122,6 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
      */
     private $paymentMethodManagement;
 
-    /**
-     * DefaultConfigProvider constructor.
-     * @param \Magento\Framework\Data\Form\FormKey $formKey
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
-     * @param \Magento\Customer\Model\Address\Config $addressConfig
-     * @param \Magento\Framework\App\Http\Context $httpContext
-     * @param \Magento\Directory\Model\Country\Postcode\ConfigInterface $postCodesConfig
-     * @param \Magento\Customer\Model\Url $customerUrlManager
-     * @param \Magento\Framework\UrlInterface $urlBuilder
-     * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
-     * @param \Magento\Catalog\Helper\Image $imageHelper
-     * @param \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool
-     * @param \Magento\Framework\Locale\FormatInterface $localeFormat
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
-     * @param \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository
-     * @param \Magento\Quote\Api\CartTotalRepositoryInterface $quoteTotalRepository
-     * @param \Magento\Checkout\Helper\Data $checkoutHelper
-     * @param \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
-     * @param \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManager
-     * @param \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
-     */
     public function __construct(
         \Magento\Framework\Data\Form\FormKey $formKey,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -354,11 +325,6 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
         return $quoteData;
     }
 
-    /**
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
     private function getQuoteItemData()
     {
         $quoteItemData = [];
@@ -394,11 +360,6 @@ class DefaultConfigProvider implements \Magento\Checkout\Model\ConfigProviderInt
         return $quoteItemData;
     }
 
-    /**
-     * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
     private function getQuoteGroupData()
     {
         $quoteGroupData = [];

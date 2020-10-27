@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Quote;
 
 use Magento\Tax\Api\Data\QuoteDetailsItemInterface;
@@ -11,6 +12,7 @@ use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector as MagentoCollector;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use Magento\Framework\Serialize\SerializerInterface;
+
 
 /**
  * Plugin for tax collector model.

@@ -9,9 +9,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 
-/**
- * Class SalesOrderCreditmemoRegisterBefore - observer
- */
 class SalesOrderCreditmemoRegisterBefore implements ObserverInterface
 {
     /**
@@ -19,10 +16,6 @@ class SalesOrderCreditmemoRegisterBefore implements ObserverInterface
      */
     private $priceCurrency;
 
-    /**
-     * SalesOrderCreditmemoRegisterBefore constructor.
-     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     */
     public function __construct(
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
     ) {

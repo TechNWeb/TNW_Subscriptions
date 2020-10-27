@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Sales\Model\Order;
@@ -69,8 +70,7 @@ class OrderHistory extends ContentAbstract
     }
 
     /**
-     * @return $this|ContentAbstract
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return $this
      */
     protected function _prepareLayout()
     {

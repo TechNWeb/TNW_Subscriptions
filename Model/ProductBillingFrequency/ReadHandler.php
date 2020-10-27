@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\EntityManager\Operation\ExtensionInterface;
@@ -10,9 +11,10 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Model\ProductBillingFrequency;
 
 /**
- * Class ReadHandler - product frequencies read handler
+ * Class ReadHandler
  */
 class ReadHandler implements ExtensionInterface
 {
@@ -27,9 +29,7 @@ class ReadHandler implements ExtensionInterface
     private $billingFrequencyRepository;
 
     /**
-     * ReadHandler constructor.
      * @param RecurringOptionRepository $recurringOptionRepository
-     * @param BillingFrequencyRepository $billingFrequencyRepository
      */
     public function __construct(
         RecurringOptionRepository $recurringOptionRepository,
@@ -42,8 +42,8 @@ class ReadHandler implements ExtensionInterface
     /**
      * @param object $entity
      * @param array $arguments
-     * @return bool|object
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return \Magento\Catalog\Api\Data\ProductInterface|object
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function execute($entity, $arguments = [])
     {
@@ -68,9 +68,10 @@ class ReadHandler implements ExtensionInterface
     }
 
     /**
-     * @param $option
+     * Get Billing Frequency data for title in Recurring options grid.
+     *
+     * @param ProductBillingFrequency $option
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getBillingFrequencyData($option)
     {

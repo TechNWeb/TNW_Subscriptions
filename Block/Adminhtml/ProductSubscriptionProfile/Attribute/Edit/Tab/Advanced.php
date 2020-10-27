@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\ProductSubscriptionProfile\Attribute\Edit\Tab;
 
 use Magento\Backend\Block\Template\Context;
@@ -47,7 +48,6 @@ class Advanced extends Generic
      * @param FormFactory $formFactory
      * @param Yesno $yesNo
      * @param Data $eavData
-     * @param PropertyLocker $propertyLocker
      * @param array $data
      */
     public function __construct(
@@ -68,8 +68,8 @@ class Advanced extends Generic
     /**
      * Adding product form elements for editing attribute.
      *
-     * @return $this|Generic
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return $this
+     * @SuppressWarnings(PHPMD)
      */
     protected function _prepareForm()
     {
@@ -200,9 +200,9 @@ class Advanced extends Generic
     }
 
     /**
-     * Initialize form fields values.
+     * Initialize form fileds values.
      *
-     * @return Generic
+     * @return $this
      */
     protected function _initFormValues()
     {

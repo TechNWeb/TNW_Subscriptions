@@ -4,12 +4,13 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Plugin\Product\ResourceModel;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
 use Magento\Framework\Exception\CouldNotDeleteException;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as ResourceProductSubscriptionProfile;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile AS ResourceProductSubscriptionProfile;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
@@ -64,9 +65,7 @@ class Product
         foreach ($profileIds as $productProfileData) {
             if (!in_array($productProfileData['profile_status'], $availableToDeleteProfileStatus)) {
                 throw new CouldNotDeleteException(
-                    __(
-                        'Product with ID %1 can\'t delete, this product attached to profile with ID %2.'
-                        . ' Profile have status %3',
+                    __('Product with ID %1 can\'t delete, this product attached to profile with ID %2. Profile have status %3',
                         $productProfileData['product_id'],
                         $productProfileData['profile_id'],
                         $this->profileStatus->getLabelByValue($productProfileData['profile_status'])

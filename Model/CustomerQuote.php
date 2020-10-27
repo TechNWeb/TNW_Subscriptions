@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use TNW\Subscriptions\Api\Data\CustomerQuoteInterface;
@@ -10,7 +11,7 @@ use Magento\Framework\Model\AbstractModel;
 use TNW\Subscriptions\Model\ResourceModel\CustomerQuote as Resource;
 
 /**
- * Class CustomerQuote - class used as customer Quote model
+ * Class CustomerQuote
  */
 class CustomerQuote extends AbstractModel implements CustomerQuoteInterface
 {
@@ -59,4 +60,5 @@ class CustomerQuote extends AbstractModel implements CustomerQuoteInterface
     {
         return $this->setData(self::CUSTOMER_ID, $customerId);
     }
+
 }

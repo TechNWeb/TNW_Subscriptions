@@ -19,8 +19,8 @@ $profileSuccessViewModel = $block->getProfileSuccessViewModel();
                 <li><span><?= __('Order %1 placed', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->escapeHtml($block->getViewOrderUrl()), $block->escapeHtml($block->getOrderId()))) ?></span></li>
                 <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
-                        <span><?= /* @escapeNotVerified */ __('Subscription %1 created,', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($profileSuccessViewModel->getEditUrl($profileOrder)), $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))))?></span>
-                        <span><?= /* @escapeNotVerified */ __('next payment on '), $block->escapeHtml($profileSuccessViewModel->getNextPaymentDate($profileOrder->getSubscriptionProfileId())) ?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created,', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($profileSuccessViewModel->getEditUrl($profileOrder)), $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))))?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('next payment on '), $block->escapeHtml($profileSuccessViewModel->getNextPaymentDate($profileOrder->getSubscriptionProfileId())) ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -29,8 +29,8 @@ $profileSuccessViewModel = $block->getProfileSuccessViewModel();
                 <li><span><?= __('Order %1 placed', $block->escapeHtml($block->getOrderId())) ?></span></li>
                 <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
-                        <span><?= /* @escapeNotVerified */ __('Subscription %1 created,', $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))) ?></span>
-                        <span><?= /* @escapeNotVerified */ __('next payment on '), $block->escapeHtml($profileSuccessViewModel->getNextPaymentDate($profileOrder->getSubscriptionProfileId())) ?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('Subscription %1 created,', $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))) ?></span>
+                        <span><?php echo /* @escapeNotVerified */ __('next payment on '), $block->escapeHtml($profileSuccessViewModel->getNextPaymentDate($profileOrder->getSubscriptionProfileId())) ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>

@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api\Data;
 
 use Magento\Catalog\Model\Product;
@@ -14,11 +15,11 @@ use Magento\Framework\Api\CustomAttributesDataInterface;
 interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterface
 {
     /**
-     * Entity table name
+     * Entity table.
      */
     const ENTITY_TABLE = 'tnw_subscriptions_product_subscription_profile_entity';
 
-    /**#@+
+    /**
      * Constants for field names
      */
     const ID = 'entity_id';
@@ -42,7 +43,6 @@ interface ProductSubscriptionProfileInterface extends CustomAttributesDataInterf
     const SKU = 'sku';
     const TNW_SUBSCR_UNLOCK_PRESET_QTY = 'tnw_subscr_unlock_preset_qty';
     const CUSTOM_OPTIONS = 'custom_options';
-    /**#@-*/
 
     /**
      * Constant for profile magento product

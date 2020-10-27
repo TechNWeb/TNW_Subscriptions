@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
- * Class PayflowPro - used to rpocess save of subscription payed via payflowpro
+ * Class PayflowPro
+ * @package TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile
  */
 class PayflowPro extends Base
 {
@@ -27,7 +28,6 @@ class PayflowPro extends Base
 
     /**
      * PayflowPro constructor.
-     *
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
      * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
@@ -54,7 +54,8 @@ class PayflowPro extends Base
      */
     public function process(array $data)
     {
-        if (empty($data['payment'][$this->getPaymentMethodCode()]['method'])
+        if (
+            empty($data['payment'][$this->getPaymentMethodCode()]['method'])
             || empty($data['payment'][$this->getPaymentMethodCode()]['additional'])
         ) {
             return;

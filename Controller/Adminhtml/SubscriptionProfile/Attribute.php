@@ -3,13 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
-
-use Magento\Framework\View\Result\PageFactory;
 
 /**
  * Subscription profile attribute controller
  */
+namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
+
+use Magento\Framework\Controller\Result;
+use Magento\Framework\View\Result\PageFactory;
+
 abstract class Attribute extends \Magento\Backend\App\Action
 {
     /**
@@ -18,6 +20,11 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * @see _isAllowed()
      */
     const ADMIN_RESOURCE = 'TNW_Subscriptions::SubscriptionProfile_attributes';
+
+//    /**
+//     * @var \Magento\Framework\Cache\FrontendInterface
+//     */
+//    protected $_attributeLabelCache;
 
     /**
      * @var string
@@ -49,6 +56,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
         PageFactory $resultPageFactory
     ) {
         $this->_coreRegistry = $coreRegistry;
+        //$this->_attributeLabelCache = $attributeLabelCache;
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
@@ -95,9 +103,8 @@ abstract class Attribute extends \Magento\Backend\App\Action
     /**
      * Generate code from label
      *
-     * @param $label
-     * @return bool|string
-     * @throws \Zend_Validate_Exception
+     * @param string $label
+     * @return string
      */
     protected function generateCode($label)
     {
@@ -112,7 +119,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
         );
         $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
         if (!$validatorAttrCode->isValid($code)) {
-            $code = 'attr_' . ($code ?: substr(hash('sha512', time()), 0, 8));
+            $code = 'attr_' . ($code ?: substr(hash('sha512',time()), 0, 8));
         }
 
         return $code;

@@ -3,29 +3,19 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
-/**
- * Class DataProvider - for subscription profile order
- */
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
-    /**
-     * @var
-     */
+
     protected $collection;
 
-    /**
-     * @var DataPersistorInterface
-     */
     protected $dataPersistor;
 
-    /**
-     * @var
-     */
     protected $loadedData;
 
     /**

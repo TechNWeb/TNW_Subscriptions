@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute;
 
 /**
@@ -22,7 +23,7 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
      *
      * @var \Magento\Framework\Registry
      */
-    protected $coreRegistry = null;
+    protected $_coreRegistry = null;
 
     /**
      * @param \Magento\Backend\Block\Widget\Context $context
@@ -34,7 +35,7 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
         \Magento\Framework\Registry $registry,
         array $data = []
     ) {
-        $this->coreRegistry = $registry;
+        $this->_coreRegistry = $registry;
         parent::__construct($context, $data);
     }
 
@@ -69,7 +70,7 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
             ['mage-init' => ['button' => ['event' => 'save', 'target' => '#edit_form']]]
         );
 
-        $entityAttribute = $this->coreRegistry->registry('entity_attribute');
+        $entityAttribute = $this->_coreRegistry->registry('entity_attribute');
         if (!$entityAttribute || !$entityAttribute->getIsUserDefined()) {
             $this->buttonList->remove('delete');
         } else {
@@ -95,8 +96,8 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
      */
     public function getHeaderText()
     {
-        if ($this->coreRegistry->registry('entity_attribute')->getId()) {
-            $frontendLabel = $this->coreRegistry->registry('entity_attribute')->getFrontendLabel();
+        if ($this->_coreRegistry->registry('entity_attribute')->getId()) {
+            $frontendLabel = $this->_coreRegistry->registry('entity_attribute')->getFrontendLabel();
             if (is_array($frontendLabel)) {
                 $frontendLabel = $frontendLabel[0];
             }

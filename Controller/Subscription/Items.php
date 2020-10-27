@@ -10,4 +10,5 @@ namespace TNW\Subscriptions\Controller\Subscription;
  */
 class Items extends \TNW\Subscriptions\Controller\Subscription\AbstractView
 {
+
 }

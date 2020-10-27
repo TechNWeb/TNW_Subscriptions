@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
@@ -11,6 +12,7 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Reflection\DataObjectProcessor;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileStatusHistorySearchResultsInterfaceFactory;

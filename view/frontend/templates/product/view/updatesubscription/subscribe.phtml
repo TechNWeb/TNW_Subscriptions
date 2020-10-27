@@ -7,16 +7,16 @@
 /** @var $block \TNW\Subscriptions\Block\Subscription\Product\Edit */
 ?>
 <div class="subscribe-container">
-    <input type="hidden" name="sub_product_id" value="<?= $block->getSubscriptionProductId()?>" />
+    <input type="hidden" name="sub_product_id" value="<?php echo $block->getSubscriptionProductId()?>" />
     <div class="fieldset">
         <div class="field required">
-            <label class="label"><span><?= __('Billing Frequency') ?>:</span></label>
+            <label class="label"><span><?php echo __('Billing Frequency') ?>:</span></label>
             <div class="control">
                 <div class="options-list nested">
                     <?php $currenctFrequency = $this->getCurrentFrequencyData()?>
                     <div class="field choice required">
                         <label class="label billing_frequency">
-                            <span><?= $currenctFrequency['label'] ?></span>
+                            <span><?php echo $currenctFrequency['label'] ?></span>
                         </label>
                     </div>
                 </div>
@@ -25,20 +25,20 @@
     </div>
     <div class="fieldset">
         <div class="field term">
-            <label class="label"><span><?= __('Term') ?>:</span></label>
+            <label class="label"><span><?php echo __('Term') ?>:</span></label>
             <div class="control">
                 <label class="label term">
-                    <span><?= $block->getSubscriptionPeriodLabel() ?></span>
+                    <span><?php echo $block->getSubscriptionPeriodLabel() ?></span>
                 </label>
             </div>
         </div>
     </div>
     <div class="fieldset">
         <div class="field">
-            <label class="label" for="start_at"><span><?= __('Start On') ?>:</span></label>
+            <label class="label" for="start_at"><span><?php echo __('Start On') ?>:</span></label>
             <div class="control">
                 <label class="label starton">
-                    <span><?= $block->getStartOn() ?></span>
+                    <span><?php echo $block->getStartOn() ?></span>
                 </label>
             </div>
         </div>
@@ -47,16 +47,16 @@
         hidden
     <?php endif; ?>">
         <div class="field required">
-            <label class="label" for="subscribe_qty"><span><?= __('Qty') ?>:</span></label>
+            <label class="label" for="subscribe_qty"><span><?php echo __('Qty') ?>:</span></label>
             <div class="control">
                 <input type="number"
                        name="subscribe_qty"
                        id="subscribe_qty"
                        maxlength="12"
-                       value="<?= /* @escapeNotVerified */ $block->getSubProductQty() * 1 ?>"
-                       title="<?= /* @escapeNotVerified */ __('Qty') ?>"
+                       value="<?php /* @escapeNotVerified */ echo $block->getSubProductQty() * 1 ?>"
+                       title="<?php /* @escapeNotVerified */ echo __('Qty') ?>" 
                        class="input-text qty"
-                       data-validate='<?= $block->escapeHtml(\json_encode($block->getQtyValidators())) ?>'
+                       data-validate='<?php echo $block->escapeHtml(\json_encode($block->getQtyValidators())) ?>'
                     <?php if (!$block->getAllowEditSubscribeQty()): ?>
                        readonly="readonly"
                     <?php endif ?>
@@ -66,19 +66,19 @@
     </div>
     <button type="submit"
             id="product-subscribe-button"
-            title="<?= /* @escapeNotVerified */ __('Subscribe') ?>"
+            title="<?php /* @escapeNotVerified */ echo __('Subscribe') ?>"
             class="action primary subscribe">
-        <span data-role="button-text"><?= /* @escapeNotVerified */ __('Update') ?></span>
+        <span data-role="button-text"><?php /* @escapeNotVerified */ echo __('Update') ?></span>
     </button>
 </div>
 <script type="text/x-magento-init">
     {
         "#product_addtocart_form": {
             "tnwSubscribeContainer": {
-                "setQtyFromFrequency": <?= $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
+                "setQtyFromFrequency": <?php echo $block->getAllowEditSubscribeQty() ? 'false' : 'true' ?>,
                 "canShowSubscribePriceBlock" : true,
-                "savingsCalculationType" : "<?= $block->getSavingCalculationType() ?>",
-                "product" : <?= $block->getProductDataArray() ?>
+                "savingsCalculationType" : "<?php echo $block->getSavingCalculationType() ?>",
+                "product" : <?php echo $block->getProductDataArray() ?>
             }
         }
     }

@@ -9,7 +9,8 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
 /**
- * Class Validator - paypal responses validator
+ * Class Validator
+ * @package TNW\Subscriptions\Model\Payment\Paypal
  */
 class Validator
 {
@@ -40,9 +41,9 @@ class Validator
         \TNW\Subscriptions\Model\Payment\Paypal\ValidationResultFactory $validationResultFactory
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
-            $this->payflowFacade = $objectManager->get(\Magento\Paypal\Model\Payflow\Transparent::class);
+            $this->payflowFacade = $objectManager->get("Magento\Paypal\Model\Payflow\Transparent");
             $this->responseValidator = $objectManager
-                ->get(\Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator::class);
+                ->get("Magento\Paypal\Model\Payflow\Service\Response\Validator\ResponseValidator");
         }
         $this->validationResultFactory = $validationResultFactory;
     }

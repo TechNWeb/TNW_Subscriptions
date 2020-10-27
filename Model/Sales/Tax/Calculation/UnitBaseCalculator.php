@@ -230,7 +230,7 @@ class UnitBaseCalculator extends MagentoUnitCalculator implements CalculatorInte
             $unitTaxesBeforeDiscount[] = $unitTaxPerRate;
         }
 
-        return [$unitTaxes, $unitTaxesBeforeDiscount, $appliedTaxes];
+        return array($unitTaxes, $unitTaxesBeforeDiscount, $appliedTaxes);
     }
 
     /**

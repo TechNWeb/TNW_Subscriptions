@@ -3,14 +3,15 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Api;
 
-/**
- * Interface SubscriptionProfileOrderRepositoryInterface - determines the functionality to implement for
- * subscription profile order repository
- */
+use Magento\Framework\Api\SearchCriteriaInterface;
+
 interface SubscriptionProfileOrderRepositoryInterface
 {
+
+
     /**
      * Save SubscriptionProfileOrder
      * @param \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder

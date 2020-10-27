@@ -15,7 +15,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
 /**
- * Class Products - subscription product summary block
+ * Class Products
  */
 class Products extends BaseSummary
 {
@@ -155,7 +155,6 @@ class Products extends BaseSummary
 
     /**
      * @return \DateTime
-     * @throws \Exception
      */
     public function getStartOn()
     {
@@ -171,7 +170,6 @@ class Products extends BaseSummary
      * Start on date formatted.
      *
      * @return string
-     * @throws \Exception
      */
     public function getStartOnFormatted()
     {
@@ -295,9 +293,8 @@ class Products extends BaseSummary
     /**
      * Return formatted price
      *
-     * @param $value
+     * @param string $value
      * @return string
-     * @throws \Zend_Currency_Exception
      */
     public function formatPrice($value)
     {

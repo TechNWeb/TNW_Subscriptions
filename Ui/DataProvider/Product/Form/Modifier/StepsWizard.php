@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Backend\Model\UrlInterface;
@@ -25,8 +26,8 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Service\Serializer;
 
 /**
- * Customize tnw attributes to use steps wizard component.
- */
+* Customize tnw attributes to use steps wizard component.
+*/
 class StepsWizard extends BaseModifier
 {
     /**
@@ -135,9 +136,7 @@ class StepsWizard extends BaseModifier
             'children'
         );
         $meta = $this->arrayManager->merge(
-            $purchaseTypePath . '/arguments/data/config',
-            $meta,
-            [
+            $purchaseTypePath . '/arguments/data/config', $meta, [
                 'component' => 'TNW_Subscriptions/js/components/purchase-type',
                 'componentType' => Field::NAME,
                 'formElement' => Select::NAME,
@@ -155,8 +154,7 @@ class StepsWizard extends BaseModifier
             null
         );
         $this->setScopeLabel($this->arrayManager->get(
-            $inheritancePath . '/arguments/data/config/scopeLabel',
-            $meta
+            $inheritancePath . '/arguments/data/config/scopeLabel', $meta
         ));
         // Move all fields to container
         if (!empty($rootArray)) {
@@ -165,9 +163,7 @@ class StepsWizard extends BaseModifier
             foreach ($rootArray as $key => $value) {
                 if ($key == 'container_' . Attribute::SUBSCRIPTION_PURCHASE_TYPE) {
                     $meta = $this->arrayManager->set(
-                        $rootPath . '/' . $key . '/arguments/data/config/sortOrder',
-                        $meta,
-                        20
+                        $rootPath . '/' . $key . '/arguments/data/config/sortOrder', $meta, 20
                     );
                 } elseif ($key == 'container_recurring_options') {
                     $recurringChildren[$key] = $value;
@@ -263,10 +259,8 @@ class StepsWizard extends BaseModifier
             ]
         ];
         if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
-            array_unshift(
-                $result['data']['config']['stepsNames'],
-                $this->stepWizardName . '.' . $this->inheritanceContainerName
-            );
+            array_unshift($result['data']['config']['stepsNames'],
+                $this->stepWizardName . '.' . $this->inheritanceContainerName);
         }
 
         return $result;
@@ -539,19 +533,13 @@ class StepsWizard extends BaseModifier
                                     'true' => '1'
                                 ],
                                 'notices' => [
-                                    '1' => __(
-                                        'Child controls if the customer can choose when to stop recurring orders'
-                                    ),
-                                    '0' => __(
-                                        'Parent controls if the customer can choose when to stop recurring orders'
-                                    )
+                                    '1' => __('Child controls if the customer can choose when to stop recurring orders'),
+                                    '0' => __('Parent controls if the customer can choose when to stop recurring orders')
                                 ],
                                 'exports' => [
-                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
-                                        . ':disabled'
+                                    'checked' => 'index = ' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS . ':disabled'
                                 ],
-                                'dataScope' => 'tnw_subscr_inheritance.'
-                                    . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+                                'dataScope' => 'tnw_subscr_inheritance.' . Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
                                 'prefer' => 'toggle',
                                 'scopeLabel' => $this->scopeLabel
                             ]
@@ -645,9 +633,7 @@ class StepsWizard extends BaseModifier
                         'label' => null,
                         'template' => 'ui/form/components/complex',
                         'sortOrder' => 10,
-                        'content' => __('Recurring options enable your products and services for recurring'
-                            . ' purchases. A product must be linked with at least one <a href="%1">'
-                            . 'billing frequency</a>, if recurring can be purchased on a schedule.', $frequencyUrl)
+                        'content' => __('Recurring options enable your products and services for recurring purchases. A product must be linked with at least one <a href="%1">billing frequency</a>, if recurring can be purchased on a schedule.', $frequencyUrl)
                     ]
                 ]
             ],
@@ -724,4 +710,5 @@ class StepsWizard extends BaseModifier
     {
         $this->scopeLabel = $scopeLabel;
     }
+
 }

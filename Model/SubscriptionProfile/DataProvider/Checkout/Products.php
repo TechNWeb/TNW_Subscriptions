@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Checkout;
 
 use Magento\CatalogInventory\Api\StockRegistryInterface;
@@ -183,10 +184,9 @@ class Products extends ModifyForm
     }
 
     /**
-     * Returns edit fieldset definition
+     * Returns edit fieldset definition.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getEditFieldsetDefinition()
     {
@@ -284,10 +284,9 @@ class Products extends ModifyForm
     /**
      * Return item edit form definition.
      *
-     * @param int|string $objectId
-     * @param int|string $itemId
+     * @param string|int $objectId
+     * @param string|int $itemId
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getForm($objectId, $itemId)
     {

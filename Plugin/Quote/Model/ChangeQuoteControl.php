@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Plugin\Quote\Model;
 
 /**
- * Class ChangeQuoteControl - modify logic for \Magento\Quote\Model\Quote::isAllowedMethod
+ * Class ChangeQuoteControl
+ * @package TNW\Subscriptions\Plugin\Quote\Model
  */
 class ChangeQuoteControl
 {
@@ -24,7 +25,8 @@ class ChangeQuoteControl
     public function aroundIsAllowed($subject, callable $proceed, $quote)
     {
         $result = $proceed($quote);
-        if (!$result
+        if (
+            !$result
             && $this->customer
             && $quote->getCustomerId() == $this->customer->getId()
         ) {

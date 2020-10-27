@@ -3,13 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
 
-/**
- * Class CreateProfileButton - adminhtml block for create profile button create
- */
 class CreateProfileButton extends GenericButton implements ButtonProviderInterface
 {
     /**

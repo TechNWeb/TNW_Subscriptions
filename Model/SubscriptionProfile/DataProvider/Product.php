@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Framework\Api\Filter;
@@ -11,26 +12,23 @@ use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Ui\Component\Container;
-use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Form\Fieldset;
+use Magento\Ui\Component\Form\Element\Select;
 use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
-use TNW\Subscriptions\Model\Source\CurrencySelect;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Grid;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ConfigurableForm;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\EditProductOptions;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
+use TNW\Subscriptions\Model\Source\CurrencySelect;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 
-/**
- * Class Product - dataprovider for susbcription profile porudct
- */
 class Product extends AbstractDataProvider
 {
     /**
@@ -39,7 +37,7 @@ class Product extends AbstractDataProvider
     const LISTING_RENDER_URL = 'tnw_subscriptions/subscriptionprofile_create_product/changecurrency';
 
     /**
-     * Listing image id field name
+     * Listing image id.
      */
     const LISTING_IMAGE_ID = 'product_listing_thumbnail';
 
@@ -157,21 +155,15 @@ class Product extends AbstractDataProvider
         $this->shippingMethods = $shippingMethods;
         $this->frequencyDescriptionCreator = $frequencyDescriptionCreator;
         $this->formContext = $formContext;
-        $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING
-            . '.'
-            . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
-        parent::__construct(
-            $name,
-            $primaryFieldName,
-            $requestFieldName,
-            $meta,
-            $data
-        );
+        $this->scopeName = $scopeName ? $scopeName : self::DATA_SCOPE_SUBSCRIPTION_LISTING . '.' . self::DATA_SCOPE_SUBSCRIPTION_LISTING;
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta,
+            $data);
     }
 
     /**
+     * Get data
+     *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -201,7 +193,7 @@ class Product extends AbstractDataProvider
                 }
                 $qty = !empty($fullSubscriptionData[Create::UNIQUE]['use_preset_qty']) ? 1 : $item->getQty();
                 $fullSubscriptionData[Create::NON_UNIQUE]['price'] +=
-                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
+                    isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty: 0;
 
                 $imageHelper = $this->formContext->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
 
@@ -231,7 +223,7 @@ class Product extends AbstractDataProvider
             $fullSubscriptionData[Create::NON_UNIQUE]['isVirtual'] = $subQuote->isVirtual();
 
             $items[] = [
-                'title' => __('Subscription') . ' #' . ($counter++),
+                'title' => __('Subscription') . ' #' . $counter++,
                 'products' => $products,
                 'frequency_description' => $this->frequencyDescriptionCreator->getDescription($fullSubscriptionData),
                 'shipping_method' => $this->getShippingMethodData($subQuote),
@@ -315,7 +307,7 @@ class Product extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-        return $this;
+
     }
 
     /**
@@ -328,10 +320,8 @@ class Product extends AbstractDataProvider
         $result = [];
 
         if ($this->stepPool->getCurrentStep() !== StepPool::STEP_PARAM_TYPE_PAYMENT) {
-            $modalTarget = $this->scopeName
-                . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.addProductsModal';
-            $modifyModalTarget = $this->scopeName
-                . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
+            $modalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.addProductsModal';
+            $modifyModalTarget = $this->scopeName . '.' . static::DATA_SCOPE_SUBSCRIPTION_PROFILE_PRODUCTS . '.modifyModal';
 
             $result = [
                 self::GROUP_SUBSCRIPTION_PROFILE_CURRENCY_SELECT => [
@@ -348,8 +338,7 @@ class Product extends AbstractDataProvider
                                         'source' => 'SubscriptionProfile',
                                         'component' => 'TNW_Subscriptions/js/form/element/currency-select',
                                         'template' => 'TNW_Subscriptions/form/element/currency-select',
-                                        'data_form_part' => $this->currencySelect
-                                            ->getCurrentDataFormPartFromStep($this->stepPool->getCurrentStep()),
+                                        'data_form_part' => $this->currencySelect->getCurrentDataFormPartFromStep($this->stepPool->getCurrentStep()),
                                         'dataScope' => '$data.currency_id',
                                         'sortOrder' => 0,
                                     ],
@@ -388,8 +377,7 @@ class Product extends AbstractDataProvider
                                                 'actionName' => 'toggleModal',
                                             ],
                                             [
-                                                'targetName' => $modalTarget
-                                                    . '.grid_container.' . self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
+                                                'targetName' => $modalTarget . '.grid_container.' . self::DATA_SCOPE_ADD_PRODUCT_MODAL_GRID,
                                                 'actionName' => 'render',
                                             ]
                                         ],
@@ -416,13 +404,11 @@ class Product extends AbstractDataProvider
                                                 'actionName' => 'toggleModal',
                                             ],
                                             [
-                                                'targetName' => $modifyModalTarget
-                                                    . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
+                                                'targetName' => $modifyModalTarget . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
                                                 'actionName' => 'destroyInserted',
                                             ],
                                             [
-                                                'targetName' => $modifyModalTarget
-                                                    . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
+                                                'targetName' => $modifyModalTarget . '.form_container.' . self::DATA_SCOPE_ADD_MODIFY_FORM,
                                                 'actionName' => 'render',
                                             ]
                                         ],
@@ -440,8 +426,7 @@ class Product extends AbstractDataProvider
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'additionalClasses' => 'admin__fieldset-section '
-                                    . 'subscription-profile-products-container',
+                                'additionalClasses' => 'admin__fieldset-section subscription-profile-products-container',
                                 'label' => false,
                                 'collapsible' => false,
                                 'componentType' => Fieldset::NAME,
@@ -534,7 +519,7 @@ class Product extends AbstractDataProvider
                         'componentType' => Modal::NAME,
                         'component' => 'TNW_Subscriptions/js/modal/modify-subscriptions-modal',
                         'options' => [
-                            'title' => __('Subscription(s)') . ' ' . $this->stepPool->getCurrentStepTitle(),
+                            'title' => __('Subscription(s)') .' '. $this->stepPool->getCurrentStepTitle(),
                             'modalClass' => 'modify-subscriptions-modal',
                         ]
                     ],
@@ -581,8 +566,7 @@ class Product extends AbstractDataProvider
                         'componentType' => Container::NAME,
                         'autoRender' => false,
                         'dataScope' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID,
-                        'externalProvider' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID
-                            . '.' . Grid::DATA_SCOPE_ADD_PRODUCT_GRID . '_data_source',
+                        'externalProvider' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID . '.' . Grid::DATA_SCOPE_ADD_PRODUCT_GRID . '_data_source',
                         'selectionsProvider' => '${ $.ns }.${ $.ns }.tnw_subscriptionprofile_product_columns.ids',
                         'ns' => Grid::DATA_SCOPE_ADD_PRODUCT_GRID,
                         'render_url' => $this->urlBuilder->getUrl('mui/index/render'),
@@ -630,8 +614,7 @@ class Product extends AbstractDataProvider
                         ),
                         'autoRender' => true,
                         'ns' => Form::DATA_SCOPE_MODAL_FORM,
-                        'externalProvider' => Form::DATA_SCOPE_MODAL_FORM
-                            . '.' . Form::DATA_SCOPE_MODAL_FORM . '_data_source',
+                        'externalProvider' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         'formSubmitType' => 'ajax',
                         '__disableTmpl' => [
@@ -669,8 +652,7 @@ class Product extends AbstractDataProvider
                         ),
                         'autoRender' => false,
                         'ns' => ModifyForm::DATA_SCOPE_MODAL_FORM,
-                        'externalProvider' => ModifyForm::DATA_SCOPE_MODAL_FORM
-                            . '.' . ModifyForm::DATA_SCOPE_MODAL_FORM . '_data_source',
+                        'externalProvider' => ModifyForm::DATA_SCOPE_MODAL_FORM . '.' . ModifyForm::DATA_SCOPE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         'formSubmitType' => 'ajax',
                         '__disableTmpl' => [
@@ -800,8 +782,7 @@ class Product extends AbstractDataProvider
                         ),
                         'autoRender' => false,
                         'ns' => '' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM,
-                        'externalProvider' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM
-                            . '.' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '_data_source',
+                        'externalProvider' => ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '.' . ConfigurableForm::DATA_SCOPE_CONFIGURABLE_MODAL_FORM . '_data_source',
                         'toolbarContainer' => '${ $.parentName }',
                         '__disableTmpl' => [
                             'toolbarContainer' => false
@@ -862,7 +843,7 @@ class Product extends AbstractDataProvider
         $initialFees = $item->getExtensionAttributes()
             ? $item->getExtensionAttributes()->getSubsInitialFees()
             : null;
-        if ($initialFees) {
+        if ($initialFees){
             $result = $initialFees->getSubsInitialFee();
         }
 

@@ -3,18 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
 use Magento\Framework\DataObject;
 
-/**
- * Class Validate - controller
- */
 class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
-    /**
-     *  Message key value
-     */
     const DEFAULT_MESSAGE_KEY = 'message';
 
     /**
@@ -57,8 +52,9 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
-     * @throws \Zend_Validate_Exception
+     * @return \Magento\Framework\Controller\ResultInterface
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function execute()
     {
@@ -110,7 +106,7 @@ class Validate extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfi
     {
         $adminValues = [];
         foreach ($optionsValues as $optionKey => $values) {
-            if (!(isset($deletedOptions[$optionKey]) && $deletedOptions[$optionKey] === '1')) {
+            if (!(isset($deletedOptions[$optionKey]) and $deletedOptions[$optionKey] === '1')) {
                 $adminValues[] = reset($values);
             }
         }

@@ -5,9 +5,6 @@
  */
 namespace TNW\Subscriptions\Plugin\Model;
 
-/**
- * Class ExtensionAttributes - plugin to modify the data after extension attribute retrieval
- */
 class ExtensionAttributes
 {
     /**
@@ -15,10 +12,6 @@ class ExtensionAttributes
      */
     private $extensionAttributesFactory;
 
-    /**
-     * ExtensionAttributes constructor.
-     * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionAttributesFactory
-     */
     public function __construct(
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionAttributesFactory
     ) {

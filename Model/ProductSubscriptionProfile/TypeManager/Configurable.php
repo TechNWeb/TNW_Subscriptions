@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -78,14 +79,8 @@ class Configurable extends Base
                                     $mainProduct,
                                     $subscriptionPart
                                 ),
-                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice(
-                                    $mainProduct,
-                                    $subscriptionPart
-                                ),
-                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice(
-                                    $mainProduct,
-                                    $subscriptionPart
-                                ),
+                                'current_preset_qty_price' => $this->getSubscriptionCurrentPresetQtyPrice($mainProduct, $subscriptionPart),
+                                'preset_qty_price' => $this->getSubscriptionPresetQtyPrice($mainProduct, $subscriptionPart),
                             ],
                         ],
                     ],
@@ -195,30 +190,24 @@ class Configurable extends Base
                     $productData->setData($key, $childProduct->getData($key));
                     if ($key === Attribute::SUBSCRIPTION_TRIAL_STATUS) {
                         $trialData = [
-                            Attribute::SUBSCRIPTION_TRIAL_LENGTH => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_TRIAL_LENGTH
-                            ),
-                            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT
-                            ),
-                            Attribute::SUBSCRIPTION_TRIAL_PRICE => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_TRIAL_PRICE
-                            ),
-                            Attribute::SUBSCRIPTION_TRIAL_START_DATE => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_TRIAL_START_DATE
-                            )
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
+                            Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
+                            Attribute::SUBSCRIPTION_TRIAL_PRICE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
+                            Attribute::SUBSCRIPTION_TRIAL_START_DATE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
                         ];
 
                         $productData->addData($trialData);
                     }
                     if ($key === Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT) {
                         $discountData = [
-                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT
-                            ),
-                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE => $childProduct->getData(
-                                Attribute::SUBSCRIPTION_DISCOUNT_TYPE
-                            ),
+                            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT),
+                            Attribute::SUBSCRIPTION_DISCOUNT_TYPE =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE),
                         ];
 
                         $productData->addData($discountData);

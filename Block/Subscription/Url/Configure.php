@@ -5,15 +5,12 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Url;
 
-/**
- * Class Configure - the configure url block
- */
 class Configure extends \Magento\Framework\View\Element\Template
 {
     /**
      * Configure product view blocks
      *
-     * @return \Magento\Framework\View\Element\Template
+     * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _prepareLayout()

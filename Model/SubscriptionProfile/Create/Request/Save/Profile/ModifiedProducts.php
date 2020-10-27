@@ -3,6 +3,7 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
 /**
@@ -37,7 +38,8 @@ class ModifiedProducts extends Base
                 } else {
                     try {
                         $saveModel->getQuoteCreator()->getCartRepository()->get($quoteId);
-                    } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                    }
+                    catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
                         //remove quote from session if quote does not exist.
                         $this->getSession()->removeSubQuote($quoteId);
                     }

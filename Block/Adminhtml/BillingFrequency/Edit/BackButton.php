@@ -3,15 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
-/**
- * Class BackButton - block to define data for back button on billing frequency
- */
 class BackButton extends GenericButton implements ButtonProviderInterface
 {
+
     /**
      * @return array
      */

@@ -3,9 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Address;
 
 use Magento\Framework\EntityManager\Operation\ExtensionInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
 
 /**
@@ -30,17 +32,17 @@ class SaveHandler implements ExtensionInterface
         $this->addressRepository = $addressRepository;
     }
 
+
     /**
-     * @param object $entity
+     * @param SubscriptionProfileInterface $entity
      * @param array $arguments
-     * @return bool|object
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return SubscriptionProfileInterface
      */
     public function execute($entity, $arguments = [])
     {
         $addresses = $entity->getAddresses();
 
-        if (!empty($addresses)) {
+        if (!empty($addresses)){
             foreach ($addresses as $address) {
                 $address->setProfileId($entity->getId());
                 if ($address->getStreet() && is_array($address->getStreet())) {

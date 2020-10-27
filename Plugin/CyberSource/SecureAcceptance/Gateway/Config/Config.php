@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config;
 
 /**
- * Class Config - plugin to modify the config data retrieval for Cybersource config
+ * Class Config
+ * @package TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config
  */
 class Config
 {

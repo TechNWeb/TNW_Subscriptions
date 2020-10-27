@@ -10,14 +10,9 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as MagentoProductCollectionFactory;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory
-    as ProductBillingFrequencyCollectionFactory;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory
-    as ProductSubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory as ProductBillingFrequencyCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\CollectionFactory as ProductSubscriptionProfileCollectionFactory;
 
-/**
- * Class ClearDbProductDeleteAfter - observer
- */
 class ClearDbProductDeleteAfter implements ObserverInterface
 {
     /**
@@ -52,7 +47,8 @@ class ClearDbProductDeleteAfter implements ObserverInterface
         ProductSubscriptionProfileCollectionFactory $productsSubscriptionProfileCollection,
         MagentoProductCollectionFactory $magentoProductCollection,
         MessageHistoryLogger $historyLogger
-    ) {
+    )
+    {
         $this->productBillFrequencyCollection = $productsBillFrequencyCollection;
         $this->productSubscriptionProfileCollection = $productsSubscriptionProfileCollection;
         $this->magentoProductCollection = $magentoProductCollection;
@@ -68,10 +64,7 @@ class ClearDbProductDeleteAfter implements ObserverInterface
     public function execute(Observer $observer)
     {
         $entity = $observer->getEvent()->getEntity();
-        $product = $this->magentoProductCollection->create()->getItemsByColumnValue(
-            'entity_id',
-            $entity->getEntityId()
-        );
+        $product = $this->magentoProductCollection->create()->getItemsByColumnValue('entity_id', $entity->getEntityId());
         if (!$product) {
             try {
                 $productSubscriptions = $this->productSubscriptionProfileCollection->create()->getItemsByColumnValue(

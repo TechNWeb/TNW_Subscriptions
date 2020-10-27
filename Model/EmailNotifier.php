@@ -6,7 +6,8 @@
 namespace TNW\Subscriptions\Model;
 
 /**
- * Class EmailNotifier - used for email notifications
+ * Class EmailNotifier
+ * @package TNW\Subscriptions\Model
  */
 class EmailNotifier
 {
@@ -262,7 +263,6 @@ class EmailNotifier
                     try {
                         $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
                     } catch (\Exception $e) {
-                        continue;
                     }
                 }
             } else {
@@ -334,12 +334,12 @@ class EmailNotifier
     private function checkEmailTemplateSetting($configPath)
     {
         if (!$this->scopeConfig->getValue(
-            $configPath,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        ) || !$this->scopeConfig->getValue(
-            self::XML_PATH_EMAIL_IDENTITY,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        )
+                $configPath,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ) || !$this->scopeConfig->getValue(
+                self::XML_PATH_EMAIL_IDENTITY,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            )
         ) {
             return false;
         }
