@@ -3,14 +3,20 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Payments;
 
 use Magento\Backend\Block\Template;
 
+/**
+ * Class Stripe - adminhtml block for stripe config
+ */
 class Stripe extends Template
 {
-    private $_configProvider;
+    /**
+     * @var mixed
+     */
+    private $configProvider;
+
     /**
      * Stripe constructor.
      * @param Template\Context $context
@@ -25,7 +31,7 @@ class Stripe extends Template
         $this->setTemplate('TNW_Subscriptions::subscription_profile/payments/stripe.phtml');
         parent::__construct($context, $data);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->_configProvider = $objectManager->get("TNW\Stripe\Model\Ui\ConfigProvider");
+            $this->configProvider = $objectManager->get(\TNW\Stripe\Model\Ui\ConfigProvider::class);
         }
     }
 
@@ -34,7 +40,7 @@ class Stripe extends Template
      */
     private function getConfig()
     {
-        return $this->_configProvider->getConfig();
+        return $this->configProvider->getConfig();
     }
 
     /**

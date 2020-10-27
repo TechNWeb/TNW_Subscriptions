@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -20,6 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Quote as AdminQuote;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin;
 
 /**
  * Create Quote for subscription profile on storefront.
@@ -47,6 +47,7 @@ class Quote extends AdminQuote
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param CustomerQuoteRepositoryInterface $customerQuoteRepository
+     * @param VaultPlugin $methodValidator
      */
     public function __construct(
         Context $context,
@@ -60,7 +61,8 @@ class Quote extends AdminQuote
         Mapper $customerMapper,
         PaymentTokenManagementInterface $paymentTokenManagement,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        CustomerQuoteRepositoryInterface $customerQuoteRepository
+        CustomerQuoteRepositoryInterface $customerQuoteRepository,
+        VaultPlugin $methodValidator
     ) {
         $this->customerQuoteRepository = $customerQuoteRepository;
         parent::__construct(
@@ -74,7 +76,8 @@ class Quote extends AdminQuote
             $customerFormFactory,
             $paymentTokenManagement,
             $paymentTokenRepository,
-            $customerMapper
+            $customerMapper,
+            $methodValidator
         );
     }
 

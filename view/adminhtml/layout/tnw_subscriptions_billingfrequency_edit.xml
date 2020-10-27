@@ -3,7 +3,6 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="styles"/>
     <head>
-        <link src="TNW_Subscriptions::js/subscriptions.js"/>
         <css src="TNW_Subscriptions::css/billing-frequency.css"/>
     </head>
     <body>

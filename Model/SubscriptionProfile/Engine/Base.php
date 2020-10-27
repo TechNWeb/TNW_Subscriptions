@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
@@ -19,7 +18,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 
 /**
- * Class Base
+ * Class Base - base class for payment processors
  */
 class Base implements EngineInterface
 {
@@ -83,8 +82,24 @@ class Base implements EngineInterface
      */
     protected $vaultPaymentAuthorization;
 
+    /**
+     * @var \Magento\Vault\Model\PaymentTokenManagement
+     */
     protected $paymentTokenManagement;
 
+    /**
+     * Base constructor.
+     * @param Config $config
+     * @param Context $context
+     * @param CartManagementInterface $cartManagement
+     * @param DataPersistorInterface $persistor
+     * @param ZeroTotal $zeroTotalValidator
+     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
+     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Vault\Model\PaymentTokenManagement $paymentTokenManagement
+     */
     public function __construct(
         Config $config,
         Context $context,
@@ -259,6 +274,12 @@ class Base implements EngineInterface
         return $this;
     }
 
+    /**
+     * @param $requestData
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
     public function processProfileByRequestDataVault($requestData)
     {
         if (empty($requestData['payment'][$this->getVaultPaymentCode()]['method'])) {
@@ -288,6 +309,9 @@ class Base implements EngineInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getVaultPaymentCode()
     {
         return '';
@@ -299,7 +323,7 @@ class Base implements EngineInterface
      */
     protected function populateProfilePayment($paymentToken)
     {
-        $tokenDetails = json_decode($paymentToken->getTokenDetails(),true);
+        $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $expiration = explode('/', $tokenDetails['expirationDate']);
         $this->getProfile()->getPayment()
             ->setEngineCode($this->getPaymentMethodCode())

@@ -29,6 +29,10 @@
         <plugin name="before_create_payment_intent"
                 type="TNW\Subscriptions\Plugin\Stripe\Model\Adapter\StripeAdapter" />
     </type>
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="after_represent_product"
+                type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item" />
+    </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -59,6 +63,11 @@
     </type>
 
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
+
+    <preference for="CyberSource\SecureAcceptance\Gateway\Request\Soap\DecisionManagerMddBuilder"
+                type="TNW\Subscriptions\Model\Payment\Cybersource\Gateway\Request\Soap\DecisionManagerMddBuilder" />
+    <preference for="CyberSource\SecureAcceptance\Plugin\Model\Method\VaultPlugin"
+                type="TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin" />
 
     <preference for="TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface"
                 type="TNW\Subscriptions\Model\BillingFrequencyRepository"/>
@@ -172,6 +181,13 @@
         <plugin name="subscriptions_product_initialization"
                 type="TNW\Subscriptions\Plugin\Product\Initialization"
                 sortOrder="50"
+                disabled="false"/>
+    </type>
+
+    <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
+        <plugin name="cybersouce_tax_collector"
+                type="TNW\Subscriptions\Plugin\CyberSource\Tax\Model\Tax\Sales\Total\Quote\Tax"
+                sortOrder="200"
                 disabled="false"/>
     </type>
 
@@ -826,6 +842,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Purchaseorder</item>
                     <item name="sortOrder" xsi:type="number">12</item>
                 </item>
+                <item name="cashondelivery" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Cashondelivery</item>
+                    <item name="sortOrder" xsi:type="number">13</item>
+                </item>
                 <item name="payflowpro" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
                     <item name="sortOrder" xsi:type="number">20</item>
@@ -958,6 +978,11 @@
                 <item name="purchaseorder" xsi:type="array">
                     <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Purchaseorder::PAYMENT_METHOD_PURCHASEORDER_CODE</item>
                     <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\PurchaseorderFactory</item>
+                    <item name="cc" xsi:type="boolean">false</item>
+                </item>
+                <item name="cashondelivery" xsi:type="array">
+                    <item name="code" xsi:type="const">Magento\OfflinePayments\Model\Cashondelivery::PAYMENT_METHOD_CASHONDELIVERY_CODE</item>
+                    <item name="factory" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Engine\CashondeliveryFactory</item>
                     <item name="cc" xsi:type="boolean">false</item>
                 </item>
                 <item name="payflowpro" xsi:type="array">

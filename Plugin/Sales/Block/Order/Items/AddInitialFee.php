@@ -3,14 +3,13 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Sales\Block\Order\Items;
 
 use Magento\Sales\Block\Adminhtml\Order\View\Items;
 use TNW\Subscriptions\Model\Context;
 
 /**
- * Class AddInitialFee
+ * Class AddInitialFee - plugin for column retrieval logic
  */
 class AddInitialFee
 {

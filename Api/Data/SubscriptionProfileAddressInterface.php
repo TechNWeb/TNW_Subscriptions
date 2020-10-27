@@ -3,9 +3,12 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
+/**
+ * Interface SubscriptionProfileAddressInterface - defines the functionality to be implemented
+ * for subscription profile address
+ */
 interface SubscriptionProfileAddressInterface
 {
     /**#@+
@@ -75,7 +78,6 @@ interface SubscriptionProfileAddressInterface
      * @return string|null Company.
      */
     public function getCompany();
-
 
     /**
      * Sets the company for the profile address.

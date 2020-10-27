@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\Payment\Braintree\Gateway\Http\Client;
 
 use Magento\Payment\Gateway\Http\ClientInterface;
@@ -11,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Model\Payment\Braintree\Adapter;
 
 /**
- * Class TransactionSale
+ * Class TransactionCustomer - braintree
  */
 class TransactionCustomer implements ClientInterface
 {

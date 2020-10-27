@@ -5,29 +5,57 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Quote\Model\Quote;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use Magento\Vault\Model\PaymentTokenFactory;
+use TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
+
+/**
+ * Class Cybersource -used for process save action for cybersource payed subscriptions
+ */
 class Cybersource extends Base
 {
     /**
-     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     * @var VaultPaymentAuthorization
      */
     private $vaultPaymentAuthorization;
 
     /**
-     * @var \Magento\Framework\Encryption\EncryptorInterface
+     * @var EncryptorInterface
      */
     private $encryptor;
 
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
     private $paymentTokenRepository;
 
+    /**
+     * @var PaymentTokenFactory
+     */
     private $paymentTokenFactory;
 
+    /**
+     * Cybersource constructor.
+     * @param CreateProfile $createModel
+     * @param QuoteSessionInterface $session
+     * @param VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param EncryptorInterface $encryptor
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param PaymentTokenFactory $paymentTokenFactory
+     */
     public function __construct(
-        \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
-        \Magento\Vault\Model\PaymentTokenFactory $paymentTokenFactory
+        CreateProfile $createModel,
+        QuoteSessionInterface $session,
+        VaultPaymentAuthorization $vaultPaymentAuthorization,
+        EncryptorInterface $encryptor,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
+        PaymentTokenFactory $paymentTokenFactory
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentTokenRepository = $paymentTokenRepository;
@@ -38,8 +66,8 @@ class Cybersource extends Base
 
     /**
      * @param array $data
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws LocalizedException
+     * @throws CommandException
      */
     public function process(array $data)
     {
@@ -50,7 +78,7 @@ class Cybersource extends Base
         $paymentData['method'] = 'chcybersource';
         $paymentData['additional_data'] = array_merge($paymentData, $paymentData['additional']);
 
-        /** @var \Magento\Quote\Model\Quote[] $subQuotes */
+        /** @var Quote[] $subQuotes */
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
         $quote = reset($subQuotes);
         $paymentToken = $this->paymentTokenFactory->create('card');
@@ -61,8 +89,11 @@ class Cybersource extends Base
         $paymentToken->setTokenDetails($this->getTokenDetails($paymentData['additional']));
         $paymentToken->setIsActive(true);
         $paymentToken->setIsVisible(true);
+        $time = $paymentData['additional']['cc_exp_year']
+            . '-' . $paymentData['additional']['cc_exp_month'] . '-01';
+        $paymentToken->setExpiresAt(strtotime($time));
         $this->paymentTokenRepository->save($paymentToken);
-        /** @var \Magento\Quote\Model\Quote $subQuote */
+        /** @var Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             if ($subQuote->getGrandTotal() < 0.001) {
                 $vaultPaymentData = [];
@@ -85,13 +116,17 @@ class Cybersource extends Base
         $this->getSubCreateModel()->setNeedCollect(true);
     }
 
+    /**
+     * @return string
+     */
     public function getVaultMethodCode()
     {
         return 'chcybersource_cc_vault';
     }
 
     /**
-     * @param $paymentToken
+     * @param $paymentData
+     * @param $customerId
      * @return string
      */
     protected function generatePublicHash($paymentData, $customerId)

@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config;
 
 /**
- * Class Config
- * @package TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Gateway\Config
+ * Class Config - plugin to modify the config data retrieval for Cybersource config
  */
 class Config
 {
@@ -26,7 +25,7 @@ class Config
         $result
     ) {
         if ($result && $this->isReBill) {
-            $result = $subject->getValue(\CyberSource\SecureAcceptance\Gateway\Config\Config::KEY_MODE);
+            $result = $subject->getValue(\CyberSource\SecureAcceptance\Gateway\Config\Config::KEY_FLOW_MODE);
         }
         return $result;
     }

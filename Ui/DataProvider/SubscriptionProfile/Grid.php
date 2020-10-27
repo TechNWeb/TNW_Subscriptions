@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
+/**
+ * Class Grid - SubscriptionProfile DataProvider
+ */
 class Grid extends DataProvider
 {
     /**
@@ -54,13 +56,5 @@ class Grid extends DataProvider
         }
 
         parent::addFilter($filter);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function addOrder($field, $direction)
-    {
-        parent::addOrder($field, $direction);
     }
 }

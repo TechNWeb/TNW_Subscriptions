@@ -52,7 +52,6 @@ define([
                 var productPrice = 0;
                 var commentPrice = 0;
 
-
                 //Find product price.
                 if ((typeof productPriceComponent != 'undefined')
                     && (typeof productPriceComponent.value() != 'undefined')) {

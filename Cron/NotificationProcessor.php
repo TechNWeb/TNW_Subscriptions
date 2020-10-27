@@ -5,22 +5,20 @@
  */
 namespace TNW\Subscriptions\Cron;
 
-use TNW\Subscriptions\Model\EmailNotifierFactory;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use TNW\Subscriptions\Model\EmailNotifier;
-use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\App\State;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
+use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\ProfileCcUtilsFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Cron\ProfileProcessor;
 
 /**
- * Class NotificationProcessor
- * @package TNW\Subscriptions\Cron
+ * Class NotificationProcessor - cron
  */
 class NotificationProcessor
 {
@@ -69,10 +67,29 @@ class NotificationProcessor
      */
     private $paymentFactory;
 
+    /**
+     * @var Manager
+     */
     private $queueManager;
 
+    /**
+     * @var ProfileProcessor
+     */
     private $processor;
 
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param State $appState
+     * @param Payment $paymentFactory
+     * @param Manager $queueManager
+     * @param ProfileProcessor $processor
+     */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
@@ -98,21 +115,22 @@ class NotificationProcessor
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            //NOTHING TO SET
+            //area already set check
+            $this->appState->getAreaCode();
         }
         $this->sendRenewalNotifications();
         $this->sendExpiredCardsNotifications();
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function sendRenewalNotifications()
     {
@@ -134,7 +152,7 @@ class NotificationProcessor
     }
 
     /**
-     *
+     * Send Notification on expired cards
      */
     public function sendExpiredCardsNotifications()
     {
@@ -146,8 +164,7 @@ class NotificationProcessor
                 } catch (\Exception $e) {
                     $profile = null;
                 }
-                if (
-                    $profile
+                if ($profile
                     && (
                         $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
                         || $profile->getStatus() == ProfileStatus::STATUS_TRIAL
@@ -162,34 +179,9 @@ class NotificationProcessor
     }
 
     /**
-     * @param $dayModifier
-     * @return mixed
-     */
-    private function getFutureOrderCollection($dayModifier)
-    {
-        if (!$dayModifier || !isset($this->loadedCollections[$dayModifier])) {
-            $currentDate = $this->timezone->date();
-            if ($dayModifier) {
-                $currentDate->modify($dayModifier);
-            }
-            $this->loadedCollections[$dayModifier] = $this->subscriptionProfileFactory->create()
-                ->addFieldToFilter('scheduled_at', [
-                    'date' => true,
-                    'from' => $currentDate->format('Y-m-d 00:00:00'),
-                    'to' => $currentDate->format('Y-m-d 23:59:59')
-                ])
-                ->addFieldToFilter('magento_order_id', ['null' => true])
-                ->addFieldToSelect('subscription_profile_id')
-                ->addFieldToSelect('scheduled_at')
-            ;
-        }
-        return $this->loadedCollections[$dayModifier];
-    }
-
-    /**
      * Get order with Cc payment method
      *
-     * @return \TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
+     * @return bool
      */
     private function getOrderWithCcPayment()
     {
@@ -201,7 +193,10 @@ class NotificationProcessor
                     tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )
-                ->addFieldToFilter('engine_code', array('nin' => ['checkmo', 'banktransfer', 'purchaseorder']))
+                ->addFieldToFilter(
+                    'engine_code',
+                    ['nin' => ['checkmo', 'banktransfer', 'purchaseorder', 'cashondelivery']]
+                )
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToFilter('sent_mail', 0)
                 ->addFieldToSelect('subscription_profile_id');

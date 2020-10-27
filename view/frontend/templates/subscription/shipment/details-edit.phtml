@@ -12,14 +12,14 @@
             <div class="method">
                 <input type="radio"
                        name="shipping_method_id"
-                       value="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
-                       id="<?php echo $block->escapeHtml($shippingMethod['value'])?>"
-                       <?php echo $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
-                <label for="<?php echo $block->escapeHtml($shippingMethod['value'])?>">
-                    <?php echo $block->escapeHtml($shippingMethod['label'])?>
+                       value="<?= $block->escapeHtml($shippingMethod['value'])?>"
+                       id="<?= $block->escapeHtml($shippingMethod['value'])?>"
+                       <?= $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
+                <label for="<?= $block->escapeHtml($shippingMethod['value'])?>">
+                    <?= $block->escapeHtml($shippingMethod['label'])?>
                 </label>
-                <div class="<?php echo $block->escapeHtml($shippingMethod['css'])?>"
-                     data-title="<?php echo $block->escapeHtml(__($shippingMethod['title']))?>">
+                <div class="<?= $block->escapeHtml($shippingMethod['css'])?>"
+                     data-title="<?= $block->escapeHtml(__($shippingMethod['title']))?>">
                 </div>
             </div>
         <?php endforeach;?>

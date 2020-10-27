@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Customer\Api\CustomerMetadataInterface;
@@ -18,12 +17,13 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\QuoteFactory as ModelQuoteFactory;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\QuoteCreateInterface;
-use Magento\Vault\Api\PaymentTokenManagementInterface;
-use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use TNW\Subscriptions\Plugin\CyberSource\SecureAcceptance\Model\VaultPlugin;
 
 /**
  * Create quotes for subscription in admin area.
@@ -90,6 +90,11 @@ class Quote extends Create implements QuoteCreateInterface
     private $paymentTokenRepository;
 
     /**
+     * @var VaultPlugin
+     */
+    private $methodValidator;
+
+    /**
      * Quote constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -102,6 +107,7 @@ class Quote extends Create implements QuoteCreateInterface
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param Mapper $customerMapper
+     * @param VaultPlugin $methodValidator
      */
     public function __construct(
         Context $context,
@@ -114,8 +120,10 @@ class Quote extends Create implements QuoteCreateInterface
         FormFactory $customerFormFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Mapper $customerMapper
+        Mapper $customerMapper,
+        VaultPlugin $methodValidator
     ) {
+        $this->methodValidator = $methodValidator;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->quoteFactory = $quoteFactory;
@@ -147,7 +155,7 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if ($session->getStoreId()) {
-            if ($session->getCurrencyId()){
+            if ($session->getCurrencyId()) {
                 $quote->setQuoteCurrencyCode($session->getCurrencyId());
             }
             $quote->setCustomerGroupId($this->groupManagement->getDefaultGroup()->getId());
@@ -216,8 +224,7 @@ class Quote extends Create implements QuoteCreateInterface
     public function fillCustomerData(CustomerInterface $customer, ModelQuote $quote)
     {
         $quoteData = [];
-        if (
-            !$quote->getCustomerId()
+        if (!$quote->getCustomerId()
             && !$quote->getPayment()->getAdditionalInformation('customer_id')
             && $quote->getPayment()->getAdditionalInformation('public_hash')
             && $customer->getId()
@@ -266,10 +273,9 @@ class Quote extends Create implements QuoteCreateInterface
         return $customerForm;
     }
 
-
     /**
      * @param ModelQuote $quote
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function validate(ModelQuote $quote)
     {
@@ -278,7 +284,7 @@ class Quote extends Create implements QuoteCreateInterface
         $session = $this->getSession();
 
         if (!$session->getStore()->getId()) {
-            throw new \Exception(__('Please select a store'));
+            throw new \Magento\Framework\Exception\LocalizedException(__('Please select a store'));
         }
         $items = $quote->getAllVisibleItems();
 
@@ -290,7 +296,9 @@ class Quote extends Create implements QuoteCreateInterface
         foreach ($items as $item) {
             $messages = $item->getMessage(false);
             if ($item->getHasError() && is_array($messages) && !empty($messages)) {
-                $errors = array_merge($errors, $messages);
+                foreach ($messages as $message) {
+                    $errors[] = $message;
+                }
             }
         }
 
@@ -303,6 +311,7 @@ class Quote extends Create implements QuoteCreateInterface
         if (!$quote->getPayment()->getMethod()) {
             $errors[] = __('Please specify a payment method.');
         } else {
+            $this->methodValidator->setIsReBill();
             $method = $quote->getPayment()->getMethodInstance();
             if (!$method->isAvailable($quote)) {
                 $errors[] = __('This payment method is not available.');
@@ -321,7 +330,7 @@ class Quote extends Create implements QuoteCreateInterface
                 $this->getContext()->getMessageManager()->addError($error);
             }
             //Maybe we need to delete customer in this case.
-            throw new \Exception(__('Quote validation is failed.'));
-        };
+            throw new  \Magento\Framework\Exception\LocalizedException(__('Quote validation is failed.'));
+        }
     }
 }

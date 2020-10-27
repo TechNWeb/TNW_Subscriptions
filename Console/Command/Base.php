@@ -3,26 +3,28 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Console\Command;
 
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use Symfony\Component\Console\Command\Command;
+use Magento\Framework\App\Area;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\State;
-use Magento\Framework\App\Area;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
-use TNW\Subscriptions\Model\Config;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\ObjectManager\ConfigLoaderInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Symfony\Component\Console\Command\Command;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Base class for subscription commands.
  */
 abstract class Base extends Command
 {
+    /**
+     * The dir usesd for locks
+     */
     const VAR_LOCKS_DIR = 'locks';
 
     /**
@@ -72,6 +74,7 @@ abstract class Base extends Command
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,

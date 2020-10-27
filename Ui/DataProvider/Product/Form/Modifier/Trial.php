@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
@@ -13,8 +12,8 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
-* Customize Trial field
-*/
+ * Customize Trial field
+ */
 class Trial extends BaseModifier
 {
     /**

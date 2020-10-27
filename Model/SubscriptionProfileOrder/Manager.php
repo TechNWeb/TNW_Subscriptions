@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfileOrder;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -18,7 +17,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Config;
 
 /**
- * Class Manager
+ * Class Manager - for subscription profile order
  */
 class Manager
 {
@@ -84,7 +83,9 @@ class Manager
         $this->config = $config;
     }
 
-
+    /**
+     * @return $this
+     */
     public function reset()
     {
         $this->profileOrderRelation = null;
@@ -153,7 +154,8 @@ class Manager
     public function getAllProfileRelations($profileId)
     {
         $this->criteriaBuilder->addFilter(
-            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profileId
+            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+            $profileId
         );
         /** @var SearchCriteriaInterface $searchCriteria */
         $searchCriteria = $this->criteriaBuilder->create();

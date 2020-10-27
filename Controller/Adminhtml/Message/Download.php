@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Controller\Adminhtml\Message;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
 
+/**
+ * Class Download - action controller
+ */
 class Download extends \Magento\Backend\App\Action
 {
     /**
@@ -14,6 +17,11 @@ class Download extends \Magento\Backend\App\Action
      */
     protected $fileFactory;
 
+    /**
+     * Download constructor.
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\App\Response\Http\FileFactory $fileFactory

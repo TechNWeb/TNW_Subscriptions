@@ -9,28 +9,28 @@
 <div class="subscription-data-wrapper"
      data-mage-init='{
         "tnwSubscribeShipment":{
-            "saveAddressUrl": "<?php echo $block->escapeUrl($block->getSaveUrl()) ?>",
-            "showEdit": "<?php echo $block->isShowEditAddress() ?>",
-            "customerAddressesData": "<?php echo $block->escapeQuote($block->getCustomerAddressesData())?>",
-            "emptyCountryLabel": "<?php echo __('Country') ?>"
+            "saveAddressUrl": "<?= $block->escapeUrl($block->getSaveUrl()) ?>",
+            "showEdit": "<?= $block->isShowEditAddress() ?>",
+            "customerAddressesData": "<?= $block->escapeQuote($block->getCustomerAddressesData())?>",
+            "emptyCountryLabel": "<?= __('Country') ?>"
         },
         "tnwSubscribeShipmentDetails":{
-            "saveUrl": "<?php echo $block->escapeUrl($block->getSaveUrl()) ?>",
-            "showEdit": "<?php echo $block->isShowEditDetails() ?>"
+            "saveUrl": "<?= $block->escapeUrl($block->getSaveUrl()) ?>",
+            "showEdit": "<?= $block->isShowEditDetails() ?>"
         }
      }'>
-    <?php echo $block->getTabMessagesHtml(); ?>
+    <?= $block->getTabMessagesHtml(); ?>
     <div class="grid-row">
         <div class="shipping-info-content grid-col2-lg">
             <?php if ($block->canShowShippingAddressBlock()):?>
-                <div id="shipping-info-view"><?php echo $block->getShippingInfoViewHtml() ?></div>
-                <div id="shipping-info-edit" class="hidden"><?php echo $block->getShippingInfoEditHtml() ?></div>
+                <div id="shipping-info-view"><?= $block->getShippingInfoViewHtml() ?></div>
+                <div id="shipping-info-edit" class="hidden"><?= $block->getShippingInfoEditHtml() ?></div>
             <?php endif;?>
         </div>
         <div class="shipping-details-content grid-col2-lg">
             <?php if ($block->canShowShippingDetailsBlock()):?>
-                <?php echo $block->getShippingDetailsViewHtml() ?>
-                <div id="shipping-details-edit" class="hidden"><?php echo $block->getShippingDetailsEditHtml() ?></div>
+                <?= $block->getShippingDetailsViewHtml() ?>
+                <div id="shipping-details-edit" class="hidden"><?= $block->getShippingDetailsEditHtml() ?></div>
             <?php endif;?>
         </div>
     </div>

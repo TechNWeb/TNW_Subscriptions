@@ -3,12 +3,14 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
 
+/**
+ * Class BackButton - adminhtml block for create profile button back
+ */
 class BackButton extends GenericButton implements ButtonProviderInterface
 {
     /**
@@ -36,7 +38,7 @@ class BackButton extends GenericButton implements ButtonProviderInterface
         $url = '*/*/';
         $params = [];
 
-        if ($prevStep && $prevStep){
+        if ($prevStep && $prevStep) {
             $url = 'tnw_subscriptions/subscriptionprofile_create/process';
             $params = [
                 StepPool::STEP_PARAM_NAME => $prevStep,

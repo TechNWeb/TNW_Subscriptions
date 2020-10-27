@@ -3,13 +3,11 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Ui\Component\Listing\Columns\Column;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\UrlBuilderInterface;
 
 /**
@@ -30,10 +28,10 @@ class ProfileLink extends Column
      * @param array $data
      */
     public function __construct(
-        ContextInterface $context, 
+        ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         UrlBuilderInterface $profileUrlBuilder,
-        array $components, 
+        array $components,
         array $data
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);

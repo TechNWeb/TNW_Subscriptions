@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Message;
 
+/**
+ * Class Truncate - action controller
+ */
 class Truncate extends \Magento\Backend\App\Action
 {
     /**

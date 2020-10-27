@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -79,7 +78,7 @@ class Label extends Column
             && $sorting['field'] === $this->getName()
         ) {
             $this->getContext()->getDataProvider()->addOrder(
-               'entity_id',
+                'entity_id',
                 strtoupper($sorting['direction'])
             );
         }

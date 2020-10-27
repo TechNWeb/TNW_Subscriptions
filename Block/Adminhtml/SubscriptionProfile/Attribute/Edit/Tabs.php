@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Attribute\Edit;
 
 /**
@@ -23,7 +22,8 @@ class Tabs extends \Magento\Backend\Block\Widget\Tabs
     }
 
     /**
-     * @return $this
+     * @return \Magento\Backend\Block\Widget\Tabs
+     * @throws \Exception
      */
     protected function _beforeToHtml()
     {

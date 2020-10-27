@@ -21,7 +21,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
 
 /**
- * Class Manager
+ * Class Manager - queue manager model
  */
 class Manager
 {
@@ -433,7 +433,6 @@ class Manager
      * @param $groupQueue
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\MailException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Payment\Gateway\Command\CommandException
      * @throws \TNW\Subscriptions\Exception\ProfileProductsUnsaleableException
@@ -467,7 +466,13 @@ class Manager
                 try {
                     $this->emailNotifierFactory->create()->outOfStockProducts($profile, $outOfStockProductData);
                 } catch (\Exception $e) {
-                    //TODO: log the email sending failure?
+                    $this->messageHistoryLogger->log(
+                        __('Some error sending out of stock notification.'),
+                        $profile->getId(),
+                        false,
+                        false,
+                        true
+                    );
                 }
                 $this->messageHistoryLogger->message(
                     SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK,

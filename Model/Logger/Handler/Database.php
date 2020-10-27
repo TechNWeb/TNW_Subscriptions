@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Model\Logger\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 
+/**
+ * Class Database - db log
+ */
 class Database extends AbstractProcessingHandler
 {
     const MESSAGE_LIMIT_SIZE = 65000;

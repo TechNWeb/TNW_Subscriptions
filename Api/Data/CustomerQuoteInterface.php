@@ -3,11 +3,10 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api\Data;
 
 /**
- * Interface CustomerQuoteInterface
+ * Interface CustomerQuoteInterface - determines the functionality to be implemented for customer quote
  */
 interface CustomerQuoteInterface
 {
@@ -63,5 +62,4 @@ interface CustomerQuoteInterface
      * @return $this
      */
     public function setCustomerId($customerId);
-
 }

@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\OfflinePayments\Model\Purchaseorder as PurchaseorderPayment;
@@ -14,8 +13,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
- * Class Purchaseorder
- * @package TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier
+ * Class Purchaseorder - modifier
  */
 class Purchaseorder extends Base implements PaymentModifierInterface
 {
@@ -86,7 +84,12 @@ class Purchaseorder extends Base implements PaymentModifierInterface
                         'componentType' => 'field',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/input',
                         'label' => __('Purchase Order Number:'),
-                        'additionalClasses' => 'admin__field-wide'
+                        'imports' => [
+                            'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                        ],
+                        'validation' => [
+                            'required-entry' => true
+                        ]
                     ],
                 ],
             ],

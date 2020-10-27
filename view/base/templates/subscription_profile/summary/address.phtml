@@ -1,14 +1,14 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */ ?>
 <div class="block">
     <div class="block-title">
-        <strong><?php echo $block->getAddressTitle() ?></strong>
-        <?php if ($block->isShowEditLink()) : ?>
-            <a href="<?php echo $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
+        <strong><?= $block->getAddressTitle() ?></strong>
+        <?php if ($block->isShowEditLink()): ?>
+            <a href="<?= $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
         <?php endif;?>
     </div>
-    <div class="block-content subscription-profile-<?php echo $this->getAddressType() ?>-address">
+    <div class="block-content subscription-profile-<?= $this->getAddressType() ?>-address">
         <address>
-            <?php echo $block->getAddressHtml() ?>
+            <?= $block->getAddressHtml() ?>
         </address>
     </div>
 </div>

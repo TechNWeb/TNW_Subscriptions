@@ -3,22 +3,21 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Controller\Subscription\Customer\Account;
 
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Subscription\AbstractSave;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
-use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
-use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
  * Saves modified subscription profile.
@@ -98,7 +97,6 @@ class Save extends AbstractSave
         parent::__construct($context, $resultPageFactory, $saveProcessor);
     }
 
-
     /**
      * Execute save profile data on customer account page.
      *
@@ -121,7 +119,8 @@ class Save extends AbstractSave
                 $profile = $this->profileManager->getProfile();
                 $frequencyChanged = isset($request['objectItemId'])
                     && isset($request['item_' . $request['objectItemId']]['billing_frequency'])
-                    && ($profile->getBillingFrequencyId()
+                    && (
+                        $profile->getBillingFrequencyId()
                         != $request['item_' . $request['objectItemId']]['billing_frequency']
                     );
                 $trialLength = $profile->getTrialLength();
@@ -130,7 +129,8 @@ class Save extends AbstractSave
                     : date('Y-m-d', strtotime($profile->getOriginalStartDate()));
                 $startOnChanged = isset($request['objectItemId'])
                     && isset($request['item_' . $request['objectItemId']]['start_on'])
-                    && (date('Y-m-d', strtotime($request['item_' . $request['objectItemId']]['start_on']))
+                    && (
+                        date('Y-m-d', strtotime($request['item_' . $request['objectItemId']]['start_on']))
                         !== $originalStartDate
                     );
                 if ($startOnChanged) {

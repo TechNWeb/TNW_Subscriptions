@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider;
 
 use Magento\Framework\Api\Filter;
@@ -67,9 +66,8 @@ class Payment extends AbstractDataProvider
     }
 
     /**
-     * Get data
-     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getData()
     {
@@ -108,7 +106,7 @@ class Payment extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
-
+        return $this;
     }
 
     /**

@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+/**
+ * Class Message - ResourceModel
+ */
 class Message extends AbstractDb
 {
     /**
@@ -88,7 +91,9 @@ class Message extends AbstractDb
         if ($count > $dbLogLimit) {
             $limit = $count - $dbLogLimit;
             $this->getConnection()
-                ->query("DELETE FROM `{$this->getMainTable()}` ORDER BY `{$this->getIdFieldName()}` ASC LIMIT {$limit}");
+                ->query(
+                    "DELETE FROM `{$this->getMainTable()}` ORDER BY `{$this->getIdFieldName()}` ASC LIMIT {$limit}"
+                );
         }
     }
 }

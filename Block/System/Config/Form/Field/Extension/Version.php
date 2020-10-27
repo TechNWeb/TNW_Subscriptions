@@ -4,7 +4,6 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Block\System\Config\Form\Field\Extension;
 
 use Magento\Backend\Block\Template\Context;
@@ -12,10 +11,22 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ModuleList;
 
+/**
+ * Class Version - block to get the config version
+ */
 class Version extends Field
 {
+    /**
+     * @var ModuleList
+     */
     protected $moduleList;
 
+    /**
+     * Version constructor.
+     * @param Context $context
+     * @param ModuleList $moduleList
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         ModuleList $moduleList,
@@ -39,5 +50,4 @@ class Version extends Field
 
         return $element->getElementHtml();
     }
-
 }

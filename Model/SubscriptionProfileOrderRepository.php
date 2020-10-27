@@ -17,7 +17,8 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory as SubscriptionProfileOrderCollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory
+    as SubscriptionProfileOrderCollectionFactory;
 
 class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepositoryInterface
 {
@@ -61,7 +62,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      */
     private $subscriptionProfileOrderCollectionFactory;
 
-
     /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
@@ -98,10 +98,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     public function save(
         \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder
     ) {
-        /* if (empty($subscriptionProfileOrder->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $subscriptionProfileOrder->setStoreId($storeId);
-        } */
         try {
             $this->resource->save($subscriptionProfileOrder);
         } catch (\Exception $exception) {
@@ -121,8 +117,10 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $subscriptionProfileOrder = $this->subscriptionProfileOrderFactory->create();
         $subscriptionProfileOrder->load($subscriptionProfileOrderId);
         if (!$subscriptionProfileOrder->getId()) {
-            throw new NoSuchEntityException(__('SubscriptionProfileOrder with id "%1" does not exist.',
-                $subscriptionProfileOrderId));
+            throw new NoSuchEntityException(__(
+                'SubscriptionProfileOrder with id "%1" does not exist.',
+                $subscriptionProfileOrderId
+            ));
         }
         return $subscriptionProfileOrder;
     }
@@ -167,7 +165,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
             $this->dataObjectHelper->populateWithArray(
                 $subscriptionProfileOrderData,
                 $subscriptionProfileOrderModel->getData(),
-                'TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface'
+                \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface::class
             );
             $items[] = $subscriptionProfileOrderData;
         }

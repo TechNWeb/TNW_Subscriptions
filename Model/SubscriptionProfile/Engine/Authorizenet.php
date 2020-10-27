@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Engine;
 
 use Magento\Quote\Model\Quote\Payment;
@@ -11,7 +10,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
- * Authorizenet Engine
+ * Authorizenet Engine - used to process the authorize net payments
  */
 class Authorizenet extends Base
 {
@@ -74,7 +73,7 @@ class Authorizenet extends Base
             $paymentTokenManagement
         );
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
-            $this->transferFactory = $objectManager->get("TNW\AuthorizeCim\Gateway\Http\TransferFactory");
+            $this->transferFactory = $objectManager->get(\TNW\AuthorizeCim\Gateway\Http\TransferFactory::class);
         }
         $this->transactionCustomer = $transactionCustomer;
     }
@@ -89,7 +88,7 @@ class Authorizenet extends Base
         $expirationDate = [];
         if (array_key_exists('extension_attributes', $additionalInfo)) {
             $cardDetails = json_decode($additionalInfo['extension_attributes'], true);
-            $expirationDate = explode('/' , $cardDetails['expirationDate']);
+            $expirationDate = explode('/', $cardDetails['expirationDate']);
         }
         if (!$cardDetails && !isset($additionalInfo[OrderPaymentInterface::CC_TYPE]) && !$expirationDate) {
             $cardDetails = [
@@ -204,12 +203,13 @@ class Authorizenet extends Base
     }
 
     /**
-     *
+     * Set reBill processing flag
      */
     public function setRebillProcessFlag()
-     {
-         $this->isRebill = true;
-     }
+    {
+        $this->isRebill = true;
+        return $this;
+    }
 
     /**
      * @param \Magento\Quote\Model\Quote $quote

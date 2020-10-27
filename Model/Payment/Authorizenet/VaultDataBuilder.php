@@ -12,8 +12,7 @@ use \Magento\Framework\ObjectManagerInterface as ObjectManager;
 use \Magento\Vault\Api\PaymentTokenManagementInterface;
 
 /**
- * Class VaultDataBuilder
- * @package TNW\Subscriptions\Model\Payment\Authorizenet
+ * Class VaultDataBuilder - authorizenet
  */
 class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
 {

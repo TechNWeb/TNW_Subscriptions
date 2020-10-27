@@ -3,13 +3,11 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Plugin\Product;
 
 use Magento\Eav\Model\Entity\Type;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory;
 use TNW\Subscriptions\Model\ProductDefaultAttributes;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 /**
  * Eav attribute interceptor
@@ -88,7 +86,7 @@ class Attribute
      */
     private function getDefaultValues()
     {
-        if (is_null($this->defaultValues)) {
+        if ($this->defaultValues === null) {
             $this->defaultValues = $this->productDefaultAttributes->getDefaultValues();
         }
 

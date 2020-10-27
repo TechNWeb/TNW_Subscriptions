@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Model\Config\Source;
 
 /**
- * Class ShippingFallback
- * @package TNW\Subscriptions\Model\Config\Source
+ * Class ShippingFallback - config source model
  */
 class ShippingFallback implements \Magento\Framework\Option\ArrayInterface
 {

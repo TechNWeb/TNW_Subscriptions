@@ -39,12 +39,12 @@
                         borderWidth: 1
                     }],
                     labels: [
-                        '<?php echo  __('%1 as of today', $block->getRenderedAsOfTodayProfit(false))?>',
+                        '<?=  __('%1 as of today', $block->getRenderedAsOfTodayProfit(false))?>',
                         <?php if (!$block->getHideRemainingProfit()): ?>
                             <?php if ($block->subscriptionProfile()->getTerm() == 1): ?>
-                                '<?php echo  __('%1 projected annual profit', $block->getRenderedRemainingProfit(false))?>'
+                                '<?=  __('%1 projected annual profit', $block->getRenderedRemainingProfit(false))?>'
                             <?php else: ?>
-                                '<?php echo  __('%1 remaining', $block->getRenderedRemainingProfit(false))?>'
+                                '<?=  __('%1 remaining', $block->getRenderedRemainingProfit(false))?>'
                             <?php endif; ?>
                         <?php endif ?>
                     ]

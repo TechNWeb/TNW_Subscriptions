@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Model\Payment;
 
 /**
- * Class VoidDataBuilder
- * @package TNW\Subscriptions\Model\Payment
+ * Class VoidDataBuilder - used as data base class for void transactions build
  */
 class VoidDataBuilder
 {

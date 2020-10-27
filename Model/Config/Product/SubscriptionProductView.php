@@ -4,11 +4,9 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
-
 namespace TNW\Subscriptions\Model\Config\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\App\RequestInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
@@ -86,7 +84,6 @@ class SubscriptionProductView
             && !empty($this->getProductBillingFrequenciesById($productId));
     }
 
-
     /**
      * Check if subscription purchase type is "Recurring purchase" only.
      *
@@ -126,9 +123,10 @@ class SubscriptionProductView
      * @param ProductInterface $product
      * @return bool
      */
-    public function IsOneTimeAndSubscribePurchase(ProductInterface $product)
+    public function isOneTimeAndSubscribePurchase(ProductInterface $product)
     {
-        return ($this->getProductSubscriptionPurchaseType($product) == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
+        return ($this->getProductSubscriptionPurchaseType($product)
+                == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
             && $product->getIsSalable();
     }
 
@@ -139,7 +137,7 @@ class SubscriptionProductView
      * @param array $productPreset
      * @return array
      */
-    public function IsOneTimeAndSubscribePurchaseByIds(array $productPreset)
+    public function isOneTimeAndSubscribePurchaseByIds(array $productPreset)
     {
         $result = [];
         $productIds = array_keys($productPreset);

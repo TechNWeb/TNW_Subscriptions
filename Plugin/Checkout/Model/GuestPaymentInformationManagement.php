@@ -6,8 +6,7 @@
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Class GuestPaymentInformationManagement
- * @package TNW\Subscriptions\Plugin\Checkout\Model
+ * Class GuestPaymentInformationManagement - plugin to before process payment info
  */
 class GuestPaymentInformationManagement
 {

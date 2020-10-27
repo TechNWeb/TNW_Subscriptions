@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
@@ -13,7 +12,7 @@ use TNW\Subscriptions\Api\Data\CustomerQuoteSearchResultsInterface;
 use TNW\Subscriptions\Api\Data\CustomerQuoteInterface;
 
 /**
- * Interface CustomerQuoteRepositoryInterface
+ * Interface CustomerQuoteRepositoryInterface - determines the functionality to implement for customer quote repository
  */
 interface CustomerQuoteRepositoryInterface
 {

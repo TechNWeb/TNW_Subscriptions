@@ -3,7 +3,6 @@
  * Copyright © 2018 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Catalog\Model\Product;
@@ -135,8 +134,8 @@ class PriceCalculator
             } else {
                 $billingFrequencyPrice = $this->getBillingFrequencyPrice(
                     $billingFrequencyId,
-                    $product->getChildProductId())
-                ;
+                    $product->getChildProductId()
+                );
                 $price = isset($productPrice) ? $productPrice : $billingFrequencyPrice;
             }
         }
@@ -260,11 +259,9 @@ class PriceCalculator
     }
 
     /**
-     * Get product billing frequency considering billing frequency and product.
-     *
      * @param $billingFrequencyId
      * @param $productId
-     * @return ProductBillingFrequencyInterface
+     * @return DataObject
      */
     public function getProductBillingFrequency($billingFrequencyId, $productId)
     {

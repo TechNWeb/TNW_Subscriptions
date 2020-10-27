@@ -9,8 +9,7 @@ use Magento\Config\Model\Config\CommentInterface;
 use Magento\Framework\View\Element\AbstractBlock;
 
 /**
- * Class ShippingMethodsComment
- * @package TNW\Subscriptions\Block\Adminhtml\System\Config
+ * Class ShippingMethodsComment - adminhtml block for config shipping methods comments
  */
 class ShippingMethodsComment extends AbstractBlock implements CommentInterface
 {
@@ -26,6 +25,9 @@ class ShippingMethodsComment extends AbstractBlock implements CommentInterface
         $comment .= "<a href='%1'>Shipping Methods</a> configuration in Magento.<br>";
         $comment .= "<span style='color:#d04437'>IMPORTANT: </span> If the default shipping method won't be available";
         $comment .= " for an order, mPower will substitute it with the cheapest available shipping method.";
-        return __($comment, $this->_urlBuilder->getUrl('adminhtml/system_config/edit', ['section' => 'carriers']));
+        return __($comment, $this->_urlBuilder->getUrl(
+            'adminhtml/system_config/edit',
+            ['section' => 'carriers']
+        ));
     }
 }
