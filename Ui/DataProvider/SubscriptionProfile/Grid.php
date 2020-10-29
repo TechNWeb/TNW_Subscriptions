@@ -41,8 +41,8 @@ class Grid extends DataProvider
             $filter->setField('customer.email');
         }
 
-        if ($field === 'customer_name') {
-            $filter->setField("CONCAT_WS(' ', customer.firstname, customer.lastname)");
+        if ($field === 'customer_id') {
+            $filter->setField('customer.name');
         }
 
         if ($field === 'website_id') {
@@ -51,6 +51,10 @@ class Grid extends DataProvider
 
         if ($field === 'status') {
             $filter->setField('main_table.status');
+        }
+
+        if ($field === 'product_name') {
+            $filter->setField('profile_product.name');
         }
 
         parent::addFilter($filter);
