@@ -109,16 +109,10 @@ class Collection extends SearchResult
                 ['next_billing_cycle_date' => 'relation.scheduled_at']
             )
             ->joinLeft(
-                ['customer' => $this->getTable('customer_entity')],
+                ['customer' => $this->getTable('customer_grid_flat')],
                 'customer.entity_id = main_table.customer_id',
                 [
-                    'customer_name' => $connection->getConcatSql(
-                        [
-                            'customer.firstname',
-                            'customer.lastname',
-                        ],
-                        ' '
-                    ),
+                    'customer_name' => 'customer.name',
                     'customer_email' => 'customer.email',
                 ]
             )
