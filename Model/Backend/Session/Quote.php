@@ -35,4 +35,17 @@ class Quote extends QuoteSession
     {
         return $this->getData('currency_id');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function clearStorage()
+    {
+        $twoFAActive = $this->getData('2fa_passed');
+        $result = parent::clearStorage();
+        if ($twoFAActive) {
+            $this->setData('2fa_passed', $twoFAActive);
+        }
+        return $result;
+    }
 }
