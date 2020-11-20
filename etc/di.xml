@@ -1397,4 +1397,8 @@
     <type name="Magento\Multishipping\Controller\Checkout\Addresses">
         <plugin name="tnw_multishipping_redirect" type="TNW\Subscriptions\Plugin\Multishipping\Controller\Checkout\Addresses"/>
     </type>
+    <type name="Magento\Framework\Session\SessionStartChecker">
+        <plugin name="tnw_transparent_session_checker"
+                type="TNW\Subscriptions\Plugin\TransparentSessionChecker" sortOrder="10"/>
+    </type>
 </config>
