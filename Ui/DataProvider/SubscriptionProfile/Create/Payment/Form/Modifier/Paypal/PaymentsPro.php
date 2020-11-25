@@ -321,6 +321,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
     {
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/fieldset',
+            'template' => 'TNW_Subscriptions/form/subscription-profile/payment/payflowpro',
             'listens'=> $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
