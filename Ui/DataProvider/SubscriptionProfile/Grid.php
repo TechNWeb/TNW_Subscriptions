@@ -41,7 +41,7 @@ class Grid extends DataProvider
             $filter->setField('customer.email');
         }
 
-        if ($field === 'customer_id') {
+        if ($field === 'customer_id' && !is_numeric($filter->getValue())) {
             $filter->setField('customer.name');
         }
 
