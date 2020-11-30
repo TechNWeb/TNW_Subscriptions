@@ -29,6 +29,10 @@
         <plugin name="before_create_payment_intent"
                 type="TNW\Subscriptions\Plugin\Stripe\Model\Adapter\StripeAdapter" />
     </type>
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="after_represent_product"
+                type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item" />
+    </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -1386,5 +1390,9 @@
     </type>
     <type name="Magento\Multishipping\Controller\Checkout\Addresses">
         <plugin name="tnw_multishipping_redirect" type="TNW\Subscriptions\Plugin\Multishipping\Controller\Checkout\Addresses"/>
+    </type>
+    <type name="Magento\Framework\Session\SessionStartChecker">
+        <plugin name="tnw_transparent_session_checker"
+                type="TNW\Subscriptions\Plugin\TransparentSessionChecker" sortOrder="10"/>
     </type>
 </config>

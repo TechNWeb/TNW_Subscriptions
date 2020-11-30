@@ -67,7 +67,7 @@ class SecureToken
         $request->setAmt(0);
         $request->setCreatesecuretoken('Y');
         $request->setSecuretokenid($this->mathRandom->getUniqueHash());
-        $routePath = 'tnw_subscriptions/paypal/response';
+        $routePath = 'tnw_subscriptions/paypal/redirect';
         $url = ($object instanceof SubscriptionProfileInterface)
             ? $this->url->getUrl(
                 $routePath,
