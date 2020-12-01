@@ -53,6 +53,11 @@ class EmailNotifier
     private $profileOrderManager;
 
     /**
+     * @var SubscriptionProfile\Manager
+     */
+    private $profileManager;
+
+    /**
      * EmailNotifier constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
@@ -60,6 +65,7 @@ class EmailNotifier
      * @param Source\ProfileStatusFactory $profileStatusFactory
      * @param \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param SubscriptionProfileOrder\Manager $profileOrderManager
+     * @param SubscriptionProfile\Manager $profileManager
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -67,8 +73,10 @@ class EmailNotifier
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         Source\ProfileStatusFactory $profileStatusFactory,
         \TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
-        SubscriptionProfileOrder\Manager $profileOrderManager
+        SubscriptionProfileOrder\Manager $profileOrderManager,
+        SubscriptionProfile\Manager $profileManager
     ) {
+        $this->profileManager = $profileManager;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->profileStatusFactory = $profileStatusFactory;
         $this->transportBuilder = $transportBuilder;
@@ -87,7 +95,7 @@ class EmailNotifier
     public function profileStatusChange($subscriptionProfile, $oldStatus, $newStatus)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_STATUS_CHANGE_TEMPLATE)) {
-            $customer = $subscriptionProfile->getCustomer();
+            list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
             $statusModel = $this->profileStatusFactory->create();
             $date = $this->getNextProfileRelation($subscriptionProfile)
                 ? date('F jS, Y', strtotime($this->getNextProfileRelation($subscriptionProfile)->getScheduledAt()))
@@ -97,17 +105,17 @@ class EmailNotifier
                     self::XML_PATH_STATUS_CHANGE_TEMPLATE,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 ),
-                $customer->getStoreId(),
+                $storeId,
                 [
                     'subscription' => $subscriptionProfile,
                     'oldStatus' => $statusModel->getLabelByValue($oldStatus),
                     'newStatus' => $statusModel->getLabelByValue($newStatus),
                     'date' => $date,
-                    'customer' => $customer
+                    'customerName' => $customerName
                 ],
                 [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                    'email' => $customerEmail,
+                    'name' => $customerName
                 ]
             );
         }
@@ -130,21 +138,21 @@ class EmailNotifier
                 }
             }
             if ($subscriptionProfile) {
-                $customer = $subscriptionProfile->getCustomer();
+                list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_COMMENT_ADDED_TEMPLATE,
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                     ),
-                    $customer->getStoreId(),
+                    $storeId,
                     [
                         'subscription' => $subscriptionProfile,
                         'comment' => $comment,
-                        'customer' => $customer
+                        'customerName' => $customerName
                     ],
                     [
-                        'email' => $customer->getEmail(),
-                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                        'email' => $customerEmail,
+                        'name' => $customerName
                     ]
                 );
             }
@@ -160,21 +168,21 @@ class EmailNotifier
     public function cardExpire($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
-            $customer = $subscriptionProfile->getCustomer();
+            list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_CARD_EXPIRE,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 ),
-                $customer->getStoreId(),
+                $storeId,
                 [
                     'subscription' => $subscriptionProfile,
-                    'customer' => $customer,
+                    'customerName' => $customerName,
                     'date' => date('F jS, Y', strtotime($date))
                 ],
                 [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                    'email' => $customerEmail,
+                    'name' => $customerName
                 ]
             );
         }
@@ -188,25 +196,25 @@ class EmailNotifier
     public function paymentFailed($subscriptionProfile)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_PAYMENT_FAILED)) {
-            $customer = $subscriptionProfile->getCustomer();
+            list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_PAYMENT_FAILED,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 ),
-                $customer->getStoreId(),
+                $storeId,
                 [
                     'subscription' => $subscriptionProfile,
-                    'customer' => $customer,
+                    'customerName' => $customerName,
                     'attempt_interval' => $this->scopeConfig->getValue(
                         'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                        $customer->getStoreId()
+                        $storeId
                     )
                 ],
                 [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                    'email' => $customerEmail,
+                    'name' => $customerName
                 ]
             );
         }
@@ -221,21 +229,21 @@ class EmailNotifier
     public function outOfStockProducts($subscriptionProfile, $products)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_OUT_OF_STOCK)) {
-            $customer = $subscriptionProfile->getCustomer();
+            list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
             $this->sendNotificationEmail(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_OUT_OF_STOCK,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 ),
-                $customer->getStoreId(),
+                $storeId,
                 [
                     'subscription' => $subscriptionProfile,
-                    'customer' => $customer,
+                    'customerName' => $customerName,
                     'products' => implode(', ', $products)
                 ],
                 [
-                    'email' => $customer->getEmail(),
-                    'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                    'email' => $customerEmail,
+                    'name' => $customerName
                 ]
             );
         }
@@ -270,22 +278,22 @@ class EmailNotifier
             }
 
             if ($subscriptionProfiles) {
-                $subscriptionProfile =  reset($subscriptionProfiles);
-                $customer = $subscriptionProfile->getCustomer();
+                $subscriptionProfile = reset($subscriptionProfiles);
+                list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_RENEWAL,
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                     ),
-                    $customer->getStoreId(),
+                    $storeId,
                     [
                         'subscriptions' => $subscriptionProfiles,
-                        'customer' => $customer,
+                        'customerName' => $customerName,
                         'date' => date('F jS, Y', strtotime($date))
                     ],
                     [
-                        'email' => $customer->getEmail(),
-                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                        'email' => $customerEmail,
+                        'name' => $customerName
                     ]
                 );
             }
@@ -344,6 +352,26 @@ class EmailNotifier
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @return array
+     */
+    private function getCustomerVars($subscriptionProfile)
+    {
+        $customer = $subscriptionProfile->getCustomer();
+        if (!$customer) {
+            $order = $this->profileManager->getLastProfileOrder($subscriptionProfile);
+            $storeId = $order->getStoreId();
+            $customerEmail = $order->getCustomerEmail();
+            $customerName = $order->getCustomerName();
+        } else {
+            $storeId = $customer->getStoreId();
+            $customerEmail = $customer->getEmail();
+            $customerName = $customer->getFirstname() . ' ' . $customer->getLastName();
+        }
+        return [$storeId, $customerEmail, $customerName];
     }
 
     /**

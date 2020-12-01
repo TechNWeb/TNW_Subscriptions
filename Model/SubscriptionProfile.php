@@ -567,12 +567,15 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * @inheritdoc
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return \Magento\Customer\Api\Data\CustomerInterface|null
      */
     public function getCustomer()
     {
-        $customer = $this->customerRepository->getById($this->getCustomerId());
+        try {
+            $customer = $this->customerRepository->getById($this->getCustomerId());
+        } catch (\Exception $e) {
+            return null;
+        }
 
         if ($this->userContext->getUserType() == UserContextInterface::USER_TYPE_GUEST) {
             $customer->setId(null);

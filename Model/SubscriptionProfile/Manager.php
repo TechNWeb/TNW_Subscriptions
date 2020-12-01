@@ -41,6 +41,7 @@ use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
 use TNW\Subscriptions\Model\Config\Source\FreeShipping;
+use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -213,6 +214,11 @@ class Manager
     ];
 
     /**
+     * @var CollectionFactory
+     */
+    private $orderCollectionFactory;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -237,6 +243,8 @@ class Manager
      * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
      * @param QuoteFactory $quoteFactory
      * @param Quote\TotalsCollector $totalsCollector
+     * @param SerializerInterface $serializer
+     * @param CollectionFactory $orderCollectionFactory
      */
     public function __construct(
         EnginePool $enginePool,
@@ -262,8 +270,10 @@ class Manager
         \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
         QuoteFactory $quoteFactory,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        CollectionFactory $orderCollectionFactory
     ) {
+        $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
         $this->quoteFactory = $quoteFactory;
         $this->freeShipping = $freeShipping;
@@ -412,6 +422,7 @@ class Manager
 
     /**
      * @return SubscriptionProfileInterface
+     * @throws Engine\InvalidEngineException
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
@@ -424,8 +435,8 @@ class Manager
         }
 
         $this->tempQuote = true;
-        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]])
-            ->assignCustomer($profile->getCustomer());
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+
         $this->populateQuoteData($quote, $profile, true, true);
         $this->populateTotals($profile, $quote);
         $this->tempQuote = false;
@@ -441,14 +452,15 @@ class Manager
 
     /**
      * @param $profile
-     * @return mixed
+     * @return Quote
+     * @throws Engine\InvalidEngineException
      * @throws LocalizedException
      */
     public function getTempQuote($profile)
     {
         $this->tempQuote = true;
-        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]])
-            ->assignCustomer($profile->getCustomer());
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        $this->assignCustomerToQuote($quote, $profile);
         $this->populateQuoteData($quote, $profile, true, true);
         $this->tempQuote = false;
         return $quote;
@@ -612,25 +624,20 @@ class Manager
     }
 
     /**
-     * @param $additionalInfo
-     * @param $property
-     * @return mixed|null
+     * @param $profile
+     * @return DataObject
      */
-    private function propertyAdditionalInfo($additionalInfo, $property)
+    public function getLastProfileOrder($profile)
     {
-        if (empty($additionalInfo)) {
-            return null;
-        }
-
-        if (is_string($additionalInfo)) {
-            $additionalInfo = (array) json_decode($additionalInfo);
-        }
-
-        if (empty($additionalInfo[$property])) {
-            return null;
-        }
-
-        return $additionalInfo[$property];
+        $orders = $this->orderCollectionFactory->create();
+        $orders
+            ->join(
+                ['relation' => $orders->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+                'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                []
+            )->addFieldToFilter('relation.subscription_profile_id', $profile->getId())
+            ->setOrder('main_table.entity_id', 'DESC');
+        return $orders->getFirstItem();
     }
 
     /**
@@ -858,6 +865,7 @@ class Manager
      * @param bool $collectQuoteTotals
      * @param bool $isReBill
      * @return array
+     * @throws Engine\InvalidEngineException
      * @throws LocalizedException
      */
     public function populateQuoteData(
@@ -888,8 +896,8 @@ class Manager
         $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
 
         //Set customer
-        if (!$quote->getCustomerId()) {
-            $quote->assignCustomer($profile->getCustomer());
+        if (!$quote->getCustomerId() && !$quote->getCustomerIsGuest()) {
+            $this->assignCustomerToQuote($quote, $profile);
         }
 
         //Add products
@@ -1154,6 +1162,25 @@ class Manager
         return $quote;
     }
 
+
+    /**
+     * @param $quote
+     * @param $profile
+     * @return mixed
+     */
+    public function assignCustomerToQuote($quote, $profile)
+    {
+        if ($customer = $profile->getCustomer()) {
+            $quote->assignCustomer($profile->getCustomer());
+        } else {
+            if ($profileOrder = $this->getLastProfileOrder($profile)) {
+                $quote->setCustomerIsGuest(true);
+                $quote->setCustomerEmail($profileOrder->getCustomerEmail());
+            }
+        }
+        return $quote;
+    }
+
     /**
      * Handles messages for subscription edit form
      *
@@ -1206,6 +1233,28 @@ class Manager
             $profileBilling,
             $profileShipping
         ];
+    }
+
+    /**
+     * @param $additionalInfo
+     * @param $property
+     * @return mixed|null
+     */
+    private function propertyAdditionalInfo($additionalInfo, $property)
+    {
+        if (empty($additionalInfo)) {
+            return null;
+        }
+
+        if (is_string($additionalInfo)) {
+            $additionalInfo = (array) json_decode($additionalInfo);
+        }
+
+        if (empty($additionalInfo[$property])) {
+            return null;
+        }
+
+        return $additionalInfo[$property];
     }
 
     /**

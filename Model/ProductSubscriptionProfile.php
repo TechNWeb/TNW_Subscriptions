@@ -10,13 +10,20 @@ use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Serialize\SerializerInterface;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
+use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory;
+use Magento\Tax\Api\TaxCalculationInterface;
+use Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory;
+use Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory;
+use Magento\Tax\Api\Data\TaxClassKeyInterface;
 use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
+
 
 /**
  * Product subscription profile model.
@@ -28,36 +35,28 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
      */
     const ENTITY = 'tnw_product_subscription_profile';
 
-    /*
+    /**
      * Default group code for custom attributes.
      */
     const DEFAULT_GROUP_CODE = 'additional-information';
 
     /**
-     * Quote details factory
-     *
-     * @var \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory
+     * @var QuoteDetailsInterfaceFactory
      */
     protected $quoteDetailsFactory;
 
     /**
-     * Tax calculation service interface
-     *
-     * @var \Magento\Tax\Api\TaxCalculationInterface
+     * @var TaxCalculationInterface
      */
     protected $taxCalculationService;
 
     /**
-     * Quote details item factory
-     *
-     * @var \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory
+     * @var QuoteDetailsItemInterfaceFactory
      */
     protected $quoteDetailsItemFactory;
 
     /**
-     * Tax class key factory
-     *
-     * @var \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory
+     * @var TaxClassKeyInterfaceFactory
      */
     protected $taxClassKeyFactory;
 
@@ -113,6 +112,11 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
     private $serializer;
 
     /**
+     * @var GroupManagementInterface
+     */
+    private $groupManagement;
+
+    /**
      * ProductSubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -120,11 +124,13 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
      * @param AttributeValueFactory $customAttributeFactory
      * @param ProductRepositoryInterface $productRepository
      * @param ProductSubscriptionProfileAttributeRepositoryInterface $metadataService
-     * @param \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory $quoteDetailsFactory
-     * @param \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService
-     * @param \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory
-     * @param \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory
+     * @param QuoteDetailsInterfaceFactory $quoteDetailsFactory
+     * @param TaxCalculationInterface $taxCalculationService
+     * @param QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory
+     * @param TaxClassKeyInterfaceFactory $taxClassKeyFactory
      * @param GroupRepository $groupRepository
+     * @param SerializerInterface $serializer
+     * @param GroupManagementInterface $groupManagement
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -136,12 +142,13 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
         AttributeValueFactory $customAttributeFactory,
         ProductRepositoryInterface $productRepository,
         ProductSubscriptionProfileAttributeRepositoryInterface $metadataService,
-        \Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory $quoteDetailsFactory,
-        \Magento\Tax\Api\TaxCalculationInterface $taxCalculationService,
-        \Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory,
-        \Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory $taxClassKeyFactory,
+        QuoteDetailsInterfaceFactory $quoteDetailsFactory,
+        TaxCalculationInterface $taxCalculationService,
+        QuoteDetailsItemInterfaceFactory $quoteDetailsItemFactory,
+        TaxClassKeyInterfaceFactory $taxClassKeyFactory,
         GroupRepository $groupRepository,
         SerializerInterface $serializer,
+        GroupManagementInterface $groupManagement,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -155,7 +162,7 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
             $resourceCollection,
             $data
         );
-
+        $this->groupManagement = $groupManagement;
         $this->taxClassKeyFactory = $taxClassKeyFactory;
         $this->quoteDetailsItemFactory = $quoteDetailsItemFactory;
         $this->quoteDetailsFactory = $quoteDetailsFactory;
@@ -260,12 +267,18 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
     {
         try {
             $taxClassKey = $this->taxClassKeyFactory->create();
-            $taxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+            $taxClassKey->setType(TaxClassKeyInterface::TYPE_ID)
                 ->setValue($this->getMagentoProduct()->getTaxClassId());
 
-            $group = $this->groupRepository->getById($subscriptionProfile->getCustomer()->getGroupId());
+            if ($subscriptionProfile->getCustomer()) {
+                $group = $this->groupRepository->getById($subscriptionProfile->getCustomer()->getGroupId());
+                $customerId = $subscriptionProfile->getCustomerId();
+            } else {
+                $group = $this->groupManagement->getNotLoggedInGroup();
+                $customerId = 0;
+            }
             $customerTaxClassKey = $this->taxClassKeyFactory->create();
-            $customerTaxClassKey->setType(\Magento\Tax\Api\Data\TaxClassKeyInterface::TYPE_ID)
+            $customerTaxClassKey->setType(TaxClassKeyInterface::TYPE_ID)
                 ->setValue($group->getTaxClassId());
 
             $quoteDetails = $this->quoteDetailsFactory->create();
@@ -277,12 +290,11 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
                 ->setIsTaxIncluded(false)
                 ->setType('product')
                 ->setUnitPrice($this->getProfileUnitPrice(true));
-
             $quoteDetails->setShippingAddress($subscriptionProfile->getShippingAddress()->exportCustomerAddress())
                 ->setBillingAddress($subscriptionProfile->getBillingAddress()->exportCustomerAddress())
                 ->setCustomerTaxClassKey($customerTaxClassKey)
                 ->setItems([$item])
-                ->setCustomerId($subscriptionProfile->getCustomerId());
+                ->setCustomerId($customerId);
             $storeId = null;
             $taxDetails = $this->taxCalculationService->calculateTax($quoteDetails, $storeId, true);
         } catch (\Exception $e) {

@@ -4,7 +4,7 @@
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
 "var store_email":"Store Email",
 "var date":"Upcoming Subscription Renewal Date",
-"var customer":"Customer",
+"var customerName":"Customer Name",
 "var subscriptions":"Subscription Profiles",
 "layout handle=\"subscriptions_email_profile_items\" subscriptionProfiles=$subscriptions":"Subscription Items Grid"
 } @-->
@@ -12,7 +12,7 @@
 <table>
     <tr class="email-intro">
         <td>
-            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
                 {{trans 'You have an upcoming recurring order on'}} <strong>{{var date}}</strong>
             </p>

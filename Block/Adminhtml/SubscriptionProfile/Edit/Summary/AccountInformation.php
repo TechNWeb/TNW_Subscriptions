@@ -7,11 +7,12 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 
 use Magento\Backend\Block\Template;
 use Magento\Customer\Api\GroupRepositoryInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as SubscriptionProfileResource;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Block for view subscription profile information
@@ -64,14 +65,25 @@ class AccountInformation extends Template
     private $registry;
 
     /**
+     * @var GroupManagementInterface
+     */
+    private $groupManagement;
+
+    /**
+     * @var Manager
+     */
+    private $profileManager;
+
+    /**
      * AccountInformation constructor.
      * @param SubscriptionProfileResource $subscriptionProfileResource
      * @param ProfileStatus $profileStatus
      * @param GroupRepositoryInterface $groupRepository
      * @param Registry $registry
      * @param Template\Context $context
+     * @param Manager $profileManager
+     * @param GroupManagementInterface $groupManagement
      * @param array $data
-     * @internal param SubscriptionProfileResource $subscriptionProfile
      */
     public function __construct(
         SubscriptionProfileResource $subscriptionProfileResource,
@@ -79,11 +91,14 @@ class AccountInformation extends Template
         GroupRepositoryInterface $groupRepository,
         Registry $registry,
         Template\Context $context,
+        Manager $profileManager,
+        GroupManagementInterface $groupManagement,
         array $data = []
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/account_information.phtml');
         parent::__construct($context, $data);
-
+        $this->profileManager = $profileManager;
+        $this->groupManagement = $groupManagement;
         $this->registry = $registry;
         $this->groupRepository = $groupRepository;
         $this->profileStatus = $profileStatus;
@@ -183,24 +198,24 @@ class AccountInformation extends Template
      */
     public function getCustomerName()
     {
-        try {
-            $customerEmail = $this->getCustomer()->getFirstname();
-        } catch (NoSuchEntityException $e) {
-            $customerEmail = 'undefined';
+        if ($customer = $this->getCustomer()) {
+            $customerName = $customer->getFirstname();
+        } else {
+            $customerName = $this->profileManager
+                ->getLastProfileOrder($this->getSubscriptionProfile())
+                ->getCustomerName();
         }
-
-        return $customerEmail;
+        return $customerName;
     }
 
     /**
      * Return customer url
      *
      * @return string
-     * @throws NoSuchEntityException
      */
     public function getCustomerUrl()
     {
-        if ($this->getCustomer()->getId()) {
+        if ($this->getCustomer()) {
             $url = $this->_urlBuilder->getUrl('customer/index/edit', ['id' => $this->getCustomer()->getId()]);
         } else {
             $url = '#';
@@ -216,12 +231,13 @@ class AccountInformation extends Template
      */
     public function getEmail()
     {
-        try {
-            $customerEmail = $this->getCustomer()->getEmail();
-        } catch (NoSuchEntityException $e) {
-            $customerEmail = 'undefined';
+        if ($customer = $this->getCustomer()) {
+            $customerEmail = $customer->getEmail();
+        } else {
+            $customerEmail = $this->profileManager
+                ->getLastProfileOrder($this->getSubscriptionProfile())
+                ->getCustomerEmail();
         }
-
         return $customerEmail;
     }
 
@@ -229,22 +245,27 @@ class AccountInformation extends Template
      * Return customer group
      *
      * @return string
-     * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomerGroup()
     {
         $groupCode = 'undefined';
-        $groupId = $this->getCustomer()->getGroupId();
 
-        if (is_numeric($groupId)) {
+        if ($this->getCustomer() && is_numeric($this->getCustomer()->getGroupId())) {
             try {
                 /** @var \Magento\Customer\Model\Data\Group $group */
-                $group = $this->groupRepository->getById($groupId);
-                $groupCode = $group->getCode();
-            } catch (NoSuchEntityException $e) {
-                $groupCode = 'undefined';
+                $group = $this->groupRepository->getById($this->getCustomer()->getGroupId());
+            } catch (\Exception $e) {
+                $group = null;
             }
+        } else {
+            try {
+                $group = $this->groupManagement->getNotLoggedInGroup();
+            } catch (\Exception $e) {
+                $group = null;
+            }
+        }
+        if ($group) {
+            $groupCode = $group->getCode();
         }
 
         return $groupCode;
@@ -274,7 +295,6 @@ class AccountInformation extends Template
      * Return customer
      *
      * @return \Magento\Customer\Api\Data\CustomerInterface
-     * @throws NoSuchEntityException
      */
     private function getCustomer()
     {
