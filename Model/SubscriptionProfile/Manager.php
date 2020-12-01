@@ -1162,7 +1162,6 @@ class Manager
         return $quote;
     }
 
-
     /**
      * @param $quote
      * @param $profile

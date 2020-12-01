@@ -24,7 +24,6 @@ use TNW\Subscriptions\Api\ProductSubscriptionProfileAttributeRepositoryInterface
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile as Resource;
 
-
 /**
  * Product subscription profile model.
  */

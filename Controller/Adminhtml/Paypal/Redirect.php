@@ -47,8 +47,7 @@ class Redirect extends Action implements CsrfAwareActionInterface, HttpPostActio
         LayoutFactory $resultLayoutFactory,
         Transparent $transparent,
         Logger $logger
-    )
-    {
+    ) {
         $this->resultLayoutFactory = $resultLayoutFactory;
         $this->transparent = $transparent;
         $this->logger = $logger;
@@ -59,9 +58,7 @@ class Redirect extends Action implements CsrfAwareActionInterface, HttpPostActio
     /**
      * @inheritDoc
      */
-    public function createCsrfValidationException(
-        RequestInterface $request
-    ): ?InvalidRequestException
+    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
     {
         return null;
     }

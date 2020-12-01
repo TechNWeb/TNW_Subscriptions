@@ -138,6 +138,5 @@ class Edit extends SubscriptionProfile
                 )
             );
         }
-
     }
 }
