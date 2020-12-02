@@ -51,9 +51,9 @@ class DataProvider extends AbstractDataProvider
      * @param RequestInterface $request
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param Manager $profileManager
-     * @param $name
-     * @param $primaryFieldName
-     * @param $requestFieldName
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
      * @param array $meta
      * @param array $data
      */
