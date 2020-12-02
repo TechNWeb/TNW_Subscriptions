@@ -15,6 +15,7 @@ use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile as ProfileModel;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class Edit - controller
@@ -32,22 +33,30 @@ class Edit extends SubscriptionProfile
     private $profileRepository;
 
     /**
+     * @var Manager
+     */
+    private $profileManager;
+
+    /**
+     * Edit constructor.
      * @param Context $context
      * @param Registry $coreRegistry
      * @param DataPersistorInterface $dataPersistor
      * @param PageFactory $resultPageFactory
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param Manager $profileManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
         PageFactory $resultPageFactory,
-        SubscriptionProfileRepositoryInterface $profileRepository
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        Manager $profileManager
     ) {
+        $this->profileManager = $profileManager;
         $this->resultPageFactory = $resultPageFactory;
         $this->profileRepository = $profileRepository;
-
         parent::__construct($context, $coreRegistry, $dataPersistor);
     }
 
@@ -55,7 +64,6 @@ class Edit extends SubscriptionProfile
      * Edit action.
      *
      * @return Page|Redirect|\Magento\Framework\App\ResponseInterface|ResultInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
@@ -108,17 +116,27 @@ class Edit extends SubscriptionProfile
      *
      * @param ProfileModel $model
      * @return \Magento\Framework\Phrase
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getSubscriptionTitle(ProfileModel $model)
     {
-        return __(
-            sprintf(
-                'Subscription (%s) for %s %s',
-                $model->getLabel(),
-                $model->getCustomer()->getFirstname(),
-                $model->getCustomer()->getLastname()
-            )
-        );
+        if ($customer = $model->getCustomer()) {
+            return __(
+                sprintf(
+                    'Subscription (%s) for %s %s',
+                    $model->getLabel(),
+                    $customer->getFirstname(),
+                    $customer->getLastname()
+                )
+            );
+        } else {
+            $order = $this->profileManager->getLastProfileOrder($model);
+            return __(
+                sprintf(
+                    'Subscription (%s) for %s',
+                    $model->getLabel(),
+                    $order->getCustomerName()
+                )
+            );
+        }
     }
 }

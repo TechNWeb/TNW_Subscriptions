@@ -3,7 +3,7 @@
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
 "var store_email":"Store Email",
-"var customer":"Customer",
+"var customerName":"Customer Name",
 "var attempt_interval":"Next payment attempt interval",
 "var subscription":"Subscription Profile",
 "layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
@@ -12,7 +12,7 @@
 <table>
     <tr class="email-intro">
         <td>
-            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
                 {{trans 'We were unable to process payment for the recurring order under'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'profile. We will try again in %attempt_interval day(s). Make sure the payment method on file has sufficient funds and up to date to prevent any interruption.' attempt_interval=$attempt_interval}}
             </p>

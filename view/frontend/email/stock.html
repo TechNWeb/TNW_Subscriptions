@@ -3,7 +3,7 @@
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
 "var store_email":"Store Email",
-"var customer":"Customer",
+"var customerName":"Customer Name",
 "var subscription":"Subscription Profile",
 "layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
 } @-->
@@ -11,7 +11,7 @@
 <table>
     <tr class="email-intro">
         <td>
-            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
                 {{trans '<a href="%account_url">Log into your account</a> to make any changes to your recurring profile. You can find it under the My Subscriptions tab after you authenticate.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
             </p>

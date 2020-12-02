@@ -12,6 +12,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class DataProvider for history
@@ -39,10 +40,17 @@ class DataProvider extends AbstractDataProvider
     private $profile;
 
     /**
+     * @var Manager
+     */
+    private $profileManager;
+
+    /**
+     * DataProvider constructor.
      * @param TimezoneInterface $timezone
      * @param CollectionFactory $collectionFactory
      * @param RequestInterface $request
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param Manager $profileManager
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -54,6 +62,7 @@ class DataProvider extends AbstractDataProvider
         CollectionFactory $collectionFactory,
         RequestInterface $request,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        Manager $profileManager,
         $name,
         $primaryFieldName,
         $requestFieldName,
@@ -65,6 +74,7 @@ class DataProvider extends AbstractDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
         $this->timezone = $timezone;
         $this->profileRepository = $profileRepository;
+        $this->profileManager = $profileManager;
     }
 
     /**
@@ -108,7 +118,6 @@ class DataProvider extends AbstractDataProvider
             ? sprintf('"%s"', $messageHistoryData['message'])
             : $messageHistoryData['message'];
         $convertedData['author'] = $this->getProfileChangeAuthor($messageHistoryData);
-        ;
         // date format like "August 23rd, 2017   2:04:15 PM"
         $convertedData['date'] = $this->timezone->formatDateTime(
             $messageHistoryData['created_at'],
@@ -157,12 +166,21 @@ class DataProvider extends AbstractDataProvider
         } elseif ($messageHistoryData['customer_id'] && $this->getProfile()
             && $this->getProfile()->getCustomerId() === $messageHistoryData['customer_id']
         ) {
-            $author = sprintf(
-                'By %s %s (%s)',
-                $this->getProfile()->getCustomer()->getFirstname(),
-                $this->getProfile()->getCustomer()->getLastname(),
-                $this->getProfile()->getCustomer()->getEmail()
-            );
+            if ($customer = $this->getProfile()->getCustomer()) {
+                $author = sprintf(
+                    'By %s %s (%s)',
+                    $customer->getFirstname(),
+                    $customer->getLastname(),
+                    $customer->getEmail()
+                );
+            } else {
+                $order = $this->profileManager->getLastProfileOrder($this->getProfile());
+                $author = sprintf(
+                    'By %s (%s)',
+                    $order->getCustomerName(),
+                    $order->getCustomerEmail()
+                );
+            }
         } else {
             $author = __('By automated process');
         }
