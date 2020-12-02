@@ -275,8 +275,9 @@ class Creator extends Base
      */
     private function getEmptyQuote(SubscriptionProfileInterface $profile)
     {
-        return $this->quoteFactory->create(['data' => ['is_active' => false]])
-            ->assignCustomer($profile->getCustomer());
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        $this->profileManager->assignCustomerToQuote($quote, $profile);
+        return $quote;
     }
 
     /**

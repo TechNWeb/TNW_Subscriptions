@@ -5,7 +5,7 @@
 "var store_email":"Store Email",
 "var date":"Upcoming Subscription Renewal Date",
 "var newStatus":"New Subscription Status",
-"var customer":"Customer",
+"var customerName":"Customer Name",
 "var subscription":"Subscription Profile",
 "layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
 } @-->
@@ -13,7 +13,7 @@
 <table>
     <tr class="email-intro">
         <td>
-            <p class="greeting">{{trans 'Dear %firstname %lastname,' firstname=$customer.getFirstName() lastname=$customer.getLastName()}}</p>
+            <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
                 {{trans 'The Status of your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'has changed to <strong>%newStatus</strong>' newStatus=$newStatus |raw}}
             </p>
