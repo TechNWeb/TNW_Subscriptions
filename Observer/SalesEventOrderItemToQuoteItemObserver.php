@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Observer;
 
+use Magento\Backend\Model\Session\Quote;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Quote\Model\Quote\Item as QuoteItem;
@@ -17,24 +18,32 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 class SalesEventOrderItemToQuoteItemObserver implements ObserverInterface
 {
     /**
-     * Subscription quote and order items extension manager.
-     *
-     * @var ExtensionManager
-     */
+    * Subscription quote and order items extension manager.
+    *
+    * @var ExtensionManager
+    */
     private $extensionManager;
+
+    /**
+     * @var Quote
+     */
+    private $session;
 
     /**
      * ToOrderItem constructor.
      * @param ExtensionManager $extensionManager
+     * @param Quote $session
      */
     public function __construct(
-        ExtensionManager $extensionManager
+        ExtensionManager $extensionManager,
+        Quote $session
     ) {
         $this->extensionManager = $extensionManager;
+        $this->session = $session;
     }
 
     /**
-     * Duplicates subscription initial fees from order item to quote item on import or reorder
+     * Duplicates subscription initial fees from order item to quote item on import and NOT on reorder
      *
      * @param Observer $observer
      * @return $this
@@ -48,7 +57,7 @@ class SalesEventOrderItemToQuoteItemObserver implements ObserverInterface
         $orderExtAttributes = $orderItem->getExtensionAttributes()
             ? $orderItem->getExtensionAttributes()->getSubsInitialFees()
             : null;
-        if ($orderExtAttributes) {
+        if ($orderExtAttributes && !$this->session->getReordered()) {
             $quoteInitialFees = $this->extensionManager->convertOrderItemToQuoteItem($orderExtAttributes);
             $quoteExtAttributes = $quoteItem->getExtensionAttributes()
                 ?: $this->extensionManager->getEmptyCartItemExtension();
