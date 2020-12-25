@@ -125,5 +125,6 @@ class UpdateQuoteItem
         ) {
             $subject->deleteItem($result);
         }
+        return $result;
     }
 }
