@@ -7,7 +7,7 @@
 ?>
 <?php if($initialFee = $block->getInitialFee()) : ?>
     <div class="sub-profile-option">
-        <b><?= /* @escapeNotVerified */ __('Initial fee included')?></b><br>
+        <b><?= /* @escapeNotVerified */ __('Initial fee(s) included')?></b><br>
         <span><?= /* @escapeNotVerified */ $block->getOrder()->formatPrice($initialFee) ?></span>
     </div>
 <?php endif; ?>
