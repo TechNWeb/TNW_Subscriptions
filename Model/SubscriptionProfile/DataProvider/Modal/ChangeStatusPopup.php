@@ -48,6 +48,7 @@ class ChangeStatusPopup extends AbstractDataProvider
     public function getData()
     {
         $data['change_status_popup']['entity_id'] = $this->dataPersistor->get('subscription_id');
+        $data['change_status_popup']['cycles_count'] = 0;
         return $data;
     }
 

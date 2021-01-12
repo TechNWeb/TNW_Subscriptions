@@ -73,12 +73,7 @@ class UpdateStatus
         $this->messageManager = $messageManager;
     }
 
-    /** Update status.
-     *
-     * @param int $profileId
-     * @param int $newStatus
-     */
-    public function updateStatus($profileId, $newStatus)
+    public function updateStatus($profileId, $newStatus, $addtionalStatusData = [])
     {
         /* @var SubscriptionProfile $model */
         $model = $this->profileRepository->getById($profileId);

@@ -123,6 +123,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         self::UPDATED_AT,
         self::GENERATE_QUOTES_STATE,
         self::NEED_RECOLLECT,
+        self::BILLING_CYCLES_TO_SKIP,
     ];
 
     /**
