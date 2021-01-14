@@ -38,30 +38,58 @@
         <settings>
             <label></label>
         </settings>
-        <field name="suspension_type">
+        <field name="suspension_text" template="TNW_Subscriptions/form/element/label" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="text" translate="true" xsi:type="string">IMPORTANT: The customer will not be billed and no orders will be created in the system while subscription profile is paused.</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <imports>
+                    <link name="visible">${ $.parentName }.suspension_type:visible</link>
+                </imports>
+            </settings>
+        </field>
+        <field name="suspension_type"
+               formElement="radioset"
+               component="TNW_Subscriptions/js/subscription_profile/pause-radio-set"
+               template="TNW_Subscriptions/form/element/checkbox-set-with-html-label">
             <argument name="data" xsi:type="array">
                 <item name="multiple" xsi:type="boolean">false</item>
                 <item name="options" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\SuspendButtonPopupOptions</item>
-                <item name="config" xsi:type="array">
-                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">radioset</item>
-                    <item name="template" xsi:type="string">TNW_Subscriptions/form/element/checkbox-set-with-html-label</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                </item>
             </argument>
+            <settings>
+                <visible>false</visible>
+                <imports>
+                    <link name="handleVisibility">${ $.provider }:data.status</link>
+                </imports>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <additionalClasses>
+                    <class name="admin__field-small">true</class>
+                </additionalClasses>
+            </settings>
         </field>
-        <field name="cycles_count">
+        <field name="cycles_count" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">orders/payments</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="dataScope" xsi:type="string">cycles_count</item>
+                    <item name="additionalInfo" xsi:type="string" translate="true">orders/payments</item>
                 </item>
             </argument>
+            <settings>
+                <dataScope>cycles_count</dataScope>
+                <dataType>text</dataType>
+                <imports>
+                    <link name="visible">${ $.parentName }.suspension_type:visible</link>
+                </imports>
+                <additionalClasses>
+                    <class name="admin__field-x-small">true</class>
+                </additionalClasses>
+                <labelVisible>false</labelVisible>
+            </settings>
         </field>
         <field name="comment_area" formElement="textarea">
             <settings>
