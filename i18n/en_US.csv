@@ -392,3 +392,5 @@ The number of future quotes to generate at a time for the new subscription profi
 "Invalid ID param provided.", "Invalid ID param provided."
 "Cannot change billing frequency. There are active subscription Profiles.", "Cannot change billing frequency. There are active subscription Profiles."
 "Error on processing profile. (See cron log).", "Error on processing profile. (See cron log)."
+"Reorder allows you to order products again on a one-off basis. If you would like to re-order the same product on recurring basis, please subscribe to those products instead.","Reorder allows you to order products again on a one-off basis. If you would like to re-order the same product on recurring basis, please subscribe to those products instead."
+"Product "%1" is Recurring-Only and cannot be reordered. If you would like to re-order on recurring basis, please subscribe to it instead.","Product "%1" is Recurring-Only and cannot be reordered. If you would like to re-order on recurring basis, please subscribe to it instead."

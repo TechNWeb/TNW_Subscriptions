@@ -6,12 +6,10 @@
 namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Framework\Registry;
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\View\Element\Template\Context;
 use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection as MessagesCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistory;
 
 /**
@@ -59,15 +57,18 @@ class ChangeHistory extends ContentAbstract
             $collection = $this->messageHistoryCollectionFactory->create();
             $this->messagesCollection = $collection->getChangeHistoryCollection(
                 $this->getSubscriptionProfile()->getId()
-            )
-                ->addFieldToFilter('is_visible_on_front', 1);
+            )->addFieldToFilter('is_visible_on_front', 1);
+
+            $page = ($this->getRequest()->getParam('p')) ? $this->getRequest()->getParam('p') : 1;
+            $pageSize = ($this->getRequest()->getParam('limit')) ? $this->getRequest()->getParam('limit') : 10;
+            $this->messagesCollection->setPageSize($pageSize);
+            $this->messagesCollection->setCurPage($page);
+            $this->messagesCollection->load();
 
             foreach ($this->messagesCollection as $message) {
                 $this->prepareMessageHistoryData($message);
             }
         }
-
-
         return $this->messagesCollection;
     }
 
@@ -98,7 +99,7 @@ class ChangeHistory extends ContentAbstract
         parent::_prepareLayout();
         if ($this->getChangeHistoryCollection()) {
             $pager = $this->getLayout()->createBlock(
-                \Magento\Theme\Block\Html\Pager::class,
+                'Magento\Theme\Block\Html\Pager',
                 'subscription.change.history.pager'
             )->setCollection(
                 $this->getChangeHistoryCollection()
