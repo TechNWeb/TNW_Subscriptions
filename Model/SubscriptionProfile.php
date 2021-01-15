@@ -665,6 +665,22 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getSkipBillingCycles()
+    {
+        return $this->getData(self::BILLING_CYCLES_TO_SKIP);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSkipBillingCycles($billingCyclesToSkip)
+    {
+        return $this->setData(self::BILLING_CYCLES_TO_SKIP, $billingCyclesToSkip);
+    }
+
+    /**
      * Get sum of all order's grand totals for current subscription profile.
      *
      * @return string

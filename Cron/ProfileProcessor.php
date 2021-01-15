@@ -100,6 +100,8 @@ class ProfileProcessor
         // Getting Profile IDs
         $profileIds = array_map([$this, 'profileIdByQueue'], $collectionToday->getItems());
 
+        $this->profileRepository->setAutomatedProcessFlag(true);
+
         // Filtering not active
         $activeQueueList = array_filter($collectionToday->getItems(), [$this, 'filterQueue']);
 

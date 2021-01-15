@@ -492,4 +492,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setPayment(SubscriptionProfilePaymentInterface $payment);
+
+    /**
+     * Gets cancel before next cycle.
+     *
+     * @return int
+     */
+    public function getSkipBillingCycles();
+
+    /**
+     * Set Subscription profile payment
+     *
+     * @param int $billingCyclesToSkip
+     * @return $this
+     */
+    public function setSkipBillingCycles($billingCyclesToSkip);
 }
