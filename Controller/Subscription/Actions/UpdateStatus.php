@@ -160,27 +160,4 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
 
         return $resultRedirect;
     }
-
-    /**
-     * Log change status in to Subscription Profile history
-     *
-     * @param SubscriptionProfile $model
-     * @param int $oldStatus
-     * @return void
-     */
-    private function logChangeStatus(SubscriptionProfile $model, $oldStatus)
-    {
-        if ($oldStatus == $model->getStatus()) {
-            return;
-        }
-
-        $this->messageHistoryLogger->message(
-            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-            [
-                $this->statusSource->getLabelByValue($oldStatus),
-                $this->statusSource->getLabelByValue($model->getStatus())
-            ],
-            $model->getId()
-        );
-    }
 }
