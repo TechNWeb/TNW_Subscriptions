@@ -27,7 +27,7 @@ class InitialFee extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        return $initialFees->getSubsInitialFee();
+        return $initialFees->getSubsInitialFee() * $item->getQtyOrdered();
     }
 
     /**
