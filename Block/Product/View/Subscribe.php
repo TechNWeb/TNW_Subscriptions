@@ -453,9 +453,9 @@ class Subscribe extends View
     {
         $period = $this->preconfiguredValue('subscription_data/unique/period');
 
-        return null !== $period
-            ? (string)$period :
-            \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
+        return $period
+            ? (string)$period
+            : \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
     }
 
     /**
