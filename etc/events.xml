@@ -75,4 +75,7 @@
     <event name="adminhtml_sales_order_creditmemo_register_before">
         <observer name="tnw_subscription" instance="TNW\Subscriptions\Observer\SalesOrderCreditmemoRegisterBefore"/>
     </event>
+    <event name="admin_system_config_save">
+        <observer name="tnw_subscription_enable" instance="TNW\Subscriptions\Observer\EnableDisableModule"/>
+    </event>
 </config>
