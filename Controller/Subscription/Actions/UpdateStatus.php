@@ -10,10 +10,6 @@ use Magento\Framework\App\Action\Context;
 use TNW\Subscriptions\Block\Subscription\History;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Controller\Subscription\Items;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
@@ -30,32 +26,11 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     private $updateStatusModel;
 
     /**
-     * Repository profile
-     *
-     * @var SubscriptionProfileRepository
-     */
-    private $profileRepository;
-
-    /**
-     * The Manager that define logic of status change on Subscription Profile
-     *
-     * @var StatusManager
-     */
-    private $statusManager;
-
-    /**
      * Profile status data source
      *
      * @var ProfileStatus
      */
     private $statusSource;
-
-    /**
-     * Message history logger
-     *
-     * @var MessageHistoryLogger
-     */
-    private $messageHistoryLogger;
 
     /**
      * Subscription items at customer account
@@ -67,27 +42,18 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     /**
      * UpdateStatus constructor.
      * @param Context $context
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param StatusManager $statusManager
      * @param ProfileStatus $statusSource
-     * @param MessageHistoryLogger $messageHistoryLogger
      * @param Items $subscriptionItems
      * @param UpdateStatusModel $updateStatusModel
      */
     public function __construct(
         Context $context,
-        SubscriptionProfileRepository $profileRepository,
-        StatusManager $statusManager,
         ProfileStatus $statusSource,
-        MessageHistoryLogger $messageHistoryLogger,
         Items $subscriptionItems,
         UpdateStatusModel $updateStatusModel
     ) {
         $this->updateStatusModel = $updateStatusModel;
-        $this->profileRepository = $profileRepository;
-        $this->statusManager = $statusManager;
         $this->statusSource = $statusSource;
-        $this->messageHistoryLogger = $messageHistoryLogger;
         $this->subscriptionItems = $subscriptionItems;
         parent::__construct($context);
     }
