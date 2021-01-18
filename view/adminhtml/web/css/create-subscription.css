@@ -84,6 +84,12 @@
 .subscriptions-add-product-modal-form-container .sub-legend legend {
   opacity: 1;
 }
+.subscriptions-add-product-modal-form-container .field-term {
+  margin-bottom: 0.8rem;
+}
+.subscriptions-add-product-modal-form-container .admin__additional-info {
+  display: none;
+}
 .subscriptions-modify-modal-form-container .sub-legend legend {
   opacity: 1;
 }
