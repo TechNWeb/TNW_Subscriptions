@@ -6,25 +6,24 @@
 
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
+use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
+use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
-use Magento\Framework\Registry;
-use Magento\Framework\UrlInterface;
-use Magento\Ui\DataProvider\Modifier\PoolInterface;
-use TNW\Subscriptions\Model\Context;
-use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
-use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
-use TNW\Subscriptions\Model\Config;
-use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
-use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -199,6 +198,8 @@ class ProductsForm extends SummaryProductsForm
      * Returns qty field definition.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getQtyDefinition()
     {
@@ -216,6 +217,11 @@ class ProductsForm extends SummaryProductsForm
             $product->getSku(),
             $websiteId
         );
+
+        if ($product->getMagentoProductId() != $productId) {
+            /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+            $stockItem = $this->stockRegistry->getStockItem($product->getMagentoProductId(), $websiteId);
+        }
 
         $params['minAllowed'] = $stockItem->getMinQty();
         if ($productSalableQty && $stockItem->getData('backorders') == 0) {
