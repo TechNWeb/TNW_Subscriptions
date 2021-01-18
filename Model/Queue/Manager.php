@@ -572,6 +572,10 @@ class Manager
                     $this->relationManager->saveRelation($relation);
                     $this->createNewRelation($queue, $profile);
                     $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
+                    $profile->setNeedRecollect(false);
+                    foreach ($profile->getProducts() as $product) {
+                        $product->setNeedRecollect(false);
+                    }
                     $this->profileRepository->save($profile);
                 }
             } catch (\Exception $e) {
