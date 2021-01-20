@@ -110,7 +110,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        if (version_compare($context->getVersion(), '2.3.14', '<')) {
+        if (version_compare($context->getVersion(), '2.3.15', '<')) {
             $this->addSkipBillingCyclesColumn($setup);
         }
 
