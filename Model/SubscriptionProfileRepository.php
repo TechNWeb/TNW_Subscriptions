@@ -21,10 +21,13 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 
 /**
  * Repository for subscription profiles.
@@ -129,6 +132,21 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $emailNotifierFactory;
 
     /**
+     * @var BillingCyclesManagerFactory
+     */
+    private $billingCyclesManagerFactory;
+
+    /**
+     * @var bool
+     */
+    private $isAutomated = false;
+
+    /**
+     * @var ProfileOrderManager
+     */
+    private $profileOrderManager;
+
+    /**
      * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
@@ -144,6 +162,8 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param HistoryLogger $statusHistoryLogger
      * @param MessageHistoryLogger $messageHistoryLogger
      * @param EmailNotifierFactory $emailNotifierFactory
+     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
+     * @param ProfileOrderManager $profileOrderManager
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -159,8 +179,12 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         HistoryManager $statusHistoryManager,
         HistoryLogger $statusHistoryLogger,
         MessageHistoryLogger $messageHistoryLogger,
-        EmailNotifierFactory $emailNotifierFactory
+        EmailNotifierFactory $emailNotifierFactory,
+        BillingCyclesManagerFactory $billingCyclesManagerFactory,
+        ProfileOrderManager $profileOrderManager
     ) {
+        $this->profileOrderManager = $profileOrderManager;
+        $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->resource = $resource;
         $this->subscriptionProfileFactory = $subscriptionProfileFactory;
@@ -190,7 +214,13 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $oldStatus = $this->statusHistoryManager->getProfileOldStatus($subscriptionProfile);
         $oldConfigOption = $this->statusHistoryManager->getProfileOldConfigOption($subscriptionProfile);
         $oldPaymentData =  $this->statusHistoryManager->getProfileOldPaymentData($subscriptionProfile);
+        $newStatus = $subscriptionProfile->getStatus();
 
+        if ($newStatus == ProfileStatus::STATUS_ACTIVE
+            && $oldStatus == ProfileStatus::STATUS_HOLDED
+        ) {
+            $subscriptionProfile->setSkipBillingCycles(0);
+        }
         try {
             $this->entityManager->save($subscriptionProfile);
         } catch (\Exception $exception) {
@@ -220,10 +250,9 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
             );
         }
 
-        $newStatus = $subscriptionProfile->getStatus();
-
         // Log status history
         if ($oldStatus != $newStatus) {
+            $this->processBillingCyclesOnStatusChange($newStatus, $oldStatus, $subscriptionProfile);
             try {
                 $this->statusHistoryLogger->log(
                     $subscriptionProfile->getId(),
@@ -374,9 +403,20 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
+     * @param $isAutomated
+     * @return $this
+     */
+    public function setAutomatedProcessFlag($isAutomated)
+    {
+        $this->isAutomated = (bool) $isAutomated;
+        return $this;
+    }
+
+    /**
      * After loading profiles via method getList() assigns products and addresses to profile.
      *
      * @param SubscriptionProfileInterface $subscriptionProfileModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function assignProductsAndAddresses(
         SubscriptionProfileInterface $subscriptionProfileModel
@@ -398,5 +438,77 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $productSearchCriteria = $this->criteriaBuilder->create();
         $products = $this->productProfileRepository->getList($productSearchCriteria)->getItems();
         $subscriptionProfileModel->setProducts($products);
+    }
+
+    /**
+     * @param $newStatus
+     * @param $oldStatus
+     * @param $subscriptionProfile
+     * @return $this
+     * @throws \Exception
+     */
+    private function processBillingCyclesOnStatusChange($newStatus, $oldStatus, $subscriptionProfile)
+    {
+        if ($newStatus == ProfileStatus::STATUS_HOLDED
+            && in_array(
+                $oldStatus,
+                [
+                    ProfileStatus::STATUS_ACTIVE,
+                    ProfileStatus::STATUS_TRIAL,
+                    ProfileStatus::STATUS_PENDING
+                ]
+            )
+            && $subscriptionProfile->getSkipBillingCycles()
+        ) {
+            $billingCyclesToSkip = $subscriptionProfile->getSkipBillingCycles();
+            $this->processSaveRelation($billingCyclesToSkip, $subscriptionProfile, $billingCyclesToSkip + 1);
+        } elseif ($newStatus == ProfileStatus::STATUS_ACTIVE
+            && $oldStatus == ProfileStatus::STATUS_HOLDED
+            && !$this->isAutomated
+        ) {
+            $this->processSaveRelation(0, $subscriptionProfile, 1);
+        }
+        return $this;
+    }
+
+    /**
+     * @param $cycleNumberToSchedule
+     * @param $subscriptionProfile
+     * @param $cyclesToSkip
+     * @return bool
+     * @throws \Exception
+     */
+    private function processSaveRelation($cycleNumberToSchedule, $subscriptionProfile, $cyclesToSkip)
+    {
+        $nextProfileRelation = $this->profileOrderManager->getNextProfileRelation($subscriptionProfile);
+        $rescheduled = false;
+        list($cycles, $needMore, $existingCycles) = $this->billingCyclesManagerFactory->create()->getBillingCycles(
+            $subscriptionProfile,
+            $cyclesToSkip,
+            true,
+            true
+        );
+        if ($cycles && is_array($cycles) && array_key_exists($cycleNumberToSchedule, $cycles)) {
+            $nextProfileRelation->setScheduledAt($cycles[$cycleNumberToSchedule]);
+            $rescheduled = true;
+            try {
+                $this->profileOrderManager->saveRelation($nextProfileRelation);
+            } catch (\Exception $e) {
+                $rescheduled = false;
+            }
+        }
+        if (!$rescheduled) {
+            $this->messageHistoryLogger->log(
+                __(
+                    'Profile won`t process anymore - paused for billing cycles exceeds '
+                    . 'the possible payments/orders limit.'
+                ),
+                $subscriptionProfile->getId(),
+                true,
+                true,
+                $this->isAutomated
+            );
+        }
+        return $rescheduled;
     }
 }

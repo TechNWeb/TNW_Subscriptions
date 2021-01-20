@@ -10,11 +10,8 @@ use Magento\Framework\App\Action\Context;
 use TNW\Subscriptions\Block\Subscription\History;
 use TNW\Subscriptions\Block\Subscription\Summary\Overview;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
-use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Controller\Subscription\Items;
+use TNW\Subscriptions\Model\SubscriptionProfile\Status\UpdateStatus as UpdateStatusModel;
 
 /**
  * Controller for subscription history at customer account dashboard.
@@ -22,18 +19,11 @@ use TNW\Subscriptions\Controller\Subscription\Items;
 class UpdateStatus extends \Magento\Framework\App\Action\Action
 {
     /**
-     * Repository profile
+     * Model for update status.
      *
-     * @var SubscriptionProfileRepository
+     * @var UpdateStatusModel
      */
-    private $profileRepository;
-
-    /**
-     * The Manager that define logic of status change on Subscription Profile
-     *
-     * @var StatusManager
-     */
-    private $statusManager;
+    private $updateStatusModel;
 
     /**
      * Profile status data source
@@ -43,13 +33,6 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     private $statusSource;
 
     /**
-     * Message history logger
-     *
-     * @var MessageHistoryLogger
-     */
-    private $messageHistoryLogger;
-
-    /**
      * Subscription items at customer account
      *
      * @var Items
@@ -57,25 +40,20 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
     private $subscriptionItems;
 
     /**
+     * UpdateStatus constructor.
      * @param Context $context
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param StatusManager $statusManager
      * @param ProfileStatus $statusSource
-     * @param MessageHistoryLogger $messageHistoryLogger
      * @param Items $subscriptionItems
+     * @param UpdateStatusModel $updateStatusModel
      */
     public function __construct(
         Context $context,
-        SubscriptionProfileRepository $profileRepository,
-        StatusManager $statusManager,
         ProfileStatus $statusSource,
-        MessageHistoryLogger $messageHistoryLogger,
-        Items $subscriptionItems
+        Items $subscriptionItems,
+        UpdateStatusModel $updateStatusModel
     ) {
-        $this->profileRepository = $profileRepository;
-        $this->statusManager = $statusManager;
+        $this->updateStatusModel = $updateStatusModel;
         $this->statusSource = $statusSource;
-        $this->messageHistoryLogger = $messageHistoryLogger;
         $this->subscriptionItems = $subscriptionItems;
         parent::__construct($context);
     }
@@ -92,23 +70,14 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
             if (!$this->subscriptionItems->canViewSubscriptionById($profileId)) {
                 throw new \Magento\Framework\Exception\NoSuchEntityException();
             }
-            /* @var SubscriptionProfile $model */
-            $model = $this->profileRepository->getById($profileId);
-
-            if (!$this->statusManager->canChangeStatus($model, $newStatus)) {
-                $this->messageManager->addErrorMessage(
-                    __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
-                );
-
-                return $this->getRedirect();
-            }
-
-            $oldStatus = $model->getStatus();
-            $model->setStatus($newStatus);
-            $this->profileRepository->save($model);
-            $this->logChangeStatus($model, $oldStatus);
-
-            if ($this->_request->isAjax()) {
+            $model = $this->updateStatusModel->updateStatus(
+                $profileId,
+                $newStatus,
+                $this->getRequest()->getParam('suspension_type') == 'billing_cycles'
+                    ? $this->getRequest()->getParam('cycles_count')
+                    : 0
+            );
+            if ($model != null && $this->_request->isAjax()) {
                 $this->messageManager->addComplexSuccessMessage(
                     'addHtmlMessage',
                     [
@@ -124,20 +93,13 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
                 );
                 return $this->getResponse()->representJson('{"error":"false"}');
             }
-
-            $this->messageManager->addSuccessMessage(__(
-                'Status successfully changed to "%1"',
-                $this->statusSource->getLabelByValue($newStatus)
-            ));
-            return $this->getRedirect();
-
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
             if ($this->_request->isAjax()) {
                 return $this->getResponse()->representJson('{"error":"true"}');
             }
-            return $this->getRedirect();
         }
+        return $this->getRedirect();
     }
 
     /**
@@ -163,28 +125,5 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
         }
 
         return $resultRedirect;
-    }
-
-    /**
-     * Log change status in to Subscription Profile history
-     *
-     * @param SubscriptionProfile $model
-     * @param int $oldStatus
-     * @return void
-     */
-    private function logChangeStatus(SubscriptionProfile $model, $oldStatus)
-    {
-        if ($oldStatus == $model->getStatus()) {
-            return;
-        }
-
-        $this->messageHistoryLogger->message(
-            MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-            [
-                $this->statusSource->getLabelByValue($oldStatus),
-                $this->statusSource->getLabelByValue($model->getStatus())
-            ],
-            $model->getId()
-        );
     }
 }

@@ -81,7 +81,13 @@ class UpdateStatus extends Action
             ['entity_id' => $profileId]
         ));
         try {
-            $this->updateStatusModel->updateStatus($profileId, $newStatus);
+            $this->updateStatusModel->updateStatus(
+                $profileId,
+                $newStatus,
+                $this->getRequest()->getParam('suspension_type') == 'billing_cycles'
+                    ? $this->getRequest()->getParam('cycles_count')
+                    : 0
+            );
             $comment = $this->_request->getParam('comment_area') ?: false;
             $notifyCustomer = (bool) $this->_request->getParam('comment_notify') ?: false;
             if ($comment) {

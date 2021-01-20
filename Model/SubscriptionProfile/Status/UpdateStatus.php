@@ -73,12 +73,16 @@ class UpdateStatus
         $this->messageManager = $messageManager;
     }
 
-    /** Update status.
-     *
-     * @param int $profileId
-     * @param int $newStatus
+    /**
+     * Update Subscription Profile Status
+     * @param $profileId
+     * @param $newStatus
+     * @param int $billingCycles
+     * @return SubscriptionProfile|null
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function updateStatus($profileId, $newStatus)
+    public function updateStatus($profileId, $newStatus, $billingCycles = 0)
     {
         /* @var SubscriptionProfile $model */
         $model = $this->profileRepository->getById($profileId);
@@ -89,9 +93,11 @@ class UpdateStatus
             $this->messageManager->addErrorMessage(
                 __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
             );
+            $model = null;
         } else {
             $oldStatus = $model->getStatus();
             $model->setStatus($newStatus);
+            $model->setSkipBillingCycles($billingCycles);
             $this->profileRepository->save($model);
             $this->logChangeStatus($model, $oldStatus);
 
@@ -100,6 +106,7 @@ class UpdateStatus
                 $this->statusSource->getLabelByValue($newStatus)
             ));
         }
+        return $model;
     }
 
     /**

@@ -669,14 +669,7 @@ class Manager
             $item->getSubscriptionProfileId(),
             $item->getScheduledAt()
         );
-        if ($status == ProfileStatus::STATUS_HOLDED) {
-            // Set subscription profile order quote ID field to null
-            $order = $this->relationManager->getRelationById($item->getProfileOrderId());
-            $order->setMagentoQuoteId(null);
-            $this->relationManager->saveRelation($order);
-            // Remove corresponding magento quote
-            $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-            $this->cartRepository->delete($quote);
+        if ($status == ProfileStatus::STATUS_HOLDED && !$item->getData('billing_cycles_to_skip')) {
             $result = true;
         }
 
@@ -707,6 +700,7 @@ class Manager
                 [
                     SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE,
                     'profile_' . SubscriptionProfile::STATUS => SubscriptionProfile::STATUS,
+                    SubscriptionProfile::BILLING_CYCLES_TO_SKIP
                 ]
             );
 

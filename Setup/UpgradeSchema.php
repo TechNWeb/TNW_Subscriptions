@@ -27,7 +27,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
-
         if (version_compare($context->getVersion(), '2.0.3', '<')) {
             $this->addInvoiceItemExtensionAttributeTable($setup);
         }
@@ -110,6 +109,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ]
             );
         }
+
+        if (version_compare($context->getVersion(), '2.3.15', '<')) {
+            $this->addSkipBillingCyclesColumn($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -769,5 +773,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ['entity_id = ?' => $row['entity_id']]
             );
         }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addSkipBillingCyclesColumn(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $setup->getConnection()->addColumn(
+            $table,
+            SubscriptionProfile::BILLING_CYCLES_TO_SKIP,
+            [
+                'type' => Table::TYPE_SMALLINT,
+                'comment' => 'Billing Cycles To Skip',
+                'default' => 0,
+            ]
+        );
     }
 }
