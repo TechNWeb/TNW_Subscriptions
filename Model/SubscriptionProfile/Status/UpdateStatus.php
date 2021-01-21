@@ -90,6 +90,7 @@ class UpdateStatus
         ) {            $this->messageManager->addErrorMessage(
                 __('Status can not be change to "%1"', $this->statusSource->getLabelByValue($newStatus))
             );
+            $model = null;
         } else {
             $oldStatus = $model->getStatus();
             $model->setStatus($newStatus);
@@ -101,6 +102,7 @@ class UpdateStatus
                 $this->statusSource->getLabelByValue($newStatus)
             ));
         }
+        return $model;
     }
 
 
