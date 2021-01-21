@@ -106,8 +106,7 @@ class BillingCyclesManager
     public function getBillingCycles(
          SubscriptionProfileInterface $profile,
          $count = 0,
-         $existingCycles = false,
-         $getFutureAllFutureCycles = false
+         $existingCycles = false
     ) {
         $neededDates = [];
         $nowDate = new \DateTime();
@@ -162,9 +161,9 @@ class BillingCyclesManager
             );
             $neededDates[] = $this->format($date);
         }
-        if (!$getFutureAllFutureCycles) {
-            $neededDates = array_diff($neededDates, $existDates);
-        }
+
+        $neededDates = array_diff($neededDates, $existDates);
+
         //generate only future dates
         $resultDates = array_filter(
             $neededDates,

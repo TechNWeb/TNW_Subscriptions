@@ -441,21 +441,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      */
     private function processBillingCyclesOnStatusChange($newStatus, $oldStatus, $subscriptionProfile)
     {
-        if ($newStatus == ProfileStatus::STATUS_HOLDED
-            && in_array(
-                $oldStatus,
-                [
-                    ProfileStatus::STATUS_ACTIVE,
-                    ProfileStatus::STATUS_TRIAL,
-                    ProfileStatus::STATUS_PENDING
-                ]
-            )
-            && $subscriptionProfile->getSkipBillingCycles()
-        ) {
-            $billingCyclesToSkip = $subscriptionProfile->getSkipBillingCycles();
-            $this->processSaveRelation($billingCyclesToSkip, $subscriptionProfile, $billingCyclesToSkip + 1);
-        } elseif ($newStatus == ProfileStatus::STATUS_ACTIVE
-            && $oldStatus == ProfileStatus::STATUS_HOLDED
+        if ($newStatus == ProfileStatus::STATUS_ACTIVE
             && !$this->isAutomated
         ) {
             $this->processSaveRelation(0, $subscriptionProfile, 1);
