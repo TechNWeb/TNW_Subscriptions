@@ -1401,4 +1401,80 @@
         <plugin name="tnw_transparent_session_checker"
                 type="TNW\Subscriptions\Plugin\TransparentSessionChecker" sortOrder="10"/>
     </type>
+    <!--    Modifier for shipping address fieldset in mass edit form-->
+    <type name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\MassEdit">
+        <arguments>
+            <argument name="modifiersPool" xsi:type="object">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\MassEdit\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\MassEdit\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="shipping_address" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\ShippingAddressModifier</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="billing_address" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\BillingAddressModifier</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="checkmo" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Checkmo</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="banktransfer" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\BankTransfer</item>
+                    <item name="sortOrder" xsi:type="number">11</item>
+                </item>
+                <item name="purchaseorder" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Purchaseorder</item>
+                    <item name="sortOrder" xsi:type="number">12</item>
+                </item>
+                <item name="cashondelivery" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Cashondelivery</item>
+                    <item name="sortOrder" xsi:type="number">13</item>
+                </item>
+                <item name="payflowpro" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal\PaymentsPro</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="braintree" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Braintree</item>
+                    <item name="sortOrder" xsi:type="number">25</item>
+                </item>
+                <item name="chcybersource" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\CyberSource</item>
+                    <item name="sortOrder" xsi:type="number">35</item>
+                </item>
+                <item name="tnw_authorize_cim" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Authorizenet</item>
+                    <item name="sortOrder" xsi:type="number">45</item>
+                </item>
+                <item name="tnw_stripe" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Stripe</item>
+                    <item name="sortOrder" xsi:type="number">55</item>
+                </item>
+                <item name="vault" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Vault</item>
+                    <item name="sortOrder" xsi:type="number">46</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\ShippingAddressModifier"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\AddressModifier">
+        <arguments>
+            <argument name="fieldsetPath" xsi:type="string">wizard_modal/children/step-wizard/children/shipping_address/children/new_shipping_address</argument>
+            <argument name="dataScope" xsi:type="string">shipping_address</argument>
+            <argument name="labelsVisible" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\BillingAddressModifier"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Modifier\AddressModifier">
+        <arguments>
+            <argument name="fieldsetPath" xsi:type="string">wizard_modal/children/step-wizard/children/billing_address/children/new_billing_address</argument>
+            <argument name="dataScope" xsi:type="string">billing_address</argument>
+            <argument name="labelsVisible" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
 </config>

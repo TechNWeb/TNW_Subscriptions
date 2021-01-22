@@ -51,12 +51,11 @@ define([
          * Trigger form saving.
          */
         saveBilling: function (value) {
-            var form,
+            var form = registry.get('index = ' + this.options.formName),
                 temp = {},
                 postData = [];
 
-            if (value){
-                form = registry.get('index = ' + this.options.formName);
+            if (value && form.source.process_url){
                 $j('body').trigger('processStart');
                 this.resetErrors();
                 //creating post data, this structure is needed to proper saving

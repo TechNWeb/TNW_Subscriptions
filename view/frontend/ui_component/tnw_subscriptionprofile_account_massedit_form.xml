@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_account_massedit_form.tnw_subscriptionprofile_account_massedit_form_data_source</item>
+            <item name="deps" xsi:type="string">tnw_subscriptionprofile_account_massedit_form.tnw_subscriptionprofile_account_massedit_form_data_source</item>
+            <item name="component" xsi:type="string">TNW_Subscriptions/js/components/mass-edit/mass-edit-form</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="ajaxSave" xsi:type="boolean">true</item>
+            <item name="update_shipping_url" xsi:type="url" path="tnw_subscriptions/subscription_massedit/processshipping"/>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <dataSource name="tnw_subscriptionprofile_account_massedit_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <dataProvider class="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\MassEdit"
+                      name="tnw_subscriptionprofile_account_massedit_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <modal name="wizard_modal">
+        <settings>
+            <options>
+                <option name="title" xsi:type="string" translate="true">Mass change subscription information</option>
+                <option name="type" xsi:type="string">popup</option>
+                <option name="clickableOverlay" xsi:type="boolean">false</option>
+                <option name="responsive" xsi:type="boolean">true</option>
+            </options>
+        </settings>
+        <container name="step-wizard"
+                   component="TNW_Subscriptions/js/components/mass-edit/mass-edit-wizard"
+                   template="TNW_Subscriptions/form/element/mass-edit-wizard">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="stepsNames" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.name }.shipping_address</item>
+                        <item name="1" xsi:type="string">${ $.name }.shipping_method</item>
+                        <item name="2" xsi:type="string">${ $.name }.billing_address</item>
+                        <item name="3" xsi:type="string">${ $.name }.payment_method</item>
+                        <item name="4" xsi:type="string">${ $.name }.summary</item>
+                    </item>
+                </item>
+            </argument>
+            <fieldset name="shipping_address"
+                      component="TNW_Subscriptions/js/components/mass-edit/address-fieldset">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">Shipping Address</item>
+                    </item>
+                </argument>
+                <settings>
+                    <collapsible>false</collapsible>
+                    <label>Shipping Address</label>
+                </settings>
+                <fieldset name="existing_shipping">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>Address Book</label>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                    </settings>
+                    <field name="shipping_address_id"
+                           formElement="select"
+                           sortOrder="1">
+                        <settings>
+                            <dataType>text</dataType>
+                            <dataScope>shipping_address.shipping_address_id</dataScope>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                            </validation>
+                            <imports>
+                                <link name="disabled">!${ $.parentName }:visible</link>
+                            </imports>
+                        </settings>
+                        <formElements>
+                            <select>
+                                <settings>
+                                    <options class="TNW\Subscriptions\Model\Source\CustomerAddressProfileCreate"/>
+                                </settings>
+                            </select>
+                        </formElements>
+                    </field>
+                    <button name="add_new">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="actions" xsi:type="array">
+                                    <item name="0" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = new_shipping_address</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                    <item name="1" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = existing_shipping</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">false</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="buttonClasses" xsi:type="array">
+                                    <item name="action-tertiary" xsi:type="boolean">true</item>
+                                </item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <displayAsLink>true</displayAsLink>
+                            <title>Add new address</title>
+                        </settings>
+                    </button>
+                </fieldset>
+                <fieldset name="new_shipping_address">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>New Address</label>
+                        <visible>false</visible>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                    </settings>
+                    <field name="save_shipping_address"
+                           formElement="checkbox"
+                           sortOrder="200">
+                        <settings>
+                            <dataType>boolean</dataType>
+                            <dataScope>shipping_address.save_shipping_address</dataScope>
+                            <label>Save in address book</label>
+                            <additionalClasses>
+                                <class name="checkbox-with-notice">true</class>
+                            </additionalClasses>
+                        </settings>
+                        <formElements>
+                            <checkbox>
+                                <settings>
+                                    <valueMap>
+                                        <map name="true" xsi:type="number">1</map>
+                                        <map name="false" xsi:type="number">0</map>
+                                    </valueMap>
+                                </settings>
+                            </checkbox>
+                        </formElements>
+                    </field>
+                    <button name="pick_saved" sortOrder="300">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="actions" xsi:type="array">
+                                    <item name="0" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = new_shipping_address</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">false</item>
+                                        </item>
+                                    </item>
+                                    <item name="1" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = existing_shipping</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <displayAsLink>true</displayAsLink>
+                            <title>Show address book</title>
+                        </settings>
+                    </button>
+                </fieldset>
+                <button name="skip_shipping">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">${ $.ns }.${ $.ns }</item>
+                                    <item name="actionName" xsi:type="string">skipShipping</item>
+                                </item>
+                            </item>
+                            <item name="buttonClasses" xsi:type="array">
+                                <item name="action-primary" xsi:type="boolean">true</item>
+                            </item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <displayAsLink>false</displayAsLink>
+                        <title>Do not change shipping info</title>
+                    </settings>
+                </button>
+            </fieldset>
+            <fieldset name="shipping_method"
+                      component="TNW_Subscriptions/js/components/mass-edit/shipping-fieldset">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">Shipping Method</item>
+                    </item>
+                </argument>
+                <settings>
+                    <collapsible>false</collapsible>
+                    <label>Shipping Method</label>
+                </settings>
+                <radioset name="method" component="TNW_Subscriptions/js/components/mass-edit/mass-edit-shipping-radio">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="additionalInfo" xsi:type="string" translate="true">IMPORTANT: Shipping cost will automatically be calculated at the time the order is processed. The recurring order may fluctuate depending on the selected shipping cost.</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <validation>
+                            <rule name="required-entry" xsi:type="boolean">true</rule>
+                        </validation>
+                        <visible>false</visible>
+                        <disabled>true</disabled>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">test</item>
+                                <item name="label" xsi:type="string">test</item>
+                            </option>
+                        </options>
+                        <dataScope>shipping_method</dataScope>
+                        <imports>
+                            <link name="disabled">${ $.provider }:data.skip_shipping</link>
+                            <link name="visible">!${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                    </settings>
+                </radioset>
+            </fieldset>
+            <fieldset name="billing_address"
+                      component="TNW_Subscriptions/js/components/mass-edit/address-fieldset">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">Billing Address</item>
+                    </item>
+                </argument>
+                <settings>
+                    <collapsible>false</collapsible>
+                    <label>Billing Address</label>
+                    <imports>
+                        <link name="setVisible">${ $.parentName }:selectedStep</link>
+                    </imports>
+                </settings>
+                <field name="same_as_shipping"
+                       formElement="checkbox">
+                    <settings>
+                        <dataType>boolean</dataType>
+                        <dataScope>billing_address.same_as_shipping</dataScope>
+                        <imports>
+                            <link name="disabled">${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                        <label>My billing address is the same as shipping</label>
+                        <additionalClasses>
+                            <class name="checkbox-with-notice">true</class>
+                        </additionalClasses>
+                    </settings>
+                    <formElements>
+                        <checkbox>
+                            <settings>
+                                <valueMap>
+                                    <map name="true" xsi:type="number">1</map>
+                                    <map name="false" xsi:type="number">0</map>
+                                </valueMap>
+                            </settings>
+                        </checkbox>
+                    </formElements>
+                </field>
+                <fieldset name="existing_billing">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>Address Book</label>
+                        <imports>
+                            <link name="visible">!${ $.parentName }.same_as_shipping:checked</link>
+                        </imports>
+                    </settings>
+                    <field name="billing_address_id"
+                           formElement="select"
+                           sortOrder="1">
+                        <settings>
+                            <dataType>text</dataType>
+                            <dataScope>billing_address.billing_address_id</dataScope>
+                            <validation>
+                                <rule name="required-entry" xsi:type="boolean">true</rule>
+                            </validation>
+                            <imports>
+                                <link name="disabled">!${ $.parentName }:visible</link>
+                            </imports>
+                        </settings>
+                        <formElements>
+                            <select>
+                                <settings>
+                                    <options class="TNW\Subscriptions\Model\Source\CustomerAddressProfileCreate"/>
+                                </settings>
+                            </select>
+                        </formElements>
+                    </field>
+                    <button name="add_new">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="actions" xsi:type="array">
+                                    <item name="0" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = new_billing_address</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                    <item name="1" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = existing_billing</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">false</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="buttonClasses" xsi:type="array">
+                                    <item name="action-tertiary" xsi:type="boolean">true</item>
+                                </item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <displayAsLink>true</displayAsLink>
+                            <title>Add new address</title>
+                        </settings>
+                    </button>
+                </fieldset>
+                <fieldset name="new_billing_address">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>New Address</label>
+                        <visible>false</visible>
+                    </settings>
+                    <button name="pick_saved" sortOrder="300">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="actions" xsi:type="array">
+                                    <item name="0" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = new_billing_address</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">false</item>
+                                        </item>
+                                    </item>
+                                    <item name="1" xsi:type="array">
+                                        <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = existing_billing</item>
+                                        <item name="actionName" xsi:type="string">visible</item>
+                                        <item name="params" xsi:type="array">
+                                            <item name="0" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <displayAsLink>true</displayAsLink>
+                            <title>Show address book</title>
+                        </settings>
+                    </button>
+                </fieldset>
+                <button name="skip_payment">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="actions" xsi:type="array">
+                                <item name="0" xsi:type="array">
+                                    <item name="targetName" xsi:type="string">${ $.ns }.${ $.ns }</item>
+                                    <item name="actionName" xsi:type="string">skipPayment</item>
+                                </item>
+                            </item>
+                            <item name="buttonClasses" xsi:type="array">
+                                <item name="action-primary" xsi:type="boolean">true</item>
+                            </item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <displayAsLink>false</displayAsLink>
+                        <title>Do not change payment info</title>
+                    </settings>
+                </button>
+            </fieldset>
+            <fieldset name="payment_method"
+                      component="TNW_Subscriptions/js/components/mass-edit/payment-fieldset">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">Payment Method</item>
+                    </item>
+                </argument>
+                <settings>
+                    <collapsible>false</collapsible>
+                    <label>Payment Method</label>
+                </settings>
+                <fieldset name="payment_information">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="collapsible" xsi:type="boolean">false</item>
+                            <item name="label" xsi:type="string" translate="true">Payment Details</item>
+                            <item name="component" xsi:type="string">TNW_Subscriptions/js/form/subscription-profile/payment/fieldset</item>
+                            <item name="sortOrder" xsi:type="number">10</item>
+                            <item name="additionalClasses" xsi:type="string">sub-fieldset</item>
+                            <item name="additionalTitleClasses" xsi:type="string">block-title</item>
+                            <item name="dataScope" xsi:type="string">payment</item>
+                        </item>
+                    </argument>
+                </fieldset>
+            </fieldset>
+            <fieldset name="summary"
+                      component="TNW_Subscriptions/js/components/mass-edit/summary-fieldset">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">Summary</item>
+                        <item name="nextLabelText" xsi:type="string" translate="true">Confirm changes</item>
+                    </item>
+                </argument>
+                <settings>
+                    <collapsible>false</collapsible>
+                    <label>Summary</label>
+                    <additionalClasses>
+                        <class name="summary-fieldset">true</class>
+                    </additionalClasses>
+                </settings>
+                <text name="notice" template="ui/form/element/html">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="value" xsi:type="string" translate="true"><![CDATA[<b>IMPORTANT:</b> The following changes will be applied to all selected subscription profiles. Once made, these changes will become permanent and you will not be able to undo/revert these changes.]]></item>
+                            <item name="inputName" xsi:type="string">notice</item>
+                        </item>
+                    </argument>
+                    <settings>
+                        <dataScope>summary.notice</dataScope>
+                    </settings>
+                </text>
+                <fieldset name="shipping_address">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>The new shipping address</label>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                    </settings>
+                    <text name="address" template="ui/form/element/html">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="inputName" xsi:type="string">address</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <dataScope>summary.shipping_address</dataScope>
+                        </settings>
+                    </text>
+                </fieldset>
+                <fieldset name="shipping_method">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>The new shipping method</label>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_shipping</link>
+                        </imports>
+                    </settings>
+                    <text name="address" template="ui/form/element/text">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="inputName" xsi:type="string">method</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <imports>
+                                <link name="value">ns = ${ $.ns }, dataScope = data.shipping_method:selectedMethodText</link>
+                            </imports>
+                            <dataScope>summary.shipping_method</dataScope>
+                        </settings>
+                    </text>
+                </fieldset>
+                <fieldset name="billing_address">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>The new billing address</label>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_payment</link>
+                        </imports>
+                    </settings>
+                    <text name="address" template="ui/form/element/html">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="inputName" xsi:type="string">address</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <dataScope>summary.billing_address</dataScope>
+                        </settings>
+                    </text>
+                </fieldset>
+                <fieldset name="payment_method">
+                    <settings>
+                        <collapsible>false</collapsible>
+                        <label>The new payment method</label>
+                        <imports>
+                            <link name="visible">!${ $.provider }:data.skip_payment</link>
+                        </imports>
+                    </settings>
+                    <text name="address" template="ui/form/element/html">
+                        <argument name="data" xsi:type="array">
+                            <item name="config" xsi:type="array">
+                                <item name="inputName" xsi:type="string">method</item>
+                            </item>
+                        </argument>
+                        <settings>
+                            <dataScope>summary.payment_method</dataScope>
+                        </settings>
+                    </text>
+                </fieldset>
+            </fieldset>
+        </container>
+    </modal>
+</form>
