@@ -462,10 +462,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         ) {
             $billingCyclesToSkip = $subscriptionProfile->getSkipBillingCycles();
             $this->processSaveRelation($billingCyclesToSkip, $subscriptionProfile, $billingCyclesToSkip + 1);
-        } elseif ($newStatus == ProfileStatus::STATUS_ACTIVE
-            && $oldStatus == ProfileStatus::STATUS_HOLDED
-            && !$this->isAutomated
-        ) {
+        } elseif ($newStatus == ProfileStatus::STATUS_ACTIVE && $oldStatus && !$this->isAutomated) {
             $this->processSaveRelation(0, $subscriptionProfile, 1);
         }
         return $this;

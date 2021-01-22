@@ -103,7 +103,7 @@ class BillingCyclesManager
      * @param SubscriptionProfileInterface $profile
      * @param int $count
      * @param bool $existingCycles
-     * @param bool $getFutureAllFutureCycles
+     * @param bool $getAllFutureCycles
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
@@ -111,7 +111,7 @@ class BillingCyclesManager
         SubscriptionProfileInterface $profile,
         $count = 0,
         $existingCycles = false,
-        $getFutureAllFutureCycles = false
+        $getAllFutureCycles = false
     ) {
         $neededDates = [];
         $nowDate = new \DateTime();
@@ -166,7 +166,7 @@ class BillingCyclesManager
             );
             $neededDates[] = $this->format($date);
         }
-        if (!$getFutureAllFutureCycles) {
+        if (!$getAllFutureCycles) {
             $neededDates = array_diff($neededDates, $existDates);
         }
         //generate only future dates
