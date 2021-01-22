@@ -665,13 +665,6 @@ class Manager
             $item->getScheduledAt()
         );
         if ($status == ProfileStatus::STATUS_HOLDED) {
-            // Set subscription profile order quote ID field to null
-            $order = $this->relationManager->getRelationById($item->getProfileOrderId());
-            $order->setMagentoQuoteId(null);
-            $this->relationManager->saveRelation($order);
-            // Remove corresponding magento quote
-            $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-            $this->cartRepository->delete($quote);
             $result = true;
         }
 
