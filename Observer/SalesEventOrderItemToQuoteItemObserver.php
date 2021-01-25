@@ -18,10 +18,10 @@ use TNW\Subscriptions\Model\Sales\ExtensionAttributes\ExtensionManager;
 class SalesEventOrderItemToQuoteItemObserver implements ObserverInterface
 {
     /**
-    * Subscription quote and order items extension manager.
-    *
-    * @var ExtensionManager
-    */
+     * Subscription quote and order items extension manager.
+     *
+     * @var ExtensionManager
+     */
     private $extensionManager;
 
     /**
