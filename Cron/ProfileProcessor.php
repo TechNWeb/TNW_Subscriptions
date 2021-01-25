@@ -163,6 +163,10 @@ class ProfileProcessor
                 $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
                 return false;
 
+            case ProfileStatus::STATUS_HOLDED:
+                $this->queueManager->makeSkipped($queueId, __('Profile is On Hold, skipping...'));
+                return false;
+
             default:
                 if ($this->passWithoutProcessing($queue)) {
                     return false;

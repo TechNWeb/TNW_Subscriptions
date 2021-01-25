@@ -65,4 +65,12 @@ interface SubscriptionProfileQueueRepositoryInterface
      * @throws LocalizedException
      */
     public function deleteById($id);
+
+    /**
+     * Retrieve Subscription Profile Queue by Relation ID
+     *
+     * @param $relationId
+     * @return SubscriptionProfileQueueInterface
+     */
+    public function retrieveByRelationId($relationId);
 }
