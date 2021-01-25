@@ -227,7 +227,6 @@ class UpdateStatus
         return $rescheduled;
     }
 
-
     /**
      * Log change status in to Subscription Profile history.
      *

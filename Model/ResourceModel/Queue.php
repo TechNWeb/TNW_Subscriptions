@@ -9,6 +9,9 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\Queue as QueueModel;
 
+/**
+ * Class Queue - resource queue model
+ */
 class Queue extends AbstractDb
 {
     /**
@@ -134,6 +137,12 @@ class Queue extends AbstractDb
         $connection->delete($this->getMainTable(), $connection->prepareSqlCondition(QueueModel::ID, ['in'=>$ids]));
     }
 
+    /**
+     * @param QueueModel $queue
+     * @param $relationId
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function loadByRelationId(QueueModel $queue, $relationId)
     {
         $connection = $this->getConnection();
