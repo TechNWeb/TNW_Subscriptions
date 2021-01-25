@@ -66,8 +66,22 @@ class UpdateStatus
      */
     private $profileOrderManager;
 
+    /**
+     * @var SubscriptionProfileQueueRepositoryInterface
+     */
     private $profileQueueRepository;
 
+    /**
+     * UpdateStatus constructor.
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param StatusManager $statusManager
+     * @param ProfileStatus $statusSource
+     * @param MessageHistoryLogger $messageHistoryLogger
+     * @param ManagerInterface $messageManager
+     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
+     * @param ProfileOrderManager $profileOrderManager
+     * @param SubscriptionProfileQueueRepositoryInterface $profileQueueRepository
+     */
     public function __construct(
         SubscriptionProfileRepository $profileRepository,
         StatusManager $statusManager,
