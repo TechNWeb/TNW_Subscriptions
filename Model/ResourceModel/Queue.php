@@ -16,6 +16,12 @@ class Queue extends AbstractDb
      */
     private $dateTime;
 
+    /**
+     * Queue constructor.
+     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $dateTime
+     * @param null $connectionName
+     */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Framework\Stdlib\DateTime\DateTime $dateTime,
@@ -126,5 +132,23 @@ class Queue extends AbstractDb
 
         $connection = $this->getConnection();
         $connection->delete($this->getMainTable(), $connection->prepareSqlCondition(QueueModel::ID, ['in'=>$ids]));
+    }
+
+    public function loadByRelationId(QueueModel $queue, $relationId)
+    {
+        $connection = $this->getConnection();
+        $bind = ['profile_order_id' => $relationId];
+        $select = $connection->select()->from(
+            $this->getMainTable()
+        )->where(
+            'profile_order_id = :profile_order_id'
+        );
+
+        $queueData = $connection->fetchRow($select, $bind);
+        if ($queueData && is_array($queueData) && array_key_exists('id', $queueData)) {
+            $queue->setData($queueData);
+        }
+
+        return $this;
     }
 }

@@ -162,11 +162,20 @@ class ProfileProcessor
                 $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
                 return false;
 
+            case ProfileStatus::STATUS_HOLDED:
+                $result = true;
+                if (!$profile->getSkipBillingCycles()) {
+                    $this->queueManager->makeSkipped($queueId, __('Profile is On Hold, skipping...'));
+                    $result = false;
+                } elseif ($this->passWithoutProcessing($queue)) {
+                    $result = false;
+                }
+                return $result;
+
             default:
                 if ($this->passWithoutProcessing($queue)) {
                     return false;
                 }
-
                 return true;
         }
     }

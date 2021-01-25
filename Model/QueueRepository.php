@@ -174,6 +174,16 @@ class QueueRepository implements SubscriptionProfileQueueRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function retrieveByRelationId($relationId)
+    {
+        $queue = $this->queueFactory->create();
+        $this->resource->loadByRelationId($queue, $relationId);
+        return $queue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function delete(
         SubscriptionProfileQueueInterface $profileQueue
     ) {
