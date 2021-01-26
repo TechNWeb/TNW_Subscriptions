@@ -386,10 +386,15 @@ class Form extends AbstractDataProvider
         if ($productId && !isset($this->productBillingFrequencies[$productId])) {
             $this->productBillingFrequencies[$productId] = [];
             try {
-                $this->productBillingFrequencies[$productId] = $this->formContext
+                $frequencies = $this->formContext
                     ->getRecurringOptionRepository()
                     ->getListByProductId($productId)
                     ->getItems();
+                foreach ($frequencies as $frequency) {
+                    if (!$frequency->getIsDisabled()) {
+                        $this->productBillingFrequencies[$productId][] = $frequency;
+                    }
+                }
             } catch (\Exception $e) {
                 $this->context->log($e->getMessage());
             }
@@ -720,7 +725,10 @@ class Form extends AbstractDataProvider
                         $productDataObject, $productFrequencies[$billingFrequencyId]
                     );
             }
-            if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
+            if ($needProductValues
+                && !empty($data['product_frequencies'][$billingFrequencyId])
+                && ($frequency->getDefaultBillingFrequency() || !$addedDefault)
+            ) {
                 $data['billing_frequency'] = $billingFrequencyId;
                 $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
                 $data['preset_qty'] = $frequency->getPresetQty();

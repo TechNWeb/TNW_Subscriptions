@@ -90,11 +90,11 @@ define([
         },
 
         getIsDefault: function (record) {
-            return record.default_billing_frequency === '1' ? 'V' : '';
+            return record.default_billing_frequency === '1';
         },
 
         getIsDisabled: function (record) {
-            return record.is_disabled === '1' ? 'V' : '';
+            return record.is_disabled === '1';
         },
 
         getTrialUnit: function () {

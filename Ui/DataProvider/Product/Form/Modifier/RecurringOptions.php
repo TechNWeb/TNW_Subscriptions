@@ -617,6 +617,13 @@ class RecurringOptions extends BaseModifier
                             'false' => '0',
                             'true' => '1'
                         ],
+                        'imports' => [
+                            'disabled' => 'parentScope = ${ $.parentScope }, index = '
+                                . static::FIELD_IS_DISABLED . ':checked',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
                         'default' => '1',
                     ],
                 ],
@@ -644,6 +651,14 @@ class RecurringOptions extends BaseModifier
                             'false' => '0',
                             'true' => '1'
                         ],
+                        'imports' => [
+                            'disabled' => 'parentScope = ${ $.parentScope }, index = '
+                                . static::FIELD_IS_DEFAULT_NAME . ':checked',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
+                        'visible' => !$this->getIsConfigurableProduct(),
                         'default' => '0',
                     ],
                 ],

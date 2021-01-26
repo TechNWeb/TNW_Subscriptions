@@ -360,14 +360,21 @@ class Subscribe extends View
                 ->getItems();
             foreach ($parentFrequencies as $parentFrequency) {
                 foreach ($childFrequencies as $childFrequency) {
-                    if ($childFrequency->getBillingFrequencyId() === $parentFrequency->getBillingFrequencyId()) {
+                    if ($childFrequency->getBillingFrequencyId() === $parentFrequency->getBillingFrequencyId()
+                        && !$childFrequency->getIsDisabled()
+                    ) {
                         $frequencies[] = $childFrequency;
                     }
                 }
             }
             return $frequencies;
         }
-        return $parentFrequencies;
+        foreach ($parentFrequencies as $parentFrequency) {
+            if (!$parentFrequency->getIsDisabled()) {
+                $frequencies[] = $parentFrequency;
+            }
+        }
+        return $frequencies;
     }
 
     /**

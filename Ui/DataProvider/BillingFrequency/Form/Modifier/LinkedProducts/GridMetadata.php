@@ -259,7 +259,11 @@ class GridMetadata
         $skuColumn = $this->getColumnBaseData('sku', false, __('SKU'), 30);
         $skuColumn = $this->setColumnSpecialData($skuColumn);
         $isDisabledColumn = $this->getColumnBaseData('is_disabled', false, __('Is Disabled'), 120);
-        $isDisabledColumn = $this->setColumnSpecialData($isDisabledColumn);
+        $isDisabledColumn = $this->setColumnSpecialData(
+            $isDisabledColumn,
+            'Magento_Ui/js/form/element/text',
+            'TNW_Subscriptions/grid/cells/checkmark.html'
+        );
 
         $priceColumn = $this->getColumnBaseData('price', false, __($this->getPriceLabel()), 40);
         $priceColumn = $this->setColumnSpecialData(

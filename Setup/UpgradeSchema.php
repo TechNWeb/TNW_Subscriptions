@@ -112,7 +112,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
-        if (version_compare($context->getVersion(), '2.2.55', '<')) {
+        if (version_compare($context->getVersion(), '2.2.58', '<')) {
             $setup->getConnection()
                 ->addColumn(
                     $setup->getTable(
