@@ -36,8 +36,7 @@ class EnableDisableModule implements ObserverInterface
     public function execute(Observer $observer)
     {
         $configData = $observer->getEvent()->getDataByKey('configData');
-        if (
-            is_array($configData)
+        if (is_array($configData)
             && array_key_exists('section', $configData)
             && $configData['section'] == 'tnw_subscriptions_general'
         ) {
@@ -56,8 +55,7 @@ class EnableDisableModule implements ObserverInterface
                     $scope,
                     $scopeId
                 );
-            } elseif (
-                isset($configData['groups']['general']['fields']['active']['inherit'])
+            } elseif (isset($configData['groups']['general']['fields']['active']['inherit'])
                 && $configData['groups']['general']['fields']['active']['inherit']
                 && $configData['website']
             ) {

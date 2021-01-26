@@ -42,7 +42,7 @@ class Status implements ArrayInterface
                 self::QUEUE_STATUS_RUNNING => __('Running'),
                 self::QUEUE_STATUS_ERROR => __('Error'),
                 self::QUEUE_STATUS_SKIPPED => __('Skipped'),
-                self::QUEUE_STATUS_COMPLETE => __('Complete'),
+                self::QUEUE_STATUS_COMPLETE => __('Complete')
             ];
         }
 

@@ -67,16 +67,17 @@ class UpdateQuoteItem
         if ($request && $request->getData('subscribe_active') && $request->getData('rebill_processing')) {
             $this->quoteItemPlugin->setIsReBillForProduct($product);
         }
-        if (
-            $this->request->getActionName() === 'reorder'
+        if ($this->request->getActionName() === 'reorder'
             && $request->getData('subscribe_active') === '1'
         ) {
             if ((int)$product->getTnwSubscrPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE) {
                 $this->messageManager->addErrorMessage(
-                    __('Product "%1" is Recurring-Only and cannot be reordered.'
+                    __(
+                        'Product "%1" is Recurring-Only and cannot be reordered.'
                         . 'If you would like to re-order on recurring basis, '
-                        . 'please subscribe to it instead.'
-                        , $product->getName())
+                        . 'please subscribe to it instead.',
+                        $product->getName()
+                    )
                 );
             } else {
                 $request->setData('subscribe_active', 0);
@@ -118,8 +119,7 @@ class UpdateQuoteItem
         Product $product,
         $request = null
     ) {
-        if (
-            $this->request->getActionName() === 'reorder'
+        if ($this->request->getActionName() === 'reorder'
             && $request->getData('subscribe_active') === '1'
             && (int)$product->getTnwSubscrPurchaseType() === PurchaseType::RECURRING_PURCHASE_TYPE
         ) {
