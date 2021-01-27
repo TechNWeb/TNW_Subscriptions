@@ -42,8 +42,9 @@
                         <!-- ko if: !getIsConfigurableProduct()-->
                         <th class="data-grid-th" translate="'Recurring Price'"/>
                         <th class="data-grid-th" translate="'Original Price'"/>
+                        <th width="90" class="data-grid-th column-centered" translate="'Is Disabled'"/>
                         <!-- /ko -->
-                        <th class="data-grid-th" translate="'Is Default'"/>
+                        <th width="90" class="data-grid-th column-centered" translate="'Is Default'"/>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,8 +57,13 @@
                                 <span text="$parent.getInitialFee(record)"/><br>
                             </td>
                             <td text="$parent.getOriginalPrice()"/>
+                            <td class="column-centered">
+                                <strong css="'icon-checkmark': $parent.getIsDisabled(record)"/>
+                            </td>
                             <!-- /ko -->
-                            <td><strong text="$parent.getIsDefault(record)"/></td>
+                            <td class="column-centered">
+                                <strong css="'icon-checkmark': $parent.getIsDefault(record)"/>
+                            </td>
                         </tr>
                     <!-- /ko -->
                 </tbody>
