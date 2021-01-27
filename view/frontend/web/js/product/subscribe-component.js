@@ -120,9 +120,13 @@ define([
             if (productId) {
                 return productId;
             }
-            _.each($(this.swatchSelector), function (swatch, index) {
-                attrId = $(swatch).attr('attribute-id');
-                attrValue = $(swatch).attr('option-selected');
+            _.each($(this.swatchSelector), function (swatch) {
+                attrId = $(swatch).attr('data-attribute-id')
+                    ? $(swatch).attr('data-attribute-id')
+                    : $(swatch).attr('attribute-id');
+                attrValue = $(swatch).attr('data-option-selected')
+                    ? $(swatch).attr('data-option-selected')
+                    : $(swatch).attr('option-selected');
                 if (!attrId || !attrValue) {
                     return false;
                 }
