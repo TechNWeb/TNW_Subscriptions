@@ -289,13 +289,13 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-
+#
 #      - m233-open_source-php71:
 #          context: powersync
 #          filters:
 #            branches:
 #              only: master
-
+#
 #      - m2210-commerce-php72:
 #          context: powersync
 #          filters:
@@ -330,17 +330,16 @@ workflows:
           context: powersync
           requires:
             - deploy
-
+#
 #      - check-composer-installation:
 #          context: powersync
 #          requires:
 #            - deploy
-
-      - update-wiki:
-          context: powersync
-          requires:
+#
+#      - update-wiki:
+#          context: powersync
+#          requires:
 #            - check-composer-installation
-            - deploy
-         filters:
-            branches:
-              only: master
+#         filters:
+#            branches:
+#              only: master
