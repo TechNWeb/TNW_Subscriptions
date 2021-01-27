@@ -19,6 +19,9 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory as SubscriptionProfileOrderCollectionFactory;
 
+/**
+ * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
+ */
 class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepositoryInterface
 {
     /**
@@ -198,5 +201,14 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     public function deleteById($subscriptionProfileOrderId)
     {
         return $this->delete($this->getById($subscriptionProfileOrderId));
+    }
+
+    /**
+     * @param $profileId
+     * @return array
+     */
+    public function getLastSubscriptionOrderByProfileId($profileId)
+    {
+        return $this->resource->getLastProfileOrderByProfileId((int) $profileId);
     }
 }
