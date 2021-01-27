@@ -38,6 +38,9 @@
                 <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="content">
+            <block name="disableCache" cacheable="false"/>
+        </referenceBlock>
         <referenceBlock name="reviews.tab" remove="true"/>
         <referenceBlock name="view.addto.compare" remove="true"/>
         <referenceBlock name="view.addto.wishlist" remove="true"/>
