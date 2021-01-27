@@ -38,5 +38,8 @@
                 <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="content">
+            <block name="disableCache" cacheable="false"/>
+        </referenceBlock>
     </body>
 </page>
