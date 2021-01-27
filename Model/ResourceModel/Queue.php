@@ -9,6 +9,9 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\Queue as QueueModel;
 
+/**
+ * Class Queue - resource model
+ */
 class Queue extends AbstractDb
 {
     /**
@@ -16,6 +19,12 @@ class Queue extends AbstractDb
      */
     private $dateTime;
 
+    /**
+     * Queue constructor.
+     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $dateTime
+     * @param null $connectionName
+     */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Framework\Stdlib\DateTime\DateTime $dateTime,
@@ -77,6 +86,30 @@ class Queue extends AbstractDb
             ->where($connection->prepareSqlCondition(QueueModel::PROFILE_ORDER_ID, ['in'=>$relationIds]));
 
         return $connection->fetchCol($select);
+    }
+
+    /**
+     * @param QueueModel $queue
+     * @param $relationId
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadByRelationId(QueueModel $queue, $relationId)
+    {
+        $connection = $this->getConnection();
+        $bind = ['profile_order_id' => $relationId];
+        $select = $connection->select()->from(
+            $this->getMainTable()
+        )->where(
+            'profile_order_id = :profile_order_id'
+        );
+
+        $queueData = $connection->fetchRow($select, $bind);
+        if ($queueData && is_array($queueData) && array_key_exists('id', $queueData)) {
+            $queue->setData($queueData);
+        }
+
+        return $this;
     }
 
     /**

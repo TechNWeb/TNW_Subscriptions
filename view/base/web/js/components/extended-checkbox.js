@@ -76,7 +76,7 @@ define([
             });
 
             _.each(records, function (comp) {
-                if (comp.value() == 1) {
+                if (comp.value() == 1 && comp.prefer === 'radio') {
                     return existIsDefault = true;
                 }
             });

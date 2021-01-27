@@ -5,51 +5,104 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance;
 
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Element\AbstractBlock;
+use Magento\Framework\View\Result\LayoutFactory;
+use Magento\Payment\Block\Transparent\Iframe;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Payment;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+
 /**
- * Class ReceiveToken
- * @package TNW\Subscriptions\Controller\Adminhtml\SecureAcceptance
+ * Class ReceiveToken - controller used to get the token from cybersource
  */
-class ReceiveToken extends \Magento\Backend\App\Action
+class ReceiveToken extends Action
 {
     /**
-     * @var \Magento\Framework\Controller\Result\JsonFactory
+     * @var Registry
      */
-    private $resultJsonFactory;
+    private $coreRegistry;
+
+    /**
+     * @var LayoutFactory
+     */
+    private $resultLayoutFactory;
+
+    /**
+     * @var ProfileManager
+     */
+    private $profileManager;
 
     /**
      * ReceiveToken constructor.
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param LayoutFactory $resultLayoutFactory
+     * @param ProfileManager $profileManager
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        Context $context,
+        Registry $coreRegistry,
+        LayoutFactory $resultLayoutFactory,
+        ProfileManager $profileManager
     ) {
         parent::__construct($context);
-        $this->resultJsonFactory = $resultJsonFactory;
+        $this->coreRegistry = $coreRegistry;
+        $this->resultLayoutFactory = $resultLayoutFactory;
+        $this->profileManager = $profileManager;
     }
 
     /**
-     * @return \Magento\Framework\Controller\Result\Json
+     * @return ResultInterface
+     * @throws LocalizedException
      */
     public function execute()
     {
+        $parameters = [];
+        $profile = null;
+        if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
+            /** @var SubscriptionProfileInterface $profile */
+            $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+        }
         if ($this->getRequest()->getParam('isAjax', false)) {
-            $result = $this->resultJsonFactory->create();
-            $result->setData([
-                'payment_token' =>  $this->_session->getData('chcybersource_payment_token')
-            ]);
+            $parameters['payment_token'] = $this->_session->getData('chcybersource_payment_token');
             $this->_session->setData('chcybersource_payment_token', null);
         } else {
-            $result = $this->resultJsonFactory->create();
             $this->_session->setData(
                 'chcybersource_payment_token',
                 $this->getRequest()->getParam('payment_token')
             );
-            $result->setData(['success' => true, 'payment_token' => $this->getRequest()->getParam('payment_token')]);
+            $parameters['payment_token'] = $this->getRequest()->getParam('payment_token');
         }
 
-        return $result;
+        $this->coreRegistry->register(Iframe::REGISTRY_KEY, $parameters);
+
+        $resultLayout = $this->resultLayoutFactory->create();
+        $resultLayout->addDefaultHandle();
+        $resultLayout->getLayout()->getUpdate()->load(['tnw_cybersource_payment_response']);
+        /** @var AbstractBlock $iframeBlock */
+        $iframeBlock = $resultLayout->getLayout()->getBlock('transparent_iframe');
+        $index = $this->getFormIndex($profile);
+        $iframeBlock->setData('index', $index);
+
+        return $resultLayout;
+    }
+
+    /**
+     * Returns response form index.
+     *
+     * @param null|SubscriptionProfileInterface $profile
+     * @return string
+     */
+    protected function getFormIndex($profile = null)
+    {
+        return isset($profile) ? SummaryPaymentMethodForm::FORM_NAME : Payment::DATA_SCOPE_PAYMENT_FORM;
     }
 
     /**

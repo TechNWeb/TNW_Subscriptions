@@ -567,6 +567,10 @@ class Manager
                     $this->relationManager->saveRelation($relation);
                     $this->createNewRelation($queue, $profile);
                     $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
+                    $profile->setNeedRecollect(false);
+                    foreach ($profile->getProducts() as $product) {
+                        $product->setNeedRecollect(false);
+                    }
                     $this->profileRepository->save($profile);
                 }
             } catch (\Exception $e) {
@@ -636,6 +640,34 @@ class Manager
     }
 
     /**
+     * @param $quoteId
+     * @param $profile
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function createNewRelationByQuoteId($quoteId, $profile)
+    {
+        /** @var BillingCyclesManager $billingCyclesManager */
+        $billingCyclesManager = $this->billingCyclesManagerFactory->create();
+        list($cycles, $needMore, $existingCycles) =
+            $billingCyclesManager->getBillingCycles($profile, 1, true);
+        if ($needMore && $cycles) {
+            $relations = [];
+            foreach ($cycles as $cycle) {
+                $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                    ->setSubscriptionProfileId($profile->getId())
+                    ->setMagentoQuoteId($quoteId)
+                    ->setScheduledAt($cycle);
+                $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+            }
+            if ($relations) {
+                return $relations;
+            }
+        }
+        return [];
+    }
+
+    /**
      * @param Queue $item
      *
      * @return bool
@@ -661,13 +693,6 @@ class Manager
             $item->getScheduledAt()
         );
         if ($status == ProfileStatus::STATUS_HOLDED) {
-            // Set subscription profile order quote ID field to null
-            $order = $this->relationManager->getRelationById($item->getProfileOrderId());
-            $order->setMagentoQuoteId(null);
-            $this->relationManager->saveRelation($order);
-            // Remove corresponding magento quote
-            $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-            $this->cartRepository->delete($quote);
             $result = true;
         }
 

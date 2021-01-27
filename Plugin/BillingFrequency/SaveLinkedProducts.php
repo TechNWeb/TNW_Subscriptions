@@ -207,6 +207,7 @@ class SaveLinkedProducts
             ProductBillingFrequencyInterface::PRICE => $this->prepareValue($data, 'price'),
             ProductBillingFrequencyInterface::INITIAL_FEE => $this->prepareValue($data, 'initial_fee'),
             ProductBillingFrequencyInterface::PRESET_QTY => $this->prepareValue($data, 'preset_qty'),
+            ProductBillingFrequencyInterface::IS_DISABLED => $this->prepareValue($data, 'is_disabled'),
             'sort_order' => $maxOrder
         ];
         $linkedProduct->setData($resultData);

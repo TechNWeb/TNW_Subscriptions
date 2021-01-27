@@ -69,7 +69,7 @@ class Process extends Action
                 if ($item && $item->getId()){
                     $this->queueManager->makeRunning($queueId);
                     try {
-                        $this->queueManager->processItem($item);
+                        $this->queueManager->placeOrderByGroupQueue([$item]);
                         $this->queueManager->makeCompleted($item->getId());
                         $this->profileProcessor->updateProfilesStatuses(
                             [$item->getSubscriptionProfileId()]
@@ -78,6 +78,9 @@ class Process extends Action
                             'Record was successfully processed.',
                             'backend'
                         );
+                    } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
+                        $this->messageManager->addErrorMessage($e->getMessage());
+                        $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
                     } catch (\Exception $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage());
                         $this->messageManager->addErrorMessage(

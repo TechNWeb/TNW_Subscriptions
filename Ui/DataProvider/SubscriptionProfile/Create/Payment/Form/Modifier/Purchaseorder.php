@@ -86,7 +86,12 @@ class Purchaseorder extends Base implements PaymentModifierInterface
                         'componentType' => 'field',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/input',
                         'label' => __('Purchase Order Number:'),
-                        'additionalClasses' => 'admin__field-wide'
+                        'imports' => [
+                            'visible' => $this->getFieldsetName() . '.additional_fields:visible'
+                        ],
+                        'validation' => [
+                            'required-entry' => true
+                        ]
                     ],
                 ],
             ],
@@ -100,7 +105,6 @@ class Purchaseorder extends Base implements PaymentModifierInterface
     protected function getAdditionalConfig()
     {
         return [
-            'listens'=> $this->getListens(),
             'options' => [
                 'gateway' => $this->getPaymentCode(),
                 'formName' => $this->getPaymentFormName()

@@ -100,11 +100,16 @@ class BillingCyclesManager
      * @param SubscriptionProfileInterface $profile
      * @param int $count
      * @param bool $existingCycles
+     * @param bool $getAllFutureCycles
      * @return array
      * @throws \Exception
      */
-    public function getBillingCycles(SubscriptionProfileInterface $profile, $count = 0, $existingCycles = false)
-    {
+    public function getBillingCycles(
+         SubscriptionProfileInterface $profile,
+         $count = 0,
+         $existingCycles = false,
+         $getAllFutureCycles = false
+    ) {
         $neededDates = [];
         $nowDate = new \DateTime();
         $formattedNowDate = $this->format($nowDate);
@@ -158,7 +163,9 @@ class BillingCyclesManager
             );
             $neededDates[] = $this->format($date);
         }
-        $neededDates = array_diff($neededDates, $existDates);
+        if (!$getAllFutureCycles) {
+            $neededDates = array_diff($neededDates, $existDates);
+        }
         //generate only future dates
         $resultDates = array_filter(
             $neededDates,

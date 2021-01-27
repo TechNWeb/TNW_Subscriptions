@@ -101,6 +101,8 @@ class ProfileProcessor
         // Getting Profile IDs
         $profileIds = array_map([$this, 'profileIdByQueue'], $collectionToday->getItems());
 
+        $this->profileRepository->setAutomatedProcessFlag(true);
+
         // Filtering not active
         $activeQueueList = array_filter($collectionToday->getItems(), [$this, 'filterQueue']);
 
@@ -159,6 +161,10 @@ class ProfileProcessor
 
             case ProfileStatus::STATUS_COMPLETE:
                 $this->queueManager->makeSkipped($queueId, __('Profile is Complete, skipping...'));
+                return false;
+
+            case ProfileStatus::STATUS_HOLDED:
+                $this->queueManager->makeSkipped($queueId, __('Profile is On Hold, skipping...'));
                 return false;
 
             default:

@@ -22,10 +22,13 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManagerFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 
 /**
  * Repository for subscription profiles.
@@ -129,6 +132,11 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @var EmailNotifierFactory
      */
     private $emailNotifierFactory;
+
+    /**
+     * @var bool
+     */
+    private $isAutomated = false;
 
     /**
      * SubscriptionProfileRepository constructor.
@@ -279,6 +287,16 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
+     * @param $isAutomated
+     * @return $this
+     */
+    public function setAutomatedProcessFlag($isAutomated)
+    {
+        $this->isAutomated = (bool) $isAutomated;
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getById($profileId)
@@ -374,6 +392,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * After loading profiles via method getList() assigns products and addresses to profile.
      *
      * @param SubscriptionProfileInterface $subscriptionProfileModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function assignProductsAndAddresses(
         SubscriptionProfileInterface $subscriptionProfileModel
