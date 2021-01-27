@@ -645,6 +645,34 @@ class Manager
     }
 
     /**
+     * @param $quoteId
+     * @param $profile
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function createNewRelationByQuoteId($quoteId, $profile)
+    {
+        /** @var BillingCyclesManager $billingCyclesManager */
+        $billingCyclesManager = $this->billingCyclesManagerFactory->create();
+        list($cycles, $needMore, $existingCycles) =
+            $billingCyclesManager->getBillingCycles($profile, 1, true);
+        if ($needMore && $cycles) {
+            $relations = [];
+            foreach ($cycles as $cycle) {
+                $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                    ->setSubscriptionProfileId($profile->getId())
+                    ->setMagentoQuoteId($quoteId)
+                    ->setScheduledAt($cycle);
+                $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+            }
+            if ($relations) {
+                return $relations;
+            }
+        }
+        return [];
+    }
+
+    /**
      * @param Queue $item
      *
      * @return bool

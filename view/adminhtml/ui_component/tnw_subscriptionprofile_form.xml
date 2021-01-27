@@ -24,6 +24,7 @@
         <item name="reverseMetadataMerge" xsi:type="boolean">true</item>
         <item name="buttons" xsi:type="array">
             <item name="back" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons\BackButton</item>
+            <item name="relation" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons\NewRelationButton</item>
             <item name="cancel" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons\CancelButton</item>
             <item name="hold" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons\HoldButton</item>
             <item name="suspend" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons\SuspendButton</item>

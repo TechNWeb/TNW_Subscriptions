@@ -25,4 +25,17 @@ class SubscriptionProfileOrder extends AbstractDb
             SubscriptionProfileOrderInterface::ID
         );
     }
+
+    public function getLastProfileOrderByProfileId($profileId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()
+            ->from($this->getMainTable(), ['*'])
+            ->order($this->getIdFieldName() . ' DESC')
+            ->where('subscription_profile_id = ?', $profileId)
+            ->limit(1);
+        ;
+        return $connection->fetchRow($select);
+    }
 }
