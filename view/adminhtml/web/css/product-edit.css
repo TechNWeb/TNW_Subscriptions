@@ -16,8 +16,13 @@
 .tnw_recurring_summary .data-grid td {
     vertical-align: middle;
 }
-.tnw_recurring_summary .data-grid td:last-child {
+.tnw_recurring_summary .data-grid .column-centered {
     text-align: center;
+}
+.tnw_recurring_summary .icon-checkmark:before {
+    content: '\e62d';
+    font-family: 'Admin Icons';
+    font-size: 1.6rem;
 }
 .product_form_product_form_subscription-options_management_modal .action-close {
     display: none;

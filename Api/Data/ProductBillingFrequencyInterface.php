@@ -22,6 +22,7 @@ interface ProductBillingFrequencyInterface
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const PRESET_QTY = 'preset_qty';
     const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
+    const IS_DISABLED = 'is_disabled';
     /**#@-*/
 
     /**
@@ -117,4 +118,15 @@ interface ProductBillingFrequencyInterface
      * @return $this
      */
     public function setPresetQty($presetQty);
+
+    /**
+     * @return mixed
+     */
+    public function getIsDisabled();
+
+    /**
+     * @param $isDisabled
+     * @return mixed
+     */
+    public function setIsDisabled($isDisabled);
 }

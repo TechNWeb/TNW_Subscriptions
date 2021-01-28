@@ -123,6 +123,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         self::UPDATED_AT,
         self::GENERATE_QUOTES_STATE,
         self::NEED_RECOLLECT,
+        self::BILLING_CYCLES_TO_SKIP,
     ];
 
     /**
@@ -661,6 +662,22 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setCancelBeforeNextCycle($cancelBeforeNextCycle)
     {
         return $this->setData(self::CANCEL_BEFORE_NEXT_CYCLE, $cancelBeforeNextCycle);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSkipBillingCycles()
+    {
+        return $this->getData(self::BILLING_CYCLES_TO_SKIP);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSkipBillingCycles($billingCyclesToSkip)
+    {
+        return $this->setData(self::BILLING_CYCLES_TO_SKIP, $billingCyclesToSkip);
     }
 
     /**

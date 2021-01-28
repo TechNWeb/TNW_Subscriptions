@@ -150,4 +150,20 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     {
         return $this->setData(self::PRESET_QTY, $presetQty);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIsDisabled()
+    {
+        return $this->getData(self::IS_DISABLED);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsDisabled($isDisabled)
+    {
+        return $this->setData(self::IS_DISABLED, $isDisabled);
+    }
 }

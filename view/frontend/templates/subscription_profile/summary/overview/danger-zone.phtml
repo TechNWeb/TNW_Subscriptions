@@ -12,14 +12,42 @@
     <div class="block-content">
         <?php if ($block->isPlaceOnHoldActive()): ?>
             <div>
-                <button onclick="window.location.href='<?= $block->getPlaceOnHoldUrl() ?>'"
-                        class="action primary place-on-hold">
+                <button class="action primary place-on-hold">
                     <?= __('Place on Hold') ?>
                 </button>
                 <span class="place-on-hold-comment">
                     <?= __('Place subscription On Hold. While "On Hold" you will not be billed.') ?>
                 </span>
             </div>
+            <script>
+                require([
+                    'jquery',
+                    'Magento_Ui/js/modal/confirm',
+                    'text!TNW_Subscriptions/template/grid/pause-radio-set.html'
+                ], function($, confirm, pauseRadioSetTmpl) {
+                    $('.action.place-on-hold').on('click', function () {
+                        confirm({
+                            title: $.mage.__('Warning!'),
+                            content: $.mage.__('Are you sure? While "On Hold" you will not be billed.')
+                                + pauseRadioSetTmpl,
+                            actions: {
+                                confirm: function(){
+                                    var data = {
+                                        isAjax: true,
+                                        suspension_type: $('[name=suspension_type]:checked').val(),
+                                        cycles_count: $('[name=cycles_count]').val()
+                                    }
+                                    $('body').trigger('processStart');
+                                    $.post('<?= $block->getPlaceOnHoldUrl() ?>', data)
+                                        .always(function() {
+                                            window.location.reload();
+                                        });
+                                }
+                            }
+                        })
+                    })
+                });
+            </script>
         <?php endif ?>
         <?php if ($block->isReActiveActive()): ?>
             <div style="margin-top: 1%">

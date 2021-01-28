@@ -4,3 +4,9 @@
 th.tnw_price_column {
     width: 10%;
 }
+
+.control-table-text .icon-checkmark:before {
+    content: '\e62d';
+    font-family: 'Admin Icons';
+    font-size: 1.6rem;
+}

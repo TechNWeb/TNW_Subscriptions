@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Acco
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
+use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
@@ -21,7 +22,6 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
-use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
@@ -40,6 +40,11 @@ class ProductsForm extends SummaryProductsForm
     protected $subscriptionConfig;
 
     /**
+     * @var $productSalableQty
+     */
+    protected $productSalableQty;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -53,6 +58,7 @@ class ProductsForm extends SummaryProductsForm
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
      * @param Config $subscriptionConfig
+     * @param GetProductSalableQtyInterface $productSalableQty
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -71,11 +77,13 @@ class ProductsForm extends SummaryProductsForm
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
         Config $subscriptionConfig,
+        GetProductSalableQtyInterface $productSalableQty,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->subscriptionConfig = $subscriptionConfig;
+        $this->productSalableQty = $productSalableQty;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -192,10 +200,43 @@ class ProductsForm extends SummaryProductsForm
      * Returns qty field definition.
      *
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getQtyDefinition()
     {
         $canUseDecimals = $this->canUseQtyDecimals();
+        $productId = current($this->profileManager->getProfile()->getProducts())->getMagentoProductId();
+        $websiteId = $this->profileManager->getProfile()->getWebsiteId();
+
+        $params = [];
+        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        $stockItem = $this->stockRegistry->getStockItem($productId, $websiteId);
+        foreach ($this->profileManager->getProfile()->getProducts() as $item) {
+            $product = $item->getChildren() ? $item->getChildren() : $item;
+        }
+        $productSalableQty = $this->productSalableQty->execute(
+            $product->getSku(),
+            $websiteId
+        );
+
+        if ($product->getMagentoProductId() != $productId) {
+            /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+            $stockItem = $this->stockRegistry->getStockItem($product->getMagentoProductId(), $websiteId);
+        }
+        $params['minAllowed'] = $stockItem->getMinQty();
+        if ($productSalableQty && $stockItem->getData('backorders') == 0) {
+            $params['maxAllowed'] = $productSalableQty < $stockItem->getMaxSaleQty()
+                ? $productSalableQty
+                : $stockItem->getMaxSaleQty();
+        } else {
+            $params['maxAllowed'] = $stockItem->getMaxSaleQty();
+        }
+
+        if ($stockItem->getQtyIncrements() > 0) {
+            $params['qtyIncrements'] = (float) $stockItem->getQtyIncrements();
+        }
+
         return [
             'arguments' => [
                 'data' => [
@@ -207,8 +248,8 @@ class ProductsForm extends SummaryProductsForm
                         'dataScope' => 'qty',
                         'validation' => [
                             'validate-greater-than-zero' => true,
-                            'required-entry' => true,
-                            'validate-digits' => !$canUseDecimals
+                            'validate-digits' => !$canUseDecimals,
+                            'validate-item-quantity' => $params
                         ],
                         'component' => 'TNW_Subscriptions/js/components/field/preview-qty',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',

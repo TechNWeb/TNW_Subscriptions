@@ -3,15 +3,21 @@ define([
     'Magento_Ui/js/grid/columns/column',
     'underscore',
     'Magento_Ui/js/modal/confirm',
-    'uiRegistry'
-], function ($, Column, _, confirm, registry) {
+    'uiRegistry',
+    'text!TNW_Subscriptions/template/grid/pause-radio-set.html'
+], function ($, Column, _, confirm, registry, pauseRadioSetTmpl) {
     return Column.extend({
 
         applyAction: function(component, action) {
             function doPost(action) {
-                var self = this;
+                var self = this,
+                    data = {isAjax: true};
                 $('body').trigger('processStart');
-                $.post(action.href, {isAjax: true})
+                if (action.type === 'hold') {
+                    data.suspension_type = $('[name=suspension_type]:checked').val();
+                    data.cycles_count = $('[name=cycles_count]').val();
+                }
+                $.post(action.href, data)
                 .done(function () {
                     registry.get(self.provider).set('params.t', Date.now());
                 })
@@ -21,9 +27,10 @@ define([
             }
 
             if (action.title && action.message) {
+                var message = action.type === 'hold' ? action.message + pauseRadioSetTmpl : action.message;
                 confirm({
                     title: action.title,
-                    content: action.message,
+                    content: message,
                     actions: {
                         confirm: doPost.bind(component, action)
                     }

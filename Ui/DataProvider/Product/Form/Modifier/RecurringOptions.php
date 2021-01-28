@@ -83,6 +83,7 @@ class RecurringOptions extends BaseModifier
     const FIELD_IS_DELETE = 'is_delete';
     const FIELD_TITLE_NAME = 'title';
     const FIELD_PRESET_QTY = 'preset_qty';
+    const FIELD_IS_DISABLED = 'is_disabled';
     /**#@-*/
 
     /**#@+
@@ -506,6 +507,7 @@ class RecurringOptions extends BaseModifier
                 static::FIELD_IS_DEFAULT_NAME => $this->getIsDefaultFieldConfig(60),
                 static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(60),
                 static::FIELD_PRESET_QTY => $this->getPresetQtyFieldConfig(50),
+                static::FIELD_IS_DISABLED => $this->getIsDisabledFieldConfig(70),
             ]
         ];
         if ($this->getIsConfigurableProduct()) {
@@ -628,7 +630,49 @@ class RecurringOptions extends BaseModifier
                             'false' => '0',
                             'true' => '1'
                         ],
+                        'imports' => [
+                            'disabled' => 'parentScope = ${ $.parentScope }, index = '
+                                . static::FIELD_IS_DISABLED . ':checked',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
                         'default' => '1',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    private function getIsDisabledFieldConfig($sortOrder)
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'formElement' => Checkbox::NAME,
+                        'componentType' => Field::NAME,
+                        'component' => 'TNW_Subscriptions/js/components/extended-checkbox',
+                        'parentContainer' => static::CONTAINER_OPTION,
+                        'parentSelections' => static::GRID_OPTIONS_NAME,
+                        'dataType' => Boolean::NAME,
+                        'label' => __('Is Disabled'),
+                        'dataScope' => static::FIELD_IS_DISABLED,
+                        'prefer' => 'checkbox',
+                        'sortOrder' => $sortOrder,
+                        'valueMap' => [
+                            'false' => '0',
+                            'true' => '1'
+                        ],
+                        'imports' => [
+                            'disabled' => 'parentScope = ${ $.parentScope }, index = '
+                                . static::FIELD_IS_DEFAULT_NAME . ':checked',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
+                        'visible' => !$this->getIsConfigurableProduct(),
+                        'default' => '0',
                     ],
                 ],
             ],

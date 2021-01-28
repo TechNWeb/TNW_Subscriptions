@@ -21,10 +21,11 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ResourceSubscriptionProfile;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\AddressRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
-use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 
 /**
  * Repository for subscription profiles.
@@ -129,6 +130,11 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $emailNotifierFactory;
 
     /**
+     * @var bool
+     */
+    private $isAutomated = false;
+
+    /**
      * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
@@ -190,7 +196,13 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $oldStatus = $this->statusHistoryManager->getProfileOldStatus($subscriptionProfile);
         $oldConfigOption = $this->statusHistoryManager->getProfileOldConfigOption($subscriptionProfile);
         $oldPaymentData =  $this->statusHistoryManager->getProfileOldPaymentData($subscriptionProfile);
+        $newStatus = $subscriptionProfile->getStatus();
 
+        if ($newStatus == ProfileStatus::STATUS_ACTIVE
+            && $oldStatus == ProfileStatus::STATUS_HOLDED
+        ) {
+            $subscriptionProfile->setSkipBillingCycles(0);
+        }
         try {
             $this->entityManager->save($subscriptionProfile);
         } catch (\Exception $exception) {
@@ -219,8 +231,6 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 $subscriptionProfile->getId()
             );
         }
-
-        $newStatus = $subscriptionProfile->getStatus();
 
         // Log status history
         if ($oldStatus != $newStatus) {
@@ -374,9 +384,20 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
+     * @param $isAutomated
+     * @return $this
+     */
+    public function setAutomatedProcessFlag($isAutomated)
+    {
+        $this->isAutomated = (bool) $isAutomated;
+        return $this;
+    }
+
+    /**
      * After loading profiles via method getList() assigns products and addresses to profile.
      *
      * @param SubscriptionProfileInterface $subscriptionProfileModel
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function assignProductsAndAddresses(
         SubscriptionProfileInterface $subscriptionProfileModel

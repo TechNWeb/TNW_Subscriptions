@@ -406,10 +406,15 @@ class Form extends AbstractDataProvider
         if ($productId && !isset($this->productBillingFrequencies[$productId])) {
             $this->productBillingFrequencies[$productId] = [];
             try {
-                $this->productBillingFrequencies[$productId] = $this->formContext
+                $frequencies = $this->formContext
                     ->getRecurringOptionRepository()
                     ->getListByProductId($productId)
                     ->getItems();
+                foreach ($frequencies as $frequency) {
+                    if (!$frequency->getIsDisabled()) {
+                        $this->productBillingFrequencies[$productId][] = $frequency;
+                    }
+                }
             } catch (\Exception $e) {
                 $this->context->log($e->getMessage());
             }
@@ -602,7 +607,10 @@ class Form extends AbstractDataProvider
                         $productFrequencies[$billingFrequencyId]
                     );
             }
-            if ($needProductValues && ($frequency->getDefaultBillingFrequency() || !$addedDefault)) {
+            if ($needProductValues
+                && !empty($data['product_frequencies'][$billingFrequencyId])
+                && ($frequency->getDefaultBillingFrequency() || !$addedDefault)
+            ) {
                 $data['billing_frequency'] = $billingFrequencyId;
                 $data['price'] = $data['product_frequencies'][$billingFrequencyId]['price'];
                 $data['preset_qty'] = $frequency->getPresetQty();
@@ -756,8 +764,8 @@ class Form extends AbstractDataProvider
             $productData = $this->getProductObjectData($productId, $arguments);
             $isInfiniteSubscriptions = (bool)$productData->getData(Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS);
             if ($isInfiniteSubscriptions) {
-                $result['elementTmpl'] = 'TNW_Subscriptions/form/element/term-label';
-                $result['value'] = 1;
+                $result['disabled'] = true;
+                $result['value'] = '1';
             }
         }
 
@@ -775,9 +783,9 @@ class Form extends AbstractDataProvider
         $productId = $productId ?: $this->getRequestProductId();
         $result = [
             'imports' => [
-                'visible' => '!ns = ${ $.ns }, index = term:checked',
+                'onTermChange' => 'ns = ${ $.ns }, index = term:value',
                 '__disableTmpl' => [
-                    'visible' => false
+                    'onTermChange' => false
                 ]
             ],
         ];

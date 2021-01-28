@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Block\Subscription\Info;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Theme\Block\Html\Pager;
 use TNW\Subscriptions\Model\MessagePool;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\Collection as MessagesCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
@@ -100,7 +101,7 @@ class ChangeHistory extends ContentAbstract
         parent::_prepareLayout();
         if ($this->getChangeHistoryCollection()) {
             $pager = $this->getLayout()->createBlock(
-                'Magento\Theme\Block\Html\Pager',
+                Pager::class,
                 'subscription.change.history.pager'
             )->setCollection(
                 $this->getChangeHistoryCollection()

@@ -608,6 +608,7 @@ class StepsWizard extends BaseModifier
                             'flatDiscountType' => '${ $.provider }:data.product.tnw_subscr_discount_type',
                             'flatDiscountAmount' => '${ $.provider }:data.product.tnw_subscr_discount_amount',
                             'infiniteSubscription' => '${ $.provider }:data.product.tnw_subscr_inf_subscriptions',
+                            'is_disabled' => '${ $.provider }:data.product.is_disabled',
                             '__disableTmpl' => [
                                 'setFrequencyRecords' => false,
                                 'originalPrice' => false,
@@ -620,7 +621,8 @@ class StepsWizard extends BaseModifier
                                 'offerFlatDiscount' => false,
                                 'flatDiscountType' => false,
                                 'flatDiscountAmount' => false,
-                                'infiniteSubscription' => false
+                                'infiniteSubscription' => false,
+                                'is_disabled' => false
                             ]
                         ]
                     ]
