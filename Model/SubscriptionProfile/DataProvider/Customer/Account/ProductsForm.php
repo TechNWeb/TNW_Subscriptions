@@ -5,10 +5,13 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
-use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
+use Magento\InventorySales\Model\GetProductSalableQty;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
@@ -40,7 +43,7 @@ class ProductsForm extends SummaryProductsForm
     protected $subscriptionConfig;
 
     /**
-     * @var $productSalableQty
+     * @var GetProductSalableQty
      */
     protected $productSalableQty;
 
@@ -58,7 +61,7 @@ class ProductsForm extends SummaryProductsForm
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
      * @param Config $subscriptionConfig
-     * @param GetProductSalableQtyInterface $productSalableQty
+     * @param GetProductSalableQty $productSalableQty
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -77,7 +80,7 @@ class ProductsForm extends SummaryProductsForm
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
         Config $subscriptionConfig,
-        GetProductSalableQtyInterface $productSalableQty,
+        GetProductSalableQty $productSalableQty,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -200,8 +203,8 @@ class ProductsForm extends SummaryProductsForm
      * Returns qty field definition.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws InputException
+     * @throws LocalizedException
      */
     protected function getQtyDefinition()
     {
@@ -210,7 +213,7 @@ class ProductsForm extends SummaryProductsForm
         $websiteId = $this->profileManager->getProfile()->getWebsiteId();
 
         $params = [];
-        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        /** @var StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem($productId, $websiteId);
         foreach ($this->profileManager->getProfile()->getProducts() as $item) {
             $product = $item->getChildren() ? $item->getChildren() : $item;
@@ -221,7 +224,7 @@ class ProductsForm extends SummaryProductsForm
         );
 
         if ($product->getMagentoProductId() != $productId) {
-            /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+            /** @var StockItemInterface $stockItem */
             $stockItem = $this->stockRegistry->getStockItem($product->getMagentoProductId(), $websiteId);
         }
         $params['minAllowed'] = $stockItem->getMinQty();
