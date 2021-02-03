@@ -190,7 +190,7 @@ abstract class AbstractView extends AbstractAccount
         $subscriptionData = $this->subscriptionProfileOrder->getList(
             $this->getFilterByProfileId($subscriptionProfileId)
         )->getItems();
-        $subscriptionProfile = array_shift($subscriptionData);
+        $subscriptionProfile = end($subscriptionData);
         if ($subscriptionProfile === null) {
             throw new NoSuchEntityException();
         }
