@@ -158,11 +158,29 @@ class CreateProfile implements ObserverInterface
                 $customer = $this->orderCustomerService->create($order->getEntityId());
                 //ISSUE: https://github.com/magento/magento2/issues/7597
                 $this->customerFactory->create()->setId($customer->getId())->reindex();
+                $isCustomerJustCreated = true;
             } catch (\Exception $e) {
                 $customer = $this->customerRepository->get($order->getCustomerEmail());
+                $isCustomerJustCreated = false;
             }
             $quote->setCustomer($customer);
             $this->changeQuoteControl->setNewCustomer($customer);
+
+            if ($isCustomerJustCreated && !$this->trialPaymentData) {
+                $payment = $order->getPayment();
+                if (
+                    $payment->getExtensionAttributes()
+                    && $payment->getExtensionAttributes()->getVaultPaymentToken()
+                    && !empty($paymentTokenData = $payment->getExtensionAttributes()->getVaultPaymentToken()->getData())
+                ) {
+                    $this->setTrialPaymentData(
+                        [
+                            'payment_data' => $payment->getData(),
+                            'payment_token' => $payment->getExtensionAttributes()->getVaultPaymentToken(),
+                        ]
+                    );
+                }
+            }
         }
 
         // Compatibility with third-party modules which convert guest to customer
