@@ -64,7 +64,7 @@ class PaymentTokenManagement
             foreach ($order->getItems() as $item) {
                 $productOptions = $item->getProductOPtions();
                 if (array_key_exists('info_buyRequest', $productOptions)
-                && array_key_exists('subscribe_active', $productOptions['info_buyRequest'])
+                    && array_key_exists('subscribe_active', $productOptions['info_buyRequest'])
                     && $productOptions['info_buyRequest']['subscribe_active']
                 ) {
                     $subscriptionCreation = true;
