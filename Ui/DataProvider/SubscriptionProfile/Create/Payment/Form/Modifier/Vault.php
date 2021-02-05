@@ -226,9 +226,11 @@ class Vault extends Base
                     $this->getPaymentMethodCodeByVaultCode($this->currentVaultMethod),
                     $this->getProfile()->getCustomerId()
                 );
-                $this->currentProfilePublicHash = $vaultToken->getPublicHash();
             } catch (\Exception $e) {
                 $vaultToken = null;
+            }
+            if ($vaultToken) {
+                $this->currentProfilePublicHash = $vaultToken->getPublicHash();
             }
         }
         foreach ($this->tokensConfig[$this->currentVaultMethod] as $ccToken) {
