@@ -76,6 +76,9 @@ class Vault extends Base
      */
     private $paymentTokenManagement;
 
+    /**
+     * @var array
+     */
     private $currentProfilePublicHash = [];
 
     /**
