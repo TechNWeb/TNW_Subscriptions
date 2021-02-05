@@ -76,10 +76,7 @@ class Vault extends Base
      */
     private $paymentTokenManagement;
 
-    /**
-     * @var string
-     */
-    private $currentProfilePublicHash = '';
+    private $currentProfilePublicHash = [];
 
     /**
      * Vault constructor.
@@ -131,7 +128,8 @@ class Vault extends Base
     public function modifyData(array $data)
     {
         if ($this->currentProfilePublicHash) {
-            $data['payment'][$this->currentVaultMethod]['additional']['publicHash'] = $this->currentProfilePublicHash;
+            $data['payment'][$this->currentProfilePublicHash['method']]['additional']['publicHash']
+                = $this->currentProfilePublicHash['value'];
         }
         return $data;
     }
@@ -230,7 +228,8 @@ class Vault extends Base
                 $vaultToken = null;
             }
             if ($vaultToken) {
-                $this->currentProfilePublicHash = $vaultToken->getPublicHash();
+                $this->currentProfilePublicHash['value'] = $vaultToken->getPublicHash();
+                $this->currentProfilePublicHash['method'] = $this->getProfile()->getPayment()->getEngineCode();
             }
         }
         foreach ($this->tokensConfig[$this->currentVaultMethod] as $ccToken) {
@@ -253,7 +252,7 @@ class Vault extends Base
                 . $expDate
                 . ')';
             $pubHash = $ccToken->getConfig()['publicHash'];
-            if ($this->currentProfilePublicHash == $pubHash) {
+            if ($this->currentProfilePublicHash && $this->currentProfilePublicHash['value'] == $pubHash) {
                 $checked = true;
             } else {
                 $checked = false;
