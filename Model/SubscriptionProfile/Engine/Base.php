@@ -187,7 +187,8 @@ class Base implements EngineInterface
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        return [];
+        $result['engine_code'] = $this->getVaultPaymentCode();
+        return $result;
     }
 
     /**
@@ -326,7 +327,7 @@ class Base implements EngineInterface
         $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $expiration = explode('/', $tokenDetails['expirationDate']);
         $this->getProfile()->getPayment()
-            ->setEngineCode($this->getPaymentMethodCode())
+            ->setEngineCode($this->getVaultPaymentCode())
             ->setPaymentToken($paymentToken->getGatewayToken())
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $tokenDetails['type'],

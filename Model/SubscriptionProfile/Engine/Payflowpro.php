@@ -35,15 +35,15 @@ class Payflowpro extends Base
                 $paymentToken = $token->getGatewayToken();
             }
         }
-        return [
-            'payment_token' => $paymentToken,
-            'encoded_payment_additional_info' => [
-                OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
-                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
-                OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
-                OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear()
-            ]
+        $result = parent::getProfilePaymentInfo($payment);
+        $result['payment_token'] = $paymentToken;
+        $result['encoded_payment_additional_info'] = [
+            OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
+            OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
+            OrderPaymentInterface::CC_EXP_MONTH => $payment->getCcExpMonth(),
+            OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear()
         ];
+        return $result;
     }
 
     /**
@@ -119,7 +119,7 @@ class Payflowpro extends Base
     {
         $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $this->getProfile()->getPayment()
-            ->setEngineCode($this->getPaymentMethodCode())
+            ->setEngineCode($this->getVaultPaymentCode())
             ->setPaymentToken($paymentToken->getGatewayToken())
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $tokenDetails['cc_type'],

@@ -72,6 +72,16 @@ class Vault extends Base
     private $sessionManager;
 
     /**
+     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     */
+    private $paymentTokenManagement;
+
+    /**
+     * @var array
+     */
+    private $currentProfilePublicHash = [];
+
+    /**
      * Vault constructor.
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig
@@ -83,6 +93,7 @@ class Vault extends Base
      * @param CartRepositoryInterface $cartRepository
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Session\SessionManagerInterface $sessionManager
+     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
      * @param string $tokensConfigClass
      */
     public function __construct(
@@ -96,6 +107,7 @@ class Vault extends Base
         CartRepositoryInterface $cartRepository,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Session\SessionManagerInterface $sessionManager,
+        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
         $tokensConfigClass = ''
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
@@ -104,12 +116,25 @@ class Vault extends Base
         } else {
             $this->tokensConfigProvider = null;
         }
+        $this->paymentTokenManagement = $paymentTokenManagement;
         $this->config = $config;
         $this->session = $session;
         $this->ccConfig = $ccConfig;
         $this->vaultConfigProvider = $vaultConfigProvider;
         $this->scopeConfig = $scopeConfig;
         $this->sessionManager = $sessionManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function modifyData(array $data)
+    {
+        if ($this->currentProfilePublicHash) {
+            $data['payment'][$this->currentProfilePublicHash['method']]['additional']['publicHash']
+                = $this->currentProfilePublicHash['value'];
+        }
+        return $data;
     }
 
     /**
@@ -175,6 +200,9 @@ class Vault extends Base
         return $meta;
     }
 
+    /**
+     * @param $configData
+     */
     protected function processTokensConfigData($configData)
     {
         if (isset($configData['payment']['vault']) && is_array($configData['payment']['vault'])) {
@@ -194,7 +222,22 @@ class Vault extends Base
     protected function getAdditionalFields()
     {
         $cards = [];
-        $checked = true;
+        $paymentToken = $this->getProfile()->getPayment()->getPaymentToken();
+        if ($paymentToken) {
+            try {
+                $vaultToken = $this->paymentTokenManagement->getByGatewayToken(
+                    $paymentToken,
+                    $this->getPaymentMethodCodeByVaultCode($this->currentVaultMethod),
+                    $this->getProfile()->getCustomerId()
+                );
+            } catch (\Exception $e) {
+                $vaultToken = null;
+            }
+            if ($vaultToken) {
+                $this->currentProfilePublicHash['value'] = $vaultToken->getPublicHash();
+                $this->currentProfilePublicHash['method'] = $this->getProfile()->getPayment()->getEngineCode();
+            }
+        }
         foreach ($this->tokensConfig[$this->currentVaultMethod] as $ccToken) {
             $ccType = isset($ccToken->getConfig()['details']['type'])
                 ? $ccToken->getConfig()['details']['type']
@@ -206,8 +249,8 @@ class Vault extends Base
             $expDate = isset($ccToken->getConfig()['details']['expirationDate'])
                 ? $ccToken->getConfig()['details']['expirationDate']
                 : $ccToken->getConfig()['details']['cc_exp_month']
-                    . '/'
-                    . $ccToken->getConfig()['details']['cc_exp_year'];
+                . '/'
+                . $ccToken->getConfig()['details']['cc_exp_year'];
             $ccTitle = $ccTypeLabel
                 . ' ending '
                 . $maskedCC
@@ -215,6 +258,11 @@ class Vault extends Base
                 . $expDate
                 . ')';
             $pubHash = $ccToken->getConfig()['publicHash'];
+            if ($this->currentProfilePublicHash && $this->currentProfilePublicHash['value'] == $pubHash) {
+                $checked = true;
+            } else {
+                $checked = false;
+            }
             $cards[$pubHash] = [
                 'arguments' => [
                     'data' => [
@@ -237,7 +285,6 @@ class Vault extends Base
                     ],
                 ]
             ];
-            $checked = false;
         }
         return $cards;
     }
@@ -277,6 +324,15 @@ class Vault extends Base
      */
     protected function getPaymentTitle()
     {
-        return $this->scopeConfig->getValue('payment/' .  $this->getPaymentCode() . '/title');
+        return $this->scopeConfig->getValue('payment/' . $this->getPaymentCode() . '/title');
+    }
+
+    /**
+     * @param $vaultCode
+     * @return mixed
+     */
+    private function getPaymentMethodCodeByVaultCode($vaultCode)
+    {
+        return str_replace(['_cc_vault', '_vault'], '', $vaultCode);
     }
 }
